@@ -73,7 +73,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     private final TechnicalLoggerService logger;
 
-    public TimerEventHandlerStrategy(final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
+    public TimerEventHandlerStrategy(final ExpressionResolverService expressionResolverService,
+            final SchedulerService schedulerService,
             final EventInstanceService eventInstanceService, final TechnicalLoggerService logger) {
         this.schedulerService = schedulerService;
         this.expressionResolverService = expressionResolverService;
@@ -82,9 +83,11 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SCatchEventInstance eventInstance,
+    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+            final SCatchEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, eventInstance);
+        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition,
+                eventInstance);
         final SJobDescriptor jobDescriptor = getJobDescriptor(jobName);
         final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, eventInstance);
         STimerEventTriggerDefinition timerEventTriggerDefinition = (STimerEventTriggerDefinition) sEventTriggerDefinition;
@@ -92,8 +95,9 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
                 eventInstance != null ? eventInstance.getParentProcessInstanceId() : null);
         Trigger trigger = scheduleJob(timerEventTriggerDefinition, jobDescriptor, jobParameters, timerCondition);
         if (timerEventTriggerDefinition.getTimerType() != STimerType.CYCLE && eventInstance != null) {
-            final STimerEventTriggerInstance sEventTriggerInstance
-                    = new STimerEventTriggerInstance(eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(), trigger.getName());
+            final STimerEventTriggerInstance sEventTriggerInstance = new STimerEventTriggerInstance(
+                    eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(),
+                    trigger.getName());
             eventInstanceService.createTimerEventTriggerInstance(sEventTriggerInstance);
         }
     }
@@ -113,7 +117,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
                 break;
             case CYCLE:
                 startDate = new Date();
-                trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), startDate, (String) timerCondition,
+                trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(),
+                        startDate, (String) timerCondition,
                         MisfireRestartPolicy.ALL);
                 break;
             default:
@@ -122,8 +127,10 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         return trigger;
     }
 
-    private Object evaluateTimerCondition(STimerEventTriggerDefinition timerTrigger, long processDefinitionId, Long processInstanceId)
-            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+    private Object evaluateTimerCondition(STimerEventTriggerDefinition timerTrigger, long processDefinitionId,
+            Long processInstanceId)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException, SInvalidExpressionException {
         final SExpressionContext expressionContext = getEvaluationContext(processDefinitionId, processInstanceId);
         final SExpression timerExpression = timerTrigger.getTimerExpression();
         final Object result = expressionResolverService.evaluate(timerExpression, expressionContext);
@@ -146,7 +153,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
+    public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+            final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) {
     }
 
@@ -160,19 +168,25 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance)
+    public void handleEventSubProcess(final SProcessDefinition processDefinition,
+            final SEventDefinition eventDefinition,
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId,
+            final SProcessInstance parentProcessInstance)
             throws SBonitaException {
-        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, parentProcessInstance.getId(), subProcessId);
+        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition,
+                parentProcessInstance.getId(), subProcessId);
         final SJobDescriptor jobDescriptor = getJobDescriptor(jobName);
-        final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, null, subProcessId, parentProcessInstance);
+        final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, null,
+                subProcessId, parentProcessInstance);
 
         STimerEventTriggerDefinition timerEventTriggerDefinition = (STimerEventTriggerDefinition) sEventTriggerDefinition;
-        final Object timerCondition = evaluateTimerCondition(timerEventTriggerDefinition, processDefinition.getId(), parentProcessInstance.getId());
+        final Object timerCondition = evaluateTimerCondition(timerEventTriggerDefinition, processDefinition.getId(),
+                parentProcessInstance.getId());
         scheduleJob(timerEventTriggerDefinition, jobDescriptor, jobParameters, timerCondition);
     }
 
-    private Trigger scheduleJob(final STimerEventTriggerDefinition sEventTriggerDefinition, final SJobDescriptor jobDescriptor,
+    private Trigger scheduleJob(final STimerEventTriggerDefinition sEventTriggerDefinition,
+            final SJobDescriptor jobDescriptor,
             final List<SJobParameter> jobParameters, Object timerCondition)
             throws SBonitaException {
         final Trigger trigger = getTrigger(sEventTriggerDefinition, timerCondition);
@@ -180,7 +194,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         return trigger;
     }
 
-    private List<SJobParameter> getJobParameters(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+    private List<SJobParameter> getJobParameters(final SProcessDefinition processDefinition,
+            final SEventDefinition eventDefinition,
             final SCatchEventInstance eventInstance) {
         final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
         jobParameters.add(SJobParameter.builder()
@@ -211,8 +226,10 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         return jobParameters;
     }
 
-    private List<SJobParameter> getJobParameters(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SCatchEventInstance eventInstance, final long subProcessId, final SProcessInstance parentProcessInstance) {
+    private List<SJobParameter> getJobParameters(final SProcessDefinition processDefinition,
+            final SEventDefinition eventDefinition,
+            final SCatchEventInstance eventInstance, final long subProcessId,
+            final SProcessInstance parentProcessInstance) {
         final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
         jobParameters.addAll(getJobParameters(processDefinition, eventDefinition, eventInstance));
         jobParameters.add(SJobParameter.builder()
@@ -236,9 +253,11 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     @Override
     public void unregisterCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance)
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId,
+            final SProcessInstance parentProcessInstance)
             throws SBonitaException {
-        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, parentProcessInstance.getId(), subProcessId);
+        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition,
+                parentProcessInstance.getId(), subProcessId);
         final boolean delete = schedulerService.delete(jobName);
         if (!delete) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -261,8 +280,10 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
-            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition,
+            final SEndEventDefinition sEventDefinition,
+            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition,
+            final SFlowNodeInstance sFlowNodeInstance) {
         // nothing to do
         return false;
     }

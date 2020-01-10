@@ -36,7 +36,8 @@ import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingU
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Specific Command to ckeck if the user given can see a overview form of a ProcesInstance with the processInstanceId given.
+ * Specific Command to ckeck if the user given can see a overview form of a ProcesInstance with the processInstanceId
+ * given.
  *
  * @author Zhao Na
  * @author Celine Souchet
@@ -60,12 +61,14 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
 
         final Long userId = (Long) parameters.get(USER_ID_KEY);
         if (userId == null || userId == 0) {
-            throw new SCommandParameterizationException("Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to Long.");
+            throw new SCommandParameterizationException(
+                    "Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to Long.");
         }
 
         final long processInstanceId = (Long) parameters.get(PROCESSINSTANCE_ID_KEY);
         if (processInstanceId == 0) {
-            throw new SCommandParameterizationException("Mandatory parameter " + PROCESSINSTANCE_ID_KEY + " is missing or not convertible to Long.");
+            throw new SCommandParameterizationException(
+                    "Mandatory parameter " + PROCESSINSTANCE_ID_KEY + " is missing or not convertible to Long.");
         }
 
         long processDefinitionId = 0;
@@ -79,7 +82,8 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 processDefinitionId = sProcessInstance.getProcessDefinitionId();
             }
         } catch (final SBonitaException e) {
-            final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
+            final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(
+                    processInstanceService,
                     tenantAccessor.getProcessDefinitionService(), searchEntitiesDescriptor, processInstanceId, 0, 5);
             try {
                 getArchivedProcessInstanceList.execute();
@@ -87,7 +91,8 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 throw e1;
             } catch (final SBonitaException e1) {
                 e.setProcessInstanceIdOnContext(processInstanceId);
-                throw new SCommandExecutionException("No process instance and archived process instance during executing command isAllowedToSeeOverviewForm.",
+                throw new SCommandExecutionException(
+                        "No process instance and archived process instance during executing command isAllowedToSeeOverviewForm.",
                         e);
             }
             final List<ArchivedProcessInstance> archivedPInstances = getArchivedProcessInstanceList.getResult();
@@ -102,15 +107,18 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 isAllowed = actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId);
             } catch (final SBonitaException e) {
                 e.setProcessDefinitionIdOnContext(processDefinitionId);
-                throw new SCommandExecutionException("No actorInitiator of user who can start the processDefinition.", e);
+                throw new SCommandExecutionException("No actorInitiator of user who can start the processDefinition.",
+                        e);
             }
         }
 
         if (!isAllowed) {
             final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
             searchOptions.addFilter("id", processInstanceId);
-            final SearchOpenProcessInstancesInvolvingUser searchOpenProcessInstances = new SearchOpenProcessInstancesInvolvingUser(processInstanceService,
-                    searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), userId, searchOptions, processDefinitionService);
+            final SearchOpenProcessInstancesInvolvingUser searchOpenProcessInstances = new SearchOpenProcessInstancesInvolvingUser(
+                    processInstanceService,
+                    searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), userId, searchOptions,
+                    processDefinitionService);
             SearchResult<ProcessInstance> processInstanceRes = null;
             try {
                 searchOpenProcessInstances.execute();
@@ -124,7 +132,8 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
             if (processInstanceRes.getCount() > 0) {// ==1?
                 isAllowed = true;
             } else {
-                final SearchArchivedProcessInstancesInvolvingUser archivedSearcher = new SearchArchivedProcessInstancesInvolvingUser(userId,
+                final SearchArchivedProcessInstancesInvolvingUser archivedSearcher = new SearchArchivedProcessInstancesInvolvingUser(
+                        userId,
                         processInstanceService, tenantAccessor.getProcessDefinitionService(),
                         searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
                 try {

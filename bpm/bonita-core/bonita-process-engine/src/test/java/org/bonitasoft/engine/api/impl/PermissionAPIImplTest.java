@@ -66,7 +66,8 @@ public class PermissionAPIImplTest {
     @Test
     public void should_executeSecurityScript_throw_not_found_exception_when_file_does_not_exists() throws Exception {
         //given
-        doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext, false);
+        doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext,
+                false);
 
         expectedException.expect(NotFoundException.class);
         expectedException.expectMessage(containsString("the class myScript is not found"));
@@ -77,7 +78,8 @@ public class PermissionAPIImplTest {
     @Test
     public void should_executeSecurityScript_throw_execution_exception() throws Exception {
         //given
-        doThrow(SExecutionException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext, false);
+        doThrow(SExecutionException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext,
+                false);
 
         expectedException.expect(ExecutionException.class);
         //when

@@ -50,7 +50,8 @@ public class ResourcesLoader {
         return classNames;
     }
 
-    private static void addJavaFileToDirectory(URL javaFile, String originalPackage, File destDirectory) throws IOException {
+    private static void addJavaFileToDirectory(URL javaFile, String originalPackage, File destDirectory)
+            throws IOException {
         File packageDirectory = createPackageDirectory(javaFile, originalPackage, destDirectory);
         File destinationFile = new File(packageDirectory, getName(javaFile.toString()));
         FileUtils.copyURLToFile(javaFile, destinationFile);

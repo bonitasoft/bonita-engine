@@ -49,17 +49,20 @@ public class BusinessDataReferenceExpressionExecutorStrategy extends CommonBusin
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final String businessDataName = expression.getContent();
         final Long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
         final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
         try {
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataRetriever.getRefBusinessDataInstance(new BusinessDataContext(
-                    businessDataName, new Container(containerId, containerType)));
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataRetriever
+                    .getRefBusinessDataInstance(new BusinessDataContext(
+                            businessDataName, new Container(containerId, containerType)));
             return ModelConvertor.toBusinessDataReference(refBusinessDataInstance);
         } catch (final SBonitaReadException e) {
-            throw new SExpressionEvaluationException(e, "Unable to retrieve business data instance with name " + businessDataName);
+            throw new SExpressionEvaluationException(e,
+                    "Unable to retrieve business data instance with name " + businessDataName);
         } catch (final SBonitaException e) {
             setProcessInstanceId(containerId, containerType, e);
             throw new SExpressionEvaluationException(e, expression.getName());
@@ -67,7 +70,8 @@ public class BusinessDataReferenceExpressionExecutorStrategy extends CommonBusin
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> bizData = new ArrayList<>(expressions.size());
         for (final SExpression expression : expressions) {

@@ -33,8 +33,6 @@ public class SUserMembershipLogBuilderImpl extends CRUDELogBuilder implements SU
         return this;
     }
 
-    
-
     @Override
     protected String getActionTypePrefix() {
         return PREFIX;
@@ -42,7 +40,8 @@ public class SUserMembershipLogBuilderImpl extends CRUDELogBuilder implements SU
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SUserMembershipLogBuilderFactoryImpl.USER_MEMBERSHIP_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SUserMembershipLogBuilderFactoryImpl.USER_MEMBERSHIP_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "UserMembership Id");
         }
 

@@ -49,7 +49,7 @@ public interface ActorMember extends BonitaObject {
 
     /**
      * Get the identifier of the role.
-     * 
+     *
      * @return The identifier of the role.
      */
     long getRoleId();

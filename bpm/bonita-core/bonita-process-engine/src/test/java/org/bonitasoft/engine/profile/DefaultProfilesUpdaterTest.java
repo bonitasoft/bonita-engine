@@ -63,7 +63,8 @@ public class DefaultProfilesUpdaterTest {
         doReturn("xml content").when(defaultProfilesUpdater).getDefaultProfilesXml();
         doReturn(defaultProfiles).when(defaultProfilesUpdater).getProfilesFromXML(anyString());
 
-        doReturn(null).when(profilesImporter).importProfiles(any(ProfilesNode.class), any(ImportPolicy.class), anyLong());
+        doReturn(null).when(profilesImporter).importProfiles(any(ProfilesNode.class), any(ImportPolicy.class),
+                anyLong());
     }
 
     @Test
@@ -80,7 +81,8 @@ public class DefaultProfilesUpdaterTest {
     public void execute_should_update_when_shouldUpdateProfiles_returns_true() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class), anyString());
+        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class),
+                anyString());
         // When
         boolean hasUpdated = defaultProfilesUpdater.execute();
         // Then
@@ -91,7 +93,8 @@ public class DefaultProfilesUpdaterTest {
     public void execute_call_doUpdateProfiles() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class), anyString());
+        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class),
+                anyString());
         // When
         defaultProfilesUpdater.execute();
         // Then
@@ -110,10 +113,12 @@ public class DefaultProfilesUpdaterTest {
     }
 
     @Test
-    public void doUpdateProfiles_should_not_write_MD5_if_import_fails() throws IOException, ExecutionException, NoSuchAlgorithmException {
+    public void doUpdateProfiles_should_not_write_MD5_if_import_fails()
+            throws IOException, ExecutionException, NoSuchAlgorithmException {
         // Given
         IOUtil.writeFile(md5File, "oldHash");
-        doThrow(new ExecutionException("")).when(profilesImporter).importProfiles(any(ProfilesNode.class), any(ImportPolicy.class), anyLong());
+        doThrow(new ExecutionException("")).when(profilesImporter).importProfiles(any(ProfilesNode.class),
+                any(ImportPolicy.class), anyLong());
         // When
         defaultProfilesUpdater.doUpdateProfiles(defaultProfiles, md5File, "content of profiles");
         // Then

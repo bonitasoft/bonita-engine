@@ -18,7 +18,7 @@ import org.bonitasoft.engine.search.Sort;
 
 /**
  * Criterion to sort categories
- * 
+ *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  * @author Celine Souchet

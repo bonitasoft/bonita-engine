@@ -15,11 +15,9 @@ package org.bonitasoft.engine.identity.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.identity.model.SUser;
 import org.junit.Test;
 
 public class SUserTest {
-
 
     @Test
     public void toString_should_not_display_password() throws Exception {

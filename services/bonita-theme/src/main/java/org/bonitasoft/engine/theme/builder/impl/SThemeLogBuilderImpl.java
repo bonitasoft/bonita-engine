@@ -38,7 +38,8 @@ public class SThemeLogBuilderImpl extends CRUDELogBuilder implements SPersistenc
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SThemeLogBuilderFactoryImpl.THEME_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SThemeLogBuilderFactoryImpl.THEME_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Theme id");
         }
     }

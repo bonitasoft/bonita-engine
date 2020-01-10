@@ -19,14 +19,13 @@ import org.bonitasoft.engine.commons.TenantLifecycleService;
 
 /**
  * Bean that returns configuration
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
 public class TenantConfiguration {
 
     private List<TenantLifecycleService> lifecycleServices;
-
 
     public List<TenantLifecycleService> getLifecycleServices() {
         return lifecycleServices;

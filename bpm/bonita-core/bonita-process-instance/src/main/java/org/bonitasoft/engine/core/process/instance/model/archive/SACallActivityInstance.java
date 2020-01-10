@@ -32,7 +32,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("call")
 public class SACallActivityInstance extends SAActivityInstance {
-    
+
     public SACallActivityInstance(final SCallActivityInstance activityInstance) {
         super(activityInstance);
     }

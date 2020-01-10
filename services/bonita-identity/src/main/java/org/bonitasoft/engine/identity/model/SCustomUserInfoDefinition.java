@@ -40,6 +40,7 @@ import org.hibernate.annotations.Filter;
 @Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 public class SCustomUserInfoDefinition implements PersistentObject {
+
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";

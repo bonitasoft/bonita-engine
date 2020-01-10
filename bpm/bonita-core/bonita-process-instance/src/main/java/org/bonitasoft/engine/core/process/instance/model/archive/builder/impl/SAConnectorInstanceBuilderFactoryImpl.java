@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConne
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SAConnectorInstanceBuilderFactoryImpl extends SANamedElementBuilderFactoryImpl implements SAConnectorInstanceBuilderFactory {
+public class SAConnectorInstanceBuilderFactoryImpl extends SANamedElementBuilderFactoryImpl
+        implements SAConnectorInstanceBuilderFactory {
 
     private static final String CONTAINER_ID_KEY = "containerId";
 

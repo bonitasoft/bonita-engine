@@ -37,9 +37,9 @@ public class SearchProfileDescriptor extends SearchEntityDescriptor {
     public SearchProfileDescriptor() {
         searchEntityKeys.put(ProfileSearchDescriptor.ID, new FieldDescriptor(SProfile.class, SProfile.ID));
         searchEntityKeys.put(ProfileSearchDescriptor.NAME, new FieldDescriptor(SProfile.class, SProfile.NAME));
-        searchEntityKeys.put(ProfileSearchDescriptor.PROFILE_ENTRY_NAME, 
+        searchEntityKeys.put(ProfileSearchDescriptor.PROFILE_ENTRY_NAME,
                 new FieldDescriptor(SProfileEntry.class, SProfileEntry.NAME));
-        
+
         final Set<String> fields = new HashSet<>();
         fields.add(SProfile.NAME);
         profileAllFields.put(SProfile.class, fields);

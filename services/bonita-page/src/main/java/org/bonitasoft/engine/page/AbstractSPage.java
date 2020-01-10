@@ -17,13 +17,12 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.MappedSuperclass;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 @Data
 @SuperBuilder
@@ -67,13 +66,13 @@ public class AbstractSPage implements PersistentObject {
     }
 
     public AbstractSPage(final String name, final long installationDate, final long installedBy, final boolean provided,
-                         final String contentName) {
-        this.name=name;
-        this.installationDate=installationDate;
-        this.installedBy=installedBy;
-        this.provided=provided;
-        this.contentType=SContentType.PAGE;
-        this.contentName=contentName;
+            final String contentName) {
+        this.name = name;
+        this.installationDate = installationDate;
+        this.installedBy = installedBy;
+        this.provided = provided;
+        this.contentType = SContentType.PAGE;
+        this.contentName = contentName;
     }
 
 }

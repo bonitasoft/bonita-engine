@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.service.TenantServiceAccessor;

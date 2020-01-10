@@ -38,7 +38,8 @@ public class SSendTaskDefinitionImpl extends SActivityDefinitionImpl implements 
         trigger = new SThrowMessageEventTriggerDefinitionImpl(activityDefinition.getMessageTrigger());
     }
 
-    public SSendTaskDefinitionImpl(final long id, final String name, final SThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition) {
+    public SSendTaskDefinitionImpl(final long id, final String name,
+            final SThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition) {
         super(id, name);
         trigger = throwMessageEventTriggerDefinition;
     }

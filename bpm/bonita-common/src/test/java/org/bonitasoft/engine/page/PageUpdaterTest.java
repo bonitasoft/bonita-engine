@@ -35,7 +35,8 @@ public class PageUpdaterTest {
     @Test
     public void should_create_page_with_default_fields() {
         // given
-        final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
+        final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME)
+                .setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
                 .setContentType(ContentType.FORM).setProcessDefinitionId(PROCESS_DEFINITION_ID);
 
         // when
@@ -48,8 +49,7 @@ public class PageUpdaterTest {
                 entry(PageUpdater.PageUpdateField.CONTENT_TYPE, ContentType.FORM),
                 entry(PageUpdater.PageUpdateField.CONTENT_NAME, ZIP_FILE_NAME),
                 entry(PageUpdater.PageUpdateField.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID),
-                entry(PageUpdater.PageUpdateField.NAME, NAME)
-                );
+                entry(PageUpdater.PageUpdateField.NAME, NAME));
     }
 
 }

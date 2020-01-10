@@ -23,7 +23,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * Adding context information about Flow Node & Process definition and instance to exception for better logging
- * 
+ *
  * @author Aurelien Pupier
  * @author Celine Souchet
  */
@@ -35,17 +35,19 @@ public class FlowNodeDefinitionAndInstanceContextWork extends TxInHandleFailureW
 
     /**
      * @param wrappedWork
-     *            The work to wrap
+     *        The work to wrap
      * @param flowNodeInstanceId
-     *            The identifier of the flow node instance
+     *        The identifier of the flow node instance
      */
-    public FlowNodeDefinitionAndInstanceContextWork(final WrappingBonitaWork wrappedWork, final long flowNodeInstanceId) {
+    public FlowNodeDefinitionAndInstanceContextWork(final WrappingBonitaWork wrappedWork,
+            final long flowNodeInstanceId) {
         super(wrappedWork);
         this.flowNodeInstanceId = flowNodeInstanceId;
     }
 
     @Override
-    protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException {
+    protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context)
+            throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);

@@ -18,7 +18,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowS
 /**
  * @author Matthieu Chaffotte
  */
-public class SThrowSignalEventTriggerDefinitionImpl extends SSignalEventTriggerDefinitionImpl implements SThrowSignalEventTriggerDefinition {
+public class SThrowSignalEventTriggerDefinitionImpl extends SSignalEventTriggerDefinitionImpl
+        implements SThrowSignalEventTriggerDefinition {
 
     private static final long serialVersionUID = -6873752170541970655L;
 

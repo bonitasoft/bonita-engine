@@ -33,15 +33,18 @@ public class UpdateDataRefAction implements EntityAction {
     private final RefBusinessDataService refBusinessDataService;
     private final RefBusinessDataRetriever refBusinessDataRetriever;
 
-    public UpdateDataRefAction(final RefBusinessDataService refBusinessDataService, final RefBusinessDataRetriever refBusinessDataRetriever) {
+    public UpdateDataRefAction(final RefBusinessDataService refBusinessDataService,
+            final RefBusinessDataRetriever refBusinessDataRetriever) {
         this.refBusinessDataService = refBusinessDataService;
         this.refBusinessDataRetriever = refBusinessDataRetriever;
     }
 
     @Override
-    public Entity execute(final Entity entity, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
+    public Entity execute(final Entity entity, final BusinessDataContext businessDataContext)
+            throws SEntityActionExecutionException {
         try {
-            final SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
+            final SRefBusinessDataInstance reference = refBusinessDataRetriever
+                    .getRefBusinessDataInstance(businessDataContext);
             checkThatIsSimpleRef(reference);
             final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
             if (!entity.getPersistenceId().equals(simpleRef.getDataId())) {
@@ -61,9 +64,11 @@ public class UpdateDataRefAction implements EntityAction {
     }
 
     @Override
-    public List<Entity> execute(final List<Entity> entities, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
+    public List<Entity> execute(final List<Entity> entities, final BusinessDataContext businessDataContext)
+            throws SEntityActionExecutionException {
         try {
-            final SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
+            final SRefBusinessDataInstance reference = refBusinessDataRetriever
+                    .getRefBusinessDataInstance(businessDataContext);
             checkThatIsMultiRef(reference);
             final SProcessMultiRefBusinessDataInstance multiRef = (SProcessMultiRefBusinessDataInstance) reference;
             final ArrayList<Long> dataIds = buildDataIdsList(entities);
@@ -96,14 +101,16 @@ public class UpdateDataRefAction implements EntityAction {
 
     private void checkNotNull(final Entity entity) throws SEntityActionExecutionException {
         if (entity == null) {
-            throw new SEntityActionExecutionException("The list of entities contains some null elements. Unable to execute action against null entity.");
+            throw new SEntityActionExecutionException(
+                    "The list of entities contains some null elements. Unable to execute action against null entity.");
         }
     }
 
     @Override
     public void handleNull(final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
         try {
-            final SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
+            final SRefBusinessDataInstance reference = refBusinessDataRetriever
+                    .getRefBusinessDataInstance(businessDataContext);
             if (reference instanceof SSimpleRefBusinessDataInstance) {
                 final SSimpleRefBusinessDataInstance simpleReference = (SSimpleRefBusinessDataInstance) reference;
                 refBusinessDataService.updateRefBusinessDataInstance(simpleReference, null);

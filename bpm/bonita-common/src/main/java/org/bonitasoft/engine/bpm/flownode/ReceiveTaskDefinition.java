@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-
 import org.bonitasoft.engine.bpm.process.Visitable;
 
 /**

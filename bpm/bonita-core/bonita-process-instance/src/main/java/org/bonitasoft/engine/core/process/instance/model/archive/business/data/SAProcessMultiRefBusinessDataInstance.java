@@ -42,7 +42,9 @@ public class SAProcessMultiRefBusinessDataInstance extends SARefBusinessDataInst
     @Column(name = "orig_proc_inst_id")
     private long processInstanceId;
     @ElementCollection
-    @CollectionTable(name = "arch_multi_biz_data", joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id"), @JoinColumn(name = "tenantid", referencedColumnName = "tenantid")})
+    @CollectionTable(name = "arch_multi_biz_data", joinColumns = {
+            @JoinColumn(name = "id", referencedColumnName = "id"),
+            @JoinColumn(name = "tenantid", referencedColumnName = "tenantid") })
     @OrderColumn(name = "idx")
     @Column(name = "data_id")
     private List<Long> dataIds;

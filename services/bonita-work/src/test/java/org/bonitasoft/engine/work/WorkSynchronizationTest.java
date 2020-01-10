@@ -44,7 +44,6 @@ public class WorkSynchronizationTest {
     private WorkDescriptor workDescriptor1 = WorkDescriptor.create("myWork1");
     private WorkDescriptor workDescriptor2 = WorkDescriptor.create("myWork2");
 
-
     @Test
     public void should_submit_work_on_commit() throws Exception {
         workSynchronization.addWork(workDescriptor1);

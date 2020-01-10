@@ -67,7 +67,8 @@ public class TomcatBundleConfiguratorTest {
         configurator = new TomcatBundleConfigurator(bundleFolder);
         FileUtils.copyDirectory(Paths.get("src/test/resources/tomcat_conf").toFile(), temporaryFolderRoot);
         System.setProperty(BONITA_SETUP_FOLDER, bundleFolder.resolve("setup").toString());
-        databaseAbsolutePath = BundleConfigurator.convertWindowsBackslashes(bundleFolder.resolve("h2_database").normalize().toString());
+        databaseAbsolutePath = BundleConfigurator
+                .convertWindowsBackslashes(bundleFolder.resolve("h2_database").normalize().toString());
         spy = spy(configurator);
     }
 
@@ -79,12 +80,15 @@ public class TomcatBundleConfiguratorTest {
         // then:
         assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
         assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
-        checkFileContains(tomcatFolder.resolve("bin").resolve("setenv.sh"), "-Dsysprop.bonita.db.vendor=postgres", "-Dsysprop.bonita.bdm.db.vendor=oracle");
-        checkFileContains(tomcatFolder.resolve("bin").resolve("setenv.bat"), "-Dsysprop.bonita.db.vendor=postgres", "-Dsysprop.bonita.bdm.db.vendor=oracle");
+        checkFileContains(tomcatFolder.resolve("bin").resolve("setenv.sh"), "-Dsysprop.bonita.db.vendor=postgres",
+                "-Dsysprop.bonita.bdm.db.vendor=oracle");
+        checkFileContains(tomcatFolder.resolve("bin").resolve("setenv.bat"), "-Dsysprop.bonita.db.vendor=postgres",
+                "-Dsysprop.bonita.bdm.db.vendor=oracle");
     }
 
     private int numberOfBackups(String file) {
-        final String[] backupFiles = bundleFolder.resolve("setup").resolve("tomcat-backups").toFile().list(new RegexFileFilter(file + "\\.[0-9-_hms]*"));
+        final String[] backupFiles = bundleFolder.resolve("setup").resolve("tomcat-backups").toFile()
+                .list(new RegexFileFilter(file + "\\.[0-9-_hms]*"));
         return backupFiles == null ? 0 : backupFiles.length;
     }
 
@@ -108,12 +112,15 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost")
+                .resolve("bonita.xml");
         checkFileContains(bonita_xml,
-                "validationQuery=\"SELECT 1\"", "username=\"bonita\"", "password=\"bpm\"", "driverClassName=\"org.postgresql.Driver\"",
+                "validationQuery=\"SELECT 1\"", "username=\"bonita\"", "password=\"bpm\"",
+                "driverClassName=\"org.postgresql.Driver\"",
                 "url=\"jdbc:postgresql://localhost:5432/bonita\"");
         checkFileContains(bonita_xml,
-                "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"", "driverClassName=\"oracle.jdbc.OracleDriver\"",
+                "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"",
+                "driverClassName=\"oracle.jdbc.OracleDriver\"",
                 "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash\"");
         checkFileContains(bonita_xml, "type=\"org.postgresql.xa.PGXADataSource\"",
                 "class=\"org.postgresql.xa.PGXADataSource\"", "factory=\"org.postgresql.xa.PGXADataSourceFactory\"",
@@ -134,12 +141,17 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost")
+                .resolve("bonita.xml");
 
-        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"", "driverClassName=\"org.h2.Driver\"",
-                "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
-        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"",
-                "driverClassName=\"oracle.jdbc.OracleDriver\"", "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash\"");
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"",
+                "driverClassName=\"org.h2.Driver\"",
+                "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"",
+                "password=\"bizPwd\"",
+                "driverClassName=\"oracle.jdbc.OracleDriver\"",
+                "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash\"");
     }
 
     @Test
@@ -154,10 +166,13 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost")
+                .resolve("bonita.xml");
 
-        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"sa\"", "password=\"\"", "driverClassName=\"org.h2.Driver\"",
-                "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"sa\"", "password=\"\"",
+                "driverClassName=\"org.h2.Driver\"",
+                "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
     }
 
     @Test
@@ -177,11 +192,13 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost")
+                .resolve("bonita.xml");
 
-        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"_bonita_with$dollar\\andBackSlash\""
-                , "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"org.h2.Driver\"",
-                "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/bonita_bdm_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"_bonita_with$dollar\\andBackSlash\"",
+                "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"org.h2.Driver\"",
+                "url=\"jdbc:h2:file:" + databaseAbsolutePath
+                        + "/bonita_bdm_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
     }
 
     @Test
@@ -201,11 +218,13 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost")
+                .resolve("bonita.xml");
 
-        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"_bonita_with$dollar\\andBackSlash\""
-                , "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"oracle.jdbc.OracleDriver\""
-                , "url=\"jdbc:oracle:thin:@//localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good\"");
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"",
+                "username=\"_bonita_with$dollar\\andBackSlash\"", "password=\"bpm_With$dollar\\andBackSlash\"",
+                "driverClassName=\"oracle.jdbc.OracleDriver\"",
+                "url=\"jdbc:oracle:thin:@//localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good\"");
     }
 
     @Test
@@ -259,7 +278,8 @@ public class TomcatBundleConfiguratorTest {
     @Test
     public void exception_in_configure_should_restore_previous_configuration() throws Exception {
         // given:
-        doThrow(PlatformException.class).when(spy).copyDatabaseDriversIfNecessary(any(Path.class), any(Path.class), eq("oracle"));
+        doThrow(PlatformException.class).when(spy).copyDatabaseDriversIfNecessary(any(Path.class), any(Path.class),
+                eq("oracle"));
 
         // when:
         try {

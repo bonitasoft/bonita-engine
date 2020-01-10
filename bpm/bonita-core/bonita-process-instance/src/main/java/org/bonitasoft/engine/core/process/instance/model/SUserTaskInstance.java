@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 
 /**
  * @author Baptiste Mesta
@@ -31,9 +31,12 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("user")
 public class SUserTaskInstance extends SHumanTaskInstance {
-    public SUserTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                 final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
-        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, priority, logicalGroup1, logicalGroup2);
+
+    public SUserTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, priority, logicalGroup1,
+                logicalGroup2);
     }
 
     @Override

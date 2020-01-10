@@ -13,17 +13,16 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
-import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Romain Bioteau
@@ -122,7 +121,7 @@ public class FieldValidationRuleTest {
 
     /**
      * Fake field used for tests. Extending abstract class Field with no extras attributes
-     * 
+     *
      * @author Colin PUY
      */
     private class FakeField extends Field {

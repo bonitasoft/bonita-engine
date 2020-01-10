@@ -64,7 +64,8 @@ public class SGatewayInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl im
 
     @Override
     public SGatewayInstanceBuilder setParentActivityInstanceId(final long parentActivityInstanceId) {
-        entity.setLogicalGroup(SGatewayInstanceBuilderFactoryImpl.PARENT_ACTIVITY_INSTANCE_INDEX, parentActivityInstanceId);
+        entity.setLogicalGroup(SGatewayInstanceBuilderFactoryImpl.PARENT_ACTIVITY_INSTANCE_INDEX,
+                parentActivityInstanceId);
         return this;
     }
 

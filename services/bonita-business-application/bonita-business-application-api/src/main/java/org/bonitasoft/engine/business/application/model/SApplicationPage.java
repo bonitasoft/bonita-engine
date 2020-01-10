@@ -27,10 +27,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 @Data
 @NoArgsConstructor

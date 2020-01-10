@@ -28,15 +28,16 @@ import org.bonitasoft.engine.core.operation.model.SOperatorType;
 public class OperationExecutorStrategyProvider {
 
     private final Map<String, OperationExecutorStrategy> operationStrategies;
-    
+
     public OperationExecutorStrategyProvider(final List<OperationExecutorStrategy> operationExecutors) {
         operationStrategies = new HashMap<>(operationExecutors.size());
         for (final OperationExecutorStrategy operationExecutorStrategy : operationExecutors) {
             operationStrategies.put(operationExecutorStrategy.getOperationType(), operationExecutorStrategy);
         }
     }
-    
-    public OperationExecutorStrategy getOperationExecutorStrategy(final SOperation operation) throws SOperationExecutionException {
+
+    public OperationExecutorStrategy getOperationExecutorStrategy(final SOperation operation)
+            throws SOperationExecutionException {
         final String operatorTypeName = getStrategyKey(operation);
         final OperationExecutorStrategy operationExecutorStrategy = operationStrategies.get(operatorTypeName);
         if (operationExecutorStrategy == null) {

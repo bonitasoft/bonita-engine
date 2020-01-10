@@ -32,7 +32,7 @@ public class ProcessDeploymentInfoUpdater implements Serializable {
 
     /**
      * Fields that can be updated on a {@link ProcessDeploymentInfo}.
-     * 
+     *
      * @author Emmanuel Duchastenier
      */
     public enum ProcessDeploymentInfoField {
@@ -63,7 +63,7 @@ public class ProcessDeploymentInfoUpdater implements Serializable {
 
     /**
      * Set the new display name of the process definition.
-     * 
+     *
      * @param name
      *        The new display name of the process definition.
      * @since 6.3.5
@@ -74,7 +74,7 @@ public class ProcessDeploymentInfoUpdater implements Serializable {
 
     /**
      * Set the new display description of the process definition.
-     * 
+     *
      * @param description
      *        The new display description of the process definition.
      * @since 6.3.5
@@ -85,7 +85,7 @@ public class ProcessDeploymentInfoUpdater implements Serializable {
 
     /**
      * Set the new icon path of the process definition.
-     * 
+     *
      * @param iconPath
      *        The new icon path of the process definition.
      * @since 6.3.5
@@ -96,7 +96,7 @@ public class ProcessDeploymentInfoUpdater implements Serializable {
 
     /**
      * Get the map of the fields to update with their new value.
-     * 
+     *
      * @return The map of the fields to update with their new value.
      * @since 6.3.5
      */

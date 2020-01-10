@@ -32,7 +32,8 @@ public class PlatformImpl implements Platform {
 
     private final String version;
 
-    public PlatformImpl(final String version, final String previousVersion, final String initialVersion, final String createdBy, final long created) {
+    public PlatformImpl(final String version, final String previousVersion, final String initialVersion,
+            final String createdBy, final long created) {
         this.version = version;
         this.previousVersion = previousVersion;
         this.initialVersion = initialVersion;

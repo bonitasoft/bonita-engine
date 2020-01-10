@@ -52,7 +52,6 @@ public class SRole implements PersistentObject, SHavingIcon {
     public static final String CREATION_DATE = "creationDate";
     public static final String LAST_UPDATE = "lastUpdate";
 
-
     @Id
     private long id;
     @Id

@@ -35,7 +35,8 @@ public class SEndEventDefinitionBuilderImpl implements SEndEventDefinitionBuilde
     }
 
     @Override
-    public SEndEventDefinitionBuilder addErrorEventTriggerDefinition(final SThrowErrorEventTriggerDefinition errorEventTrigger) {
+    public SEndEventDefinitionBuilder addErrorEventTriggerDefinition(
+            final SThrowErrorEventTriggerDefinition errorEventTrigger) {
         entity.addErrorEventTriggerDefinition(errorEventTrigger);
         return this;
     }

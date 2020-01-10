@@ -31,7 +31,7 @@ public class AuthorizationRulesInjector {
 
     /**
      * Called by Spring automatically
-     * 
+     *
      * @param authorizationRules
      */
     public void setAuthorizationRules(List<AuthorizationRule> authorizationRules) {

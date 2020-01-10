@@ -17,7 +17,7 @@ package org.bonitasoft.engine.core.process.instance.api.states;
  * This is code that are returned by state when they are execute
  * DONE is when the state is finished and executed correctly
  * EXECUTING when there is still work to be done on the state (so the state must not change)
- * 
+ *
  * @author Baptiste Mesta
  */
 public enum StateCode {

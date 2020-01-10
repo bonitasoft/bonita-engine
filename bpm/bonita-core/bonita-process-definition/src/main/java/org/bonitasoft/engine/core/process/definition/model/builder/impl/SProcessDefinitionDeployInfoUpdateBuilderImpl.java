@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.definition.model.builder.impl;
 
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -58,7 +57,8 @@ public class SProcessDefinitionDeployInfoUpdateBuilderImpl implements SProcessDe
     }
 
     @Override
-    public SProcessDefinitionDeployInfoUpdateBuilder updateConfigurationState(final ConfigurationState configurationState) {
+    public SProcessDefinitionDeployInfoUpdateBuilder updateConfigurationState(
+            final ConfigurationState configurationState) {
         descriptor.addField(SProcessDefinitionDeployInfo.CONFIGURATION_STATE_KEY, configurationState.name());
         return this;
     }
@@ -70,7 +70,7 @@ public class SProcessDefinitionDeployInfoUpdateBuilderImpl implements SProcessDe
     }
 
     @Override
-    public SProcessDefinitionDeployInfoUpdateBuilder updateDesignContent(String processDefinitionAsXMLString){
+    public SProcessDefinitionDeployInfoUpdateBuilder updateDesignContent(String processDefinitionAsXMLString) {
         descriptor.addField(SProcessDefinitionDeployInfo.DESIGN_CONTENT, processDefinitionAsXMLString);
         return this;
     }

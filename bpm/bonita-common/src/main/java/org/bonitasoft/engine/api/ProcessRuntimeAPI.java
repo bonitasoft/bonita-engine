@@ -77,8 +77,10 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
- * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process, retrieving and executing tasks, accessing to
- * all types of tasks, assigning a user to a task, retrieving archived versions of a task, accessing / updating data / variable values, adding / retrieving
+ * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process,
+ * retrieving and executing tasks, accessing to
+ * all types of tasks, assigning a user to a task, retrieving archived versions of a task, accessing / updating data /
+ * variable values, adding / retrieving
  * process comments ...
  * It generally allows all BPM runtime actions, that is, once process instances are running of finished executing.
  *
@@ -97,7 +99,8 @@ public interface ProcessRuntimeAPI {
      * List all open root process instances.
      *
      * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return A {@link ProcessInstance} object.
      * @throws SearchException
      *         If an exception occurs when getting the list of tasks.
@@ -109,7 +112,8 @@ public interface ProcessRuntimeAPI {
      * List all process instances.
      *
      * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return A {@link ProcessInstance} object.
      * @throws SearchException
      *         If an exception occurs when getting the list of {@link ProcessInstance}.
@@ -118,10 +122,12 @@ public interface ProcessRuntimeAPI {
     SearchResult<ProcessInstance> searchProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * List all process instances with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state.
+     * List all process instances with at least one failed task or the
+     * {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state.
      *
      * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return A {@link ProcessInstance} object.
      * @throws SearchException
      *         If an exception occurs when getting the list of {@link ProcessInstance}.
@@ -130,20 +136,23 @@ public interface ProcessRuntimeAPI {
     SearchResult<ProcessInstance> searchFailedProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * List all process instances with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state that
+     * List all process instances with at least one failed task or the
+     * {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state that
      * are supervised by the given user.
      * If the specified userId does not correspond to a user, an empty SearchResult is returned.
      *
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return The list of failed process instances supervised by the specified user.
      * @throws SearchException
      *         If an exception occurs when getting the list of process instances.
      * @since 7.0
      */
-    SearchResult<ProcessInstance> searchFailedProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<ProcessInstance> searchFailedProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * List all open process instances supervised by a user.
@@ -152,13 +161,15 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return The list of process instances supervised by the specified user.
      * @throws SearchException
      *         If an exception occurs when getting the list of process instances.
      * @since 6.0
      */
-    SearchResult<ProcessInstance> searchOpenProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<ProcessInstance> searchOpenProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Get the number of process data instances by process id.
@@ -212,13 +223,15 @@ public interface ProcessRuntimeAPI {
      * @return The list of archived process instances.
      * @since 6.0
      */
-    List<ArchivedProcessInstance> getArchivedProcessInstances(int startIndex, int maxResults, ProcessInstanceCriterion criterion);
+    List<ArchivedProcessInstance> getArchivedProcessInstances(int startIndex, int maxResults,
+            ProcessInstanceCriterion criterion);
 
     /**
      * Get a paged list of archived activity instances for a process instance.
      *
      * @param sourceProcessInstanceId
-     *        The identifier of the source process instance (used as root container id of the archived activity instances).
+     *        The identifier of the source process instance (used as root container id of the archived activity
+     *        instances).
      * @param startIndex
      *        The index of the first result (starting from 0).
      * @param maxResults
@@ -228,7 +241,8 @@ public interface ProcessRuntimeAPI {
      * @return The list of archived activity instances.
      * @since 6.0
      */
-    List<ArchivedActivityInstance> getArchivedActivityInstances(long sourceProcessInstanceId, int startIndex, int maxResults,
+    List<ArchivedActivityInstance> getArchivedActivityInstances(long sourceProcessInstanceId, int startIndex,
+            int maxResults,
             ActivityInstanceCriterion criterion);
 
     /**
@@ -245,7 +259,8 @@ public interface ProcessRuntimeAPI {
      * @return The list of activity instances.
      * @since 6.0
      */
-    List<ActivityInstance> getOpenActivityInstances(long processInstanceId, int startIndex, int maxResults, ActivityInstanceCriterion criterion);
+    List<ActivityInstance> getOpenActivityInstances(long processInstanceId, int startIndex, int maxResults,
+            ActivityInstanceCriterion criterion);
 
     /**
      * Get the total number of open activity instances by process instance id.
@@ -270,7 +285,8 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of archived process instances.
-     * Root process instances in state COMPLETED are counted. Process instances started by call activities won't be counted.
+     * Root process instances in state COMPLETED are counted. Process instances started by call activities won't be
+     * counted.
      *
      * @return The number of archived process instances.
      * @since 6.0
@@ -291,9 +307,12 @@ public interface ProcessRuntimeAPI {
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
 
     /**
-     * Delete active process instances, and their elements, of process definition given as input parameter respecting the pagination parameters.
-     * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
-     * Instead, to delete all Process instances of a specific process definition, should you should use a loop and delete instances in bulk.
+     * Delete active process instances, and their elements, of process definition given as input parameter respecting
+     * the pagination parameters.
+     * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may
+     * thus result in timeout operation.
+     * Instead, to delete all Process instances of a specific process definition, should you should use a loop and
+     * delete instances in bulk.
      *
      * @param processDefinitionId
      *        Identifier of the processDefinition
@@ -309,9 +328,12 @@ public interface ProcessRuntimeAPI {
     long deleteProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
 
     /**
-     * Delete archived process instances of process definition given as input parameter respecting the pagination parameters.
-     * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
-     * Instead, to delete all archived process instances of a specific process definition, you should use a loop and delete archived instances in bulk.
+     * Delete archived process instances of process definition given as input parameter respecting the pagination
+     * parameters.
+     * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may
+     * thus result in timeout operation.
+     * Instead, to delete all archived process instances of a specific process definition, you should use a loop and
+     * delete archived instances in bulk.
      *
      * @param processDefinitionId
      *        Identifier of the processDefinition
@@ -319,20 +341,25 @@ public interface ProcessRuntimeAPI {
      *        The index
      * @param maxResults
      *        The max number of elements to retrieve per page
-     * @return The number of rows deleted from the archived process instance table related to the cases that were deleted
+     * @return The number of rows deleted from the archived process instance table related to the cases that were
+     *         deleted
      * @throws DeletionException
      *         If there is some e.g. connection issue to the database
      * @since 6.1
      */
-    long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
+    long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults)
+            throws DeletionException;
 
     /**
      * Delete all archived process instance (different states) of the source identifier list.
-     * This work only with process instances that are root (not called by an other process). Using this method with ids of called processes (using call activity) will not delete them.
+     * This work only with process instances that are root (not called by an other process). Using this method with ids
+     * of called processes (using call activity) will not delete them.
      *
      * @param sourceProcessInstanceIds
-     *        Identifiers corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}. These ids needs to be ids of root process instances
-     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived in several
+     *        Identifiers corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}. These ids needs to be
+     *        ids of root process instances
+     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process
+     *         instance can be archived in several
      *         states: Cancelled, Aborted, Completed, Failed
      * @throws DeletionException
      *         If there is some e.g. connection issue to the database
@@ -342,11 +369,14 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Delete all archived process instance (different states) corresponding to the source identifier.
-     * This work only with process instances that are root (not called by an other process). Using this method with id of called process (using call activity) will not delete it.
+     * This work only with process instances that are root (not called by an other process). Using this method with id
+     * of called process (using call activity) will not delete it.
      *
      * @param sourceProcessInstanceId
-     *        Identifier corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}. These id needs to be the id of a root process instances
-     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived in several
+     *        Identifier corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}. These id needs to be the
+     *        id of a root process instances
+     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process
+     *         instance can be archived in several
      *         states: Cancelled, Aborted, Completed, Failed
      * @throws DeletionException
      *         If there is some e.g. connection issue to the database
@@ -355,7 +385,8 @@ public interface ProcessRuntimeAPI {
     long deleteArchivedProcessInstancesInAllStates(long sourceProcessInstanceId) throws DeletionException;
 
     /**
-     * Start an instance of the process with the specified process definition, using the current session user. <b>Note</b>: If the process instantiation
+     * Start an instance of the process with the specified process definition, using the current session user.
+     * <b>Note</b>: If the process instantiation
      * contract requires inputs, you must use {@link #startProcessWithInputs(long, Map)} instead.
      *
      * @param processDefinitionId
@@ -369,12 +400,15 @@ public interface ProcessRuntimeAPI {
      *         If a problem occurs when starting the process.
      * @since 6.0
      */
-    ProcessInstance startProcess(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+    ProcessInstance startProcess(long processDefinitionId)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
      * Instantiates a process. <br />
-     * The process variables will be initialized by the <code>initialVariables</code> parameter. <b>Note</b>: If the process instantiation contract requires
-     * inputs, you must use {@link #startProcessWithInputs(long, Map)} instead, transforming <code>initialVariables</code> parameter as follows: in the process,
+     * The process variables will be initialized by the <code>initialVariables</code> parameter. <b>Note</b>: If the
+     * process instantiation contract requires
+     * inputs, you must use {@link #startProcessWithInputs(long, Map)} instead, transforming
+     * <code>initialVariables</code> parameter as follows: in the process,
      * define process variables initial values (expressions) with contract inputs.
      *
      * @param processDefinitionId
@@ -390,13 +424,17 @@ public interface ProcessRuntimeAPI {
      *         If the process is disable
      * @since 6.1
      */
-    ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
+    ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables)
+            throws ProcessDefinitionNotFoundException,
             ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations. <b>Note</b>:
-     * If the process instantiation contract requires inputs, you must use {@link #startProcessWithInputs(long, Map)} instead. The best practice is to define
-     * contract inputs in the process definition, and use these contract inputs in operations, instead of providing operations at start time.
+     * Start an instance of the process with the specified process definition id, and set the initial values of the data
+     * with the given operations. <b>Note</b>:
+     * If the process instantiation contract requires inputs, you must use {@link #startProcessWithInputs(long, Map)}
+     * instead. The best practice is to define
+     * contract inputs in the process definition, and use these contract inputs in operations, instead of providing
+     * operations at start time.
      *
      * @param processDefinitionId
      *        The identifier of the process definition for which an instance will be started.
@@ -413,11 +451,13 @@ public interface ProcessRuntimeAPI {
      *         If a problem occurs when starting the process.
      * @since 6.0
      */
-    ProcessInstance startProcess(long processDefinitionId, List<Operation> operations, Map<String, Serializable> context)
+    ProcessInstance startProcess(long processDefinitionId, List<Operation> operations,
+            Map<String, Serializable> context)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id on behalf of a given user. <b>Note</b>: If the process instantiation contract
+     * Start an instance of the process with the specified process definition id on behalf of a given user. <b>Note</b>:
+     * If the process instantiation contract
      * requires inputs, you must use {@link #startProcessWithInputs(long, long, Map)} instead.
      *
      * @param userId
@@ -435,12 +475,15 @@ public interface ProcessRuntimeAPI {
      *         If an execution problem occurs when starting the process.
      * @since 6.0
      */
-    ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
+    ProcessInstance startProcess(long userId, long processDefinitionId)
+            throws UserNotFoundException, ProcessDefinitionNotFoundException,
             ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
-     * given operations. <b>Note</b>: If the process instantiation contract requires inputs, you must use {@link #startProcessWithInputs(long, long, Map)}
+     * Start an instance of the process with the specified process definition id on behalf of a given user, and set the
+     * initial values of the data with the
+     * given operations. <b>Note</b>: If the process instantiation contract requires inputs, you must use
+     * {@link #startProcessWithInputs(long, long, Map)}
      * instead. The best practice is to design contract inputs in the process definition, and use these
      * contract inputs in operations, instead of providing operations at start time.
      *
@@ -465,12 +508,16 @@ public interface ProcessRuntimeAPI {
      *         If a problem occurs when starting the process.
      * @since 6.0
      */
-    ProcessInstance startProcess(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context)
-            throws UserNotFoundException, ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+    ProcessInstance startProcess(long userId, long processDefinitionId, List<Operation> operations,
+            Map<String, Serializable> context)
+            throws UserNotFoundException, ProcessDefinitionNotFoundException, ProcessActivationException,
+            ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
-     * given initialVariables. <b>Note</b>: If the process instantiation contract requires inputs, you must use {@link #startProcessWithInputs(long, long, Map)}
+     * Start an instance of the process with the specified process definition id on behalf of a given user, and set the
+     * initial values of the data with the
+     * given initialVariables. <b>Note</b>: If the process instantiation contract requires inputs, you must use
+     * {@link #startProcessWithInputs(long, long, Map)}
      * instead, using contract inputs stored in process variables, instead of using directly initialVariables.
      *
      * @param userId
@@ -490,11 +537,13 @@ public interface ProcessRuntimeAPI {
      *         If a problem occurs when starting the process.
      * @since 6.0
      */
-    ProcessInstance startProcess(final long userId, final long processDefinitionId, final Map<String, Serializable> initialVariables)
+    ProcessInstance startProcess(final long userId, final long processDefinitionId,
+            final Map<String, Serializable> initialVariables)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id, and provides inputs to fulfill Process Contract.
+     * Start an instance of the process with the specified process definition id, and provides inputs to fulfill Process
+     * Contract.
      * See {@link org.bonitasoft.engine.bpm.contract.ContractDefinition} for details on contracts.
      *
      * @param processDefinitionId
@@ -514,11 +563,14 @@ public interface ProcessRuntimeAPI {
      *         If inputs don't fit with task contract
      * @since 7.0.0
      */
-    ProcessInstance startProcessWithInputs(final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException;
+    ProcessInstance startProcessWithInputs(final long processDefinitionId,
+            final Map<String, Serializable> instantiationInputs)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException,
+            ContractViolationException;
 
     /**
-     * Start an instance of the process with the specified process definition id on behalf of a given user, and provides inputs to fulfill Process Contract.
+     * Start an instance of the process with the specified process definition id on behalf of a given user, and provides
+     * inputs to fulfill Process Contract.
      * See {@link org.bonitasoft.engine.bpm.contract.ContractDefinition} for details on contracts.
      *
      * @param userId The identifier of the user in the name of whom the process is started.
@@ -539,8 +591,10 @@ public interface ProcessRuntimeAPI {
      *         If inputs don't fit with process contract
      * @since 7.0.0
      */
-    ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException;
+    ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId,
+            final Map<String, Serializable> instantiationInputs)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException,
+            ContractViolationException;
 
     /**
      * <p>
@@ -571,7 +625,7 @@ public interface ProcessRuntimeAPI {
      * Use this method only if you need to manually control the execution of a flownode.
      * <b>DO NOT USE THIS TO EXECUTE HUMAN TASKS.</b> Use {@link #executeUserTask(long, long, Map)} instead.
      * </p>
-     * 
+     *
      * @param userId
      *        The identifier of the user for which you want to execute the flow node
      * @param flownodeInstanceId
@@ -650,7 +704,8 @@ public interface ProcessRuntimeAPI {
      *         If the archived activity instance cannot be retrieved.
      * @since 6.0
      */
-    ArchivedActivityInstance getArchivedActivityInstance(long sourceActivityInstanceId) throws ActivityInstanceNotFoundException;
+    ArchivedActivityInstance getArchivedActivityInstance(long sourceActivityInstanceId)
+            throws ActivityInstanceNotFoundException;
 
     /**
      * Get the list of human task instances assigned to the specified user.
@@ -670,12 +725,14 @@ public interface ProcessRuntimeAPI {
      *         If a task instance cannot be retrieved.
      * @since 6.0
      */
-    List<HumanTaskInstance> getAssignedHumanTaskInstances(long userId, int startIndex, int maxResults, ActivityInstanceCriterion criterion);
+    List<HumanTaskInstance> getAssignedHumanTaskInstances(long userId, int startIndex, int maxResults,
+            ActivityInstanceCriterion criterion);
 
     /**
      * Get the list of pending human task instances available to the specified user.
      * A human task is pending for a given user if it is not yet assigned and if the
-     * user is a candidate either through an {@link org.bonitasoft.engine.bpm.actor.ActorMember} or through a {@link org.bonitasoft.engine.filter.UserFilter}.
+     * user is a candidate either through an {@link org.bonitasoft.engine.bpm.actor.ActorMember} or through a
+     * {@link org.bonitasoft.engine.filter.UserFilter}.
      *
      * @param userId
      *        The identifier of the user.
@@ -690,7 +747,8 @@ public interface ProcessRuntimeAPI {
      *         Occurs when the session is invalid.
      * @since 6.0
      */
-    List<HumanTaskInstance> getPendingHumanTaskInstances(long userId, int startIndex, int maxResults, ActivityInstanceCriterion pagingCriterion);
+    List<HumanTaskInstance> getPendingHumanTaskInstances(long userId, int startIndex, int maxResults,
+            ActivityInstanceCriterion pagingCriterion);
 
     /**
      * Count the total number of human task instances assigned to the specified user.
@@ -766,7 +824,8 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    List<EventInstance> getEventInstances(long rootContainerId, int startIndex, int maxResults, EventCriterion sortingType);
+    List<EventInstance> getEventInstances(long rootContainerId, int startIndex, int maxResults,
+            EventCriterion sortingType);
 
     /**
      * Assign a task to a user with given user identifier.
@@ -855,7 +914,8 @@ public interface ProcessRuntimeAPI {
      *         If a problem occurs while updating the data value.
      * @since 6.0
      */
-    void updateProcessDataInstance(String dataName, long processInstanceId, Serializable dataValue) throws UpdateException;
+    void updateProcessDataInstance(String dataName, long processInstanceId, Serializable dataValue)
+            throws UpdateException;
 
     /**
      * Update the value of a named data item in a specified process instance.
@@ -870,7 +930,8 @@ public interface ProcessRuntimeAPI {
      *         If a problem occurs while updating the data value.
      * @since 6.2.3
      */
-    void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException;
+    void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues)
+            throws UpdateException;
 
     /**
      * Get a list of the data instances from a specified activity instance.
@@ -905,8 +966,10 @@ public interface ProcessRuntimeAPI {
     /**
      * Update the value of a named data instance in a specified activity instance.<br>
      * <br>
-     * <b>WARNING</b>: this method is not supported for updating a Custom Data Instance variable with a remote Engine API connection,
-     * because the custom data type is not present in the remote classloader that deserializes the API call parameters. <br>
+     * <b>WARNING</b>: this method is not supported for updating a Custom Data Instance variable with a remote Engine
+     * API connection,
+     * because the custom data type is not present in the remote classloader that deserializes the API call parameters.
+     * <br>
      * use {@link ProcessRuntimeAPI#updateActivityInstanceVariables(List, long, Map)} instead
      *
      * @param dataName
@@ -921,7 +984,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs during the update.
      * @since 6.0
      */
-    void updateActivityDataInstance(String dataName, long activityInstanceId, Serializable dataValue) throws UpdateException;
+    void updateActivityDataInstance(String dataName, long activityInstanceId, Serializable dataValue)
+            throws UpdateException;
 
     /**
      * Update the value of a named transient data instance in a specified activity instance.
@@ -938,7 +1002,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs during the update.
      * @since 6.0
      */
-    void updateActivityTransientDataInstance(String dataName, long activityInstanceId, Serializable dataValue) throws UpdateException;
+    void updateActivityTransientDataInstance(String dataName, long activityInstanceId, Serializable dataValue)
+            throws UpdateException;
 
     /**
      * Get a list of the transient data instances from a specified activity instance.
@@ -968,7 +1033,8 @@ public interface ProcessRuntimeAPI {
      *         If the specified data value cannot be found.
      * @since 6.0
      */
-    DataInstance getActivityTransientDataInstance(String dataName, long activityInstanceId) throws DataNotFoundException;
+    DataInstance getActivityTransientDataInstance(String dataName, long activityInstanceId)
+            throws DataNotFoundException;
 
     /**
      * Get the date when the specified activity instance reached the given state.
@@ -1000,7 +1066,8 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    void updateActivityInstanceVariables(long activityInstanceId, Map<String, Serializable> variables) throws UpdateException;
+    void updateActivityInstanceVariables(long activityInstanceId, Map<String, Serializable> variables)
+            throws UpdateException;
 
     /**
      * Update the values of variables in an activity instance using expressions.
@@ -1017,7 +1084,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs during the update.
      * @since 6.0
      */
-    void updateActivityInstanceVariables(List<Operation> operations, long activityInstanceId, Map<String, Serializable> expressionContexts)
+    void updateActivityInstanceVariables(List<Operation> operations, long activityInstanceId,
+            Map<String, Serializable> expressionContexts)
             throws UpdateException;
 
     /**
@@ -1053,7 +1121,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
-    long getOneAssignedUserTaskInstanceOfProcessInstance(long processInstanceId, long userId) throws ProcessInstanceNotFoundException, UserNotFoundException;
+    long getOneAssignedUserTaskInstanceOfProcessInstance(long processInstanceId, long userId)
+            throws ProcessInstanceNotFoundException, UserNotFoundException;
 
     /**
      * Get an instance of a task asssigned to a given user for the specified process definition.
@@ -1073,7 +1142,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
-    long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
+    long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId)
+            throws ProcessDefinitionNotFoundException,
             UserNotFoundException;
 
     /**
@@ -1106,7 +1176,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
-    boolean canExecuteTask(long activityInstanceId, long userId) throws ActivityInstanceNotFoundException, UserNotFoundException;
+    boolean canExecuteTask(long activityInstanceId, long userId)
+            throws ActivityInstanceNotFoundException, UserNotFoundException;
 
     /**
      * Release a task (unclaim or unassign). After the operation, the task is in the pending task list.
@@ -1125,7 +1196,8 @@ public interface ProcessRuntimeAPI {
 
     /**
      * List the archived process instances for the specified process instance.
-     * A process instance is archived when it changes state, so there are several archived process instances for each process instance.
+     * A process instance is archived when it changes state, so there are several archived process instances for each
+     * process instance.
      *
      * @param processInstanceId
      *        The identifier of the process instance.
@@ -1144,11 +1216,13 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the last archived instance of a process instance.
-     * A process instance is archived when it changes state, so there are several archived process instances for each process instance.
+     * A process instance is archived when it changes state, so there are several archived process instances for each
+     * process instance.
      * The last archived instance is returned.
      *
      * @param sourceProcessInstanceId
-     *        The identifier of the source process instance, i.e. not an archived version, the original process instance id.
+     *        The identifier of the source process instance, i.e. not an archived version, the original process instance
+     *        id.
      * @return The archived process instance.
      * @throws ArchivedProcessInstanceNotFoundException
      *         If no archived process instance can be found with the provided Id.
@@ -1158,7 +1232,8 @@ public interface ProcessRuntimeAPI {
      *         If the search fails because an archived process instance cannot be read.
      * @since 6.0
      */
-    ArchivedProcessInstance getFinalArchivedProcessInstance(long sourceProcessInstanceId) throws ArchivedProcessInstanceNotFoundException;
+    ArchivedProcessInstance getFinalArchivedProcessInstance(long sourceProcessInstanceId)
+            throws ArchivedProcessInstanceNotFoundException;
 
     /**
      * Set the state of an activity instance.
@@ -1242,8 +1317,10 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
-            Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processDefinitionId)
+    Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId,
+            String connectorDefinitionVersion,
+            Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
+            long processDefinitionId)
             throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
@@ -1263,7 +1340,8 @@ public interface ProcessRuntimeAPI {
      *        The input values for the operations.
      * @param processDefinitionId
      *        The identifier of the process definition.
-     * @return A map with connector parameter names and parameter value objects after operations and connector execution.
+     * @return A map with connector parameter names and parameter value objects after operations and connector
+     *         execution.
      * @throws ConnectorExecutionException
      *         If an error occurs during connector execution.
      * @throws ConnectorNotFoundException
@@ -1272,9 +1350,12 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
-            Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, List<Operation> operations,
-            Map<String, Serializable> operationInputValues, long processDefinitionId) throws ConnectorExecutionException, ConnectorNotFoundException;
+    Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId,
+            String connectorDefinitionVersion,
+            Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
+            List<Operation> operations,
+            Map<String, Serializable> operationInputValues, long processDefinitionId)
+            throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Search the archived human tasks for tasks that match the search options.
@@ -1291,22 +1372,26 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasks(SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasks(SearchOptions searchOptions)
+            throws SearchException;
 
     /**
-     * Search the assigned human tasks for tasks that match the search options and are administered by the specified user.
+     * Search the assigned human tasks for tasks that match the search options and are administered by the specified
+     * user.
      *
      * @param managerUserId
      *        The identifier of the user.
      * @param searchOptions
      *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The assigned human tasks that match the search conditions and are supervised by the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
      * @since 6.0
      */
-    SearchResult<HumanTaskInstance> searchAssignedTasksManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<HumanTaskInstance> searchAssignedTasksManagedBy(long managerUserId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search the pending human tasks for tasks that match the search options and are supervised by the specified user.
@@ -1315,13 +1400,15 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user.
      * @param searchOptions
      *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The pending human tasks that match the search conditions and are supervised by the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
      * @since 6.0
      */
-    SearchResult<HumanTaskInstance> searchPendingTasksSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<HumanTaskInstance> searchPendingTasksSupervisedBy(long userId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search the pending human tasks for tasks available to the specified user.
@@ -1330,13 +1417,15 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user.
      * @param searchOptions
      *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The pending human tasks that match the search conditions and are available to the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
      * @since 6.0
      */
-    SearchResult<HumanTaskInstance> searchPendingTasksForUser(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<HumanTaskInstance> searchPendingTasksForUser(long userId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search the pending human tasks assigned to a specified user.
@@ -1345,13 +1434,15 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user.
      * @param searchOptions
      *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The pending human tasks that match the search conditions and are assigned to the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
      * @since 7.5.5
      */
-    SearchResult<HumanTaskInstance> searchPendingTasksAssignedToUser(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<HumanTaskInstance> searchPendingTasksAssignedToUser(long userId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search the pending human tasks for tasks that match the search options and are managed by the specified user.
@@ -1360,7 +1451,8 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user.
      * @param searchOptions
      *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The pending human tasks that match the search conditions and are managed by the user.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1368,10 +1460,12 @@ public interface ProcessRuntimeAPI {
      *         If there is an error in the search conditions.
      * @since 6.0
      */
-    SearchResult<HumanTaskInstance> searchPendingTasksManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<HumanTaskInstance> searchPendingTasksManagedBy(long managerUserId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
-     * Search the assigned and pending human tasks for the specified user, on the specified root process definition, corresponding to the options.
+     * Search the assigned and pending human tasks for the specified user, on the specified root process definition,
+     * corresponding to the options.
      *
      * @param rootProcessDefinitionId
      *        The identifier of the root process definition
@@ -1379,41 +1473,48 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user
      * @param searchOptions
      *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The assigned and pending human tasks
      * @throws SearchException
      *         If there is an error in the search conditions.
      * @since 6.3.3
      */
-    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasksFor(final long rootProcessDefinitionId, final long userId,
+    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasksFor(final long rootProcessDefinitionId,
+            final long userId,
             final SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search the assigned and pending human tasks for any user, on the specified root process definition, corresponding to the options.
+     * Search the assigned and pending human tasks for any user, on the specified root process definition, corresponding
+     * to the options.
      *
      * @param rootProcessDefinitionId
      *        The identifier of the root process definition
      * @param searchOptions
      *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The assigned and pending human tasks
      * @throws SearchException
      *         If there is an error in the search conditions.
      * @since 6.3.3
      */
-    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final SearchOptions searchOptions)
+    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final long rootProcessDefinitionId,
+            final SearchOptions searchOptions)
             throws SearchException;
 
     /**
      * Search the assigned and pending human tasks for any user corresponding to the options.
      *
      * @param searchOptions The search conditions and the options for sorting and paging the results. See
-     *                      {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The assigned and pending human tasks
      * @throws SearchException If there is an error in the search conditions.
      * @since 7.6.1
      */
-    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final SearchOptions searchOptions) throws SearchException;
+    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Get the number of assigned and pending overdue tasks for the specified users.
@@ -1443,10 +1544,14 @@ public interface ProcessRuntimeAPI {
     void cancelProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException;
 
     /**
-     * Reset the state of a failed {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and then execute it. Pre-condition: the
-     * {@code FlowNodeInstance} must be in state FAILED. If this condition is not respected, a ActivityExecutionException is thrown.
-     * <p>If the {@code FlowNodeInstance} contains failed {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance}s, they will be re-executed. In the case
-     * where the connector execution fails again, the {@code FlowNodeInstance} will remain in failed state. There is not counter on the number of
+     * Reset the state of a failed {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and
+     * then execute it. Pre-condition: the
+     * {@code FlowNodeInstance} must be in state FAILED. If this condition is not respected, a
+     * ActivityExecutionException is thrown.
+     * <p>If the {@code FlowNodeInstance} contains failed
+     * {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance}s, they will be re-executed. In the case
+     * where the connector execution fails again, the {@code FlowNodeInstance} will remain in failed state. There is not
+     * counter on the number of
      * re-executions</p>
      *
      * @param activityInstanceId
@@ -1456,7 +1561,8 @@ public interface ProcessRuntimeAPI {
      * @throws ActivityInstanceNotFoundException
      *         when no {@code FlowNodeInstance} is found with the specified identifier.
      * @throws ActivityExecutionException
-     *         occurs if the current Flownode is not in FAILED state, or while resetting the state, or while executing the {@code FlowNodeInstance}.
+     *         occurs if the current Flownode is not in FAILED state, or while resetting the state, or while executing
+     *         the {@code FlowNodeInstance}.
      * @since 6.0
      * @see org.bonitasoft.engine.bpm.flownode.FlowNodeInstance
      * @see org.bonitasoft.engine.bpm.connector.ConnectorInstance
@@ -1464,9 +1570,10 @@ public interface ProcessRuntimeAPI {
     void retryTask(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
     /**
-     * When a matching BPM event couple messageInstance / waitingMessageEvent fails to execute and no failure handling has been successful, a log message
+     * When a matching BPM event couple messageInstance / waitingMessageEvent fails to execute and no failure handling
+     * has been successful, a log message
      * indicates that this method can be called to try again the execution. The necessary parameters are also indicated.
-     * 
+     *
      * @param messageInstanceId the ID of the message instance to try to trigger again.
      * @param waitingMessageEventId the ID of the waiting message event to try to trigger again.
      * @throws ExecutionException if the execution failed. A more precise cause is given in the getCause() method.
@@ -1490,7 +1597,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs while evaluating the expression.
      * @since 6.0
      */
-    Serializable evaluateExpressionOnProcessDefinition(Expression expression, Map<String, Serializable> context, long processDefinitionId)
+    Serializable evaluateExpressionOnProcessDefinition(Expression expression, Map<String, Serializable> context,
+            long processDefinitionId)
             throws ExpressionEvaluationException;
 
     /**
@@ -1539,7 +1647,8 @@ public interface ProcessRuntimeAPI {
      * @param targetProcess
      *        An expression representing the target process name.
      * @param targetFlowNode
-     *        An expression representing the target flow node name. Optional parameter that can be used to explicitly set the target flow node if the
+     *        An expression representing the target flow node name. Optional parameter that can be used to explicitly
+     *        set the target flow node if the
      *        message is caught by different flow nodes in the same process. If not necessary, pass null value.
      * @param messageContent
      *        A key-&gt;value map containing the message data, with the data name as key.
@@ -1549,18 +1658,21 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs while sending message.
      * @since 6.0
      */
-    void sendMessage(String messageName, Expression targetProcess, Expression targetFlowNode, Map<Expression, Expression> messageContent)
+    void sendMessage(String messageName, Expression targetProcess, Expression targetFlowNode,
+            Map<Expression, Expression> messageContent)
             throws SendEventException;
 
     /**
-     * Send a BPMN message event, with message correlation. Invoking this method acts as executing a Throw Message Event.
+     * Send a BPMN message event, with message correlation. Invoking this method acts as executing a Throw Message
+     * Event.
      *
      * @param messageName
      *        The message name.
      * @param targetProcess
      *        An expression representing the target process name.
      * @param targetFlowNode
-     *        An expression representing the target flow node name. Optional parameter that can be used to explicitly set the target flow node if the
+     *        An expression representing the target flow node name. Optional parameter that can be used to explicitly
+     *        set the target flow node if the
      *        message is caught by different flow nodes in the same process. If not necessary, pass null value.
      * @param messageContent
      *        A key-&gt;value map containing the message data, with the data name as key.
@@ -1572,7 +1684,8 @@ public interface ProcessRuntimeAPI {
      *         If there are too many correlations (more than 5) or an exception occurs while sending message.
      * @since 6.0
      */
-    void sendMessage(String messageName, Expression targetProcess, Expression targetFlowNode, Map<Expression, Expression> messageContent,
+    void sendMessage(String messageName, Expression targetProcess, Expression targetFlowNode,
+            Map<Expression, Expression> messageContent,
             Map<Expression, Expression> correlations) throws SendEventException;
 
     /**
@@ -1581,10 +1694,10 @@ public interface ProcessRuntimeAPI {
      * @param creationDate
      *        The date until the messages will be deleted.
      * @param searchOptions
-     *       The optional search conditions for retrieve messages that will be removed.
+     *        The optional search conditions for retrieve messages that will be removed.
      * @return The number of message deleted
      * @throws ExecutionException
-     *           If the deletion could not be completed correctly.
+     *         If the deletion could not be completed correctly.
      * @since 7.10
      */
 
@@ -1604,7 +1717,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs while trying to retrieve the <code>ArchivedProcessInstance</code>.
      * @since 6.0
      */
-    ArchivedProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId) throws ArchivedProcessInstanceNotFoundException;
+    ArchivedProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId)
+            throws ArchivedProcessInstanceNotFoundException;
 
     /**
      * Retrieve an <code>ArchivedFlowNodeInstance</code> specified by its identifier.
@@ -1620,7 +1734,8 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs while trying to retrieve the <code>ArchivedFlowNodeInstance</code>.
      * @since 6.0
      */
-    ArchivedFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId) throws ArchivedFlowNodeInstanceNotFoundException;
+    ArchivedFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId)
+            throws ArchivedFlowNodeInstanceNotFoundException;
 
     /**
      * Retrieve an <code>ArchivedComment</code> specified by its identifier.
@@ -1643,7 +1758,8 @@ public interface ProcessRuntimeAPI {
      *
      * @param searchOptions
      *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The {@link SearchResult} containing the <code>ConnectorInstance</code>s matching the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1657,16 +1773,19 @@ public interface ProcessRuntimeAPI {
      * Search for archived connector instances.
      *
      * @param searchOptions
-     *        The search options parameters. See {@link org.bonitasoft.engine.bpm.connector.ArchiveConnectorInstancesSearchDescriptor} for valid fields for
+     *        The search options parameters. See
+     *        {@link org.bonitasoft.engine.bpm.connector.ArchiveConnectorInstancesSearchDescriptor} for valid fields for
      *        searching and sorting.
-     * @return The {@link SearchResult} containing the <code>ArchivedConnectorInstance</code>s matching the search options.
+     * @return The {@link SearchResult} containing the <code>ArchivedConnectorInstance</code>s matching the search
+     *         options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
      * @since 6.0
      */
-    SearchResult<ArchivedConnectorInstance> searchArchivedConnectorInstances(SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedConnectorInstance> searchArchivedConnectorInstances(SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * List the named human tasks belonging to the specified process instance.
@@ -1684,7 +1803,8 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    List<HumanTaskInstance> getHumanTaskInstances(long rootProcessInstanceId, String taskName, int startIndex, int maxResults);
+    List<HumanTaskInstance> getHumanTaskInstances(long rootProcessInstanceId, String taskName, int startIndex,
+            int maxResults);
 
     /**
      * Return the last created human task instance with the specified name for the given process instance.
@@ -1700,14 +1820,17 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    HumanTaskInstance getLastStateHumanTaskInstance(long rootProcessInstanceId, String taskName) throws NotFoundException;
+    HumanTaskInstance getLastStateHumanTaskInstance(long rootProcessInstanceId, String taskName)
+            throws NotFoundException;
 
     /**
-     * Search for archived activity instances in terminal states. Archived activity instances in intermediate states are not considered.
+     * Search for archived activity instances in terminal states. Archived activity instances in intermediate states are
+     * not considered.
      *
      * @param searchOptions
      *        The criterion used to search for archived activity instances. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1721,7 +1844,8 @@ public interface ProcessRuntimeAPI {
      * Search for activity instances.
      *
      * @param searchOptions
-     *        The criterion used to search for activity instances. See {@link org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor} for valid
+     *        The criterion used to search for activity instances. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -1736,7 +1860,8 @@ public interface ProcessRuntimeAPI {
      * Search for flow node instances (activities, gateways and events).
      *
      * @param searchOptions
-     *        The criterion used to search for flow node instances. See {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor} for valid
+     *        The criterion used to search for flow node instances. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -1751,7 +1876,8 @@ public interface ProcessRuntimeAPI {
      * Search for archived flow node instances (activities, gateways and events)
      *
      * @param searchOptions
-     *        The options used to search for flow node instances. See {@link org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor} for
+     *        The options used to search for flow node instances. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -1761,7 +1887,8 @@ public interface ProcessRuntimeAPI {
      * @see ArchivedFlowNodeInstance
      * @since 6.0
      */
-    SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstances(SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstances(SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search for all tasks available to a specified user.
@@ -1770,7 +1897,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user for whom the tasks are available.
      * @param searchOptions
-     *        The options used to search for tasks. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        The options used to search for tasks. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
      *        searching and sorting.
      * @return The list of tasks matching the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -1779,13 +1907,15 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs during the search.
      * @since 6.0
      */
-    SearchResult<HumanTaskInstance> searchMyAvailableHumanTasks(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<HumanTaskInstance> searchMyAvailableHumanTasks(long userId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search for comments related to the specified process instance.
      *
      * @param searchOptions
-     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching
+     *        The options used to search for comments. See
+     *        {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching
      *        and sorting.
      * @return The matching comments.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -1797,8 +1927,10 @@ public interface ProcessRuntimeAPI {
     SearchResult<Comment> searchComments(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Add a comment on a process instance. Be aware that operations inside tasks are executed by the System, not the task assignee.
-     * Therefore, when called from an operation inside a task, the user "System" will be marked as having made the comment. If you wish to add a comment made by the assigned user in those places,
+     * Add a comment on a process instance. Be aware that operations inside tasks are executed by the System, not the
+     * task assignee.
+     * Therefore, when called from an operation inside a task, the user "System" will be marked as having made the
+     * comment. If you wish to add a comment made by the assigned user in those places,
      * use addProcessCommentOnBehalfOfUser.
      *
      * @param processInstanceId
@@ -1809,13 +1941,15 @@ public interface ProcessRuntimeAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws CreationException
-     *         If the parameter processInstanceId does not refer to any active process instance (existing and non-archived).
+     *         If the parameter processInstanceId does not refer to any active process instance (existing and
+     *         non-archived).
      * @since 6.1
      */
     Comment addProcessComment(final long processInstanceId, final String comment) throws CreationException;
 
     /**
-     * Add a comment on a process instance, on behalf of an user. Mainly intended to be used in groovy scripts when the behavior of the addProcessComment might be unsatisfactory.
+     * Add a comment on a process instance, on behalf of an user. Mainly intended to be used in groovy scripts when the
+     * behavior of the addProcessComment might be unsatisfactory.
      *
      * @param processInstanceId
      *        The identifier of the process instance.
@@ -1827,10 +1961,12 @@ public interface ProcessRuntimeAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws CreationException
-     *         If the parameter processInstanceId does not refer to any active process instance (existing and non-archived).
+     *         If the parameter processInstanceId does not refer to any active process instance (existing and
+     *         non-archived).
      * @since 7.7
      */
-    Comment addProcessCommentOnBehalfOfUser(final long processInstanceId, final String comment, long userId) throws CreationException;
+    Comment addProcessCommentOnBehalfOfUser(final long processInstanceId, final String comment, long userId)
+            throws CreationException;
 
     /**
      * Get the first 20 comments of the specified process instance.
@@ -1840,7 +1976,8 @@ public interface ProcessRuntimeAPI {
      * @return The list of comments found
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @deprecated use paginated version {@link #searchComments(SearchOptions)} instead, passing a filter on processInstanceId field.
+     * @deprecated use paginated version {@link #searchComments(SearchOptions)} instead, passing a filter on
+     *             processInstanceId field.
      * @since 6.0
      */
     @Deprecated
@@ -1856,7 +1993,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching and
+     *        The options used to search for comments. See
+     *        {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching and
      *        sorting.
      * @return The comments managed by the user that match the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -1865,7 +2003,8 @@ public interface ProcessRuntimeAPI {
      *         If the search could not be completed correctly.
      * @since 6.0
      */
-    SearchResult<Comment> searchCommentsManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<Comment> searchCommentsManagedBy(long managerUserId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Get the comments on process instances that the specified user can access.
@@ -1873,7 +2012,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching and
+     *        The options used to search for comments. See
+     *        {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching and
      *        sorting.
      * @return The comments on process instances that the user can access.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -1901,7 +2041,8 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    List<Long> getChildrenInstanceIdsOfProcessInstance(long processInstanceId, int startIndex, int maxResults, ProcessInstanceCriterion criterion);
+    List<Long> getChildrenInstanceIdsOfProcessInstance(long processInstanceId, int startIndex, int maxResults,
+            ProcessInstanceCriterion criterion);
 
     /**
      * Check whether a specific user is involved in a given process instance.<br/>
@@ -1928,7 +2069,8 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      * @see #isManagerOfUserInvolvedInProcessInstance(long, long)
      */
-    boolean isInvolvedInProcessInstance(long userId, long processInstanceId) throws ProcessInstanceNotFoundException, UserNotFoundException;
+    boolean isInvolvedInProcessInstance(long userId, long processInstanceId)
+            throws ProcessInstanceNotFoundException, UserNotFoundException;
 
     /**
      * Check whether a specific user is involved in a given human task instance.<br/>
@@ -1950,10 +2092,12 @@ public interface ProcessRuntimeAPI {
      * @since 6.5.1
      * @see #isManagerOfUserInvolvedInProcessInstance(long, long)
      */
-    boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId) throws ActivityInstanceNotFoundException, UserNotFoundException;
+    boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId)
+            throws ActivityInstanceNotFoundException, UserNotFoundException;
 
     /**
-     * Check whether a specific user has at least one subordinate (person he / she is the manager of) involved in a given process instance.<br/>
+     * Check whether a specific user has at least one subordinate (person he / she is the manager of) involved in a
+     * given process instance.<br/>
      * User A is involved with a process instance if any of the following is true:
      * <ul>
      * <li>user A has started the process instance</li>
@@ -2013,12 +2157,13 @@ public interface ProcessRuntimeAPI {
      *         If no ProcessDefinition have an id corresponding to the parameter.
      * @since 6.0
      */
-    long getProcessDefinitionIdFromActivityInstanceId(long activityInstanceId) throws ProcessDefinitionNotFoundException;
+    long getProcessDefinitionIdFromActivityInstanceId(long activityInstanceId)
+            throws ProcessDefinitionNotFoundException;
 
     /**
      * Search for archived comments.
-     *
      * -- ex: Retrieve comments of a given archived case --
+     *
      * <pre>
      * {@code
      *  public List<ArchivedComment> retrieveComments(ProcessRuntimeAPI processRuntimeAPI, ArchivedProcessInstance archivedProcessInstance) {
@@ -2028,10 +2173,11 @@ public interface ProcessRuntimeAPI {
      *      return processRuntimeAPI.searchArchivedComments(searchOptions).getResult();
      *  }
      * }
-     * </pre>   
+     * </pre>
      *
      * @param searchOptions
-     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.ArchivedCommentsSearchDescriptor} for valid fields for
+     *        The options used to search for comments. See
+     *        {@link org.bonitasoft.engine.bpm.comment.ArchivedCommentsSearchDescriptor} for valid fields for
      *        searching and sorting.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -2048,14 +2194,16 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user manager,
      * @param searchOptions
-     *        The options used to search for tasks. See {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for valid fields
+     *        The options used to search for tasks. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for valid fields
      *        for searching and sorting.
      * @return The archived humanTask instances managed by the specified user that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
      * @since 6.0
      */
-    SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasksManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasksManagedBy(long managerUserId,
+            SearchOptions searchOptions) throws SearchException;
 
     /**
      * Search for open process instances that the specified user can access.
@@ -2063,7 +2211,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for process instance. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields
+     *        The options used to search for process instance. See
+     *        {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields
      *        for searching and sorting.
      * @return The <code>ProcessInstance</code>s that match the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -2072,7 +2221,8 @@ public interface ProcessRuntimeAPI {
      *         If the search could not be completed correctly.
      * @since 6.0
      */
-    SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUser(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUser(long userId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search for open process instances that all subordinates of the specified user can access.
@@ -2080,7 +2230,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user manager.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid
+     *        The search options (pagination, filter, order sort). See
+     *        {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return The <code>ProcessInstance</code>s that match the search options.
      * @throws SearchException
@@ -2089,38 +2240,46 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId,
+            SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search for archived root process instances. Only archived process instances in states COMPLETED, ABORTED, CANCELED and FAILED will be retrieved. Process instances started by call activities won't be retrieved.
-     * See {@link #searchArchivedProcessInstancesInAllStates(SearchOptions) searchArchivedProcessInstancesInAllStates} to search amoung any archived instance.
+     * Search for archived root process instances. Only archived process instances in states COMPLETED, ABORTED,
+     * CANCELED and FAILED will be retrieved. Process instances started by call activities won't be retrieved.
+     * See {@link #searchArchivedProcessInstancesInAllStates(SearchOptions) searchArchivedProcessInstancesInAllStates}
+     * to search amoung any archived instance.
      *
      * @param searchOptions
      *        The search options (pagination, filter, order sort).
      * @return The archived process instances that match the search options. See
-     *         {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and sorting.
+     *         {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for valid fields for
+     *         searching and sorting.
      * @throws SearchException
      *         If the search could not be full filled correctly
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances(SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances(SearchOptions searchOptions)
+            throws SearchException;
 
     /**
-     * Search for archived process instances (root and intermediate levels) in all states (even intermediate states). Depending on used filters several
+     * Search for archived process instances (root and intermediate levels) in all states (even intermediate states).
+     * Depending on used filters several
      * ArchivedProcessInstance will be
      * retrieved for a single ProcessInstance (one for each reached state).
      *
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
+     *        The search options (pagination, filter, order sort). See
+     *        {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return The archived process instances in all states that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
      * @since 6.2
      */
-    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInAllStates(SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInAllStates(SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search for archived process instances supervised by the specified user.
@@ -2128,7 +2287,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
+     *        The search options (pagination, filter, order sort). See
+     *        {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return The archived process instances supervised by the user that match the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -2137,7 +2297,8 @@ public interface ProcessRuntimeAPI {
      *         If the search could not be completed correctly.
      * @since 6.0
      */
-    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesSupervisedBy(long userId,
+            SearchOptions searchOptions) throws SearchException;
 
     /**
      * Search for archived process instances that the specified user can access.
@@ -2145,7 +2306,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
+     *        The search options (pagination, filter, order sort). See
+     *        {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return The archived process instances that the user can access that match the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -2154,13 +2316,15 @@ public interface ProcessRuntimeAPI {
      *         If the search could not be completed correctly.
      * @since 6.0
      */
-    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInvolvingUser(long userId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInvolvingUser(long userId,
+            SearchOptions searchOptions) throws SearchException;
 
     /**
      * Search for human task instances.
      *
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
+     *        The search options (pagination, filter, order sort). See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return The human task instances that match the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -2177,7 +2341,8 @@ public interface ProcessRuntimeAPI {
      * @param supervisorId
      *        The identifier of supervising user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
+     *        The search options (pagination, filter, order sort). See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return The human task instances that match the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -2186,7 +2351,8 @@ public interface ProcessRuntimeAPI {
      *         If the search could not be completed correctly.
      * @since 6.0
      */
-    SearchResult<HumanTaskInstance> searchAssignedTasksSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<HumanTaskInstance> searchAssignedTasksSupervisedBy(long supervisorId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Search for archived tasks assigned to users supervised by the specified user.
@@ -2194,7 +2360,8 @@ public interface ProcessRuntimeAPI {
      * @param supervisorId
      *        The identifier of the supervising user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for
+     *        The search options (pagination, filter, order sort). See
+     *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return The archived human task instances that match the search options.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -2203,7 +2370,8 @@ public interface ProcessRuntimeAPI {
      *         If the search could not be completed correctly.
      * @since 6.0
      */
-    SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasksSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasksSupervisedBy(long supervisorId,
+            SearchOptions searchOptions) throws SearchException;
 
     /**
      * Evaluate expressions with values valid at process instantiation scope.
@@ -2212,7 +2380,8 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the process instance.
      * @param expressions
      *        The map of expressions to evaluate.
-     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
+     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression
+     *         map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
@@ -2220,7 +2389,8 @@ public interface ProcessRuntimeAPI {
      *         Occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
-    Map<String, Serializable> evaluateExpressionsAtProcessInstanciation(long processInstanceId, Map<Expression, Map<String, Serializable>> expressions)
+    Map<String, Serializable> evaluateExpressionsAtProcessInstanciation(long processInstanceId,
+            Map<Expression, Map<String, Serializable>> expressions)
             throws ExpressionEvaluationException;
 
     /**
@@ -2230,7 +2400,8 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the process instance.
      * @param expressions
      *        The map of expressions to evaluate.
-     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
+     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression
+     *         map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
@@ -2238,7 +2409,8 @@ public interface ProcessRuntimeAPI {
      *         Occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
-    Map<String, Serializable> evaluateExpressionOnCompletedProcessInstance(long processInstanceId, Map<Expression, Map<String, Serializable>> expressions)
+    Map<String, Serializable> evaluateExpressionOnCompletedProcessInstance(long processInstanceId,
+            Map<Expression, Map<String, Serializable>> expressions)
             throws ExpressionEvaluationException;
 
     /**
@@ -2248,7 +2420,8 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the process instance.
      * @param expressions
      *        The map of expressions to evaluate.
-     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
+     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression
+     *         map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
@@ -2256,7 +2429,8 @@ public interface ProcessRuntimeAPI {
      *         Occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
-    Map<String, Serializable> evaluateExpressionsOnProcessInstance(long processInstanceId, Map<Expression, Map<String, Serializable>> expressions)
+    Map<String, Serializable> evaluateExpressionsOnProcessInstance(long processInstanceId,
+            Map<Expression, Map<String, Serializable>> expressions)
             throws ExpressionEvaluationException;
 
     /**
@@ -2266,7 +2440,8 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the process definition.
      * @param expressions
      *        The map of expressions to evaluate.
-     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
+     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression
+     *         map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
@@ -2274,7 +2449,8 @@ public interface ProcessRuntimeAPI {
      *         Occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
-    Map<String, Serializable> evaluateExpressionsOnProcessDefinition(long processDefinitionId, Map<Expression, Map<String, Serializable>> expressions)
+    Map<String, Serializable> evaluateExpressionsOnProcessDefinition(long processDefinitionId,
+            Map<Expression, Map<String, Serializable>> expressions)
             throws ExpressionEvaluationException;
 
     /**
@@ -2284,7 +2460,8 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the activity instance.
      * @param expressions
      *        The map of expressions to evaluate.
-     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
+     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression
+     *         map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
@@ -2292,7 +2469,8 @@ public interface ProcessRuntimeAPI {
      *         Occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
-    Map<String, Serializable> evaluateExpressionsOnActivityInstance(long activityInstanceId, Map<Expression, Map<String, Serializable>> expressions)
+    Map<String, Serializable> evaluateExpressionsOnActivityInstance(long activityInstanceId,
+            Map<Expression, Map<String, Serializable>> expressions)
             throws ExpressionEvaluationException;
 
     /**
@@ -2302,7 +2480,8 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the activity instance.
      * @param expressions
      *        The map of expressions to evaluate.
-     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
+     * @return The result of the expression execution. Content of the resulting map depends on the incoming expression
+     *         map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
@@ -2310,7 +2489,8 @@ public interface ProcessRuntimeAPI {
      *         Occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
-    Map<String, Serializable> evaluateExpressionsOnCompletedActivityInstance(long activityInstanceId, Map<Expression, Map<String, Serializable>> expressions)
+    Map<String, Serializable> evaluateExpressionsOnCompletedActivityInstance(long activityInstanceId,
+            Map<Expression, Map<String, Serializable>> expressions)
             throws ExpressionEvaluationException;
 
     /**
@@ -2328,11 +2508,8 @@ public interface ProcessRuntimeAPI {
     List<FailedJob> getFailedJobs(int startIndex, int maxResults);
 
     /**
-     *
      * Replay a job that failed.
-     *
      * Job that failed can be found using {@link #getFailedJobs(int, int)}
-     *
      * This will remove the traces of Failed Jobs and restart the job once.
      * If you wish to re-execute multiple times the job that failed in case a recurrent job failed multiple times,
      * call this method several times.
@@ -2344,12 +2521,9 @@ public interface ProcessRuntimeAPI {
     void replayFailedJob(final long jobDescriptorId) throws ExecutionException;
 
     /**
-     *
      * Update parameters of a job and replay it.
-     *
      * The specified parameters replace the stored parameters. i.e. If the job is recurrent, all
      * future executions of this job will use the newly specified parameters.
-     *
      *
      * @param jobDescriptorId
      *        The identifier of the job descriptor.
@@ -2367,7 +2541,8 @@ public interface ProcessRuntimeAPI {
      * @param dataName
      *        The name of the data
      * @param sourceProcessInstanceId
-     *        The identifier of the source process instance (used as root container id of the archived activity instances).
+     *        The identifier of the source process instance (used as root container id of the archived activity
+     *        instances).
      * @return An archived instance of data.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
@@ -2375,7 +2550,8 @@ public interface ProcessRuntimeAPI {
      *         If the specified data cannot be found.
      * @since 6.1
      */
-    ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long sourceProcessInstanceId) throws ArchivedDataNotFoundException;
+    ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long sourceProcessInstanceId)
+            throws ArchivedDataNotFoundException;
 
     /**
      * Gets the last archived data instance of the named data of the specified activity instance.
@@ -2391,13 +2567,15 @@ public interface ProcessRuntimeAPI {
      *         If the specified data cannot be found
      * @since 6.1
      */
-    ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long sourceActivityInstanceId) throws ArchivedDataNotFoundException;
+    ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long sourceActivityInstanceId)
+            throws ArchivedDataNotFoundException;
 
     /**
      * Lists the last archived instances of data of the specified process instance.
      *
      * @param sourceProcessInstanceId
-     *        The identifier of the source process instance (used as root container id of the archived activity instances).
+     *        The identifier of the source process instance (used as root container id of the archived activity
+     *        instances).
      * @param startIndex
      *        The start index
      * @param maxResults
@@ -2409,7 +2587,8 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs while retrieving the archived instances of data
      * @since 6.1
      */
-    List<ArchivedDataInstance> getArchivedProcessDataInstances(long sourceProcessInstanceId, int startIndex, int maxResults);
+    List<ArchivedDataInstance> getArchivedProcessDataInstances(long sourceProcessInstanceId, int startIndex,
+            int maxResults);
 
     /**
      * Lists the last archived instances of data of the specified activity instance.
@@ -2427,7 +2606,8 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs while retrieving the archived instances of data
      * @since 6.1
      */
-    List<ArchivedDataInstance> getArchivedActivityDataInstances(long sourceActivityInstanceId, int startIndex, int maxResults);
+    List<ArchivedDataInstance> getArchivedActivityDataInstances(long sourceActivityInstanceId, int startIndex,
+            int maxResults);
 
     /**
      * Lists the possible users (candidates) of the specified human task instance.
@@ -2455,7 +2635,8 @@ public interface ProcessRuntimeAPI {
      * @param humanTaskInstanceId
      *        The identifier of the human task instance
      * @param searchOptions
-     *        the search options. See {@link org.bonitasoft.engine.identity.UserSearchDescriptor} for valid fields for searching and sorting.
+     *        the search options. See {@link org.bonitasoft.engine.identity.UserSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The list of users.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
@@ -2463,7 +2644,8 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs while retrieving the users
      * @since 6.3
      */
-    SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, SearchOptions searchOptions);
+    SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId,
+            SearchOptions searchOptions);
 
     /**
      * Search process definitions that have instances with assigned or pending human tasks for a specific user.
@@ -2472,31 +2654,36 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor}
+     *        for valid fields for searching and
      *        sorting.
      * @return The list of process definitions
      * @throws SearchException
      *         if an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
-    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(long userId, SearchOptions searchOptions)
+    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(long userId,
+            SearchOptions searchOptions)
             throws SearchException;
 
     /**
-     * Search process definitions supervised by a specific user, that have instances with assigned or pending human tasks.
+     * Search process definitions supervised by a specific user, that have instances with assigned or pending human
+     * tasks.
      * The tasks are in stable state, not in terminal/executing state.
      *
      * @param supervisorId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor}
+     *        for valid fields for searching and
      *        sorting.
      * @return The list of process definitions
      * @throws SearchException
      *         if an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
-    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(long supervisorId, SearchOptions searchOptions)
+    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(
+            long supervisorId, SearchOptions searchOptions)
             throws SearchException;
 
     /**
@@ -2504,21 +2691,25 @@ public interface ProcessRuntimeAPI {
      * The tasks are in stable state, not in terminal/executing state.
      *
      * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor}
+     *        for valid fields for searching and
      *        sorting.
      * @return The list of process definitions
      * @throws SearchException
      *         If an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
-    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
+    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(
+            SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not count the flownodes of sub-process instances
+     * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not
+     * count the flownodes of sub-process instances
      * of the given process instance.
      *
      * @param processInstanceId ID of the process instance of which to retrieve the current indicators.
-     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode, that is,
+     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the
+     *         current counters for this flownode, that is,
      *         a map of &lt;state name, number of current flownode in that state&gt;
      *         If no results, returns an empty Map.
      * @since 6.5.0
@@ -2535,7 +2726,8 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs when getting the timer event triggers.
      * @since 6.4.0
      */
-    SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId, SearchOptions searchOptions) throws SearchException;
+    SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId,
+            SearchOptions searchOptions) throws SearchException;
 
     /**
      * Change the date of the execution of a specific {@link TimerEventTriggerInstance}.
@@ -2590,7 +2782,8 @@ public interface ProcessRuntimeAPI {
      *         If an execution exception occurs
      * @since 7.0
      */
-    void executeUserTask(long userTaskInstanceId, Map<String, Serializable> inputs) throws UserTaskNotFoundException, ContractViolationException,
+    void executeUserTask(long userTaskInstanceId, Map<String, Serializable> inputs)
+            throws UserTaskNotFoundException, ContractViolationException,
             FlowNodeExecutionException;
 
     /**
@@ -2613,11 +2806,13 @@ public interface ProcessRuntimeAPI {
      *         If an execution exception occurs
      * @since 7.0
      */
-    void executeUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs) throws UserTaskNotFoundException, ContractViolationException,
+    void executeUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs)
+            throws UserTaskNotFoundException, ContractViolationException,
             FlowNodeExecutionException;
-    
+
     /**
-     * Assign a task to a user with given user identifier and executes a user task that is in a stable state on behalf of a given user
+     * Assign a task to a user with given user identifier and executes a user task that is in a stable state on behalf
+     * of a given user
      * Will make the task go in the next stable state and then continue the execution of the process
      * If userId equals 0, the logged-in user is declared as the executer of the task.
      * The user, who executed the task on behalf of a given user, is declared as a executer delegate.
@@ -2638,7 +2833,8 @@ public interface ProcessRuntimeAPI {
      *         If an execution exception occurs
      * @since 7.9
      */
-    void assignAndExecuteUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs) throws UpdateException, UserTaskNotFoundException, ContractViolationException,
+    void assignAndExecuteUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs)
+            throws UpdateException, UserTaskNotFoundException, ContractViolationException,
             FlowNodeExecutionException;
 
     /**
@@ -2651,10 +2847,12 @@ public interface ProcessRuntimeAPI {
      * @return The identifier of the user task
      * @throws ContractDataNotFoundException if no data found for the given user task instance and name.
      */
-    Serializable getUserTaskContractVariableValue(long userTaskInstanceId, String name) throws ContractDataNotFoundException;
+    Serializable getUserTaskContractVariableValue(long userTaskInstanceId, String name)
+            throws ContractDataNotFoundException;
 
     /**
-     * Gets the value of a process instantiation input, during the phase of initializing. For instance, if a connector on_enter fails, this method can be called
+     * Gets the value of a process instantiation input, during the phase of initializing. For instance, if a connector
+     * on_enter fails, this method can be called
      * to check the current value.
      *
      * @param processInstanceId The identifier of the process instance
@@ -2662,28 +2860,34 @@ public interface ProcessRuntimeAPI {
      * @return The identifier of the user task
      * @throws ContractDataNotFoundException if no data found for the given process instance and name.
      */
-    Serializable getProcessInputValueDuringInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
+    Serializable getProcessInputValueDuringInitialization(long processInstanceId, String name)
+            throws ContractDataNotFoundException;
 
     /**
-     * Gets the value of a process instantiation input, after initialization has finished. Requires Archiving feature to be enabled (default behaviour).
+     * Gets the value of a process instantiation input, after initialization has finished. Requires Archiving feature to
+     * be enabled (default behaviour).
      *
      * @param processInstanceId The identifier of the process instance
      * @param name The name of the process input to retrieve
      * @return The identifier of the user task
      * @throws ContractDataNotFoundException if identifier does not refer to an existing process instance.
      */
-    Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
+    Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name)
+            throws ContractDataNotFoundException;
 
     /**
      * return the context defined in the process definition for this user task instance. Context includes:
      * <ul>
      * <li>Business data references (see {@link org.bonitasoft.engine.business.data.BusinessDataReference},
-     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
+     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and
+     * {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
      * Key of
      * data reference is the name of the business data as declared in process definition followed by "_ref".
-     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same as for business data ("_ref" suffix).
+     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same
+     * as for business data ("_ref" suffix).
      * <li>For multi-instantiated task only: iterator name with "_ref" suffix (type of the value is
-     * {@link org.bonitasoft.engine.business.data.BusinessDataReference}). By default: multiInstanceIterator_ref. Only exist if iterator value is set using
+     * {@link org.bonitasoft.engine.business.data.BusinessDataReference}). By default: multiInstanceIterator_ref. Only
+     * exist if iterator value is set using
      * a business variable.
      * <li>
      * </ul>
@@ -2692,25 +2896,30 @@ public interface ProcessRuntimeAPI {
      * @return a map containing the evaluated context
      * @throws UserTaskNotFoundException if <code>userTaskInstanceId</code> does not reference any existing task.
      */
-    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
+    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId)
+            throws UserTaskNotFoundException, ExpressionEvaluationException;
 
     /**
      * return the context defined in the process definition for this user task instance. Context includes:
      * <ul>
      * <li>Business data references (see {@link org.bonitasoft.engine.business.data.BusinessDataReference},
-     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
+     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and
+     * {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
      * Key of
      * data reference is the name of the business data as declared in process definition followed by "_ref".
-     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same as for business data ("_ref" suffix).
+     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same
+     * as for business data ("_ref" suffix).
      * <li>For multi-instantiated task only: iterator name with "_ref" suffix (type of the value is
-     * {@link org.bonitasoft.engine.business.data.BusinessDataReference}). By default: multiInstanceIterator_ref. Only exist if iterator value is set using
+     * {@link org.bonitasoft.engine.business.data.BusinessDataReference}). By default: multiInstanceIterator_ref. Only
+     * exist if iterator value is set using
      * a business variable.
      * <li>
      * </ul>
      *
      * @param archivedUserTaskInstanceId the id of the archived version of the user task instance
      * @return a map containing the evaluated context
-     * @throws UserTaskNotFoundException if <code>archivedUserTaskInstanceId</code> does not reference any existing archived task.
+     * @throws UserTaskNotFoundException if <code>archivedUserTaskInstanceId</code> does not reference any existing
+     *         archived task.
      */
     Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId)
             throws UserTaskNotFoundException, ExpressionEvaluationException;
@@ -2719,32 +2928,40 @@ public interface ProcessRuntimeAPI {
      * return the context defined in the process definition for this process instance. Context includes:
      * <ul>
      * <li>Business data references (see {@link org.bonitasoft.engine.business.data.BusinessDataReference},
-     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
+     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and
+     * {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
      * Key of
      * data reference is the name of the business data as declared in process definition followed by "_ref".
-     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same as for business data ("_ref" suffix).
+     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same
+     * as for business data ("_ref" suffix).
      * </ul>
-     * 
+     *
      * @param processInstanceId the id of the process instance
      * @return a map containing the evaluated context
-     * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing process.
+     * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing
+     *         process.
      */
-    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
+    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId)
+            throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
 
     /**
      * return the context defined in the process definition for this process instance. Context includes:
      * <ul>
      * <li>Business data references (see {@link org.bonitasoft.engine.business.data.BusinessDataReference},
-     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
+     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and
+     * {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
      * Key of
      * data reference is the name of the business data as declared in process definition followed by "_ref".
-     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same as for business data ("_ref" suffix).
+     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same
+     * as for business data ("_ref" suffix).
      * </ul>
      *
-     * @param archivedProcessInstanceId the id of the archived version of a process instance. You can use {@link #getFinalArchivedProcessInstance(long)} to get
+     * @param archivedProcessInstanceId the id of the archived version of a process instance. You can use
+     *        {@link #getFinalArchivedProcessInstance(long)} to get
      *        the id of an archived instance based on the id of the same instance while it was running.
      * @return a map containing the evaluated context
-     * @throws ProcessInstanceNotFoundException if <code>archivedProcessInstanceId</code> does not reference any existing process.
+     * @throws ProcessInstanceNotFoundException if <code>archivedProcessInstanceId</code> does not reference any
+     *         existing process.
      */
     Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long archivedProcessInstanceId)
             throws ProcessInstanceNotFoundException, ExpressionEvaluationException;

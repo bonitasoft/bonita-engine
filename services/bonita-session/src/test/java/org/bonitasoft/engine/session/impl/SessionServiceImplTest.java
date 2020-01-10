@@ -119,7 +119,8 @@ public class SessionServiceImplTest {
     }
 
     @Test
-    public final void should_getLoggedUserFromSession_return_minus_1_when_there_is_no_session() throws SessionIdNotSetException, SSessionNotFoundException {
+    public final void should_getLoggedUserFromSession_return_minus_1_when_there_is_no_session()
+            throws SessionIdNotSetException, SSessionNotFoundException {
         //given
         doThrow(SessionIdNotSetException.class).when(sessionAccessor).getSessionId();
         doReturn(sSession).when(sessionProvider).getSession(SESSION_ID);
@@ -131,7 +132,8 @@ public class SessionServiceImplTest {
     }
 
     @Test
-    public final void should_getLoggedUserFromSession_return_minus_1_when_the_session_is_not_found() throws SessionIdNotSetException, SSessionNotFoundException {
+    public final void should_getLoggedUserFromSession_return_minus_1_when_the_session_is_not_found()
+            throws SessionIdNotSetException, SSessionNotFoundException {
         //given
         doReturn(SESSION_ID).when(sessionAccessor).getSessionId();
         doThrow(SSessionNotFoundException.class).when(sessionProvider).getSession(SESSION_ID);

@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.STermin
 /**
  * @author Matthieu Chaffotte
  */
-public class STerminateEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl implements STerminateEventTriggerDefinition {
+public class STerminateEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl
+        implements STerminateEventTriggerDefinition {
 
     private static final long serialVersionUID = -8156042655414582732L;
 

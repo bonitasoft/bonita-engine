@@ -27,12 +27,6 @@ import java.util.Set;
 
 import javax.lang.model.SourceVersion;
 
-import org.apache.commons.lang3.text.WordUtils;
-import org.bonitasoft.engine.bdm.model.field.Field;
-import org.bonitasoft.engine.bdm.model.field.FieldType;
-import org.bonitasoft.engine.bdm.model.field.RelationField;
-import org.bonitasoft.engine.bdm.model.field.SimpleField;
-
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
@@ -51,6 +45,11 @@ import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.util.NullStream;
+import org.apache.commons.lang3.text.WordUtils;
+import org.bonitasoft.engine.bdm.model.field.Field;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.RelationField;
+import org.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
  * @author Romain Bioteau
@@ -147,8 +146,8 @@ public class CodeGenerator {
     public JClass toJavaClass(final Field field) {
         if (field instanceof SimpleField) {
             final Class<?> fieldClass = ((SimpleField) field).getType().getClazz();
-                return getModel().ref(fieldClass);
-            }
+            return getModel().ref(fieldClass);
+        }
         final String qualifiedName = ((RelationField) field).getReference().getQualifiedName();
         return getModel().ref(qualifiedName);
     }
@@ -177,7 +176,8 @@ public class CodeGenerator {
         ifListIsNull._then().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
 
         final JBlock elseBlock = ifListIsNull._else();
-        final JVar copyVar = elseBlock.decl(field.type(), "copy", JExpr._new(getModel().ref(ArrayList.class)).arg(field));
+        final JVar copyVar = elseBlock.decl(field.type(), "copy",
+                JExpr._new(getModel().ref(ArrayList.class)).arg(field));
         elseBlock.invoke(JExpr._this().ref(field.name()), "clear");
         elseBlock.invoke(JExpr._this().ref(field.name()), "addAll").arg(copyVar);
 
@@ -191,7 +191,8 @@ public class CodeGenerator {
         return method;
     }
 
-    public JMethod addMethodSignature(final JDefinedClass definedClass, final String methodName, final JType returnType) {
+    public JMethod addMethodSignature(final JDefinedClass definedClass, final String methodName,
+            final JType returnType) {
         return definedClass.method(JMod.PUBLIC, returnType, methodName);
     }
 
@@ -203,7 +204,8 @@ public class CodeGenerator {
         return addListMethod(definedClass, field, "remove", "removeFrom");
     }
 
-    private JMethod addListMethod(final JDefinedClass definedClass, final Field field, final String listMethodName, final String parameterName) {
+    private JMethod addListMethod(final JDefinedClass definedClass, final Field field, final String listMethodName,
+            final String parameterName) {
         final JClass fieldClass = toJavaClass(field);
         final StringBuilder builder = new StringBuilder(parameterName);
         builder.append(WordUtils.capitalize(field.getName()));
@@ -222,7 +224,8 @@ public class CodeGenerator {
     }
 
     public String getGetterName(final Field field) {
-        final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType()) && !field.isCollection();
+        final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType())
+                && !field.isCollection();
         return getGetterName(bool, field.getName());
     }
 
@@ -245,7 +248,8 @@ public class CodeGenerator {
         return model;
     }
 
-    protected JAnnotationUse addAnnotation(final JAnnotatable annotable, final Class<? extends Annotation> annotationType) {
+    protected JAnnotationUse addAnnotation(final JAnnotatable annotable,
+            final Class<? extends Annotation> annotationType) {
         final Set<ElementType> supportedElementTypes = getSupportedElementTypes(annotationType);
         checkAnnotationTarget(annotable, annotationType, supportedElementTypes);
         return annotable.annotate(model.ref(annotationType));
@@ -253,13 +257,16 @@ public class CodeGenerator {
 
     protected void checkAnnotationTarget(final JAnnotatable annotable, final Class<? extends Annotation> annotationType,
             final Set<ElementType> supportedElementTypes) {
-        if (annotable instanceof JClass && !supportedElementTypes.isEmpty() && !supportedElementTypes.contains(ElementType.TYPE)) {
+        if (annotable instanceof JClass && !supportedElementTypes.isEmpty()
+                && !supportedElementTypes.contains(ElementType.TYPE)) {
             throw new IllegalArgumentException(annotationType.getName() + " is not supported for " + annotable);
         }
-        if (annotable instanceof JFieldVar && !supportedElementTypes.isEmpty() && !supportedElementTypes.contains(ElementType.FIELD)) {
+        if (annotable instanceof JFieldVar && !supportedElementTypes.isEmpty()
+                && !supportedElementTypes.contains(ElementType.FIELD)) {
             throw new IllegalArgumentException(annotationType.getName() + " is not supported for " + annotable);
         }
-        if (annotable instanceof JMethod && !supportedElementTypes.isEmpty() && !supportedElementTypes.contains(ElementType.METHOD)) {
+        if (annotable instanceof JMethod && !supportedElementTypes.isEmpty()
+                && !supportedElementTypes.contains(ElementType.METHOD)) {
             throw new IllegalArgumentException(annotationType.getName() + " is not supported for " + annotable);
         }
     }

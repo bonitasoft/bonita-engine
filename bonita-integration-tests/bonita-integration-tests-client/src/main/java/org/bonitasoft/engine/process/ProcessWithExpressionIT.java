@@ -53,8 +53,10 @@ public class ProcessWithExpressionIT extends TestWithUser {
 
     @Test
     public void executeProcessWithListExpression() throws Exception {
-        final Serializable result = executeProcessAndGetResultOfExpression(new ExpressionBuilder().createListExpression("list1",
-                Collections.singletonList(new ExpressionBuilder().createConstantStringExpression("test"))), List.class.getName());
+        final Serializable result = executeProcessAndGetResultOfExpression(
+                new ExpressionBuilder().createListExpression("list1",
+                        Collections.singletonList(new ExpressionBuilder().createConstantStringExpression("test"))),
+                List.class.getName());
         assertTrue(result instanceof List);
         assertEquals(1, ((List<?>) result).size());
         assertEquals("test", ((List<?>) result).get(0));
@@ -64,7 +66,8 @@ public class ProcessWithExpressionIT extends TestWithUser {
     public void executeProcessWithListOfListOfExpression() throws Exception {
         final Serializable result = executeProcessAndGetResultOfExpression(
                 new ExpressionBuilder().createListOfListExpression("myMap",
-                        Collections.singletonList(Collections.singletonList(new ExpressionBuilder().createConstantStringExpression("test")))),
+                        Collections.singletonList(Collections
+                                .singletonList(new ExpressionBuilder().createConstantStringExpression("test")))),
                 "java.util.List");
         assertTrue(result instanceof List);
         assertEquals(1, ((List<?>) result).size());
@@ -73,37 +76,46 @@ public class ProcessWithExpressionIT extends TestWithUser {
 
     @Test
     public void executeProcessWithScriptUsingApi() throws Exception {
-        final Serializable result = executeProcessAndGetResultOfExpression(new ExpressionBuilder().createGroovyScriptExpression("scriptAPI",
-                "apiAccessor.getProcessAPI().getProcessDefinition(processDefinitionId) != null ?Boolean.TRUE:Boolean.false", Boolean.class.getName(),
-                new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
-                new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_DEFINITION_ID)), Boolean.class.getName());
+        final Serializable result = executeProcessAndGetResultOfExpression(
+                new ExpressionBuilder().createGroovyScriptExpression("scriptAPI",
+                        "apiAccessor.getProcessAPI().getProcessDefinition(processDefinitionId) != null ?Boolean.TRUE:Boolean.false",
+                        Boolean.class.getName(),
+                        new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
+                        new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_DEFINITION_ID)),
+                Boolean.class.getName());
 
         assertEquals(Boolean.TRUE, result);
     }
 
-    private Serializable executeProcessAndGetResultOfExpression(final Expression expression, final String dataType) throws Exception {
+    private Serializable executeProcessAndGetResultOfExpression(final Expression expression, final String dataType)
+            throws Exception {
         return executeProcessAndGetResultOfExpression(expression, dataType, null, null, null);
     }
 
-    private Serializable executeProcessAndGetResultOfExpression(final Expression expression, final String dataType, final String extraDataName,
+    private Serializable executeProcessAndGetResultOfExpression(final Expression expression, final String dataType,
+            final String extraDataName,
             final String extraDataType, final Expression extraDataValue) throws Exception {
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithExpression", "1.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithExpression", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
         designProcessDefinition.addData("data1", dataType, null);
         if (extraDataName != null) {
             designProcessDefinition.addData(extraDataName, extraDataType, extraDataValue);
         }
-        designProcessDefinition.addAutomaticTask("step1").addOperation(new LeftOperandBuilder().createNewInstance("data1").done(), OperatorType.ASSIGNMENT,
+        designProcessDefinition.addAutomaticTask("step1").addOperation(
+                new LeftOperandBuilder().createNewInstance("data1").done(), OperatorType.ASSIGNMENT,
                 "=", null, expression);
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step2");
 
-        final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("data1", processInstance.getId());
+        final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("data1",
+                processInstance.getId());
         final Serializable value = processDataInstance.getValue();
         disableAndDeleteProcess(processDefinition);
         return value;
@@ -112,14 +124,17 @@ public class ProcessWithExpressionIT extends TestWithUser {
     @Test
     public void evaluateGroovyScriptWithConnectorHavingDependencies() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
-        final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
+        final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess",
+                String.valueOf(System.currentTimeMillis()));
         pBuilder.addActor(ACTOR_NAME)
                 .addUserTask("step1", ACTOR_NAME)
                 .addDisplayName(
                         new ExpressionBuilder().createGroovyScriptExpression("myScript",
-                                "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()", String.class.getName()));
+                                "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()",
+                                String.class.getName()));
         final DesignProcessDefinition done = pBuilder.done();
-        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(done);
         final InputStream stream = CommonAPIIT.class.getResourceAsStream("/mylibrary-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
@@ -165,13 +180,17 @@ public class ProcessWithExpressionIT extends TestWithUser {
         }
     }
 
-    private ProcessDefinition deployProcessWithScriptAndLibrary(final BarResource myLibrary, final String script) throws BonitaException {
+    private ProcessDefinition deployProcessWithScriptAndLibrary(final BarResource myLibrary, final String script)
+            throws BonitaException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
-        final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
+        final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess",
+                String.valueOf(System.currentTimeMillis()));
         pBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME)
-                .addDisplayName(new ExpressionBuilder().createGroovyScriptExpression("myScript", script, String.class.getName()));
+                .addDisplayName(new ExpressionBuilder().createGroovyScriptExpression("myScript", script,
+                        String.class.getName()));
         final DesignProcessDefinition done = pBuilder.done();
-        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(done);
         builder.addClasspathResource(myLibrary);
         return deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
     }
@@ -195,18 +214,22 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployEmptyProcess();
         Expression expression = new ExpressionBuilder().createConstantBooleanExpression(true);
         final Map<String, Serializable> inputValues = new HashMap<>(0);
-        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
+        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues,
+                processDefinition.getId()));
 
         expression = new ExpressionBuilder().createConstantStringExpression("test");
-        assertEquals("test", getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
+        assertEquals("test", getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues,
+                processDefinition.getId()));
 
         expression = new ExpressionBuilder().createConstantLongExpression(123456L);
-        assertEquals(123456L, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
+        assertEquals(123456L, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues,
+                processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 
     private ProcessDefinition deployEmptyProcess() throws BonitaException {
-        final DesignProcessDefinition done = new ProcessDefinitionBuilder().createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()))
+        final DesignProcessDefinition done = new ProcessDefinitionBuilder()
+                .createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()))
                 .done();
         return deployAndEnableProcess(done);
     }
@@ -217,31 +240,38 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression expression = new ExpressionBuilder().createInputExpression("test", Boolean.class.getName());
         final Map<String, Serializable> inputValues = new HashMap<>();
         inputValues.put("test", true);
-        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
+        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues,
+                processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test
     public void evaluateGroovyExpressionFromApi() throws Exception {
         final ProcessDefinition processDefinition = deployEmptyProcess();
-        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("evaluateGroovyExpressionFromApi", "input1 + 12",
-                Integer.class.getName(), new ExpressionBuilder().createInputExpression("input1", Integer.class.getName()));
+        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression(
+                "evaluateGroovyExpressionFromApi", "input1 + 12",
+                Integer.class.getName(),
+                new ExpressionBuilder().createInputExpression("input1", Integer.class.getName()));
         final Map<String, Serializable> inputValues = new HashMap<>(1);
         inputValues.put("input1", 8);
-        assertEquals(20, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
+        assertEquals(20, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues,
+                processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test
     public void evaluateGroovyWithDataProvidedExpressionFromApi() throws Exception {
         final ProcessDefinition processDefinition = deployEmptyProcess();
-        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("evaluateGroovyWithDataProvidedExpressionFromApi",
-                "input1 + data1 + 12", Integer.class.getName(), new ExpressionBuilder().createInputExpression("input1", Integer.class.getName()),
+        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression(
+                "evaluateGroovyWithDataProvidedExpressionFromApi",
+                "input1 + data1 + 12", Integer.class.getName(),
+                new ExpressionBuilder().createInputExpression("input1", Integer.class.getName()),
                 new ExpressionBuilder().createDataExpression("data1", Integer.class.getName()));
         final Map<String, Serializable> inputValues = new HashMap<>(2);
         inputValues.put("input1", 6);
         inputValues.put("data1", 2);
-        assertEquals(20, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
+        assertEquals(20, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues,
+                processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -252,13 +282,16 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression constantExpr = new ExpressionBuilder().createConstantStringExpression("DUMMY");
         final String data1Content = "data1_name";
         final Expression data1Expr = new ExpressionBuilder().createDataExpression(data1Content, String.class.getName());
-        final Expression listExpression1 = new ExpressionBuilder().createListExpression("manuList1", Arrays.asList(constantExpr, data1Expr));
+        final Expression listExpression1 = new ExpressionBuilder().createListExpression("manuList1",
+                Arrays.asList(constantExpr, data1Expr));
         final Expression felixConstExp = new ExpressionBuilder().createConstantStringExpression("FELIX");
-        final Expression listExpression2 = new ExpressionBuilder().createListExpression("manuList2", Arrays.asList(listExpression1, felixConstExp));
+        final Expression listExpression2 = new ExpressionBuilder().createListExpression("manuList2",
+                Arrays.asList(listExpression1, felixConstExp));
 
         final Map<String, Serializable> inputValues = new HashMap<>(1);
         inputValues.put(data1Content, "dataValue");
-        final List<Serializable> result = (List<Serializable>) getProcessAPI().evaluateExpressionOnProcessDefinition(listExpression2, inputValues,
+        final List<Serializable> result = (List<Serializable>) getProcessAPI().evaluateExpressionOnProcessDefinition(
+                listExpression2, inputValues,
                 processDefinition.getId());
         assertEquals(2, result.size());
         assertEquals(2, ((List<Serializable>) result.get(0)).size());
@@ -277,12 +310,14 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final String data1Content = "data1_name";
         final Expression data1Expr = new ExpressionBuilder().createDataExpression(data1Content, String.class.getName());
 
-        final Expression listExpression = new ExpressionBuilder().createListExpression("ManuList1", Arrays.asList(groovyExpr, constantExpr, data1Expr));
+        final Expression listExpression = new ExpressionBuilder().createListExpression("ManuList1",
+                Arrays.asList(groovyExpr, constantExpr, data1Expr));
 
         final Map<String, Serializable> inputValues = new HashMap<>(1);
         inputValues.put(data1Content, "EXPRESSION");
         @SuppressWarnings("unchecked")
-        final List<Serializable> result = (List<Serializable>) getProcessAPI().evaluateExpressionOnProcessDefinition(listExpression, inputValues,
+        final List<Serializable> result = (List<Serializable>) getProcessAPI().evaluateExpressionOnProcessDefinition(
+                listExpression, inputValues,
                 processDefinition.getId());
         assertEquals(3, result.size());
         assertEquals("1_EXPRESSION", result.get(0));
@@ -307,17 +342,20 @@ public class ProcessWithExpressionIT extends TestWithUser {
     public void evaluateGreaterThanComparationExpression() throws Exception {
         final Expression dependExpr1 = new ExpressionBuilder().createConstantDoubleExpression(5.1);
         final Expression dependExpr2 = new ExpressionBuilder().createConstantIntegerExpression(6);
-        final Expression expression1 = new ExpressionBuilder().createComparisonExpression("comp1", dependExpr1, ComparisonOperator.GREATER_THAN, dependExpr2);
+        final Expression expression1 = new ExpressionBuilder().createComparisonExpression("comp1", dependExpr1,
+                ComparisonOperator.GREATER_THAN, dependExpr2);
         Serializable result = executeProcessAndGetResultOfExpression(expression1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertFalse((Boolean) result);
 
-        final Expression expression2 = new ExpressionBuilder().createComparisonExpression("comp1", dependExpr2, ComparisonOperator.GREATER_THAN, dependExpr1);
+        final Expression expression2 = new ExpressionBuilder().createComparisonExpression("comp1", dependExpr2,
+                ComparisonOperator.GREATER_THAN, dependExpr1);
         result = executeProcessAndGetResultOfExpression(expression2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
 
-        final Expression expression3 = new ExpressionBuilder().createComparisonExpression("comp2", dependExpr2, ComparisonOperator.GREATER_THAN, dependExpr2);
+        final Expression expression3 = new ExpressionBuilder().createComparisonExpression("comp2", dependExpr2,
+                ComparisonOperator.GREATER_THAN, dependExpr2);
         result = executeProcessAndGetResultOfExpression(expression3, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertFalse((Boolean) result);
@@ -326,14 +364,17 @@ public class ProcessWithExpressionIT extends TestWithUser {
     @Test
     public void evaluateLogicalComplementExpression() throws Exception {
         final Expression dependExpr1 = new ExpressionBuilder().createConstantBooleanExpression(true);
-        final Expression dependExpr2 = new ExpressionBuilder().createGroovyScriptExpression("toReturnFalse", "4 == 5", Boolean.class.getName());
+        final Expression dependExpr2 = new ExpressionBuilder().createGroovyScriptExpression("toReturnFalse", "4 == 5",
+                Boolean.class.getName());
 
-        final Expression expression1 = new ExpressionBuilder().createLogicalComplementExpression("complement1", dependExpr1);
+        final Expression expression1 = new ExpressionBuilder().createLogicalComplementExpression("complement1",
+                dependExpr1);
         Serializable result = executeProcessAndGetResultOfExpression(expression1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertFalse((Boolean) result);
 
-        final Expression expression2 = new ExpressionBuilder().createLogicalComplementExpression("complement1", dependExpr2);
+        final Expression expression2 = new ExpressionBuilder().createLogicalComplementExpression("complement1",
+                dependExpr2);
         result = executeProcessAndGetResultOfExpression(expression2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
@@ -346,19 +387,22 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression exprOperand3 = new ExpressionBuilder().createConstantIntegerExpression(7);
         final Expression exprOperand4 = new ExpressionBuilder().createConstantIntegerExpression(-8);
 
-        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("GreaterThanOrEquals1", exprOperand1,
+        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("GreaterThanOrEquals1",
+                exprOperand1,
                 ComparisonOperator.GREATER_THAN_OR_EQUALS, exprOperand2);
         Serializable result = executeProcessAndGetResultOfExpression(exprResult1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertFalse((Boolean) result);
 
-        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThanOrEquals2", exprOperand1,
+        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThanOrEquals2",
+                exprOperand1,
                 ComparisonOperator.GREATER_THAN_OR_EQUALS, exprOperand3);
         result = executeProcessAndGetResultOfExpression(exprResult2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
 
-        final Expression exprResult3 = new ExpressionBuilder().createComparisonExpression("GreaterThanOrEquals3", exprOperand3,
+        final Expression exprResult3 = new ExpressionBuilder().createComparisonExpression("GreaterThanOrEquals3",
+                exprOperand3,
                 ComparisonOperator.GREATER_THAN_OR_EQUALS, exprOperand4);
         result = executeProcessAndGetResultOfExpression(exprResult3, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
@@ -398,19 +442,22 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression exprOperand3 = new ExpressionBuilder().createConstantIntegerExpression(7);
         final Expression exprOperand4 = new ExpressionBuilder().createConstantIntegerExpression(-8);
 
-        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("LessThanOrEquals1", exprOperand1,
+        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("LessThanOrEquals1",
+                exprOperand1,
                 ComparisonOperator.LESS_THAN_OR_EQUALS, exprOperand2);
         Serializable result = executeProcessAndGetResultOfExpression(exprResult1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
 
-        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("LessThanOrEquals2", exprOperand1,
+        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("LessThanOrEquals2",
+                exprOperand1,
                 ComparisonOperator.LESS_THAN_OR_EQUALS, exprOperand3);
         result = executeProcessAndGetResultOfExpression(exprResult2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
 
-        final Expression exprResult3 = new ExpressionBuilder().createComparisonExpression("LessThanOrEquals3", exprOperand3,
+        final Expression exprResult3 = new ExpressionBuilder().createComparisonExpression("LessThanOrEquals3",
+                exprOperand3,
                 ComparisonOperator.LESS_THAN_OR_EQUALS, exprOperand4);
         result = executeProcessAndGetResultOfExpression(exprResult3, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
@@ -422,12 +469,14 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantBooleanExpression(false);
         final Expression exprOperand2 = new ExpressionBuilder().createConstantBooleanExpression(true);
 
-        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1, ComparisonOperator.EQUALS, exprOperand2);
+        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1,
+                ComparisonOperator.EQUALS, exprOperand2);
         Serializable result = executeProcessAndGetResultOfExpression(exprResult1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertFalse((Boolean) result);
 
-        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand2, ComparisonOperator.GREATER_THAN,
+        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand2,
+                ComparisonOperator.GREATER_THAN,
                 exprOperand1);
         result = executeProcessAndGetResultOfExpression(exprResult2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
@@ -440,12 +489,14 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression exprOperand2 = new ExpressionBuilder().createConstantDoubleExpression(2.0);
         final Expression exprOperand3 = new ExpressionBuilder().createConstantDoubleExpression(1.0);
 
-        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1, ComparisonOperator.EQUALS, exprOperand3);
+        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1,
+                ComparisonOperator.EQUALS, exprOperand3);
         Serializable result = executeProcessAndGetResultOfExpression(exprResult1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
 
-        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand1, ComparisonOperator.GREATER_THAN,
+        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand1,
+                ComparisonOperator.GREATER_THAN,
                 exprOperand2);
         result = executeProcessAndGetResultOfExpression(exprResult2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
@@ -458,12 +509,14 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression exprOperand2 = new ExpressionBuilder().createConstantLongExpression(353);
         final Expression exprOperand3 = new ExpressionBuilder().createConstantLongExpression(145);
 
-        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1, ComparisonOperator.EQUALS, exprOperand3);
+        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1,
+                ComparisonOperator.EQUALS, exprOperand3);
         Serializable result = executeProcessAndGetResultOfExpression(exprResult1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
 
-        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand1, ComparisonOperator.GREATER_THAN,
+        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand1,
+                ComparisonOperator.GREATER_THAN,
                 exprOperand2);
         result = executeProcessAndGetResultOfExpression(exprResult2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
@@ -476,12 +529,14 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression exprOperand2 = new ExpressionBuilder().createConstantStringExpression("ashley");
         final Expression exprOperand3 = new ExpressionBuilder().createConstantStringExpression("john");
 
-        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1, ComparisonOperator.EQUALS, exprOperand3);
+        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1,
+                ComparisonOperator.EQUALS, exprOperand3);
         Serializable result = executeProcessAndGetResultOfExpression(exprResult1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
 
-        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand2, ComparisonOperator.GREATER_THAN,
+        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand2,
+                ComparisonOperator.GREATER_THAN,
                 exprOperand1);
         result = executeProcessAndGetResultOfExpression(exprResult2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
@@ -495,23 +550,27 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression exprOperand3 = new ExpressionBuilder().createConstantStringExpression("JOHN");
         final Expression exprOperand4 = new ExpressionBuilder().createConstantStringExpression("ASHLEY");
 
-        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1, ComparisonOperator.EQUALS, exprOperand3);
+        final Expression exprResult1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1,
+                ComparisonOperator.EQUALS, exprOperand3);
         Serializable result = executeProcessAndGetResultOfExpression(exprResult1, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertFalse((Boolean) result);
 
-        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand2, ComparisonOperator.GREATER_THAN,
+        final Expression exprResult2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand2,
+                ComparisonOperator.GREATER_THAN,
                 exprOperand4);
         result = executeProcessAndGetResultOfExpression(exprResult2, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertTrue((Boolean) result);
 
-        final Expression exprResult3 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand3, ComparisonOperator.EQUALS, exprOperand1);
+        final Expression exprResult3 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand3,
+                ComparisonOperator.EQUALS, exprOperand1);
         result = executeProcessAndGetResultOfExpression(exprResult3, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
         assertFalse((Boolean) result);
 
-        final Expression exprResult4 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand4, ComparisonOperator.GREATER_THAN,
+        final Expression exprResult4 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand4,
+                ComparisonOperator.GREATER_THAN,
                 exprOperand1);
         result = executeProcessAndGetResultOfExpression(exprResult4, Boolean.class.getName());
         assertTrue(result instanceof Boolean);
@@ -520,12 +579,15 @@ public class ProcessWithExpressionIT extends TestWithUser {
 
     @Test
     public void runProcessWithScriptThatThrowExceptionFailTheTask() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithGroovy", "1.0");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithGroovy", "1.0");
         processBuilder.addAutomaticTask("activityThatFail").addData("data1", String.class.getName(),
-                new ExpressionBuilder().createGroovyScriptExpression("script", "throw new Exception()", String.class.getName()));
+                new ExpressionBuilder().createGroovyScriptExpression("script", "throw new Exception()",
+                        String.class.getName()));
         processBuilder.addUserTask("aTask", ACTOR_NAME);
         processBuilder.addActor(ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "aTask");
         waitForTaskToFail(processInstance);
@@ -534,23 +596,28 @@ public class ProcessWithExpressionIT extends TestWithUser {
 
     @Test
     public void processWithXPathExpression() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("XPathExpression", "1.0");
-        processBuilder.addData("data", String.class.getName(), new ExpressionBuilder().createXPathExpression("xpath", "/root/element/@name",
-                XPathReturnType.STRING, "<root><element name='Alexander Corvinus' /></root>"));
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("XPathExpression", "1.0");
+        processBuilder.addData("data", String.class.getName(),
+                new ExpressionBuilder().createXPathExpression("xpath", "/root/element/@name",
+                        XPathReturnType.STRING, "<root><element name='Alexander Corvinus' /></root>"));
         processBuilder.addUserTask("aDummyTask", ACTOR_NAME);
         processBuilder.addActor(ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "aDummyTask");
 
-        assertEquals("Alexander Corvinus", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
+        assertEquals("Alexander Corvinus",
+                getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test
     public void executeProcessWithAutomaticTasksAndTransitionFailed() throws Exception {
         // Build condition
-        final Expression condition = new ExpressionBuilder().createGroovyScriptExpression("evaluateGroovyExpressionFromApi", "throw new Exception()",
+        final Expression condition = new ExpressionBuilder().createGroovyScriptExpression(
+                "evaluateGroovyExpressionFromApi", "throw new Exception()",
                 Boolean.class.getName());
 
         // Build process
@@ -564,7 +631,8 @@ public class ProcessWithExpressionIT extends TestWithUser {
         designProcessDefinition.addDefaultTransition("step1", "default");
 
         // Start process
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                ACTOR_NAME, user);
         getProcessAPI().startProcess(processDefinition.getId());
 
         // Test if step1 state is FAILED
@@ -577,11 +645,14 @@ public class ProcessWithExpressionIT extends TestWithUser {
     public void evaluateJavaMethodCallExpression() throws Exception {
         final String extraDataName = "myValues";
         final String extraDataType = List.class.getName();
-        final Expression extraDataValue = new ExpressionBuilder().createGroovyScriptExpression("defaultList", "return Arrays.asList(1, 2 , 3);", extraDataType);
+        final Expression extraDataValue = new ExpressionBuilder().createGroovyScriptExpression("defaultList",
+                "return Arrays.asList(1, 2 , 3);", extraDataType);
         final Expression dep = new ExpressionBuilder().createDataExpression(extraDataName, extraDataType);
 
-        final Expression expression = new ExpressionBuilder().createJavaMethodCallExpression("getter", "toString", String.class.getName(), dep);
-        final Serializable result = executeProcessAndGetResultOfExpression(expression, String.class.getName(), extraDataName, extraDataType, extraDataValue);
+        final Expression expression = new ExpressionBuilder().createJavaMethodCallExpression("getter", "toString",
+                String.class.getName(), dep);
+        final Serializable result = executeProcessAndGetResultOfExpression(expression, String.class.getName(),
+                extraDataName, extraDataType, extraDataValue);
         assertEquals("[1, 2, 3]", result);
 
     }
@@ -591,15 +662,20 @@ public class ProcessWithExpressionIT extends TestWithUser {
         // the cache on ClassReflector made impossible to call the same expression on the same class if it was loaded by 2 different process
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive();
         builder.addClasspathResource(getResource("/custom-0.1.jar.bak", "custom-0.1.jar"));
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("ProcessWithCustomData", "1.0");
-        designProcessDefinition.addData("adress", "org.bonitasoft.custom.Address", new ExpressionBuilder().createGroovyScriptExpression("create adress",
-                "new org.bonitasoft.custom.Address(\"name1\",\"Rue ampère\",\"38000\",\"Grenoble\",\"France\")", "org.bonitasoft.custom.Address"));
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithCustomData", "1.0");
+        designProcessDefinition.addData("adress", "org.bonitasoft.custom.Address",
+                new ExpressionBuilder().createGroovyScriptExpression("create adress",
+                        "new org.bonitasoft.custom.Address(\"name1\",\"Rue ampère\",\"38000\",\"Grenoble\",\"France\")",
+                        "org.bonitasoft.custom.Address"));
         designProcessDefinition
                 .addActor(ACTOR_NAME)
                 .addUserTask("step1", ACTOR_NAME)
                 .addDisplayName(
-                        new ExpressionBuilder().createJavaMethodCallExpression("getNameOfAdress", "getName", String.class.getName(),
-                                new ExpressionBuilder().createDataExpression("adress", "org.bonitasoft.custom.Address")));
+                        new ExpressionBuilder().createJavaMethodCallExpression("getNameOfAdress", "getName",
+                                String.class.getName(),
+                                new ExpressionBuilder().createDataExpression("adress",
+                                        "org.bonitasoft.custom.Address")));
         designProcessDefinition.addAutomaticTask("start").addTransition("start", "step1");
         builder.setProcessDefinition(designProcessDefinition.done());
         final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
@@ -610,15 +686,20 @@ public class ProcessWithExpressionIT extends TestWithUser {
         // do the same thing a second time
         final BusinessArchiveBuilder builder2 = new BusinessArchiveBuilder().createNewBusinessArchive();
         builder2.addClasspathResource(getResource("/custom-0.1.jar.bak", "custom-0.1.jar"));
-        final ProcessDefinitionBuilder designProcessDefinition2 = new ProcessDefinitionBuilder().createNewInstance("ProcessWithCustomData", "1.1");
-        designProcessDefinition2.addData("adress", "org.bonitasoft.custom.Address", new ExpressionBuilder().createGroovyScriptExpression("create adress",
-                "new org.bonitasoft.custom.Address(\"name1\",\"Rue ampère\",\"38000\",\"Grenoble\",\"France\")", "org.bonitasoft.custom.Address"));
+        final ProcessDefinitionBuilder designProcessDefinition2 = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithCustomData", "1.1");
+        designProcessDefinition2.addData("adress", "org.bonitasoft.custom.Address",
+                new ExpressionBuilder().createGroovyScriptExpression("create adress",
+                        "new org.bonitasoft.custom.Address(\"name1\",\"Rue ampère\",\"38000\",\"Grenoble\",\"France\")",
+                        "org.bonitasoft.custom.Address"));
         designProcessDefinition2
                 .addActor(ACTOR_NAME)
                 .addUserTask("step1", ACTOR_NAME)
                 .addDisplayName(
-                        new ExpressionBuilder().createJavaMethodCallExpression("getNameOfAdress", "getName", String.class.getName(),
-                                new ExpressionBuilder().createDataExpression("adress", "org.bonitasoft.custom.Address")));
+                        new ExpressionBuilder().createJavaMethodCallExpression("getNameOfAdress", "getName",
+                                String.class.getName(),
+                                new ExpressionBuilder().createDataExpression("adress",
+                                        "org.bonitasoft.custom.Address")));
         designProcessDefinition2.addAutomaticTask("start").addTransition("start", "step1");
         builder2.setProcessDefinition(designProcessDefinition2.done());
         final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(builder2.done(), ACTOR_NAME, user);

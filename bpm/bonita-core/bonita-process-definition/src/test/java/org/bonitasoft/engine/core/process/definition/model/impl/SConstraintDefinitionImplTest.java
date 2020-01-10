@@ -22,7 +22,8 @@ public class SConstraintDefinitionImplTest {
     @Test
     public void should_add_input_name() throws Exception {
         //given
-        final SConstraintDefinitionImpl sConstraintDefinition = new SConstraintDefinitionImpl("name", "expression", "explanation");
+        final SConstraintDefinitionImpl sConstraintDefinition = new SConstraintDefinitionImpl("name", "expression",
+                "explanation");
 
         //when
         sConstraintDefinition.addInputName("inputName");

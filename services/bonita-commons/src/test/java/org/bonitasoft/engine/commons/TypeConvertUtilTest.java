@@ -28,7 +28,8 @@ class TypeConvertUtilTest {
 
     @BeforeEach
     void before() {
-        String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss.SSS" };
+        String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss",
+                "yyyy-MM-dd'T'HH:mm:ss.SSS" };
         typeConverterUtil = new TypeConverterUtil(datePatterns);
     }
 
@@ -42,8 +43,8 @@ class TypeConvertUtilTest {
         assertThat((Float) typeConverterUtil.convertToType(Float.class, "-17.596")).isEqualTo(-17.596F);
 
         final BigDecimal bigDecimal = new BigDecimal(12.3650000000000002131628207280300557613372802734375);
-        assertThat((BigDecimal) typeConverterUtil.convertToType(BigDecimal.class, "12.3650000000000002131628207280300557613372802734375")).isEqualTo(bigDecimal);
-
+        assertThat((BigDecimal) typeConverterUtil.convertToType(BigDecimal.class,
+                "12.3650000000000002131628207280300557613372802734375")).isEqualTo(bigDecimal);
 
         assertThat((Boolean) typeConverterUtil.convertToType(Boolean.class, "true")).isTrue();
         assertThat((Boolean) typeConverterUtil.convertToType(Boolean.class, "false")).isFalse();
@@ -66,9 +67,8 @@ class TypeConvertUtilTest {
     private void checkDateConvert(String dateToConvert, long expectedDateAsLong) {
         final Date expectedDate = new Date(expectedDateAsLong);
         final Date returnedDate = (Date) typeConverterUtil.convertToType(Date.class, dateToConvert);
-        assertThat(returnedDate).as("error while converting date:" + dateToConvert + " (assuming provided date is GMT)").hasTime(expectedDateAsLong).isEqualTo(expectedDate);
+        assertThat(returnedDate).as("error while converting date:" + dateToConvert + " (assuming provided date is GMT)")
+                .hasTime(expectedDateAsLong).isEqualTo(expectedDate);
     }
-
-
 
 }

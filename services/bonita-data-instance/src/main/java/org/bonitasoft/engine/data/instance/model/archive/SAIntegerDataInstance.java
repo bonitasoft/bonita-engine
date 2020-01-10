@@ -32,6 +32,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @Entity
 @DiscriminatorValue("SAIntegerDataInstanceImpl")
 public class SAIntegerDataInstance extends SADataInstance {
+
     @Column(name = "intValue")
     private Integer value;
 

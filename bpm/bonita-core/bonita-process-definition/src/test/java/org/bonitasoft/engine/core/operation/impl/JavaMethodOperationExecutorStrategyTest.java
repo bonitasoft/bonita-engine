@@ -55,7 +55,8 @@ public class JavaMethodOperationExecutorStrategyTest {
         when(operation.getLeftOperand()).thenReturn(leftOperand);
         when(leftOperand.getName()).thenReturn("unknownData");
 
-        final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
+        final SExpressionContext expressionContext = new SExpressionContext(123L,
+                DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         expressionContext.setInputValues(Collections.<String, Object> emptyMap());
         strategy.computeNewValueForLeftOperand(operation, "Update", expressionContext, false);
     }
@@ -72,7 +73,8 @@ public class JavaMethodOperationExecutorStrategyTest {
         when(operation.getOperator()).thenReturn("setThing:int");
         when(rightOperand.getReturnType()).thenReturn(Object.class.getName());
 
-        final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
+        final SExpressionContext expressionContext = new SExpressionContext(123L,
+                DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         final Map<String, Object> map = new HashMap<>();
         map.put("myData", new MyClassThatThrowException());
         expressionContext.setInputValues(map);
@@ -92,11 +94,13 @@ public class JavaMethodOperationExecutorStrategyTest {
         when(operation.getOperator()).thenReturn("setThing:int");
         when(rightOperand.getReturnType()).thenReturn(Integer.class.getName());
 
-        final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
+        final SExpressionContext expressionContext = new SExpressionContext(123L,
+                DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         final Map<String, Object> map = new HashMap<>();
         map.put("myData", new MyClass());
         expressionContext.setInputValues(map);
-        final MyClass updated = (MyClass) strategy.computeNewValueForLeftOperand(operation, 12, expressionContext, false);
+        final MyClass updated = (MyClass) strategy.computeNewValueForLeftOperand(operation, 12, expressionContext,
+                false);
 
         assertEquals(12, updated.getThing());
     }
@@ -117,7 +121,8 @@ public class JavaMethodOperationExecutorStrategyTest {
         final String operationType = strategy.getOperationType();
 
         //then
-        assertThat(operationType).as("should get operation type").isEqualTo(JavaMethodOperationExecutorStrategy.TYPE_JAVA_METHOD);
+        assertThat(operationType).as("should get operation type")
+                .isEqualTo(JavaMethodOperationExecutorStrategy.TYPE_JAVA_METHOD);
 
     }
 

@@ -25,7 +25,8 @@ import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 
 /**
- * Represents the content of a BusinessArchive file (*.bar). It contains the {@link org.bonitasoft.engine.bpm.process.DesignProcessDefinition} and all resources
+ * Represents the content of a BusinessArchive file (*.bar). It contains the
+ * {@link org.bonitasoft.engine.bpm.process.DesignProcessDefinition} and all resources
  * necessary to the process execution.
  *
  * @author Baptiste Mesta
@@ -111,11 +112,11 @@ public class BusinessArchive implements Serializable {
      * Retrieves a byte array representing the content of the resource identified by the given path.
      * <br>
      * <p>Example:</p>
-     * 
+     *
      * <pre>
      * businessArchive.getResource("actorMapping.xml")
      * </pre>
-     * 
+     *
      * <br>
      *
      * @param resourcePath the complete resource path
@@ -126,19 +127,21 @@ public class BusinessArchive implements Serializable {
     }
 
     /**
-     * Retrieves a {@link java.util.Map} representing the resources having paths matching with the given regular expression. The {@code Map} keys store the
+     * Retrieves a {@link java.util.Map} representing the resources having paths matching with the given regular
+     * expression. The {@code Map} keys store the
      * resource paths and the {@code Map} values store the resource content.
      * <br>
      * <p>Example:</p>
-     * 
+     *
      * <pre>
      * businessArchive.getResources("^classpath/.*$")
      * </pre>
-     * 
+     *
      * <br>
      *
      * @param regex the regular expression used to match the resource path
-     * @return a {@link java.util.Map} representing the resources having paths matching with the given regular expression
+     * @return a {@link java.util.Map} representing the resources having paths matching with the given regular
+     *         expression
      */
     public Map<String, byte[]> getResources(final String regex) {
         final Pattern pattern = Pattern.compile(regex);
@@ -162,7 +165,8 @@ public class BusinessArchive implements Serializable {
     }
 
     /**
-     * Retrieves a {@code Map} containing all resources of this {@code BusinessArchive}. The {@code Map} keys store the resource full paths and the {@code Map}
+     * Retrieves a {@code Map} containing all resources of this {@code BusinessArchive}. The {@code Map} keys store the
+     * resource full paths and the {@code Map}
      * values store the resource content.
      *
      * @return a {@code Map} containing all resources of this {@code BusinessArchive}

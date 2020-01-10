@@ -20,6 +20,7 @@ import org.hibernate.type.descriptor.sql.VarcharTypeDescriptor;
 
 public class PostgresXMLType
         extends AbstractSingleColumnStandardBasicType<Serializable> {
+
     public static final PostgresXMLType INSTANCE = new PostgresXMLType();
 
     public PostgresXMLType() {

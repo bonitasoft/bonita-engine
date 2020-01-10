@@ -16,7 +16,6 @@ package org.bonitasoft.engine.authentication;
 /**
  * @author Julien Reboul
  * @author Celine Souchet
- * 
  */
 public class AuthenticationConstants {
 

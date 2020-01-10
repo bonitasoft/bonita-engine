@@ -23,12 +23,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class APIUtils {
 
-
-
     protected static long getUserId() {
         return SessionInfos.getUserIdFromSession();
     }
-
 
     protected static TenantServiceAccessor getTenantAccessor() {
         try {

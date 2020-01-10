@@ -41,7 +41,8 @@ public class AbstractDBPersistenceServiceTest {
 
         public DummyDBPersistenceService(final String name,
                 final char likeEscapeCharacter, final SequenceManager sequenceManager,
-                final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
+                final DataSource datasource, final boolean enableWordSearch,
+                final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
                 throws ClassNotFoundException {
             super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                     wordSearchExclusionMappings, logger);
@@ -58,7 +59,8 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
+        public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor)
+                throws SBonitaReadException {
             return null;
         }
 
@@ -83,7 +85,8 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) throws SPersistenceException {
+        public void deleteByTenant(final Class<? extends PersistentObject> entityClass,
+                final List<FilterOption> filters) throws SPersistenceException {
 
         }
 
@@ -93,12 +96,14 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass)
+                throws SPersistenceException {
 
         }
 
         @Override
-        public void delete(final long id, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        public void delete(final long id, final Class<? extends PersistentObject> entityClass)
+                throws SPersistenceException {
 
         }
 
@@ -118,7 +123,8 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        public int update(final String updateQueryName, final Map<String, Object> inputParameters) throws SPersistenceException {
+        public int update(final String updateQueryName, final Map<String, Object> inputParameters)
+                throws SPersistenceException {
             return 0;
         }
     }
@@ -208,9 +214,11 @@ public class AbstractDBPersistenceServiceTest {
     }
 
     @Test
-    public void should_word_search_returns_false_when_feature_is_enabled_and_entity_class_is_excluded() throws Exception {
+    public void should_word_search_returns_false_when_feature_is_enabled_and_entity_class_is_excluded()
+            throws Exception {
         final boolean enableWordSearch = true;
-        final Set<String> wordSearchExclusionMappings = Collections.singleton(ParentDummyPersistentObject.class.getName());
+        final Set<String> wordSearchExclusionMappings = Collections
+                .singleton(ParentDummyPersistentObject.class.getName());
         final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = false;
 
@@ -218,7 +226,8 @@ public class AbstractDBPersistenceServiceTest {
     }
 
     @Test
-    public void should_word_search_returns_true_when_feature_is_enabled_and_entity_class_is_not_excluded() throws Exception {
+    public void should_word_search_returns_true_when_feature_is_enabled_and_entity_class_is_not_excluded()
+            throws Exception {
         final boolean enableWordSearch = true;
         final Set<String> wordSearchExclusionMappings = Collections.singleton(DummyPersistentObject2.class.getName());
         final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
@@ -228,9 +237,11 @@ public class AbstractDBPersistenceServiceTest {
     }
 
     @Test
-    public void should_word_search_returns_false_when_feature_is_enabled_and_parent_entity_class_is_excluded() throws Exception {
+    public void should_word_search_returns_false_when_feature_is_enabled_and_parent_entity_class_is_excluded()
+            throws Exception {
         final boolean enableWordSearch = true;
-        final Set<String> wordSearchExclusionMappings = Collections.singleton(ParentDummyPersistentObject.class.getName());
+        final Set<String> wordSearchExclusionMappings = Collections
+                .singleton(ParentDummyPersistentObject.class.getName());
         final Class<? extends PersistentObject> entityClass = Child1DummyPersistentObject.class;
         final boolean expectedResult = false;
 
@@ -238,9 +249,11 @@ public class AbstractDBPersistenceServiceTest {
     }
 
     @Test
-    public void should_word_search_returns_true_when_feature_is_enabled_and_child_entity_class_is_excluded() throws Exception {
+    public void should_word_search_returns_true_when_feature_is_enabled_and_child_entity_class_is_excluded()
+            throws Exception {
         final boolean enableWordSearch = true;
-        final Set<String> wordSearchExclusionMappings = Collections.singleton(Child1DummyPersistentObject.class.getName());
+        final Set<String> wordSearchExclusionMappings = Collections
+                .singleton(Child1DummyPersistentObject.class.getName());
         final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = true;
 
@@ -248,22 +261,26 @@ public class AbstractDBPersistenceServiceTest {
     }
 
     @Test
-    public void should_word_search_returns_true_when_feature_is_enabled_and_brother_entity_class_is_excluded() throws Exception {
+    public void should_word_search_returns_true_when_feature_is_enabled_and_brother_entity_class_is_excluded()
+            throws Exception {
         final boolean enableWordSearch = true;
-        final Set<String> wordSearchExclusionMappings = Collections.singleton(Child1DummyPersistentObject.class.getName());
+        final Set<String> wordSearchExclusionMappings = Collections
+                .singleton(Child1DummyPersistentObject.class.getName());
         final Class<? extends PersistentObject> entityClass = Child2DummyPersistentObject.class;
         final boolean expectedResult = true;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
-    private void executeIsWordSearchEnabled(final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
+    private void executeIsWordSearchEnabled(final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings,
             final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
             throws ClassNotFoundException {
         final SequenceManager sequenceManager = mock(SequenceManager.class);
         final DataSource datasource = mock(DataSource.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", '#', sequenceManager,
+        final AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", '#',
+                sequenceManager,
                 datasource, enableWordSearch, wordSearchExclusionMappings, logger);
 
         assertThat(persistenceService.isWordSearchEnabled(entityClass)).isEqualTo(expectedResult);

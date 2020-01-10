@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api.event;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
@@ -41,33 +44,32 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface EventInstanceService  {
-
+public interface EventInstanceService {
 
     void createEventInstance(SEventInstance eventInstance) throws SEventInstanceCreationException;
 
     /**
-     *
      * STimerEventTriggerInstance is used to keep track of currently running timers
      * using {@link org.bonitasoft.engine.api.ProcessAPI#searchTimerEventTriggerInstances(long, SearchOptions)}
      */
-    void createTimerEventTriggerInstance(STimerEventTriggerInstance sEventTriggerInstance) throws SEventTriggerInstanceCreationException;
+    void createTimerEventTriggerInstance(STimerEventTriggerInstance sEventTriggerInstance)
+            throws SEventTriggerInstanceCreationException;
 
     void createMessageInstance(SMessageInstance messageInstance) throws SMessageInstanceCreationException;
 
     void createWaitingEvent(SWaitingEvent waitingEvent) throws SWaitingEventCreationException;
 
-    SWaitingErrorEvent getBoundaryWaitingErrorEvent(long relatedActivityInstanceId, String errorCode) throws SWaitingEventReadException;
+    SWaitingErrorEvent getBoundaryWaitingErrorEvent(long relatedActivityInstanceId, String errorCode)
+            throws SWaitingEventReadException;
 
-    List<SEventInstance> getEventInstances(long rootContainerId, int fromIndex, int maxResults, String fieldName, OrderByType orderByType)
+    List<SEventInstance> getEventInstances(long rootContainerId, int fromIndex, int maxResults, String fieldName,
+            OrderByType orderByType)
             throws SEventInstanceReadException;
 
     /**
@@ -78,7 +80,8 @@ public interface EventInstanceService  {
      * @throws SEventInstanceReadException
      * @since 6.2
      */
-    List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long activityInstanceId, int fromIndex, int maxResults) throws SEventInstanceReadException;
+    List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long activityInstanceId, int fromIndex,
+            int maxResults) throws SEventInstanceReadException;
 
     /**
      * @param entityClass
@@ -87,7 +90,8 @@ public interface EventInstanceService  {
      * @throws SEventTriggerInstanceReadException
      * @since 6.4.0
      */
-    <T extends STimerEventTriggerInstance> T getEventTriggerInstance(Class<T> entityClass, long eventTriggerInstanceId) throws SEventTriggerInstanceReadException;
+    <T extends STimerEventTriggerInstance> T getEventTriggerInstance(Class<T> entityClass, long eventTriggerInstanceId)
+            throws SEventTriggerInstanceReadException;
 
     void deleteMessageInstance(SMessageInstance messageInstance) throws SMessageModificationException;
 
@@ -101,7 +105,8 @@ public interface EventInstanceService  {
      * @throws SEventTriggerInstanceReadException
      * @since 6.3
      */
-    List<SWaitingSignalEvent> getWaitingSignalEvents(String signalName, int fromIndex, int maxResults) throws SEventTriggerInstanceReadException;
+    List<SWaitingSignalEvent> getWaitingSignalEvents(String signalName, int fromIndex, int maxResults)
+            throws SEventTriggerInstanceReadException;
 
     /**
      * @param processDefinitionId
@@ -110,27 +115,34 @@ public interface EventInstanceService  {
      * @throws SBonitaReadException
      * @since 6.3
      */
-    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
-    List<SMessageEventCouple> getMessageEventCouples(int fromIndex, int maxResults) throws SEventTriggerInstanceReadException;
+    List<SMessageEventCouple> getMessageEventCouples(int fromIndex, int maxResults)
+            throws SEventTriggerInstanceReadException;
 
     SWaitingMessageEvent getWaitingMessage(long waitingMessageId) throws SWaitingEventReadException;
 
     SMessageInstance getMessageInstance(long messageInstanceId) throws SMessageInstanceReadException;
 
-    void updateWaitingMessage(SWaitingMessageEvent waitingMessageEvent, EntityUpdateDescriptor descriptor) throws SWaitingEventModificationException;
+    void updateWaitingMessage(SWaitingMessageEvent waitingMessageEvent, EntityUpdateDescriptor descriptor)
+            throws SWaitingEventModificationException;
 
-    void updateMessageInstance(SMessageInstance messageInstance, EntityUpdateDescriptor descriptor) throws SMessageModificationException;
+    void updateMessageInstance(SMessageInstance messageInstance, EntityUpdateDescriptor descriptor)
+            throws SMessageModificationException;
 
-    <T extends SWaitingEvent> List<T> searchWaitingEvents(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
+    <T extends SWaitingEvent> List<T> searchWaitingEvents(Class<T> entityClass, QueryOptions searchOptions)
+            throws SBonitaReadException;
 
-    long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaReadException;
+    long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions)
+            throws SBonitaReadException;
 
     /**
      * @param flowNodeInstanceId the flow node instance id
      * @return the timer event trigger instance of this flow node if there is one
      */
-    Optional<STimerEventTriggerInstance> getTimerEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException;
+    Optional<STimerEventTriggerInstance> getTimerEventTriggerInstanceOfFlowNode(long flowNodeInstanceId)
+            throws SBonitaReadException;
 
     SWaitingSignalEvent getWaitingSignalEvent(long id)
             throws SEventTriggerInstanceReadException, SEventTriggerInstanceNotFoundException;
@@ -140,9 +152,11 @@ public interface EventInstanceService  {
      * @throws SEventTriggerInstanceDeletionException
      * @since 6.1
      */
-    void deleteEventTriggerInstance(STimerEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException;
+    void deleteEventTriggerInstance(STimerEventTriggerInstance eventTriggerInstance)
+            throws SEventTriggerInstanceDeletionException;
 
-    void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException, SEventTriggerInstanceDeletionException;
+    void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId)
+            throws SBonitaReadException, SEventTriggerInstanceDeletionException;
 
     /**
      * @param flowNodeInstance
@@ -150,9 +164,8 @@ public interface EventInstanceService  {
      * @throws SEventTriggerInstanceReadException
      * @since 6.1
      */
-    void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException,  SEventTriggerInstanceReadException;
-
-
+    void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance)
+            throws SWaitingEventModificationException, SEventTriggerInstanceReadException;
 
     /**
      * Resets all Message Instances marked as handled, so that they are eligible to match Waiting Events again.
@@ -163,7 +176,8 @@ public interface EventInstanceService  {
     int resetProgressMessageInstances() throws SMessageModificationException;
 
     /**
-     * Resets all Waiting Message Events marked as 'in progress", so that they are eligible to match Message Instances again.
+     * Resets all Waiting Message Events marked as 'in progress", so that they are eligible to match Message Instances
+     * again.
      *
      * @return the number of waiting events reset.
      * @throws SWaitingEventModificationException
@@ -181,7 +195,8 @@ public interface EventInstanceService  {
      * @return The number of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
      * @since 6.4.0
      */
-    long getNumberOfTimerEventTriggerInstances(long processInstanceId, QueryOptions searchOptions) throws SBonitaReadException;
+    long getNumberOfTimerEventTriggerInstances(long processInstanceId, QueryOptions searchOptions)
+            throws SBonitaReadException;
 
     /**
      * Search the list of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
@@ -194,13 +209,13 @@ public interface EventInstanceService  {
      * @since 6.4.0
      */
     List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId,
-                                                                      QueryOptions searchOptions) throws SBonitaReadException;
+            QueryOptions searchOptions) throws SBonitaReadException;
 
     Integer deleteMessageAndDataInstanceOlderThanCreationDate(long creationDate,
-                                                              QueryOptions queryOptions) throws  SMessageModificationException;
+            QueryOptions queryOptions) throws SMessageModificationException;
 
-
-    List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate, QueryOptions queryOptions) throws SEventTriggerInstanceReadException, SMessageInstanceReadException;
+    List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate, QueryOptions queryOptions)
+            throws SEventTriggerInstanceReadException, SMessageInstanceReadException;
 
     /**
      * Update an event trigger instance.
@@ -212,7 +227,8 @@ public interface EventInstanceService  {
      * @throws SEventTriggerInstanceModificationException
      * @since 6.4.0
      */
-    void updateEventTriggerInstance(STimerEventTriggerInstance sTimerEventTriggerInstance, EntityUpdateDescriptor descriptor)
+    void updateEventTriggerInstance(STimerEventTriggerInstance sTimerEventTriggerInstance,
+            EntityUpdateDescriptor descriptor)
             throws SEventTriggerInstanceModificationException;
 
 }

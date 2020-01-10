@@ -33,6 +33,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @DiscriminatorValue("SALongTextDataInstanceImpl")
 public class SALongTextDataInstance extends SADataInstance {
+
     @Column(name = "clobValue")
     @Type(type = "materialized_clob")
     private String value;

@@ -75,8 +75,9 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceModificationException
      * @throws SProcessInstanceHierarchicalDeletionException
      */
-    void deleteProcessInstance(long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException,
-    SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
+    void deleteProcessInstance(long processInstanceId)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException,
+            SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instance
@@ -88,8 +89,9 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceHierarchicalDeletionException
      * @since 6.0
      */
-    void deleteProcessInstance(SProcessInstance processInstance) throws SFlowNodeReadException, SProcessInstanceModificationException,
-    SProcessInstanceHierarchicalDeletionException;
+    void deleteProcessInstance(SProcessInstance processInstance)
+            throws SFlowNodeReadException, SProcessInstanceModificationException,
+            SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instances with id, and their elements archived and not, if are not a subProcess
@@ -119,7 +121,8 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceNotFoundException
      * @throws SProcessInstanceReadException
      */
-    SProcessInstance getProcessInstance(long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException;
+    SProcessInstance getProcessInstance(long processInstanceId)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException;
 
     /**
      * Set state for the processInstance
@@ -131,7 +134,8 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceNotFoundException
      * @throws SProcessInstanceModificationException
      */
-    void setState(SProcessInstance processInstance, ProcessInstanceState state) throws SProcessInstanceNotFoundException, SProcessInstanceModificationException;
+    void setState(SProcessInstance processInstance, ProcessInstanceState state)
+            throws SProcessInstanceNotFoundException, SProcessInstanceModificationException;
 
     /**
      * Set process state category for the given process instance
@@ -144,8 +148,9 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceModificationException
      * @since 6.0
      */
-    void setStateCategory(SProcessInstance processInstance, SStateCategory stateCatetory) throws SProcessInstanceNotFoundException,
-    SProcessInstanceModificationException;
+    void setStateCategory(SProcessInstance processInstance, SStateCategory stateCatetory)
+            throws SProcessInstanceNotFoundException,
+            SProcessInstanceModificationException;
 
     /**
      * Delete specified archived process instance
@@ -156,12 +161,13 @@ public interface ProcessInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.0
      */
-    void deleteArchivedProcessInstance(SAProcessInstance archivedProcessInstance) throws SProcessInstanceModificationException, SFlowNodeReadException;
+    void deleteArchivedProcessInstance(SAProcessInstance archivedProcessInstance)
+            throws SProcessInstanceModificationException, SFlowNodeReadException;
 
     /**
      * delete archived process instances using a list of root source process instance ids
-     *
-     * If the given id is not a root process instance (but a called process) it will not be deleted along with its elements.
+     * If the given id is not a root process instance (but a called process) it will not be deleted along with its
+     * elements.
      *
      * @param sourceProcessInstanceIds list of root source process instance ids
      * @return the number of archived elements deleted (might be greater than the number of ids given)
@@ -185,7 +191,8 @@ public interface ProcessInstanceService {
      * @return a list of identifiers
      * @throws SProcessInstanceReadException
      */
-    List<Long> getChildInstanceIdsOfProcessInstance(long processInstanceId, int fromIndex, int maxResults, String sortingField, OrderByType sortingOrder)
+    List<Long> getChildInstanceIdsOfProcessInstance(long processInstanceId, int fromIndex, int maxResults,
+            String sortingField, OrderByType sortingOrder)
             throws SProcessInstanceReadException;
 
     /**
@@ -197,7 +204,8 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceNotFoundException
      * @throws SBonitaReadException
      */
-    SProcessInstance getChildOfActivity(long activityInstId) throws SProcessInstanceNotFoundException, SBonitaReadException;
+    SProcessInstance getChildOfActivity(long activityInstId)
+            throws SProcessInstanceNotFoundException, SBonitaReadException;
 
     /**
      * Get total number of child instance for specific process instance
@@ -218,7 +226,8 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceReadException
      * @since 6.4.0
      */
-    List<SAProcessInstance> getArchivedProcessInstancesInAllStates(List<Long> processInstanceIds) throws SProcessInstanceReadException;
+    List<SAProcessInstance> getArchivedProcessInstancesInAllStates(List<Long> processInstanceIds)
+            throws SProcessInstanceReadException;
 
     /**
      * Get total number of archived process instances according to specific criteria
@@ -281,10 +290,12 @@ public interface ProcessInstanceService {
      * @return number of open process instance for the specific supervisor
      * @throws SBonitaReadException
      */
-    long getNumberOfOpenProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+    long getNumberOfOpenProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
-     * Get total number of {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
+     * Get total number of {@link SProcessInstance} with at least one failed task or the
+     * {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
      * state for the specific supervisor
      *
      * @param userId
@@ -296,22 +307,26 @@ public interface ProcessInstanceService {
      * @throws SBonitaReadException
      * @since 7.0
      */
-    long getNumberOfFailedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+    long getNumberOfFailedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
-     * Search all {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state
+     * Search all {@link SProcessInstance} with at least one failed task or the
+     * {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state
      * for the specific supervisor
      *
      * @param userId
      *        identifier of supervisor user
      * @param queryOptions
      *        a map of specific parameters of a query
-     * @return The list of {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
+     * @return The list of {@link SProcessInstance} with at least one failed task or the
+     *         {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
      *         state for the specific supervisor
      * @throws SBonitaReadException
      * @since 7.0
      */
-    List<SProcessInstance> searchFailedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<SProcessInstance> searchFailedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * Search all open process instances for the specific supervisor
@@ -323,7 +338,8 @@ public interface ProcessInstanceService {
      * @return a list of SProcessInstance objects
      * @throws SBonitaReadException
      */
-    List<SProcessInstance> searchOpenProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<SProcessInstance> searchOpenProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * Get total number of open process instance involving the specific user
@@ -335,7 +351,8 @@ public interface ProcessInstanceService {
      * @return number of open process instance for the specific user
      * @throws SBonitaReadException
      */
-    long getNumberOfOpenProcessInstancesInvolvingUser(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+    long getNumberOfOpenProcessInstancesInvolvingUser(long userId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * Search all open process instance involving the specific user
@@ -346,7 +363,8 @@ public interface ProcessInstanceService {
      * @return a list of SProcessInstance objects
      * @throws SBonitaReadException
      */
-    List<SProcessInstance> searchOpenProcessInstancesInvolvingUser(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<SProcessInstance> searchOpenProcessInstancesInvolvingUser(long userId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * Get total number of open process instance involving all users of the specific manager
@@ -356,7 +374,8 @@ public interface ProcessInstanceService {
      * @return
      * @throws SBonitaReadException
      */
-    long getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId, QueryOptions queryOptions) throws SBonitaReadException;
+    long getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * Search all open process instance involving all users of the specific manager
@@ -366,10 +385,12 @@ public interface ProcessInstanceService {
      * @return
      * @throws SBonitaReadException
      */
-    List<SProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<SProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId,
+            QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
-     * Get the list of sourceObjectIds for archived process instances children of process instance identified by rootProcessIntanceId
+     * Get the list of sourceObjectIds for archived process instances children of process instance identified by
+     * rootProcessIntanceId
      *
      * @param rootProcessIntanceId
      *        the root process instance id
@@ -379,11 +400,13 @@ public interface ProcessInstanceService {
      *        max number of results to be retrieved
      * @param sortingOrder
      *        the searching order (ASC or DESC)
-     * @return the list of sourceObjectIds for archived process instances children of process instance identified by rootProcessIntanceId
+     * @return the list of sourceObjectIds for archived process instances children of process instance identified by
+     *         rootProcessIntanceId
      * @throws SBonitaReadException
      * @since 6.0
      */
-    List<Long> getArchivedChildrenSourceObjectIdsFromRootProcessInstance(long rootProcessIntanceId, int fromIndex, int maxResults, OrderByType sortingOrder)
+    List<Long> getArchivedChildrenSourceObjectIdsFromRootProcessInstance(long rootProcessIntanceId, int fromIndex,
+            int maxResults, OrderByType sortingOrder)
             throws SBonitaReadException;
 
     /**
@@ -404,7 +427,8 @@ public interface ProcessInstanceService {
      * @return a list of SAProcessInstance objects
      * @throws SBonitaReadException
      */
-    List<SAProcessInstance> searchArchivedProcessInstancesWithoutSubProcess(QueryOptions queryOptions) throws SBonitaReadException;
+    List<SAProcessInstance> searchArchivedProcessInstancesWithoutSubProcess(QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * Get total number of archived process instance for the specific supervisor
@@ -416,7 +440,8 @@ public interface ProcessInstanceService {
      * @return number of archived process instance for the specific supervisor
      * @throws SBonitaReadException
      */
-    long getNumberOfArchivedProcessInstancesSupervisedBy(long userId, QueryOptions countOptions) throws SBonitaReadException;
+    long getNumberOfArchivedProcessInstancesSupervisedBy(long userId, QueryOptions countOptions)
+            throws SBonitaReadException;
 
     /**
      * Search all archived process instance for the specific supervisor
@@ -428,7 +453,8 @@ public interface ProcessInstanceService {
      * @return a list of SAProcessInstance objects
      * @throws SBonitaReadException
      */
-    List<SAProcessInstance> searchArchivedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<SAProcessInstance> searchArchivedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * Get total number of archived process instance involving the specific user
@@ -440,7 +466,8 @@ public interface ProcessInstanceService {
      * @return number of archived process instance involving the specific user
      * @throws SBonitaReadException
      */
-    long getNumberOfArchivedProcessInstancesInvolvingUser(long userId, QueryOptions countOptions) throws SBonitaReadException;
+    long getNumberOfArchivedProcessInstancesInvolvingUser(long userId, QueryOptions countOptions)
+            throws SBonitaReadException;
 
     /**
      * Search all archived process instance involving the specific user
@@ -452,7 +479,8 @@ public interface ProcessInstanceService {
      * @return a list of SAProcessInstance objects
      * @throws SBonitaReadException
      */
-    List<SAProcessInstance> searchArchivedProcessInstancesInvolvingUser(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<SAProcessInstance> searchArchivedProcessInstancesInvolvingUser(long userId, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * Update the specific process instance
@@ -463,7 +491,8 @@ public interface ProcessInstanceService {
      *        update description
      * @throws SProcessInstanceModificationException
      */
-    void updateProcess(SProcessInstance processInstance, EntityUpdateDescriptor descriptor) throws SProcessInstanceModificationException;
+    void updateProcess(SProcessInstance processInstance, EntityUpdateDescriptor descriptor)
+            throws SProcessInstanceModificationException;
 
     /**
      * @param flowNodeInstance
@@ -471,8 +500,9 @@ public interface ProcessInstanceService {
      * @throws SFlowNodeReadException
      * @throws SProcessInstanceModificationException
      */
-    void deleteFlowNodeInstance(SFlowNodeInstance flowNodeInstance, SProcessDefinition processDefinition) throws SFlowNodeReadException,
-    SProcessInstanceModificationException;
+    void deleteFlowNodeInstance(SFlowNodeInstance flowNodeInstance, SProcessDefinition processDefinition)
+            throws SFlowNodeReadException,
+            SProcessInstanceModificationException;
 
     /**
      * @param processDefinitionId
@@ -482,9 +512,9 @@ public interface ProcessInstanceService {
      * @return
      * @throws SProcessInstanceReadException
      */
-    List<Long> getSourceProcessInstanceIdsOfArchProcessInstancesFromDefinition(long processDefinitionId, int fromIndex, int maxResults, OrderByType sortingOrder)
+    List<Long> getSourceProcessInstanceIdsOfArchProcessInstancesFromDefinition(long processDefinitionId, int fromIndex,
+            int maxResults, OrderByType sortingOrder)
             throws SProcessInstanceReadException;
-
 
     /**
      * Returns the list of <code>SProcessInstance</code>s in a given list of states.
@@ -497,7 +527,8 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceReadException
      *         if a read error occurs
      */
-    List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
+    List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions,
+            final ProcessInstanceState... states)
             throws SProcessInstanceReadException;
 
     /**
@@ -509,7 +540,8 @@ public interface ProcessInstanceService {
     SAProcessInstance getLastArchivedProcessInstance(long sourceObjectProcessInstanceId) throws SBonitaReadException;
 
     /**
-     * Get the number of the {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
+     * Get the number of the {@link SProcessInstance} with at least one failed task or the
+     * {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
      * state.
      *
      * @param queryOptions
@@ -522,11 +554,13 @@ public interface ProcessInstanceService {
     long getNumberOfFailedProcessInstances(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
-     * List all {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state.
+     * List all {@link SProcessInstance} with at least one failed task or the
+     * {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state.
      *
      * @param queryOptions
      *        the search criteria containing a map of specific parameters of a query
-     * @return The list of {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
+     * @return The list of {@link SProcessInstance} with at least one failed task or the
+     *         {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
      *         state.
      * @throws SBonitaException
      * @since 6.4.0

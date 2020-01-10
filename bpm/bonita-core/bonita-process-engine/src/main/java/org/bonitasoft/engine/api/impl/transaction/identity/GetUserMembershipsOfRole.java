@@ -36,7 +36,8 @@ public class GetUserMembershipsOfRole implements TransactionContentWithResult<Li
 
     private final int maxResults;
 
-    public GetUserMembershipsOfRole(final long roleId, final IdentityService identityService, final int startIndex, final int maxResults) {
+    public GetUserMembershipsOfRole(final long roleId, final IdentityService identityService, final int startIndex,
+            final int maxResults) {
         this.roleId = roleId;
         this.identityService = identityService;
         this.startIndex = startIndex;

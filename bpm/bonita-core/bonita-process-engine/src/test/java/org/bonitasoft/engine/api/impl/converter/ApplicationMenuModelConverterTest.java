@@ -32,7 +32,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationMenuModelConverterTest {
 
-
     private ApplicationMenuModelConverter convertor;
 
     @Before
@@ -94,7 +93,8 @@ public class ApplicationMenuModelConverterTest {
     }
 
     @Test
-    public void toApplicationMenu_list_should_call_toApplitionMenu_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
+    public void toApplicationMenu_list_should_call_toApplitionMenu_for_each_element_in_the_list_and_return_the_list_of_converted_values()
+            throws Exception {
         //given
         final SApplicationMenu sMenu1 = mock(SApplicationMenu.class);
         final SApplicationMenu sMenu2 = mock(SApplicationMenu.class);

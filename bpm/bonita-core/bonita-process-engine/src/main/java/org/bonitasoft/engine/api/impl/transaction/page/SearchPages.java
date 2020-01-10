@@ -32,7 +32,8 @@ public class SearchPages extends AbstractSearchEntity<Page, SPage> {
 
     private final PageService pageService;
 
-    public SearchPages(final PageService pageService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchPages(final PageService pageService, final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
         this.pageService = pageService;
     }

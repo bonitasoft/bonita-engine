@@ -24,14 +24,14 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -39,7 +39,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @IdClass(PersistentObjectId.class)
 @Filter(name = "tenantFilter")
-@Table(name="queriable_log")
+@Table(name = "queriable_log")
 public class SQueriableLog implements PersistentObject {
 
     public static final int STATUS_FAIL = 0;
@@ -105,6 +105,7 @@ public class SQueriableLog implements PersistentObject {
     private long numericIndex5 = -1;
 
     public static class SQueriableLogBuilder {
+
         public SQueriableLogBuilder initializeNow() {
             final Date date = new Date();
             final Calendar calendar = Calendar.getInstance();

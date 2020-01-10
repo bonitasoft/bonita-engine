@@ -33,7 +33,8 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * <ul>
  * <li>Using Java System Properties</li>
  * <li>Programmatically</li>
- * <li>DEPRECATED: using a file inside bonita-home. See <a href="http://documentation.bonitasoft.com/bonita/current/configure-client-of-bonita-bpm-engine#toc3">online
+ * <li>DEPRECATED: using a file inside bonita-home. See <a
+ * href="http://documentation.bonitasoft.com/bonita/current/configure-client-of-bonita-bpm-engine#toc3">online
  * documentation</a>.</li>
  * </ul>
  * <h1>Using Java System Properties</h1>
@@ -47,10 +48,13 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * <p>
  * connect to the server using HTTP. You must also specify:
  * <ul>
- * <li><code>-Dorg.bonitasoft.engine.api-type.server.url=HTTP_SERVER_URL</code>, e.g. <code>http://localhost:8080</code></li>
- * <li><code>-Dorg.bonitasoft.engine.api-type.application.name=WEBAPP_NAME</code>, this is the name of the web application, e.g. <code>bonita</code></li>
+ * <li><code>-Dorg.bonitasoft.engine.api-type.server.url=HTTP_SERVER_URL</code>, e.g.
+ * <code>http://localhost:8080</code></li>
+ * <li><code>-Dorg.bonitasoft.engine.api-type.application.name=WEBAPP_NAME</code>, this is the name of the web
+ * application, e.g. <code>bonita</code></li>
  * </ul>
- * Optionally you can specify the maximum number of connections (JVM-wide) using <code>-Dorg.bonitasoft.engine.api-type.connections.max=CONNECTIONS_MAX</code>
+ * Optionally you can specify the maximum number of connections (JVM-wide) using
+ * <code>-Dorg.bonitasoft.engine.api-type.connections.max=CONNECTIONS_MAX</code>
  * </p>
  * </li>
  * <li>TCP
@@ -80,7 +84,8 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
- * @see <a href="http://documentation.bonitasoft.com/bonita/current/configure-client-of-bonita-bpm-engine#toc0">Online documentation on Client configuration</a>
+ * @see <a href="http://documentation.bonitasoft.com/bonita/current/configure-client-of-bonita-bpm-engine#toc0">Online
+ *      documentation on Client configuration</a>
  */
 public class APITypeManager {
 
@@ -142,7 +147,8 @@ public class APITypeManager {
     private static void warnIfUsingRemoteConnectionWithLocalEngine(ApiAccessType type) {
         if (type != null && type != LOCAL) {
             try {
-                Thread.currentThread().getContextClassLoader().loadClass("org.bonitasoft.engine.api.impl.ProcessAPIImpl");
+                Thread.currentThread().getContextClassLoader()
+                        .loadClass("org.bonitasoft.engine.api.impl.ProcessAPIImpl");
                 LOGGER.warning(
                         "You are declaring an API access to Bonita Engine as a remote connection, whereas it looks like you are running in the same JVM. You should use LOCAL connection, using constant 'ApiAccessType.LOCAL'");
             } catch (ClassNotFoundException ignored) {

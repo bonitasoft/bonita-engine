@@ -31,17 +31,18 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 
-
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SCatchMessageEventTriggerDefinitionImpl extends SMessageEventTriggerDefinitionImpl implements SCatchMessageEventTriggerDefinition {
+public class SCatchMessageEventTriggerDefinitionImpl extends SMessageEventTriggerDefinitionImpl
+        implements SCatchMessageEventTriggerDefinition {
 
     private static final long serialVersionUID = 8502224424679479589L;
 
     private final List<SOperation> sOperations;
 
-    public SCatchMessageEventTriggerDefinitionImpl(final String messageName, final List<SOperation> operations, final List<SCorrelationDefinition> correlations) {
+    public SCatchMessageEventTriggerDefinitionImpl(final String messageName, final List<SOperation> operations,
+            final List<SCorrelationDefinition> correlations) {
         super(messageName, correlations);
         sOperations = operations;
     }
@@ -59,7 +60,8 @@ public class SCatchMessageEventTriggerDefinitionImpl extends SMessageEventTrigge
         }
     }
 
-    public SCatchMessageEventTriggerDefinitionImpl(SCatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
+    public SCatchMessageEventTriggerDefinitionImpl(
+            SCatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
         super(catchMessageEventTriggerDefinition);
         sOperations = catchMessageEventTriggerDefinition.getOperations();
     }
@@ -68,13 +70,15 @@ public class SCatchMessageEventTriggerDefinitionImpl extends SMessageEventTrigge
         final SExpression rightOperand = ServerModelConvertor.convertExpression(operation.getRightOperand());
         final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
         final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
-        final SOperation sOperation = BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
+        final SOperation sOperation = BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance()
+                .setOperator(operation.getOperator())
                 .setRightOperand(rightOperand).setType(operatorType).setLeftOperand(sLeftOperand).done();
         return sOperation;
     }
 
     private SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).setType(variableToSet.getType()).done();
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName())
+                .setType(variableToSet.getType()).done();
     }
 
     @Override

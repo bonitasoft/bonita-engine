@@ -59,7 +59,8 @@ public class CancellingCallActivityStateImplTest {
     private CancellingCallActivityStateImpl cancellingCallActivityState;
     private SProcessDefinition processDefinition = new SProcessDefinitionImpl("myProcess", "1.0");
     private SProcessInstance processInstance = new SProcessInstance("myProcess", PROCESS_DEFINITION_ID);
-    private SCallActivityInstance callActivity = new SCallActivityInstance("callACtivity", 5342985348L, 4323264L, 65222L, 87686L, 2342L);
+    private SCallActivityInstance callActivity = new SCallActivityInstance("callACtivity", 5342985348L, 4323264L,
+            65222L, 87686L, 2342L);
     @Mock
     private ProcessInstanceService processInstanceService;
     @Mock
@@ -83,7 +84,8 @@ public class CancellingCallActivityStateImplTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
+        doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
+                .getLocalClassLoader(anyString(), anyLong());
         callActivity.setId(CALL_ACTIVITY_ID);
         doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(PROCESS_DEFINITION_ID);
         processInstance.setId(PROCESS_INSTANCE_ID);
@@ -93,7 +95,8 @@ public class CancellingCallActivityStateImplTest {
     public void should_warn_when_completing_call_activity_with_no_called_process() throws Exception {
         //given
         callActivity.setTokenCount(0);
-        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getChildOfActivity(CALL_ACTIVITY_ID);
+        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService)
+                .getChildOfActivity(CALL_ACTIVITY_ID);
         //when
         cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
         //then

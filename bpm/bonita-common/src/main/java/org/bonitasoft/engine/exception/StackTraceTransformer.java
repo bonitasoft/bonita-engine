@@ -56,7 +56,8 @@ public class StackTraceTransformer {
         try {
             return new StackTraceTransformer(e).merge();
         } catch (final Exception e1) {
-            System.err.println("Unable to throw the root exception: " + e1.getClass().getName() + ": " + e1.getMessage());
+            System.err
+                    .println("Unable to throw the root exception: " + e1.getClass().getName() + ": " + e1.getMessage());
             e1.printStackTrace();
             return new ServerWrappedException(new BonitaRuntimeException(
                     "Unable to throw the root exception because of (see log for the original stack trace)", e));
@@ -69,7 +70,8 @@ public class StackTraceTransformer {
         final StackTraceElement[] newStack = new StackTraceElement[causeStack.length + clientStackTrace.length + 1];
 
         System.arraycopy(clientStackTrace, 0, newStack, 0, clientStackTrace.length);
-        newStack[clientStackTrace.length] = new StackTraceElement("\t< ========== Beginning of the server stack trace ========== >", " ", " ", -3);
+        newStack[clientStackTrace.length] = new StackTraceElement(
+                "\t< ========== Beginning of the server stack trace ========== >", " ", " ", -3);
         System.arraycopy(causeStack, 0, newStack, clientStackTrace.length + 1, causeStack.length);
         e.setStackTrace(newStack);
     }
@@ -126,11 +128,14 @@ public class StackTraceTransformer {
         int i = 0;
         for (final StackTraceElement[] stackTraceElements : causesStacks) {
             final Integer framesInCommon = framesInCommons.get(i);
-            mergedStackTrace[current] = new StackTraceElement("\tCaused by: " + exceptions.get(i).getClass().getName(), ": "
-                    + exceptions.get(i).getMessage() + " ", " ",
+            mergedStackTrace[current] = new StackTraceElement("\tCaused by: " + exceptions.get(i).getClass().getName(),
+                    ": "
+                            + exceptions.get(i).getMessage() + " ",
+                    " ",
                     -3);
             current++;
-            System.arraycopy(stackTraceElements, 0, mergedStackTrace, current, stackTraceElements.length - framesInCommon);
+            System.arraycopy(stackTraceElements, 0, mergedStackTrace, current,
+                    stackTraceElements.length - framesInCommon);
             current += stackTraceElements.length - framesInCommon;
             if (framesInCommon != 0) {
                 mergedStackTrace[current] = new StackTraceElement("... " + framesInCommon + " more", " ", " ", -3);

@@ -63,7 +63,8 @@ public class BusinessObjectModelTest {
     public void should_list_distincts_business_object_class_names() {
         final String aClassName = "aClassName";
         final String anotherClassName = "anotherClassName";
-        final BusinessObjectModel bom = aBOM().withBOs(aBO(aClassName).build(), aBO(aClassName).build(), aBO(anotherClassName).build()).build();
+        final BusinessObjectModel bom = aBOM()
+                .withBOs(aBO(aClassName).build(), aBO(aClassName).build(), aBO(anotherClassName).build()).build();
 
         final Set<String> classNames = bom.getBusinessObjectsClassNames();
 

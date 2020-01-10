@@ -40,34 +40,41 @@ public class UpdateDefaultsImportStrategyTest {
     public UpdateDefaultsImportStrategy updateDefaultsImportStrategy;
 
     @Test
-    public void should_whenProfileExists_update_if_default() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+    public void should_whenProfileExists_update_if_default()
+            throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
         SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(false);
-        updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",true), sProfile);
+        updateDefaultsImportStrategy.whenProfileExists(-1, new ProfileNode("plop", true), sProfile);
 
         verify(profileService).updateProfile(eq(sProfile), any(EntityUpdateDescriptor.class));
     }
+
     @Test
-    public void should_whenProfileExists_update_if_default2() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+    public void should_whenProfileExists_update_if_default2()
+            throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
         SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(true);
-        updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",false), sProfile);
+        updateDefaultsImportStrategy.whenProfileExists(-1, new ProfileNode("plop", false), sProfile);
 
         verify(profileService).updateProfile(eq(sProfile), any(EntityUpdateDescriptor.class));
     }
+
     @Test
-    public void should_whenProfileExists_not_update_if_custom() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+    public void should_whenProfileExists_not_update_if_custom()
+            throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
         SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(false);
-        updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",false), sProfile);
+        updateDefaultsImportStrategy.whenProfileExists(-1, new ProfileNode("plop", false), sProfile);
 
-        verify(profileService,times(0)).updateProfile(any(SProfile.class), any(EntityUpdateDescriptor.class));
+        verify(profileService, times(0)).updateProfile(any(SProfile.class), any(EntityUpdateDescriptor.class));
     }
+
     @Test
-    public void should_shouldUpdateProfileEntries_return_true() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+    public void should_shouldUpdateProfileEntries_return_true()
+            throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
         boolean shouldUpdateProfileEntries = updateDefaultsImportStrategy.shouldUpdateProfileEntries(null, null);
 
@@ -75,14 +82,17 @@ public class UpdateDefaultsImportStrategyTest {
     }
 
     @Test
-    public void  should_canCreateProfileIfNotExists_return_true_if_default(){
-        boolean canCreateProfileIfNotExists = updateDefaultsImportStrategy.canCreateProfileIfNotExists(new ProfileNode("plop", true));
+    public void should_canCreateProfileIfNotExists_return_true_if_default() {
+        boolean canCreateProfileIfNotExists = updateDefaultsImportStrategy
+                .canCreateProfileIfNotExists(new ProfileNode("plop", true));
 
         assertThat(canCreateProfileIfNotExists).isTrue();
     }
+
     @Test
-    public void  should_canCreateProfileIfNotExists_return_false_if_custom(){
-        boolean canCreateProfileIfNotExists = updateDefaultsImportStrategy.canCreateProfileIfNotExists(new ProfileNode("plop", false));
+    public void should_canCreateProfileIfNotExists_return_false_if_custom() {
+        boolean canCreateProfileIfNotExists = updateDefaultsImportStrategy
+                .canCreateProfileIfNotExists(new ProfileNode("plop", false));
 
         assertThat(canCreateProfileIfNotExists).isFalse();
     }

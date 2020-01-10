@@ -30,7 +30,8 @@ import org.junit.Test;
 
 public class ServerModelConvertorTest {
 
-    Expression buildClientExpression(final String name, final String content, final String expressionType, final String returnType,
+    Expression buildClientExpression(final String name, final String content, final String expressionType,
+            final String returnType,
             final List<SExpression> dependencies) {
         final ExpressionImpl expression = new ExpressionImpl();
         expression.setName(name);
@@ -47,7 +48,8 @@ public class ServerModelConvertorTest {
         final String expressionType = ExpressionType.TYPE_QUERY_BUSINESS_DATA.name();
         final String returnType = "org.bonitasoft.Employee";
         final Expression clientExpression = buildClientExpression(name, content, expressionType, returnType, null);
-        final SExpressionImpl expected = new SExpressionImpl(name, content, expressionType, returnType, null, Collections.<SExpression> emptyList());
+        final SExpressionImpl expected = new SExpressionImpl(name, content, expressionType, returnType, null,
+                Collections.<SExpression> emptyList());
 
         final SExpression expression = ServerModelConvertor.convertExpression(clientExpression);
 
@@ -70,9 +72,12 @@ public class ServerModelConvertorTest {
         contractInputs.put("inputname1", expression1);
         contractInputs.put("inputname2", expression2);
 
-        final Map<String, SExpression> convertedContractInputs = ServerModelConvertor.convertContractInputs(contractInputs);
+        final Map<String, SExpression> convertedContractInputs = ServerModelConvertor
+                .convertContractInputs(contractInputs);
 
-        assertThat(convertedContractInputs.get("inputname1")).isEqualTo(ServerModelConvertor.convertExpression(expression1));
-        assertThat(convertedContractInputs.get("inputname2")).isEqualTo(ServerModelConvertor.convertExpression(expression2));
+        assertThat(convertedContractInputs.get("inputname1"))
+                .isEqualTo(ServerModelConvertor.convertExpression(expression1));
+        assertThat(convertedContractInputs.get("inputname2"))
+                .isEqualTo(ServerModelConvertor.convertExpression(expression2));
     }
 }

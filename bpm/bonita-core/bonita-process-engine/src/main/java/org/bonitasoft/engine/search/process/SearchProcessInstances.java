@@ -31,7 +31,8 @@ public class SearchProcessInstances extends AbstractProcessInstanceSearchEntity 
 
     private final ProcessInstanceService processInstanceService;
 
-    public SearchProcessInstances(final ProcessInstanceService processInstanceService, final SearchProcessInstanceDescriptor searchEntitiesDescriptor,
+    public SearchProcessInstances(final ProcessInstanceService processInstanceService,
+            final SearchProcessInstanceDescriptor searchEntitiesDescriptor,
             final SearchOptions options, final ProcessDefinitionService processDefinitionService) {
         super(searchEntitiesDescriptor, options, processDefinitionService);
         this.processInstanceService = processInstanceService;

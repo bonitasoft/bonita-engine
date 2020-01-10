@@ -68,13 +68,15 @@ public class CompletingSubTaskStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) parentInstance;
         return sHumanTaskInstance.getTokenCount() == 0;
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) flowNodeInstance;
         final boolean hasTokens = sHumanTaskInstance.getTokenCount() > 0;
         if (hasTokens) {

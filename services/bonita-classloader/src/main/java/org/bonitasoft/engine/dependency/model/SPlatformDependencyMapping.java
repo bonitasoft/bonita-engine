@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -21,7 +20,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -34,7 +32,6 @@ public class SPlatformDependencyMapping extends SAbstractDependencyMapping {
     public SPlatformDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super(artifactId, artifactType, dependencyId);
     }
-
 
     @Override
     public void setTenantId(long id) {

@@ -15,7 +15,8 @@ package org.bonitasoft.engine.test.persistence.builder.archive;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 
-public abstract class ArchivedFlowNodeInstanceBuilder<T extends SAFlowNodeInstance, B extends ArchivedFlowNodeInstanceBuilder<T, B>> extends
+public abstract class ArchivedFlowNodeInstanceBuilder<T extends SAFlowNodeInstance, B extends ArchivedFlowNodeInstanceBuilder<T, B>>
+        extends
         ArchivedPersistentObjectBuilder<T, B> {
 
     protected int stateId;

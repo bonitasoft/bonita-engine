@@ -17,7 +17,6 @@ import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 
 public class LoopActivityInstanceBuilder extends FlowNodeInstanceBuilder {
 
-
     public static LoopActivityInstanceBuilder aLoopActivity() {
         return new LoopActivityInstanceBuilder();
     }
@@ -29,7 +28,8 @@ public class LoopActivityInstanceBuilder extends FlowNodeInstanceBuilder {
 
     @Override
     SLoopActivityInstance _build() {
-        final SLoopActivityInstance loopActivityInstance = new SLoopActivityInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
+        final SLoopActivityInstance loopActivityInstance = new SLoopActivityInstance(name, flowNodeDefinitionId,
+                rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
         loopActivityInstance.setLoopCounter(loopCounter);
         return loopActivityInstance;
     }

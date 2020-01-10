@@ -22,12 +22,11 @@ import javax.xml.bind.JAXBException;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
-import org.xml.sax.SAXException;
-
 import org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
+import org.xml.sax.SAXException;
 
 public class FieldAssert extends AbstractAssert<FieldAssert, Field> {
 
@@ -62,7 +61,8 @@ public class FieldAssert extends AbstractAssert<FieldAssert, Field> {
     }
 
     private BusinessObjectModel marshallUnmarshall(final Field field) throws JAXBException, IOException, SAXException {
-        final BusinessObjectModelBuilder bom = aBOM().withBO(aBO("someUglyNameMightNotAppear").withField(field).build());
+        final BusinessObjectModelBuilder bom = aBOM()
+                .withBO(aBO("someUglyNameMightNotAppear").withField(field).build());
         addReferencedBoToBom(field, bom);
         return Marshaller.marshallUnmarshall(bom.build());
     }

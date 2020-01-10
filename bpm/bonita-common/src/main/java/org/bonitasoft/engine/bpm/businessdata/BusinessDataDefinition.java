@@ -24,21 +24,21 @@ public interface BusinessDataDefinition extends DescriptionElement, Visitable {
 
     /**
      * Returns the class name of the Business Data type.
-     * 
+     *
      * @return the class name of the Business Data type.
      */
     String getClassName();
 
     /**
      * Returns the default value of the business data, as an Expression to evaluate.
-     * 
+     *
      * @return the default value of the business data, as an Expression to evaluate.
      */
     Expression getDefaultValueExpression();
 
     /**
      * Returns if this business data is handled as a List.
-     * 
+     *
      * @return true if this business data is handled as a List.
      */
     boolean isMultiple();

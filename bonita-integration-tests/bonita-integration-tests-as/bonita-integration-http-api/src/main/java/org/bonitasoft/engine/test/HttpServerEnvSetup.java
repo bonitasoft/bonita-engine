@@ -37,7 +37,6 @@ public class HttpServerEnvSetup {
         return jettyServer;
     }
 
-
     public static void setClientApiToHTTP(int localPort) {
         Map<String, String> params = new HashMap<>();
         params.put("server.url", "http://localhost:" + localPort);

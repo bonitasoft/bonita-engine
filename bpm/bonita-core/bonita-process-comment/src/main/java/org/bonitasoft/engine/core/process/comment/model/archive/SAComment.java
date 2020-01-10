@@ -34,7 +34,6 @@ import org.hibernate.annotations.Filter;
 @Filter(name = "tenantFilter")
 public class SAComment implements ArchivedPersistentObject {
 
-
     public static final String ID_KEY = "id";
     public static final String TENANTID_KEY = "tenantId";
     public static final String USERID_KEY = "userId";

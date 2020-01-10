@@ -97,7 +97,8 @@ public class CheckPlatformVersionTest {
 
         Boolean sameVersion = checkPlatformVersion.call();
         assertFalse(sameVersion);
-        assertEquals("The version of the platform in database is not the same as expected: bonita-server version is <6.0.3> and database version is <5.0.3>",
+        assertEquals(
+                "The version of the platform in database is not the same as expected: bonita-server version is <6.0.3> and database version is <5.0.3>",
                 checkPlatformVersion.getErrorMessage());
     }
 
@@ -108,10 +109,10 @@ public class CheckPlatformVersionTest {
         Boolean sameVersion = checkPlatformVersion.call();
 
         assertFalse(sameVersion);
-        assertEquals("The version of the platform in database is not the same as expected: bonita-server version is <6.10> and database version is <6.1>",
+        assertEquals(
+                "The version of the platform in database is not the same as expected: bonita-server version is <6.10> and database version is <6.1>",
                 checkPlatformVersion.getErrorMessage());
     }
-
 
     @Test
     public void check_platform_and_db_with_different_maintenance_version_is_accepted() throws Exception {

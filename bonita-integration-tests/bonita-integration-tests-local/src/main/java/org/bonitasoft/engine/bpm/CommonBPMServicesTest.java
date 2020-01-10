@@ -194,7 +194,8 @@ public class CommonBPMServicesTest {
 
     private void clean() throws Exception {
         try {
-            final APISession apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
+            final APISession apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(),
+                    TestUtil.getDefaultPassword());
             openTx();
             cleanProcessesDefinitions();
             cleanProcessInstance();
@@ -212,12 +213,15 @@ public class CommonBPMServicesTest {
 
     private void cleanProcessesDefinitions() throws SBonitaReadException, SProcessDefinitionNotFoundException,
             SProcessDeletionException, SDeletingEnabledProcessException {
-        final QueryOptions queryOptions = new QueryOptions(0, 200, SProcessDefinitionDeployInfo.class, "name", OrderByType.ASC);
-        final List<SProcessDefinitionDeployInfo> processes = getTenantAccessor().getProcessDefinitionService().getProcessDeploymentInfos(queryOptions);
+        final QueryOptions queryOptions = new QueryOptions(0, 200, SProcessDefinitionDeployInfo.class, "name",
+                OrderByType.ASC);
+        final List<SProcessDefinitionDeployInfo> processes = getTenantAccessor().getProcessDefinitionService()
+                .getProcessDeploymentInfos(queryOptions);
         if (processes.size() > 0) {
             for (final SProcessDefinitionDeployInfo process : processes) {
                 try {
-                    getTenantAccessor().getProcessDefinitionService().disableProcessDeploymentInfo(process.getProcessId());
+                    getTenantAccessor().getProcessDefinitionService()
+                            .disableProcessDeploymentInfo(process.getProcessId());
                 } catch (final Throwable ignored) {
                 }
                 getTenantAccessor().getProcessDefinitionService().delete(process.getProcessId());
@@ -225,7 +229,8 @@ public class CommonBPMServicesTest {
         }
     }
 
-    private void cleanProcessInstance() throws SBonitaReadException, SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException,
+    private void cleanProcessInstance() throws SBonitaReadException, SProcessInstanceNotFoundException,
+            SProcessInstanceReadException, SFlowNodeReadException,
             SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException {
         // let's clean up All Process Instances:
         List<SProcessInstance> processInstances = getFirstProcessInstances(5000);
@@ -264,13 +269,16 @@ public class CommonBPMServicesTest {
 
     public List<SProcessInstance> getFirstProcessInstances(final int nb) throws SBonitaReadException {
         // we are already in a transaction context here:
-        final OrderByOption orderByOption = new OrderByOption(SProcessInstance.class, SProcessInstance.LAST_UPDATE_KEY, OrderByType.DESC);
-        final QueryOptions queryOptions = new QueryOptions(0, nb, Collections.singletonList(orderByOption), Collections.<FilterOption> emptyList(), null);
+        final OrderByOption orderByOption = new OrderByOption(SProcessInstance.class, SProcessInstance.LAST_UPDATE_KEY,
+                OrderByType.DESC);
+        final QueryOptions queryOptions = new QueryOptions(0, nb, Collections.singletonList(orderByOption),
+                Collections.<FilterOption> emptyList(), null);
         return getTenantAccessor().getProcessInstanceService().searchProcessInstances(queryOptions);
     }
 
     protected SProcessInstance createSProcessInstance() throws SBonitaException {
-        final SProcessInstance processInstance = SProcessInstance.builder().name("process").processDefinitionId(1).build();
+        final SProcessInstance processInstance = SProcessInstance.builder().name("process").processDefinitionId(1)
+                .build();
 
         openTx();
         getTenantAccessor().getProcessInstanceService().createProcessInstance(processInstance);
@@ -296,68 +304,83 @@ public class CommonBPMServicesTest {
         return flowNodeInstance;
     }
 
-    protected SEventInstance createSStartEventInstance(final String eventName, final long flowNodeDefinitionId, final long rootProcessInstanceId,
-            final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
+    protected SEventInstance createSStartEventInstance(final String eventName, final long flowNodeDefinitionId,
+            final long rootProcessInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId)
+            throws STransactionCreationException, SEventInstanceCreationException,
             STransactionCommitException, STransactionRollbackException, SMessageInstanceCreationException {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SStartEventInstanceBuilderFactory.class)
-                .createNewStartEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, rootProcessInstanceId, processDefinitionId,
+                .createNewStartEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId,
+                        rootProcessInstanceId, processDefinitionId,
                         rootProcessInstanceId, parentProcessInstanceId)
                 .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
 
-    protected SEventInstance createSEndEventInstance(final String eventName, final long flowNodeDefinitionId, final long rootProcessInstanceId,
-            final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
+    protected SEventInstance createSEndEventInstance(final String eventName, final long flowNodeDefinitionId,
+            final long rootProcessInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId)
+            throws STransactionCreationException, SEventInstanceCreationException,
             STransactionCommitException, STransactionRollbackException, SMessageInstanceCreationException {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SEndEventInstanceBuilderFactory.class)
-                .createNewEndEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, rootProcessInstanceId, processDefinitionId,
+                .createNewEndEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId,
+                        rootProcessInstanceId, processDefinitionId,
                         rootProcessInstanceId, parentProcessInstanceId)
                 .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
 
-    protected SEventInstance createSIntermediateCatchEventInstance(final String eventName, final long flowNodeDefinitionId, final long rootProcessInstanceId,
-            final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
+    protected SEventInstance createSIntermediateCatchEventInstance(final String eventName,
+            final long flowNodeDefinitionId, final long rootProcessInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId)
+            throws STransactionCreationException, SEventInstanceCreationException,
             STransactionCommitException, STransactionRollbackException, SMessageInstanceCreationException {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SIntermediateCatchEventInstanceBuilderFactory.class)
-                .createNewIntermediateCatchEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, parentProcessInstanceId, processDefinitionId,
+                .createNewIntermediateCatchEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId,
+                        parentProcessInstanceId, processDefinitionId,
                         rootProcessInstanceId, parentProcessInstanceId)
                 .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
 
-    protected SEventInstance createSIntermediateThrowEventInstance(final String eventName, final long flowNodeDefinitionId, final long processInstanceId,
-            final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
+    protected SEventInstance createSIntermediateThrowEventInstance(final String eventName,
+            final long flowNodeDefinitionId, final long processInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId)
+            throws STransactionCreationException, SEventInstanceCreationException,
             STransactionCommitException, STransactionRollbackException, SMessageInstanceCreationException {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SIntermediateThrowEventInstanceBuilderFactory.class)
-                .createNewIntermediateThrowEventInstance(eventName, flowNodeDefinitionId, processInstanceId, processInstanceId, processDefinitionId,
+                .createNewIntermediateThrowEventInstance(eventName, flowNodeDefinitionId, processInstanceId,
+                        processInstanceId, processDefinitionId,
                         processInstanceId, parentProcessInstanceId)
                 .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
 
-    protected SEventInstance createIntermediateThrowEventInstance(final String eventName, final long flowNodeDefinitionId, final long processInstanceId,
-                                                                   final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
+    protected SEventInstance createIntermediateThrowEventInstance(final String eventName,
+            final long flowNodeDefinitionId, final long processInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId)
+            throws STransactionCreationException, SEventInstanceCreationException,
             STransactionCommitException, STransactionRollbackException, SMessageInstanceCreationException {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SIntermediateThrowEventInstanceBuilderFactory.class)
-                .createNewIntermediateThrowEventInstance(eventName, flowNodeDefinitionId, processInstanceId, processInstanceId, processDefinitionId,
+                .createNewIntermediateThrowEventInstance(eventName, flowNodeDefinitionId, processInstanceId,
+                        processInstanceId, processDefinitionId,
                         processInstanceId, parentProcessInstanceId)
                 .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
 
-
-    protected void createSEventInstance(final SEventInstance eventInstance) throws STransactionCreationException, SEventInstanceCreationException,
+    protected void createSEventInstance(final SEventInstance eventInstance)
+            throws STransactionCreationException, SEventInstanceCreationException,
             STransactionCommitException, STransactionRollbackException, SMessageInstanceCreationException {
         openTx();
         getTenantAccessor().getEventInstanceService().createEventInstance(eventInstance);
@@ -370,11 +393,13 @@ public class CommonBPMServicesTest {
         closeTx();
     }
 
-    protected SUserTaskInstance createSUserTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId,
+    protected SUserTaskInstance createSUserTaskInstance(final String name, final long flowNodeDefinitionId,
+            final long parentId,
             final long processDefinitionId,
             final long rootProcessInst, final long actorId) throws SBonitaException {
         final SUserTaskInstance taskInstance = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
-                .createNewUserTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId, actorId, processDefinitionId, rootProcessInst, parentId)
+                .createNewUserTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId, actorId,
+                        processDefinitionId, rootProcessInst, parentId)
                 .done();
         openTx();
         getTenantAccessor().getActivityInstanceService().createActivityInstance(taskInstance);
@@ -382,28 +407,34 @@ public class CommonBPMServicesTest {
         return taskInstance;
     }
 
-    protected SActivityInstance createSAutomaticTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId,
+    protected SActivityInstance createSAutomaticTaskInstance(final String name, final long flowNodeDefinitionId,
+            final long parentId,
             final long processDefinitionId, final long rootProcessInst) throws SBonitaException {
         final SActivityInstance taskInstance = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class)
-                .createNewAutomaticTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId, processDefinitionId, rootProcessInst, parentId).done();
+                .createNewAutomaticTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId,
+                        processDefinitionId, rootProcessInst, parentId)
+                .done();
         openTx();
         getTenantAccessor().getActivityInstanceService().createActivityInstance(taskInstance);
         closeTx();
         return taskInstance;
     }
 
-    protected SProcessDefinition buildSProcessDefinition(final String name, final String version) throws SProcessDefinitionException {
+    protected SProcessDefinition buildSProcessDefinition(final String name, final String version)
+            throws SProcessDefinitionException {
         final DesignProcessDefinitionImpl designProcessDefinition = new DesignProcessDefinitionImpl(name, version);
         designProcessDefinition.setProcessContainer(new FlowElementContainerDefinitionImpl());
         return getTenantAccessor().getProcessDefinitionService().store(designProcessDefinition);
     }
 
-    private SActor buildSActor(final String name, final long scopeId, final boolean initiator) throws SActorCreationException {
+    private SActor buildSActor(final String name, final long scopeId, final boolean initiator)
+            throws SActorCreationException {
         final SActor sActor = SActor.builder().name(name).scopeId(scopeId).initiator(initiator).build();
         return getTenantAccessor().getActorMappingService().addActor(sActor);
     }
 
-    public SProcessDefinition createSProcessDefinitionWithSActor(final String name, final String version, final String actorName,
+    public SProcessDefinition createSProcessDefinitionWithSActor(final String name, final String version,
+            final String actorName,
             final boolean actorIsInitiator, final List<SUser> sUsersToAddToActor) throws SBonitaException {
         openTx();
 
@@ -420,7 +451,8 @@ public class CommonBPMServicesTest {
         return sProcessDefinition;
     }
 
-    public SProcessDefinition createSProcessDefinition(final String name, final String version) throws SBonitaException {
+    public SProcessDefinition createSProcessDefinition(final String name, final String version)
+            throws SBonitaException {
         openTx();
 
         final SProcessDefinition sProcessDefinition = buildSProcessDefinition(name, version);
@@ -431,7 +463,8 @@ public class CommonBPMServicesTest {
         return sProcessDefinition;
     }
 
-    public List<SProcessDefinition> createSProcessDefinitions(final int count, final String name, final String version) throws SBonitaException {
+    public List<SProcessDefinition> createSProcessDefinitions(final int count, final String name, final String version)
+            throws SBonitaException {
         final List<SProcessDefinition> processDefinitons = new ArrayList<>();
 
         openTx();
@@ -477,30 +510,36 @@ public class CommonBPMServicesTest {
         closeTx();
     }
 
-    public List<SUser> createEnabledSUsers(final int count, final String firstName, final String lastName, final String password) throws SBonitaException {
+    public List<SUser> createEnabledSUsers(final int count, final String firstName, final String lastName,
+            final String password) throws SBonitaException {
         openTx();
         final List<SUser> users = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
-            users.add(getTenantAccessor().getIdentityService().createUser(buildEnabledSUser(firstName + i, lastName + i, password + i, 0)));
+            users.add(getTenantAccessor().getIdentityService()
+                    .createUser(buildEnabledSUser(firstName + i, lastName + i, password + i, 0)));
         }
         closeTx();
 
         return users;
     }
 
-    public SUser createEnabledSUser(final String firstName, final String lastName, final String password) throws SBonitaException {
+    public SUser createEnabledSUser(final String firstName, final String lastName, final String password)
+            throws SBonitaException {
         return createEnabledSUser(firstName, lastName, password, 0);
     }
 
-    public SUser createEnabledSUser(final String firstName, final String lastName, final String password, final long managerUserId) throws SBonitaException {
+    public SUser createEnabledSUser(final String firstName, final String lastName, final String password,
+            final long managerUserId) throws SBonitaException {
         openTx();
-        final SUser user = getTenantAccessor().getIdentityService().createUser(buildEnabledSUser(firstName, lastName, password, managerUserId));
+        final SUser user = getTenantAccessor().getIdentityService()
+                .createUser(buildEnabledSUser(firstName, lastName, password, managerUserId));
         closeTx();
 
         return user;
     }
 
-    public SUser buildEnabledSUser(final String firstName, final String lastName, final String password, final long managerUserId) {
+    public SUser buildEnabledSUser(final String firstName, final String lastName, final String password,
+            final long managerUserId) {
         final SUser.SUserBuilder userBuilder = SUser.builder();
         userBuilder.createdBy(2);
         userBuilder.creationDate(6);
@@ -584,18 +623,22 @@ public class CommonBPMServicesTest {
         return role;
     }
 
-    public SUserMembership createSUserMembership(final SUser user, final SGroup group, final SRole role) throws SBonitaException {
+    public SUserMembership createSUserMembership(final SUser user, final SGroup group, final SRole role)
+            throws SBonitaException {
         openTx();
-        final SUserMembership userMembership = SUserMembership.builder().userId(user.getId()).groupId(group.getId()).roleId(role.getId()).build();
+        final SUserMembership userMembership = SUserMembership.builder().userId(user.getId()).groupId(group.getId())
+                .roleId(role.getId()).build();
         getTenantAccessor().getIdentityService().createUserMembership(userMembership);
         closeTx();
         return userMembership;
     }
 
-    protected List<SFlowNodeInstance> searchFlowNodeInstances(final QueryOptions searchOptions) throws SBonitaException {
+    protected List<SFlowNodeInstance> searchFlowNodeInstances(final QueryOptions searchOptions)
+            throws SBonitaException {
         openTx();
-        final List<SFlowNodeInstance> flowNodes = getTenantAccessor().getActivityInstanceService().searchFlowNodeInstances(SFlowNodeInstance.class,
-                searchOptions);
+        final List<SFlowNodeInstance> flowNodes = getTenantAccessor().getActivityInstanceService()
+                .searchFlowNodeInstances(SFlowNodeInstance.class,
+                        searchOptions);
         closeTx();
 
         return flowNodes;
@@ -606,7 +649,8 @@ public class CommonBPMServicesTest {
     }
 
     protected long createTenant(String tenantName) throws Exception {
-        return PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), tenantName,
+        return PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(),
+                tenantName,
                 PlatformUtil.DEFAULT_CREATED_BY, PlatformUtil.TENANT_STATUS_ACTIVATED);
     }
 

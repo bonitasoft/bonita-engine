@@ -30,7 +30,8 @@ public final class SetTaskPriority implements TransactionContent {
 
     private final ActivityInstanceService activityInstanceService;
 
-    public SetTaskPriority(final ActivityInstanceService activityInstanceService, final long activityInstanceId, final STaskPriority sTaskPriority) {
+    public SetTaskPriority(final ActivityInstanceService activityInstanceService, final long activityInstanceId,
+            final STaskPriority sTaskPriority) {
         this.activityInstanceService = activityInstanceService;
         this.activityInstanceId = activityInstanceId;
         priority = sTaskPriority;

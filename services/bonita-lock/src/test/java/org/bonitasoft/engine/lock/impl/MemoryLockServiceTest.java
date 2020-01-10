@@ -143,17 +143,19 @@ public class MemoryLockServiceTest {
         assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNull();
 
         //Unable to lock in an other thread: the lock is still hold once by the current thread
-        memoryLockService.unlock(bonitaLock,tenantId);
+        memoryLockService.unlock(bonitaLock, tenantId);
         assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNull();
 
         //Able to unlock the thread release all holds
-        memoryLockService.unlock(bonitaLock,tenantId);
+        memoryLockService.unlock(bonitaLock, tenantId);
         assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNotNull();
     }
 
-    private BonitaLock tryLockInAnOtherThread(int objectToLockId, String abc, Long tenantId) throws InterruptedException, java.util.concurrent.ExecutionException {
-        return executorService.submit(() ->
-                memoryLockService.tryLock(objectToLockId, abc, 10, TimeUnit.MILLISECONDS, tenantId)).get();
+    private BonitaLock tryLockInAnOtherThread(int objectToLockId, String abc, Long tenantId)
+            throws InterruptedException, java.util.concurrent.ExecutionException {
+        return executorService
+                .submit(() -> memoryLockService.tryLock(objectToLockId, abc, 10, TimeUnit.MILLISECONDS, tenantId))
+                .get();
     }
 
     @Test

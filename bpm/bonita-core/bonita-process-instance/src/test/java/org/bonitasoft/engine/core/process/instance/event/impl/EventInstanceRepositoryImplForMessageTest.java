@@ -13,6 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
@@ -42,15 +52,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 /**
  * @author Celine Souchet
@@ -137,7 +138,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#resetProgressMessageInstances()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#resetProgressMessageInstances()}.
      */
     @Test
     public final void resetProgressMessageInstances_should_update_message() throws Exception {
@@ -161,7 +163,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getMessageEventCouples(int, int)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getMessageEventCouples(int, int)}.
      */
     @Test
     public final void getMessageEventCouples_should_return_message_event_couples() throws Exception {
@@ -204,7 +207,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getMessageInstance(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getMessageInstance(long)}.
      */
     @Test
     public final void getMessageInstance_should_return_message_instance() throws Exception {
@@ -223,7 +227,6 @@ public class EventInstanceRepositoryImplForMessageTest {
         assertEquals("Should return the result of the mock.", sMessageInstance, result);
     }
 
-
     @Test
     public final void deleteMessage_should_process_ids_in_batch() throws Exception {
         // Given
@@ -234,7 +237,6 @@ public class EventInstanceRepositoryImplForMessageTest {
         // Then
         verify(persistenceService, times(4)).update(anyString(), anyMap());
     }
-
 
     @Test
     public final void getMessageInstance_should_return_null_if_doesnt_exist() throws Exception {
@@ -317,7 +319,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     @Test(expected = IllegalArgumentException.class)
     public final void should_throw_exception_when_query_option_have_bad_filters()
             throws Exception {
-        eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(14500L, new QueryOptions(Collections.singletonList(new FilterOption(SMessageInstance.class, "toto", "testt")), null));
+        eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(14500L, new QueryOptions(
+                Collections.singletonList(new FilterOption(SMessageInstance.class, "toto", "testt")), null));
 
     }
 }

@@ -85,10 +85,12 @@ public class Folder {
 
     public void create() throws IOException {
         if (!folder.getParentFile().exists()) {
-            throw new IOException("Folder denoted by path " + folder.getAbsolutePath() + " cannot be created as its parent does not exist.");
+            throw new IOException("Folder denoted by path " + folder.getAbsolutePath()
+                    + " cannot be created as its parent does not exist.");
         }
         if (!folder.getParentFile().isDirectory()) {
-            throw new IOException("Folder denoted by path " + folder.getAbsolutePath() + " cannot be created as its parent is not a folder.");
+            throw new IOException("Folder denoted by path " + folder.getAbsolutePath()
+                    + " cannot be created as its parent is not a folder.");
         }
         folder.mkdir();
     }
@@ -103,7 +105,8 @@ public class Folder {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ZipOutputStream zos = new ZipOutputStream(baos);
         try {
-            org.bonitasoft.engine.io.IOUtil.zipDir(this.folder.getAbsolutePath(), zos, destFolder.getFile().getAbsolutePath());
+            org.bonitasoft.engine.io.IOUtil.zipDir(this.folder.getAbsolutePath(), zos,
+                    destFolder.getFile().getAbsolutePath());
             return baos.toByteArray();
         } finally {
             zos.close();
@@ -112,7 +115,8 @@ public class Folder {
     }
 
     public Map<String, byte[]> getResources(String filenamesPattern) throws IOException {
-        final Collection<File> files = FileUtils.listFiles(getFile(), new DeepRegexFileFilter(getFile(), filenamesPattern),
+        final Collection<File> files = FileUtils.listFiles(getFile(),
+                new DeepRegexFileFilter(getFile(), filenamesPattern),
                 DirectoryFileFilter.DIRECTORY);
         final Map<String, byte[]> res = new HashMap<>(files.size());
         for (final File file : files) {

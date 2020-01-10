@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api.event;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
@@ -40,8 +43,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Pascal GARCIA
@@ -174,7 +175,8 @@ public interface EventInstanceRepository {
     int resetProgressMessageInstances() throws SMessageModificationException;
 
     /**
-     * Resets all Waiting Message Events marked as 'in progress", so that they are eligible to match Message Instances again.
+     * Resets all Waiting Message Events marked as 'in progress", so that they are eligible to match Message Instances
+     * again.
      *
      * @return the number of waiting events reset.
      * @throws SWaitingEventModificationException

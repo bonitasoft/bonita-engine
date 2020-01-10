@@ -35,13 +35,15 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<>("getCommandByName", parameters, SCommand.class);
     }
 
-    public static SelectListDescriptor<SCommand> getCommands(final String field, final OrderByType order, final int fromIndex, final int numberOfElements) {
+    public static SelectListDescriptor<SCommand> getCommands(final String field, final OrderByType order,
+            final int fromIndex, final int numberOfElements) {
         final Map<String, Object> parameters = Collections.emptyMap();
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SCommand.class, field, order);
         return new SelectListDescriptor<>("getCommands", parameters, SCommand.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SCommand> getUserCommands(final String field, final OrderByType order, final int fromIndex, final int numberOfElements) {
+    public static SelectListDescriptor<SCommand> getUserCommands(final String field, final OrderByType order,
+            final int fromIndex, final int numberOfElements) {
         final Map<String, Object> parameters = Collections.singletonMap("isSystem", false);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SCommand.class, field, order);
         return new SelectListDescriptor<>("getUserCommands", parameters, SCommand.class, queryOptions);

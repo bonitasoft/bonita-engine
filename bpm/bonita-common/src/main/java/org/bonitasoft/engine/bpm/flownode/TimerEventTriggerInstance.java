@@ -16,8 +16,9 @@ package org.bonitasoft.engine.bpm.flownode;
 import java.util.Date;
 
 /**
- * Represent the instance of the {@link TimerEventTriggerDefinition} (only for the type {@link TimerType#DATE} and {@link TimerType#DURATION})
- * 
+ * Represent the instance of the {@link TimerEventTriggerDefinition} (only for the type {@link TimerType#DATE} and
+ * {@link TimerType#DURATION})
+ *
  * @author Celine Souchet
  * @version 6.4.0
  * @since 6.4.0
@@ -26,7 +27,7 @@ public interface TimerEventTriggerInstance extends EventTriggerInstance {
 
     /**
      * Return the date of the execution of the trigger.
-     * 
+     *
      * @return The date of the execution of the trigger.
      * @since 6.4.0
      */
@@ -34,7 +35,7 @@ public interface TimerEventTriggerInstance extends EventTriggerInstance {
 
     /**
      * Return the name of the {@link EventInstance} which it is attached.
-     * 
+     *
      * @return The name of the {@link EventInstance}
      * @since 6.4.0
      */

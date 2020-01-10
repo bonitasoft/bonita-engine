@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl.application.deployer.detector;
 import static org.bonitasoft.engine.io.FileOperations.getFileFromZip;
 import static org.bonitasoft.engine.io.FileOperations.isBarFile;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.bonitasoft.engine.io.FileAndContent;

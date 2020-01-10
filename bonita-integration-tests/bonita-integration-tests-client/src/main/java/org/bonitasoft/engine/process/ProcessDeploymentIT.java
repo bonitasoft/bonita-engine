@@ -67,15 +67,18 @@ public class ProcessDeploymentIT extends TestWithUser {
 
     @Test
     public void deployProcessInDisabledState() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2"),
-                Arrays.asList(true, true));
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(
+                        Arrays.asList("step1", "step2"),
+                        Arrays.asList(true, true));
 
         final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                        .done());
         addUserToFirstActorOfProcess(user.getId(), processDefinition);
 
-        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().enableProcess(processDefinition.getId());
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -87,9 +90,11 @@ public class ProcessDeploymentIT extends TestWithUser {
 
     @Test
     public void deployProcessFromFile() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2"), Arrays.asList(true, true));
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(
+                        Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(designProcessDefinition).done();
         File folder = temporaryFolder.newFolder();
         File tempFile = new File(folder, "tempFile");
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
@@ -100,7 +105,8 @@ public class ProcessDeploymentIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployProcess(readBusinessArchive);
         addUserToFirstActorOfProcess(user.getId(), processDefinition);
 
-        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().enableProcess(processDefinition.getId());
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -113,8 +119,9 @@ public class ProcessDeploymentIT extends TestWithUser {
     @Test
     public void deployProcessWithUTF8Characteres() throws Exception {
         // Create process
-        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
-                Arrays.asList(false));
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
+                        Arrays.asList(false));
         final ProcessDefinition processDefinition1 = deployAndEnableProcess(designProcessDefinition1);
 
         assertEquals(APITestUtil.PROCESS_NAME, processDefinition1.getName());
@@ -125,19 +132,22 @@ public class ProcessDeploymentIT extends TestWithUser {
     @Test
     public void deployProcessWithAutologin_should_respect_lifecycle() throws Exception {
         //given
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2"),
-                Arrays.asList(true, true));
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(
+                        Arrays.asList("step1", "step2"),
+                        Arrays.asList(true, true));
         final BusinessArchiveBuilder newBusinessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         final byte[] properties = IOUtil
-                .getAllContentFrom(this.getClass().getClassLoader().getResourceAsStream("org/bonitasoft/engine/process/security-config.properties"));
+                .getAllContentFrom(this.getClass().getClassLoader()
+                        .getResourceAsStream("org/bonitasoft/engine/process/security-config.properties"));
         newBusinessArchive.addExternalResource(new BarResource("forms/security-config.properties", properties));
 
         //when
         final ProcessDefinition processDefinition = deployProcess(
                 newBusinessArchive.setProcessDefinition(designProcessDefinition).done());
         addUserToFirstActorOfProcess(user.getId(), processDefinition);
-        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
 
         //then
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
@@ -163,8 +173,9 @@ public class ProcessDeploymentIT extends TestWithUser {
     @Test
     public void deployProcessWith_no_security_resource_should_not_allow_auto_login() throws Exception {
         // given
-        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
-                Arrays.asList(false));
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
+                        Arrays.asList(false));
 
         //when
         final ProcessDefinition processDefinition1 = deployAndEnableProcess(designProcessDefinition1);
@@ -184,18 +195,21 @@ public class ProcessDeploymentIT extends TestWithUser {
 
     private BonitaConfiguration getPortalAutoLoginConfiguration() throws Exception {
         ConfigurationService configurationService = PlatformSetupAccessor.getConfigurationService();
-        return configurationService.getTenantPortalConfiguration(getApiClient().getSession().getTenantId(), "autologin-v6.json");
+        return configurationService.getTenantPortalConfiguration(getApiClient().getSession().getTenantId(),
+                "autologin-v6.json");
     }
 
     @Test
     public void deployBigProcess() throws Exception {
         // Create process
-        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
-                Arrays.asList(false));
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
+                        Arrays.asList(false));
         final byte[] bigContent = new byte[1024 * 1024 * 5];
         new Random().nextBytes(bigContent);
 
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition1)
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(designProcessDefinition1)
                 .addClasspathResource(new BarResource("bigRessource", bigContent)).done();
         final ProcessDefinition processDefinition = deployProcess(businessArchive);
         getProcessAPI().enableProcess(processDefinition.getId());
@@ -205,9 +219,11 @@ public class ProcessDeploymentIT extends TestWithUser {
     @Test(expected = AlreadyExistsException.class)
     public void deployProcess2Times() throws Exception {
         // First process def with 2 instances:
-        final DesignProcessDefinition designProcessDef1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("initTask1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(designProcessDef1, APITestUtil.ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDef1 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("initTask1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(designProcessDef1, APITestUtil.ACTOR_NAME,
+                user);
         try {
             deployAndEnableProcessWithActor(designProcessDef1, APITestUtil.ACTOR_NAME, user);
         } finally {
@@ -221,12 +237,16 @@ public class ProcessDeploymentIT extends TestWithUser {
         final User jack = createUser("jack", "bpm");
         //create the process
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addConnector("connectorName", "theConnectorId", "theConnectorVersion", ConnectorEvent.ON_ENTER);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("MyProcess", "1.0");
+        processDefinitionBuilder.addConnector("connectorName", "theConnectorId", "theConnectorVersion",
+                ConnectorEvent.ON_ENTER);
         processDefinitionBuilder.addActor("actor");
-        processDefinitionBuilder.addUserTask("step1", "actor").addUserFilter("userFilterName", "theUserFilterId", "theUserFilterVersion");
+        processDefinitionBuilder.addUserTask("step1", "actor").addUserFilter("userFilterName", "theUserFilterId",
+                "theUserFilterVersion");
         processDefinitionBuilder.addParameter("param1", String.class.getName());
-        processDefinitionBuilder.addDocumentDefinition("myDoc").addContentFileName("myPdfModifiedName.pdf").addDescription("a cool pdf document")
+        processDefinitionBuilder.addDocumentDefinition("myDoc").addContentFileName("myPdfModifiedName.pdf")
+                .addDescription("a cool pdf document")
                 .addMimeType("application/pdf")
                 .addFile("myPdf.pdf").addDescription("my description");
         businessArchiveBuilder.setProcessDefinition(processDefinitionBuilder.done());
@@ -234,22 +254,27 @@ public class ProcessDeploymentIT extends TestWithUser {
         //create the business archive
         businessArchiveBuilder.setParameters(Collections.singletonMap("param1", "theValue"));
         final FormMappingModel formMappingModel = new FormMappingModel();
-        formMappingModel.addFormMapping(new FormMappingDefinition("theUrl", FormMappingType.TASK, FormMappingTarget.URL, "step1"));
+        formMappingModel.addFormMapping(
+                new FormMappingDefinition("theUrl", FormMappingType.TASK, FormMappingTarget.URL, "step1"));
         businessArchiveBuilder.setFormMappings(formMappingModel);
         final Actor actor = new Actor("actor");
         actor.addUser("john");
         final ActorMapping actorMapping = new ActorMapping();
         actorMapping.addActor(actor);
         businessArchiveBuilder.setActorMapping(actorMapping);
-        final byte[] connectorImplementationFile = BuildTestUtil.buildConnectorImplementationFile("theConnectorId", "theConnectorVersion", "impl1", "1.0",
+        final byte[] connectorImplementationFile = BuildTestUtil.buildConnectorImplementationFile("theConnectorId",
+                "theConnectorVersion", "impl1", "1.0",
                 TestConnectorWithOutput.class.getName());
-        businessArchiveBuilder.addConnectorImplementation(new BarResource("theConnctor.impl", connectorImplementationFile));
-        final byte[] userFilterImpl = BuildTestUtil.buildConnectorImplementationFile("theConnectorId", "theConnectorVersion", "impl1", "1.0",
+        businessArchiveBuilder
+                .addConnectorImplementation(new BarResource("theConnctor.impl", connectorImplementationFile));
+        final byte[] userFilterImpl = BuildTestUtil.buildConnectorImplementationFile("theConnectorId",
+                "theConnectorVersion", "impl1", "1.0",
                 TestConnectorWithOutput.class.getName());
         businessArchiveBuilder.addUserFilters(new BarResource("theUserFilter.impl", userFilterImpl));
         final byte[] pdfContent = new byte[] { 5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5 };
         businessArchiveBuilder.addDocumentResource(new BarResource("myPdf.pdf", pdfContent));
-        businessArchiveBuilder.addClasspathResource(BuildTestUtil.generateJarAndBuildBarResource(ProcessAPI.class, "myJar,jar"));
+        businessArchiveBuilder
+                .addClasspathResource(BuildTestUtil.generateJarAndBuildBarResource(ProcessAPI.class, "myJar,jar"));
         businessArchiveBuilder.addExternalResource(new BarResource("index.html", "<html>".getBytes()));
         businessArchiveBuilder.addExternalResource(new BarResource("content/other.html", "<html>1".getBytes()));
 
@@ -267,7 +292,8 @@ public class ProcessDeploymentIT extends TestWithUser {
 
         //check
         assertThat(exportedBAR.getResources().keySet()).containsAll(businessArchive.getResources().keySet());
-        assertThat(exportedBAR.getFormMappingModel().getFormMappings()).containsAll(businessArchive.getFormMappingModel().getFormMappings());
+        assertThat(exportedBAR.getFormMappingModel().getFormMappings())
+                .containsAll(businessArchive.getFormMappingModel().getFormMappings());
         assertThat(exportedBAR.getParameters()).isEqualTo(businessArchive.getParameters());
         assertThat(exportedBAR.getProcessDefinition()).isEqualTo(businessArchive.getProcessDefinition());
 

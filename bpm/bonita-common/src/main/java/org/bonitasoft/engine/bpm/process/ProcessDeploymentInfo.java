@@ -20,10 +20,12 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
  * Gives access to the {@link ProcessDefinition} deployment information.<br>
- * A <code>ProcessDeploymentInfo</code> has a {@link ConfigurationState}, which says if the process is <code>resolved</code> (all its basic configuration has a
+ * A <code>ProcessDeploymentInfo</code> has a {@link ConfigurationState}, which says if the process is
+ * <code>resolved</code> (all its basic configuration has a
  * proper value), or <code>unresolved</code> (some configuration has to be done before the process can be activated).
  * <p>
- * A <code>ProcessDeploymentInfo</code> has an {@link ActivationState}, which says if the process was set to <code>enabled</code> (logged users can start
+ * A <code>ProcessDeploymentInfo</code> has an {@link ActivationState}, which says if the process was set to
+ * <code>enabled</code> (logged users can start
  * instances of this process), or <code>disabled</code> (no start can be performed on the process).
  *
  * @author Baptiste Mesta
@@ -54,14 +56,17 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
     String getVersion();
 
     /**
-     * Retrieves the {@link ProcessDefinition} display description. Unlike <code>description</code> that is static, the <code>display description</code> can be
-     * updated via {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
+     * Retrieves the {@link ProcessDefinition} display description. Unlike <code>description</code> that is static, the
+     * <code>display description</code> can be
+     * updated via
+     * {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
      * <p>
      * When set, this field is used by the Bonita Portal in the place of <code>description</code>.
      *
      * @return a String representing the {@link ProcessDefinition} display description.
      * @see ProcessDefinition
-     * @see org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
+     * @see org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long,
+     *      ProcessDeploymentInfoUpdater)
      */
     String getDisplayDescription();
 
@@ -74,7 +79,8 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
     Date getDeploymentDate();
 
     /**
-     * Retrieves the identifier of the Bonita {@link org.bonitasoft.engine.identity.User} which deployed the {@link ProcessDefinition}
+     * Retrieves the identifier of the Bonita {@link org.bonitasoft.engine.identity.User} which deployed the
+     * {@link ProcessDefinition}
      *
      * @return a long representing the identifier of the <code>Bonita user</code> which deployed the process.
      * @see org.bonitasoft.engine.identity.User
@@ -83,14 +89,17 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
     long getDeployedBy();
 
     /**
-     * Retrieves the {@link ProcessDefinition} display name. Unlike <code>name</code> that is static, the <code>display name</code> can be
-     * updated via {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
+     * Retrieves the {@link ProcessDefinition} display name. Unlike <code>name</code> that is static, the <code>display
+     * name</code> can be
+     * updated via
+     * {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
      * <p>
      * When set this field is used by the Bonita Portal in the place of <code>name</code>.
      *
      * @return a String representing the <code>ProcessDefinition</code> display name.
      * @see ProcessDefinition
-     * @see org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
+     * @see org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long,
+     *      ProcessDeploymentInfoUpdater)
      */
     String getDisplayName();
 

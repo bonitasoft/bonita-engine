@@ -39,7 +39,8 @@ public class WaitForFlowNode extends WaitUntil {
     private final ProcessAPI processAPI;
 
     @Deprecated
-    public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId, final boolean useRootProcessInstance,
+    public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId,
+            final boolean useRootProcessInstance,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.name = name;
@@ -49,14 +50,16 @@ public class WaitForFlowNode extends WaitUntil {
     }
 
     @Deprecated
-    public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId, final String state,
+    public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId,
+            final String state,
             final boolean rootProcessInstance, final ProcessAPI processAPI) {
         this(repeatEach, timeout, name, processInstanceId, rootProcessInstance, processAPI);
         this.state = state;
     }
 
     @Deprecated
-    public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId, final StateCategory stateCategory,
+    public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId,
+            final StateCategory stateCategory,
             final boolean rootProcessInstance, final ProcessAPI processAPI) {
         this(repeatEach, timeout, name, processInstanceId, rootProcessInstance, processAPI);
         this.stateCategory = stateCategory;
@@ -71,7 +74,8 @@ public class WaitForFlowNode extends WaitUntil {
             searchOptionsBuilder.filter(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstanceId);
         }
         searchOptionsBuilder.filter(FlowNodeInstanceSearchDescriptor.NAME, name);
-        final SearchResult<FlowNodeInstance> searchResult = processAPI.searchFlowNodeInstances(searchOptionsBuilder.done());
+        final SearchResult<FlowNodeInstance> searchResult = processAPI
+                .searchFlowNodeInstances(searchOptionsBuilder.done());
         final boolean found = searchResult.getCount() > 0;
         boolean check = found;
         if (found) {

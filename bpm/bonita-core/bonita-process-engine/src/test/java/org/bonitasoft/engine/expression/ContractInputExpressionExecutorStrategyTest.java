@@ -54,7 +54,8 @@ public class ContractInputExpressionExecutorStrategyTest {
     }
 
     private SExpression buildInputContractExpression(final String name, final Class<?> returnType) {
-        return new SExpressionImpl(name, name, ExpressionExecutorStrategy.TYPE_CONTRACT_INPUT, returnType.getName(), null, null);
+        return new SExpressionImpl(name, name, ExpressionExecutorStrategy.TYPE_CONTRACT_INPUT, returnType.getName(),
+                null, null);
     }
 
     @Test
@@ -73,7 +74,8 @@ public class ContractInputExpressionExecutorStrategyTest {
     public void evaluateShouldThrowAnExceptionInputNotFound() throws Exception {
         final SExpression expression = buildInputContractExpression("comment", String.class);
         final Map<String, Object> context = buildInitialContext(465465L);
-        when(contractDataService.getUserTaskDataValue(465465L, "comment")).thenThrow(new SContractDataNotFoundException("exception"));
+        when(contractDataService.getUserTaskDataValue(465465L, "comment"))
+                .thenThrow(new SContractDataNotFoundException("exception"));
 
         strategy.evaluate(expression, context, null, null);
     }
@@ -90,7 +92,8 @@ public class ContractInputExpressionExecutorStrategyTest {
     public void evaluateShouldThrowAnExceptionDuetoServiceFailure() throws Exception {
         final SExpression expression = buildInputContractExpression("comment", String.class);
         final Map<String, Object> context = buildInitialContext(465465L);
-        when(contractDataService.getUserTaskDataValue(465465L, "comment")).thenThrow(new SBonitaReadException("exception"));
+        when(contractDataService.getUserTaskDataValue(465465L, "comment"))
+                .thenThrow(new SBonitaReadException("exception"));
 
         strategy.evaluate(expression, context, null, null);
     }

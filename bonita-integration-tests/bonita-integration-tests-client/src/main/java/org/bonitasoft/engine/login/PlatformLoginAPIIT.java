@@ -13,16 +13,11 @@
  **/
 package org.bonitasoft.engine.login;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
@@ -65,7 +60,8 @@ public class PlatformLoginAPIIT extends CommonAPIIT {
         final PlatformCommandAPI platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
 
         // register and execute a command to delete a session
-        platformCommandAPI.register(COMMAND_NAME, "Deletes a platform session based on its sessionId", "org.bonitasoft.engine.command.DeletePlatformSessionCommand");
+        platformCommandAPI.register(COMMAND_NAME, "Deletes a platform session based on its sessionId",
+                "org.bonitasoft.engine.command.DeletePlatformSessionCommand");
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("sessionId", sessionId);
         platformCommandAPI.execute(COMMAND_NAME, parameters);

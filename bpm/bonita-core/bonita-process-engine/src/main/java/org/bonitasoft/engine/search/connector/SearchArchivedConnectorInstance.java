@@ -33,7 +33,8 @@ public class SearchArchivedConnectorInstance extends AbstractArchivedConnectorIn
 
     private final ConnectorInstanceService connectorInstanceService;
 
-    public SearchArchivedConnectorInstance(final ConnectorInstanceService connectorInstanceService, final SearchEntityDescriptor searchDescriptor,
+    public SearchArchivedConnectorInstance(final ConnectorInstanceService connectorInstanceService,
+            final SearchEntityDescriptor searchDescriptor,
             final SearchOptions options, final ReadPersistenceService persistenceService) {
         super(searchDescriptor, options);
         this.connectorInstanceService = connectorInstanceService;

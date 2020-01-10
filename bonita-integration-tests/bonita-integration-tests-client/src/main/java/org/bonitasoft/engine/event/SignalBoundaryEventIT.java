@@ -53,7 +53,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(), TestStates.READY,
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(),
+                TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -68,12 +69,14 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     @Test
     public void signalBoundaryEventOnCallActivityTriggered() throws Exception {
         final String signalName = "MySignal";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnCallActivity(signalName);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnCallActivity(
+                signalName);
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance calledStep = waitForUserTaskAndGetIt(processInstance, "calledStep");
-        final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
+        final ProcessInstance calledProcessInstance = getProcessAPI()
+                .getProcessInstance(calledStep.getParentProcessInstanceId());
 
         getProcessAPI().sendSignal("MySignal");
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
@@ -92,19 +95,22 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     @Test
     public void signalBoundaryEventOnCallActivityNotTriggered() throws Exception {
         final String signalName = "MySignal";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnCallActivity(signalName);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnCallActivity(
+                signalName);
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance calledStep = waitForUserTaskAndExecuteAndGetIt(processInstance, "calledStep", user);
-        final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
+        final ProcessInstance calledProcessInstance = getProcessAPI()
+                .getProcessInstance(calledStep.getParentProcessInstanceId());
 
         final long step2Id = waitForUserTask(processInstance, "step2");
         waitForProcessToFinish(calledProcessInstance);
 
         getProcessAPI().sendSignal("MySignal");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(), TestStates.READY,
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(),
+                TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -121,7 +127,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     public void signalBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 4;
         final boolean isSequential = true;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(loopCardinality, isSequential);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(
+                loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -141,7 +148,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     public void signalBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 3;
         final boolean isSequential = true;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(loopCardinality, isSequential);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(
+                loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
@@ -151,7 +159,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(), TestStates.READY,
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(),
+                TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -167,7 +176,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     public void signalBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 4;
         final boolean isSequential = false;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(loopCardinality, isSequential);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(
+                loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -187,7 +197,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     public void signalBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 3;
         final boolean isSequential = false;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(loopCardinality, isSequential);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(
+                loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
@@ -197,7 +208,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(), TestStates.READY,
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(),
+                TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -212,7 +224,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     @Test
     public void signalBoundaryEventTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 3;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnLoopActivity(loopMax);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnLoopActivity(
+                loopMax);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -231,7 +244,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     @Test
     public void signalBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 2;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnLoopActivity(loopMax);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnLoopActivity(
+                loopMax);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopMax; i++) {
@@ -241,7 +255,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(), TestStates.READY,
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(),
+                TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 

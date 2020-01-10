@@ -25,7 +25,6 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 /**
  * @author Hongwen Zang
- * 
  */
 public class SearchCommentsInvolvingUser extends AbstractCommentSearchEntity {
 
@@ -33,7 +32,8 @@ public class SearchCommentsInvolvingUser extends AbstractCommentSearchEntity {
 
     private final long userId;
 
-    public SearchCommentsInvolvingUser(SearchEntityDescriptor searchDescriptor, SearchOptions options, SCommentService commentService, long userId) {
+    public SearchCommentsInvolvingUser(SearchEntityDescriptor searchDescriptor, SearchOptions options,
+            SCommentService commentService, long userId) {
         super(searchDescriptor, options);
         this.commentService = commentService;
         this.userId = userId;

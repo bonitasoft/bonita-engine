@@ -66,10 +66,12 @@ public class StarterThreadTest {
 
     @Before
     public void before() throws Exception {
-        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService).executeInTransaction(any());
+        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService)
+                .executeInTransaction(any());
         starterThread = spy(new StarterThread(1L, sessionAccessor, sessionService, transactionService,
                 platformService, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)));
-        doReturn(SSession.builder().id(54L).tenantId(1).userName("SYSTEM").userId(12).build()).when(sessionService).createSession(anyLong(), anyString());
+        doReturn(SSession.builder().id(54L).tenantId(1).userName("SYSTEM").userId(12).build()).when(sessionService)
+                .createSession(anyLong(), anyString());
         doReturn(tenant).when(platformService).getTenant(1L);
     }
 

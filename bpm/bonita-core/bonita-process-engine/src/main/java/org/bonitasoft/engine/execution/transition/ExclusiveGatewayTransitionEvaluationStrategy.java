@@ -17,6 +17,7 @@ package org.bonitasoft.engine.execution.transition;
  * @author Elias Ricken de Medeiros
  */
 public class ExclusiveGatewayTransitionEvaluationStrategy implements TransitionEvaluationStrategy {
+
     @Override
     public boolean shouldContinue(final boolean alreadyFound) {
         return !alreadyFound;

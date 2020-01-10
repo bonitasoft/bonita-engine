@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.ST
 /**
  * @author Baptiste Mesta
  */
-public class SThrowErrorEventTriggerDefinitionBuilderFactoryImpl implements SThrowErrorEventTriggerDefinitionBuilderFactory {
+public class SThrowErrorEventTriggerDefinitionBuilderFactoryImpl
+        implements SThrowErrorEventTriggerDefinitionBuilderFactory {
 
     @Override
     public SThrowErrorEventTriggerDefinitionBuilder createNewInstance(final String errorCode) {

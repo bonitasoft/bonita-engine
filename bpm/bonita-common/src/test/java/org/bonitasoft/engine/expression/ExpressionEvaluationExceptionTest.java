@@ -22,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ExpressionEvaluationExceptionTest {
@@ -37,7 +36,8 @@ public class ExpressionEvaluationExceptionTest {
      */
     @Test
     public final void getExpressionName() {
-        final ExpressionEvaluationException expressionEvaluationException = new ExpressionEvaluationException(cause, expressionName);
+        final ExpressionEvaluationException expressionEvaluationException = new ExpressionEvaluationException(cause,
+                expressionName);
 
         final String result = expressionEvaluationException.getExpressionName();
         assertEquals(expressionName, result);

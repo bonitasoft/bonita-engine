@@ -36,10 +36,10 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
 
     private CommandService commandService;
 
-
     public CommandServiceIntegrationTest() {
         commandService = getTenantAccessor().getCommandService();
     }
+
     @After
     public void restoreDefaultCommands() throws SBonitaException {
         getTransactionService().begin();
@@ -150,7 +150,8 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
         assertEquals("this is an old command", oldCommand.getDescription());
 
         final String commandName = "new";
-        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SCommandUpdateBuilderFactory.class).createNewInstance().updateName(commandName)
+        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SCommandUpdateBuilderFactory.class)
+                .createNewInstance().updateName(commandName)
                 .updateDescription("this is a new command").done();
         commandService.update(oldCommand, updateDescriptor);
         final SCommand newCommand = commandService.get(commandName);

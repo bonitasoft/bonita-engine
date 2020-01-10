@@ -19,12 +19,11 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.MappedSuperclass;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @author Baptiste Mesta

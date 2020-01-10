@@ -41,7 +41,8 @@ public class SProcessDefinitionLogBuilderImpl extends CRUDELogBuilder implements
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
             if (log.getNumericIndex(ProcessDefinitionLogIndexesMapper.PROCESS_DEFINITION_INDEX) == 0L) {
-                throw new MissingMandatoryFieldsException("Some mandatory fields are missing: ProcessDefinition deployment info Id");
+                throw new MissingMandatoryFieldsException(
+                        "Some mandatory fields are missing: ProcessDefinition deployment info Id");
             }
         }
     }

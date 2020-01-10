@@ -39,7 +39,8 @@ public class AddUserMembership implements TransactionContentWithResult<SUserMemb
 
     private SUserMembership userMembership;
 
-    public AddUserMembership(final long userId, final long groupId, final long roleId, final long assignedBy, final IdentityService identityService) {
+    public AddUserMembership(final long userId, final long groupId, final long roleId, final long assignedBy,
+            final IdentityService identityService) {
         this.assignedBy = assignedBy;
         this.identityService = identityService;
         this.userId = userId;
@@ -53,7 +54,8 @@ public class AddUserMembership implements TransactionContentWithResult<SUserMemb
         final SUser user = identityService.getUser(userId);
         final SRole role = identityService.getRole(roleId);
         final SGroup group = identityService.getGroup(groupId);
-        userMembership = SUserMembership.builder().userId(user.getId()).groupId(group.getId()).roleId(role.getId()).assignedBy(assignedBy)
+        userMembership = SUserMembership.builder().userId(user.getId()).groupId(group.getId()).roleId(role.getId())
+                .assignedBy(assignedBy)
                 .assignedDate(System.currentTimeMillis()).build();
         identityService.createUserMembership(userMembership);
     }

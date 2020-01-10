@@ -33,16 +33,21 @@ import org.hibernate.SessionFactory;
  */
 public class PlatformHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
-    protected PlatformHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
-            final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
+    protected PlatformHibernatePersistenceService(final SessionFactory sessionFactory,
+            final List<Class<? extends PersistentObject>> classMapping,
+            final Map<String, String> classAliasMappings, final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings,
             final TechnicalLoggerService logger) throws ClassNotFoundException {
         super(sessionFactory, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings, logger);
     }
 
-    public PlatformHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
+    public PlatformHibernatePersistenceService(final String name,
+            final HibernateConfigurationProvider hbmConfigurationProvider,
             final Properties extraHibernateProperties,
-            final char likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws Exception {
+            final char likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
+            final DataSource datasource,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings)
+            throws Exception {
         super(name, hbmConfigurationProvider, extraHibernateProperties, likeEscapeCharacter, logger,
                 sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
     }

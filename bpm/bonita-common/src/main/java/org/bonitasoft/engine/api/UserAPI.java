@@ -37,7 +37,8 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 /**
- * UserAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Users: creation, deletion, certain
+ * UserAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on
+ * Users: creation, deletion, certain
  * specific getXXX() methods, generic search methods, etc...
  * It also to retrieve user ContactData.
  *
@@ -90,7 +91,8 @@ public interface UserAPI {
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
-    User createUser(String userName, String password, String firstName, String lastName) throws AlreadyExistsException, CreationException;
+    User createUser(String userName, String password, String firstName, String lastName)
+            throws AlreadyExistsException, CreationException;
 
     /**
      * Creates a user.
@@ -113,7 +115,8 @@ public interface UserAPI {
      * Updates the user according to the updater values.
      * <p>
      * This method also allow to update the icon of the user.
-     * When you update it, the iconId will be set on the user and you can later get it using {@link IdentityAPI#getIcon(long)}.
+     * When you update it, the iconId will be set on the user and you can later get it using
+     * {@link IdentityAPI#getIcon(long)}.
      * Changing the content of the icon will create a new icon and change the iconId of the user.
      * </p>
      *
@@ -135,8 +138,10 @@ public interface UserAPI {
     /**
      * Deletes the user.
      * </p>
-     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s may present display problems in the Bonita
-     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so, use the method
+     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s
+     * may present display problems in the Bonita
+     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so,
+     * use the method
      * {@link #updateUser(long, UserUpdater)} to set the attribute 'enabled' to false</p>.
      *
      * @param userId
@@ -155,8 +160,10 @@ public interface UserAPI {
     /**
      * Deletes the user.
      * </p>
-     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s may present display problems in the Bonita
-     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so, use the method
+     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s
+     * may present display problems in the Bonita
+     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so,
+     * use the method
      * {@link #updateUser(long, UserUpdater)} to set the attribute 'enabled' to false</p>.
      *
      * @param userName
@@ -175,8 +182,10 @@ public interface UserAPI {
     /**
      * Deletes the users.
      * </p>
-     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s may present display problems in the Bonita
-     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so, use the method
+     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s
+     * may present display problems in the Bonita
+     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so,
+     * use the method
      * {@link #updateUser(long, UserUpdater)} to set the attribute 'enabled' to false</p>.
      *
      * @param userIds
@@ -567,7 +576,8 @@ public interface UserAPI {
      * @return the list of user identifiers containing the chosen custom user information with the given value.
      * @since 6.3.2
      */
-    List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex, int maxResults);
+    List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex,
+            int maxResults);
 
     /**
      * get the icon having specified id

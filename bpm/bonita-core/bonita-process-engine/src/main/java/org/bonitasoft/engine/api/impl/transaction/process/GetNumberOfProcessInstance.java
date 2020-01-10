@@ -35,7 +35,8 @@ public class GetNumberOfProcessInstance implements TransactionContentWithResult<
 
     private long number;
 
-    public GetNumberOfProcessInstance(final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService,
+    public GetNumberOfProcessInstance(final ProcessInstanceService processInstanceService,
+            final ProcessDefinitionService processDefinitionService,
             final SearchEntitiesDescriptor searchEntitiesDescriptor) {
         this.processInstanceService = processInstanceService;
         this.processDefinitionService = processDefinitionService;

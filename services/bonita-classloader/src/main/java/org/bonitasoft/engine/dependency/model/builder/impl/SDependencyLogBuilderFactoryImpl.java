@@ -26,7 +26,7 @@ public class SDependencyLogBuilderFactoryImpl extends CRUDELogBuilderFactory imp
     public SDependencyLogBuilder createNewInstance() {
         return new SDependencyLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return SDependencyLogIndexesMapper.DEPENDENCY_INDEX_NAME;

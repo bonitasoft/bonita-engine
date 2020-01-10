@@ -87,7 +87,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * This exception id is used to find potential causes
-     * 
+     *
      * @return the Id of the exception
      */
     public String getExceptionId() {
@@ -111,7 +111,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param id
-     *            The identifier of the process definition to set
+     *        The identifier of the process definition to set
      * @since 6.3
      */
     public void setProcessDefinitionIdOnContext(final Long id) {
@@ -120,7 +120,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param name
-     *            The name of the process definition to set
+     *        The name of the process definition to set
      * @since 6.3
      */
     public void setProcessDefinitionNameOnContext(final String name) {
@@ -129,7 +129,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param version
-     *            The version of the process definition to set
+     *        The version of the process definition to set
      * @since 6.3
      */
     public void setProcessDefinitionVersionOnContext(final String version) {
@@ -138,7 +138,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param id
-     *            The identifier of the process instance to set
+     *        The identifier of the process instance to set
      * @since 6.3
      */
     public void setProcessInstanceIdOnContext(final Long id) {
@@ -147,7 +147,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param id
-     *            The identifier of the root process instance to set
+     *        The identifier of the root process instance to set
      * @since 6.3
      */
     public void setRootProcessInstanceIdOnContext(final Long id) {
@@ -156,7 +156,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param id
-     *            The identifier of the connector definition
+     *        The identifier of the connector definition
      * @since 6.3
      */
     public void setConnectorDefinitionIdOnContext(final String id) {
@@ -165,7 +165,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param name
-     *            The class name of the implementation of the connector definition to set
+     *        The class name of the implementation of the connector definition to set
      * @since 6.3
      */
     public void setConnectorImplementationClassNameOnContext(final String name) {
@@ -174,7 +174,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param version
-     *            The version of the connector definition
+     *        The version of the connector definition
      * @since 6.3
      */
     public void setConnectorDefinitionVersionOnContext(final String version) {
@@ -183,7 +183,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param activationEvent
-     *            The event which activates the connector to set
+     *        The event which activates the connector to set
      * @since 6.3
      */
     public void setConnectorActivationEventOnContext(final String activationEvent) {
@@ -192,7 +192,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param id
-     *            The identifier of the connector instance to set
+     *        The identifier of the connector instance to set
      * @since 6.3
      */
     public void setConnectorInstanceIdOnContext(final long id) {
@@ -201,7 +201,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param id
-     *            The identifier of the flow node definition to set
+     *        The identifier of the flow node definition to set
      * @since 6.3
      */
     public void setFlowNodeDefinitionIdOnContext(final long id) {
@@ -210,7 +210,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param id
-     *            The identifier of the flow node instance to set
+     *        The identifier of the flow node instance to set
      * @since 6.3
      */
     public void setFlowNodeInstanceIdOnContext(final long id) {
@@ -219,7 +219,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param name
-     *            The name of the flow node to set
+     *        The name of the flow node to set
      * @since 6.3
      */
     public void setFlowNodeNameOnContext(final String name) {
@@ -228,7 +228,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param name
-     *            The name of the message instance to set
+     *        The name of the message instance to set
      * @since 6.3
      */
     public void setMessageInstanceNameOnContext(final String name) {
@@ -237,7 +237,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param name
-     *            The target process name of the message instance to set
+     *        The target process name of the message instance to set
      * @since 6.3
      */
     public void setMessageInstanceTargetProcessOnContext(final String name) {
@@ -246,7 +246,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param name
-     *            The target flow node name of the message instance to set
+     *        The target flow node name of the message instance to set
      * @since 6.3
      */
     public void setMessageInstanceTargetFlowNodeOnContext(final String name) {
@@ -255,7 +255,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param eventType
-     *            The event type of the waiting message instance to set
+     *        The event type of the waiting message instance to set
      * @since 6.3
      */
     public void setWaitingMessageEventTypeOnContext(final String eventType) {
@@ -264,7 +264,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param id
-     *            The identifier of the document
+     *        The identifier of the document
      * @since 6.3
      */
     public void setDocumentIdOnContext(final long id) {
@@ -273,7 +273,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param userId
-     *            The identifier of the user
+     *        The identifier of the user
      * @since 6.3
      */
     public void setUserIdOnContext(final Long userId) {
@@ -282,7 +282,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param groupId
-     *            The identifier of the group
+     *        The identifier of the group
      * @since 6.3
      */
     public void setGroupIdOnContext(final Long groupId) {
@@ -291,7 +291,7 @@ public abstract class SBonitaException extends Exception {
 
     /**
      * @param roleId
-     *            The identifier of the role
+     *        The identifier of the role
      * @since 6.3
      */
     public void setRoleIdOnContext(final Long roleId) {

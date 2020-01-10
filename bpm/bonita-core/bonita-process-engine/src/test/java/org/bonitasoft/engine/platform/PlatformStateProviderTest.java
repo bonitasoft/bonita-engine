@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.platform;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.platform.PlatformState.STARTED;
 import static org.bonitasoft.engine.platform.PlatformState.STARTING;
@@ -24,7 +23,6 @@ import org.junit.Test;
 
 public class PlatformStateProviderTest {
 
-
     @Test
     public void should_return_false_when_initializingStart_on_STARTING_platform() {
         PlatformStateProvider platformStateProvider = new PlatformStateProvider(STARTING);
@@ -34,6 +32,7 @@ public class PlatformStateProviderTest {
         assertThat(initializeStart).isFalse();
         assertThat(platformStateProvider.getState()).isEqualTo(STARTING);
     }
+
     @Test
     public void should_return_false_when_initializingStart_on_STOPPING_platform() {
         PlatformStateProvider platformStateProvider = new PlatformStateProvider(STOPPING);
@@ -53,6 +52,7 @@ public class PlatformStateProviderTest {
         assertThat(initializeStart).isFalse();
         assertThat(platformStateProvider.getState()).isEqualTo(STARTED);
     }
+
     @Test
     public void should_return_true_when_initializingStart_on_STOPPED_platform() {
         PlatformStateProvider platformStateProvider = new PlatformStateProvider(STOPPED);
@@ -72,6 +72,7 @@ public class PlatformStateProviderTest {
         assertThat(initializeStop).isFalse();
         assertThat(platformStateProvider.getState()).isEqualTo(STARTING);
     }
+
     @Test
     public void should_return_false_when_initializingStop_on_STOPPING_platform() {
         PlatformStateProvider platformStateProvider = new PlatformStateProvider(STOPPING);
@@ -91,6 +92,7 @@ public class PlatformStateProviderTest {
         assertThat(initializeStop).isTrue();
         assertThat(platformStateProvider.getState()).isEqualTo(STOPPING);
     }
+
     @Test
     public void should_return_false_when_initializingStop_on_STOPPED_platform() {
         PlatformStateProvider platformStateProvider = new PlatformStateProvider(STOPPED);

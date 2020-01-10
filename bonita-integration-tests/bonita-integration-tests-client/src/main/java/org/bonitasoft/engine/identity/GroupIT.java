@@ -330,7 +330,8 @@ public class GroupIT extends TestWithTechnicalUser {
         final String parentGroupPath = "/parentPath";
         final Group group = createGroup("BonitaSoft", parentGroupPath);
         Group result = getIdentityAPI().getGroup(group.getId());
-        assertEquals("The parent path must be equals to " + parentGroupPath + ".", parentGroupPath, result.getParentPath());
+        assertEquals("The parent path must be equals to " + parentGroupPath + ".", parentGroupPath,
+                result.getParentPath());
 
         // update parent path
         final GroupUpdater updateDescriptor = new GroupUpdater();
@@ -381,7 +382,8 @@ public class GroupIT extends TestWithTechnicalUser {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void should_throw_AlreadyExistException_when_update_group_with_group_name_already_exist() throws BonitaException {
+    public void should_throw_AlreadyExistException_when_update_group_with_group_name_already_exist()
+            throws BonitaException {
         Group groupToUpdate = getIdentityAPI().createGroup("England", defaultGroup.getPath());
         final GroupUpdater groupUpdater = new GroupUpdater();
         groupUpdater.updateName("test");
@@ -472,7 +474,8 @@ public class GroupIT extends TestWithTechnicalUser {
         final Role testRoleB = getIdentityAPI().createRole(roleCreatorB);
         getIdentityAPI().addUserMemberships(testIds, group.getId(), testRoleB.getId());
 
-        final List<User> users = getIdentityAPI().getUsersInGroup(defaultGroup.getId(), 0, 5000, UserCriterion.USER_NAME_ASC);
+        final List<User> users = getIdentityAPI().getUsersInGroup(defaultGroup.getId(), 0, 5000,
+                UserCriterion.USER_NAME_ASC);
         assertNotNull(users);
         assertEquals(2, users.size());
         assertEquals("testnameA", users.get(0).getUserName());
@@ -512,7 +515,8 @@ public class GroupIT extends TestWithTechnicalUser {
         final Role testRoleB = getIdentityAPI().createRole(roleCreatorB);
         getIdentityAPI().addUserMemberships(testIds, group.getId(), testRoleB.getId());
 
-        final List<User> users = getIdentityAPI().getActiveUsersInGroup(defaultGroup.getId(), 0, 5000, UserCriterion.USER_NAME_ASC);
+        final List<User> users = getIdentityAPI().getActiveUsersInGroup(defaultGroup.getId(), 0, 5000,
+                UserCriterion.USER_NAME_ASC);
         assertNotNull(users);
         assertEquals(1, users.size());
         assertEquals("testnameA", users.get(0).getUserName());
@@ -532,7 +536,7 @@ public class GroupIT extends TestWithTechnicalUser {
     public void getInactiveUsersInGroup() throws BonitaException {
         final User aUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameA", "bpm").setEnabled(true));
         final User bUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameB", "bpm").setEnabled(false));
-         final User cUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameE", "bpm").setEnabled(false));
+        final User cUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameE", "bpm").setEnabled(false));
         final User cUserInRoleB = getIdentityAPI().createUser(new UserCreator("testnameC", "bpm").setEnabled(true));
         final User dUser = getIdentityAPI().createUser(new UserCreator("testnameD", "bpm").setEnabled(true));
 
@@ -553,7 +557,8 @@ public class GroupIT extends TestWithTechnicalUser {
         final Role testRoleB = getIdentityAPI().createRole(roleCreatorB);
         getIdentityAPI().addUserMemberships(testIds, group.getId(), testRoleB.getId());
 
-        final List<User> users = getIdentityAPI().getInactiveUsersInGroup(defaultGroup.getId(), 0, 5000, UserCriterion.USER_NAME_ASC);
+        final List<User> users = getIdentityAPI().getInactiveUsersInGroup(defaultGroup.getId(), 0, 5000,
+                UserCriterion.USER_NAME_ASC);
         assertNotNull(users);
         assertEquals(2, users.size());
         assertEquals("testnameB", users.get(0).getUserName());
@@ -580,7 +585,8 @@ public class GroupIT extends TestWithTechnicalUser {
         final Role testRole = getIdentityAPI().createRole("testRole");
 
         getIdentityAPI().addUserMemberships(userIds, defaultGroup.getId(), testRole.getId());
-        final List<User> users = getIdentityAPI().getUsersInGroup(defaultGroup.getId(), 0, 5000, UserCriterion.USER_NAME_ASC);
+        final List<User> users = getIdentityAPI().getUsersInGroup(defaultGroup.getId(), 0, 5000,
+                UserCriterion.USER_NAME_ASC);
         final long count = getIdentityAPI().getNumberOfUsersInGroup(defaultGroup.getId());
 
         assertNotNull(users);
@@ -695,15 +701,18 @@ public class GroupIT extends TestWithTechnicalUser {
         createGroup("Back Office & Logistique", "/acme/Site/Service/Departement");
         createGroup("Administration Titres", "/acme/Site/Service/Departement/Back Office & Logistique");
 
-        assertEquals("Administration Titres", getIdentityAPI().getGroupByPath("/acme/Site/Service/Departement/Back Office & Logistique/Administration Titres")
-                .getName());
+        assertEquals("Administration Titres",
+                getIdentityAPI()
+                        .getGroupByPath("/acme/Site/Service/Departement/Back Office & Logistique/Administration Titres")
+                        .getName());
         deleteGroups(getIdentityAPI().getGroupByPath("/acme"));
     }
 
     @Test
     public void should_createGroup_with_icon_create_the_icon() throws Exception {
         //given
-        Group mainGroup = getIdentityAPI().createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        Group mainGroup = getIdentityAPI()
+                .createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
         //when
         Icon icon = getIdentityAPI().getIcon(mainGroup.getIconId());
         //then
@@ -715,9 +724,11 @@ public class GroupIT extends TestWithTechnicalUser {
     @Test
     public void should_updateGroup_with_new_icon_create_a_new_icon() throws Exception {
         //given
-        Group mainGroup = getIdentityAPI().createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        Group mainGroup = getIdentityAPI()
+                .createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
         //when
-        Group group = getIdentityAPI().updateGroup(mainGroup.getId(), new GroupUpdater().updateIcon("newIcon.jpg", new byte[] { 3, 4, 5 }));
+        Group group = getIdentityAPI().updateGroup(mainGroup.getId(),
+                new GroupUpdater().updateIcon("newIcon.jpg", new byte[] { 3, 4, 5 }));
         //then
         Icon icon = getIdentityAPI().getIcon(group.getIconId());
         assertThat(icon.getId()).isNotEqualTo(mainGroup.getIconId());
@@ -730,7 +741,8 @@ public class GroupIT extends TestWithTechnicalUser {
     @Test
     public void should_deleteGroup_with_icon_delete_the_icon() throws Exception {
         //given
-        Group mainGroup = getIdentityAPI().createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        Group mainGroup = getIdentityAPI()
+                .createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
         //when
         getIdentityAPI().deleteGroup(mainGroup.getId());
         //then

@@ -92,7 +92,7 @@ public class EngineStarter {
             System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", "jbossts-properties.xml");
             if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
                 //force it to local if not specified
-                APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String>emptyMap());
+                APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
             }
             if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
                 prepareEnvironment();
@@ -100,7 +100,8 @@ public class EngineStarter {
                 engine.start();
             }
             deployCommandsOnDefaultTenant();
-            LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
+            LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000
+                    + "s)  ===");
         } catch (Exception e) {
             hasFailed = true;
             throw e;
@@ -177,8 +178,9 @@ public class EngineStarter {
         boolean fail = nbOfThreads > nbOfExpectedThreads;
         LOGGER.info(nbOfThreads + " threads are alive. " + nbOfExpectedThreads + " are expected.");
         if (cacheManagerThreads.size() > 2) {
-            LOGGER.info("Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but "
-                    + cacheManagerThreads.size() + " are found:");
+            LOGGER.info(
+                    "Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but "
+                            + cacheManagerThreads.size() + " are found:");
             for (Thread thread : cacheManagerThreads) {
                 printThread(thread);
             }
@@ -282,7 +284,6 @@ public class EngineStarter {
 
         shutdown();
 
-
         checkTempFoldersAreCleaned();
         checkThreadsAreStopped();
     }
@@ -344,7 +345,6 @@ public class EngineStarter {
     public void setBonitaDatabaseConfiguration(BonitaDatabaseConfiguration database) {
         engine.setBonitaDatabaseConfiguration(database);
     }
-
 
     public void setBusinessDataDatabaseConfiguration(BonitaDatabaseConfiguration bonitaDatabaseConfiguration) {
         engine.setBusinessDataDatabaseConfiguration(bonitaDatabaseConfiguration);

@@ -33,7 +33,8 @@ public class BonitaConfigurationTenantUpdater implements BatchPreparedStatementS
     private String dbVendor;
     private ConfigurationType type;
 
-    public BonitaConfigurationTenantUpdater(List<BonitaConfiguration> bonitaConfigurations, String dbVendor, ConfigurationType type) {
+    public BonitaConfigurationTenantUpdater(List<BonitaConfiguration> bonitaConfigurations, String dbVendor,
+            ConfigurationType type) {
         this.bonitaConfigurations = bonitaConfigurations;
         this.dbVendor = dbVendor;
         this.type = type;

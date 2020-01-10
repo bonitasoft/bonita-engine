@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import javax.sql.DataSource;
 
@@ -64,7 +67,8 @@ public class TenantHibernatePersistenceServiceTest {
     public void before() throws Exception {
         doReturn(mock(SessionFactory.class)).when(hbmConfigurationProvider).getSessionFactory();
         tenantHibernatePersistenceService = spy(
-                new TenantHibernatePersistenceService("TenantHibernatePersistenceService", sessionAccessor, hbmConfigurationProvider, null,
+                new TenantHibernatePersistenceService("TenantHibernatePersistenceService", sessionAccessor,
+                        hbmConfigurationProvider, null,
                         ' ', logger, sequenceManager, datasource,
                         true, null, metricsBinder));
     }
@@ -115,7 +119,8 @@ public class TenantHibernatePersistenceServiceTest {
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.WARNING.name());
         // recreate the service because the checking mode is read at service creation:
         tenantHibernatePersistenceService = spy(
-                new TenantHibernatePersistenceService("TenantHibernatePersistenceService", sessionAccessor, hbmConfigurationProvider, null,
+                new TenantHibernatePersistenceService("TenantHibernatePersistenceService", sessionAccessor,
+                        hbmConfigurationProvider, null,
                         ' ', logger, sequenceManager, datasource,
                         true, null, metricsBinder));
         doReturn("").when(query).getQueryString();

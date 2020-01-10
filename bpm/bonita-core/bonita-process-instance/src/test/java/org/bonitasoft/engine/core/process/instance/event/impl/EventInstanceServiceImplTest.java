@@ -24,6 +24,9 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
@@ -34,10 +37,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EventInstanceServiceImplTest {
@@ -55,12 +54,11 @@ public class EventInstanceServiceImplTest {
             k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
             Clock.SYSTEM);
 
-   @Before
-   public void setUp(){
-       eventInstanceServiceImpl = new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry, 1L);
-   }
-
-
+    @Before
+    public void setUp() {
+        eventInstanceServiceImpl = new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry,
+                1L);
+    }
 
     @Test
     public final void deleteMessageAndDataInstanceOlderCreationDate_should_call_expected_method_and_return_nbMessage_deleted()
@@ -86,10 +84,6 @@ public class EventInstanceServiceImplTest {
         verify(dataInstanceService).deleteLocalArchivedDataInstances(2L,
                 MESSAGE_INSTANCE.name());
     }
-
-
-
-
 
     @Test
     public final void should_count_message_thrown() throws SMessageInstanceCreationException {

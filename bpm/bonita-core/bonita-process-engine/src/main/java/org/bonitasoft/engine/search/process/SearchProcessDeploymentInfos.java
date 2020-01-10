@@ -30,7 +30,8 @@ public class SearchProcessDeploymentInfos extends AbstractProcessDeploymentInfoS
 
     private final ProcessDefinitionService processDefinitionService;
 
-    public SearchProcessDeploymentInfos(final ProcessDefinitionService processDefinitionService, final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor,
+    public SearchProcessDeploymentInfos(final ProcessDefinitionService processDefinitionService,
+            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor,
             final SearchOptions options) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
@@ -42,7 +43,8 @@ public class SearchProcessDeploymentInfos extends AbstractProcessDeploymentInfoS
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions)
+            throws SBonitaReadException {
         return processDefinitionService.searchProcessDeploymentInfos(searchOptions);
     }
 

@@ -21,15 +21,15 @@ import org.bonitasoft.engine.bdm.model.Index;
 public class IndexBuilder {
 
     private Index index = new Index();
-    
+
     public static IndexBuilder anIndex() {
         return new IndexBuilder();
     }
-    
+
     public Index build() {
         return index;
     }
-    
+
     public IndexBuilder withName(String name) {
         index.setName(name);
         return this;

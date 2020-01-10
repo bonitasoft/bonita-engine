@@ -204,7 +204,8 @@ public class AdvancedStartProcessCommandIT extends TestWithUser {
     }
 
     private Operation createSetDataOperation(final String name, final String value) throws InvalidExpressionException {
-        return new OperationBuilder().createSetDataOperation(name, new ExpressionBuilder().createConstantStringExpression(value));
+        return new OperationBuilder().createSetDataOperation(name,
+                new ExpressionBuilder().createConstantStringExpression(value));
     }
 
     private ProcessDefinitionBuilder getProcessDefinitionBuilder() {
@@ -215,11 +216,13 @@ public class AdvancedStartProcessCommandIT extends TestWithUser {
         return builder;
     }
 
-    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final String activityName) throws Exception {
+    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId,
+            final String activityName) throws Exception {
         return startProcess(startedBy, processDefinitionId, activityName, null, null);
     }
 
-    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final String activityName, final List<Operation> operations,
+    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId,
+            final String activityName, final List<Operation> operations,
             final Map<String, Serializable> context) throws Exception {
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("started_by", startedBy);
@@ -252,17 +255,20 @@ public class AdvancedStartProcessCommandIT extends TestWithUser {
 
     @Test
     public void advancedStartProcessCommandWithConnectorOnEnterOnProcess() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", null);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("a"))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(),
+                        OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, user,
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(
+                processDefinitionBuilder, ACTOR_NAME, user,
                 "TestConnectorWithOutput.impl", TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
 
         // Start the process with the command on the step2

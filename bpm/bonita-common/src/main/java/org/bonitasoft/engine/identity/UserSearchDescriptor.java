@@ -26,7 +26,7 @@ public final class UserSearchDescriptor {
 
     /** filter search on User's id */
     public static final String ID = "id";
-    
+
     /** filter search on User's username */
     public static final String USER_NAME = "userName";
 

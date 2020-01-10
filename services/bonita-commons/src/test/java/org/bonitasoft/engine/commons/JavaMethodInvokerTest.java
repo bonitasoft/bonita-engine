@@ -72,7 +72,8 @@ class JavaMethodInvokerTest {
         final List<User> createdUsers = new ArrayList<User>();
         createdUsers.add(new User("Matti"));
 
-        invoker.invokeJavaMethod(createdUsers.getClass().getName(), createdUsers, users, "addAll", List.class.getName());
+        invoker.invokeJavaMethod(createdUsers.getClass().getName(), createdUsers, users, "addAll",
+                List.class.getName());
 
         assertThat(users).isEqualTo(createdUsers);
     }
@@ -98,10 +99,11 @@ class JavaMethodInvokerTest {
 
                     final JavaMethodInvoker invoker = new JavaMethodInvoker();
 
-                    final MyClass object = (MyClass) invoker.invokeJavaMethod(String.class.getName(), "A STRING", myData, "setDoesNotExistMethod",
+                    final MyClass object = (MyClass) invoker.invokeJavaMethod(String.class.getName(), "A STRING",
+                            myData, "setDoesNotExistMethod",
                             "java.lang.String");
                 })
-                .isInstanceOf(NoSuchMethodException.class);
+                        .isInstanceOf(NoSuchMethodException.class);
     }
 
 }

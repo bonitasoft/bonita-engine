@@ -202,8 +202,10 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), parentContainerId, state, stateCategory, rootContainerId, processDefinitionId, parentProcessInstanceId,
-                displayDescription, displayName, description, executedBy, executedBySubstitute, flownodeDefinitionId, reachedStateDate, lastUpdateDate);
+        return Objects.hash(super.hashCode(), parentContainerId, state, stateCategory, rootContainerId,
+                processDefinitionId, parentProcessInstanceId,
+                displayDescription, displayName, description, executedBy, executedBySubstitute, flownodeDefinitionId,
+                reachedStateDate, lastUpdateDate);
     }
 
     @Override

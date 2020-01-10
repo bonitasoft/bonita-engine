@@ -40,16 +40,16 @@ public class ThemeAPIImplTest {
     @Spy
     private ThemeAPIImpl themeAPI;
 
-
     @Before
-    public void before(){
+    public void before() {
         doReturn(tenantAccessor).when(themeAPI).getTenantAccessor();
         doReturn(themeService).when(tenantAccessor).getThemeService();
     }
 
     @Test
     public void shouldBeAvalableWhenTenantIsPause() throws Exception {
-        assertThat(ThemeAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as("should theme api be available when tenant is paused")
+        assertThat(ThemeAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class))
+                .as("should theme api be available when tenant is paused")
                 .isTrue();
     }
 
@@ -63,7 +63,5 @@ public class ThemeAPIImplTest {
 
         assertThat(lastUpdateDate).isEqualTo(date);
     }
-
-
 
 }

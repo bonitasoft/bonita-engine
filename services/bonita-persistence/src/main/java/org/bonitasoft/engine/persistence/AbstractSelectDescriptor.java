@@ -25,7 +25,8 @@ public abstract class AbstractSelectDescriptor<T> {
 
     private final Class<T> returnType;
 
-    public AbstractSelectDescriptor(final String queryName, final Class<? extends PersistentObject> entityType, final Class<T> returnType) {
+    public AbstractSelectDescriptor(final String queryName, final Class<? extends PersistentObject> entityType,
+            final Class<T> returnType) {
         this.entityType = entityType;
         this.queryName = queryName;
         this.returnType = returnType;
@@ -45,7 +46,8 @@ public abstract class AbstractSelectDescriptor<T> {
 
     @Override
     public String toString() {
-        return "AbstractSelectDescriptor [entityType=" + entityType + ", queryName=" + queryName + ", returnType=" + returnType + "]";
+        return "AbstractSelectDescriptor [entityType=" + entityType + ", queryName=" + queryName + ", returnType="
+                + returnType + "]";
     }
 
     @Override

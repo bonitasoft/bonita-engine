@@ -66,8 +66,10 @@ public class JobWrapper implements StatelessJob {
 
     private final JobService jobService;
 
-    public JobWrapper(final JobIdentifier jobIdentifier, final StatelessJob statelessJob, final TechnicalLoggerService logger, final long tenantId,
-                      final EventService eventService, final SessionAccessor sessionAccessor, final TransactionService transactionService, PersistenceService persistenceService, JobService jobService) {
+    public JobWrapper(final JobIdentifier jobIdentifier, final StatelessJob statelessJob,
+            final TechnicalLoggerService logger, final long tenantId,
+            final EventService eventService, final SessionAccessor sessionAccessor,
+            final TransactionService transactionService, PersistenceService persistenceService, JobService jobService) {
         this.jobIdentifier = jobIdentifier;
         this.sessionAccessor = sessionAccessor;
         this.statelessJob = statelessJob;
@@ -81,7 +83,6 @@ public class JobWrapper implements StatelessJob {
         jobExecuting = new SEvent(JOB_EXECUTING);
         jobCompleted = new SEvent(JOB_COMPLETED);
     }
-
 
     @Override
     public String getName() {
@@ -108,7 +109,8 @@ public class JobWrapper implements StatelessJob {
             //make sure hibernate flush everything we did before going back to quartz code
             persistenceService.flushStatements();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Finished execution of " + statelessJob.getName());
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                        "Finished execution of " + statelessJob.getName());
             }
 
         } catch (final SRetryableException e) {
@@ -131,12 +133,15 @@ public class JobWrapper implements StatelessJob {
             registerFailInAnOtherThread(e, jobIdentifier);
             transactionService.setRollbackOnly();
         } catch (STransactionException | STransactionNotFoundException e1) {
-            logger.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to rollback transaction after fail on job  " + jobIdentifier.getId(), e);
+            logger.log(getClass(), TechnicalLogSeverity.ERROR,
+                    "Unable to rollback transaction after fail on job  " + jobIdentifier.getId(), e);
         }
     }
 
-    private void registerFailInAnOtherThread(final Throwable jobException, final JobIdentifier jobIdentifier) throws STransactionNotFoundException {
+    private void registerFailInAnOtherThread(final Throwable jobException, final JobIdentifier jobIdentifier)
+            throws STransactionNotFoundException {
         transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
+
             @Override
             public void beforeCommit() {
 
@@ -145,11 +150,13 @@ public class JobWrapper implements StatelessJob {
             @Override
             public void afterCompletion(TransactionState txState) {
                 Thread thread = new Thread(new Runnable() {
+
                     @Override
                     public void run() {
                         try {
                             sessionAccessor.setTenantId(jobIdentifier.getTenantId());
                             transactionService.executeInTransaction(new Callable<Object>() {
+
                                 @Override
                                 public Object call() throws Exception {
                                     jobService.logJobError(jobException, jobIdentifier.getId());
@@ -157,7 +164,8 @@ public class JobWrapper implements StatelessJob {
                                 }
                             });
                         } catch (Exception e) {
-                            logger.log(getClass(), TechnicalLogSeverity.ERROR, "Error while registering the error for the job " + jobIdentifier.getId(), e);
+                            logger.log(getClass(), TechnicalLogSeverity.ERROR,
+                                    "Error while registering the error for the job " + jobIdentifier.getId(), e);
                             logger.log(getClass(), TechnicalLogSeverity.ERROR, "job exception was ", jobException);
                         }
                         sessionAccessor.deleteTenantId();
@@ -167,7 +175,8 @@ public class JobWrapper implements StatelessJob {
                 try {
                     thread.join();
                 } catch (InterruptedException e) {
-                    logger.log(getClass(), TechnicalLogSeverity.ERROR, "Thread to log error on job " + jobIdentifier.getId() + " interrupted", e);
+                    logger.log(getClass(), TechnicalLogSeverity.ERROR,
+                            "Thread to log error on job " + jobIdentifier.getId() + " interrupted", e);
                 }
 
             }
@@ -176,7 +185,8 @@ public class JobWrapper implements StatelessJob {
 
     private void logFailedJob(final Throwable e) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error while executing job " + jobIdentifier + " : " + e.getMessage(), e);
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
+                    "Error while executing job " + jobIdentifier + " : " + e.getMessage(), e);
         }
     }
 

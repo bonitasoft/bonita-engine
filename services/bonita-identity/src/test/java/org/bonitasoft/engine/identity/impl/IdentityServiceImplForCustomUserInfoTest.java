@@ -15,11 +15,11 @@ package org.bonitasoft.engine.identity.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -57,8 +57,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -108,7 +108,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
         identityServiceImpl.createCustomUserInfoDefinition(userInfoDef);
 
         // then
-        verify(recorder, times(1)).recordInsert(eq(new InsertRecord(userInfoDef)), eq(IdentityService.CUSTOM_USER_INFO_DEFINITION));
+        verify(recorder, times(1)).recordInsert(eq(new InsertRecord(userInfoDef)),
+                eq(IdentityService.CUSTOM_USER_INFO_DEFINITION));
     }
 
     @Test
@@ -136,7 +137,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
         // given
         final SCustomUserInfoDefinition duplicateDef = mock(SCustomUserInfoDefinition.class);
         given(duplicateDef.getName()).willReturn(DEFAULT_NAME);
-        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willReturn(userInfoDef);
+        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME)))
+                .willReturn(userInfoDef);
 
         try {
             // when
@@ -153,10 +155,12 @@ public class IdentityServiceImplForCustomUserInfoTest {
     @Test
     public void getCustomUserInfoDefinitionByName_should_return_result_of_persistence_service() throws Exception {
         // given
-        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willReturn(userInfoDef);
+        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME)))
+                .willReturn(userInfoDef);
 
         // when
-        final SCustomUserInfoDefinition retrievedDef = identityServiceImpl.getCustomUserInfoDefinitionByName(DEFAULT_NAME);
+        final SCustomUserInfoDefinition retrievedDef = identityServiceImpl
+                .getCustomUserInfoDefinitionByName(DEFAULT_NAME);
 
         // then
         assertThat(retrievedDef).isEqualTo(userInfoDef);
@@ -166,7 +170,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void getCustomUserInfoDefinitionByName_should_throw_SCustomUserInfoDefinitionNotFoundException_when_persistence_service_returns_null()
             throws Exception {
         // given
-        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willReturn(null);
+        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME)))
+                .willReturn(null);
 
         try {
             // when
@@ -183,7 +188,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
             throws Exception {
         // given
         final SBonitaReadException persistenceException = new SBonitaReadException("");
-        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willThrow(persistenceException);
+        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME)))
+                .willThrow(persistenceException);
 
         try {
             // when
@@ -197,9 +203,11 @@ public class IdentityServiceImplForCustomUserInfoTest {
     }
 
     @Test
-    public void hasCustomUserInfoDefinition_should_return_true_if_persistence_service_finds_an_element() throws Exception {
+    public void hasCustomUserInfoDefinition_should_return_true_if_persistence_service_finds_an_element()
+            throws Exception {
         // given
-        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willReturn(userInfoDef);
+        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME)))
+                .willReturn(userInfoDef);
 
         // when
         final boolean hasDef = identityServiceImpl.hasCustomUserInfoDefinition(DEFAULT_NAME);
@@ -213,7 +221,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
             throws Exception {
         // given
         final SBonitaReadException persistenceException = new SBonitaReadException("");
-        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willThrow(persistenceException);
+        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME)))
+                .willThrow(persistenceException);
 
         try {
             // when
@@ -231,7 +240,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
         // given
         final QueryOptions queryOptions = new QueryOptions(0, 10);
         final List<SCustomUserInfoValue> persistenceResult = Arrays.asList(userInfoValue);
-        given(persistenceService.searchEntity(SCustomUserInfoValue.class, queryOptions, null)).willReturn(persistenceResult);
+        given(persistenceService.searchEntity(SCustomUserInfoValue.class, queryOptions, null))
+                .willReturn(persistenceResult);
 
         // when
         final List<SCustomUserInfoValue> userInfoValues = identityServiceImpl.searchCustomUserInfoValue(queryOptions);
@@ -247,7 +257,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
             throws Exception {
         // given
         final QueryOptions queryOptions = new QueryOptions(0, 10);
-        given(persistenceService.searchEntity(SCustomUserInfoValue.class, queryOptions, null)).willThrow(new SBonitaReadException(""));
+        given(persistenceService.searchEntity(SCustomUserInfoValue.class, queryOptions, null))
+                .willThrow(new SBonitaReadException(""));
 
         // when
         identityServiceImpl.searchCustomUserInfoValue(queryOptions);
@@ -267,7 +278,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
     }
 
     @Test(expected = SIdentityException.class)
-    public void createCustomUserInfoValue_should_throw_SIdentityException_when_recorder_throws_SRecorderException() throws Exception {
+    public void createCustomUserInfoValue_should_throw_SIdentityException_when_recorder_throws_SRecorderException()
+            throws Exception {
         // given
         doThrow(SRecorderException.class).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
@@ -289,7 +301,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
     }
 
     @Test(expected = SIdentityException.class)
-    public void deleteCustomUserInfoValue_should_throw_SIdentityException_when_recorder_throws_SRecorderException() throws Exception {
+    public void deleteCustomUserInfoValue_should_throw_SIdentityException_when_recorder_throws_SRecorderException()
+            throws Exception {
         // given
         doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
@@ -301,7 +314,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void getCustomUserInfoValue_shoul_return_value_returned_by_persistence_service() throws Exception {
         final long id = 10;
         // given
-        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue",
+        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(
+                SCustomUserInfoValue.class, "SCustomUserInfoValue",
                 id);
         given(persistenceService.selectById(selector)).willReturn(userInfoValue);
 
@@ -313,10 +327,12 @@ public class IdentityServiceImplForCustomUserInfoTest {
     }
 
     @Test(expected = SCustomUserInfoValueNotFoundException.class)
-    public void getCustomUserInfoValue_shoul_throw_SCustomUserInfoValueNotFoundException_when_persistence_service_returns_null() throws Exception {
+    public void getCustomUserInfoValue_shoul_throw_SCustomUserInfoValueNotFoundException_when_persistence_service_returns_null()
+            throws Exception {
         final long id = 10;
         // given
-        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue",
+        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(
+                SCustomUserInfoValue.class, "SCustomUserInfoValue",
                 id);
         given(persistenceService.selectById(selector)).willReturn(null);
 
@@ -325,10 +341,12 @@ public class IdentityServiceImplForCustomUserInfoTest {
     }
 
     @Test(expected = SCustomUserInfoValueReadException.class)
-    public void getCustomUserInfoValue_shoul_throw_SCustomUserInfoValueReadException_when_persistence_service_throws_SBonitaReadException() throws Exception {
+    public void getCustomUserInfoValue_shoul_throw_SCustomUserInfoValueReadException_when_persistence_service_throws_SBonitaReadException()
+            throws Exception {
         final long id = 10;
         // given
-        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue",
+        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(
+                SCustomUserInfoValue.class, "SCustomUserInfoValue",
                 id);
         given(persistenceService.selectById(selector)).willThrow(new SBonitaReadException(""));
 
@@ -351,12 +369,14 @@ public class IdentityServiceImplForCustomUserInfoTest {
     }
 
     @Test
-    public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfo_when_no_partial_match() throws Exception {
+    public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfo_when_no_partial_match()
+            throws Exception {
         //given
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("userInfoName", DEFAULT_NAME);
         parameters.put("userInfoValue", "Java");
-        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfo", parameters, SUser.class, Long.class,
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfo",
+                parameters, SUser.class, Long.class,
                 new QueryOptions(0, 10));
         given(persistenceService.selectList(descriptor)).willReturn(Arrays.asList(10L, 20L));
 
@@ -368,12 +388,14 @@ public class IdentityServiceImplForCustomUserInfoTest {
     }
 
     @Test
-    public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfoContains_when_partial_match() throws Exception {
+    public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfoContains_when_partial_match()
+            throws Exception {
         //given
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("userInfoName", DEFAULT_NAME);
         parameters.put("userInfoValue", "Java");
-        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfoContains", parameters, SUser.class,
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>(
+                "getUserIdsWithCustomUserInfoContains", parameters, SUser.class,
                 Long.class,
                 new QueryOptions(0, 10));
         given(persistenceService.selectList(descriptor)).willReturn(Arrays.asList(10L, 20L));
@@ -387,9 +409,11 @@ public class IdentityServiceImplForCustomUserInfoTest {
 
     @Test(expected = SIdentityException.class)
     //then
-    public void getUserIdsWithCustomUserInfo_should_throw_SIdentityException_when_persistence_service_throws_exception() throws Exception {
+    public void getUserIdsWithCustomUserInfo_should_throw_SIdentityException_when_persistence_service_throws_exception()
+            throws Exception {
         //given
-        given(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).willThrow(new SBonitaReadException(""));
+        given(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any()))
+                .willThrow(new SBonitaReadException(""));
 
         //when
         identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);

@@ -43,7 +43,8 @@ public class CustomUserInfo implements BonitaObject {
      * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
      * @see org.bonitasoft.engine.identity.CustomUserInfoValue
      */
-    public CustomUserInfo(final long userId, final CustomUserInfoDefinition definition, final CustomUserInfoValue value) {
+    public CustomUserInfo(final long userId, final CustomUserInfoDefinition definition,
+            final CustomUserInfoValue value) {
         this.userId = userId;
         this.definition = definition;
         if (value != null) {
@@ -53,7 +54,7 @@ public class CustomUserInfo implements BonitaObject {
 
     /**
      * Retrieves the {@link org.bonitasoft.engine.identity.CustomUserInfoDefinition}
-     * 
+     *
      * @return the {@code CustomUserInfoDefinition}
      * @since 6.3
      * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
@@ -64,7 +65,7 @@ public class CustomUserInfo implements BonitaObject {
 
     /**
      * Retrieves the {@link org.bonitasoft.engine.identity.User} identifier
-     * 
+     *
      * @return the {@code User} identifier
      * @since 6.3
      * @see org.bonitasoft.engine.identity.User
@@ -76,9 +77,10 @@ public class CustomUserInfo implements BonitaObject {
     /**
      * Retrieves a {@link String} representing the {@code Custom User Information} value. This is the value of
      * {@link org.bonitasoft.engine.identity.CustomUserInfoValue#getValue()} of
-     * the {@code CustomUserInfoValue} related to this {@code CustomUserInfo}. If there is not related {@code CustomUserInfoValue}, this method will return
+     * the {@code CustomUserInfoValue} related to this {@code CustomUserInfo}. If there is not related
+     * {@code CustomUserInfoValue}, this method will return
      * null.
-     * 
+     *
      * @return a {@code String} representing the {@code Custom User Information} value.
      * @since 6.3
      */

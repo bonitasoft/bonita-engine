@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.business.application.importer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -68,7 +68,8 @@ public class ApplicationImporterTest {
     private ApplicationImporter applicationImporter;
 
     @Test
-    public void importApplication_should_create_application_import_pages_and_menus_and_return_status() throws Exception {
+    public void importApplication_should_create_application_import_pages_and_menus_and_return_status()
+            throws Exception {
         //given
         long createdBy = 5L;
         SApplication app = mock(SApplication.class);
@@ -166,7 +167,8 @@ public class ApplicationImporterTest {
     }
 
     @Test
-    public void importApplication_should_not_set_home_page_when_applicationNode_does_not_have_home_page() throws Exception {
+    public void importApplication_should_not_set_home_page_when_applicationNode_does_not_have_home_page()
+            throws Exception {
         //given
         long createdBy = 5L;
         SApplication app = mock(SApplication.class);
@@ -186,7 +188,8 @@ public class ApplicationImporterTest {
 
         //then
         //set home page
-        verify(applicationService, never()).updateApplication(any(SApplication.class), any(EntityUpdateDescriptor.class));
+        verify(applicationService, never()).updateApplication(any(SApplication.class),
+                any(EntityUpdateDescriptor.class));
     }
 
     @Test
@@ -214,7 +217,8 @@ public class ApplicationImporterTest {
 
         //then
         //set home page
-        verify(applicationService, never()).updateApplication(any(SApplication.class), any(EntityUpdateDescriptor.class));
+        verify(applicationService, never()).updateApplication(any(SApplication.class),
+                any(EntityUpdateDescriptor.class));
         verify(importStatus, times(1)).addError(new ImportError("home", ImportError.Type.APPLICATION_PAGE));
     }
 

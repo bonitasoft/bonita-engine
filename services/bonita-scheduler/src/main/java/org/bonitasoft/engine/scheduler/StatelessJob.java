@@ -17,17 +17,18 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.events.model.SFireEventException;
-import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 
 /**
- * Interface of a scheduled job. A job is classified using a name and a group name. A job has a unique name and group name. It
+ * Interface of a scheduled job. A job is classified using a name and a group name. A job has a unique name and group
+ * name. It
  * fires the following events :
  * <ul>
  * <li>JOB_EXECUTING = "JOB_EXECUTING"</li>
  * <li>JOB_COMPLETED = "JOB_COMPLETED"</li>
  * </ul>
- * 
+ *
  * @author Matthieu Chaffotte
  */
 public interface StatelessJob extends Serializable {
@@ -40,7 +41,7 @@ public interface StatelessJob extends Serializable {
 
     /**
      * Gets the job name.
-     * 
+     *
      * @return the job name
      * @since 6.0
      */
@@ -48,7 +49,7 @@ public interface StatelessJob extends Serializable {
 
     /**
      * Gets the description of the job.
-     * 
+     *
      * @return the job description
      * @since 6.0
      */
@@ -56,9 +57,9 @@ public interface StatelessJob extends Serializable {
 
     /**
      * Execute the content of the job.
-     * 
+     *
      * @throws SJobExecutionException
-     *             if an exception occurs
+     *         if an exception occurs
      * @throws SFireEventException
      * @since 6.0
      */
@@ -66,10 +67,10 @@ public interface StatelessJob extends Serializable {
 
     /**
      * This method is called by the scheduler service before the execution of the job
-     * 
+     *
      * @param attributes
-     *            key is the name of the attribute
-     *            value is the value of the attribute
+     *        key is the name of the attribute
+     *        value is the value of the attribute
      * @throws SJobConfigurationException
      * @since 6.0
      */

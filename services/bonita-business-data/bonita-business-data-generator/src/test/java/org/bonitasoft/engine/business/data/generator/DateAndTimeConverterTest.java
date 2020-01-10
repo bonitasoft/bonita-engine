@@ -54,7 +54,8 @@ public class DateAndTimeConverterTest {
     public void dateAndTimeConverter_should_generate_the_same_object_in_and_out() {
         DateAndTimeConverter dateAndTimeConverter = new DateAndTimeConverter();
         LocalDateTime localDateTime = LocalDateTime.of(1961, 4, 12, 6, 7, 00);
-        LocalDateTime resultLocalDateTime = dateAndTimeConverter.convertToEntityAttribute(dateAndTimeConverter.convertToDatabaseColumn(localDateTime));
+        LocalDateTime resultLocalDateTime = dateAndTimeConverter
+                .convertToEntityAttribute(dateAndTimeConverter.convertToDatabaseColumn(localDateTime));
         assertThat(resultLocalDateTime).isNotNull();
         assertThat(resultLocalDateTime).isEqualTo(localDateTime);
     }
@@ -73,25 +74,25 @@ public class DateAndTimeConverterTest {
         assertThat(localDate).isNull();
     }
 
-    
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    
+
     @Test
     public void convertToEntityAttribute_should_throw_an_exception_when_given_a_faulty_string() {
         DateAndTimeConverter dateAndTimeConverter = new DateAndTimeConverter();
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Database date & time format must be ISO-8601 compliant ( yyyy-mm-ddThh:mm:ss )");
+        expectedException
+                .expectMessage("Database date & time format must be ISO-8601 compliant ( yyyy-mm-ddThh:mm:ss )");
         LocalDateTime localDate = dateAndTimeConverter.convertToEntityAttribute("LaLaLand");
     }
-    
+
     @Test
     public void convertToDatabaseColumn_should_account_up_to_nanoseconds_in_the_generated_string() throws Exception {
         DateAndTimeConverter dateAndTimeConverter = new DateAndTimeConverter();
-        LocalDateTime localDateTime = LocalDateTime.of(2017, 2, 28, 17, 42, 12,9649);
+        LocalDateTime localDateTime = LocalDateTime.of(2017, 2, 28, 17, 42, 12, 9649);
         String dateAndTimeString = dateAndTimeConverter.convertToDatabaseColumn(localDateTime);
         assertThat(dateAndTimeString).isNotNull();
         assertThat(dateAndTimeString).isEqualTo("2017-02-28T17:42:12.000009649");
-        
+
     }
 }

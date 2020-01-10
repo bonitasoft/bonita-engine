@@ -22,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SInvalidExpressionExceptionTest {
@@ -35,33 +34,39 @@ public class SInvalidExpressionExceptionTest {
     private final String message = "message";
 
     /**
-     * Test method for {@link org.bonitasoft.engine.expression.exception.SInvalidExpressionException#getExpressionName()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.expression.exception.SInvalidExpressionException#getExpressionName()}.
      */
     @Test
     public final void return_expression_name_when_use_constructor_with_cause() {
-        final SInvalidExpressionException sExpressionEvaluationException = new SInvalidExpressionException(cause, expressionName);
+        final SInvalidExpressionException sExpressionEvaluationException = new SInvalidExpressionException(cause,
+                expressionName);
 
         final String result = sExpressionEvaluationException.getExpressionName();
         assertEquals(expressionName, result);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.expression.exception.SInvalidExpressionException#getExpressionName()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.expression.exception.SInvalidExpressionException#getExpressionName()}.
      */
     @Test
     public final void return_expression_name_when_use_constructor_with_message() {
-        final SInvalidExpressionException sExpressionEvaluationException = new SInvalidExpressionException(message, expressionName);
+        final SInvalidExpressionException sExpressionEvaluationException = new SInvalidExpressionException(message,
+                expressionName);
 
         final String result = sExpressionEvaluationException.getExpressionName();
         assertEquals(expressionName, result);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.expression.exception.SInvalidExpressionException#getExpressionName()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.expression.exception.SInvalidExpressionException#getExpressionName()}.
      */
     @Test
     public final void return_expression_name_when_use_constructor_with_message_and_cause() {
-        final SInvalidExpressionException sExpressionEvaluationException = new SInvalidExpressionException(message, cause, expressionName);
+        final SInvalidExpressionException sExpressionEvaluationException = new SInvalidExpressionException(message,
+                cause, expressionName);
 
         final String result = sExpressionEvaluationException.getExpressionName();
         assertEquals(expressionName, result);

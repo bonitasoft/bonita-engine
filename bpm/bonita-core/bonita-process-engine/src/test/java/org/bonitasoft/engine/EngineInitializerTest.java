@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
@@ -58,7 +57,6 @@ public class EngineInitializerTest {
         doReturn(serviceAccessorFactory).when(engineInitializer).getServiceAccessorFactory();
         doReturn(sPlatformSession).when(platformSessionService).createSession(anyString());
     }
-
 
     @Test
     public void testInitializeEngine() throws Exception {
@@ -102,7 +100,6 @@ public class EngineInitializerTest {
         //then
         verify(platformAPI, never()).initializePlatform();
     }
-
 
     @Test
     public void testUnloadEngine() throws Exception {

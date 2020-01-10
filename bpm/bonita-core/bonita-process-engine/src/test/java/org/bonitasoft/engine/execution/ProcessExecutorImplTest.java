@@ -101,7 +101,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessExecutorImplTest {
-    
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -205,7 +205,8 @@ public class ProcessExecutorImplTest {
         final List<SOperation> operations = new ArrayList<SOperation>();
         final Map<String, Object> context = new HashMap<String, Object>();
 
-        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
+        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class,
+                withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null);
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
@@ -219,24 +220,29 @@ public class ProcessExecutorImplTest {
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, operations, context, null, selector, null);
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, null, operations, context, null, -1, selector, null);
-        
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, operations, context,
+                null, selector, null);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, null, operations,
+                context, null, -1, selector, null);
+
         exception.expect(SProcessInstanceCreationException.class);
-        final Throwable expectedCause = new SProcessDefinitionException("The process processName processVersion is not enabled.", processId, processName, processVersion);
+        final Throwable expectedCause = new SProcessDefinitionException(
+                "The process processName processVersion is not enabled.", processId, processName, processVersion);
         exception.expectCause(new TypeSafeMatcher<Throwable>() {
+
             @Override
             protected boolean matchesSafely(Throwable item) {
-                return expectedCause.getClass().getName().equals(item.getClass().getName()) && expectedCause.getMessage().equals(item.getMessage());
+                return expectedCause.getClass().getName().equals(item.getClass().getName())
+                        && expectedCause.getMessage().equals(item.getMessage());
             }
 
             @Override
             public void describeTo(Description description) {
                 description.appendValue(expectedCause);
-                
+
             }
         });
-        
+
         mockedProcessExecutorImpl.start(starterId, starterSubstituteId, operations, context, null, selector, null);
     }
 
@@ -249,27 +255,33 @@ public class ProcessExecutorImplTest {
         final Map<String, Object> context = new HashMap<String, Object>(1);
         context.put("input", "value");
 
-        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
+        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class,
+                withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null);
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
         doReturn(ActivationState.ENABLED.name()).when(sProcessDefinitionDeployInfo).getActivationState();
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
-        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, -1)).thenReturn(sProcessInstance);
+        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, -1))
+                .thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.startElements(eq(sProcessInstance), eq(selector))).thenReturn(sProcessInstance);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, operations, context, null, selector, null);
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, null, operations, context, null, -1, selector, null);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId, operations, context, null, selector, null);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, operations, context,
+                null, selector, null);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, null, operations,
+                context, null, -1, selector, null);
+        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId, operations,
+                context, null, selector, null);
 
         Assert.assertNotNull(result);
         Assert.assertEquals(sProcessInstance, result);
     }
 
     @Test
-    public void startProcessWithOperationsAndContextAndExpressionContextAndConnectors_on_EventSubProcess() throws Exception {
+    public void startProcessWithOperationsAndContextAndExpressionContextAndConnectors_on_EventSubProcess()
+            throws Exception {
         final long starterId = 1L;
         final long starterSubstituteId = 9L;
         final List<SOperation> operations = new ArrayList<SOperation>(1);
@@ -282,7 +294,8 @@ public class ProcessExecutorImplTest {
         final long callerId = 1L;
         final long subProcessDefinitionId = 1L;
 
-        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
+        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class,
+                withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SSubProcessDefinition subProcessDef = mock(SSubProcessDefinition.class);
         final SFlowElementContainerDefinition rootContainerDefinition = mock(SFlowElementContainerDefinition.class);
@@ -294,25 +307,31 @@ public class ProcessExecutorImplTest {
         doReturn(ActivationState.ENABLED.name()).when(sProcessDefinitionDeployInfo).getActivationState();
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
         when(mockedProcessExecutorImpl.startElements(sProcessInstance, selector)).thenReturn(sProcessInstance);
-        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, subProcessDefinitionId)).thenReturn(
-                sProcessInstance);
+        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId,
+                subProcessDefinitionId)).thenReturn(
+                        sProcessInstance);
 
         final Map<String, Serializable> processInputs = new HashMap<>(0);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, expressionContext, operations, context,
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, expressionContext,
+                operations, context,
                 connectors, callerId, selector, processInputs);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId, expressionContext, operations,
+        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId,
+                expressionContext, operations,
                 context, connectors, callerId, selector, processInputs);
 
         // and check methods are called:
-        verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessInstance.class), any(FlowNodeSelector.class));
-        verify(mockedProcessExecutorImpl).createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, subProcessDefinitionId);
+        verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessInstance.class),
+                any(FlowNodeSelector.class));
+        verify(mockedProcessExecutorImpl).createProcessInstance(sProcessDefinition, starterId, starterSubstituteId,
+                subProcessDefinitionId);
         verify(mockedProcessExecutorImpl, never()).validateContractInputs(processInputs, sProcessDefinition);
 
         Assert.assertNotNull(result);
         Assert.assertEquals(sProcessInstance, result);
     }
+
     @Test
     public void startProcessWithOperationsAndContextAndExpressionContextAndConnectors() throws Exception {
         final long starterId = 1L;
@@ -327,7 +346,8 @@ public class ProcessExecutorImplTest {
         final long callerId = 1L;
         final long subProcessDefinitionId = 1L;
 
-        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
+        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class,
+                withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SFlowElementContainerDefinition rootContainerDefinition = mock(SFlowElementContainerDefinition.class);
         doReturn(rootContainerDefinition).when(sProcessDefinition).getProcessContainer();
@@ -337,40 +357,46 @@ public class ProcessExecutorImplTest {
         doReturn(ActivationState.ENABLED.name()).when(sProcessDefinitionDeployInfo).getActivationState();
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
         when(mockedProcessExecutorImpl.startElements(eq(sProcessInstance), eq(selector))).thenReturn(sProcessInstance);
-        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, 1L)).thenReturn(
-                sProcessInstance);
+        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, 1L))
+                .thenReturn(
+                        sProcessInstance);
 
         final Map<String, Serializable> processInputs = new HashMap<>(0);
         doNothing().when(mockedProcessExecutorImpl).validateContractInputs(processInputs, sProcessDefinition);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, expressionContext, operations, context,
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, expressionContext,
+                operations, context,
                 connectors, callerId, selector, processInputs);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId, expressionContext, operations,
+        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId,
+                expressionContext, operations,
                 context, connectors, callerId, selector, processInputs);
 
         // and check methods are called:
-        verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessInstance.class), any(FlowNodeSelector.class));
-        verify(mockedProcessExecutorImpl).createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, subProcessDefinitionId);
-        verify(mockedProcessExecutorImpl,times(1)).validateContractInputs(processInputs, sProcessDefinition);
+        verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessInstance.class),
+                any(FlowNodeSelector.class));
+        verify(mockedProcessExecutorImpl).createProcessInstance(sProcessDefinition, starterId, starterSubstituteId,
+                subProcessDefinitionId);
+        verify(mockedProcessExecutorImpl, times(1)).validateContractInputs(processInputs, sProcessDefinition);
 
         Assert.assertNotNull(result);
         Assert.assertEquals(sProcessInstance, result);
     }
 
-    private SFlowElementContainerDefinitionImpl createProcessWithBusinessData(SBusinessDataDefinitionImpl businessDataDefinition) {
+    private SFlowElementContainerDefinitionImpl createProcessWithBusinessData(
+            SBusinessDataDefinitionImpl businessDataDefinition) {
         SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
         processContainer.addBusinessDataDefinition(businessDataDefinition);
         return processContainer;
     }
 
     @Test
-    public void should_not_fail_when_initialize_multiple_businessData_even_when_expression_returns_null() throws Exception {
+    public void should_not_fail_when_initialize_multiple_businessData_even_when_expression_returns_null()
+            throws Exception {
         SBusinessDataDefinitionImpl businessDataDefinition = new SBusinessDataDefinitionImpl();
         businessDataDefinition.setMultiple(true);
         businessDataDefinition.setDefaultValueExpression(new SExpressionImpl());
         SFlowElementContainerDefinitionImpl processContainer = createProcessWithBusinessData(businessDataDefinition);
-
 
         processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
 
@@ -383,8 +409,8 @@ public class ProcessExecutorImplTest {
         businessDataDefinition.setMultiple(true);
         businessDataDefinition.setDefaultValueExpression(new SExpressionImpl());
         SFlowElementContainerDefinitionImpl processContainer = createProcessWithBusinessData(businessDataDefinition);
-        doReturn(Arrays.asList(mock(Entity.class), mock(Entity.class))).when(expressionResolverService).evaluate(any(SExpression.class), any());
-
+        doReturn(Arrays.asList(mock(Entity.class), mock(Entity.class))).when(expressionResolverService)
+                .evaluate(any(SExpression.class), any());
 
         processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
 
@@ -392,12 +418,12 @@ public class ProcessExecutorImplTest {
     }
 
     @Test
-    public void should_not_fail_when_initialize_simple_businessData_even_when_expression_returns_null() throws Exception {
+    public void should_not_fail_when_initialize_simple_businessData_even_when_expression_returns_null()
+            throws Exception {
         SBusinessDataDefinitionImpl businessDataDefinition = new SBusinessDataDefinitionImpl();
         businessDataDefinition.setMultiple(false);
         businessDataDefinition.setDefaultValueExpression(new SExpressionImpl());
         SFlowElementContainerDefinitionImpl processContainer = createProcessWithBusinessData(businessDataDefinition);
-
 
         processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
 
@@ -412,31 +438,34 @@ public class ProcessExecutorImplTest {
         doReturn(mock(Entity.class)).when(expressionResolverService).evaluate(any(SExpression.class), any());
         SFlowElementContainerDefinitionImpl processContainer = createProcessWithBusinessData(businessDataDefinition);
 
-
         processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
 
         verify(refBusinessDataService).addRefBusinessDataInstance(any(SSimpleRefBusinessDataInstance.class));
     }
 
     @Test
-    public void should_getInitialDocumentValue_return_the_document_value_from_expression() throws BonitaHomeNotSetException, STenantIdNotSetException,
+    public void should_getInitialDocumentValue_return_the_document_value_from_expression()
+            throws BonitaHomeNotSetException, STenantIdNotSetException,
             IOException, SBonitaReadException {
         //given
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SExpression initialValueExpression = new SExpressionImpl();
         final DocumentValue theUrl = new DocumentValue("theUrl");
-        Map<SExpression, DocumentValue> evaluatedDocumentValues = Collections.singletonMap(initialValueExpression, theUrl);
+        Map<SExpression, DocumentValue> evaluatedDocumentValues = Collections.singletonMap(initialValueExpression,
+                theUrl);
         SDocumentDefinitionImpl documentDefinition = new SDocumentDefinitionImpl("myDoc");
         documentDefinition.setUrl("toto");//check it overrides it
         documentDefinition.setInitialValue(initialValueExpression);
         //when
-        final DocumentValue initialDocumentValue = processExecutorImpl.getInitialDocumentValue(sProcessDefinition, evaluatedDocumentValues, documentDefinition);
+        final DocumentValue initialDocumentValue = processExecutorImpl.getInitialDocumentValue(sProcessDefinition,
+                evaluatedDocumentValues, documentDefinition);
         //then
         assertThat(initialDocumentValue).isEqualTo(theUrl);
     }
 
     @Test
-    public void should_getInitialDocumentValue_return_the_document_value_from_url() throws BonitaHomeNotSetException, STenantIdNotSetException, IOException, SBonitaReadException {
+    public void should_getInitialDocumentValue_return_the_document_value_from_url()
+            throws BonitaHomeNotSetException, STenantIdNotSetException, IOException, SBonitaReadException {
         //given
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         SDocumentDefinitionImpl documentDefinition = new SDocumentDefinitionImpl("myDoc");
@@ -449,14 +478,15 @@ public class ProcessExecutorImplTest {
     }
 
     @Test
-    public void should_getInitialDocumentValue_return_the_document_value_from_file() throws BonitaHomeNotSetException, STenantIdNotSetException, IOException, SBonitaReadException {
+    public void should_getInitialDocumentValue_return_the_document_value_from_file()
+            throws BonitaHomeNotSetException, STenantIdNotSetException, IOException, SBonitaReadException {
         //given
         ProcessExecutorImpl processExecutor = spy(processExecutorImpl);
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         SDocumentDefinitionImpl documentDefinition = new SDocumentDefinitionImpl("myDoc");
         documentDefinition.setFile("toto.txt");
         documentDefinition.setFileName("myFile.txt");
-        final byte[] content = {1, 2, 3};
+        final byte[] content = { 1, 2, 3 };
         doReturn(content).when(processExecutor).getProcessDocumentContent(sProcessDefinition, documentDefinition);
         //when
         final DocumentValue initialDocumentValue = processExecutor.getInitialDocumentValue(sProcessDefinition,
@@ -487,10 +517,12 @@ public class ProcessExecutorImplTest {
         final SProcessDefinition processDef = mock(SProcessDefinition.class);
         final SFlowNodeDefinition gatewayDefinition = new SGatewayDefinitionImpl(12, "myGate", SGatewayType.INCLUSIVE);
         final SGatewayInstance gatewayInstanceToBeReturned = mock(SGatewayInstance.class);
-        doReturn(gatewayInstanceToBeReturned).when(bpmInstancesCreator).createFlowNodeInstance(anyLong(), anyLong(), anyLong(), eq(SFlowElementsContainerType.PROCESS),
+        doReturn(gatewayInstanceToBeReturned).when(bpmInstancesCreator).createFlowNodeInstance(anyLong(), anyLong(),
+                anyLong(), eq(SFlowElementsContainerType.PROCESS),
                 eq(gatewayDefinition), anyLong(), anyLong(), eq(false), eq(0), eq(SStateCategory.NORMAL), anyLong());
 
-        final SGatewayInstance gatewayInstance = processExecutorImpl.getActiveGatewayOrCreateIt(processDef, gatewayDefinition, SStateCategory.NORMAL, 45l, 46l);
+        final SGatewayInstance gatewayInstance = processExecutorImpl.getActiveGatewayOrCreateIt(processDef,
+                gatewayDefinition, SStateCategory.NORMAL, 45l, 46l);
 
         assertThat(gatewayInstance).isEqualTo(gatewayInstanceToBeReturned);
     }
@@ -500,27 +532,31 @@ public class ProcessExecutorImplTest {
         final SProcessDefinition processDef = mock(SProcessDefinition.class);
         final SFlowNodeDefinition gatewayDefinition = new SGatewayDefinitionImpl(12, "myGate", SGatewayType.INCLUSIVE);
         final SGatewayInstance gatewayInstanceToBeReturned = mock(SGatewayInstance.class);
-        doReturn(gatewayInstanceToBeReturned).when(gatewayInstanceService).getActiveGatewayInstanceOfTheProcess(45l,"myGate");
+        doReturn(gatewayInstanceToBeReturned).when(gatewayInstanceService).getActiveGatewayInstanceOfTheProcess(45l,
+                "myGate");
 
-        final SGatewayInstance gatewayInstance = processExecutorImpl.getActiveGatewayOrCreateIt(processDef, gatewayDefinition, SStateCategory.NORMAL, 45l, 46l);
+        final SGatewayInstance gatewayInstance = processExecutorImpl.getActiveGatewayOrCreateIt(processDef,
+                gatewayDefinition, SStateCategory.NORMAL, 45l, 46l);
 
         assertThat(gatewayInstance).isEqualTo(gatewayInstanceToBeReturned);
     }
-    
-    private STransitionDefinitionImpl create_Transition_and_set_Id(String name, long source, long target, long id){
-        STransitionDefinitionImpl transition = new STransitionDefinitionImpl(name,source,target);
+
+    private STransitionDefinitionImpl create_Transition_and_set_Id(String name, long source, long target, long id) {
+        STransitionDefinitionImpl transition = new STransitionDefinitionImpl(name, source, target);
         transition.setId(id);
         return transition;
     }
-    
+
     @Test
-    public void removeDuplicatedInclusiveGatewayTransitions_should_remove_transitions_going_into_the_same_inclusive_gateway(){
+    public void removeDuplicatedInclusiveGatewayTransitions_should_remove_transitions_going_into_the_same_inclusive_gateway() {
         List<STransitionDefinition> transitionList = new LinkedList<>();
-        SFlowNodeDefinition localFlowNodeDefinitionInclusive = new SGatewayDefinitionImpl(1,"The Inclusive Gateway",SGatewayType.INCLUSIVE);
-        SFlowNodeDefinition localFlowNodeDefinitionParallel = new SGatewayDefinitionImpl(2,"The Parallel Gateway",SGatewayType.PARALLEL);
-        STransitionDefinitionImpl transition1 = create_Transition_and_set_Id("The identical one",0,1,11L);
-        STransitionDefinitionImpl transition2 = create_Transition_and_set_Id("The identical one",0,1,22L);
-        STransitionDefinitionImpl transition3 = create_Transition_and_set_Id("The different transition",0,2,33L);
+        SFlowNodeDefinition localFlowNodeDefinitionInclusive = new SGatewayDefinitionImpl(1, "The Inclusive Gateway",
+                SGatewayType.INCLUSIVE);
+        SFlowNodeDefinition localFlowNodeDefinitionParallel = new SGatewayDefinitionImpl(2, "The Parallel Gateway",
+                SGatewayType.PARALLEL);
+        STransitionDefinitionImpl transition1 = create_Transition_and_set_Id("The identical one", 0, 1, 11L);
+        STransitionDefinitionImpl transition2 = create_Transition_and_set_Id("The identical one", 0, 1, 22L);
+        STransitionDefinitionImpl transition3 = create_Transition_and_set_Id("The different transition", 0, 2, 33L);
         transitionList.add(transition1);
         transitionList.add(transition2);
         transitionList.add(transition3);
@@ -528,25 +564,33 @@ public class ProcessExecutorImplTest {
         doReturn(localFlowNodeDefinitionInclusive).when(processContainer).getFlowNode(1);
         doReturn(localFlowNodeDefinitionParallel).when(processContainer).getFlowNode(2);
 
-        processExecutorImpl.removeDuplicatedInclusiveGatewayTransitions(processDefinition,transitionList);
+        processExecutorImpl.removeDuplicatedInclusiveGatewayTransitions(processDefinition, transitionList);
 
         assertThat(transitionList).hasSize(2);
         assertThat(transitionList).contains(transition1);
         assertThat(transitionList).contains(transition3);
         assertThat(transitionList).doesNotContain(transition2);
     }
-    
-    @Test
-    public void removeDuplicatedInclusiveGatewayTransitions_should_keep_transitions_going_to_different_gateways(){
 
-        SFlowNodeDefinition localFlowNodeDefinitionInclusive = new SGatewayDefinitionImpl(1,"The Inclusive Gateway",SGatewayType.INCLUSIVE);
-        SFlowNodeDefinition localFlowNodeDefinitionInclusive2 = new SGatewayDefinitionImpl(3,"Another Inclusive Gateway",SGatewayType.INCLUSIVE);
-        SFlowNodeDefinition localFlowNodeDefinitionParallel = new SGatewayDefinitionImpl(2,"The Parallel Gateway",SGatewayType.PARALLEL);
-        STransitionDefinitionImpl transition1 = create_Transition_and_set_Id("The identical one going into Inclusive",0,1,11L);
-        STransitionDefinitionImpl transition2 = create_Transition_and_set_Id("The identical one going into Inclusive",0,1,22L);
-        STransitionDefinitionImpl transition3 = create_Transition_and_set_Id("The identical one going into Parallel",0,2,33L);
-        STransitionDefinitionImpl transition4 = create_Transition_and_set_Id("The identical one going into Parallel",0,2,44L);
-        STransitionDefinitionImpl transition5 = create_Transition_and_set_Id("The identical one going into another Inclusive",0,3,55L);
+    @Test
+    public void removeDuplicatedInclusiveGatewayTransitions_should_keep_transitions_going_to_different_gateways() {
+
+        SFlowNodeDefinition localFlowNodeDefinitionInclusive = new SGatewayDefinitionImpl(1, "The Inclusive Gateway",
+                SGatewayType.INCLUSIVE);
+        SFlowNodeDefinition localFlowNodeDefinitionInclusive2 = new SGatewayDefinitionImpl(3,
+                "Another Inclusive Gateway", SGatewayType.INCLUSIVE);
+        SFlowNodeDefinition localFlowNodeDefinitionParallel = new SGatewayDefinitionImpl(2, "The Parallel Gateway",
+                SGatewayType.PARALLEL);
+        STransitionDefinitionImpl transition1 = create_Transition_and_set_Id("The identical one going into Inclusive",
+                0, 1, 11L);
+        STransitionDefinitionImpl transition2 = create_Transition_and_set_Id("The identical one going into Inclusive",
+                0, 1, 22L);
+        STransitionDefinitionImpl transition3 = create_Transition_and_set_Id("The identical one going into Parallel", 0,
+                2, 33L);
+        STransitionDefinitionImpl transition4 = create_Transition_and_set_Id("The identical one going into Parallel", 0,
+                2, 44L);
+        STransitionDefinitionImpl transition5 = create_Transition_and_set_Id(
+                "The identical one going into another Inclusive", 0, 3, 55L);
         List<STransitionDefinition> transitionList = new LinkedList<>();
         transitionList.add(transition1);
         transitionList.add(transition2);
@@ -557,9 +601,9 @@ public class ProcessExecutorImplTest {
         doReturn(localFlowNodeDefinitionInclusive).when(processContainer).getFlowNode(1);
         doReturn(localFlowNodeDefinitionParallel).when(processContainer).getFlowNode(2);
         doReturn(localFlowNodeDefinitionInclusive2).when(processContainer).getFlowNode(3);
-        
-        processExecutorImpl.removeDuplicatedInclusiveGatewayTransitions(processDefinition,transitionList);
-        
+
+        processExecutorImpl.removeDuplicatedInclusiveGatewayTransitions(processDefinition, transitionList);
+
         assertThat(transitionList).hasSize(4);
         assertThat(transitionList).contains(transition1);
         assertThat(transitionList).contains(transition3);

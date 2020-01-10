@@ -39,7 +39,8 @@ public class EqualityComparatorTest {
     }
 
     @Test
-    public void areEquals_should_return_false_when_first_parameter_is_null_and_second_one_is_not_null() throws Exception {
+    public void areEquals_should_return_false_when_first_parameter_is_null_and_second_one_is_not_null()
+            throws Exception {
         //given
 
         //when
@@ -50,7 +51,8 @@ public class EqualityComparatorTest {
     }
 
     @Test
-    public void areEquals_should_return_false_when_first_parameter_is_not_null_and_second_one_is_null() throws Exception {
+    public void areEquals_should_return_false_when_first_parameter_is_not_null_and_second_one_is_null()
+            throws Exception {
         //given
 
         //when

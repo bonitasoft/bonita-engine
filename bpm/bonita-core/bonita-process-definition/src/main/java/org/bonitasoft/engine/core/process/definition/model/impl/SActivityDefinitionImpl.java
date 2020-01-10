@@ -38,7 +38,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.impl.SBoundaryE
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.operation.Operation;
 
-
 /**
  * @author Matthieu Chaffotte
  * @author Frederic Bouquet
@@ -82,7 +81,8 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
             if (loop instanceof StandardLoopCharacteristics) {
                 loopCharacteristics = new SStandardLoopCharacteristicsImpl((StandardLoopCharacteristics) loop);
             } else {
-                loopCharacteristics = new SMultiInstanceLoopCharacteristicsImpl((MultiInstanceLoopCharacteristics) loop);
+                loopCharacteristics = new SMultiInstanceLoopCharacteristicsImpl(
+                        (MultiInstanceLoopCharacteristics) loop);
             }
         }
         addBoundaryEvents(activityDefinition, transitionsMap);
@@ -116,7 +116,8 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
     }
 
     @Override
-    public SBoundaryEventDefinition getBoundaryEventDefinition(final String name) throws SBoundaryEventNotFoundException {
+    public SBoundaryEventDefinition getBoundaryEventDefinition(final String name)
+            throws SBoundaryEventNotFoundException {
         boolean found = false;
         SBoundaryEventDefinition boundary = null;
         final Iterator<SBoundaryEventDefinition> iterator = sBoundaryEventDefinitions.iterator();

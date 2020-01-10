@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.identity.xml;
 
 import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -55,8 +56,10 @@ public class ExportedCustomUserInfoDefinition {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ExportedCustomUserInfoDefinition that = (ExportedCustomUserInfoDefinition) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description);

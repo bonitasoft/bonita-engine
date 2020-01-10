@@ -83,49 +83,59 @@ public class ImportActorMapping {
         }
     }
 
-    private void checkAlreadyExistingUserMapping(final long actorId, final long userId) throws SActorMemberAlreadyExistsException, SBonitaReadException {
+    private void checkAlreadyExistingUserMapping(final long actorId, final long userId)
+            throws SActorMemberAlreadyExistsException, SBonitaReadException {
         List<SActorMember> actorMembersOfUser;
         int startIndex = 0;
         do {
             actorMembersOfUser = actorMappingService.getActorMembers(actorId, startIndex, 50);
             for (final SActorMember sActorMember : actorMembersOfUser) {
-                if (sActorMember.getUserId() == userId && sActorMember.getRoleId() == -1 && sActorMember.getGroupId() == -1) {
-                    throw new SActorMemberAlreadyExistsException("This user / actor mapping already exists: actorId=" + actorId + ", userId=" + userId);
+                if (sActorMember.getUserId() == userId && sActorMember.getRoleId() == -1
+                        && sActorMember.getGroupId() == -1) {
+                    throw new SActorMemberAlreadyExistsException(
+                            "This user / actor mapping already exists: actorId=" + actorId + ", userId=" + userId);
                 }
             }
             startIndex += 50;
         } while (actorMembersOfUser.size() > 0);
     }
 
-    private void checkAlreadyExistingGroupMapping(final long actorId, final long groupId) throws SActorMemberAlreadyExistsException, SBonitaReadException {
+    private void checkAlreadyExistingGroupMapping(final long actorId, final long groupId)
+            throws SActorMemberAlreadyExistsException, SBonitaReadException {
         List<SActorMember> actorMembersOfGroup;
         int startIndex = 0;
         do {
             actorMembersOfGroup = actorMappingService.getActorMembers(actorId, startIndex, 50);
             for (final SActorMember sActorMember : actorMembersOfGroup) {
-                if (sActorMember.getGroupId() == groupId && sActorMember.getRoleId() == -1 && sActorMember.getUserId() == -1) {
-                    throw new SActorMemberAlreadyExistsException("This group / actor mapping already exists: actorId=" + actorId + ", groupId=" + groupId);
+                if (sActorMember.getGroupId() == groupId && sActorMember.getRoleId() == -1
+                        && sActorMember.getUserId() == -1) {
+                    throw new SActorMemberAlreadyExistsException(
+                            "This group / actor mapping already exists: actorId=" + actorId + ", groupId=" + groupId);
                 }
             }
             startIndex += 50;
         } while (actorMembersOfGroup.size() > 0);
     }
 
-    private void checkAlreadyExistingRoleMapping(final long actorId, final long roleId) throws SActorMemberAlreadyExistsException, SBonitaReadException {
+    private void checkAlreadyExistingRoleMapping(final long actorId, final long roleId)
+            throws SActorMemberAlreadyExistsException, SBonitaReadException {
         List<SActorMember> actorMembersOfRole;
         int startIndex = 0;
         do {
             actorMembersOfRole = actorMappingService.getActorMembers(actorId, startIndex, 50);
             for (final SActorMember sActorMember : actorMembersOfRole) {
-                if (sActorMember.getRoleId() == roleId && sActorMember.getGroupId() == -1 && sActorMember.getUserId() == -1) {
-                    throw new SActorMemberAlreadyExistsException("This role / actor mapping already exists: actorId=" + actorId + ", roleId=" + roleId);
+                if (sActorMember.getRoleId() == roleId && sActorMember.getGroupId() == -1
+                        && sActorMember.getUserId() == -1) {
+                    throw new SActorMemberAlreadyExistsException(
+                            "This role / actor mapping already exists: actorId=" + actorId + ", roleId=" + roleId);
                 }
             }
             startIndex += 50;
         } while (actorMembersOfRole.size() > 0);
     }
 
-    private void checkAlreadyExistingMembershipMapping(final long actorId, final long groupId, final long roleId) throws SActorMemberAlreadyExistsException,
+    private void checkAlreadyExistingMembershipMapping(final long actorId, final long groupId, final long roleId)
+            throws SActorMemberAlreadyExistsException,
             SBonitaReadException {
         List<SActorMember> actorMembersOfMembership;
         int startIndex = 0;
@@ -133,8 +143,10 @@ public class ImportActorMapping {
             actorMembersOfMembership = actorMappingService.getActorMembers(actorId, startIndex, 50);
             for (final SActorMember sActorMember : actorMembersOfMembership) {
                 if (sActorMember.getRoleId() == roleId && sActorMember.getGroupId() == groupId) {
-                    throw new SActorMemberAlreadyExistsException("This membership / actor mapping already exists: actorId=" + actorId + ", groupId=" + groupId
-                            + ", roleId=" + roleId);
+                    throw new SActorMemberAlreadyExistsException(
+                            "This membership / actor mapping already exists: actorId=" + actorId + ", groupId="
+                                    + groupId
+                                    + ", roleId=" + roleId);
                 }
             }
             startIndex += 50;

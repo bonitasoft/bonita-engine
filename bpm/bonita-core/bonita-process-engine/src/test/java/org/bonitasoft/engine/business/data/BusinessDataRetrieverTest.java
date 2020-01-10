@@ -71,9 +71,11 @@ public class BusinessDataRetrieverTest {
     }
 
     @Test
-    public void getSimpleBusinessData_should_return_null_when_ref_business_data_does_not_reference_any_data() throws Exception {
+    public void getSimpleBusinessData_should_return_null_when_ref_business_data_does_not_reference_any_data()
+            throws Exception {
         //when
-        Entity retrievedEntity = retriever.getSimpleBusinessData(buildSimpleRefBusinessData((Long) null), Employee.class);
+        Entity retrievedEntity = retriever.getSimpleBusinessData(buildSimpleRefBusinessData((Long) null),
+                Employee.class);
 
         //then
         assertThat(retrievedEntity).isNull();
@@ -85,8 +87,10 @@ public class BusinessDataRetrieverTest {
     public void getMultiBusinessData_should_return_list_of_proxyfied_entities() throws Exception {
         //given
         List<Long> ids = Arrays.asList(11L, 12L);
-        List<Employee> employees = Arrays.asList(new Employee(ids.get(0), 1L, "John", "Doe"), new Employee(ids.get(1), 1L, "Jack", "Doe"));
-        List<Employee> proxies = Arrays.asList(new Employee(ids.get(0), 1L, "John", "Proxy"), new Employee(ids.get(1), 1L, "Jack", "Proxy"));
+        List<Employee> employees = Arrays.asList(new Employee(ids.get(0), 1L, "John", "Doe"),
+                new Employee(ids.get(1), 1L, "Jack", "Doe"));
+        List<Employee> proxies = Arrays.asList(new Employee(ids.get(0), 1L, "John", "Proxy"),
+                new Employee(ids.get(1), 1L, "Jack", "Proxy"));
         given(repository.findByIds(Employee.class, ids)).willReturn(employees);
         given(proxyfier.proxify(employees.get(0))).willReturn(proxies.get(0));
         given(proxyfier.proxify(employees.get(1))).willReturn(proxies.get(1));
@@ -99,9 +103,11 @@ public class BusinessDataRetrieverTest {
     }
 
     @Test
-    public void getMultiBusinessData_should_return_empty_list_when_multi_ref_data_does_not_reference_any_data() throws Exception {
+    public void getMultiBusinessData_should_return_empty_list_when_multi_ref_data_does_not_reference_any_data()
+            throws Exception {
         //when
-        List<Entity> retrievedEntities = retriever.getMultiBusinessData(buildMultiRefBusinessData((List<Long>) null), Employee.class);
+        List<Entity> retrievedEntities = retriever.getMultiBusinessData(buildMultiRefBusinessData((List<Long>) null),
+                Employee.class);
 
         //then
         assertThat(retrievedEntities).isEmpty();
@@ -110,9 +116,11 @@ public class BusinessDataRetrieverTest {
     }
 
     @Test
-    public void getMultiBusinessData_should_return_empty_Array_list_when_multi_ref_data_does_not_reference_any_data() throws Exception {
+    public void getMultiBusinessData_should_return_empty_Array_list_when_multi_ref_data_does_not_reference_any_data()
+            throws Exception {
 
-        List<Entity> retrievedEntities = retriever.getMultiBusinessData(buildMultiRefBusinessData(new ArrayList<>()), Employee.class);
+        List<Entity> retrievedEntities = retriever.getMultiBusinessData(buildMultiRefBusinessData(new ArrayList<>()),
+                Employee.class);
 
         assertThat(retrievedEntities).isEmpty();
 
@@ -145,7 +153,8 @@ public class BusinessDataRetrieverTest {
         BusinessDataRetriever retrieverSpy = spy(retriever);
         SProcessMultiRefBusinessDataInstance dataRef = buildMultiRefBusinessData(Employee.class.getName());
         Employee employee = new Employee(5L, 1L, "John", "Doe");
-        given(retrieverSpy.getMultiBusinessData(dataRef, Employee.class)).willReturn(Collections.<Entity>singletonList(employee));
+        given(retrieverSpy.getMultiBusinessData(dataRef, Employee.class))
+                .willReturn(Collections.<Entity> singletonList(employee));
 
         //when
         List<Entity> businessData = (List<Entity>) retrieverSpy.getBusinessData(dataRef);
@@ -162,7 +171,8 @@ public class BusinessDataRetrieverTest {
 
         //then
         expectedException.expect(SExpressionEvaluationException.class);
-        expectedException.expectMessage("Unable to load class for the business data having reference '" + dataName + "'");
+        expectedException
+                .expectMessage("Unable to load class for the business data having reference '" + dataName + "'");
 
         //when
         retriever.getBusinessData(dataRef);

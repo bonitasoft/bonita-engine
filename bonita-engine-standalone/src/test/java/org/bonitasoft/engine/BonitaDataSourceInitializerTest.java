@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -28,7 +27,7 @@ public class BonitaDataSourceInitializerTest {
     private BonitaDataSourceInitializer bonitaDataSourceInitializer = new BonitaDataSourceInitializer();
 
     @Test
-    public void should_fail_to_create_datasource_if_some_field_are_not_set(){
+    public void should_fail_to_create_datasource_if_some_field_are_not_set() {
         BonitaDatabaseConfiguration configuration = BonitaDatabaseConfiguration.builder()
                 .dbVendor("postgres")
                 .url("jdbc::postgres")
@@ -41,17 +40,15 @@ public class BonitaDataSourceInitializerTest {
     }
 
     @Test
-    public void should_fail_to_create_datasource_configuration_is_empty(){
+    public void should_fail_to_create_datasource_configuration_is_empty() {
         expectedExceptions.expect(IllegalArgumentException.class);
         expectedExceptions.expectMessage("Database dbVendor not set");
 
         bonitaDataSourceInitializer.createDataSource(new BonitaDatabaseConfiguration());
     }
 
-
-
     @Test
-    public void should_fail_if_db_vendor_is_not_supported(){
+    public void should_fail_if_db_vendor_is_not_supported() {
         BonitaDatabaseConfiguration configuration = BonitaDatabaseConfiguration.builder()
                 .dbVendor("toto")
                 .url("jdbc::postgres")
@@ -59,7 +56,6 @@ public class BonitaDataSourceInitializerTest {
 
         expectedExceptions.expect(IllegalArgumentException.class);
         expectedExceptions.expectMessage("Database db vendor toto is invalid");
-
 
         bonitaDataSourceInitializer.createDataSource(configuration);
     }
@@ -112,6 +108,5 @@ public class BonitaDataSourceInitializerTest {
         assertThat(dataSource.getMaxTotal()).isEqualTo(5);
         assertThat(managedDataSource.getMaxTotal()).isEqualTo(10);
     }
-
 
 }

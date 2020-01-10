@@ -22,6 +22,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 public interface SDependencyMappingLogBuilderFactory extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
 
     SDependencyMappingLogBuilder createNewInstance();
-    
+
     String getDependencyIdKey();
 }

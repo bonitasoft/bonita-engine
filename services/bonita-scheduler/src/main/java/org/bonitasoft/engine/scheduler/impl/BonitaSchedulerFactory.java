@@ -15,7 +15,6 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import java.util.Properties;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;

@@ -22,8 +22,10 @@ import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
  */
 public interface SGatewayInstanceBuilderFactory extends SFlowNodeInstanceBuilderFactory {
 
-    SGatewayInstanceBuilder createNewInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, long parentContainerId,
-            final SGatewayType gatewayType, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
+    SGatewayInstanceBuilder createNewInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId, long parentContainerId,
+            final SGatewayType gatewayType, long processDefinitionId, long rootProcessInstanceId,
+            long parentProcessInstanceId);
 
     String getGatewayTypeKey();
 

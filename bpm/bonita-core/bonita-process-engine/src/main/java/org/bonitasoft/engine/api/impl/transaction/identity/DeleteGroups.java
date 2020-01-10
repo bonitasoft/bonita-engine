@@ -32,7 +32,8 @@ public class DeleteGroups extends DeleteWithActorMembers implements TransactionC
 
     private final List<Long> groupIds;
 
-    public DeleteGroups(final IdentityService identityService, final ActorMappingService actorMappingService, final ProfileService profileService,
+    public DeleteGroups(final IdentityService identityService, final ActorMappingService actorMappingService,
+            final ProfileService profileService,
             final List<Long> groupIds) {
         super(actorMappingService, profileService, identityService);
         this.groupIds = groupIds;

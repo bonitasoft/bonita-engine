@@ -74,13 +74,15 @@ public class ClasspathArtifactManager implements BusinessArchiveArtifactManager 
         try {
             dependencyService.deleteDependencies(processDefinition.getId(), ScopeType.PROCESS);
         } catch (SDependencyException e) {
-            throw new SObjectModificationException("Unable to delete dependencies of process " + processDefinition.getId(), e);
+            throw new SObjectModificationException(
+                    "Unable to delete dependencies of process " + processDefinition.getId(), e);
         }
 
     }
 
     @Override
-    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder) throws SBonitaException {
+    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder)
+            throws SBonitaException {
         final ArrayList<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SDependencyMapping.class, "artifactId", processDefinitionId));
         filters.add(new FilterOption(SDependencyMapping.class, "artifactType", ScopeType.PROCESS.name()));
@@ -88,7 +90,8 @@ public class ClasspathArtifactManager implements BusinessArchiveArtifactManager 
                 .getDependencyMappings(new QueryOptions(0, Integer.MAX_VALUE, null, filters, null));
         for (SDependencyMapping dependencyMapping : dependencyMappings) {
             final AbstractSDependency dependency = dependencyService.getDependency(dependencyMapping.getDependencyId());
-            businessArchiveBuilder.addClasspathResource(new BarResource(dependency.getFileName(), dependency.getValue()));
+            businessArchiveBuilder
+                    .addClasspathResource(new BarResource(dependency.getFileName(), dependency.getValue()));
         }
     }
 
@@ -100,7 +103,8 @@ public class ClasspathArtifactManager implements BusinessArchiveArtifactManager 
         for (Map.Entry<String, byte[]> entry : resources.entrySet()) {
             if (!dependencies.contains(getDependencyName(processDefinitionId, entry.getKey()))) {
                 final String name = entry.getKey();
-                dependencyService.createMappedDependency(name, entry.getValue(), name /* it is the real filename */, processDefinitionId, ScopeType.PROCESS);
+                dependencyService.createMappedDependency(name, entry.getValue(), name /* it is the real filename */,
+                        processDefinitionId, ScopeType.PROCESS);
             }
         }
     }
@@ -109,7 +113,8 @@ public class ClasspathArtifactManager implements BusinessArchiveArtifactManager 
         return processDefinitionId + "_" + name;
     }
 
-    private List<String> getDependenciesOfProcess(final DependencyService dependencyService, final List<Long> dependencyIds) throws SBonitaException {
+    private List<String> getDependenciesOfProcess(final DependencyService dependencyService,
+            final List<Long> dependencyIds) throws SBonitaException {
         if (dependencyIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -121,13 +126,15 @@ public class ClasspathArtifactManager implements BusinessArchiveArtifactManager 
         return dependencyNames;
     }
 
-    private List<Long> getDependencyMappingsOfProcess(final DependencyService dependencyService, final long processDefinitionId) throws SDependencyException {
+    private List<Long> getDependencyMappingsOfProcess(final DependencyService dependencyService,
+            final long processDefinitionId) throws SDependencyException {
         final List<Long> dependencyIds = new ArrayList<>();
         int fromIndex = 0;
         final int pageSize = 100;
         List<Long> currentPage;
         do {
-            currentPage = dependencyService.getDependencyIds(processDefinitionId, ScopeType.PROCESS, fromIndex, pageSize);
+            currentPage = dependencyService.getDependencyIds(processDefinitionId, ScopeType.PROCESS, fromIndex,
+                    pageSize);
             dependencyIds.addAll(currentPage);
             fromIndex += pageSize;
         } while (currentPage.size() == pageSize);

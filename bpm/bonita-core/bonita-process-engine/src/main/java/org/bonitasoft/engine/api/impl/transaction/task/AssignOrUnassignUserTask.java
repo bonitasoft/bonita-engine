@@ -34,7 +34,8 @@ public final class AssignOrUnassignUserTask implements TransactionContent {
 
     private final StateBehaviors stateBehaviors;
 
-    public AssignOrUnassignUserTask(final long userId, final long userTaskId, final ActivityInstanceService activityInstanceService,
+    public AssignOrUnassignUserTask(final long userId, final long userTaskId,
+            final ActivityInstanceService activityInstanceService,
             StateBehaviors stateBehaviors) {
         this.userId = userId;
         this.userTaskId = userTaskId;
@@ -46,7 +47,8 @@ public final class AssignOrUnassignUserTask implements TransactionContent {
     public void execute() throws SBonitaException {
         final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(userTaskId);
         if (userId == 0 && SFlowNodeType.MANUAL_TASK.equals(activityInstance.getType())) {
-            throw new SUnreleasableTaskException("The activity with id " + activityInstance.getId() + " can't be assigned because it is a manual sub task");
+            throw new SUnreleasableTaskException("The activity with id " + activityInstance.getId()
+                    + " can't be assigned because it is a manual sub task");
         }
         activityInstanceService.assignHumanTask(userTaskId, userId);
         if (userId > 0) {

@@ -46,8 +46,10 @@ public class SContactInfoLogBuilderImpl extends CRUDELogBuilder implements SCont
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SContactInfoLogBuilderFactoryImpl.USER_CONTACT_INFO_USERID_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: Identity Contact info User Id");
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SContactInfoLogBuilderFactoryImpl.USER_CONTACT_INFO_USERID_INDEX) == 0L) {
+            throw new MissingMandatoryFieldsException(
+                    "Some mandatory fields are missing: Identity Contact info User Id");
         }
     }
 

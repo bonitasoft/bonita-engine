@@ -39,11 +39,12 @@ public class STaskVisibilityException extends SBonitaException {
 
     /**
      * @param taskInstanceId
-     *            the ID of the task whose visibility is being
+     *        the ID of the task whose visibility is being
      * @param userId
-     *            the ID of the user whose Task visibility is associated to
+     *        the ID of the user whose Task visibility is associated to
      */
-    public STaskVisibilityException(final String message, final long activityInstanceId, final long userId, final Throwable cause) {
+    public STaskVisibilityException(final String message, final long activityInstanceId, final long userId,
+            final Throwable cause) {
         super(message, cause);
         setFlowNodeDefinitionIdOnContext(activityInstanceId);
         setUserIdOnContext(userId);

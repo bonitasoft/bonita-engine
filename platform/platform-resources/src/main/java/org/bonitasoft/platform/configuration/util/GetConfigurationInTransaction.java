@@ -36,7 +36,8 @@ public class GetConfigurationInTransaction implements TransactionCallback<Bonita
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
-    public GetConfigurationInTransaction(JdbcTemplate jdbcTemplate, long tenantId, ConfigurationType type, String resourceName) {
+    public GetConfigurationInTransaction(JdbcTemplate jdbcTemplate, long tenantId, ConfigurationType type,
+            String resourceName) {
         this.jdbcTemplate = jdbcTemplate;
         this.tenantId = tenantId;
         this.type = type;
@@ -45,7 +46,8 @@ public class GetConfigurationInTransaction implements TransactionCallback<Bonita
 
     @Override
     public BonitaConfiguration doInTransaction(TransactionStatus status) {
-        LOGGER.debug("get configurations for type:" + type.name() + " resource:" + resourceName + " and tenant id:" + tenantId);
+        LOGGER.debug("get configurations for type:" + type.name() + " resource:" + resourceName + " and tenant id:"
+                + tenantId);
 
         final List<BonitaConfiguration> bonitaConfigurations = jdbcTemplate.query(
                 BonitaConfigurationRowMapper.SELECT_CONFIGURATION,

@@ -65,11 +65,13 @@ public class FormMappingModelMarshallerTest {
     }
 
     private FormMappingDefinition buildFormMapping() {
-        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, FormMappingTarget.INTERNAL).withTaskname("aTask").build();
+        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, FormMappingTarget.INTERNAL)
+                .withTaskname("aTask").build();
     }
 
     private FormMappingDefinition buildMyFormMappingWithTaskName() {
-        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, FormMappingTarget.INTERNAL).withTaskname("aTask").build();
+        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, FormMappingTarget.INTERNAL)
+                .withTaskname("aTask").build();
     }
 
     public FormMappingModel buildDefaultModelWithOneFormMapping() {

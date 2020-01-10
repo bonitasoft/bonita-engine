@@ -48,9 +48,8 @@ public class ExpressionServiceImpl implements ExpressionService {
 
     private final TimeTracker timeTracker;
 
-
     public ExpressionServiceImpl(final TechnicalLoggerService logger, final boolean checkExpressionReturnType,
-                                 final TimeTracker timeTracker) {
+            final TimeTracker timeTracker) {
         super();
         this.checkExpressionReturnType = checkExpressionReturnType;
         this.logger = logger;
@@ -66,14 +65,14 @@ public class ExpressionServiceImpl implements ExpressionService {
 
     @Override
     public Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions,
-                           final ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            final ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         return evaluate(expression, new HashMap<String, Object>(1), resolvedExpressions, containerState);
     }
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues,
-                           final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
+            final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         final boolean isTraceEnable = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
@@ -94,7 +93,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION)) {
                 final long endTime = System.currentTimeMillis();
                 timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION, "Expression: " + expression + " - "
-                                + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy,
+                        + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy,
                         endTime - startTime);
             }
         }
@@ -110,7 +109,7 @@ public class ExpressionServiceImpl implements ExpressionService {
     }
 
     private void validateExpression(final ExpressionExecutorStrategy expressionExecutorStrategy,
-                                    final SExpression expression) throws SInvalidExpressionException {
+            final SExpression expression) throws SInvalidExpressionException {
         try {
             // this will throw exception if the expression is invalid
             expressionExecutorStrategy.validate(expression);
@@ -139,8 +138,8 @@ public class ExpressionServiceImpl implements ExpressionService {
 
     @Override
     public List<Object> evaluate(final ExpressionKind expressionKind, final List<SExpression> expressions,
-                                 final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions,
-                                 final ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
@@ -157,7 +156,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSIONS)) {
                 final long endTime = System.currentTimeMillis();
                 timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSIONS, "Expressions: " + expressions + " - "
-                                + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy,
+                        + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy,
                         endTime - startTime);
             }
         }
@@ -191,6 +190,5 @@ public class ExpressionServiceImpl implements ExpressionService {
     public boolean mustPutEvaluatedExpressionInContext(final ExpressionKind expressionKind) {
         return expressionExecutorsMap.get(expressionKind).mustPutEvaluatedExpressionInContext();
     }
-
 
 }

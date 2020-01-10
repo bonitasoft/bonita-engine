@@ -67,7 +67,8 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             final ProcessInstanceService processInstanceService,
             final DocumentService documentService, final TechnicalLoggerService logger,
             final ArchiveService archiveService, final SCommentService commentService,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
+            final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService,
             ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService) {
         super(stateBehaviors);
         this.operationService = operationService;
@@ -83,26 +84,33 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
     }
 
     @Override
-    protected void beforeConnectors(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    protected void beforeConnectors(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
         executeDataOutputOperations(processDefinition, flowNodeInstance);
         stateBehaviors.executeOperations(processDefinition, (SActivityInstance) flowNodeInstance);
     }
 
-    private void executeDataOutputOperations(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+    private void executeDataOutputOperations(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance instance)
             throws SActivityStateExecutionException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-        final SCallActivityDefinition callActivityDef = (SCallActivityDefinition) processContainer.getFlowNode(instance.getFlowNodeDefinitionId());
+        final SCallActivityDefinition callActivityDef = (SCallActivityDefinition) processContainer
+                .getFlowNode(instance.getFlowNodeDefinitionId());
         try {
             final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
-            final SExpressionContext expressionContext = new SExpressionContext(childProcInst.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
+            final SExpressionContext expressionContext = new SExpressionContext(childProcInst.getId(),
+                    DataInstanceContainer.PROCESS_INSTANCE.name(),
                     childProcInst.getProcessDefinitionId());
             expressionContext.setParentProcessDefinitionId(instance.getProcessDefinitionId());
-            operationService.execute(callActivityDef.getDataOutputOperations(), instance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+            operationService.execute(callActivityDef.getDataOutputOperations(), instance.getId(),
+                    DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                     expressionContext);
             // archive child process instance
-            new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
-                    commentService, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+            new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService,
+                    documentService, logger,
+                    commentService, processDefinitionService, connectorInstanceService, classLoaderService,
+                    refBusinessDataService);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }

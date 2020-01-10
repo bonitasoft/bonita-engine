@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMapping
 public class SProcessCategoryMappingBuilderImpl implements SProcessCategoryMappingBuilder {
 
     private final SProcessCategoryMapping entity;
-    
+
     public SProcessCategoryMappingBuilderImpl(final SProcessCategoryMapping entity) {
         super();
         this.entity = entity;

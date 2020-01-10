@@ -43,18 +43,21 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
     }
 
     @Override
-    public void add(long processDefinitionId, String name, BARResourceType type, byte[] content) throws SRecorderException {
+    public void add(long processDefinitionId, String name, BARResourceType type, byte[] content)
+            throws SRecorderException {
         SBARResource resource = new SBARResource(name, type, processDefinitionId, content);
         recorder.recordInsert(new InsertRecord(resource), BAR_RESOURCE);
     }
 
     @Override
     public void update(AbstractSBARResource resource, byte[] content) throws SRecorderException {
-        recorder.recordUpdate(UpdateRecord.buildSetFields(resource, Collections.singletonMap("content", content)), BAR_RESOURCE);
+        recorder.recordUpdate(UpdateRecord.buildSetFields(resource, Collections.singletonMap("content", content)),
+                BAR_RESOURCE);
     }
 
     @Override
-    public void removeAll(long processDefinitionId, BARResourceType type) throws SBonitaReadException, SRecorderException {
+    public void removeAll(long processDefinitionId, BARResourceType type)
+            throws SBonitaReadException, SRecorderException {
         List<SBARResourceLight> resources;
         while (!(resources = getLight(processDefinitionId, type, 0, 100)).isEmpty()) {
             for (SBARResourceLight resource : resources) {
@@ -63,21 +66,25 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
         }
     }
 
-    public List<SBARResourceLight> getLight(long processDefinitionId, BARResourceType type, int from, int numberOfElements) throws SBonitaReadException {
+    public List<SBARResourceLight> getLight(long processDefinitionId, BARResourceType type, int from,
+            int numberOfElements) throws SBonitaReadException {
         Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("processDefinitionId", processDefinitionId);
         inputParameters.put("type", type);
-        return persistenceService.selectList(new SelectListDescriptor<SBARResourceLight>("getBARResourcesLightOfType", inputParameters, SBARResourceLight.class,
+        return persistenceService.selectList(new SelectListDescriptor<SBARResourceLight>("getBARResourcesLightOfType",
+                inputParameters, SBARResourceLight.class,
                 new QueryOptions(from, numberOfElements)));
     }
 
     @Override
-    public List<SBARResource> get(long processDefinitionId, BARResourceType type, int from, int numberOfElements) throws SBonitaReadException {
+    public List<SBARResource> get(long processDefinitionId, BARResourceType type, int from, int numberOfElements)
+            throws SBonitaReadException {
         Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("processDefinitionId", processDefinitionId);
         inputParameters.put("type", type);
         return persistenceService.selectList(
-                new SelectListDescriptor<SBARResource>("getBARResourcesOfType", inputParameters, SBARResource.class, new QueryOptions(from, numberOfElements)));
+                new SelectListDescriptor<SBARResource>("getBARResourcesOfType", inputParameters, SBARResource.class,
+                        new QueryOptions(from, numberOfElements)));
     }
 
     @Override
@@ -85,7 +92,8 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
         Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("processDefinitionId", processDefinitionId);
         inputParameters.put("type", type);
-        return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfBARResourcesOfType", inputParameters, SBARResource.class));
+        return persistenceService.selectOne(
+                new SelectOneDescriptor<Long>("getNumberOfBARResourcesOfType", inputParameters, SBARResource.class));
     }
 
     @Override
@@ -94,7 +102,8 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
         inputParameters.put("processDefinitionId", processDefinitionId);
         inputParameters.put("type", type);
         inputParameters.put("name", name);
-        return persistenceService.selectOne(new SelectOneDescriptor<SBARResource>("getBARResource", inputParameters, SBARResource.class));
+        return persistenceService.selectOne(
+                new SelectOneDescriptor<SBARResource>("getBARResource", inputParameters, SBARResource.class));
     }
 
     @Override

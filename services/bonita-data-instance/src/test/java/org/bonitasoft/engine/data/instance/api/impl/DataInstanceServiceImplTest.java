@@ -29,11 +29,11 @@ import org.bonitasoft.engine.data.instance.api.DataContainer;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.SLongTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance;
-import org.bonitasoft.engine.data.instance.model.SLongTextDataInstance;
-import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -44,9 +44,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -69,7 +69,8 @@ public class DataInstanceServiceImplTest {
     private DataInstanceServiceImpl dataInstanceServiceImpl;
 
     @Test(expected = SDataInstanceReadException.class)
-    public final void should_throw_read_exception_when_persistence_service_has_read_exception() throws SBonitaException {
+    public final void should_throw_read_exception_when_persistence_service_has_read_exception()
+            throws SBonitaException {
         dataInstanceServiceImpl.getLastSADataInstance("kaupunki", 1, "PROCESS_INSTANCE", parentContainerResolver);
     }
 
@@ -77,28 +78,35 @@ public class DataInstanceServiceImplTest {
     public final void getLastSADataInstancesFromContainer() throws SBonitaException {
         final List<SADataInstance> archiveInstances = Collections.emptyList();
         doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
-        doReturn(archiveInstances).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
+        doReturn(archiveInstances).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
 
-        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
+        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1,
+                "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(archiveInstances, dataInstances);
     }
 
     @Test
     public final void getEmptyLastSADataInstancesFromContainer() throws SBonitaException {
         doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
-        doReturn(Collections.emptyList()).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
+        doReturn(Collections.emptyList()).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
 
-        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
+        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1,
+                "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(Collections.emptyList(), dataInstances);
     }
 
     @Test(expected = SDataInstanceReadException.class)
-    public final void getLastSADataInstancesFromContainerThrowsAnExceptionDueToProblemOnPersistenceService() throws SBonitaException {
+    public final void getLastSADataInstancesFromContainerThrowsAnExceptionDueToProblemOnPersistenceService()
+            throws SBonitaException {
         final List<SADataInstance> archiveInstances = Collections.emptyList();
         doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
-        doThrow(new SBonitaReadException("moustache")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
+        doThrow(new SBonitaReadException("moustache")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
 
-        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
+        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1,
+                "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(archiveInstances, dataInstances);
     }
 
@@ -111,7 +119,8 @@ public class DataInstanceServiceImplTest {
         dataInstanceServiceImpl.createDataInstance(dataInstance);
         //then
         verify(archiveService).recordInsert(anyLong(), archiveInsertRecordArgumentCaptor.capture());
-        final SAShortTextDataInstance entity = (SAShortTextDataInstance) archiveInsertRecordArgumentCaptor.getValue().getEntity();
+        final SAShortTextDataInstance entity = (SAShortTextDataInstance) archiveInsertRecordArgumentCaptor.getValue()
+                .getEntity();
         assertThat(entity.getValue()).isEqualTo("theValue");
     }
 
@@ -127,7 +136,8 @@ public class DataInstanceServiceImplTest {
         dataInstanceServiceImpl.updateDataInstance(dataInstance, updateDescriptor);
         //then
         verify(archiveService).recordInsert(anyLong(), archiveInsertRecordArgumentCaptor.capture());
-        final SAShortTextDataInstance entity = (SAShortTextDataInstance) archiveInsertRecordArgumentCaptor.getValue().getEntity();
+        final SAShortTextDataInstance entity = (SAShortTextDataInstance) archiveInsertRecordArgumentCaptor.getValue()
+                .getEntity();
         assertThat(entity.getValue()).isEqualTo("theNewValue");
     }
 
@@ -141,7 +151,8 @@ public class DataInstanceServiceImplTest {
         dataInstances.add(createArchDataInstance(4, 66L, "TASK", 1478087736549L, "VALUE4"));
         doReturn(dataInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
         //order the retrieved list by container level and by archive date
-        SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 1L, "TASK", parentContainerResolver);
+        SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 1L, "TASK",
+                parentContainerResolver);
         //should return the last version
         assertThat(dataInstance.getValue()).isEqualTo("VALUE4");
     }
@@ -156,7 +167,8 @@ public class DataInstanceServiceImplTest {
         dataInstances.add(createArchDataInstance(4, 66L, "TASK", 1475800000003L, "VALUE4"));
         doReturn(dataInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
         //order the retrieved list by container level and by archive date
-        SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 1L, "TASK", parentContainerResolver);
+        SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 1L, "TASK",
+                parentContainerResolver);
         //should return the last version
         assertThat(dataInstance.getValue()).isEqualTo("VALUE4");
     }
@@ -169,15 +181,18 @@ public class DataInstanceServiceImplTest {
         dataInstances.add(createArchDataInstance(2, 67L, "TASK", 1475800000001L, "TASK_VALUE"));
         dataInstances.add(createArchDataInstance(2, 68L, "SUBTASK", 1475800000000L, "SUBTASK_VALUE"));
         doReturn(dataInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
-        doReturn(Arrays.asList(new DataContainer(68L, "SUBTASK"), new DataContainer(67L, "TASK"), new DataContainer(66L, "PROC"))).when(parentContainerResolver)
-                .getArchivedContainerHierarchy(new DataContainer(68L, "SUBTASK"));
+        doReturn(Arrays.asList(new DataContainer(68L, "SUBTASK"), new DataContainer(67L, "TASK"),
+                new DataContainer(66L, "PROC"))).when(parentContainerResolver)
+                        .getArchivedContainerHierarchy(new DataContainer(68L, "SUBTASK"));
         //when
-        SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 68L, "SUBTASK", parentContainerResolver);
+        SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 68L, "SUBTASK",
+                parentContainerResolver);
         //then
         assertThat(dataInstance.getValue()).isEqualTo("SUBTASK_VALUE");
     }
 
-    private SALongTextDataInstance createArchDataInstance(long id, long containerId, String containerType, long archiveDate, String value) {
+    private SALongTextDataInstance createArchDataInstance(long id, long containerId, String containerType,
+            long archiveDate, String value) {
         SALongTextDataInstance dataInstance = new SALongTextDataInstance();
         dataInstance.setId(id);
         dataInstance.setContainerId(containerId);
@@ -204,10 +219,12 @@ public class DataInstanceServiceImplTest {
         dataInstances.add(createDataInstance(2, 67L, "TASK", "TASK_VALUE"));
         dataInstances.add(createDataInstance(2, 68L, "SUBTASK", "SUBTASK_VALUE"));
         doReturn(dataInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
-        doReturn(Arrays.asList(new DataContainer(68L, "SUBTASK"), new DataContainer(67L, "TASK"), new DataContainer(66L, "PROC"))).when(parentContainerResolver)
-                .getContainerHierarchy(new DataContainer(68L, "SUBTASK"));
+        doReturn(Arrays.asList(new DataContainer(68L, "SUBTASK"), new DataContainer(67L, "TASK"),
+                new DataContainer(66L, "PROC"))).when(parentContainerResolver)
+                        .getContainerHierarchy(new DataContainer(68L, "SUBTASK"));
         //when
-        SDataInstance dataInstance = dataInstanceServiceImpl.getDataInstance("testData", 68L, "SUBTASK", parentContainerResolver);
+        SDataInstance dataInstance = dataInstanceServiceImpl.getDataInstance("testData", 68L, "SUBTASK",
+                parentContainerResolver);
         //then
         assertThat(dataInstance.getValue()).isEqualTo("SUBTASK_VALUE");
     }

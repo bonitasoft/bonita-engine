@@ -63,7 +63,9 @@ public class LayoutDetectorTest {
     @Test
     public void isCompliant_should_accept_valid_layout() throws Exception {
         // given:
-        final FileAndContent file = file("layout.zip", zip(file("page.properties", "name=custompage_test1\ncontentType=layout"), file("resources/index.html", "someContent")));
+        final FileAndContent file = file("layout.zip",
+                zip(file("page.properties", "name=custompage_test1\ncontentType=layout"),
+                        file("resources/index.html", "someContent")));
 
         // when:
         final boolean compliant = new LayoutDetector().isCompliant(file);

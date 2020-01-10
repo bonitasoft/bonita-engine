@@ -44,7 +44,8 @@ public class SExpressionImpl implements SExpression {
         super();
     }
 
-    public SExpressionImpl(final String name, final String content, final String expressionType, final String returnType, final String interpreter,
+    public SExpressionImpl(final String name, final String content, final String expressionType,
+            final String returnType, final String interpreter,
             final List<SExpression> dependencies) {
         this.name = name;
         this.content = content;

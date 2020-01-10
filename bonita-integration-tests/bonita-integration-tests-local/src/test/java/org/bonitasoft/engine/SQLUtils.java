@@ -25,15 +25,15 @@ public class SQLUtils {
 
     private static SessionFactory sessionFactory;
 
-
-    public static List query(String query) throws Exception{
+    public static List query(String query) throws Exception {
         return TenantServiceSingleton.getInstance().getUserTransactionService()
-                .executeInTransaction(()->getSessionFactory().getCurrentSession().createSQLQuery(query).list());
+                .executeInTransaction(() -> getSessionFactory().getCurrentSession().createSQLQuery(query).list());
     }
 
-    public static int execute(String query) throws Exception{
+    public static int execute(String query) throws Exception {
         return TenantServiceSingleton.getInstance().getUserTransactionService()
-                .executeInTransaction(()->getSessionFactory().getCurrentSession().createSQLQuery(query).executeUpdate());
+                .executeInTransaction(
+                        () -> getSessionFactory().getCurrentSession().createSQLQuery(query).executeUpdate());
     }
 
     private static SessionFactory getSessionFactory() throws NoSuchFieldException, IllegalAccessException {
@@ -49,6 +49,5 @@ public class SQLUtils {
         sessionFactoryField.setAccessible(true);
         return (SessionFactory) sessionFactoryField.get(persistenceService);
     }
-
 
 }

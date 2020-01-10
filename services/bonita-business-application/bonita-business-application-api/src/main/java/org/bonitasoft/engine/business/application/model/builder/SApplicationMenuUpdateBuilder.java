@@ -30,6 +30,4 @@ public interface SApplicationMenuUpdateBuilder {
 
     SApplicationMenuUpdateBuilder updateParentId(Long parentId);
 
-
-
 }

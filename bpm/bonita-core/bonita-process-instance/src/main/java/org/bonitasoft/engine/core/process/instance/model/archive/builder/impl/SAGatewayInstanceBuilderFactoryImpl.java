@@ -20,9 +20,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatew
 
 /**
  * @author Hongwen Zang
- * 
  */
-public class SAGatewayInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SAGatewayInstanceBuilderFactory {
+public class SAGatewayInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SAGatewayInstanceBuilderFactory {
 
     @Override
     public SAGatewayInstanceBuilder createNewGatewayInstance(final SGatewayInstance sGatewayInstance) {

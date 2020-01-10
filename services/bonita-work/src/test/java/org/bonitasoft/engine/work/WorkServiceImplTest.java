@@ -60,7 +60,8 @@ public class WorkServiceImplTest {
     }
 
     @Test
-    public void should_register_work_on_the_transaction_synchronization_and_set_the_work_registration_instant() throws SBonitaException {
+    public void should_register_work_on_the_transaction_synchronization_and_set_the_work_registration_instant()
+            throws SBonitaException {
         Instant registrationInstant = Instant.now().minus(25, ChronoUnit.HOURS);
         doReturn(registrationInstant).when(engineClock).now();
         // given

@@ -54,7 +54,8 @@ public class EventServiceImpl extends AbstractEventServiceImpl {
     }
 
     @Override
-    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler)
+            throws HandlerRegistrationException {
         // check if the given event type is already registered in the Event Service
         if (containsHandlerFor(eventType)) {
             // if the handler already exists for the same eventType, an Exception is thrown
@@ -63,7 +64,8 @@ public class EventServiceImpl extends AbstractEventServiceImpl {
             // Check if another handler of the same class is already registered
             for (SHandler<SEvent> tmpHandler : handlers) {
                 if (tmpHandler.getIdentifier().equals(handler.getIdentifier())) {
-                    throw new HandlerRegistrationException("The handler with identifier " + tmpHandler.getIdentifier() + " is already registered for the event " + eventType);
+                    throw new HandlerRegistrationException("The handler with identifier " + tmpHandler.getIdentifier()
+                            + " is already registered for the event " + eventType);
                 }
             }
 
@@ -88,7 +90,8 @@ public class EventServiceImpl extends AbstractEventServiceImpl {
     }
 
     @Override
-    protected void removeHandlerFor(final String eventType, final SHandler<SEvent> h) throws HandlerUnregistrationException {
+    protected void removeHandlerFor(final String eventType, final SHandler<SEvent> h)
+            throws HandlerUnregistrationException {
         boolean removed = false;
         Collection<SHandler<SEvent>> handlers = getHandlersFor(eventType);
         if (handlers != null) {

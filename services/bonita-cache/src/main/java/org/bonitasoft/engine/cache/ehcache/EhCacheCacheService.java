@@ -45,7 +45,7 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
 
     @Override
     protected String getCacheManagerName() {
-        return "BONITA_TENANT_"+tenantId;
+        return "BONITA_TENANT_" + tenantId;
     }
 
     @Override

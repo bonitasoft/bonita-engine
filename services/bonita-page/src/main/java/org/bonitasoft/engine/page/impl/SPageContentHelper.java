@@ -28,12 +28,14 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
  */
 public class SPageContentHelper {
 
-    public Properties loadPageProperties(final byte[] zipContent) throws IOException, SInvalidPageZipMissingPropertiesException {
+    public Properties loadPageProperties(final byte[] zipContent)
+            throws IOException, SInvalidPageZipMissingPropertiesException {
         final Map<String, byte[]> content = IOUtil.unzip(zipContent);
         return loadPageProperties(content);
     }
 
-    public Properties loadPageProperties(final Map<String, byte[]> content) throws SInvalidPageZipMissingPropertiesException, IOException {
+    public Properties loadPageProperties(final Map<String, byte[]> content)
+            throws SInvalidPageZipMissingPropertiesException, IOException {
         final byte[] pagePropertiesContent = content.get(PageService.PROPERTIES_FILE_NAME);
         if (pagePropertiesContent == null) {
             throw new SInvalidPageZipMissingPropertiesException();

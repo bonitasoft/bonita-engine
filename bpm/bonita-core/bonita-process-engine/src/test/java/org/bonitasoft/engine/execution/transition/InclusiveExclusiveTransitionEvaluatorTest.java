@@ -45,8 +45,10 @@ public class InclusiveExclusiveTransitionEvaluatorTest extends AbstractTransitio
         super.setUp();
         inclusiveStrategy = new InclusiveGatewayTransitionEvaluationStrategy();
         exclusiveStrategy = new ExclusiveGatewayTransitionEvaluationStrategy();
-        inclusiveTransitionEvaluator = new InclusiveExclusiveTransitionEvaluator(inclusiveStrategy, conditionEvaluator, defaultTransitionGetter);
-        exclusiveTransitionEvaluator = new InclusiveExclusiveTransitionEvaluator(exclusiveStrategy, conditionEvaluator, defaultTransitionGetter);
+        inclusiveTransitionEvaluator = new InclusiveExclusiveTransitionEvaluator(inclusiveStrategy, conditionEvaluator,
+                defaultTransitionGetter);
+        exclusiveTransitionEvaluator = new InclusiveExclusiveTransitionEvaluator(exclusiveStrategy, conditionEvaluator,
+                defaultTransitionGetter);
     }
 
     STransitionDefinition buildTransition(String name, SExpression expression) {
@@ -56,14 +58,17 @@ public class InclusiveExclusiveTransitionEvaluatorTest extends AbstractTransitio
     }
 
     @Test
-    public void evaluateTransitions_should_return_all_transitions_without_conditions_or_with_true_conditions_when_inclusive_strategy_is_used() throws Exception {
+    public void evaluateTransitions_should_return_all_transitions_without_conditions_or_with_true_conditions_when_inclusive_strategy_is_used()
+            throws Exception {
         //given
         FlowNodeTransitionsWrapper transitions = new FlowNodeTransitionsWrapper();
-        transitions.setAllOutgoingTransitionDefinitions(Arrays.asList(unConditionalTransition, trueTransition1, trueTransition2, falseTransition,
-                nullTransition));
+        transitions.setAllOutgoingTransitionDefinitions(
+                Arrays.asList(unConditionalTransition, trueTransition1, trueTransition2, falseTransition,
+                        nullTransition));
 
         //when
-        List<STransitionDefinition> chosenTransitions = inclusiveTransitionEvaluator.evaluateTransitions(processDefinition, flowNodeInstance,
+        List<STransitionDefinition> chosenTransitions = inclusiveTransitionEvaluator.evaluateTransitions(
+                processDefinition, flowNodeInstance,
                 transitions, context);
 
         //then
@@ -71,13 +76,16 @@ public class InclusiveExclusiveTransitionEvaluatorTest extends AbstractTransitio
     }
 
     @Test
-    public void evaluateTransitions_should_return_only_the_first_transition_with_true_condition_when_exclusive_strategy_is_used() throws Exception {
+    public void evaluateTransitions_should_return_only_the_first_transition_with_true_condition_when_exclusive_strategy_is_used()
+            throws Exception {
         //given
         FlowNodeTransitionsWrapper transitions = new FlowNodeTransitionsWrapper();
-        transitions.setAllOutgoingTransitionDefinitions(Arrays.asList(trueTransition1, trueTransition2, falseTransition, nullTransition));
+        transitions.setAllOutgoingTransitionDefinitions(
+                Arrays.asList(trueTransition1, trueTransition2, falseTransition, nullTransition));
 
         //when
-        List<STransitionDefinition> chosenTransitions = exclusiveTransitionEvaluator.evaluateTransitions(processDefinition, flowNodeInstance,
+        List<STransitionDefinition> chosenTransitions = exclusiveTransitionEvaluator.evaluateTransitions(
+                processDefinition, flowNodeInstance,
                 transitions, context);
 
         //then
@@ -89,12 +97,15 @@ public class InclusiveExclusiveTransitionEvaluatorTest extends AbstractTransitio
             throws Exception {
         //given
         FlowNodeTransitionsWrapper transitions = new FlowNodeTransitionsWrapper();
-        transitions.setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(Arrays.asList(falseTransition,
-                nullTransition)));
-        given(defaultTransitionGetter.getDefaultTransition(transitions, processDefinition, flowNodeInstance)).willReturn(defaultTransition);
+        transitions
+                .setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(Arrays.asList(falseTransition,
+                        nullTransition)));
+        given(defaultTransitionGetter.getDefaultTransition(transitions, processDefinition, flowNodeInstance))
+                .willReturn(defaultTransition);
 
         //when
-        List<STransitionDefinition> chosenTransitions = inclusiveTransitionEvaluator.evaluateTransitions(processDefinition, flowNodeInstance,
+        List<STransitionDefinition> chosenTransitions = inclusiveTransitionEvaluator.evaluateTransitions(
+                processDefinition, flowNodeInstance,
                 transitions, context);
 
         //then
@@ -106,11 +117,14 @@ public class InclusiveExclusiveTransitionEvaluatorTest extends AbstractTransitio
             throws Exception {
         //given
         FlowNodeTransitionsWrapper transitions = new FlowNodeTransitionsWrapper();
-        transitions.setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(Arrays.asList(falseTransition, nullTransition)));
-        given(defaultTransitionGetter.getDefaultTransition(transitions, processDefinition, flowNodeInstance)).willReturn(defaultTransition);
+        transitions.setAllOutgoingTransitionDefinitions(
+                new ArrayList<STransitionDefinition>(Arrays.asList(falseTransition, nullTransition)));
+        given(defaultTransitionGetter.getDefaultTransition(transitions, processDefinition, flowNodeInstance))
+                .willReturn(defaultTransition);
 
         //when
-        List<STransitionDefinition> chosenTransitions = exclusiveTransitionEvaluator.evaluateTransitions(processDefinition, flowNodeInstance,
+        List<STransitionDefinition> chosenTransitions = exclusiveTransitionEvaluator.evaluateTransitions(
+                processDefinition, flowNodeInstance,
                 transitions, context);
 
         //then

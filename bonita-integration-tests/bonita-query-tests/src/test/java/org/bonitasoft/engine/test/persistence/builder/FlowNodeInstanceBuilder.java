@@ -16,7 +16,8 @@ package org.bonitasoft.engine.test.persistence.builder;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 
-public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstance, B extends FlowNodeInstanceBuilder<T, B>> extends PersistentObjectBuilder<T, B> {
+public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstance, B extends FlowNodeInstanceBuilder<T, B>>
+        extends PersistentObjectBuilder<T, B> {
 
     protected int stateId;
 

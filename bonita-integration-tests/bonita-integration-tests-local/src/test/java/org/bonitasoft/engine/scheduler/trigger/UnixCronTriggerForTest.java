@@ -24,19 +24,22 @@ public class UnixCronTriggerForTest extends OneExecutionTrigger implements CronT
 
     private final Date endDate;
 
-    public UnixCronTriggerForTest(final String name, final Date startDate, final int priority, final String expression) {
+    public UnixCronTriggerForTest(final String name, final Date startDate, final int priority,
+            final String expression) {
         super(name, startDate, priority);
         this.expression = expression;
         this.endDate = null;
     }
 
-    public UnixCronTriggerForTest(final String name, final Date startDate, final int priority, final String expression, final MisfireRestartPolicy misfireRestartPolicy) {
+    public UnixCronTriggerForTest(final String name, final Date startDate, final int priority, final String expression,
+            final MisfireRestartPolicy misfireRestartPolicy) {
         super(name, startDate, priority, misfireRestartPolicy);
         this.expression = expression;
         this.endDate = null;
     }
 
-    public UnixCronTriggerForTest(final String name, final Date startDate, final int priority, final String expression, final Date endDate) {
+    public UnixCronTriggerForTest(final String name, final Date startDate, final int priority, final String expression,
+            final Date endDate) {
         super(name, startDate, priority);
         this.expression = expression;
         this.endDate = endDate;

@@ -21,7 +21,7 @@ import org.bonitasoft.engine.tenant.TenantResource;
 
 /**
  * This API gives access to tenant administration tasks.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
@@ -39,7 +39,7 @@ public interface TenantAdministrationAPI {
      * Only technical user can login when the tenant is paused.
      * All users connected are disconnected (apart from the technical user).
      * Only IdentityAPI, ThemeAPI and ProfileAPI are accessible.
-     * 
+     *
      * @throws org.bonitasoft.engine.exception.UpdateException
      *         if the tenant cannot be paused.
      */
@@ -55,7 +55,7 @@ public interface TenantAdministrationAPI {
 
     /**
      * Installs a new business data model.
-     * 
+     *
      * @param zip
      *        the binary content of the business object model.
      * @return the version of the Business Data Model just deployed.
@@ -64,11 +64,12 @@ public interface TenantAdministrationAPI {
      * @throws BusinessDataRepositoryDeploymentException
      *         if the deployment cannot be fulfilled completely.
      */
-    String installBusinessDataModel(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
+    String installBusinessDataModel(final byte[] zip)
+            throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
     /**
      * Uninstalls the business data model.
-     * 
+     *
      * @throws BusinessDataRepositoryDeploymentException
      *         if the deployment cannot be fulfilled completely.
      */
@@ -76,7 +77,7 @@ public interface TenantAdministrationAPI {
 
     /**
      * Deletes all business data and uninstalls the business data model.
-     * 
+     *
      * @throws BusinessDataRepositoryDeploymentException
      *         if the deployment cannot be fulfilled completely.
      */
@@ -91,7 +92,7 @@ public interface TenantAdministrationAPI {
 
     /**
      * Returns the current Business Data Model version, if any, or null if no Business Data Model is currently deployed.
-     * 
+     *
      * @return the current Business Data Model version, if any, or null if no Business Data Model is currently deployed
      * @throws BusinessDataRepositoryException
      *         if the BDM version cannot be retrieved properly.

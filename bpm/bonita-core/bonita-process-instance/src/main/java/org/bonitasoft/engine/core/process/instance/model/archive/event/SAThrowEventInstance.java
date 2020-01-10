@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public abstract class SAThrowEventInstance extends SAEventInstance {
+
     public SAThrowEventInstance(final SThrowEventInstance sThrowEventInstance) {
         super(sThrowEventInstance);
     }

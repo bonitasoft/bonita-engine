@@ -89,7 +89,7 @@ public class ParameterServiceImplTest {
 
     @Test
     public void add_should_convert_parameter_value() throws Exception {
-        parameterService.add(9874654654L,"parameter", "defaultValue");
+        parameterService.add(9874654654L, "parameter", "defaultValue");
 
         verify(parameterService).interpretParameterValue("defaultValue");
     }
@@ -205,11 +205,11 @@ public class ParameterServiceImplTest {
         SParameter hostParameter = sParameter("host", "localhost", processDefinitionId);
         doReturn(hostParameter).when(parameterService).get(processDefinitionId, "host");
         when(loggerService.isLoggable(any(), any())).thenReturn(true);
-        
+
         Map<String, String> parameters = new HashMap<>();
         parameters.put("host", "192.168.0.1");
         parameters.put("password", "kittycat");
-        
+
         parameterService.merge(processDefinitionId, parameters);
 
         verify(parameterService).update(hostParameter, "192.168.0.1");

@@ -77,7 +77,8 @@ public class JPABusinessDataRepositoryImplTest {
     public void setUp() {
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
         repository = spy(
-                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepository, loggerService, configuration, classLoaderService, 1L));
+                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepository, loggerService,
+                        configuration, classLoaderService, 1L));
         doReturn(manager).when(repository).getEntityManager();
         doReturn(true).when(businessDataModelRepository).isBDMDeployed();
         CriteriaBuilder criteriaBuilder = mock(CriteriaBuilder.class);
@@ -190,7 +191,8 @@ public class JPABusinessDataRepositoryImplTest {
         doThrow(PersistenceException.class).when(typedQuery).getResultList();
         doReturn(typedQuery).when(manager).createNamedQuery(anyString(), any(Class.class));
         //when
-        repository.findListByNamedQuery("queryName", Address.class, Collections.<String, Serializable> emptyMap(), 0, 10);
+        repository.findListByNamedQuery("queryName", Address.class, Collections.<String, Serializable> emptyMap(), 0,
+                10);
         //then exception
     }
 
@@ -247,7 +249,7 @@ public class JPABusinessDataRepositoryImplTest {
     public void should_transform_query_parameter_values_from_string_array_to_collection() throws Exception {
         Object collection = repository
                 .checkParameterValue(new String[] { "v1", "v2" });
- 
+
         assertThat((Collection) collection).contains("v1", "v2");
     }
 

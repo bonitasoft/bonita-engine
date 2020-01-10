@@ -15,12 +15,11 @@ package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 
-
 /**
  * @author Julien Reboul
- *
  */
-public class CallActivityInstanceBuilder extends ActivityInstanceBuilder<SCallActivityInstance, CallActivityInstanceBuilder> {
+public class CallActivityInstanceBuilder
+        extends ActivityInstanceBuilder<SCallActivityInstance, CallActivityInstanceBuilder> {
 
     @Override
     CallActivityInstanceBuilder getThisBuilder() {

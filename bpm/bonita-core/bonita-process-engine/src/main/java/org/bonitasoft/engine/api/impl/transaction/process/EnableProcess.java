@@ -56,7 +56,8 @@ public final class EnableProcess implements TransactionContent {
     private final String userName;
     private final long tenantId;
 
-    public EnableProcess(final ProcessDefinitionService processDefinitionService, ConfigurationService configurationService,
+    public EnableProcess(final ProcessDefinitionService processDefinitionService,
+            ConfigurationService configurationService,
             ProcessResourcesService processResourcesService, final long processId,
             final EventsHandler eventsHandler,
             final TechnicalLoggerService logger, final String userName, long tenantId) {
@@ -78,13 +79,16 @@ public final class EnableProcess implements TransactionContent {
         processDefinitionService.enableProcessDeploymentInfo(processId);
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + userName + "> has enabled process <" + sProcessDefinition.getName()
-                    + "> in version <" + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                    "The user <" + userName + "> has enabled process <" + sProcessDefinition.getName()
+                            + "> in version <" + sProcessDefinition.getVersion() + "> with id <"
+                            + sProcessDefinition.getId() + ">");
         }
     }
 
     private void handleAutoLoginConfiguration(SProcessDefinition sProcessDefinition) throws SBonitaReadException {
-        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(configurationService, tenantId, sProcessDefinition);
+        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(
+                configurationService, tenantId, sProcessDefinition);
         try {
             final SBARResource sbarResource = processResourcesService.get(processId, BARResourceType.EXTERNAL,
                     RESOURCES_FORMS_SECURITY_CONFIG_PROPERTIES);

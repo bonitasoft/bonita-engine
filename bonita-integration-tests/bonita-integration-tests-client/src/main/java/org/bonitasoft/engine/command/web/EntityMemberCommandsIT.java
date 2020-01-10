@@ -113,7 +113,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         createCommandParameters.put(USER_ID_KEY, newUser.getId());
         // createCommandParameters.put(ROLE_ID_KEY, -1L);
         // createCommandParameters.put(GROUP_ID_KEY, -1L);
-        final EntityMember entityMember = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters);
+        final EntityMember entityMember = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters);
         assertEquals(newUser.getId(), entityMember.getUserId());
         assertEquals(-1, entityMember.getRoleId());
         assertEquals(-1, entityMember.getGroupId());
@@ -161,7 +162,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         searchParameters1.put(USER_ID_KEY, userId);
         searchParameters1.put(EXTERNAL_ID_KEY, externalId1);
         searchParameters1.put(SEARCH_OPTIONS_KEY, new SearchOptionsBuilder(0, 10).done());
-        SearchResult<EntityMember> entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters1);
+        SearchResult<EntityMember> entityMembers = (SearchResult<EntityMember>) getCommandAPI()
+                .execute(SEARCH_FOR_USER_COMMAND, searchParameters1);
         assertEquals(2, entityMembers.getCount());
 
         final HashMap<String, Serializable> searchParameters2 = new HashMap<>(4);
@@ -169,7 +171,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         searchParameters2.put(USER_ID_KEY, userId);
         searchParameters2.put(EXTERNAL_ID_KEY, externalId1);
         searchParameters2.put(SEARCH_OPTIONS_KEY, new SearchOptionsBuilder(0, 10).done());
-        SearchResult<EntityMember> entityMembers2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters2);
+        SearchResult<EntityMember> entityMembers2 = (SearchResult<EntityMember>) getCommandAPI()
+                .execute(SEARCH_FOR_USER_COMMAND, searchParameters2);
         assertEquals(1, entityMembers2.getCount());
 
         // delete the one for discrim1:
@@ -179,9 +182,11 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         getCommandAPI().execute(DELETE_SEVERAL_COMMAND, deleteCommandParameters);
 
         // Check we deleted only for discrim1:
-        entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters1);
+        entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND,
+                searchParameters1);
         assertEquals(0, entityMembers.getCount());
-        entityMembers2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters2);
+        entityMembers2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND,
+                searchParameters2);
         assertEquals(1, entityMembers2.getCount());
 
         // delete the one for discrim2:
@@ -189,9 +194,11 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         getCommandAPI().execute(DELETE_SEVERAL_COMMAND, deleteCommandParameters);
 
         // Check we deleted records for discrim2 now:
-        entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters1);
+        entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND,
+                searchParameters1);
         assertEquals(0, entityMembers.getCount());
-        entityMembers2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters2);
+        entityMembers2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND,
+                searchParameters2);
         assertEquals(0, entityMembers2.getCount());
 
         deleteUser(user);
@@ -212,33 +219,39 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         createCommandParameters.put(USER_ID_KEY, newUser.getId());
         // createCommandParameters.put(ROLE_ID_KEY, -1L);
         // createCommandParameters.put(GROUP_ID_KEY, -1L);
-        final EntityMember entityMember = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters);
+        final EntityMember entityMember = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters);
 
         createCommandParameters.put(USER_ID_KEY, newUser2.getId());
-        final EntityMember entityMember2 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters);
+        final EntityMember entityMember2 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters);
 
         createCommandParameters.put(EXTERNAL_ID_KEY, externalId2);
-        final EntityMember entityMember3 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters);
+        final EntityMember entityMember3 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters);
 
         createCommandParameters.put(EXTERNAL_ID_KEY, externalId1);
         // set for Role:
         createCommandParameters.remove(USER_ID_KEY);
         createCommandParameters.put(ROLE_ID_KEY, role.getId());
-        final EntityMember entityMember4 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters);
+        final EntityMember entityMember4 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters);
 
         HashMap<String, Serializable> searchParameters = new HashMap<>(3);
         searchParameters.put(DISCRIMINATOR_ID_KEY, "INNNNNEXISTENT");
         searchParameters.put(USER_ID_KEY, newUser.getId());
         searchParameters.put(EXTERNAL_ID_KEY, externalId1);
         searchParameters.put(SEARCH_OPTIONS_KEY, new SearchOptionsBuilder(0, 10).done());
-        SearchResult<EntityMember> entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters);
+        SearchResult<EntityMember> entityMembers = (SearchResult<EntityMember>) getCommandAPI()
+                .execute(SEARCH_FOR_USER_COMMAND, searchParameters);
         // There should be no results returned:
         assertEquals(0, entityMembers.getCount());
 
         searchParameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         searchParameters.put(USER_ID_KEY, newUser.getId());
         searchParameters.put(EXTERNAL_ID_KEY, externalId1);
-        searchParameters.put(SEARCH_OPTIONS_KEY, new SearchOptionsBuilder(0, 10).sort(EntityMemberSearchDescriptor.EXTERNAL_ID, Order.DESC).done());
+        searchParameters.put(SEARCH_OPTIONS_KEY,
+                new SearchOptionsBuilder(0, 10).sort(EntityMemberSearchDescriptor.EXTERNAL_ID, Order.DESC).done());
         entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters);
         assertEquals(1, entityMembers.getCount());
         assertEquals(entityMember.getEntityMemberId(), entityMembers.getResult().get(0).getEntityMemberId());
@@ -249,7 +262,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         searchParameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         searchParameters.put(EXTERNAL_ID_KEY, externalId1);
         searchParameters.put(USER_ID_KEY, newUser.getId());
-        searchParameters.put(SEARCH_OPTIONS_KEY, new SearchOptionsBuilder(0, 10).sort(EntityMemberSearchDescriptor.USER_NAME, Order.DESC).done());
+        searchParameters.put(SEARCH_OPTIONS_KEY,
+                new SearchOptionsBuilder(0, 10).sort(EntityMemberSearchDescriptor.USER_NAME, Order.DESC).done());
         entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters);
         assertEquals(1, entityMembers.getCount());
         assertEquals(entityMember.getEntityMemberId(), entityMembers.getResult().get(0).getEntityMemberId());
@@ -272,7 +286,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         final User newUser = createUser("Giulio", "contrasenha");
         final Role role = createRole("OneRingToRoleThemAll");
         final Group group = createGroup("myBand");
-        final UserMembership userMembership = createUserMembership(newUser.getUserName(), role.getName(), group.getName());
+        final UserMembership userMembership = createUserMembership(newUser.getUserName(), role.getName(),
+                group.getName());
 
         final HashMap<String, Serializable> createCommandParameters = new HashMap<>(4);
         createCommandParameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
@@ -280,7 +295,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         createCommandParameters.put(USER_ID_KEY, newUser.getId());
         // createCommandParameters.put(ROLE_ID_KEY, -1L);
         // createCommandParameters.put(GROUP_ID_KEY, -1L);
-        final EntityMember entityMember = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters);
+        final EntityMember entityMember = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters);
 
         // set for Role:
         createCommandParameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
@@ -288,14 +304,17 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         // createCommandParameters.put(USER_ID_KEY, -1L);
         createCommandParameters.put(ROLE_ID_KEY, role.getId());
         // createCommandParameters.put(GROUP_ID_KEY, -1L);
-        final EntityMember entityMember2 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters);
+        final EntityMember entityMember2 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters);
 
         final HashMap<String, Serializable> searchParameters = new HashMap<>(3);
         searchParameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         searchParameters.put(USER_ID_KEY, newUser.getId());
         searchParameters.put(EXTERNAL_ID_KEY, externalId1);
-        searchParameters.put(SEARCH_OPTIONS_KEY, new SearchOptionsBuilder(0, 10).sort(EntityMemberSearchDescriptor.EXTERNAL_ID, Order.DESC).done());
-        final SearchResult<EntityMember> entityMembers = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters);
+        searchParameters.put(SEARCH_OPTIONS_KEY,
+                new SearchOptionsBuilder(0, 10).sort(EntityMemberSearchDescriptor.EXTERNAL_ID, Order.DESC).done());
+        final SearchResult<EntityMember> entityMembers = (SearchResult<EntityMember>) getCommandAPI()
+                .execute(SEARCH_FOR_USER_COMMAND, searchParameters);
         assertEquals(1, entityMembers.getCount());
         assertEquals(entityMember.getEntityMemberId(), entityMembers.getResult().get(0).getEntityMemberId());
 
@@ -315,10 +334,12 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         beforeSearchEntityMembersForUser();
 
         // test ASC
-        SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, Order.ASC);
+        SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART3,
+                Order.ASC);
         final Map<String, Serializable> searchParameters = getSearchParameters(builder, MemberType.USER);
 
-        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(5, result1.getCount());
         List<EntityMember> entityMembers = result1.getResult();
         assertNotNull(entityMembers);
@@ -332,7 +353,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
 
         builder = buildSearchOptions(null, 3, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, Order.ASC);
         searchParameters.put(SEARCH_OPTIONS_KEY, builder.done());
-        final SearchResult<EntityMember> result2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(5, result2.getCount());
         entityMembers = result2.getResult();
         assertNotNull(entityMembers);
@@ -343,7 +365,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         // test DESC
         builder = buildSearchOptions(null, 0, 2, EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, Order.DESC);
         searchParameters.put(SEARCH_OPTIONS_KEY, builder.done());
-        final SearchResult<EntityMember> result4 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result4 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(5, result4.getCount());
         entityMembers = result4.getResult();
         assertNotNull(entityMembers);
@@ -361,21 +384,26 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         beforeSearchEntityMembersForUser();
 
         // filter on process
-        Map<String, Serializable> filters = Collections.singletonMap(EntityMemberSearchDescriptor.EXTERNAL_ID, (Serializable) externalId2);
-        SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
+        Map<String, Serializable> filters = Collections.singletonMap(EntityMemberSearchDescriptor.EXTERNAL_ID,
+                (Serializable) externalId2);
+        SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 3,
+                EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
         final Map<String, Serializable> searchParameters = getSearchParameters(builder, MemberType.USER);
 
-        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(2, result1.getCount());
         List<EntityMember> entityMembers = result1.getResult();
         assertEquals(entityMember4.getUserId(), entityMembers.get(0).getUserId());
         assertEquals(entityMember5.getUserId(), entityMembers.get(1).getUserId());
 
         // filter on display name 1
-        filters = Collections.singletonMap(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, (Serializable) "FirstName1");
+        filters = Collections.singletonMap(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1,
+                (Serializable) "FirstName1");
         builder = buildSearchOptions(filters, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
         searchParameters.put(SEARCH_OPTIONS_KEY, builder.done());
-        final SearchResult<EntityMember> result2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(1, result2.getCount());
         entityMembers = result2.getResult();
         assertEquals(entityMember1.getUserId(), entityMembers.get(0).getUserId());
@@ -389,11 +417,13 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
     public void testSearchEntityMembersForUserWithSearchTerm() throws Exception {
         beforeSearchEntityMembersForUser();
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3,
+                EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
         builder.searchTerm("FirstName1");
         final Map<String, Serializable> searchParameters = getSearchParameters(builder, MemberType.USER);
 
-        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(1, result1.getCount());
         final List<EntityMember> entityMembers = result1.getResult();
         assertEquals(entityMember1.getUserId(), entityMembers.get(0).getUserId());
@@ -406,10 +436,12 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
     @Test
     public void testSearchEntityMembersForGroup() throws Exception {
         beforeSearchEntityMembersForGroup();
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, EntityMemberSearchDescriptor.EXTERNAL_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, EntityMemberSearchDescriptor.EXTERNAL_ID,
+                Order.ASC);
         final Map<String, Serializable> searchParameters = getSearchParameters(builder, MemberType.GROUP);
 
-        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(2, result1.getCount());
         final List<EntityMember> entityMembers = result1.getResult();
         assertEquals(group1.getId(), entityMembers.get(0).getGroupId());
@@ -424,10 +456,12 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
     public void testSearchEntityMembersForRole() throws Exception {
         beforeSearchEntityMembersForRole();
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, EntityMemberSearchDescriptor.EXTERNAL_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, EntityMemberSearchDescriptor.EXTERNAL_ID,
+                Order.ASC);
         final Map<String, Serializable> searchParameters = getSearchParameters(builder, MemberType.ROLE);
 
-        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(2, result1.getCount());
         final List<EntityMember> entityMembers = result1.getResult();
         assertEquals(role1.getId(), entityMembers.get(0).getRoleId());
@@ -447,7 +481,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         builder.sort(EntityMemberSearchDescriptor.ROLE_ID, Order.ASC);
         final Map<String, Serializable> searchParameters = getSearchParameters(builder, MemberType.MEMBERSHIP);
 
-        final SearchResult<EntityMember> result = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters);
+        final SearchResult<EntityMember> result = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND,
+                searchParameters);
         assertEquals(3, result.getCount());
         final List<EntityMember> entityMembers = result.getResult();
         assertEquals(role1.getId(), entityMembers.get(0).getRoleId());
@@ -475,16 +510,19 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         createCommandParameters1.put(DISCRIMINATOR_ID_KEY, SUPERVISOR_REPORT_DISCRIMINATOR);
         createCommandParameters1.put(EXTERNAL_ID_KEY, report1);
         createCommandParameters1.put(USER_ID_KEY, user1.getId());
-        final EntityMember member1 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters1);
+        final EntityMember member1 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters1);
 
-        SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, Order.ASC);
+        SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART3,
+                Order.ASC);
         builder.filter(EntityMemberSearchDescriptor.EXTERNAL_ID, report1);
         final Map<String, Serializable> searchParameters1 = new HashMap<>(3);
         searchParameters1.put(DISCRIMINATOR_ID_KEY, SUPERVISOR_REPORT_DISCRIMINATOR);
         searchParameters1.put(SEARCH_OPTIONS_KEY, builder.done());
         searchParameters1.put(MEMBER_TYPE_KEY, MemberType.USER);
 
-        final SearchResult<EntityMember> memberResult1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters1);
+        final SearchResult<EntityMember> memberResult1 = (SearchResult<EntityMember>) getCommandAPI()
+                .execute(SEARCH_COMMAND, searchParameters1);
         assertEquals(1, memberResult1.getCount());
         assertEquals(member1.getExternalId(), report1);
         assertEquals(member1.getUserId(), user1.getId());
@@ -496,7 +534,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         searchParameters2.put(SEARCH_OPTIONS_KEY, builder.done());
         searchParameters2.put(MEMBER_TYPE_KEY, MemberType.USER);
 
-        final SearchResult<EntityMember> memberResult2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters2);
+        final SearchResult<EntityMember> memberResult2 = (SearchResult<EntityMember>) getCommandAPI()
+                .execute(SEARCH_COMMAND, searchParameters2);
         assertEquals(0, memberResult2.getCount());
 
         deleteUser(user1);
@@ -518,24 +557,28 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         createCommandParameters1.put(DISCRIMINATOR_ID_KEY, SUPERVISOR_REPORT_DISCRIMINATOR);
         createCommandParameters1.put(EXTERNAL_ID_KEY, report1);
         createCommandParameters1.put(ROLE_ID_KEY, role1.getId());
-        final EntityMember member1 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters1);
+        final EntityMember member1 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters1);
 
         // add a group to report's user
         final HashMap<String, Serializable> createCommandParameters2 = new HashMap<>(3);
         createCommandParameters2.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         createCommandParameters2.put(EXTERNAL_ID_KEY, report1);
         createCommandParameters2.put(GROUP_ID_KEY, group1.getId());
-        final EntityMember member2 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, createCommandParameters2);
+        final EntityMember member2 = (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME,
+                createCommandParameters2);
 
         // it can not use DISPLAY_NAME_PART3 to be ORDER BY, refer class SearchEntityMemberGroupDescriptor
-        SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART2, Order.ASC);
+        SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, EntityMemberSearchDescriptor.DISPLAY_NAME_PART2,
+                Order.ASC);
         builder.filter(EntityMemberSearchDescriptor.EXTERNAL_ID, report1);
         final Map<String, Serializable> searchParameters1 = new HashMap<>(3);
         searchParameters1.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         searchParameters1.put(SEARCH_OPTIONS_KEY, builder.done());
         searchParameters1.put(MEMBER_TYPE_KEY, MemberType.GROUP);
 
-        final SearchResult<EntityMember> memberResult1 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters1);
+        final SearchResult<EntityMember> memberResult1 = (SearchResult<EntityMember>) getCommandAPI()
+                .execute(SEARCH_COMMAND, searchParameters1);
         assertEquals(1, memberResult1.getCount());
         assertEquals(member2.getExternalId(), report1);
         assertEquals(member2.getGroupId(), group1.getId());
@@ -548,7 +591,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         searchParameters2.put(SEARCH_OPTIONS_KEY, builder.done());
         searchParameters2.put(MEMBER_TYPE_KEY, MemberType.ROLE);
 
-        final SearchResult<EntityMember> memberResult2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters2);
+        final SearchResult<EntityMember> memberResult2 = (SearchResult<EntityMember>) getCommandAPI()
+                .execute(SEARCH_COMMAND, searchParameters2);
         assertEquals(1, memberResult2.getCount());
         assertEquals(member1.getExternalId(), report1);
         assertEquals(member1.getRoleId(), role1.getId());
@@ -559,7 +603,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         deleteEntityMembers(member1, member2);
     }
 
-    private Map<String, Serializable> getSearchParameters(final SearchOptionsBuilder builder, final MemberType memberType) {
+    private Map<String, Serializable> getSearchParameters(final SearchOptionsBuilder builder,
+            final MemberType memberType) {
         final Map<String, Serializable> searchParameters = new HashMap<>(3);
         searchParameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         searchParameters.put(SEARCH_OPTIONS_KEY, builder.done());
@@ -567,7 +612,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         return searchParameters;
     }
 
-    private SearchOptionsBuilder buildSearchOptions(final Map<String, Serializable> filters, final int pageIndex, final int numberOfResults,
+    private SearchOptionsBuilder buildSearchOptions(final Map<String, Serializable> filters, final int pageIndex,
+            final int numberOfResults,
             final String orderByField, final Order order) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(pageIndex, numberOfResults);
         if (filters != null) {
@@ -587,7 +633,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         }
     }
 
-    private void deleteEntityMember(final Long id) throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
+    private void deleteEntityMember(final Long id)
+            throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
         final Map<String, Serializable> parameters = new HashMap<>(2);
         parameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         parameters.put(ENTITY_MEMBER_ID_KEY, id);
@@ -618,7 +665,8 @@ public class EntityMemberCommandsIT extends TestWithTechnicalUser {
         return (EntityMember) getCommandAPI().execute(CREATE_COMMAND_NAME, parameters);
     }
 
-    private EntityMember createMembershipEntityMember(final String externalId, final long roleId, final long groupId) throws BonitaException {
+    private EntityMember createMembershipEntityMember(final String externalId, final long roleId, final long groupId)
+            throws BonitaException {
         final HashMap<String, Serializable> parameters = new HashMap<>(4);
         parameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         parameters.put(EXTERNAL_ID_KEY, externalId);

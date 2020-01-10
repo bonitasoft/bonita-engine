@@ -20,15 +20,14 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.bonitasoft.engine.bdm.serialization.CustomLocalDateDeserializer;
-import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeDeserializer;
-import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeDeserializer;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.bonitasoft.engine.bdm.serialization.CustomLocalDateDeserializer;
+import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeDeserializer;
+import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeDeserializer;
 
 /**
  * @author Romain Bioteau

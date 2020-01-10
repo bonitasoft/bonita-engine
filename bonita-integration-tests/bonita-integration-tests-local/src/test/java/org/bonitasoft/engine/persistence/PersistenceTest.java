@@ -19,7 +19,6 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.junit.Before;
@@ -142,7 +141,8 @@ public class PersistenceTest extends CommonBPMServicesTest {
         changeTenant(tenant2Id);
 
         getTransactionService().begin();
-        final Long nbOfSUserImpl = persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfSUser", null, SUser.class, Long.class));
+        final Long nbOfSUserImpl = persistenceService
+                .selectOne(new SelectOneDescriptor<>("getNumberOfSUser", null, SUser.class, Long.class));
         getTransactionService().complete();
         getTransactionService().begin();
         final SUser SUser2 = buildSUserImpl(firstName, lastName);
@@ -158,7 +158,8 @@ public class PersistenceTest extends CommonBPMServicesTest {
         }
         getTransactionService().begin();
         assertEquals(Long.valueOf(151 + nbOfSUserImpl),
-                persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfSUser", null, SUser.class, Long.class)));
+                persistenceService
+                        .selectOne(new SelectOneDescriptor<>("getNumberOfSUser", null, SUser.class, Long.class)));
         getTransactionService().complete();
     }
 

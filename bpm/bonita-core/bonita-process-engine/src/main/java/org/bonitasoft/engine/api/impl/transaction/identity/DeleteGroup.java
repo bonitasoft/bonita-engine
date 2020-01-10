@@ -29,7 +29,8 @@ public class DeleteGroup extends DeleteWithActorMembers implements TransactionCo
 
     private final long groupId;
 
-    public DeleteGroup(final IdentityService identityService, final ActorMappingService actorMappingService, final ProfileService profileService,
+    public DeleteGroup(final IdentityService identityService, final ActorMappingService actorMappingService,
+            final ProfileService profileService,
             final long groupId) {
         super(actorMappingService, profileService, identityService);
         this.groupId = groupId;

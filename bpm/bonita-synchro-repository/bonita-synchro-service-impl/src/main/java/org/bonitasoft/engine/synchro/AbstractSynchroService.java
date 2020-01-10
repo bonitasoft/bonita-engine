@@ -21,8 +21,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -74,7 +74,8 @@ public abstract class AbstractSynchroService implements SynchroService {
             } else {
                 // Waiter already exists, let's release waiter:
                 getEventKeyAndIdMap().put(semaphoreKey, id);
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "releasing waiter for event " + event + " and id " + id);
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                        "releasing waiter for event " + event + " and id " + id);
                 releaseWaiter(semaphoreKey);
             }
         } finally {
@@ -83,7 +84,8 @@ public abstract class AbstractSynchroService implements SynchroService {
     }
 
     protected String getWaiterAndRemoveIt(final Map<String, Serializable> event) {
-        for (final Iterator<Entry<Map<String, Serializable>, String>> iterator = getWaitersMap().entrySet().iterator(); iterator.hasNext();) {
+        for (final Iterator<Entry<Map<String, Serializable>, String>> iterator = getWaitersMap().entrySet()
+                .iterator(); iterator.hasNext();) {
             final Entry<Map<String, Serializable>, String> waiter = iterator.next();
             if (matchedAtLeastAllExpectedEntries(waiter.getKey(), event)) {
                 iterator.remove();
@@ -93,7 +95,8 @@ public abstract class AbstractSynchroService implements SynchroService {
         return null;
     }
 
-    protected boolean matchedAtLeastAllExpectedEntries(final Map<String, Serializable> expectedEventEntries, final Map<String, Serializable> actualEventEntries) {
+    protected boolean matchedAtLeastAllExpectedEntries(final Map<String, Serializable> expectedEventEntries,
+            final Map<String, Serializable> actualEventEntries) {
         for (final Entry<String, Serializable> expectedEventEntry : expectedEventEntries.entrySet()) {
             final Serializable expectedValue = expectedEventEntry.getValue();
             if (!expectedValue.equals(actualEventEntries.get(expectedEventEntry.getKey()))) {
@@ -122,7 +125,8 @@ public abstract class AbstractSynchroService implements SynchroService {
     }
 
     protected void throwTimeout(final Map<String, Serializable> event, final long timeout) throws TimeoutException {
-        throw new TimeoutException("Event '" + event + "' has not been received on time after waiting '" + timeout + " ms'");
+        throw new TimeoutException(
+                "Event '" + event + "' has not been received on time after waiting '" + timeout + " ms'");
     }
 
     @Override

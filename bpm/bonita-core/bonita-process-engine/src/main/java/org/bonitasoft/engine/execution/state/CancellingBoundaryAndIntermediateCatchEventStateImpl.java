@@ -20,7 +20,8 @@ import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class CancellingBoundaryAndIntermediateCatchEventStateImpl extends EndingIntermediateCatchEventExceptionStateImpl {
+public class CancellingBoundaryAndIntermediateCatchEventStateImpl
+        extends EndingIntermediateCatchEventExceptionStateImpl {
 
     public CancellingBoundaryAndIntermediateCatchEventStateImpl(WaitingEventsInterrupter waitingEventsInterrupter) {
         super(waitingEventsInterrupter);

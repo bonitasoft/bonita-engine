@@ -52,7 +52,8 @@ public class EntityGetterTest {
 
         //then
         assertThat(entityGetter.getTargetEntityClass()).isEqualTo(Address.class);
-        assertThat(entityGetter.getReturnTypeClassName()).isEqualTo("org.bonitasoft.engine.business.data.proxy.Address");
+        assertThat(entityGetter.getReturnTypeClassName())
+                .isEqualTo("org.bonitasoft.engine.business.data.proxy.Address");
         assertThat(entityGetter.returnsList()).isTrue();
     }
 

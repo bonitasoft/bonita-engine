@@ -30,7 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/testContext.xml"})
+@ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
 public class TenantResourceServiceQueriesTest {
 
@@ -43,14 +43,20 @@ public class TenantResourceServiceQueriesTest {
     @Test
     public void getTenantResource_should_get_one_resource() {
         // given
-        STenantResource resource = repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes()).withType(TenantResourceType.BDM).withState(STenantResourceState.INSTALLED).lastUpdatedBy(135L).withLastUpdateDate(1973L).build());
-        repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource = repository.add(aTenantResource().withName("MyResource")
+                .withContent("The content".getBytes()).withType(TenantResourceType.BDM)
+                .withState(STenantResourceState.INSTALLED).lastUpdatedBy(135L).withLastUpdateDate(1973L).build());
+        repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes())
+                .withType(TenantResourceType.BDM).build());
 
         // This check is to ensure we added the annotation @Enumerated(EnumType.STRING) on field 'state',
         // because by default Hibernate converts ENUMs with their ordinal value when storing to Database:
         repository.flush();
-        assertThat(jdbcTemplate.queryForObject("select state from tenant_resource where name = 'MyResource'", String.class)).isEqualTo("INSTALLED");
-        assertThat(jdbcTemplate.queryForObject("select type from tenant_resource where name = 'MyResource'", String.class)).isEqualTo("BDM");
+        assertThat(jdbcTemplate.queryForObject("select state from tenant_resource where name = 'MyResource'",
+                String.class)).isEqualTo("INSTALLED");
+        assertThat(
+                jdbcTemplate.queryForObject("select type from tenant_resource where name = 'MyResource'", String.class))
+                        .isEqualTo("BDM");
 
         //when
         STenantResource myResource = repository.getTenantResource(TenantResourceType.BDM, "MyResource");
@@ -66,15 +72,20 @@ public class TenantResourceServiceQueriesTest {
     @Test
     public void getTenantResourceOfType_should_get_all_resource_of_type() {
         // given
-        STenantResource resource1 = repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
-        STenantResource resource2 = repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
-        STenantResource resource3 = repository.add(aTenantResource().withName("MyResource3").withContent("The content3".getBytes()).withType(TenantResourceType.BDM).build());
-        STenantResource resource4 = repository.add(aTenantResource().withName("MyConnector").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource1 = repository.add(aTenantResource().withName("MyResource")
+                .withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource2 = repository.add(aTenantResource().withName("MyResource2")
+                .withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource3 = repository.add(aTenantResource().withName("MyResource3")
+                .withContent("The content3".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource4 = repository.add(aTenantResource().withName("MyConnector")
+                .withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
 
         //when
         List<STenantResource> myResources = repository.getTenantResourcesOfType(TenantResourceType.BDM);
         // //then
-        assertThat(myResources).extracting("id", "content").containsOnly(tuple(resource1.getId(), resource1.getContent()),
+        assertThat(myResources).extracting("id", "content").containsOnly(
+                tuple(resource1.getId(), resource1.getContent()),
                 tuple(resource2.getId(), resource2.getContent()),
                 tuple(resource3.getId(), resource3.getContent()),
                 tuple(resource4.getId(), resource4.getContent()));
@@ -83,13 +94,18 @@ public class TenantResourceServiceQueriesTest {
     @Test
     public void getNumberTenantResourceOfType_should_get_all_resource_of_type() {
         // given
-        repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
-        repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
-        repository.add(aTenantResource().withName("MyResource3").withContent("The content3".getBytes()).withType(TenantResourceType.BDM).build());
-        repository.add(aTenantResource().withName("MyConnector").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
+        repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes())
+                .withType(TenantResourceType.BDM).build());
+        repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes())
+                .withType(TenantResourceType.BDM).build());
+        repository.add(aTenantResource().withName("MyResource3").withContent("The content3".getBytes())
+                .withType(TenantResourceType.BDM).build());
+        repository.add(aTenantResource().withName("MyConnector").withContent("The content".getBytes())
+                .withType(TenantResourceType.BDM).build());
 
         // This resources should be excluded by the tenantID filter:
-        repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes()).withType(TenantResourceType.BDM).build());
+        repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes())
+                .withType(TenantResourceType.BDM).build());
 
         //when
         long myResources = repository.getNumberOfTenantResourcesOfType(TenantResourceType.BDM);
@@ -100,14 +116,19 @@ public class TenantResourceServiceQueriesTest {
     @Test
     public void getTenantResourceLightOfType_should_get_all_resource_of_type_without_content() {
         // given
-        STenantResource resource1 = repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource1 = repository.add(aTenantResource().withName("MyResource")
+                .withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
 
         // This resources should be excluded by the tenantID filter:
-        repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes()).withType(TenantResourceType.BDM).build());
+        repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes())
+                .withType(TenantResourceType.BDM).build());
 
-        STenantResource resource2 = repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
-        STenantResource resource3 = repository.add(aTenantResource().withName("MyResource3").withContent("The content3".getBytes()).withType(TenantResourceType.BDM).build());
-        STenantResource resource4 = repository.add(aTenantResource().withName("MyConnector").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource2 = repository.add(aTenantResource().withName("MyResource2")
+                .withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource3 = repository.add(aTenantResource().withName("MyResource3")
+                .withContent("The content3".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource4 = repository.add(aTenantResource().withName("MyConnector")
+                .withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
 
         //when
         List<STenantResourceLight> myResources = repository.getTenantResourcesLightOfType(TenantResourceType.BDM);

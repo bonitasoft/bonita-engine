@@ -33,7 +33,8 @@ public class SimpleFieldValidationRule extends ValidationRule<SimpleField, Valid
     public ValidationStatus validate(SimpleField field) {
         final ValidationStatus status = new ValidationStatus();
         if (field.getType() == null) {
-            status.addError(StatusCode.FIELD_WITHOUT_NAME, String.format("%s must have a type declared", field.getName()),
+            status.addError(StatusCode.FIELD_WITHOUT_NAME,
+                    String.format("%s must have a type declared", field.getName()),
                     Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, field.getName()));
         }
         return status;

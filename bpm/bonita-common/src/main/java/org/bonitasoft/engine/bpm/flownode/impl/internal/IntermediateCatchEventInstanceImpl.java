@@ -20,7 +20,8 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventInstance;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class IntermediateCatchEventInstanceImpl extends CatchEventInstanceImpl implements IntermediateCatchEventInstance {
+public class IntermediateCatchEventInstanceImpl extends CatchEventInstanceImpl
+        implements IntermediateCatchEventInstance {
 
     private static final long serialVersionUID = -1163487409085885481L;
 

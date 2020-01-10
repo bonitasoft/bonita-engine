@@ -16,8 +16,9 @@ package org.bonitasoft.engine.business.data;
 import java.util.List;
 
 /**
- * A <code>MultipleBusinessDataReference</code> is a reference of a {@link org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition} which is multiple.
- * 
+ * A <code>MultipleBusinessDataReference</code> is a reference of a
+ * {@link org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition} which is multiple.
+ *
  * @author Matthieu Chaffotte
  */
 public interface MultipleBusinessDataReference extends BusinessDataReference {

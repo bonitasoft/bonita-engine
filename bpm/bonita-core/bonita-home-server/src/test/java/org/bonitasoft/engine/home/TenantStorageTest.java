@@ -38,7 +38,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class TenantStorageTest {
 
     @Rule
-    public final ClearSystemProperties bonitaClientHome = new ClearSystemProperties(TenantStorage.INCIDENT_LOG_FOLDER_PROPERTY);
+    public final ClearSystemProperties bonitaClientHome = new ClearSystemProperties(
+            TenantStorage.INCIDENT_LOG_FOLDER_PROPERTY);
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();;
@@ -60,7 +61,8 @@ public class TenantStorageTest {
     @Test
     public void getIncidentFileHandler_should_use_temp_folder_if_property_not_set() throws Exception {
         //given
-        final String expectedIncidentFileAbsolutePath = Paths.get(tenantStorage.getTenantTempFolder(14L).getFile().getAbsolutePath())
+        final String expectedIncidentFileAbsolutePath = Paths
+                .get(tenantStorage.getTenantTempFolder(14L).getFile().getAbsolutePath())
                 .resolve(INCIDENTS_LOG_FILENAME).toString();
 
         // when
@@ -75,7 +77,8 @@ public class TenantStorageTest {
         final String newFolder = temporaryFolder.newFolder().getAbsolutePath();
         System.setProperty(TenantStorage.INCIDENT_LOG_FOLDER_PROPERTY, newFolder);
         final long tenantId = 14L;
-        final String expectedIncidentFileAbsolutePath = Paths.get(newFolder).resolve("tenants").resolve("" + tenantId).resolve(INCIDENTS_LOG_FILENAME)
+        final String expectedIncidentFileAbsolutePath = Paths.get(newFolder).resolve("tenants").resolve("" + tenantId)
+                .resolve(INCIDENTS_LOG_FILENAME)
                 .toString();
 
         // when

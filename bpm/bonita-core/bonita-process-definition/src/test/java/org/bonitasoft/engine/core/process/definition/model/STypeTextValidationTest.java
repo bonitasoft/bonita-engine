@@ -19,7 +19,6 @@ import org.junit.Test;
 
 public class STypeTextValidationTest {
 
-
     @Test
     public void string_are_valid() throws Exception {
 

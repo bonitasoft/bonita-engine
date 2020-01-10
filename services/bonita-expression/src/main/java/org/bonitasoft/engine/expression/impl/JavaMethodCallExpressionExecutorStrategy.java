@@ -33,7 +33,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final SExpression dependency = expression.getDependencies().get(0);
         final Object object = resolvedExpressions.get(dependency.getDiscriminant());
@@ -49,7 +50,8 @@ public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExp
         super.validate(expression);
         if (expression.getDependencies() == null || expression.getDependencies().size() != 1) {
             throw new SInvalidExpressionException("An expression of type " + TYPE_JAVA_METHOD_CALL
-                    + " must have exactly one dependency. This dependency represents the object where the method will be called. Expression :" + expression,
+                    + " must have exactly one dependency. This dependency represents the object where the method will be called. Expression :"
+                    + expression,
                     expression.getName());
         }
     }
@@ -60,7 +62,8 @@ public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExp
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> result = new ArrayList<Object>(2);
         for (final SExpression expression : expressions) {

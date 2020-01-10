@@ -77,9 +77,11 @@ public class BusinessDataServiceImplTest {
 
     @Before
     public void before() throws Exception {
-        final String[] datePatterns = new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS"};
+        final String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd",
+                "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS" };
         typeConverterUtil = new TypeConverterUtil(datePatterns);
-        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository, typeConverterUtil,
+        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer,
+                businessDataModelRepository, typeConverterUtil,
                 businessDataReloader, countQueryProvider));
     }
 
@@ -151,7 +153,8 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, NEW_NAME, "setName", String.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, NEW_NAME, "setName",
+                String.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getName()).as("should have set name").isEqualTo(NEW_NAME);
@@ -164,7 +167,8 @@ public class BusinessDataServiceImplTest {
 
         //when
         businessDataService.callJavaOperation(pojo, NEW_NAME, "setName", String.class.getName());
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, null, "setName", String.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, null, "setName",
+                String.class.getName());
 
         //then
         assertThat(pojoObject).as("should return object").isNotNull();
@@ -179,12 +183,14 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, compositionEntity, "setCompositionEntity",
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, compositionEntity,
+                "setCompositionEntity",
                 Entity.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getCompositionEntity()).as("should have set entity").isEqualTo(compositionEntity);
-        verify(businessDataRepository, never()).findById(compositionEntity.getClass(), compositionEntity.getPersistenceId());
+        verify(businessDataRepository, never()).findById(compositionEntity.getClass(),
+                compositionEntity.getPersistenceId());
     }
 
     @Test
@@ -195,12 +201,14 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, compositionEntity, "setCompositionEntity",
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, compositionEntity,
+                "setCompositionEntity",
                 Entity.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getCompositionEntity()).as("should have set entity").isEqualTo(compositionEntity);
-        verify(businessDataRepository, never()).findById(compositionEntity.getClass(), compositionEntity.getPersistenceId());
+        verify(businessDataRepository, never()).findById(compositionEntity.getClass(),
+                compositionEntity.getPersistenceId());
     }
 
     @Test
@@ -235,7 +243,8 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo.getClass()).when(businessDataReloader).getEntityRealClass(any(Entity.class));
 
         //when
-        businessDataService.callJavaOperation(pojo, Collections.singletonList(proxyfiedEntity), "setAggregationEntities", List.class.getName());
+        businessDataService.callJavaOperation(pojo, Collections.singletonList(proxyfiedEntity),
+                "setAggregationEntities", List.class.getName());
 
         verify(businessDataRepository).findByIds(entity.getClass(), Collections.singletonList(2L));
     }
@@ -256,7 +265,8 @@ public class BusinessDataServiceImplTest {
         doReturn(entities).when(businessDataRepository).findByIds(EntityPojo.class, keys);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities,
+                "setAggregationEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getAggregationEntities()).as("should have set entities").isEqualTo(entities);
@@ -276,7 +286,8 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setCompositionEntities", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities,
+                "setCompositionEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getCompositionEntities()).as("should have set entities").isEqualTo(entities);
@@ -295,7 +306,8 @@ public class BusinessDataServiceImplTest {
 
         // expect
         expectedException.expect(SBusinessDataNotFoundException.class);
-        expectedException.expectMessage("Forbidden instance of org.bonitasoft.engine.business.data.impl.EntityPojo found. It is only possible to reference persisted instances in an aggregation relation.");
+        expectedException.expectMessage(
+                "Forbidden instance of org.bonitasoft.engine.business.data.impl.EntityPojo found. It is only possible to reference persisted instances in an aggregation relation.");
 
         //when
         businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
@@ -310,7 +322,8 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities,
+                "setAggregationEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getAggregationEntities()).as("should have set entities").isEmpty();
@@ -323,7 +336,8 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, longs, "setNumbers", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, longs, "setNumbers",
+                List.class.getName());
 
         //then
         assertThat(pojoObject).as("should return object").isNotNull();
@@ -338,7 +352,8 @@ public class BusinessDataServiceImplTest {
 
         //when
         businessDataService.callJavaOperation(pojo, longs, "setNumbers", List.class.getName());
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, null, "setNumbers", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, null, "setNumbers",
+                List.class.getName());
 
         //then
         assertThat(pojoObject).as("should return object").isNotNull();
@@ -362,7 +377,8 @@ public class BusinessDataServiceImplTest {
         doReturn(newEntities).when(businessDataRepository).findByIds(entity2.getClass(), keys2);
 
         //when
-        final EntityPojo resultPojo = (EntityPojo) businessDataService.callJavaOperation(entityPojo, newEntities, "setAggregationEntities",
+        final EntityPojo resultPojo = (EntityPojo) businessDataService.callJavaOperation(entityPojo, newEntities,
+                "setAggregationEntities",
                 List.class.getName());
 
         assertThat(resultPojo).as("should return object").isNotNull();
@@ -393,7 +409,8 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
 
         //when
-        businessDataService.getJsonEntity(pojo.getClass().getName(), pojo.getPersistenceId(), PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        businessDataService.getJsonEntity(pojo.getClass().getName(), pojo.getPersistenceId(),
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
         verify(jsonEntitySerializer).serializeEntity(pojo, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
@@ -404,10 +421,12 @@ public class BusinessDataServiceImplTest {
     public void should_getJsonEntity_throw_exception() throws Exception {
         //given
         doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
-        doThrow(SBusinessDataRepositorySerializationException.class).when(jsonEntitySerializer).serializeEntity(pojo, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        doThrow(SBusinessDataRepositorySerializationException.class).when(jsonEntitySerializer).serializeEntity(pojo,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
-        businessDataService.getJsonEntity(pojo.getClass().getName(), pojo.getPersistenceId(), PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        businessDataService.getJsonEntity(pojo.getClass().getName(), pojo.getPersistenceId(),
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
     @Test
@@ -417,10 +436,12 @@ public class BusinessDataServiceImplTest {
         final EntityPojo childEntity = new EntityPojo(156842L);
         parentEntity.setAggregationEntity(childEntity);
 
-        doReturn(parentEntity).when(businessDataRepository).findById(parentEntity.getClass(), parentEntity.getPersistenceId());
+        doReturn(parentEntity).when(businessDataRepository).findById(parentEntity.getClass(),
+                parentEntity.getPersistenceId());
 
         //when
-        final Serializable jsonChildEntity = businessDataService.getJsonChildEntity(parentEntity.getClass().getName(), parentEntity.getPersistenceId(),
+        final Serializable jsonChildEntity = businessDataService.getJsonChildEntity(parentEntity.getClass().getName(),
+                parentEntity.getPersistenceId(),
                 "nullChildEntity",
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
@@ -436,11 +457,13 @@ public class BusinessDataServiceImplTest {
         final EntityPojo childEntity = new EntityPojo(156842L);
         parentEntity.setAggregationEntity(childEntity);
 
-        doReturn(parentEntity).when(businessDataRepository).findById(parentEntity.getClass(), parentEntity.getPersistenceId());
+        doReturn(parentEntity).when(businessDataRepository).findById(parentEntity.getClass(),
+                parentEntity.getPersistenceId());
         doReturn(childEntity).when(businessDataRepository).unwrap(childEntity);
 
         //when
-        businessDataService.getJsonChildEntity(parentEntity.getClass().getName(), parentEntity.getPersistenceId(), "aggregationEntity",
+        businessDataService.getJsonChildEntity(parentEntity.getClass().getName(), parentEntity.getPersistenceId(),
+                "aggregationEntity",
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
@@ -455,10 +478,12 @@ public class BusinessDataServiceImplTest {
         final EntityPojo childEntity = new EntityPojo(156842L);
         parentEntity.getAggregationEntities().add(childEntity);
 
-        doReturn(parentEntity).when(businessDataRepository).findById(parentEntity.getClass(), parentEntity.getPersistenceId());
+        doReturn(parentEntity).when(businessDataRepository).findById(parentEntity.getClass(),
+                parentEntity.getPersistenceId());
 
         //when
-        businessDataService.getJsonChildEntity(parentEntity.getClass().getName(), parentEntity.getPersistenceId(), "aggregationEntities",
+        businessDataService.getJsonChildEntity(parentEntity.getClass().getName(), parentEntity.getPersistenceId(),
+                "aggregationEntities",
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
@@ -481,7 +506,8 @@ public class BusinessDataServiceImplTest {
 
         final List<Entity> entities = new ArrayList<>();
         entities.add(entity);
-        doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(), anyInt(), anyInt());
+        doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(),
+                anyInt(), anyInt());
 
         //given
         final BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
@@ -500,8 +526,10 @@ public class BusinessDataServiceImplTest {
 
         //given
         doReturn(EntityPojo.class).when(businessDataService).loadClass(EntityPojo.class.getName());
-        doReturn(Collections.singletonList(5L)).when(businessDataRepository).findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
-        doReturn(getBusinessObjectModel(new EntityPojo(1562L))).when(businessDataModelRepository).getBusinessObjectModel();
+        doReturn(Collections.singletonList(5L)).when(businessDataRepository).findListByNamedQuery(anyString(), any(),
+                anyMap(), anyInt(), anyInt());
+        doReturn(getBusinessObjectModel(new EntityPojo(1562L))).when(businessDataModelRepository)
+                .getBusinessObjectModel();
 
         //when
         businessDataService.getJsonQueryEntities(EntityPojo.class.getName(), "countForFind", new HashMap<>(), 0, 1,
@@ -514,7 +542,8 @@ public class BusinessDataServiceImplTest {
     @Test
     public void getJsonQueryEntities_should_throw_exception_when_query_not_found() throws Exception {
         expectedException.expect(SBusinessDataRepositoryException.class);
-        expectedException.expectMessage("unable to get query wrongQuery for business object " + EntityPojo.class.getName());
+        expectedException
+                .expectMessage("unable to get query wrongQuery for business object " + EntityPojo.class.getName());
 
         //given
         final EntityPojo entity = new EntityPojo(1562L);
@@ -548,7 +577,8 @@ public class BusinessDataServiceImplTest {
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
         //        Query findQuery=new Query("find","query");
         Query countQuery = new Query("countForFind", "query", Long.class.getName());
-        doReturn(countQuery).when(countQueryProvider).getCountQueryDefinition(any(BusinessObject.class), any(Query.class));
+        doReturn(countQuery).when(countQueryProvider).getCountQueryDefinition(any(BusinessObject.class),
+                any(Query.class));
         final long count = 5L;
         doReturn(count).when(businessDataRepository).findByNamedQuery(eq("EntityPojo.countForFind"), eq(Long.class),
                 anyMap());
@@ -556,7 +586,8 @@ public class BusinessDataServiceImplTest {
         //when
         final int startIndex = 3;
         final int maxResults = 10;
-        final BusinessDataQueryResult queryResult = businessDataService.getJsonQueryEntities(entity.getClass().getName(), "find", parameters, startIndex,
+        final BusinessDataQueryResult queryResult = businessDataService.getJsonQueryEntities(
+                entity.getClass().getName(), "find", parameters, startIndex,
                 maxResults,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
@@ -624,7 +655,8 @@ public class BusinessDataServiceImplTest {
         pojos.add(pojo2);
         when(businessDataRepository.findByIdentifiers(EntityPojo.class, identifiers)).thenReturn(pojos);
 
-        businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         verify(jsonEntitySerializer).serializeEntities(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
@@ -645,7 +677,8 @@ public class BusinessDataServiceImplTest {
         when(jsonEntitySerializer.serializeEntities(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
                 .thenThrow(new SBusinessDataRepositorySerializationException("exception"));
 
-        businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
 }

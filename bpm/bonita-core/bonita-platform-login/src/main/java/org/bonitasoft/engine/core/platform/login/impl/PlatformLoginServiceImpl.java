@@ -35,13 +35,15 @@ public class PlatformLoginServiceImpl implements PlatformLoginService {
 
     private final PlatformSessionService sessionService;
 
-    public PlatformLoginServiceImpl(final PlatformAuthenticationService platformAuthenticationService, final PlatformSessionService platformSessionService) {
+    public PlatformLoginServiceImpl(final PlatformAuthenticationService platformAuthenticationService,
+            final PlatformSessionService platformSessionService) {
         authenticationService = platformAuthenticationService;
         sessionService = platformSessionService;
     }
 
     @Override
-    public SPlatformSession login(final String userName, final String password) throws SPlatformLoginException, SInvalidPlatformCredentialsException {
+    public SPlatformSession login(final String userName, final String password)
+            throws SPlatformLoginException, SInvalidPlatformCredentialsException {
         try {
             authenticationService.checkUserCredentials(userName, password);
             return sessionService.createSession(userName);

@@ -21,12 +21,9 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @SuppressWarnings("javadoc")
@@ -44,8 +41,9 @@ public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
     @Override
     @Before
     public void before() throws SBonitaException {
-        txBonitawork = spy(new MessageInstanceContextWork(wrappedWork, MESSAGE_INSTANCE_NAME,MESSAGE_INSTANCE_TARGET_PROCESS_NAME,
-                MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME,WAITING_MESSAGE_EVENT_TYPE.name()));
+        txBonitawork = spy(
+                new MessageInstanceContextWork(wrappedWork, MESSAGE_INSTANCE_NAME, MESSAGE_INSTANCE_TARGET_PROCESS_NAME,
+                        MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, WAITING_MESSAGE_EVENT_TYPE.name()));
         super.before();
     }
 
@@ -60,8 +58,10 @@ public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
         txBonitawork.handleFailure(e, context);
 
         assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME=" + MESSAGE_INSTANCE_NAME));
-        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME=" + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
-        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME=" + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
+        assertTrue(e.getMessage()
+                .contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME=" + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
+        assertTrue(e.getMessage()
+                .contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME=" + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
         assertTrue(e.getMessage().contains("WAITING_MESSAGE_INSTANCE_TYPE=" + WAITING_MESSAGE_EVENT_TYPE.name()));
         verify(wrappedWork).handleFailure(e, context);
     }

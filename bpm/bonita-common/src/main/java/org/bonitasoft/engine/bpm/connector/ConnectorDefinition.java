@@ -23,7 +23,7 @@ import org.bonitasoft.engine.operation.Operation;
 
 /**
  * The connector definition associated to a process definition or a flow node definition
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  */

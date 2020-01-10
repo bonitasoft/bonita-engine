@@ -67,7 +67,8 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
 
     private final ArchiveService archiveService;
 
-    public RefBusinessDataServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
+    public RefBusinessDataServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead,
+            final EventService eventService,
             final QueriableLoggerService queriableLoggerService, final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
@@ -79,8 +80,9 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     @Override
     public SRefBusinessDataInstance getRefBusinessDataInstance(final String name, final long processInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        final SelectOneDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSRefBusinessDataInstance(name,
-                processInstanceId);
+        final SelectOneDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder
+                .getSRefBusinessDataInstance(name,
+                        processInstanceId);
         final SRefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
         if (ref == null) {
             throw new SRefBusinessDataInstanceNotFoundException(processInstanceId, name);
@@ -91,8 +93,9 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     @Override
     public SRefBusinessDataInstance getFlowNodeRefBusinessDataInstance(final String name, final long flowNodeInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        final SelectOneDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSFlowNodeRefBusinessDataInstance(name,
-                flowNodeInstanceId);
+        final SelectOneDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder
+                .getSFlowNodeRefBusinessDataInstance(name,
+                        flowNodeInstanceId);
         final SRefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
         if (ref == null) {
             throw new SRefBusinessDataInstanceNotFoundException(flowNodeInstanceId, name);
@@ -101,8 +104,10 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
-    public SRefBusinessDataInstance addRefBusinessDataInstance(final SRefBusinessDataInstance instance) throws SRefBusinessDataInstanceCreationException {
-        final SRefBusinessDataInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, NEW_REF_BUSINESS_DATA_INSTANCE_ADDED);
+    public SRefBusinessDataInstance addRefBusinessDataInstance(final SRefBusinessDataInstance instance)
+            throws SRefBusinessDataInstanceCreationException {
+        final SRefBusinessDataInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED,
+                NEW_REF_BUSINESS_DATA_INSTANCE_ADDED);
         try {
             recorder.recordInsert(new InsertRecord(instance), REF_BUSINESS_DATA_INSTANCE);
             initiateLogBuilder(instance.getId(), SQueriableLog.STATUS_OK, logBuilder, "addRefBusinessDataInstance");
@@ -114,7 +119,8 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     protected SRefBusinessDataInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SRefBusinessDataInstanceLogBuilder logBuilder = BuilderFactory.get(SRefBusinessDataInstanceLogBuilderFactory.class).createNewInstance();
+        final SRefBusinessDataInstanceLogBuilder logBuilder = BuilderFactory
+                .get(SRefBusinessDataInstanceLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
@@ -128,7 +134,8 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         logBuilder.setActionType(actionType);
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder,
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus,
+            final SPersistenceLogBuilder logBuilder,
             final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
@@ -140,7 +147,8 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
-    public void updateRefBusinessDataInstance(final SSimpleRefBusinessDataInstance refBusinessDataInstance, final Long dataId)
+    public void updateRefBusinessDataInstance(final SSimpleRefBusinessDataInstance refBusinessDataInstance,
+            final Long dataId)
             throws SRefBusinessDataInstanceModificationException {
         final Map<String, Object> fields = new HashMap<>();
         fields.put("dataId", dataId);
@@ -148,42 +156,50 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
-    public void updateRefBusinessDataInstance(final SProcessMultiRefBusinessDataInstance refBusinessDataInstance, final List<Long> dataIds)
+    public void updateRefBusinessDataInstance(final SProcessMultiRefBusinessDataInstance refBusinessDataInstance,
+            final List<Long> dataIds)
             throws SRefBusinessDataInstanceModificationException {
         final Map<String, Object> fields = new HashMap<>();
         fields.put("dataIds", dataIds);
         updateRefBusinessDataInstance(refBusinessDataInstance, fields);
     }
 
-    private void updateRefBusinessDataInstance(final SRefBusinessDataInstance refBusinessDataInstance, final Map<String, Object> fields)
+    private void updateRefBusinessDataInstance(final SRefBusinessDataInstance refBusinessDataInstance,
+            final Map<String, Object> fields)
             throws SRefBusinessDataInstanceModificationException {
         try {
-            recorder.recordUpdate(UpdateRecord.buildSetFields(refBusinessDataInstance, fields), REF_BUSINESS_DATA_INSTANCE);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(refBusinessDataInstance, fields),
+                    REF_BUSINESS_DATA_INSTANCE);
         } catch (final SRecorderException sre) {
             throw new SRefBusinessDataInstanceModificationException(sre);
         }
     }
 
     @Override
-    public int getNumberOfDataOfMultiRefBusinessData(final String name, final long processInstanceId) throws SBonitaReadException {
-        final SelectOneDescriptor<Integer> descriptor = SelectBusinessDataDescriptorBuilder.getNumberOfDataOfMultiRefBusinessData(name,
-                processInstanceId);
+    public int getNumberOfDataOfMultiRefBusinessData(final String name, final long processInstanceId)
+            throws SBonitaReadException {
+        final SelectOneDescriptor<Integer> descriptor = SelectBusinessDataDescriptorBuilder
+                .getNumberOfDataOfMultiRefBusinessData(name,
+                        processInstanceId);
         return persistenceRead.selectOne(descriptor);
     }
 
     @Override
-    public List<SRefBusinessDataInstance> getRefBusinessDataInstances(final long processInstanceId, final int startIndex, final int maxResults)
+    public List<SRefBusinessDataInstance> getRefBusinessDataInstances(final long processInstanceId,
+            final int startIndex, final int maxResults)
             throws SBonitaReadException {
-        final SelectListDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSRefBusinessDataInstances(processInstanceId,
-                startIndex, maxResults);
+        final SelectListDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder
+                .getSRefBusinessDataInstances(processInstanceId,
+                        startIndex, maxResults);
         return persistenceRead.selectList(descriptor);
     }
 
     @Override
     public SARefBusinessDataInstance getSARefBusinessDataInstance(final String name, final long processInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        final SelectOneDescriptor<SARefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSARefBusinessDataInstance(name,
-                processInstanceId);
+        final SelectOneDescriptor<SARefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder
+                .getSARefBusinessDataInstance(name,
+                        processInstanceId);
         final SARefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
         if (ref == null) {
             throw new SRefBusinessDataInstanceNotFoundException(processInstanceId, name);
@@ -192,10 +208,12 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
-    public SARefBusinessDataInstance getSAFlowNodeRefBusinessDataInstance(final String name, final long flowNodeInstanceId)
+    public SARefBusinessDataInstance getSAFlowNodeRefBusinessDataInstance(final String name,
+            final long flowNodeInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        final SelectOneDescriptor<SARefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSAFlowNodeRefBusinessDataInstance(name,
-                flowNodeInstanceId);
+        final SelectOneDescriptor<SARefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder
+                .getSAFlowNodeRefBusinessDataInstance(name,
+                        flowNodeInstanceId);
         final SARefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
         if (ref == null) {
             throw new SRefBusinessDataInstanceNotFoundException(flowNodeInstanceId, name);
@@ -204,9 +222,11 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
-    public void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SObjectModificationException {
+    public void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance)
+            throws SObjectModificationException {
         try {
-            final SARefBusinessDataInstance saRefBusinessDataInstance = BuilderFactory.get(SARefBusinessDataInstanceBuilderFactory.class)
+            final SARefBusinessDataInstance saRefBusinessDataInstance = BuilderFactory
+                    .get(SARefBusinessDataInstanceBuilderFactory.class)
                     .createNewInstance(businessDataInstance).done();
             final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saRefBusinessDataInstance);
             archiveService.recordInsert(0L, archiveInsertRecord); // no archived date (nor sourceObjectId) in this table, as it is not necessary (archived only once at end of process execution)
@@ -223,16 +243,20 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
             //            archiveService.deleteFromQuery("deleteArchivedMultiRefBizDataForProcessInstance",
             //                    Collections.<String, Object> singletonMap("processInstanceId", processInstanceId));
         } catch (SRecorderException e) {
-            throw new SObjectModificationException("Unable to delete SARefBusinessDataInstance's for processInstanceId: " + processInstanceId, e);
+            throw new SObjectModificationException(
+                    "Unable to delete SARefBusinessDataInstance's for processInstanceId: " + processInstanceId, e);
         }
     }
+
     @Override
-    public void deleteArchivedRefBusinessDataInstance(List<Long> processInstanceIds) throws SObjectModificationException {
+    public void deleteArchivedRefBusinessDataInstance(List<Long> processInstanceIds)
+            throws SObjectModificationException {
         try {
             archiveService.deleteFromQuery("deleteArchivedRefBizDataForProcessInstances",
                     Collections.singletonMap("processInstanceIds", processInstanceIds));
         } catch (SRecorderException e) {
-            throw new SObjectModificationException("Unable to delete SARefBusinessDataInstance's for processInstanceIds: " + processInstanceIds, e);
+            throw new SObjectModificationException(
+                    "Unable to delete SARefBusinessDataInstance's for processInstanceIds: " + processInstanceIds, e);
         }
     }
 

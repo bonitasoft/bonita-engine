@@ -19,7 +19,8 @@ import org.bonitasoft.engine.classloader.ClassLoaderListener;
 /**
  * @author Baptiste Mesta
  */
-public class JacksonCacheClearer implements ClassLoaderListener{
+public class JacksonCacheClearer implements ClassLoaderListener {
+
     @Override
     public void onUpdate(ClassLoader newClassLoader) {
         TypeFactory.defaultInstance().clearCache();

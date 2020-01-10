@@ -32,6 +32,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("send")
 public class SASendTaskInstance extends SAActivityInstance {
+
     public SASendTaskInstance(final SSendTaskInstance sSendTaskInstance) {
         super(sSendTaskInstance);
     }

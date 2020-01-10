@@ -21,9 +21,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 public abstract class BonitaWork {
 
@@ -40,7 +38,6 @@ public abstract class BonitaWork {
     public abstract String getDescription();
 
     /**
-     * 
      * @return
      *         how to restart the work if it fails
      */
@@ -50,9 +47,9 @@ public abstract class BonitaWork {
 
     /**
      * Execution code of the work
-     * 
+     *
      * @param context
-     *            a map of context that can be filled by a work to be given to a wrapped work
+     *        a map of context that can be filled by a work to be given to a wrapped work
      * @throws Exception
      */
     public abstract CompletableFuture<Void> work(Map<String, Object> context) throws Exception;
@@ -91,8 +88,10 @@ public abstract class BonitaWork {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         BonitaWork work = (BonitaWork) o;
         return new EqualsBuilder()
                 .append(tenantId, work.tenantId)

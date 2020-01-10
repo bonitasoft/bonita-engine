@@ -43,6 +43,7 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import javax.xml.XMLConstants;
@@ -116,7 +117,8 @@ public class IOUtil {
         byte[] data;
         try (InputStream inputStream = clazz.getClassLoader().getResourceAsStream(resource)) {
             if (inputStream == null) {
-                throw new IOException("Impossible to get stream from class: " + clazz.getName() + ", className= " + resource);
+                throw new IOException(
+                        "Impossible to get stream from class: " + clazz.getName() + ", className= " + resource);
             }
             data = IOUtil.getAllContentFrom(inputStream);
         }
@@ -169,7 +171,7 @@ public class IOUtil {
         final byte[] resultArray;
 
         try (BufferedInputStream bis = new BufferedInputStream(in);
-             ByteArrayOutputStream result = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream result = new ByteArrayOutputStream()) {
             int amountRead;
             while ((amountRead = bis.read(buffer)) > 0) {
                 result.write(buffer, 0, amountRead);
@@ -297,7 +299,6 @@ public class IOUtil {
     /**
      * Create a structured zip archive recursively.
      * The string must be OS specific String to represent path.
-     *
      */
     public static void zipDir(final String dir2zip, final ZipOutputStream zos, final String root) throws IOException {
         final File zipDir = new File(dir2zip);
@@ -311,7 +312,8 @@ public class IOUtil {
                 continue;
             }
             try {
-                final ZipEntry anEntry = new ZipEntry(path.substring(root.length() + 1, path.length()).replace(String.valueOf(File.separatorChar), "/"));
+                final ZipEntry anEntry = new ZipEntry(path.substring(root.length() + 1, path.length())
+                        .replace(String.valueOf(File.separatorChar), "/"));
                 zos.putNextEntry(anEntry);
                 copyFileToZip(zos, readBuffer, file);
                 zos.flush();
@@ -389,7 +391,8 @@ public class IOUtil {
         }
     }
 
-    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws IOException {
+    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder)
+            throws IOException {
         ZipEntry zipEntry;
         while ((zipEntry = zipInputstream.getNextEntry()) != null) {
             try {
@@ -407,7 +410,8 @@ public class IOUtil {
         }
     }
 
-    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
+    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile)
+            throws FileNotFoundException, IOException {
         // The input is a file. An FileOutputStream is created to write the content of the new file.
         mkdirs(outputFile.getParentFile());
         try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
@@ -430,7 +434,8 @@ public class IOUtil {
         writeContentToFileOutputStream(content, fileOutput);
     }
 
-    public static void writeContentToFileOutputStream(final String content, final FileOutputStream fileOutput) throws IOException {
+    public static void writeContentToFileOutputStream(final String content, final FileOutputStream fileOutput)
+            throws IOException {
         try (OutputStreamWriter out = new OutputStreamWriter(fileOutput, FILE_ENCODING)) {
             out.write(content);
             out.flush();
@@ -441,7 +446,7 @@ public class IOUtil {
 
     public static void write(final File file, final byte[] fileContent) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(file);
-             BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+                BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             bos.write(fileContent);
             bos.flush();
         }
@@ -449,7 +454,7 @@ public class IOUtil {
 
     public static byte[] getContent(final File file) throws IOException {
         try (FileInputStream fin = new FileInputStream(file);
-             FileChannel ch = fin.getChannel()) {
+                FileChannel ch = fin.getChannel()) {
             final int size = (int) ch.size();
             final MappedByteBuffer buf = ch.map(MapMode.READ_ONLY, 0, size);
             final byte[] bytes = new byte[size];
@@ -458,7 +463,8 @@ public class IOUtil {
         }
     }
 
-    public static byte[] marshallObjectToXML(final Object jaxbModel, final URL schemaURL) throws JAXBException, IOException, SAXException {
+    public static byte[] marshallObjectToXML(final Object jaxbModel, final URL schemaURL)
+            throws JAXBException, IOException, SAXException {
         if (jaxbModel == null) {
             return null;
         }
@@ -477,7 +483,8 @@ public class IOUtil {
         }
     }
 
-    public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL) throws JAXBException, IOException,
+    public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL)
+            throws JAXBException, IOException,
             SAXException {
         if (xmlObject == null) {
             return null;

@@ -34,19 +34,26 @@ public class ActivityDataDefinitionIT extends TestWithUser {
 
     @Test
     public void getDataDefinitionsHavingComplexeInitialValue() throws Exception {
-        final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("a+b", "a+b", String.class.getName(),
+        final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("a+b", "a+b",
+                String.class.getName(),
                 new ExpressionBuilder().createDataExpression("a", String.class.getName()),
                 new ExpressionBuilder().createDataExpression("b", String.class.getName()));
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("avalue"));
-        processDefinitionBuilder.addShortTextData("b", new ExpressionBuilder().createConstantStringExpression("bvalue"));
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addData("myData", String.class.getName(), scriptExpression);
+        processDefinitionBuilder.addShortTextData("a",
+                new ExpressionBuilder().createConstantStringExpression("avalue"));
+        processDefinitionBuilder.addShortTextData("b",
+                new ExpressionBuilder().createConstantStringExpression("bvalue"));
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addData("myData", String.class.getName(),
+                scriptExpression);
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final List<DataDefinition> dataDefList = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), "step1", 0, 10);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final List<DataDefinition> dataDefList = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(),
+                "step1", 0, 10);
         assertEquals(1, dataDefList.size());
         assertEquals(2, dataDefList.get(0).getDefaultValueExpression().getDependencies().size());
         disableAndDeleteProcess(processDefinition);
@@ -61,14 +68,17 @@ public class ActivityDataDefinitionIT extends TestWithUser {
         final String taskName = "autoTask1";
 
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         // activity level
-        final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder.addAutomaticTask(taskName);
+        final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder
+                .addAutomaticTask(taskName);
         activityDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         activityDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, user);
 
         final int number = getProcessAPI().getNumberOfActivityDataDefinitions(processDefinition.getId(), taskName);
         assertEquals(2, number);
@@ -85,14 +95,17 @@ public class ActivityDataDefinitionIT extends TestWithUser {
         final String taskName = "autoTask1";
 
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         // activity level
-        final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder.addAutomaticTask(taskName);
+        final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder
+                .addAutomaticTask(taskName);
         activityDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         activityDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, user);
         try {
             getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName + "qwer", 0, 5);
         } finally {
@@ -109,16 +122,20 @@ public class ActivityDataDefinitionIT extends TestWithUser {
         final String taskName = "autoTask1";
 
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         // activity level
-        final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder.addAutomaticTask(taskName);
+        final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder
+                .addAutomaticTask(taskName);
         activityDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         activityDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, user);
 
-        final List<DataDefinition> dataDefList = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName, 0, 5);
+        final List<DataDefinition> dataDefList = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(),
+                taskName, 0, 5);
         assertEquals(2, dataDefList.size());
 
         final DataDefinition dataDef1 = dataDefList.get(0);
@@ -143,17 +160,21 @@ public class ActivityDataDefinitionIT extends TestWithUser {
         final String taskName = "autoTask1";
 
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         // activity level
-        final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder.addAutomaticTask(taskName);
+        final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder
+                .addAutomaticTask(taskName);
         activityDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         for (int i = 1; i <= 10; i++) {
             activityDefinitionBuilder.addShortTextData(strDataName + i, strDefaultExp);
         }
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
-        List<DataDefinition> processDataDefinitions = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName, 0, 5);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, user);
+        List<DataDefinition> processDataDefinitions = getProcessAPI()
+                .getActivityDataDefinitions(processDefinition.getId(), taskName, 0, 5);
         assertEquals(5, processDataDefinitions.size());
         assertThat(processDataDefinitions.get(0), nameIs("luckyNum"));
         assertThat(processDataDefinitions.get(1), nameIs("color1"));

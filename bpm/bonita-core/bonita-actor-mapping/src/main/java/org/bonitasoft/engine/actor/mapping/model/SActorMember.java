@@ -46,5 +46,4 @@ public class SActorMember implements PersistentObject {
     @Column
     private long roleId = -1;
 
-
 }

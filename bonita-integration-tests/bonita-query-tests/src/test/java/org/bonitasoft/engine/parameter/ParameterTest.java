@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
 import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -44,9 +45,11 @@ public class ParameterTest {
     public void should_save_and_get_parameter() {
         SParameter sParameter = testRepository.add(new SParameter("parameterName", "StringValue", 12345L));
 
-        PersistentObject parameterFromQuery = testRepository.selectOne("getParameterByName", pair("name", "parameterName"), pair("processDefinitionId", 12345L));
+        PersistentObject parameterFromQuery = testRepository.selectOne("getParameterByName",
+                pair("name", "parameterName"), pair("processDefinitionId", 12345L));
         testRepository.flush();
-        Map<String, Object> parameterAsMap = jdbcTemplate.queryForMap("SELECT * FROM proc_parameter WHERE name = 'parameterName'");
+        Map<String, Object> parameterAsMap = jdbcTemplate
+                .queryForMap("SELECT * FROM proc_parameter WHERE name = 'parameterName'");
 
         assertThat(parameterFromQuery).isEqualTo(sParameter);
         assertThat(parameterAsMap).containsOnly(
@@ -54,7 +57,6 @@ public class ParameterTest {
                 entry("ID", sParameter.getId()),
                 entry("PROCESS_ID", 12345L),
                 entry("NAME", "parameterName"),
-                entry("VALUE", "StringValue")
-        );
+                entry("VALUE", "StringValue"));
     }
 }

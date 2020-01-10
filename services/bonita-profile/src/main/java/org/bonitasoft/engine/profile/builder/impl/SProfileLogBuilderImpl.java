@@ -38,7 +38,8 @@ public class SProfileLogBuilderImpl extends CRUDELogBuilder implements SPersiste
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SProfileLogBuilderFactoryImpl.PROFILE_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SProfileLogBuilderFactoryImpl.PROFILE_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Profile id");
         }
     }

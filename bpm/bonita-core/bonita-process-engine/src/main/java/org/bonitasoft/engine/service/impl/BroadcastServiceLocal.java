@@ -18,20 +18,17 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
 
 /**
  * This implementation does nothing, to be used in a single node environment.
- *
  * When cluster feature is enabled, an other implementation of the BroadcastService dispatch calls to other nodes.
  *
  * @author Baptiste Mesta
  */
 public class BroadcastServiceLocal implements BroadcastService {
-
 
     @Override
     public <T> Future<Map<String, TaskResult<T>>> executeOnOthers(Callable<T> callable) {

@@ -30,14 +30,14 @@ public interface CronTrigger extends Trigger {
      * 5. month
      * 6 day of the week
      * 7 year (optional)
-     * 
+     *
      * @return a unix-like CRON expression
      */
     String getExpression();
 
     /**
      * Returns when the trigger ends. It can be null which means that the trigger never ends
-     * 
+     *
      * @return
      */
     Date getEndDate();

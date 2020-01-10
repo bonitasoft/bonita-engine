@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.handler;
 
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -30,8 +29,8 @@ public class SchedulerServiceRestartHandler implements PlatformRestartHandler {
     private UserTransactionService userTransactionService;
 
     public SchedulerServiceRestartHandler(SchedulerService schedulerService,
-                                          TechnicalLoggerService technicalLoggerService,
-                                          UserTransactionService userTransactionService) {
+            TechnicalLoggerService technicalLoggerService,
+            UserTransactionService userTransactionService) {
         super();
         this.schedulerService = schedulerService;
         this.logger = technicalLoggerService.asLogger(SchedulerServiceRestartHandler.class);
@@ -47,7 +46,9 @@ public class SchedulerServiceRestartHandler implements PlatformRestartHandler {
                 return null;
             });
         } catch (Exception e) {
-            logger.warn("Unable to reschedule all erroneous triggers, call PlatformAPI.rescheduleErroneousTriggers to retry. Cause is {}", e.getMessage());
+            logger.warn(
+                    "Unable to reschedule all erroneous triggers, call PlatformAPI.rescheduleErroneousTriggers to retry. Cause is {}",
+                    e.getMessage());
             logger.debug("Cause: ", e);
         }
     }

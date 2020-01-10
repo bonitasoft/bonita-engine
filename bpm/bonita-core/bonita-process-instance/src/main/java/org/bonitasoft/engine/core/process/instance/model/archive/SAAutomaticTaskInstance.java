@@ -32,6 +32,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("auto")
 public class SAAutomaticTaskInstance extends SAActivityInstance {
+
     public SAAutomaticTaskInstance(final SAutomaticTaskInstance sAutomaticTaskInstance) {
         super(sAutomaticTaskInstance);
     }

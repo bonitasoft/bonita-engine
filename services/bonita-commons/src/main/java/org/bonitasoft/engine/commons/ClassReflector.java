@@ -76,7 +76,8 @@ public class ClassReflector {
         }
     }
 
-    public static <T> Constructor<T> getConstructor(final Class<T> clazz, final Class<?>... parameterTypes) throws SReflectException {
+    public static <T> Constructor<T> getConstructor(final Class<T> clazz, final Class<?>... parameterTypes)
+            throws SReflectException {
         try {
             return clazz.getConstructor(parameterTypes);
         } catch (final Exception e) {
@@ -84,7 +85,8 @@ public class ClassReflector {
         }
     }
 
-    public static <T> Constructor<T> getConstructor(final Class<T> clazz, final String className, final Class<?>... parameterTypes) throws SReflectException {
+    public static <T> Constructor<T> getConstructor(final Class<T> clazz, final String className,
+            final Class<?>... parameterTypes) throws SReflectException {
         try {
             return getClass(clazz, className).getConstructor(parameterTypes);
         } catch (final Exception e) {
@@ -92,7 +94,8 @@ public class ClassReflector {
         }
     }
 
-    public static <T> T getInstance(final Constructor<T> constructor, final Object... parameters) throws SReflectException {
+    public static <T> T getInstance(final Constructor<T> constructor, final Object... parameters)
+            throws SReflectException {
         try {
             return constructor.newInstance(parameters);
         } catch (final Exception e) {
@@ -110,7 +113,8 @@ public class ClassReflector {
         }
     }
 
-    public static void invokeSetter(final Object entity, final String setterName, final Class<?> parameterType, final Object parameterValue)
+    public static void invokeSetter(final Object entity, final String setterName, final Class<?> parameterType,
+            final Object parameterValue)
             throws SReflectException {
         try {
             final Method setter = getMethod(entity.getClass(), setterName, parameterType);
@@ -120,7 +124,8 @@ public class ClassReflector {
         }
     }
 
-    public static Method getMethod(final Class<?> clazz, final String methodName, final Class<?>... parameterTypes) throws NoSuchMethodException {
+    public static Method getMethod(final Class<?> clazz, final String methodName, final Class<?>... parameterTypes)
+            throws NoSuchMethodException {
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(clazz.hashCode());
         stringBuilder.append(':');
@@ -140,7 +145,8 @@ public class ClassReflector {
         return methods.get(key);
     }
 
-    private static void putIfAbsent(final Class<?> clazz, final String methodName, final String key, final Class<?>... parameterTypes)
+    private static void putIfAbsent(final Class<?> clazz, final String methodName, final String key,
+            final Class<?>... parameterTypes)
             throws NoSuchMethodException {
         if (!methods.containsKey(key)) {
             synchronized (MUTEX) {
@@ -181,12 +187,14 @@ public class ClassReflector {
         return selectedMethod;
     }
 
-    public static Object invokeMethodByName(final Object entity, final String methodName, final Object... parameterValues) throws SReflectException {
+    public static Object invokeMethodByName(final Object entity, final String methodName,
+            final Object... parameterValues) throws SReflectException {
         final Class<?> clazz = entity.getClass();
         // no check on parameters
         final Method methodToInvoke = getMethodByName(clazz, methodName);
         if (methodToInvoke == null) {
-            throw new SReflectException("unable to find a method with name '" + methodName + "' within class " + clazz.getName());
+            throw new SReflectException(
+                    "unable to find a method with name '" + methodName + "' within class " + clazz.getName());
         }
         try {
             return methodToInvoke.invoke(entity, parameterValues);
@@ -195,26 +203,32 @@ public class ClassReflector {
         }
     }
 
-    public static Object invokeMethod(final Object entity, final String methodName, final Class<?> parameterType, final Object parameterValue)
+    public static Object invokeMethod(final Object entity, final String methodName, final Class<?> parameterType,
+            final Object parameterValue)
             throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         final Method method = getMethod(entity.getClass(), methodName, parameterType);
         return method.invoke(entity, parameterValue);
     }
 
-    public static Object invokeMethod(final Object entity, final String methodName, final Class<?>[] parameterType, final Object[] parameterValue)
+    public static Object invokeMethod(final Object entity, final String methodName, final Class<?>[] parameterType,
+            final Object[] parameterValue)
             throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         final Method method = getMethod(entity.getClass(), methodName, parameterType);
         return method.invoke(entity, parameterValue);
     }
 
     private static boolean isWrapped(final Class<?> a, final Class<?> b) {
-        return a.equals(int.class) && b.equals(Integer.class) || a.equals(double.class) && b.equals(Double.class) || a.equals(boolean.class)
-                && b.equals(Boolean.class) || a.equals(char.class) && b.equals(Character.class) || a.equals(long.class) && b.equals(Long.class)
-                || a.equals(short.class) && b.equals(Short.class) || a.equals(float.class) && b.equals(Float.class) || a.equals(byte.class)
-                && b.equals(Byte.class);
+        return a.equals(int.class) && b.equals(Integer.class) || a.equals(double.class) && b.equals(Double.class)
+                || a.equals(boolean.class)
+                        && b.equals(Boolean.class)
+                || a.equals(char.class) && b.equals(Character.class) || a.equals(long.class) && b.equals(Long.class)
+                || a.equals(short.class) && b.equals(Short.class) || a.equals(float.class) && b.equals(Float.class)
+                || a.equals(byte.class)
+                        && b.equals(Byte.class);
     }
 
-    public static Method getCompatibleMethod(final Class<?> clazz, final String methodName, final Class<?>... paramTypes) throws SReflectException {
+    public static Method getCompatibleMethod(final Class<?> clazz, final String methodName,
+            final Class<?>... paramTypes) throws SReflectException {
         try {
             return clazz.getMethod(methodName, paramTypes);
         } catch (final Exception e) {
@@ -228,7 +242,8 @@ public class ClassReflector {
                             throw new SReflectException("wrong parameters");
                         }
                         for (int i = 0; i < types.length; i++) {
-                            if (!(types[i].isAssignableFrom(paramTypes[i]) || paramTypes[i].isAssignableFrom(types[i]) || isWrapped(types[i], paramTypes[i]))) {
+                            if (!(types[i].isAssignableFrom(paramTypes[i]) || paramTypes[i].isAssignableFrom(types[i])
+                                    || isWrapped(types[i], paramTypes[i]))) {
                                 check = false;
                                 break;
                             }
@@ -243,7 +258,8 @@ public class ClassReflector {
         }
     }
 
-    public static Type getGetterReturnType(final Class<?> classConnector, final String getterName) throws SReflectException {
+    public static Type getGetterReturnType(final Class<?> classConnector, final String getterName)
+            throws SReflectException {
         Method m;
         try {
             m = getMethod(classConnector, getterName);
@@ -283,16 +299,16 @@ public class ClassReflector {
 
     public static boolean isASetterMethod(final Method method) {
         final String methodName = method.getName();
-        return methodName.startsWith(SET) && "void".equals(method.getReturnType().toString()) && method.getParameterTypes().length == 1;
+        return methodName.startsWith(SET) && "void".equals(method.getReturnType().toString())
+                && method.getParameterTypes().length == 1;
     }
 
     public static String getGetterName(final String fieldName) {
         return "get" + WordUtils.capitalize(fieldName);
     }
 
-
     public static String getGetterName(final String fieldName, final Class<?> fieldType) {
-        return getGetterPrefix(fieldType)+ WordUtils.capitalize(fieldName);
+        return getGetterPrefix(fieldType) + WordUtils.capitalize(fieldName);
     }
 
     private static String getGetterPrefix(Class<?> fieldType) {
@@ -320,17 +336,17 @@ public class ClassReflector {
     /**
      * call a setter by reflection
      * support pointed notation like pojo.child.name
-     * @param object
-     *      object on with to call the setter
-     * @param fieldName
      *
+     * @param object
+     *        object on with to call the setter
+     * @param fieldName
      * @param parameterValue
      * @throws SReflectException
      */
     public static void setField(Object object, String fieldName, Object parameterValue) throws SReflectException {
         String[] getters = fieldName.split("\\.");
         int i;
-        for (i = 0; i < getters.length -1; i++) {
+        for (i = 0; i < getters.length - 1; i++) {
             object = invokeMethodByName(object, getGetterName(getters[i]));
         }
 
@@ -342,13 +358,12 @@ public class ClassReflector {
         return "set" + WordUtils.capitalize(getter);
     }
 
-    public static void clearCache(){
+    public static void clearCache() {
         methods.clear();
     }
 
-    public static int getCacheSize(){
+    public static int getCacheSize() {
         return methods.size();
     }
-
 
 }

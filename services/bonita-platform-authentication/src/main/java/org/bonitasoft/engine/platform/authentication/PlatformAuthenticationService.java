@@ -21,12 +21,13 @@ public interface PlatformAuthenticationService {
 
     /**
      * @param username
-     *            The username of the platform
+     *        The username of the platform
      * @param passwordHash
-     *            The hashed password of the platform
+     *        The hashed password of the platform
      * @throws SInvalidUserException
      * @throws SInvalidPasswordException
      */
-    void checkUserCredentials(final String username, final String passwordHash) throws SInvalidUserException, SInvalidPasswordException;
+    void checkUserCredentials(final String username, final String passwordHash)
+            throws SInvalidUserException, SInvalidPasswordException;
 
 }

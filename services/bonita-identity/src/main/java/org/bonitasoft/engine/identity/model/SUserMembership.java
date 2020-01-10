@@ -67,8 +67,9 @@ public class SUserMembership implements PersistentObject {
     private transient String groupName;
     private transient String username;
 
-    public SUserMembership(final long id, final long userId, final long groupId, final long roleId, final long assignedBy, final long assignedDate,
-                               final String roleName, final String groupName, final String username, String groupParentPath) {
+    public SUserMembership(final long id, final long userId, final long groupId, final long roleId,
+            final long assignedBy, final long assignedDate,
+            final String roleName, final String groupName, final String username, String groupParentPath) {
         super();
         setId(id);
         this.userId = userId;

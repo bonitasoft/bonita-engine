@@ -38,7 +38,8 @@ public final class CheckNbOfArchivedActivities extends WaitUntil {
     private String activityState = null;
 
     @Deprecated
-    public CheckNbOfArchivedActivities(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions,
+    public CheckNbOfArchivedActivities(final ProcessAPI processAPI, final int repeatEach, final int timeout,
+            final boolean throwExceptions,
             final ProcessInstance processInstance, final int nbActivities) {
         super(repeatEach, timeout, throwExceptions);
         this.processInstance = processInstance;
@@ -47,7 +48,8 @@ public final class CheckNbOfArchivedActivities extends WaitUntil {
     }
 
     @Deprecated
-    public CheckNbOfArchivedActivities(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions,
+    public CheckNbOfArchivedActivities(final ProcessAPI processAPI, final int repeatEach, final int timeout,
+            final boolean throwExceptions,
             final ProcessInstance processInstance, final int nbActivities, final TestStates state) {
         this(processAPI, repeatEach, timeout, throwExceptions, processInstance, nbActivities);
         activityState = state.getStateName();
@@ -55,7 +57,8 @@ public final class CheckNbOfArchivedActivities extends WaitUntil {
 
     @Override
     protected boolean check() {
-        final List<ArchivedActivityInstance> activities = processAPI.getArchivedActivityInstances(processInstance.getId(), 0, 200,
+        final List<ArchivedActivityInstance> activities = processAPI.getArchivedActivityInstances(
+                processInstance.getId(), 0, 200,
                 ActivityInstanceCriterion.NAME_ASC);
         result = new HashSet<ArchivedActivityInstance>(activities.size());
         // The number of activities is the one expected...

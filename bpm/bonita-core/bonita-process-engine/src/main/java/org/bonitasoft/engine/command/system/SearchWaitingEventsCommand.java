@@ -29,7 +29,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * Search Waiting events
  * Parameters ->
  * searchOptions: the searchOptions
- * 
+ *
  * @author Elias Ricken de Medeiros
  */
 public class SearchWaitingEventsCommand extends CommandWithParameters {
@@ -44,8 +44,10 @@ public class SearchWaitingEventsCommand extends CommandWithParameters {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         final EventInstanceService eventInstanceService = serviceAccessor.getEventInstanceService();
-        final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY, "Missing mandatory field: " + SEARCH_OPTIONS_KEY);
-        final SearchWaitingEvents searchWaitingEvents = new SearchWaitingEvents(new SearchWaitingEventSerchDescriptor(), searchOptions,
+        final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY,
+                "Missing mandatory field: " + SEARCH_OPTIONS_KEY);
+        final SearchWaitingEvents searchWaitingEvents = new SearchWaitingEvents(new SearchWaitingEventSerchDescriptor(),
+                searchOptions,
                 eventInstanceService);
         try {
             searchWaitingEvents.execute();

@@ -29,6 +29,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("intermediateThrowEvent")
 public class SAIntermediateThrowEventInstance extends SAThrowEventInstance {
+
     public SAIntermediateThrowEventInstance(final SIntermediateThrowEventInstance sIntermediateThrowEventInstance) {
         super(sIntermediateThrowEventInstance);
     }

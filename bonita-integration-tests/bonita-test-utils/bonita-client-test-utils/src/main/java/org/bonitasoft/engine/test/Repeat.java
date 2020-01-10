@@ -21,19 +21,20 @@ import java.lang.annotation.Target;
  * @author Laurent Leseigneur
  *         <p>use this rule to play x times the same junit test and add rule {@link RepeatRule}.</p>
  *         Example:<br>
- *        <pre>
+ *
+ *         <pre>
  * {@code
- * @Rule public RepeatRule repeatRule = new RepeatRule();
- * @Repeat(times = 100)
+ * &#64;Rule public RepeatRule repeatRule = new RepeatRule();
+ * &#64;Repeat(times = 100)
  *               public void testName() throws Exception {
  *               ...
  *               }
  *               }
- *               </pre>
+ *         </pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-    java.lang.annotation.ElementType.METHOD
+        java.lang.annotation.ElementType.METHOD
 })
 public @interface Repeat {
 

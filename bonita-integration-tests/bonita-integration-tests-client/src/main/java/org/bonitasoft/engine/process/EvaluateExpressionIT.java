@@ -68,15 +68,24 @@ public class EvaluateExpressionIT extends TestWithUser {
     @Before
     public void before() throws Exception {
         super.before();
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processDefinitionBuilder.addData("stringData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("Word"));
-        processDefinitionBuilder.addDateData("dateData", new ExpressionBuilder().createConstantDateExpression("2013-07-18T14:49:26.86+02:00"));
-        processDefinitionBuilder.addData("doubleData", Double.class.getName(), new ExpressionBuilder().createConstantDoubleExpression(2D));
-        processDefinitionBuilder.addData("longData", Long.class.getName(), new ExpressionBuilder().createConstantLongExpression(1L));
-        processDefinitionBuilder.addData("booleanData", Boolean.class.getName(), new ExpressionBuilder().createConstantBooleanExpression(true));
-        processDefinitionBuilder.addData("floatData", Float.class.getName(), new ExpressionBuilder().createConstantFloatExpression(100F));
-        processDefinitionBuilder.addData("integerData", Integer.class.getName(), new ExpressionBuilder().createConstantIntegerExpression(4));
-        processDefinitionBuilder.addData("processData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("processData"));
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processDefinitionBuilder.addData("stringData", String.class.getName(),
+                new ExpressionBuilder().createConstantStringExpression("Word"));
+        processDefinitionBuilder.addDateData("dateData",
+                new ExpressionBuilder().createConstantDateExpression("2013-07-18T14:49:26.86+02:00"));
+        processDefinitionBuilder.addData("doubleData", Double.class.getName(),
+                new ExpressionBuilder().createConstantDoubleExpression(2D));
+        processDefinitionBuilder.addData("longData", Long.class.getName(),
+                new ExpressionBuilder().createConstantLongExpression(1L));
+        processDefinitionBuilder.addData("booleanData", Boolean.class.getName(),
+                new ExpressionBuilder().createConstantBooleanExpression(true));
+        processDefinitionBuilder.addData("floatData", Float.class.getName(),
+                new ExpressionBuilder().createConstantFloatExpression(100F));
+        processDefinitionBuilder.addData("integerData", Integer.class.getName(),
+                new ExpressionBuilder().createConstantIntegerExpression(4));
+        processDefinitionBuilder.addData("processData", String.class.getName(),
+                new ExpressionBuilder().createConstantStringExpression("processData"));
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask(STEP1_NAME, ACTOR_NAME);
         processDefinitionBuilder.addUserTask(STEP2_NAME, ACTOR_NAME);
@@ -87,39 +96,50 @@ public class EvaluateExpressionIT extends TestWithUser {
         final List<Expression> stringDependencies = new ArrayList<>();
         stringDependencies.add(new ExpressionBuilder().createDataExpression("stringData", String.class.getName()));
         stringDependencies.add(new ExpressionBuilder().createInputExpression("field_string", String.class.getName()));
-        final Expression stringExpression = new ExpressionBuilder().createGroovyScriptExpression("StringScript", "stringData + \"-\" + field_string",
+        final Expression stringExpression = new ExpressionBuilder().createGroovyScriptExpression("StringScript",
+                "stringData + \"-\" + field_string",
                 String.class.getName(), stringDependencies);
         final Map<String, Serializable> fieldValues = new HashMap<>();
         fieldValues.put("field_string", "Excel");
 
-        final List<Expression> dateDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("dateData", Date.class.getName()));
+        final List<Expression> dateDependencies = Collections
+                .singletonList(new ExpressionBuilder().createDataExpression("dateData", Date.class.getName()));
         final Expression dateExpression = new ExpressionBuilder().createGroovyScriptExpression("DateScript",
                 "import java.text.SimpleDateFormat;import java.util.TimeZone;"
                         + "SimpleDateFormat dateFormat = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss zzz\"); dateFormat.setTimeZone(TimeZone.getTimeZone(\"GMT+2\"));"
                         + "dateFormat.format(dateData) + \"plop\"",
                 String.class.getName(), dateDependencies);
 
-        final List<Expression> longDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("longData", Long.class.getName()));
-        final Expression longExpression = new ExpressionBuilder().createGroovyScriptExpression("LongScript", "String.valueOf(longData)+ \"plop\"",
+        final List<Expression> longDependencies = Collections
+                .singletonList(new ExpressionBuilder().createDataExpression("longData", Long.class.getName()));
+        final Expression longExpression = new ExpressionBuilder().createGroovyScriptExpression("LongScript",
+                "String.valueOf(longData)+ \"plop\"",
                 String.class.getName(), longDependencies);
 
         final List<Expression> doubleDependencies = Collections
                 .singletonList(new ExpressionBuilder().createDataExpression("doubleData", Double.class.getName()));
-        final Expression doubleExpression = new ExpressionBuilder().createGroovyScriptExpression("DoubleScript", "String.valueOf(doubleData) + \"plop\"",
+        final Expression doubleExpression = new ExpressionBuilder().createGroovyScriptExpression("DoubleScript",
+                "String.valueOf(doubleData) + \"plop\"",
                 String.class.getName(), doubleDependencies);
 
-        final List<Expression> booleanDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("booleanData",
-                Boolean.class.getName()));
-        final Expression booleanExpression = new ExpressionBuilder().createGroovyScriptExpression("BooleanScript", "booleanData && false",
+        final List<Expression> booleanDependencies = Collections
+                .singletonList(new ExpressionBuilder().createDataExpression("booleanData",
+                        Boolean.class.getName()));
+        final Expression booleanExpression = new ExpressionBuilder().createGroovyScriptExpression("BooleanScript",
+                "booleanData && false",
                 Boolean.class.getName(), booleanDependencies);
 
-        final List<Expression> floatDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("floatData", Float.class.getName()));
-        final Expression floatExpression = new ExpressionBuilder().createGroovyScriptExpression("FloatScript", "String.valueOf(floatData) + \"plop\"",
+        final List<Expression> floatDependencies = Collections
+                .singletonList(new ExpressionBuilder().createDataExpression("floatData", Float.class.getName()));
+        final Expression floatExpression = new ExpressionBuilder().createGroovyScriptExpression("FloatScript",
+                "String.valueOf(floatData) + \"plop\"",
                 String.class.getName(), floatDependencies);
 
-        final List<Expression> integerDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("integerData",
-                Integer.class.getName()));
-        final Expression integerExpression = new ExpressionBuilder().createGroovyScriptExpression("IntegerScript", "String.valueOf(integerData) + \"plop\"",
+        final List<Expression> integerDependencies = Collections
+                .singletonList(new ExpressionBuilder().createDataExpression("integerData",
+                        Integer.class.getName()));
+        final Expression integerExpression = new ExpressionBuilder().createGroovyScriptExpression("IntegerScript",
+                "String.valueOf(integerData) + \"plop\"",
                 String.class.getName(), integerDependencies);
 
         final Expression constantStringExpression = new ExpressionBuilder().createNewInstance("Word").setContent("")
@@ -134,7 +154,8 @@ public class EvaluateExpressionIT extends TestWithUser {
         expressions.put(floatExpression, new HashMap<String, Serializable>());
         expressions.put(integerExpression, new HashMap<String, Serializable>());
         expressions.put(constantStringExpression, new HashMap<String, Serializable>());
-        expressions.put(new ExpressionBuilder().createDataExpression("processData", String.class.getName()), new HashMap<String, Serializable>());
+        expressions.put(new ExpressionBuilder().createDataExpression("processData", String.class.getName()),
+                new HashMap<String, Serializable>());
     }
 
     @Override
@@ -144,9 +165,11 @@ public class EvaluateExpressionIT extends TestWithUser {
         super.after();
     }
 
-    private static ProcessDefinitionBuilder createProcessDefinitionBuilderWithHumanAndAutomaticSteps(final String processName, final String processVersion,
+    private static ProcessDefinitionBuilder createProcessDefinitionBuilderWithHumanAndAutomaticSteps(
+            final String processName, final String processVersion,
             final List<String> stepNames, final List<Boolean> isHuman) {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                processVersion);
         processBuilder.addActor("Actor1");
         ActivityDefinitionBuilder activityDefinitionBuilder = null;
         for (int i = 0; i < stepNames.size(); i++) {
@@ -168,9 +191,11 @@ public class EvaluateExpressionIT extends TestWithUser {
         TransitionDefinitionBuilder transitionDefinitionBuilder = null;
         for (int i = 0; i < stepNames.size() - 1; i++) {
             if (transitionDefinitionBuilder != null) {
-                transitionDefinitionBuilder = transitionDefinitionBuilder.addTransition(stepNames.get(i), stepNames.get(i + 1));
+                transitionDefinitionBuilder = transitionDefinitionBuilder.addTransition(stepNames.get(i),
+                        stepNames.get(i + 1));
             } else {
-                transitionDefinitionBuilder = activityDefinitionBuilder.addTransition(stepNames.get(i), stepNames.get(i + 1));
+                transitionDefinitionBuilder = activityDefinitionBuilder.addTransition(stepNames.get(i),
+                        stepNames.get(i + 1));
             }
         }
         return processBuilder;
@@ -180,14 +205,17 @@ public class EvaluateExpressionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinitionId);
     }
 
-    private ProcessDefinition createAndDeployProcessDefinitionAndInstance(final String dataName, final int value, final boolean isHuman, final User user)
+    private ProcessDefinition createAndDeployProcessDefinitionAndInstance(final String dataName, final int value,
+            final boolean isHuman, final User user)
             throws Exception {
         // create data expression
         final Expression dataDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(value);
 
         // create a processDefinition with data and parameter...
-        final DesignProcessDefinition processDef = createProcessDefinitionBuilderWithHumanAndAutomaticSteps("My_Process", "1.0",
-                Collections.singletonList("step1"), Collections.singletonList(isHuman)).addIntegerData(dataName, dataDefaultExp)
+        final DesignProcessDefinition processDef = createProcessDefinitionBuilderWithHumanAndAutomaticSteps(
+                "My_Process", "1.0",
+                Collections.singletonList("step1"), Collections.singletonList(isHuman))
+                        .addIntegerData(dataName, dataDefaultExp)
                         .addDescription("Delivery all day and night long").getProcess();
 
         return deployAndEnableProcessWithActor(processDef, "Actor1", user);
@@ -197,7 +225,8 @@ public class EvaluateExpressionIT extends TestWithUser {
     public void evaluateExpressionsAtProcessInstantiation() throws Exception {
         waitForPendingTasks(getSession().getUserId(), 1);
 
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions);
+        final Map<String, Serializable> result = getProcessAPI()
+                .evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));
@@ -215,7 +244,8 @@ public class EvaluateExpressionIT extends TestWithUser {
     @Test
     public void evaluateExpressionsOnCompletedActivityInstance() throws Exception {
         final long step1Id = waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id, expressions);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id,
+                expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));
@@ -231,7 +261,8 @@ public class EvaluateExpressionIT extends TestWithUser {
         final long step1Id = waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
         waitForUserTaskAndExecuteIt(processInstance, STEP2_NAME, user);
         waitForProcessToFinish(processInstance);
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id, expressions);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id,
+                expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));
@@ -253,7 +284,8 @@ public class EvaluateExpressionIT extends TestWithUser {
         final long step1Id = waitForUserTaskAndExecuteIt(callerInstance, STEP1_NAME, user);
         waitForUserTaskAndExecuteIt(callerInstance, STEP2_NAME, user);
         waitForProcessToFinish(callerInstance);
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id, expressions);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id,
+                expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));
@@ -276,7 +308,8 @@ public class EvaluateExpressionIT extends TestWithUser {
         waitForUserTaskAndExecuteIt(processInstance, STEP2_NAME, user);
         waitForProcessToFinish(processInstance);
 
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
+        final Map<String, Serializable> result = getProcessAPI()
+                .evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));
@@ -294,7 +327,8 @@ public class EvaluateExpressionIT extends TestWithUser {
         waitForUserTaskAndExecuteIt(processInstance, STEP2_NAME, user);
         waitForProcessToFinish(processInstance);
 
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
+        final Map<String, Serializable> result = getProcessAPI()
+                .evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
         assertEquals(
                 "if Word-Excel is returned, it means the values of the variable used are the latest ones whereas it should be the ones of when the activity was submited",
                 "Plop-Excel", result.get("StringScript"));
@@ -310,7 +344,8 @@ public class EvaluateExpressionIT extends TestWithUser {
     @Test
     public void evaluateExpressionsOnActivityInstance() throws Exception {
         final long step1Id = waitForUserTask(processInstance, STEP1_NAME);
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id, expressions);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id,
+                expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));
@@ -331,15 +366,19 @@ public class EvaluateExpressionIT extends TestWithUser {
     public void evaluateAssigneeId() throws Exception {
         final ActivityInstance userTaskInstance = waitForUserTaskAndAssignIt(processInstance, STEP1_NAME, user);
 
-        final Expression taskAssigneeExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.TASK_ASSIGNEE_ID);
-        final Expression engineExecContextExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.ENGINE_EXECUTION_CONTEXT);
+        final Expression taskAssigneeExpr = new ExpressionBuilder()
+                .createEngineConstant(ExpressionConstants.TASK_ASSIGNEE_ID);
+        final Expression engineExecContextExpr = new ExpressionBuilder()
+                .createEngineConstant(ExpressionConstants.ENGINE_EXECUTION_CONTEXT);
         final Map<Expression, Map<String, Serializable>> engineExpresssions = new HashMap<>();
         engineExpresssions.put(taskAssigneeExpr, Collections.<String, Serializable> emptyMap());
         engineExpresssions.put(engineExecContextExpr, Collections.<String, Serializable> emptyMap());
 
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskInstance.getId(), engineExpresssions);
+        final Map<String, Serializable> result = getProcessAPI()
+                .evaluateExpressionsOnActivityInstance(userTaskInstance.getId(), engineExpresssions);
         assertEquals(user.getId(), result.get(taskAssigneeExpr.getContent()));
-        assertEquals(user.getId(), ((EngineExecutionContext) result.get(engineExecContextExpr.getContent())).getTaskAssigneeId());
+        assertEquals(user.getId(),
+                ((EngineExecutionContext) result.get(engineExecContextExpr.getContent())).getTaskAssigneeId());
     }
 
     @Test
@@ -347,7 +386,8 @@ public class EvaluateExpressionIT extends TestWithUser {
         waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Excel");
 
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
+        final Map<String, Serializable> result = getProcessAPI()
+                .evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
         assertFalse("Result should not be empty", result.isEmpty());
         assertEquals("Excel-Excel", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
@@ -364,7 +404,8 @@ public class EvaluateExpressionIT extends TestWithUser {
         waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Excel");
 
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
+        final Map<String, Serializable> result = getProcessAPI()
+                .evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
         assertEquals("Excel-Excel", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));
@@ -387,7 +428,8 @@ public class EvaluateExpressionIT extends TestWithUser {
 
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsOnProcessDefinition() throws Exception {
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessDefinition(processDefinition.getId(), expressions);
+        final Map<String, Serializable> result = getProcessAPI()
+                .evaluateExpressionsOnProcessDefinition(processDefinition.getId(), expressions);
         assertFalse("Result should not be empty", result.isEmpty());
         assertEquals("Word", result.get("StringScript"));
         assertEquals(EXPECTED_EVALUATED_DATE, result.get("DateScript"));
@@ -408,8 +450,10 @@ public class EvaluateExpressionIT extends TestWithUser {
     public void evaluatePatternExpression() throws Exception {
         final String dataName = "birthYear";
         // get processInstance
-        final ProcessDefinition processDefinition = createAndDeployProcessDefinitionAndInstance(dataName, 1977, true, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = createAndDeployProcessDefinitionAndInstance(dataName, 1977, true,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
@@ -417,12 +461,14 @@ public class EvaluateExpressionIT extends TestWithUser {
         final Expression expConstantExpression = new ExpressionBuilder().createConstantStringExpression("year");
 
         final String messagePattern = "My birth ${year} is ${birthYear}";
-        final Expression expPattern = new ExpressionBuilder().createPatternExpression("TestEvaluatePatternExpression", messagePattern, expData,
+        final Expression expPattern = new ExpressionBuilder().createPatternExpression("TestEvaluatePatternExpression",
+                messagePattern, expData,
                 expConstantExpression);
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
         expressions.put(expPattern, null);
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
+        final Map<String, Serializable> result = getProcessAPI()
+                .evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
         assertEquals("My birth year is 1977", result.get(messagePattern));
 
         cleanup(processDefinition.getId());

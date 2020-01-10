@@ -34,7 +34,8 @@ public class SearchOpenProcessInstancesInvolvingUser extends AbstractProcessInst
     private final long userId;
 
     public SearchOpenProcessInstancesInvolvingUser(final ProcessInstanceService processInstanceService,
-            final SearchProcessInstanceDescriptor searchEntitiesDescriptor, final long userId, final SearchOptions options,
+            final SearchProcessInstanceDescriptor searchEntitiesDescriptor, final long userId,
+            final SearchOptions options,
             final ProcessDefinitionService processDefinitionService) {
         super(searchEntitiesDescriptor, options, processDefinitionService);
         this.processInstanceService = processInstanceService;

@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * Informations concerning the connected tenant to the APIs
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet

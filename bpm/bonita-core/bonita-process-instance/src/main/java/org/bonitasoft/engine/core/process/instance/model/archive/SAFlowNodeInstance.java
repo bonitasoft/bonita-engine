@@ -71,7 +71,6 @@ public abstract class SAFlowNodeInstance implements ArchivedPersistentObject {
     @Column(name = "flownodeDefinitionId")
     private long flowNodeDefinitionId;
 
-
     public SAFlowNodeInstance(final SFlowNodeInstance flowNodeInstance) {
         sourceObjectId = flowNodeInstance.getId();
         name = flowNodeInstance.getName();
@@ -94,7 +93,6 @@ public abstract class SAFlowNodeInstance implements ArchivedPersistentObject {
         executedBySubstitute = flowNodeInstance.getExecutedBySubstitute();
         flowNodeDefinitionId = flowNodeInstance.getFlowNodeDefinitionId();
     }
-
 
     public long getProcessDefinitionId() {
         return logicalGroup1;

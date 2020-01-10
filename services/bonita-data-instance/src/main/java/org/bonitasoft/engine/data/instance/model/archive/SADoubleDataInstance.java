@@ -33,10 +33,8 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @DiscriminatorValue("SADoubleDataInstanceImpl")
 public class SADoubleDataInstance extends SADataInstance {
 
-
     @Column(name = "doubleValue")
     private Double value;
-
 
     public SADoubleDataInstance(final SDataInstance sDataInstance) {
         super(sDataInstance);

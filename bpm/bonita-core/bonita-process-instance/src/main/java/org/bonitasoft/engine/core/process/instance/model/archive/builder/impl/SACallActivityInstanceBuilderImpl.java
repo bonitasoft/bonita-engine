@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallA
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SACallActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SACallActivityInstanceBuilder {
+public class SACallActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl
+        implements SACallActivityInstanceBuilder {
 
     public SACallActivityInstanceBuilderImpl(final SACallActivityInstance entity) {
         super(entity);

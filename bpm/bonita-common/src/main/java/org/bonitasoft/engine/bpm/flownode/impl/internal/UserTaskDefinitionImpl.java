@@ -37,8 +37,10 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
  * @author Celine Souchet
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "incomings", "outgoings", "connectors", "description", "displayDescription", "displayName", "displayDescriptionAfterCompletion",
-        "defaultTransition", "dataDefinitions", "businessDataDefinitions", "operations", "loopCharacteristics", "boundaryEventDefinitions",
+@XmlType(propOrder = { "incomings", "outgoings", "connectors", "description", "displayDescription", "displayName",
+        "displayDescriptionAfterCompletion",
+        "defaultTransition", "dataDefinitions", "businessDataDefinitions", "operations", "loopCharacteristics",
+        "boundaryEventDefinitions",
         "userFilterDefinition", "contract", "context", "expectedDuration" })
 public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements UserTaskDefinition {
 

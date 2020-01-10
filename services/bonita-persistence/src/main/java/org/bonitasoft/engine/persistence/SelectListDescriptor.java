@@ -23,7 +23,8 @@ public class SelectListDescriptor<T> extends AbstractSelectWithParametersDescrip
 
     private final QueryOptions queryOptions;
 
-    public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
+    public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters,
+            final Class<? extends PersistentObject> entityType,
             final QueryOptions queryOptions) {
         super(queryName, inputParameters, entityType, (Class<T>) entityType);
         if (queryOptions != null) {
@@ -33,7 +34,8 @@ public class SelectListDescriptor<T> extends AbstractSelectWithParametersDescrip
         }
     }
 
-    public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
+    public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters,
+            final Class<? extends PersistentObject> entityType,
             final Class<T> returnType, final QueryOptions queryOptions) {
         super(queryName, inputParameters, entityType, returnType);
         if (queryOptions != null) {

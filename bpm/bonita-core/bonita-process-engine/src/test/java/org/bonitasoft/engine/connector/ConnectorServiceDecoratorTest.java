@@ -61,10 +61,12 @@ public class ConnectorServiceDecoratorTest {
         parameters.put("connectorApiAccessor", EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression());
         parameters.put("engineExecutionContext", EngineConstantExpressionBuilder.getEngineExecutionContext());
         final ConnectorResult toBeReturned = new ConnectorResult(null, result);
-        doReturn(toBeReturned).when(connectorService).executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
+        doReturn(toBeReturned).when(connectorService).executeMultipleEvaluation(processDefinitionId,
+                connectorDefinitionId,
                 connectorDefinitionVersion, parameters, inputValues, classLoader, sexpContext);
 
-        final ConnectorResult connectorResult = connectorServiceDecorator.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
+        final ConnectorResult connectorResult = connectorServiceDecorator.executeMultipleEvaluation(processDefinitionId,
+                connectorDefinitionId,
                 connectorDefinitionVersion, connectorInputParameters, inputValues, classLoader, sexpContext);
         assertEquals(toBeReturned, connectorResult);
     }
@@ -81,9 +83,11 @@ public class ConnectorServiceDecoratorTest {
         final Map<String, Object> toBeReturned = new HashMap<String, Object>(parameters);
         toBeReturned.put("connectorApiAccessor", EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression());
         toBeReturned.put("engineExecutionContext", EngineConstantExpressionBuilder.getEngineExecutionContext());
-        doReturn(toBeReturned).when(connectorService).evaluateInputParameters("connectorId", newParameters, sExpressionContext, inputValues);
+        doReturn(toBeReturned).when(connectorService).evaluateInputParameters("connectorId", newParameters,
+                sExpressionContext, inputValues);
 
-        final Map<String, Object> evaluateInputParameters = connectorServiceDecorator.evaluateInputParameters("connectorId", parameters, sExpressionContext,
+        final Map<String, Object> evaluateInputParameters = connectorServiceDecorator.evaluateInputParameters(
+                "connectorId", parameters, sExpressionContext,
                 inputValues);
         assertEquals(toBeReturned, evaluateInputParameters);
     }

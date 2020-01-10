@@ -14,6 +14,7 @@
 package org.bonitasoft.engine;
 
 import java.util.Map;
+
 import javax.naming.Context;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NamingException;

@@ -52,7 +52,8 @@ public class ClientBDMJarBuilderTest {
 
         clientBDMJarBuilder.addSourceFilesToDirectory(BOMBuilder.aBOM().build(), directory);
 
-        verify(resourcesLoader).copyJavaFilesToDirectory(BusinessObjectDeserializer.class.getPackage().getName(), directory);
+        verify(resourcesLoader).copyJavaFilesToDirectory(BusinessObjectDeserializer.class.getPackage().getName(),
+                directory);
         FileUtils.deleteDirectory(directory);
     }
 

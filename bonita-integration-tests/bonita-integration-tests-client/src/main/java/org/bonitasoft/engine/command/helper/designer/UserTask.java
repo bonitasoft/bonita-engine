@@ -34,7 +34,7 @@ public class UserTask extends FlowNode {
     @Override
     public void build(ProcessDefinitionBuilder builder) {
         UserTaskDefinitionBuilder task = builder.addUserTask(getName(), actor);
-        if(event != null) {
+        if (event != null) {
             event.attach(task, builder);
         }
     }

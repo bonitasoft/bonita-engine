@@ -29,6 +29,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("endEvent")
 public class SAEndEventInstance extends SAThrowEventInstance {
+
     public SAEndEventInstance(final SEndEventInstance endEvent) {
         super(endEvent);
     }

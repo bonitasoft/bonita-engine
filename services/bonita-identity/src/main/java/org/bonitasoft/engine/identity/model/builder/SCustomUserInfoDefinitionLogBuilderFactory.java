@@ -19,7 +19,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 /**
  * @author Yanyan Liu
  */
-public interface SCustomUserInfoDefinitionLogBuilderFactory extends HasCRUDEActionFactory, SPersistenceLogBuilderFactory {
+public interface SCustomUserInfoDefinitionLogBuilderFactory
+        extends HasCRUDEActionFactory, SPersistenceLogBuilderFactory {
 
     @Override
     SCustomUserInfoDefinitionLogBuilder createNewInstance();

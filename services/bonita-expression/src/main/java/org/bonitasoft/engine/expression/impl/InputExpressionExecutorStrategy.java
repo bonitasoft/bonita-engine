@@ -32,7 +32,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         if (context != null && !context.isEmpty()) {
             final String key = expression.getContent();
@@ -40,7 +41,8 @@ public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionEx
                 return context.get(key);
             }
         }
-        throw new SExpressionEvaluationException("No value found for mandatory expression '" + expression.getContent() + "' of type Input Expression",
+        throw new SExpressionEvaluationException(
+                "No value found for mandatory expression '" + expression.getContent() + "' of type Input Expression",
                 expression.getName());
     }
 
@@ -50,7 +52,8 @@ public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionEx
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {

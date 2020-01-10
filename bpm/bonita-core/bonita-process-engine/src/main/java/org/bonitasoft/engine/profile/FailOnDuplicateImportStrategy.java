@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.profile;
 
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
 
 /**
  * @author Baptiste Mesta

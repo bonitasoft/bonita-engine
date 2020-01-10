@@ -13,13 +13,11 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-
-
 /**
  * A Task is an atomic Activity within a Process flow. A Task is used when the work in the Process cannot be broken
  * down to a finer level of detail. Generally, an end-user and/or applications are used to perform the Task when it is
  * execute
- * 
+ *
  * @author Baptiste Mesta
  */
 public interface TaskDefinition extends ActivityDefinition {

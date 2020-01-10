@@ -17,9 +17,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
  * Represent failure(s) that happened to a certain job (e.g. Timer execution)
- *
  */
 public interface FailedJob extends Serializable {
 

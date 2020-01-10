@@ -26,5 +26,5 @@ public class SCategoryUpdateBuilderFactoryImpl implements SCategoryUpdateBuilder
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         return new SCategoryUpdateBuilderImpl(descriptor);
     }
-    
+
 }

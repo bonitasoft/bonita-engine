@@ -34,13 +34,18 @@ import org.bonitasoft.engine.search.SearchResult;
 /**
  * Manipulate documents that are attached to a process instance.
  * <p>
- * A document can be stored directly with the process instance, or by reference. If you store a document by reference, the process instance contains a document
- * object that has metadata describing the document: its name, content MimeType, the name of the file of the document, and a URL giving the location of the
- * document. The choice of direct local storage or storage by reference depends on the performance profile of document access within an instance of the process.
- * If you require frequent and rapid access to update the document and the document is not large, use direct storage. If the document is large or is not
+ * A document can be stored directly with the process instance, or by reference. If you store a document by reference,
+ * the process instance contains a document
+ * object that has metadata describing the document: its name, content MimeType, the name of the file of the document,
+ * and a URL giving the location of the
+ * document. The choice of direct local storage or storage by reference depends on the performance profile of document
+ * access within an instance of the process.
+ * If you require frequent and rapid access to update the document and the document is not large, use direct storage. If
+ * the document is large or is not
  * accessed frequently within a process instance, or is not updated by the process, store it by reference.
  * <p>
- * Multiple versions of a document can be stored. You can retrieve the latest version or the version that was current at a given milestone (for example process
+ * Multiple versions of a document can be stored. You can retrieve the latest version or the version that was current at
+ * a given milestone (for example process
  * instantiation, or activity completion).
  *
  * @author Emmanuel Duchastenier
@@ -52,8 +57,10 @@ public interface DocumentAPI {
      * Attach a document by reference to the specified process instance.
      * <p>
      * The document itself does not contain content but is a reference to external content specified by its URL.
-     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
-     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach a
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task
+     * are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a
+     * groovy script for example) will attach a
      * document whose author is the user System.
      * </p>
      *
@@ -76,7 +83,8 @@ public interface DocumentAPI {
      *         when an error occurs while attaching the document
      * @since 6.0
      */
-    Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType, String url) throws ProcessInstanceNotFoundException,
+    Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType, String url)
+            throws ProcessInstanceNotFoundException,
             DocumentAttachmentException;
 
     /**
@@ -110,13 +118,16 @@ public interface DocumentAPI {
      * Depending on the DocumentValue given the document will be internal (with content) or external (with url).
      * <ol>
      * <li>If the target document is a list of document then we append it to the list</li>
-     * <li>If the target document is a list of document and the index is set on the document value then we insert the element in the list at the specified
+     * <li>If the target document is a list of document and the index is set on the document value then we insert the
+     * element in the list at the specified
      * index</li>
      * <li>If the target single document or is non existent in the definition we create it</li>
      * <li>If the target single document and is already existent an exception is thrown</li>
      * </ol>
-     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
-     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach add
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task
+     * are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a
+     * groovy script for example) will attach add
      * a document whose author is the user System.
      *
      * @param processInstanceId
@@ -145,8 +156,10 @@ public interface DocumentAPI {
      * Attach the given document to the specified process instance.
      * <p>
      * The content is stored to enable later retrieval.
-     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
-     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach a
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task
+     * are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a
+     * groovy script for example) will attach a
      * document whose author is the user System.
      * </p>
      *
@@ -169,15 +182,19 @@ public interface DocumentAPI {
      *         when an error occurs while attaching the document
      * @since 6.0
      */
-    Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType, byte[] documentContent)
+    Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType,
+            byte[] documentContent)
             throws ProcessInstanceNotFoundException, DocumentAttachmentException;
 
     /**
      * Attach a new version of a document by reference to the specified process instance. The referenced document is
      * a new version of the named document.
-     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
-     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach a
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task
+     * are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a
+     * groovy script for example) will attach a
      * document whose author is the user System.
+     *
      * @param processInstanceId
      *        The identifier of the process instance
      * @param documentName
@@ -195,15 +212,19 @@ public interface DocumentAPI {
      *         when an error occurs while attaching the new version of the document
      * @since 6.0
      */
-    Document attachNewDocumentVersion(long processInstanceId, String documentName, String fileName, String mimeType, String url)
+    Document attachNewDocumentVersion(long processInstanceId, String documentName, String fileName, String mimeType,
+            String url)
             throws DocumentAttachmentException;
 
     /**
-     * Attach a new document version to the specified process instance. The document is a new version of the named document.
+     * Attach a new document version to the specified process instance. The document is a new version of the named
+     * document.
      * <p>
      * The content is stored to enable later retrieval.
-     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
-     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach a
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task
+     * are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a
+     * groovy script for example) will attach a
      * document whose author is the user System.
      * </p>
      *
@@ -224,7 +245,8 @@ public interface DocumentAPI {
      *         when an error occurs while attaching the new version of the document
      * @since 6.0
      */
-    Document attachNewDocumentVersion(long processInstanceId, String documentName, String contentFileName, String contentMimeType, byte[] documentContent)
+    Document attachNewDocumentVersion(long processInstanceId, String documentName, String contentFileName,
+            String contentMimeType, byte[] documentContent)
             throws DocumentAttachmentException;
 
     /**
@@ -244,7 +266,8 @@ public interface DocumentAPI {
     /**
      * Remove the document with the specified identifier and returns it.
      * <p>
-     * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database, use
+     * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database,
+     * use
      * {@link #deleteContentOfArchivedDocument} to delete the content
      * </p>
      *
@@ -280,7 +303,8 @@ public interface DocumentAPI {
      *         when any other error occurs during document handling
      * @since 6.0
      */
-    List<Document> getLastVersionOfDocuments(long processInstanceId, int pageIndex, int numberPerPage, DocumentCriterion pagingCriterion)
+    List<Document> getLastVersionOfDocuments(long processInstanceId, int pageIndex, int numberPerPage,
+            DocumentCriterion pagingCriterion)
             throws ProcessInstanceNotFoundException, DocumentException;
 
     /**
@@ -329,7 +353,8 @@ public interface DocumentAPI {
      *         If the specified documentName does not refer to a document attached to the specified process instance.
      * @since 6.0
      */
-    Document getDocumentAtProcessInstantiation(long processInstanceId, String documentName) throws DocumentNotFoundException;
+    Document getDocumentAtProcessInstantiation(long processInstanceId, String documentName)
+            throws DocumentNotFoundException;
 
     /**
      * Get the version of the named document when the specified activity completed.
@@ -341,15 +366,18 @@ public interface DocumentAPI {
      *        The name of the document
      * @return a document object
      * @throws DocumentNotFoundException
-     *         If the specified documentName does not refer to an existing document attached to the process instance that contains the activity.
+     *         If the specified documentName does not refer to an existing document attached to the process instance
+     *         that contains the activity.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    Document getDocumentAtActivityInstanceCompletion(long activityInstanceId, String documentName) throws DocumentNotFoundException;
+    Document getDocumentAtActivityInstanceCompletion(long activityInstanceId, String documentName)
+            throws DocumentNotFoundException;
 
     /**
-     * Get the number of documents attached to the specified process instance. A document with multiple versions is counted once.
+     * Get the number of documents attached to the specified process instance. A document with multiple versions is
+     * counted once.
      *
      * @param processInstanceId
      *        The process instance identifier
@@ -392,12 +420,14 @@ public interface DocumentAPI {
      *         when an error occurs during the search
      * @since 6.0
      */
-    SearchResult<Document> searchDocumentsSupervisedBy(long userId, SearchOptions searchOptions) throws UserNotFoundException, SearchException;
+    SearchResult<Document> searchDocumentsSupervisedBy(long userId, SearchOptions searchOptions)
+            throws UserNotFoundException, SearchException;
 
     /**
-     * Search for archived documents that meet the search options. An archived document is a document that is not the latest version.
-     *
+     * Search for archived documents that meet the search options. An archived document is a document that is not the
+     * latest version.
      * -- ex: Retrieve documents of a given archived case --
+     *
      * <pre>
      * {@code
      *   public List<ArchivedDocument> retrieveDocuments(DocumentAPI documentAPI, ArchivedProcessInstance archivedProcessInstance) {
@@ -407,7 +437,7 @@ public interface DocumentAPI {
      *       return documentAPI.searchArchivedDocuments(searchOptions).getResult();
      *   }
      * }
-     * </pre>  
+     * </pre>
      *
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
@@ -421,7 +451,8 @@ public interface DocumentAPI {
     SearchResult<ArchivedDocument> searchArchivedDocuments(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search for archived documents that match the search options and are supervised by the specified user. An archived document is a document that is not the
+     * Search for archived documents that match the search options and are supervised by the specified user. An archived
+     * document is a document that is not the
      * latest version.
      *
      * @param userId
@@ -437,7 +468,8 @@ public interface DocumentAPI {
      *         when an error occurs during the search
      * @since 6.0
      */
-    SearchResult<ArchivedDocument> searchArchivedDocumentsSupervisedBy(long userId, SearchOptions searchOptions) throws UserNotFoundException, SearchException;
+    SearchResult<ArchivedDocument> searchArchivedDocumentsSupervisedBy(long userId, SearchOptions searchOptions)
+            throws UserNotFoundException, SearchException;
 
     /**
      * Get an ArchivedDocument based on it's id.
@@ -451,7 +483,8 @@ public interface DocumentAPI {
      *         when the specified identifier does not refer to an archived document
      * @since 6.0
      */
-    ArchivedDocument getArchivedProcessDocument(final long archivedProcessDocumentId) throws ArchivedDocumentNotFoundException;
+    ArchivedDocument getArchivedProcessDocument(final long archivedProcessDocumentId)
+            throws ArchivedDocumentNotFoundException;
 
     /**
      * Get the latest version of the document with the specified identifier.
@@ -483,7 +516,8 @@ public interface DocumentAPI {
      * @throws DocumentNotFoundException
      * @since 6.4.0
      */
-    List<Document> getDocumentList(long processInstanceId, String name, int fromIndex, int numberOfResult) throws DocumentNotFoundException;
+    List<Document> getDocumentList(long processInstanceId, String name, int fromIndex, int numberOfResult)
+            throws DocumentNotFoundException;
 
     /**
      * Set the document list on a specified process
@@ -498,12 +532,14 @@ public interface DocumentAPI {
      * @see org.bonitasoft.engine.bpm.process.ProcessInstance#getId()
      * @since 6.4.0
      */
-    void setDocumentList(long processInstanceId, String name, List<DocumentValue> documentsValues) throws DocumentNotFoundException, DocumentException;
+    void setDocumentList(long processInstanceId, String name, List<DocumentValue> documentsValues)
+            throws DocumentNotFoundException, DocumentException;
 
     /**
      * Remove the content of an archived document while keeping it's metadata.
      * <p>
-     * After calling this method you will not be able to retrieve the content of the document since it will be erased from the database.
+     * After calling this method you will not be able to retrieve the content of the document since it will be erased
+     * from the database.
      * This method can be useful for keeping history of a document without overloading the database.
      * </p>
      *

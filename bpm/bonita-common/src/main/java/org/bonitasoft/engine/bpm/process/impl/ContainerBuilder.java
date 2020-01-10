@@ -26,9 +26,9 @@ public interface ContainerBuilder extends FlowElementBuilder {
      * {@link org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addDocumentResource(org.bonitasoft.engine.bpm.bar.BarResource)}
      *
      * @param name
-     *      name of the document definition
+     *        name of the document definition
      * @return
-     *      the builder
+     *         the builder
      */
     DocumentDefinitionBuilder addDocumentDefinition(final String name);
 

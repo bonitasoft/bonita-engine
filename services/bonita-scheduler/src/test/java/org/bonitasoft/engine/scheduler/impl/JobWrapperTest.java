@@ -41,8 +41,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class JobWrapperTest {
 
-
-
     private JobWrapper jobWrapper;
     @Mock
     private TechnicalLoggerService logger;
@@ -59,13 +57,11 @@ public class JobWrapperTest {
     @Mock
     private StatelessJob job;
 
-
     @Before
-    public void before(){
-        jobWrapper = new JobWrapper(new JobIdentifier(145, 2, "MyJob"), job, logger, 2, eventService, sessionAccessor, transactionService, persistenceService, jobService);
+    public void before() {
+        jobWrapper = new JobWrapper(new JobIdentifier(145, 2, "MyJob"), job, logger, 2, eventService, sessionAccessor,
+                transactionService, persistenceService, jobService);
     }
-
-
 
     @Test
     public void should_executeJob_execute_the_job() throws Exception {
@@ -93,7 +89,7 @@ public class JobWrapperTest {
 
             jobWrapper.execute();
             fail("should have thrown exception");
-        }catch (SJobExecutionException e){
+        } catch (SJobExecutionException e) {
             assertThat(e.getCause()).isInstanceOf(RuntimeException.class);
         }
         //then

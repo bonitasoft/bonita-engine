@@ -36,12 +36,18 @@ public class SearchProfileMemberRoleDescriptor extends SearchEntityDescriptor {
 
     public SearchProfileMemberRoleDescriptor() {
         searchEntityKeys = new HashMap<String, FieldDescriptor>(6);
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.ID, new FieldDescriptor(SProfileMember.class, SProfileMember.ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.PROFILE_ID, new FieldDescriptor(SProfileMember.class, SProfileMember.PROFILE_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.ROLE_ID, new FieldDescriptor(SProfileMember.class, SProfileMember.ROLE_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.USER_ID, new FieldDescriptor(SProfileMember.class, SProfileMember.USER_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.GROUP_ID, new FieldDescriptor(SProfileMember.class, SProfileMember.GROUP_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, SRole.NAME));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.ID,
+                new FieldDescriptor(SProfileMember.class, SProfileMember.ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.PROFILE_ID,
+                new FieldDescriptor(SProfileMember.class, SProfileMember.PROFILE_ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.ROLE_ID,
+                new FieldDescriptor(SProfileMember.class, SProfileMember.ROLE_ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.USER_ID,
+                new FieldDescriptor(SProfileMember.class, SProfileMember.USER_ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.GROUP_ID,
+                new FieldDescriptor(SProfileMember.class, SProfileMember.GROUP_ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1,
+                new FieldDescriptor(SRole.class, SRole.NAME));
 
         profileMemberAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> roleFields = new HashSet<String>(1);

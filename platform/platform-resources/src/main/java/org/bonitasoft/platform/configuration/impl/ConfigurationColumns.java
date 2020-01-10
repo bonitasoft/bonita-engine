@@ -17,6 +17,7 @@ package org.bonitasoft.platform.configuration.impl;
  * @author Laurent Leseigneur
  */
 public interface ConfigurationColumns {
+
     int COLUMN_INDEX_TENANT_ID = 1;
     int COLUMN_INDEX_TYPE = 2;
     int COLUMN_INDEX_RESOURCE_NAME = 3;

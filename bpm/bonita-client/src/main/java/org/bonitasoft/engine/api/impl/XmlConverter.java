@@ -19,11 +19,10 @@ import java.io.ObjectOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import org.bonitasoft.engine.api.BonitaStackTraceElementConverter;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
+import org.bonitasoft.engine.api.BonitaStackTraceElementConverter;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 
 public class XmlConverter {
 
@@ -38,7 +37,7 @@ public class XmlConverter {
 
     public String toXML(final Object object) {
         final StringWriter stringWriter = new StringWriter();
-        try (final ObjectOutputStream out = XSTREAM.createObjectOutputStream(stringWriter)){
+        try (final ObjectOutputStream out = XSTREAM.createObjectOutputStream(stringWriter)) {
             out.writeObject(object);
         } catch (IOException e) {
             throw new BonitaRuntimeException("Unable to serialize object " + object, e);

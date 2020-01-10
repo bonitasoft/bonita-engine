@@ -22,20 +22,26 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SWaitingMessageEventBuilderFactoryImpl extends SWaitingEventKeyProviderBuilderFactoryImpl implements SWaitingMessageEventBuilderFactory {
+public class SWaitingMessageEventBuilderFactoryImpl extends SWaitingEventKeyProviderBuilderFactoryImpl
+        implements SWaitingMessageEventBuilderFactory {
 
     @Override
-    public SWaitingMessageEventBuilder createNewWaitingMessageStartEventInstance(final long processdefinitionId, final String messageName,
+    public SWaitingMessageEventBuilder createNewWaitingMessageStartEventInstance(final long processdefinitionId,
+            final String messageName,
             final String processName, final long flowNodeDefinitionId, final String flowNodeName) {
-        final SWaitingMessageEvent entity = new SWaitingMessageEvent(SBPMEventType.START_EVENT, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, messageName);
+        final SWaitingMessageEvent entity = new SWaitingMessageEvent(SBPMEventType.START_EVENT, processdefinitionId,
+                processName, flowNodeDefinitionId, flowNodeName, messageName);
         return new SWaitingMessageEventBuilderImpl(entity);
     }
 
     @Override
-    public SWaitingMessageEventBuilder createNewWaitingMessageEventSubProcInstance(final long processdefinitionId, final long parentProcessInstanceId,
-            final long rootProcessInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
+    public SWaitingMessageEventBuilder createNewWaitingMessageEventSubProcInstance(final long processdefinitionId,
+            final long parentProcessInstanceId,
+            final long rootProcessInstanceId, final String messageName, final String processName,
+            final long flowNodeDefinitionId, final String flowNodeName,
             final long subProcessId) {
-        final SWaitingMessageEvent entity = new SWaitingMessageEvent(SBPMEventType.EVENT_SUB_PROCESS, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName,
+        final SWaitingMessageEvent entity = new SWaitingMessageEvent(SBPMEventType.EVENT_SUB_PROCESS,
+                processdefinitionId, processName, flowNodeDefinitionId, flowNodeName,
                 messageName);
         entity.setRootProcessInstanceId(rootProcessInstanceId);
         entity.setParentProcessInstanceId(parentProcessInstanceId);
@@ -44,9 +50,12 @@ public class SWaitingMessageEventBuilderFactoryImpl extends SWaitingEventKeyProv
     }
 
     @Override
-    public SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(final long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
-            final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName) {
-        final SWaitingMessageEvent entity = new SWaitingMessageEvent(SBPMEventType.INTERMEDIATE_CATCH_EVENT, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName,
+    public SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(final long processdefinitionId,
+            final long rootProcessInstanceId, final long processInstanceId,
+            final long flowNodeInstanceId, final String messageName, final String processName,
+            final long flowNodeDefinitionId, final String flowNodeName) {
+        final SWaitingMessageEvent entity = new SWaitingMessageEvent(SBPMEventType.INTERMEDIATE_CATCH_EVENT,
+                processdefinitionId, processName, flowNodeDefinitionId, flowNodeName,
                 messageName);
         entity.setRootProcessInstanceId(rootProcessInstanceId);
         entity.setParentProcessInstanceId(processInstanceId);
@@ -55,9 +64,12 @@ public class SWaitingMessageEventBuilderFactoryImpl extends SWaitingEventKeyProv
     }
 
     @Override
-    public SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(final long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
-            final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName) {
-        final SWaitingMessageEvent entity = new SWaitingMessageEvent(SBPMEventType.BOUNDARY_EVENT, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, messageName);
+    public SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(final long processdefinitionId,
+            final long rootProcessInstanceId, final long processInstanceId,
+            final long flowNodeInstanceId, final String messageName, final String processName,
+            final long flowNodeDefinitionId, final String flowNodeName) {
+        final SWaitingMessageEvent entity = new SWaitingMessageEvent(SBPMEventType.BOUNDARY_EVENT, processdefinitionId,
+                processName, flowNodeDefinitionId, flowNodeName, messageName);
         entity.setRootProcessInstanceId(rootProcessInstanceId);
         entity.setParentProcessInstanceId(processInstanceId);
         entity.setFlowNodeInstanceId(flowNodeInstanceId);
@@ -66,8 +78,10 @@ public class SWaitingMessageEventBuilderFactoryImpl extends SWaitingEventKeyProv
 
     @Override
     public SWaitingMessageEventBuilder createNewInstance(final SWaitingMessageEvent waitingMessage) {
-        final SWaitingMessageEvent entity = new SWaitingMessageEvent(waitingMessage.getEventType(), waitingMessage.getProcessDefinitionId(), waitingMessage.getProcessName(),
-                waitingMessage.getFlowNodeDefinitionId(), waitingMessage.getFlowNodeName(), waitingMessage.getMessageName());
+        final SWaitingMessageEvent entity = new SWaitingMessageEvent(waitingMessage.getEventType(),
+                waitingMessage.getProcessDefinitionId(), waitingMessage.getProcessName(),
+                waitingMessage.getFlowNodeDefinitionId(), waitingMessage.getFlowNodeName(),
+                waitingMessage.getMessageName());
         entity.setRootProcessInstanceId(waitingMessage.getRootProcessInstanceId());
         entity.setParentProcessInstanceId(waitingMessage.getParentProcessInstanceId());
         entity.setFlowNodeInstanceId(waitingMessage.getFlowNodeInstanceId());

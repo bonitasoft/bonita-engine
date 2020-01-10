@@ -47,12 +47,14 @@ public class ProfilesUpdaterRestartHandlerTest {
 
     @Before
     public void before() throws Exception {
-        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService).executeInTransaction(any());
+        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService)
+                .executeInTransaction(any());
     }
 
     @Test
     public void should_execute_default_profiles_update_after_service_start() throws Exception {
-        profilesUpdaterRestartHandler = spy(new ProfilesUpdaterRestartHandler(1L, new TechnicalLoggerSLF4JImpl(), profilesImporter, transactionService));
+        profilesUpdaterRestartHandler = spy(new ProfilesUpdaterRestartHandler(1L, new TechnicalLoggerSLF4JImpl(),
+                profilesImporter, transactionService));
         doReturn(defaultProfilesUpdater).when(profilesUpdaterRestartHandler).getDefaultProfilesUpdater();
 
         profilesUpdaterRestartHandler.afterServicesStart();

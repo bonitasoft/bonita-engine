@@ -29,8 +29,9 @@ public class SFailedJobImpl implements SFailedJob {
     private final long lastUpdateDate;
     private final String lastMessage;
 
-    public SFailedJobImpl(final long jobDescriptorId, final String jobName, final String description, long retryNumber, final long lastUpdateDate,
-                          final String lastMessage) {
+    public SFailedJobImpl(final long jobDescriptorId, final String jobName, final String description, long retryNumber,
+            final long lastUpdateDate,
+            final String lastMessage) {
         this.jobDescriptorId = jobDescriptorId;
         this.jobName = jobName;
         this.description = description;

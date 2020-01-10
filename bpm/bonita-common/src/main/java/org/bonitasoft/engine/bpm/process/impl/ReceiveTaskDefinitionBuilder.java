@@ -24,7 +24,8 @@ import org.bonitasoft.engine.operation.Operation;
  */
 public class ReceiveTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
-    public ReceiveTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
+    public ReceiveTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl process,
             final String name, final String messageName) {
         super(process, processDefinitionBuilder, new ReceiveTaskDefinitionImpl(name, messageName));
     }
@@ -35,7 +36,8 @@ public class ReceiveTaskDefinitionBuilder extends ActivityDefinitionBuilder {
      * It's possible to define up to five correlations. If more then five correlations are defined, the
      * process becomes invalid.
      * <p>
-     * The expressions representing correlation key and correlation value are evaluated once during the flow node initialization
+     * The expressions representing correlation key and correlation value are evaluated once during the flow node
+     * initialization
      *
      * @param correlationKey expression representing the correlation key
      * @param value expression representing the correlation value
@@ -45,16 +47,18 @@ public class ReceiveTaskDefinitionBuilder extends ActivityDefinitionBuilder {
         final ReceiveTaskDefinitionImpl receiveTask = getActivity();
         receiveTask.addCorrelation(correlationKey, value);
         if (receiveTask.getTrigger().getCorrelations().size() > 5) {
-            getProcessBuilder().addError("The limit of correlation keys are 5 on receive task: " + receiveTask.getName());
+            getProcessBuilder()
+                    .addError("The limit of correlation keys are 5 on receive task: " + receiveTask.getName());
         }
         return this;
     }
 
     /**
-     * Adds the given operation on this message event. Operations added here can be used to initialize process data from message content.
+     * Adds the given operation on this message event. Operations added here can be used to initialize process data from
+     * message content.
      *
      * @param operation
-     *            operation to be added
+     *        operation to be added
      * @return
      */
     public ReceiveTaskDefinitionBuilder addMessageOperation(final Operation operation) {

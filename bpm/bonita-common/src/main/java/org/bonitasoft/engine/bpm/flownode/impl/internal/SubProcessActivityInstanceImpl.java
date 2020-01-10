@@ -26,7 +26,8 @@ public class SubProcessActivityInstanceImpl extends ActivityInstanceImpl impleme
 
     private final boolean triggeredByEvent;
 
-    public SubProcessActivityInstanceImpl(final String name, final long flownodeDefinitionId, final boolean triggeredByEvent) {
+    public SubProcessActivityInstanceImpl(final String name, final long flownodeDefinitionId,
+            final boolean triggeredByEvent) {
         super(name, flownodeDefinitionId);
         this.triggeredByEvent = triggeredByEvent;
     }

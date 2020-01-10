@@ -22,14 +22,14 @@ public interface QueriableLogSessionProvider {
 
     /**
      * Get the logged user
-     * 
+     *
      * @return the logged user
      */
     String getUserId();
 
     /**
      * Get the cluster node when the engine is running in a cluster.
-     * 
+     *
      * @return the cluster node
      */
     String getClusterNode();

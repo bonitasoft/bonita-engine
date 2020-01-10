@@ -229,11 +229,13 @@ public class APITestUtil extends PlatformTestUtil {
         loginOnDefaultTenantWith(userName, password);
     }
 
-    public void addMappingOfActorsForRole(final String actorName, final long roleId, final ProcessDefinition definition) throws BonitaException {
+    public void addMappingOfActorsForRole(final String actorName, final long roleId, final ProcessDefinition definition)
+            throws BonitaException {
         getProcessAPI().addRoleToActor(actorName, definition, roleId);
     }
 
-    public void addMappingOfActorsForRoleAndGroup(final String actorName, final long roleId, final long groupId, final ProcessDefinition definition)
+    public void addMappingOfActorsForRoleAndGroup(final String actorName, final long roleId, final long groupId,
+            final ProcessDefinition definition)
             throws BonitaException {
         getProcessAPI().addRoleAndGroupToActor(actorName, definition, roleId, groupId);
     }
@@ -241,14 +243,18 @@ public class APITestUtil extends PlatformTestUtil {
     /**
      * First actor means "first one in Alphanumerical order !"
      */
-    public void addUserToFirstActorOfProcess(final long userId, final ProcessDefinition processDefinition) throws BonitaException {
-        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC);
+    public void addUserToFirstActorOfProcess(final long userId, final ProcessDefinition processDefinition)
+            throws BonitaException {
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1,
+                ActorCriterion.NAME_ASC);
         final ActorInstance actor = actors.get(0);
         getProcessAPI().addUserToActor(actor.getId(), userId);
     }
 
-    public ActorInstance getActor(final String actorName, final ProcessDefinition processDefinition) throws ActorNotFoundException {
-        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 50, ActorCriterion.NAME_ASC);
+    public ActorInstance getActor(final String actorName, final ProcessDefinition processDefinition)
+            throws ActorNotFoundException {
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 50,
+                ActorCriterion.NAME_ASC);
         final ActorInstance actorInstance = getActorInstance(actors, actorName);
         if (actorInstance == null) {
             throw new ActorNotFoundException(actorName, processDefinition);
@@ -269,7 +275,8 @@ public class APITestUtil extends PlatformTestUtil {
         return getIdentityAPI().createUser(userName, password);
     }
 
-    public User createUser(final String userName, final String password, final String firstName, final String lastName) throws BonitaException {
+    public User createUser(final String userName, final String password, final String firstName, final String lastName)
+            throws BonitaException {
         return getIdentityAPI().createUser(userName, password, firstName, lastName);
     }
 
@@ -346,8 +353,10 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
-    public UserMembership createUserMembership(final String userName, final String roleName, final String groupName) throws BonitaException {
-        return getIdentityAPI().addUserMembership(getIdentityAPI().getUserByUserName(userName).getId(), getIdentityAPI().getGroupByPath(groupName).getId(),
+    public UserMembership createUserMembership(final String userName, final String roleName, final String groupName)
+            throws BonitaException {
+        return getIdentityAPI().addUserMembership(getIdentityAPI().getUserByUserName(userName).getId(),
+                getIdentityAPI().getGroupByPath(groupName).getId(),
                 getIdentityAPI().getRoleByName(roleName).getId());
     }
 
@@ -386,8 +395,10 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
-    public ProcessDefinition deployAndEnableProcess(final DesignProcessDefinition designProcessDefinition) throws BonitaException {
-        return deployAndEnableProcess(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+    public ProcessDefinition deployAndEnableProcess(final DesignProcessDefinition designProcessDefinition)
+            throws BonitaException {
+        return deployAndEnableProcess(new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(designProcessDefinition).done());
     }
 
     public ProcessDefinition deployAndEnableProcess(final BusinessArchive businessArchive) throws BonitaException {
@@ -397,19 +408,24 @@ public class APITestUtil extends PlatformTestUtil {
 
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final User user)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName, final User user)
             throws BonitaException {
-        return deployAndEnableProcessWithActor(designProcessDefinition, Collections.singletonList(actorName), Collections.singletonList(user));
+        return deployAndEnableProcessWithActor(designProcessDefinition, Collections.singletonList(actorName),
+                Collections.singletonList(user));
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName,
             final List<User> users)
             throws BonitaException {
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(designProcessDefinition).done();
         return deployAndEnableProcessWithActor(businessArchive, actorName, users);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final String actorName, final List<User> users)
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive,
+            final String actorName, final List<User> users)
             throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(businessArchive);
         for (final User user : users) {
@@ -419,19 +435,25 @@ public class APITestUtil extends PlatformTestUtil {
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final String actorName,
+    public ProcessDefinition deployAndEnableProcessWithActorAndParameters(
+            final DesignProcessDefinition designProcessDefinition, final String actorName,
             final User user, final Map<String, String> parameters) throws BonitaException {
-        return deployAndEnableProcessWithActorAndParameters(designProcessDefinition, Collections.singletonList(actorName), Collections.singletonList(user),
+        return deployAndEnableProcessWithActorAndParameters(designProcessDefinition,
+                Collections.singletonList(actorName), Collections.singletonList(user),
                 parameters);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final List<String> actorsName,
             final List<User> users) throws BonitaException {
-        return deployAndEnableProcessWithActor(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done(),
+        return deployAndEnableProcessWithActor(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                        .done(),
                 actorsName, users);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final List<String> actorsName, final List<User> users)
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive,
+            final List<String> actorsName, final List<User> users)
             throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(businessArchive);
         for (int i = 0; i < users.size(); i++) {
@@ -441,13 +463,17 @@ public class APITestUtil extends PlatformTestUtil {
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final Map<String, List<User>> actorUsers)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final Map<String, List<User>> actorUsers)
             throws BonitaException {
-        return deployAndEnableProcessWithActor(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done(),
+        return deployAndEnableProcessWithActor(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                        .done(),
                 actorUsers);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final Map<String, List<User>> actorUsers)
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive,
+            final Map<String, List<User>> actorUsers)
             throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(businessArchive);
         for (final Entry<String, List<User>> actorUser : actorUsers.entrySet()) {
@@ -466,7 +492,8 @@ public class APITestUtil extends PlatformTestUtil {
         return getProcessAPI().deploy(businessArchive);
     }
 
-    private void enableProcess(final ProcessDefinition processDefinition) throws ProcessDefinitionNotFoundException, ProcessEnablementException {
+    private void enableProcess(final ProcessDefinition processDefinition)
+            throws ProcessDefinitionNotFoundException, ProcessEnablementException {
         try {
             getProcessAPI().enableProcess(processDefinition.getId());
         } catch (final ProcessEnablementException e) {
@@ -475,32 +502,40 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final String actorName, final User user)
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive,
+            final String actorName, final User user)
             throws BonitaException {
-        return deployAndEnableProcessWithActor(businessArchive, Collections.singletonList(actorName), Collections.singletonList(user));
+        return deployAndEnableProcessWithActor(businessArchive, Collections.singletonList(actorName),
+                Collections.singletonList(user));
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
+    public ProcessDefinition deployAndEnableProcessWithActorAndParameters(
+            final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
             final List<User> users, final Map<String, String> parameters) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        final BusinessArchive businessArchive = businessArchiveBuilder.setParameters(parameters).setProcessDefinition(designProcessDefinition).done();
+        final BusinessArchive businessArchive = businessArchiveBuilder.setParameters(parameters)
+                .setProcessDefinition(designProcessDefinition).done();
         return deployAndEnableProcessWithActor(businessArchive, actorsName, users);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Group group)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName, final Group group)
             throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                        .done());
         getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName,
             final Group... groups)
             throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                        .done());
         for (final Group group : groups) {
             getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
         }
@@ -524,19 +559,23 @@ public class APITestUtil extends PlatformTestUtil {
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName, final Role role)
             throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                        .done());
         addMappingOfActorsForRole(actorName, role.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role... roles)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName, final Role... roles)
             throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                        .done());
         for (final Role role : roles) {
             addMappingOfActorsForRole(actorName, role.getId(), processDefinition);
         }
@@ -544,82 +583,104 @@ public class APITestUtil extends PlatformTestUtil {
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role,
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName, final Role role,
             final Group group) throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                        .done());
         addMappingOfActorsForRoleAndGroup(actorName, role.getId(), group.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final long userId)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName, final long userId)
             throws BonitaException {
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = deployProcess(businessArchive);
         getProcessAPI().addUserToActor(actorName, processDefinition, userId);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+    public ProcessDefinition deployAndEnableProcessWithConnector(
+            final ProcessDefinitionBuilder processDefinitionBuilder,
+            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies)
+            throws BonitaException {
+        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
+                .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                        connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
         return deployAndEnableProcess(businessArchiveBuilder.done());
     }
 
-    public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String connectorImplName,
+    public ProcessDefinition deployAndEnableProcessWithConnector(
+            final ProcessDefinitionBuilder processDefinitionBuilder, final String connectorImplName,
             final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
         return deployAndEnableProcessWithConnector(processDefinitionBuilder,
                 Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource(connectorImplName, clazz)),
                 Collections.singletonList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)));
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActorAndConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
-            final User user, final String name, final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
+    public ProcessDefinition deployAndEnableProcessWithActorAndConnector(
+            final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
+            final User user, final String name, final Class<? extends AbstractConnector> clazz, final String jarName)
+            throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
                 Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
                 Collections.singletonList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), null);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(
+            final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user) throws BonitaException, IOException {
-        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestConnectorEngineExecutionContext.impl",
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user,
+                "TestConnectorEngineExecutionContext.impl",
                 TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final String actorName, final User user, final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies,
+    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(
+            final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final List<BarResource> connectorImplementations,
+            final List<BarResource> generateConnectorDependencies,
             final Map<String, String> parameters) throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
+                .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                        connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
         if (parameters != null) {
             businessArchiveBuilder.setParameters(parameters);
         }
         return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final String actorName, final User user, final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies,
+    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndUserFilter(
+            final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final List<BarResource> connectorImplementations,
+            final List<BarResource> generateConnectorDependencies,
             final List<BarResource> userFilters) throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, userFilters);
+        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
+                .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                        connectorImplementations, generateConnectorDependencies, userFilters);
         return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final String actorName, final User user, final Map<String, String> parameters, final String name, final Class<? extends AbstractConnector> clazz,
+    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(
+            final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final Map<String, String> parameters, final String name,
+            final Class<? extends AbstractConnector> clazz,
             final String jarName) throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
                 Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
                 Collections.singletonList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), parameters);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
+    public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(
+            final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
             throws BonitaException {
-        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
+        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user,
+                Collections.<BarResource> emptyList(),
                 generateFilterDependencies, userFilters);
     }
 
@@ -641,7 +702,8 @@ public class APITestUtil extends PlatformTestUtil {
         // Delete all archived process instances
         long nbDeletedArchivedProcessInstances;
         do {
-            nbDeletedArchivedProcessInstances = getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 100);
+            nbDeletedArchivedProcessInstances = getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0,
+                    100);
         } while (nbDeletedArchivedProcessInstances > 0);
 
         getProcessAPI().deleteProcessDefinition(processDefinitionId);
@@ -676,7 +738,8 @@ public class APITestUtil extends PlatformTestUtil {
         deleteProcessInstanceAndArchived(Arrays.asList(processDefinitions));
     }
 
-    public void deleteProcessInstanceAndArchived(final List<ProcessDefinition> processDefinitions) throws BonitaException {
+    public void deleteProcessInstanceAndArchived(final List<ProcessDefinition> processDefinitions)
+            throws BonitaException {
         if (processDefinitions != null) {
             for (final ProcessDefinition processDefinition : processDefinitions) {
                 deleteProcessInstanceAndArchived(processDefinition.getId());
@@ -709,7 +772,8 @@ public class APITestUtil extends PlatformTestUtil {
         return getIdentityAPI().createGroup(groupName, parentGroupPath);
     }
 
-    public Group createGroup(final String name, final String displayName, final String description) throws CreationException {
+    public Group createGroup(final String name, final String displayName, final String description)
+            throws CreationException {
         final GroupCreator groupCreator = new GroupCreator(name);
         groupCreator.setDisplayName(displayName).setDescription(description);
         return getIdentityAPI().createGroup(groupCreator);
@@ -719,7 +783,8 @@ public class APITestUtil extends PlatformTestUtil {
         return getIdentityAPI().createRole(roleName);
     }
 
-    public void assignAndExecuteStep(final ActivityInstance activityInstance, final long userId) throws BonitaException {
+    public void assignAndExecuteStep(final ActivityInstance activityInstance, final long userId)
+            throws BonitaException {
         assignAndExecuteStep(activityInstance.getId(), userId);
     }
 
@@ -736,7 +801,8 @@ public class APITestUtil extends PlatformTestUtil {
         getProcessAPI().executeFlowNode(activityInstanceId);
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final String taskName, final User user) throws Exception {
+    public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final String taskName, final User user)
+            throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(taskName);
         assignAndExecuteStep(humanTaskInstance, user);
         return humanTaskInstance;
@@ -748,13 +814,16 @@ public class APITestUtil extends PlatformTestUtil {
         return humanTaskInstanceId;
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
-        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
+    public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final ProcessInstance processInstance,
+            final String taskName, final User user) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName,
+                DEFAULT_TIMEOUT);
         assignAndExecuteStep(humanTaskInstance, user);
         return humanTaskInstance;
     }
 
-    public long waitForUserTaskAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
+    public long waitForUserTaskAndExecuteIt(final ProcessInstance processInstance, final String taskName,
+            final User user) throws Exception {
         final long humanTaskInstanceId = waitForUserTask(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
         assignAndExecuteStep(humanTaskInstanceId, user);
         return humanTaskInstanceId;
@@ -766,24 +835,27 @@ public class APITestUtil extends PlatformTestUtil {
         return humanTaskInstance;
     }
 
-    public HumanTaskInstance waitForUserTaskAndAssignIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
+    public HumanTaskInstance waitForUserTaskAndAssignIt(final ProcessInstance processInstance, final String taskName,
+            final User user) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         return humanTaskInstance;
     }
 
-
-    public HumanTaskInstance waitForUserTaskAssignAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user, Map<String, Serializable> inputs) throws Exception {
+    public HumanTaskInstance waitForUserTaskAssignAndExecuteIt(final ProcessInstance processInstance,
+            final String taskName, final User user, Map<String, Serializable> inputs) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
         getProcessAPI().assignAndExecuteUserTask(user.getId(), humanTaskInstance.getId(), inputs);
         return humanTaskInstance;
     }
 
-    public HumanTaskInstance waitForUserTaskAndGetIt(final ProcessInstance processInstance, final String taskName) throws Exception {
+    public HumanTaskInstance waitForUserTaskAndGetIt(final ProcessInstance processInstance, final String taskName)
+            throws Exception {
         return waitForUserTaskAndGetIt(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
     }
 
-    public HumanTaskInstance waitForUserTaskAndGetIt(final long processInstanceId, final String taskName) throws Exception {
+    public HumanTaskInstance waitForUserTaskAndGetIt(final long processInstanceId, final String taskName)
+            throws Exception {
         return waitForUserTaskAndGetIt(processInstanceId, taskName, DEFAULT_TIMEOUT);
     }
 
@@ -799,14 +871,16 @@ public class APITestUtil extends PlatformTestUtil {
         return waitForUserTask(-1, taskName, DEFAULT_TIMEOUT);
     }
 
-    private HumanTaskInstance waitForUserTaskAndGetIt(final long processInstanceId, final String taskName, final int timeout) throws Exception {
+    private HumanTaskInstance waitForUserTaskAndGetIt(final long processInstanceId, final String taskName,
+            final int timeout) throws Exception {
         final long activityInstanceId = waitForUserTask(processInstanceId, taskName, timeout);
         final HumanTaskInstance getHumanTaskInstance = getHumanTaskInstance(activityInstanceId);
         assertNotNull(getHumanTaskInstance);
         return getHumanTaskInstance;
     }
 
-    private long waitForUserTask(final long processInstanceId, final String taskName, final int timeout) throws CommandNotFoundException,
+    private long waitForUserTask(final long processInstanceId, final String taskName, final int timeout)
+            throws CommandNotFoundException,
             CommandParameterizationException, CommandExecutionException, TimeoutException {
         final Map<String, Serializable> readyTaskEvent;
         if (processInstanceId > 0) {
@@ -817,14 +891,16 @@ public class APITestUtil extends PlatformTestUtil {
         return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent, timeout);
     }
 
-    private HumanTaskInstance getHumanTaskInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {
+    private HumanTaskInstance getHumanTaskInstance(final Long id)
+            throws ActivityInstanceNotFoundException, RetrieveException {
         if (id != null) {
             return getProcessAPI().getHumanTaskInstance(id);
         }
         throw new RuntimeException("no id returned for human task ");
     }
 
-    private ActivityInstance getActivityInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {
+    private ActivityInstance getActivityInstance(final Long id)
+            throws ActivityInstanceNotFoundException, RetrieveException {
         if (id != null) {
             return getProcessAPI().getActivityInstance(id);
         }
@@ -853,7 +929,8 @@ public class APITestUtil extends PlatformTestUtil {
 
     @Deprecated
     public List<HumanTaskInstance> waitForPendingTasks(final long userId, final int nbPendingTasks) throws Exception {
-        final WaitForPendingTasks waitUntil = new WaitForPendingTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbPendingTasks, userId, getProcessAPI());
+        final WaitForPendingTasks waitUntil = new WaitForPendingTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT,
+                nbPendingTasks, userId, getProcessAPI());
         assertTrue("no pending user task instances are found", waitUntil.waitUntil());
         return waitUntil.getResults();
     }
@@ -863,15 +940,18 @@ public class APITestUtil extends PlatformTestUtil {
         return waitForPendingTasks(user.getId(), nbPendingTasks);
     }
 
-    public StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName) throws Exception {
+    public StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName)
+            throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
         final ActivityInstance task = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
         return new StartProcessUntilStep(processInstance, task);
     }
 
     @Deprecated
-    public ArchivedActivityInstance waitForArchivedActivity(final long activityId, final TestStates state) throws Exception {
-        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityId, state,
+    public ArchivedActivityInstance waitForArchivedActivity(final long activityId, final TestStates state)
+            throws Exception {
+        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(DEFAULT_REPEAT_EACH,
+                DEFAULT_TIMEOUT, activityId, state,
                 getProcessAPI());
         assertTrue(waitForArchivedActivity.waitUntil());
         final ArchivedActivityInstance archivedActivityInstance = waitForArchivedActivity.getArchivedActivityInstance();
@@ -880,8 +960,10 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public void waitForCompletedArchivedStep(final String value, final long id, final String displayName, final String displayDescription) throws Exception {
-        final WaitForCompletedArchivedStep waitUntil = new WaitForCompletedArchivedStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, value, id, getProcessAPI());
+    public void waitForCompletedArchivedStep(final String value, final long id, final String displayName,
+            final String displayDescription) throws Exception {
+        final WaitForCompletedArchivedStep waitUntil = new WaitForCompletedArchivedStep(DEFAULT_REPEAT_EACH,
+                DEFAULT_TIMEOUT, value, id, getProcessAPI());
         assertTrue(waitUntil.waitUntil());
         final ArchivedHumanTaskInstance saUserTaskInstance = waitUntil.getArchivedTask();
         assertEquals(displayName, saUserTaskInstance.getDisplayName());
@@ -897,68 +979,86 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     private void waitForProcessToFinish(final long processInstanceId, final int timeout) throws Exception {
-        ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceFinishedEvent(processInstanceId), timeout);
+        ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
+                ClientEventUtil.getProcessInstanceFinishedEvent(processInstanceId), timeout);
     }
 
-    public void waitForProcessToBeInState(final ProcessInstance processInstance, final ProcessInstanceState state) throws Exception {
+    public void waitForProcessToBeInState(final ProcessInstance processInstance, final ProcessInstanceState state)
+            throws Exception {
         waitForProcessToBeInState(processInstance.getId(), state);
     }
 
-    public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state) throws Exception {
-        ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceInState(processInstanceId, state.getId()),
+    public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state)
+            throws Exception {
+        ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
+                ClientEventUtil.getProcessInstanceInState(processInstanceId, state.getId()),
                 DEFAULT_TIMEOUT);
     }
 
     public void waitForInitializingProcess() throws Exception {
-        ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceInState(ProcessInstanceState.INITIALIZING.getId()),
+        ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
+                ClientEventUtil.getProcessInstanceInState(ProcessInstanceState.INITIALIZING.getId()),
                 DEFAULT_TIMEOUT);
     }
 
-    private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName, final boolean useRootProcessInstance,
+    private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName,
+            final boolean useRootProcessInstance,
             final int timeout) throws Exception {
         Map<String, Serializable> params;
         if (useRootProcessInstance) {
             params = ClientEventUtil.getFlowNodeInState(processInstanceId, state.getStateName(), flowNodeName);
         } else {
-            params = ClientEventUtil.getFlowNodeInStateWithParentId(processInstanceId, state.getStateName(), flowNodeName);
+            params = ClientEventUtil.getFlowNodeInStateWithParentId(processInstanceId, state.getStateName(),
+                    flowNodeName);
         }
         return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
     }
 
-    public FlowNodeInstance waitForFlowNodeInReadyState(final ProcessInstance processInstance, final String flowNodeName, final boolean useRootProcessInstance)
+    public FlowNodeInstance waitForFlowNodeInReadyState(final ProcessInstance processInstance,
+            final String flowNodeName, final boolean useRootProcessInstance)
             throws Exception {
-        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.READY, flowNodeName, useRootProcessInstance,
+        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.READY, flowNodeName,
+                useRootProcessInstance,
                 DEFAULT_TIMEOUT);
         return getFlowNode(flowNodeInstanceId);
     }
 
-    public FlowNodeInstance waitForFlowNodeInExecutingState(final ProcessInstance processInstance, final String flowNodeName,
+    public FlowNodeInstance waitForFlowNodeInExecutingState(final ProcessInstance processInstance,
+            final String flowNodeName,
             final boolean useRootProcessInstance) throws Exception {
-        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.EXECUTING, useRootProcessInstance);
+        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.EXECUTING,
+                useRootProcessInstance);
         return getFlowNodeInstance(activityId);
     }
 
-    public ArchivedActivityInstance waitForActivityInCompletedState(final ProcessInstance processInstance, final String flowNodeName,
+    public ArchivedActivityInstance waitForActivityInCompletedState(final ProcessInstance processInstance,
+            final String flowNodeName,
             final boolean useRootProcessInstance) throws Exception {
-        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.NORMAL_FINAL, useRootProcessInstance);
+        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.NORMAL_FINAL,
+                useRootProcessInstance);
         // we must wait for the activity to be completely archived:
-        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(30, 8000, activityId, TestStates.NORMAL_FINAL, getProcessAPI());
+        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(30, 8000, activityId,
+                TestStates.NORMAL_FINAL, getProcessAPI());
         assertTrue(waitForArchivedActivity.waitUntil());
         return waitForArchivedActivity.getArchivedActivityInstance();
     }
 
-    public FlowNodeInstance waitForFlowNodeInWaitingState(final ProcessInstance processInstance, final String flowNodeName,
+    public FlowNodeInstance waitForFlowNodeInWaitingState(final ProcessInstance processInstance,
+            final String flowNodeName,
             final boolean useRootProcessInstance) throws Exception {
-        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.WAITING, useRootProcessInstance);
+        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.WAITING,
+                useRootProcessInstance);
         return getFlowNodeInstance(activityId);
     }
 
-    public Long waitForFlowNodeInState(final ProcessInstance processInstance, final String flowNodeName, final TestStates state,
+    public Long waitForFlowNodeInState(final ProcessInstance processInstance, final String flowNodeName,
+            final TestStates state,
             final boolean useRootProcessInstance) throws Exception {
         return waitForFlowNode(processInstance.getId(), state, flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
     }
 
-    public ActivityInstance waitForTaskInState(final ProcessInstance processInstance, final String flowNodeName, final TestStates state) throws Exception {
+    public ActivityInstance waitForTaskInState(final ProcessInstance processInstance, final String flowNodeName,
+            final TestStates state) throws Exception {
         final Long activityId = waitForFlowNode(processInstance.getId(), state, flowNodeName, true, DEFAULT_TIMEOUT);
         return getActivityInstance(activityId);
     }
@@ -971,30 +1071,35 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ActivityInstance waitForTaskToFail(final ProcessInstance processInstance) throws Exception {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getFlowNodeInState(processInstance.getId(), TestStates.FAILED.getStateName()), DEFAULT_TIMEOUT);
+                ClientEventUtil.getFlowNodeInState(processInstance.getId(), TestStates.FAILED.getStateName()),
+                DEFAULT_TIMEOUT);
         return getActivityInstance(activityId);
     }
 
     public FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance) throws Exception {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getFlowNodeInState(processInstance.getId(), TestStates.FAILED.getStateName()), DEFAULT_TIMEOUT);
+                ClientEventUtil.getFlowNodeInState(processInstance.getId(), TestStates.FAILED.getStateName()),
+                DEFAULT_TIMEOUT);
         return getFlowNodeInstance(activityId);
     }
 
     public void waitForFlowNodeInFailedState(final String flowNodeInstanceName) throws Exception {
         final long failedTaskId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getFlowNodeInState(TestStates.FAILED.getStateName(), flowNodeInstanceName), DEFAULT_TIMEOUT);
+                ClientEventUtil.getFlowNodeInState(TestStates.FAILED.getStateName(), flowNodeInstanceName),
+                DEFAULT_TIMEOUT);
         assertNotNull(failedTaskId);
     }
 
-    public FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance, final String flowNodeName) throws Exception {
+    public FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance,
+            final String flowNodeName) throws Exception {
         final Long flowNodeInstanceId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.FAILED, true);
         return getFlowNodeInstance(flowNodeInstanceId);
     }
 
     public GatewayInstance waitForGateway(final ProcessInstance processInstance, final String name) throws Exception {
         final Map<String, Serializable> readyTaskEvent = ClientEventUtil.getFlowNode(processInstance.getId(), name);
-        final Long activityInstanceId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent, DEFAULT_REPEAT_EACH * DEFAULT_TIMEOUT);
+        final Long activityInstanceId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent,
+                DEFAULT_REPEAT_EACH * DEFAULT_TIMEOUT);
         final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(activityInstanceId);
         assertNotNull(flowNodeInstance);
         if (flowNodeInstance instanceof GatewayInstance) {
@@ -1004,34 +1109,42 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public WaitForFinalArchivedActivity waitForFinalArchivedActivity(final String activityName, final ProcessInstance processInstance) throws Exception {
-        final WaitForFinalArchivedActivity waitForFinalArchivedActivity = new WaitForFinalArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityName,
+    public WaitForFinalArchivedActivity waitForFinalArchivedActivity(final String activityName,
+            final ProcessInstance processInstance) throws Exception {
+        final WaitForFinalArchivedActivity waitForFinalArchivedActivity = new WaitForFinalArchivedActivity(
+                DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityName,
                 processInstance.getId(), getProcessAPI());
         assertTrue(activityName + " should be finished and archived", waitForFinalArchivedActivity.waitUntil());
         return waitForFinalArchivedActivity;
     }
 
     @Deprecated
-    public WaitForEvent waitForEventInWaitingState(final ProcessInstance processInstance, final String eventName) throws Exception {
+    public WaitForEvent waitForEventInWaitingState(final ProcessInstance processInstance, final String eventName)
+            throws Exception {
         return waitForEvent(processInstance, eventName, TestStates.WAITING);
     }
 
     @Deprecated
-    public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final TestStates state) throws Exception {
+    public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName,
+            final TestStates state) throws Exception {
         return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance.getId(), eventName, state);
     }
 
     @Deprecated
-    private WaitForEvent waitForEvent(final int repeatEach, final int timeout, final long processInstanceId, final String eventName, final TestStates state)
+    private WaitForEvent waitForEvent(final int repeatEach, final int timeout, final long processInstanceId,
+            final String eventName, final TestStates state)
             throws Exception {
-        final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstanceId, state, getProcessAPI());
+        final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstanceId, state,
+                getProcessAPI());
         assertTrue("Expected 1 activities in " + state + " state", waitForEvent.waitUntil());
         return waitForEvent;
     }
 
     @Deprecated
-    public void checkNbOfOpenTasks(final ProcessInstance processInstance, final String message, final int expectedNbOfOpenActivities) throws Exception {
-        final CheckNbOfOpenActivities checkNbOfOpenActivities = new CheckNbOfOpenActivities(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, false, processInstance,
+    public void checkNbOfOpenTasks(final ProcessInstance processInstance, final String message,
+            final int expectedNbOfOpenActivities) throws Exception {
+        final CheckNbOfOpenActivities checkNbOfOpenActivities = new CheckNbOfOpenActivities(DEFAULT_REPEAT_EACH,
+                DEFAULT_TIMEOUT, false, processInstance,
                 expectedNbOfOpenActivities, getProcessAPI());
         checkNbOfOpenActivities.waitUntil();
         assertEquals(message, expectedNbOfOpenActivities, checkNbOfOpenActivities.getNumberOfOpenActivities());
@@ -1043,29 +1156,35 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public CheckNbPendingTaskOf checkNbPendingTaskOf(final boolean throwExceptions, final int nbOfPendingTasks, final User user) throws Exception {
+    public CheckNbPendingTaskOf checkNbPendingTaskOf(final boolean throwExceptions, final int nbOfPendingTasks,
+            final User user) throws Exception {
         return checkNbPendingTaskOf(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, throwExceptions, nbOfPendingTasks, user);
     }
 
     @Deprecated
-    private CheckNbPendingTaskOf checkNbPendingTaskOf(final int repeatEach, final int timeout, final boolean throwExceptions, final int nbOfPendingTasks,
+    private CheckNbPendingTaskOf checkNbPendingTaskOf(final int repeatEach, final int timeout,
+            final boolean throwExceptions, final int nbOfPendingTasks,
             final User user) throws Exception {
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), repeatEach, timeout, throwExceptions, nbOfPendingTasks,
+        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), repeatEach, timeout,
+                throwExceptions, nbOfPendingTasks,
                 user);
         assertTrue("There isn't " + nbOfPendingTasks + " pending task", checkNbPendingTaskOf.waitUntil());
         return checkNbPendingTaskOf;
     }
 
     @Deprecated
-    public void checkNbOfOpenActivities(final ProcessInstance processInstance, final int nbActivities) throws Exception {
+    public void checkNbOfOpenActivities(final ProcessInstance processInstance, final int nbActivities)
+            throws Exception {
         checkNbOfOpenActivities(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, nbActivities);
     }
 
     @Deprecated
-    private void checkNbOfOpenActivities(final int repeatEach, final int timeout, final ProcessInstance processInstance, final int nbActivities)
+    private void checkNbOfOpenActivities(final int repeatEach, final int timeout, final ProcessInstance processInstance,
+            final int nbActivities)
             throws Exception {
-        assertTrue("Expected " + nbActivities + " OPEN activities for process instance", new CheckNbOfOpenActivities(repeatEach, timeout, true,
-                processInstance, nbActivities, getProcessAPI()).waitUntil());
+        assertTrue("Expected " + nbActivities + " OPEN activities for process instance",
+                new CheckNbOfOpenActivities(repeatEach, timeout, true,
+                        processInstance, nbActivities, getProcessAPI()).waitUntil());
     }
 
     @Deprecated
@@ -1074,69 +1193,87 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    private void checkProcessInstanceIsArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
-        assertTrue(new CheckProcessInstanceIsArchived(repeatEach, timeout, processInstance.getId(), getProcessAPI()).waitUntil());
+    private void checkProcessInstanceIsArchived(final int repeatEach, final int timeout,
+            final ProcessInstance processInstance) throws Exception {
+        assertTrue(new CheckProcessInstanceIsArchived(repeatEach, timeout, processInstance.getId(), getProcessAPI())
+                .waitUntil());
     }
 
     @Deprecated
-    public void checkNbOfArchivedActivityInstances(final ProcessInstance processInstance, final int expected) throws Exception {
+    public void checkNbOfArchivedActivityInstances(final ProcessInstance processInstance, final int expected)
+            throws Exception {
         checkNbOfArchivedActivityInstances(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, expected);
     }
 
     @Deprecated
-    private void checkNbOfArchivedActivityInstances(final int repeatEach, final int timeout, final ProcessInstance processInstance, final int expected)
+    private void checkNbOfArchivedActivityInstances(final int repeatEach, final int timeout,
+            final ProcessInstance processInstance, final int expected)
             throws Exception {
-        assertTrue(new CheckNbOfArchivedActivityInstances(repeatEach, timeout, processInstance, expected, getProcessAPI()).waitUntil());
+        assertTrue(
+                new CheckNbOfArchivedActivityInstances(repeatEach, timeout, processInstance, expected, getProcessAPI())
+                        .waitUntil());
     }
 
     @Deprecated
-    public void checkNbOfArchivedActivities(final ProcessInstance processInstance, final int nbAbortedActivities) throws Exception {
+    public void checkNbOfArchivedActivities(final ProcessInstance processInstance, final int nbAbortedActivities)
+            throws Exception {
         checkNbOfArchivedActivities(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, nbAbortedActivities);
     }
 
     @Deprecated
-    private void checkNbOfArchivedActivities(final int repeatEach, final int timeout, final ProcessInstance processInstance, final int nbAbortedActivities)
+    private void checkNbOfArchivedActivities(final int repeatEach, final int timeout,
+            final ProcessInstance processInstance, final int nbAbortedActivities)
             throws Exception {
-        final CheckNbOfArchivedActivities checkNbOfActivities = new CheckNbOfArchivedActivities(getProcessAPI(), repeatEach, timeout, true, processInstance,
+        final CheckNbOfArchivedActivities checkNbOfActivities = new CheckNbOfArchivedActivities(getProcessAPI(),
+                repeatEach, timeout, true, processInstance,
                 nbAbortedActivities, TestStates.ABORTED);
         final boolean waitUntil = checkNbOfActivities.waitUntil();
-        assertTrue("Expected " + nbAbortedActivities + " in the aboted state. But was " + checkNbOfActivities.getResult().size(), waitUntil);
+        assertTrue("Expected " + nbAbortedActivities + " in the aboted state. But was "
+                + checkNbOfActivities.getResult().size(), waitUntil);
     }
 
     @Deprecated
     public CheckNbOfProcessInstances checkNbOfProcessInstances(final int nbOfProcInst) throws Exception {
-        final CheckNbOfProcessInstances checkNbOfProcessInstances = new CheckNbOfProcessInstances(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbOfProcInst,
+        final CheckNbOfProcessInstances checkNbOfProcessInstances = new CheckNbOfProcessInstances(DEFAULT_REPEAT_EACH,
+                DEFAULT_TIMEOUT, nbOfProcInst,
                 getProcessAPI());
         assertTrue(checkNbOfProcessInstances.waitUntil());
         return checkNbOfProcessInstances;
     }
 
     @Deprecated
-    public CheckNbOfProcessInstances checkNbOfProcessInstances(final int nbOfProcInst, final ProcessInstanceCriterion orderBy) throws Exception {
+    public CheckNbOfProcessInstances checkNbOfProcessInstances(final int nbOfProcInst,
+            final ProcessInstanceCriterion orderBy) throws Exception {
         return checkNbOfProcessInstances(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbOfProcInst, orderBy);
     }
 
     @Deprecated
-    private CheckNbOfProcessInstances checkNbOfProcessInstances(final int repeatEach, final int timeout, final int nbOfProcInst,
+    private CheckNbOfProcessInstances checkNbOfProcessInstances(final int repeatEach, final int timeout,
+            final int nbOfProcInst,
             final ProcessInstanceCriterion orderBy) throws Exception {
-        final CheckNbOfProcessInstances checkNbOfProcessInstances = new CheckNbOfProcessInstances(repeatEach, timeout, nbOfProcInst, orderBy, getProcessAPI());
+        final CheckNbOfProcessInstances checkNbOfProcessInstances = new CheckNbOfProcessInstances(repeatEach, timeout,
+                nbOfProcInst, orderBy, getProcessAPI());
         assertTrue(checkNbOfProcessInstances.waitUntil());
         return checkNbOfProcessInstances;
     }
 
     public void checkFlowNodeWasntExecuted(final long processInstancedId, final String flowNodeName) {
-        final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(processInstancedId, 0, 200,
+        final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(
+                processInstancedId, 0, 200,
                 ActivityInstanceCriterion.DEFAULT);
         for (final ArchivedActivityInstance archivedActivityInstance : archivedActivityInstances) {
             assertFalse(flowNodeName.equals(archivedActivityInstance.getName()));
         }
     }
 
-    public void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName) throws InvalidSessionException, SearchException {
+    public void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName)
+            throws InvalidSessionException, SearchException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
-        searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, parentProcessInstance.getId());
+        searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,
+                parentProcessInstance.getId());
         searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, flowNodeName);
-        final SearchResult<ArchivedFlowNodeInstance> searchArchivedActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchOptionsBuilder.done());
+        final SearchResult<ArchivedFlowNodeInstance> searchArchivedActivities = getProcessAPI()
+                .searchArchivedFlowNodeInstances(searchOptionsBuilder.done());
         assertTrue(searchArchivedActivities.getCount() == 0);
     }
 
@@ -1152,7 +1289,8 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
-    public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
+    public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId,
+            final String dataName,
             final boolean isTransient)
             throws InvalidExpressionException, UpdateException {
         final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
@@ -1172,7 +1310,8 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     protected void cleanProcessDefinitions() throws BonitaException {
-        final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200, ProcessDeploymentInfoCriterion.DEFAULT);
+        final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200,
+                ProcessDeploymentInfoCriterion.DEFAULT);
         if (processes.size() > 0) {
             for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
                 if (ActivationState.ENABLED.equals(processDeploymentInfo.getActivationState())) {
@@ -1186,7 +1325,8 @@ public class APITestUtil extends PlatformTestUtil {
     protected void cleanSupervisors() throws SearchException, DeletionException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 200);
         builder.sort(ProcessSupervisorSearchDescriptor.ID, Order.ASC);
-        final List<ProcessSupervisor> supervisors = getProcessAPI().searchProcessSupervisors(builder.done()).getResult();
+        final List<ProcessSupervisor> supervisors = getProcessAPI().searchProcessSupervisors(builder.done())
+                .getResult();
         if (supervisors.size() > 0) {
             for (final ProcessSupervisor supervisor : supervisors) {
                 getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
@@ -1195,7 +1335,8 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     protected void cleanProcessInstances() throws DeletionException {
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 1000,
+                ProcessInstanceCriterion.DEFAULT);
         if (!processInstances.isEmpty()) {
             for (final ProcessInstance processInstance : processInstances) {
                 getProcessAPI().deleteProcessInstance(processInstance.getId());
@@ -1204,7 +1345,8 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     protected void cleanArchiveProcessInstances() throws DeletionException {
-        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0,
+                1000, ProcessInstanceCriterion.DEFAULT);
         if (!archivedProcessInstances.isEmpty()) {
             for (final ArchivedProcessInstance archivedProcessInstance : archivedProcessInstances) {
                 getProcessAPI().deleteArchivedProcessInstancesInAllStates(archivedProcessInstance.getSourceObjectId());
@@ -1215,7 +1357,8 @@ public class APITestUtil extends PlatformTestUtil {
     protected void cleanGroups() throws DeletionException {
         final long numberOfGroups = getIdentityAPI().getNumberOfGroups();
         if (numberOfGroups > 0) {
-            final List<Group> groups = getIdentityAPI().getGroups(0, Long.valueOf(numberOfGroups).intValue(), GroupCriterion.NAME_ASC);
+            final List<Group> groups = getIdentityAPI().getGroups(0, Long.valueOf(numberOfGroups).intValue(),
+                    GroupCriterion.NAME_ASC);
             for (final Group group : groups) {
                 getIdentityAPI().deleteGroup(group.getId());
             }
@@ -1225,7 +1368,8 @@ public class APITestUtil extends PlatformTestUtil {
     protected void cleanRoles() throws DeletionException {
         final long numberOfRoles = getIdentityAPI().getNumberOfRoles();
         if (numberOfRoles > 0) {
-            final List<Role> roles = getIdentityAPI().getRoles(0, Long.valueOf(numberOfRoles).intValue(), RoleCriterion.NAME_ASC);
+            final List<Role> roles = getIdentityAPI().getRoles(0, Long.valueOf(numberOfRoles).intValue(),
+                    RoleCriterion.NAME_ASC);
             for (final Role role : roles) {
                 getIdentityAPI().deleteRole(role.getId());
             }
@@ -1235,7 +1379,8 @@ public class APITestUtil extends PlatformTestUtil {
     protected void cleanUsers() throws DeletionException {
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         if (numberOfUsers > 0) {
-            final List<User> users = getIdentityAPI().getUsers(0, Long.valueOf(numberOfUsers).intValue(), UserCriterion.USER_NAME_ASC);
+            final List<User> users = getIdentityAPI().getUsers(0, Long.valueOf(numberOfUsers).intValue(),
+                    UserCriterion.USER_NAME_ASC);
             for (final User user : users) {
                 getIdentityAPI().deleteUser(user.getId());
             }
@@ -1247,7 +1392,8 @@ public class APITestUtil extends PlatformTestUtil {
         searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.ADD_HANDLER_COMMAND);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.WAIT_SERVER_COMMAND);
-        final SearchResult<CommandDescriptor> searchCommands = getCommandAPI().searchCommands(searchOptionsBuilder.done());
+        final SearchResult<CommandDescriptor> searchCommands = getCommandAPI()
+                .searchCommands(searchOptionsBuilder.done());
         final List<CommandDescriptor> commands = searchCommands.getResult();
         if (searchCommands.getCount() > 0) {
             for (final CommandDescriptor command : commands) {
@@ -1310,9 +1456,11 @@ public class APITestUtil extends PlatformTestUtil {
         buildAndAttachDocument(processInstance, documentName, doc.getContentFileName());
     }
 
-    public void buildAndAttachDocument(final ProcessInstance processInstance, final String documentName, final String fileName) throws BonitaException {
+    public void buildAndAttachDocument(final ProcessInstance processInstance, final String documentName,
+            final String fileName) throws BonitaException {
         final Document doc = BuildTestUtil.buildDocument(documentName);
-        getProcessAPI().attachDocument(processInstance.getId(), documentName, fileName, doc.getContentMimeType(), documentName.getBytes());
+        getProcessAPI().attachDocument(processInstance.getId(), documentName, fileName, doc.getContentMimeType(),
+                documentName.getBytes());
     }
 
     public String getAttachmentDocumentName(final ProcessInstance processInstance) throws BonitaException {
@@ -1321,19 +1469,23 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public Document getAttachmentWithoutItsContent(final ProcessInstance processInstance) throws BonitaException {
-        final List<Document> attachments = getProcessAPI().getLastVersionOfDocuments(processInstance.getId(), 0, 1, DocumentCriterion.DEFAULT);
+        final List<Document> attachments = getProcessAPI().getLastVersionOfDocuments(processInstance.getId(), 0, 1,
+                DocumentCriterion.DEFAULT);
         assertTrue("No attachments found!", attachments != null && attachments.size() == 1);
         return attachments.get(0);
     }
 
-    public ProcessInstance deployAndEnableProcessWithActorAndStartIt(final BusinessArchive businessArchive, final User user) throws BonitaException {
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, BuildTestUtil.ACTOR_NAME, user);
+    public ProcessInstance deployAndEnableProcessWithActorAndStartIt(final BusinessArchive businessArchive,
+            final User user) throws BonitaException {
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive,
+                BuildTestUtil.ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertTrue(processInstance != null);
         return processInstance;
     }
 
-    public ArchivedDataInstance getArchivedDataInstance(final List<ArchivedDataInstance> archivedDataInstances, final String dataName) {
+    public ArchivedDataInstance getArchivedDataInstance(final List<ArchivedDataInstance> archivedDataInstances,
+            final String dataName) {
         ArchivedDataInstance archivedDataInstance = null;
         final Iterator<ArchivedDataInstance> iterator = archivedDataInstances.iterator();
         while (archivedDataInstance == null || iterator.hasNext()) {
@@ -1346,24 +1498,30 @@ public class APITestUtil extends PlatformTestUtil {
         return archivedDataInstance;
     }
 
-    public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess, final User user,
+    public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess,
+            final User user,
             final List<String> stepNames, final List<Boolean> isHuman) throws BonitaException {
         final List<ProcessDefinition> processDefinitions = new ArrayList<>();
-        final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil.buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
-                isHuman);
+        final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil
+                .buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
+                        isHuman);
 
         for (final DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
-            processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
+            processDefinitions
+                    .add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
         }
         return processDefinitions;
     }
 
-    protected void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected, final String xmlPrettyFormatExported) throws SAXException, IOException {
+    protected void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected,
+            final String xmlPrettyFormatExported) throws SAXException, IOException {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
-        final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
+        final DetailedDiff diff = new DetailedDiff(
+                XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
         final List<?> allDifferences = diff.getAllDifferences();
-        assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
+        assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected,
+                xmlPrettyFormatExported).isEmpty();
     }
 
     public BarResource getBarResource(final String path, final String name, Class<?> clazz) throws IOException {
@@ -1377,7 +1535,8 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
-    protected byte[] createTestPageContent(final String pageName, final String displayName, final String description) throws Exception {
+    protected byte[] createTestPageContent(final String pageName, final String displayName, final String description)
+            throws Exception {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             final ZipOutputStream zos = new ZipOutputStream(baos);
@@ -1385,7 +1544,8 @@ public class APITestUtil extends PlatformTestUtil {
             zos.write("return \"\";".getBytes());
 
             zos.putNextEntry(new ZipEntry("page.properties"));
-            zos.write(("name=" + pageName + "\n" + "displayName=" + displayName + "\n" + "description=" + description + "\n").getBytes());
+            zos.write(("name=" + pageName + "\n" + "displayName=" + displayName + "\n" + "description=" + description
+                    + "\n").getBytes());
 
             zos.closeEntry();
             return baos.toByteArray();
@@ -1518,7 +1678,8 @@ public class APITestUtil extends PlatformTestUtil {
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
         final Query getEmployeeByPersistId = employee
-                .addQuery("findByPersistId", "SELECT e FROM Employee e WHERE e.persistenceId=:id", EMPLOYEE_QUALIFIED_NAME);
+                .addQuery("findByPersistId", "SELECT e FROM Employee e WHERE e.persistenceId=:id",
+                        EMPLOYEE_QUALIFIED_NAME);
         getEmployeeByPersistId.addQueryParameter("id", Long.class.getName());
 
         final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
@@ -1526,12 +1687,14 @@ public class APITestUtil extends PlatformTestUtil {
         getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
 
         final Query findByFirstNAmeAndLastNameNewOrder = employee.addQuery(FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER,
-                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName", List.class.getName());
+                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName",
+                List.class.getName());
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("firstName", String.class.getName());
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("lastName", String.class.getName());
 
         final Query findByFirstNameFetchAddresses = employee.addQuery(FIND_BY_FIRST_NAME_FETCH_ADDRESSES,
-                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName", List.class.getName());
+                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName",
+                List.class.getName());
         findByFirstNameFetchAddresses.addQueryParameter("firstName", String.class.getName());
 
         final Query findByHireDate = employee.addQuery(FIND_BY_HIRE_DATE_RANGE,
@@ -1540,7 +1703,8 @@ public class APITestUtil extends PlatformTestUtil {
         findByHireDate.addQueryParameter("date2", Date.class.getName());
 
         final Query countForFindByHireDate = employee.addQuery(COUNT_FOR_FIND_BY_HIRE_DATE_RANGE,
-                "SELECT count(e) FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2", Long.class.getName());
+                "SELECT count(e) FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2",
+                Long.class.getName());
         countForFindByHireDate.addQueryParameter("date1", Date.class.getName());
         countForFindByHireDate.addQueryParameter("date2", Date.class.getName());
 

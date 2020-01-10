@@ -35,6 +35,7 @@ import org.hibernate.annotations.Filter;
 @Table(name = "process_content")
 @Builder
 public class SProcessDefinitionDesignContent implements PersistentObject {
+
     @Id
     private long tenantId;
     @Id

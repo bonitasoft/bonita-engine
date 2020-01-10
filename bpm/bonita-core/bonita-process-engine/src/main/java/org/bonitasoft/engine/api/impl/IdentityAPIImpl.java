@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -162,14 +163,16 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public User createUser(final String userName, final String password) throws AlreadyExistsException, CreationException {
+    public User createUser(final String userName, final String password)
+            throws AlreadyExistsException, CreationException {
         final UserCreator creator = new UserCreator(userName, password);
         creator.setEnabled(true);
         return createUser(creator);
     }
 
     @Override
-    public User createUser(final String userName, final String password, final String firstName, final String lastName) throws AlreadyExistsException,
+    public User createUser(final String userName, final String password, final String firstName, final String lastName)
+            throws AlreadyExistsException,
             CreationException {
         final UserCreator creator = new UserCreator(userName, password);
         creator.setFirstName(firstName).setLastName(lastName);
@@ -182,7 +185,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         validateUserCreator(creator);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         IdentityService identityService = tenantAccessor.getIdentityService();
-        if (creator.getFields().containsKey(UserCreator.UserField.ICON_NAME) || creator.getFields().containsKey(UserCreator.UserField.ICON_PATH)) {
+        if (creator.getFields().containsKey(UserCreator.UserField.ICON_NAME)
+                || creator.getFields().containsKey(UserCreator.UserField.ICON_PATH)) {
             tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
                     "setIconName and setIconPath are deprecated, use setIcon instead");
         }
@@ -230,14 +234,18 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
 
         // User change
-        final EntityUpdateDescriptor userUpdateDescriptor = getUserUpdateDescriptor(updater, tenantAccessor.getTechnicalLoggerService());
+        final EntityUpdateDescriptor userUpdateDescriptor = getUserUpdateDescriptor(updater,
+                tenantAccessor.getTechnicalLoggerService());
         // Personal data change
-        final EntityUpdateDescriptor personalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(updater.getPersoContactUpdater());
+        final EntityUpdateDescriptor personalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(
+                updater.getPersoContactUpdater());
         // Professional data change
-        final EntityUpdateDescriptor professionalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(updater.getProContactUpdater());
+        final EntityUpdateDescriptor professionalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(
+                updater.getProContactUpdater());
         final EntityUpdateDescriptor iconUpdater = getIconUpdater(updater);
         try {
-            SUser sUser = identityService.updateUser(userId, userUpdateDescriptor, personalDataUpdateDescriptor, professionalDataUpdateDescriptor, iconUpdater);
+            SUser sUser = identityService.updateUser(userId, userUpdateDescriptor, personalDataUpdateDescriptor,
+                    professionalDataUpdateDescriptor, iconUpdater);
             return ModelConvertor.toUser(sUser);
         } catch (final SUserNotFoundException e) {
             throw new UserNotFoundException(e);
@@ -273,8 +281,10 @@ public class IdentityAPIImpl implements IdentityAPI {
         return entityUpdateDescriptor;
     }
 
-    private EntityUpdateDescriptor getUserUpdateDescriptor(final UserUpdater updateDescriptor, TechnicalLoggerService technicalLoggerService) {
-        final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
+    private EntityUpdateDescriptor getUserUpdateDescriptor(final UserUpdater updateDescriptor,
+            TechnicalLoggerService technicalLoggerService) {
+        final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class)
+                .createNewInstance();
         if (updateDescriptor != null) {
             final Map<UserField, Serializable> fields = updateDescriptor.getFields();
             for (final Entry<UserField, Serializable> field : fields.entrySet()) {
@@ -295,10 +305,12 @@ public class IdentityAPIImpl implements IdentityAPI {
                         userUpdateBuilder.updateManagerUserId((Long) field.getValue());
                         break;
                     case ICON_NAME:
-                        technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "setIconName is deprecated, use setIcon instead");
+                        technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                                "setIconName is deprecated, use setIcon instead");
                         break;
                     case ICON_PATH:
-                        technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "setIconPath is deprecated, use setIcon instead");
+                        technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                                "setIconPath is deprecated, use setIcon instead");
                         break;
                     case TITLE:
                         userUpdateBuilder.updateTitle((String) field.getValue());
@@ -323,7 +335,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     private EntityUpdateDescriptor getUserContactInfoUpdateDescriptor(final ContactDataUpdater updater) {
-        final SContactInfoUpdateBuilder updateBuilder = BuilderFactory.get(SContactInfoUpdateBuilderFactory.class).createNewInstance();
+        final SContactInfoUpdateBuilder updateBuilder = BuilderFactory.get(SContactInfoUpdateBuilderFactory.class)
+                .createNewInstance();
         if (updater != null) {
             final Map<ContactDataField, Serializable> fields = updater.getFields();
             for (final Entry<ContactDataField, Serializable> field : fields.entrySet()) {
@@ -399,7 +412,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            final DeleteUser deleteUser = new DeleteUser(identityService, actorMappingService, profileService, userName);
+            final DeleteUser deleteUser = new DeleteUser(identityService, actorMappingService, profileService,
+                    userName);
             deleteUser.execute();
             final Set<Long> removedActorIds = deleteUser.getRemovedActorIds();
             updateActorProcessDependencies(tenantAccessor, actorMappingService, removedActorIds);
@@ -416,7 +430,8 @@ public class IdentityAPIImpl implements IdentityAPI {
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final ProfileService profileService = tenantAccessor.getProfileService();
             try {
-                final DeleteUsers deleteUsers = new DeleteUsers(identityService, actorMappingService, profileService, userIds);
+                final DeleteUsers deleteUsers = new DeleteUsers(identityService, actorMappingService, profileService,
+                        userIds);
                 deleteUsers.execute();
             } catch (final SBonitaException sbe) {
                 throw new DeletionException(sbe);
@@ -546,7 +561,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchUsers searchUsers = new SearchUsers(identityService, searchEntitiesDescriptor.getSearchUserDescriptor(), options);
+        final SearchUsers searchUsers = new SearchUsers(identityService,
+                searchEntitiesDescriptor.getSearchUserDescriptor(), options);
         try {
             searchUsers.execute();
             return searchUsers.getResult();
@@ -560,7 +576,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final GetNumberOfUsersInType transactionContentWithResult = new GetNumberOfUsersInType(roleId, "getNumberOfUsersInRole", identityService);
+            final GetNumberOfUsersInType transactionContentWithResult = new GetNumberOfUsersInType(roleId,
+                    "getNumberOfUsersInRole", identityService);
             transactionContentWithResult.execute();
             return transactionContentWithResult.getResult();
         } catch (final SBonitaException sbe) {
@@ -569,12 +586,14 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public List<User> getUsersInRole(final long roleId, final int startIndex, final int maxResults, final UserCriterion criterion) {
+    public List<User> getUsersInRole(final long roleId, final int startIndex, final int maxResults,
+            final UserCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getUsersWithRole(roleId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+            return ModelConvertor.toUsers(
+                    identityService.getUsersWithRole(roleId, startIndex, maxResults, sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -586,7 +605,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getActiveUsersWithRole(roleId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+            return ModelConvertor.toUsers(identityService.getActiveUsersWithRole(roleId, startIndex, maxResults,
+                    sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -598,7 +618,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getInactiveUsersWithRole(roleId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+            return ModelConvertor.toUsers(identityService.getInactiveUsersWithRole(roleId, startIndex, maxResults,
+                    sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -610,31 +631,36 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getUsersWithManager(managerId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+            return ModelConvertor.toUsers(identityService.getUsersWithManager(managerId, startIndex, maxResults,
+                    sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
     }
 
     @Override
-    public List<User> getActiveUsersWithManager(long managerId, int startIndex, int maxResults, UserCriterion criterion) {
+    public List<User> getActiveUsersWithManager(long managerId, int startIndex, int maxResults,
+            UserCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getActiveUsersWithManager(managerId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+            return ModelConvertor.toUsers(identityService.getActiveUsersWithManager(managerId, startIndex, maxResults,
+                    sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
     }
 
     @Override
-    public List<User> getInactiveUsersWithManager(long managerId, int startIndex, int maxResults, UserCriterion criterion) {
+    public List<User> getInactiveUsersWithManager(long managerId, int startIndex, int maxResults,
+            UserCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getInactiveUsersWithManager(managerId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+            return ModelConvertor.toUsers(identityService.getInactiveUsersWithManager(managerId, startIndex, maxResults,
+                    sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -644,7 +670,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUsersInGroup(final long groupId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final GetNumberOfUsersInType transactionContentWithResult = new GetNumberOfUsersInType(groupId, "getNumberOfUsersInGroup", identityService);
+        final GetNumberOfUsersInType transactionContentWithResult = new GetNumberOfUsersInType(groupId,
+                "getNumberOfUsersInGroup", identityService);
         try {
             transactionContentWithResult.execute();
             return transactionContentWithResult.getResult();
@@ -654,13 +681,15 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public List<User> getUsersInGroup(final long groupId, final int startIndex, final int maxResults, final UserCriterion criterion) {
+    public List<User> getUsersInGroup(final long groupId, final int startIndex, final int maxResults,
+            final UserCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getUsersInGroup(groupId, startIndex, maxResults, sort.getField(),
-                    sort.getOrder()));
+            return ModelConvertor
+                    .toUsers(identityService.getUsersInGroup(groupId, startIndex, maxResults, sort.getField(),
+                            sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -672,8 +701,9 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getActiveUsersInGroup(groupId, startIndex, maxResults, sort.getField(),
-                    sort.getOrder()));
+            return ModelConvertor
+                    .toUsers(identityService.getActiveUsersInGroup(groupId, startIndex, maxResults, sort.getField(),
+                            sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -686,18 +716,21 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Sort sort = getSortFromCriterion(criterion);
         try {
-            return ModelConvertor.toUsers(identityService.getInactiveUsersInGroup(groupId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+            return ModelConvertor.toUsers(identityService.getInactiveUsersInGroup(groupId, startIndex, maxResults,
+                    sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
     }
 
     @Override
-    public List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex, int maxResults) {
+    public List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch,
+            int startIndex, int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            return identityService.getUserIdsWithCustomUserInfo(infoName, infoValue, usePartialMatch, startIndex, maxResults);
+            return identityService.getUserIdsWithCustomUserInfo(infoName, infoValue, usePartialMatch, startIndex,
+                    maxResults);
         } catch (SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -718,7 +751,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        if (creator.getFields().containsKey(RoleCreator.RoleField.ICON_NAME) || creator.getFields().containsKey(RoleCreator.RoleField.ICON_PATH)) {
+        if (creator.getFields().containsKey(RoleCreator.RoleField.ICON_NAME)
+                || creator.getFields().containsKey(RoleCreator.RoleField.ICON_PATH)) {
             tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
                     "setIconName and setIconPath are deprecated, use setIcon instead");
         }
@@ -740,15 +774,18 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public Role updateRole(final long roleId, final RoleUpdater updateDescriptor) throws RoleNotFoundException, UpdateException {
+    public Role updateRole(final long roleId, final RoleUpdater updateDescriptor)
+            throws RoleNotFoundException, UpdateException {
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final EntityUpdateDescriptor changeDescriptor = getRoleUpdateDescriptor(updateDescriptor, tenantAccessor.getTechnicalLoggerService());
-            return ModelConvertor.toRole(identityService.updateRole(identityService.getRole(roleId), changeDescriptor, getIconUpdater(updateDescriptor)));
+            final EntityUpdateDescriptor changeDescriptor = getRoleUpdateDescriptor(updateDescriptor,
+                    tenantAccessor.getTechnicalLoggerService());
+            return ModelConvertor.toRole(identityService.updateRole(identityService.getRole(roleId), changeDescriptor,
+                    getIconUpdater(updateDescriptor)));
         } catch (final SRoleNotFoundException e) {
             throw new RoleNotFoundException(e);
         } catch (SIdentityException e) {
@@ -756,8 +793,10 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private EntityUpdateDescriptor getRoleUpdateDescriptor(final RoleUpdater updateDescriptor, TechnicalLoggerService technicalLoggerService) {
-        final SRoleUpdateBuilder roleUpdateBuilder = BuilderFactory.get(SRoleUpdateBuilderFactory.class).createNewInstance();
+    private EntityUpdateDescriptor getRoleUpdateDescriptor(final RoleUpdater updateDescriptor,
+            TechnicalLoggerService technicalLoggerService) {
+        final SRoleUpdateBuilder roleUpdateBuilder = BuilderFactory.get(SRoleUpdateBuilderFactory.class)
+                .createNewInstance();
         final Map<RoleField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<RoleField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
@@ -771,10 +810,12 @@ public class IdentityAPIImpl implements IdentityAPI {
                     roleUpdateBuilder.updateDescription((String) field.getValue());
                     break;
                 case ICON_NAME:
-                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "setIconPath is deprecated, use setIcon instead");
+                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                            "setIconPath is deprecated, use setIcon instead");
                     break;
                 case ICON_PATH:
-                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "setIconPath is deprecated, use setIcon instead");
+                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                            "setIconPath is deprecated, use setIcon instead");
                     break;
                 default:
                     break;
@@ -848,7 +889,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final GetNumberOfInstance getNumberOfInstance = new GetNumberOfInstance("getNumberOfRoles", identityService);
+            final GetNumberOfInstance getNumberOfInstance = new GetNumberOfInstance("getNumberOfRoles",
+                    identityService);
             getNumberOfInstance.execute();
             return getNumberOfInstance.getResult();
         } catch (final SBonitaException e) {
@@ -910,7 +952,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchRoles searchRoles = new SearchRoles(identityService, searchEntitiesDescriptor.getSearchRoleDescriptor(), options);
+        final SearchRoles searchRoles = new SearchRoles(identityService,
+                searchEntitiesDescriptor.getSearchRoleDescriptor(), options);
         try {
             searchRoles.execute();
             return searchRoles.getResult();
@@ -937,7 +980,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        if (creator.getFields().containsKey(GroupCreator.GroupField.ICON_NAME) || creator.getFields().containsKey(GroupCreator.GroupField.ICON_PATH)) {
+        if (creator.getFields().containsKey(GroupCreator.GroupField.ICON_NAME)
+                || creator.getFields().containsKey(GroupCreator.GroupField.ICON_PATH)) {
             tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
                     "setIconName and setIconPath are deprecated, use setIcon instead");
         }
@@ -959,7 +1003,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public Group updateGroup(final long groupId, final GroupUpdater updater) throws GroupNotFoundException, UpdateException, AlreadyExistsException {
+    public Group updateGroup(final long groupId, final GroupUpdater updater)
+            throws GroupNotFoundException, UpdateException, AlreadyExistsException {
         if (updater == null || updater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
@@ -967,8 +1012,10 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             checkPathUnicity(groupId, updater, identityService);
-            final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(updater, tenantAccessor.getTechnicalLoggerService());
-            return ModelConvertor.toGroup(new UpdateGroup(groupId, changeDescriptor, identityService, getIconUpdater(updater)).update());
+            final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(updater,
+                    tenantAccessor.getTechnicalLoggerService());
+            return ModelConvertor.toGroup(
+                    new UpdateGroup(groupId, changeDescriptor, identityService, getIconUpdater(updater)).update());
         } catch (final SGroupNotFoundException e) {
             throw new GroupNotFoundException(e);
         } catch (final SIdentityException sbe) {
@@ -976,12 +1023,14 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private void checkPathUnicity(long groupId, GroupUpdater updater, IdentityService identityService) throws SGroupNotFoundException, AlreadyExistsException {
+    private void checkPathUnicity(long groupId, GroupUpdater updater, IdentityService identityService)
+            throws SGroupNotFoundException, AlreadyExistsException {
         final Serializable updatedName = updater.getFields().get(GroupField.NAME);
         SGroup sGroupToBeUpdated = identityService.getGroup(groupId);
         String name = updatedName != null ? updatedName.toString() : sGroupToBeUpdated.getName();
         StringBuilder sb = new StringBuilder();
-        String parentPath = updater.getFields().get(GroupField.PARENT_PATH) != null ? updater.getFields().get(GroupField.PARENT_PATH).toString() : "";
+        String parentPath = updater.getFields().get(GroupField.PARENT_PATH) != null
+                ? updater.getFields().get(GroupField.PARENT_PATH).toString() : "";
         sb.append(parentPath).append("/").append(name);
         try {
             if (updatedName != null) {
@@ -994,9 +1043,11 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private EntityUpdateDescriptor getGroupUpdateDescriptor(final GroupUpdater updateDescriptor, TechnicalLoggerService technicalLoggerService)
+    private EntityUpdateDescriptor getGroupUpdateDescriptor(final GroupUpdater updateDescriptor,
+            TechnicalLoggerService technicalLoggerService)
             throws UpdateException {
-        final SGroupUpdateBuilder groupUpdateBuilder = BuilderFactory.get(SGroupUpdateBuilderFactory.class).createNewInstance();
+        final SGroupUpdateBuilder groupUpdateBuilder = BuilderFactory.get(SGroupUpdateBuilderFactory.class)
+                .createNewInstance();
         final Map<GroupField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<GroupField, Serializable> field : fields.entrySet()) {
             final Serializable value = field.getValue();
@@ -1011,17 +1062,20 @@ public class IdentityAPIImpl implements IdentityAPI {
                     groupUpdateBuilder.updateDescription((String) value);
                     break;
                 case ICON_NAME:
-                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "updateIconName is deprecated, use updateIcon instead");
+                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                            "updateIconName is deprecated, use updateIcon instead");
                     break;
                 case ICON_PATH:
-                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "updateIconPath is deprecated, use updateIcon instead");
+                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                            "updateIconPath is deprecated, use updateIcon instead");
                     break;
                 case ICON_CONTENT:
                     break;
                 case ICON_FILENAME:
                     break;
                 case PARENT_PATH:
-                    groupUpdateBuilder.updateParentPath((value != null && ((String) value).isEmpty()) ? null : (String) value);
+                    groupUpdateBuilder
+                            .updateParentPath((value != null && ((String) value).isEmpty()) ? null : (String) value);
                     break;
                 default:
                     throw new UpdateException("Invalid field: " + field.getKey().name());
@@ -1057,7 +1111,8 @@ public class IdentityAPIImpl implements IdentityAPI {
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final ProfileService profileService = tenantAccessor.getProfileService();
             try {
-                final DeleteGroups deleteGroups = new DeleteGroups(identityService, actorMappingService, profileService, groupIds);
+                final DeleteGroups deleteGroups = new DeleteGroups(identityService, actorMappingService, profileService,
+                        groupIds);
                 deleteGroups.execute();
                 updateActorProcessDependencies(tenantAccessor, actorMappingService, deleteGroups.getRemovedActorIds());
             } catch (final SBonitaException e) {
@@ -1090,7 +1145,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final GetNumberOfInstance getNumberOfInstance = new GetNumberOfInstance("getNumberOfGroups", identityService);
+            final GetNumberOfInstance getNumberOfInstance = new GetNumberOfInstance("getNumberOfGroups",
+                    identityService);
             getNumberOfInstance.execute();
             return getNumberOfInstance.getResult();
         } catch (final SBonitaException sbe) {
@@ -1152,7 +1208,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchGroups searchGroups = new SearchGroups(identityService, searchEntitiesDescriptor.getSearchGroupDescriptor(), options);
+        final SearchGroups searchGroups = new SearchGroups(identityService,
+                searchEntitiesDescriptor.getSearchGroupDescriptor(), options);
         try {
             searchGroups.execute();
             return searchGroups.getResult();
@@ -1164,7 +1221,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     /**
      * Check / update process resolution information, for all processes in a list of actor IDs.
      */
-    private void updateActorProcessDependencies(final TenantServiceAccessor tenantAccessor, final ActorMappingService actorMappingService,
+    private void updateActorProcessDependencies(final TenantServiceAccessor tenantAccessor,
+            final ActorMappingService actorMappingService,
             final Set<Long> removedActorIds) throws SBonitaException {
         final Set<Long> processDefinitionIds = new HashSet<>(removedActorIds.size());
         for (final Long actorId : removedActorIds) {
@@ -1174,12 +1232,14 @@ public class IdentityAPIImpl implements IdentityAPI {
             final Long processDefId = actor.getScopeId();
             if (!processDefinitionIds.contains(processDefId)) {
                 processDefinitionIds.add(processDefId);
-                tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(actor.getScopeId(), tenantAccessor);
+                tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(actor.getScopeId(),
+                        tenantAccessor);
             }
         }
     }
 
-    private List<User> getUsersWithOrder(final int startIndex, final int maxResults, final UserCriterion pagingCriterion, final IdentityService identityService)
+    private List<User> getUsersWithOrder(final int startIndex, final int maxResults,
+            final UserCriterion pagingCriterion, final IdentityService identityService)
             throws SIdentityException {
         final String field = getUserFieldKey(pagingCriterion);
         final OrderByType order = getUserOrderByType(pagingCriterion);
@@ -1244,7 +1304,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public UserMembership addUserMembership(final long userId, final long groupId, final long roleId) throws AlreadyExistsException, CreationException {
+    public UserMembership addUserMembership(final long userId, final long groupId, final long roleId)
+            throws AlreadyExistsException, CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final long assignedBy = SessionInfos.getUserIdFromSession();
@@ -1252,14 +1313,16 @@ public class IdentityAPIImpl implements IdentityAPI {
             final GetUserMembership getUserMembership = new GetUserMembership(userId, groupId, roleId, identityService);
             getUserMembership.execute();
             if (getUserMembership.getResult() != null) {
-                throw new AlreadyExistsException("A userMembership with userId \"" + userId + "\", groupId \"" + groupId + "\" and roleId \"" + roleId
+                throw new AlreadyExistsException("A userMembership with userId \"" + userId + "\", groupId \"" + groupId
+                        + "\" and roleId \"" + roleId
                         + "\" already exists");
             }
         } catch (final SBonitaException e) {
             // Membership does not exists but was unable to be created
         }
         try {
-            final AddUserMembership createUserMembership = new AddUserMembership(userId, groupId, roleId, assignedBy, identityService);
+            final AddUserMembership createUserMembership = new AddUserMembership(userId, groupId, roleId, assignedBy,
+                    identityService);
             createUserMembership.execute();
             final SUserMembership sUserMembership = createUserMembership.getResult();
             return ModelConvertor.toUserMembership(sUserMembership);
@@ -1269,13 +1332,15 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public void addUserMemberships(final List<Long> userIds, final long groupId, final long roleId) throws AlreadyExistsException, CreationException {
+    public void addUserMemberships(final List<Long> userIds, final long groupId, final long roleId)
+            throws AlreadyExistsException, CreationException {
         // FIXME rewrite
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final long currentUserId = SessionInfos.getUserIdFromSession();
         try {
-            final AddUserMemberships transactionContent = new AddUserMemberships(groupId, roleId, userIds, identityService, currentUserId);
+            final AddUserMemberships transactionContent = new AddUserMemberships(groupId, roleId, userIds,
+                    identityService, currentUserId);
             transactionContent.execute();
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
@@ -1283,13 +1348,16 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public UserMembership updateUserMembership(final long userMembershipId, final long newGroupId, final long newRoleId) throws UpdateException {
+    public UserMembership updateUserMembership(final long userMembershipId, final long newGroupId, final long newRoleId)
+            throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserMembershipUpdateBuilderFactory.class).createNewInstance()
+        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserMembershipUpdateBuilderFactory.class)
+                .createNewInstance()
                 .updateGroupId(newGroupId).updateRoleId(newRoleId).done();
         try {
-            final TransactionContent transactionContent = new UpdateMembershipByRoleIdAndGroupId(userMembershipId, identityService, changeDescriptor);
+            final TransactionContent transactionContent = new UpdateMembershipByRoleIdAndGroupId(userMembershipId,
+                    identityService, changeDescriptor);
             transactionContent.execute();
             final GetUserMembership getMembershipAfterUpdate = new GetUserMembership(userMembershipId, identityService);
             getMembershipAfterUpdate.execute();
@@ -1312,7 +1380,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public void deleteUserMembership(final long userId, final long groupId, final long roleId) throws DeletionException {
+    public void deleteUserMembership(final long userId, final long groupId, final long roleId)
+            throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
@@ -1323,7 +1392,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public void deleteUserMemberships(final List<Long> userIds, final long groupId, final long roleId) throws DeletionException {
+    public void deleteUserMemberships(final List<Long> userIds, final long groupId, final long roleId)
+            throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
@@ -1355,7 +1425,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final TransactionContentWithResult<Long> transactionContent = new GetNumberOfUserMemberships(userId, identityService);
+            final TransactionContentWithResult<Long> transactionContent = new GetNumberOfUserMemberships(userId,
+                    identityService);
             transactionContent.execute();
             return transactionContent.getResult();
         } catch (final SBonitaException sbe) {
@@ -1406,13 +1477,16 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private List<UserMembership> getUserMemberships(final long userId, final int startIndex, final int maxResults, final OrderByOption orderByOption,
+    private List<UserMembership> getUserMemberships(final long userId, final int startIndex, final int maxResults,
+            final OrderByOption orderByOption,
             final IdentityService identityService) throws SBonitaException {
         return getUserMemberships(userId, startIndex, maxResults, null, null, orderByOption, identityService);
     }
 
-    private List<UserMembership> getUserMemberships(final long userId, final int startIndex, final int maxResults, final OrderByType orderExecutor,
-            final String fieldExecutor, final OrderByOption orderByOption, final IdentityService identityService) throws SBonitaException {
+    private List<UserMembership> getUserMemberships(final long userId, final int startIndex, final int maxResults,
+            final OrderByType orderExecutor,
+            final String fieldExecutor, final OrderByOption orderByOption, final IdentityService identityService)
+            throws SBonitaException {
         List<SUserMembership> sUserMemberships;
         if (userId == -1) {
             sUserMemberships = identityService.getUserMemberships(startIndex, maxResults);
@@ -1421,16 +1495,19 @@ public class IdentityAPIImpl implements IdentityAPI {
         } else if (fieldExecutor == null) {
             sUserMemberships = identityService.getUserMembershipsOfUser(userId, startIndex, maxResults);
         } else {
-            sUserMemberships = identityService.getUserMembershipsOfUser(userId, startIndex, maxResults, fieldExecutor, orderExecutor);
+            sUserMemberships = identityService.getUserMembershipsOfUser(userId, startIndex, maxResults, fieldExecutor,
+                    orderExecutor);
         }
         return ModelConvertor.toUserMembership(sUserMemberships);
     }
 
     @Override
-    public List<UserMembership> getUserMembershipsByGroup(final long groupId, final int startIndex, final int maxResults) {
+    public List<UserMembership> getUserMembershipsByGroup(final long groupId, final int startIndex,
+            final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final GetUserMembershipsOfGroup transactionContentWithResult = new GetUserMembershipsOfGroup(groupId, identityService, startIndex, maxResults);
+        final GetUserMembershipsOfGroup transactionContentWithResult = new GetUserMembershipsOfGroup(groupId,
+                identityService, startIndex, maxResults);
         try {
             transactionContentWithResult.execute();
             return ModelConvertor.toUserMembership(transactionContentWithResult.getResult());
@@ -1440,11 +1517,13 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public List<UserMembership> getUserMembershipsByRole(final long roleId, final int startIndex, final int maxResults) {
+    public List<UserMembership> getUserMembershipsByRole(final long roleId, final int startIndex,
+            final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final GetUserMembershipsOfRole transactionContentWithResult = new GetUserMembershipsOfRole(roleId, identityService, startIndex, maxResults);
+            final GetUserMembershipsOfRole transactionContentWithResult = new GetUserMembershipsOfRole(roleId,
+                    identityService, startIndex, maxResults);
             transactionContentWithResult.execute();
             return ModelConvertor.toUserMembership(transactionContentWithResult.getResult());
         } catch (final SBonitaException sbe) {
@@ -1464,18 +1543,23 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public void importOrganization(final String organizationContent, final ImportPolicy policy) throws OrganizationImportException {
+    public void importOrganization(final String organizationContent, final ImportPolicy policy)
+            throws OrganizationImportException {
         importOrganizationWithWarnings(organizationContent, policy);
     }
 
     @Override
-    public List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy) throws OrganizationImportException {
+    public List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy)
+            throws OrganizationImportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class);
-            final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(tenantAccessor.getIdentityService(),
+            final SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory
+                    .get(SCustomUserInfoValueUpdateBuilderFactory.class);
+            final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(
+                    tenantAccessor.getIdentityService(),
                     updaterFactor);
-            ImportOrganization importedOrganization = new ImportOrganization(tenantAccessor, organizationContent, policy, customUserInfoValueAPI);
+            ImportOrganization importedOrganization = new ImportOrganization(tenantAccessor, organizationContent,
+                    policy, customUserInfoValueAPI);
             return importedOrganization.execute();
         } catch (JAXBException e) {
             throw new InvalidOrganizationFileFormatException(e);
@@ -1488,7 +1572,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     public String exportOrganization() throws OrganizationExportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final int maxResults = 100;
-        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getIdentityService(), maxResults);
+        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getIdentityService(),
+                maxResults);
         try {
             exportOrganization.execute();
             return exportOrganization.getResult();
@@ -1498,13 +1583,15 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public CustomUserInfoDefinition createCustomUserInfoDefinition(final CustomUserInfoDefinitionCreator creator) throws CreationException,
+    public CustomUserInfoDefinition createCustomUserInfoDefinition(final CustomUserInfoDefinitionCreator creator)
+            throws CreationException,
             AlreadyExistsException {
         return createCustomUserInfoDefinitionAPI().create(creator);
     }
 
     @Override
-    public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(final int startIndex, final int maxResult) throws RetrieveException {
+    public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(final int startIndex, final int maxResult)
+            throws RetrieveException {
         return createCustomUserInfoDefinitionAPI().list(startIndex, maxResult);
     }
 
@@ -1530,14 +1617,17 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public SearchResult<CustomUserInfoValue> searchCustomUserInfoValues(final SearchOptions options) {
         try {
-            return createCustomUserInfoValueAPI().search(getTenantAccessor().getSearchEntitiesDescriptor().getSearchCustomUserInfoValueDescriptor(), options);
+            return createCustomUserInfoValueAPI().search(
+                    getTenantAccessor().getSearchEntitiesDescriptor().getSearchCustomUserInfoValueDescriptor(),
+                    options);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
     }
 
     @Override
-    public CustomUserInfoValue setCustomUserInfoValue(final long definitionId, final long userId, final String value) throws UpdateException {
+    public CustomUserInfoValue setCustomUserInfoValue(final long definitionId, final long userId, final String value)
+            throws UpdateException {
         try {
             return ModelConvertor.convert(createCustomUserInfoValueAPI().set(definitionId, userId, value));
         } catch (final SBonitaException e) {
@@ -1600,7 +1690,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     private SCustomUserInfoValueAPI createCustomUserInfoValueAPI() {
-        return new SCustomUserInfoValueAPI(getTenantAccessor().getIdentityService(), BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class));
+        return new SCustomUserInfoValueAPI(getTenantAccessor().getIdentityService(),
+                BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class));
     }
 
     private class Sort {

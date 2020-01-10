@@ -51,14 +51,17 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
     @Override
     public SPlatformSession createSession(final String username) throws SSessionException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createSession"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "createSession"));
         }
         final long sessionId = PlatformSessionIdGenerator.getNextId();
         final long duration = getSessionsDuration();
-        final SPlatformSession session = BuilderFactory.get(SPlatformSessionBuilderFactory.class).createNewInstance(sessionId, duration, username).done();
+        final SPlatformSession session = BuilderFactory.get(SPlatformSessionBuilderFactory.class)
+                .createNewInstance(sessionId, duration, username).done();
         platformSessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createSession"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "createSession"));
         }
         return session;
     }
@@ -66,23 +69,27 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
     @Override
     public void deleteSession(final long sessionId) throws SSessionNotFoundException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteSession"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "deleteSession"));
         }
         platformSessionProvider.removeSession(sessionId);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteSession"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "deleteSession"));
         }
     }
 
     @Override
     public boolean isValid(final long sessionId) throws SSessionNotFoundException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "isValid"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "isValid"));
         }
         final SPlatformSession session = platformSessionProvider.getSession(sessionId);
         final Date now = new Date();
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "isValid"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "isValid"));
         }
         return session.getExpirationDate().after(now);
     }
@@ -90,11 +97,13 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
     @Override
     public SPlatformSession getSession(final long sessionId) throws SSessionNotFoundException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getSession"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "getSession"));
         }
         final SPlatformSession session = platformSessionProvider.getSession(sessionId);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getSession"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "getSession"));
         }
         return BuilderFactory.get(SPlatformSessionBuilderFactory.class).copy(session);
     }
@@ -102,14 +111,16 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
     @Override
     public void setSessionDuration(final long duration) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "setSessionDuration"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "setSessionDuration"));
         }
         if (duration <= 0) {
             throw new IllegalArgumentException("The duration must be greater then 0");
         }
         sessionDuration = duration;
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "setSessionDuration"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "setSessionDuration"));
         }
     }
 
@@ -126,18 +137,21 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
     @Override
     public void renewSession(final long sessionId) throws SSessionException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "renewSession"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "renewSession"));
         }
         final SPlatformSession session = getSession(sessionId);
         try {
             ClassReflector.invokeSetter(session, "setLastRenewDate", Date.class, new Date());
             platformSessionProvider.updateSession(session);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "renewSession"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "renewSession"));
             }
         } catch (final SReflectException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "renewSession", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "renewSession", e));
             }
             throw new SSessionException(e);
         }

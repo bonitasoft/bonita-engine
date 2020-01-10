@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.document.model.builder;
 
-
 /**
  * @author Nicolas Chabanoles
  * @author Zhang Bole
@@ -31,7 +30,8 @@ public class SDocumentBuilderFactory {
         return sDocumentBuilder;
     }
 
-    public SDocumentBuilder createNewProcessDocument(final String fileName, final String mimetype, final long authorId, final byte[] content) {
+    public SDocumentBuilder createNewProcessDocument(final String fileName, final String mimetype, final long authorId,
+            final byte[] content) {
         if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("The fileName must be filled for a document with content");
         }
@@ -42,7 +42,8 @@ public class SDocumentBuilderFactory {
         return sDocumentBuilder;
     }
 
-    public SDocumentBuilder createNewExternalProcessDocumentReference(final String fileName, final String mimetype, final long authorId, final String url) {
+    public SDocumentBuilder createNewExternalProcessDocumentReference(final String fileName, final String mimetype,
+            final long authorId, final String url) {
         final SDocumentBuilder sDocumentBuilder = createNewInstance(fileName, mimetype, authorId);
         sDocumentBuilder.setURL(url);
         sDocumentBuilder.setHasContent(false);

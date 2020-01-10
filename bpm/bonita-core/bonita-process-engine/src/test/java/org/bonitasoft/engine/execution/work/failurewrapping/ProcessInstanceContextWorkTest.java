@@ -30,7 +30,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessInstanceContextWorkTest extends AbstractContextWorkTest {

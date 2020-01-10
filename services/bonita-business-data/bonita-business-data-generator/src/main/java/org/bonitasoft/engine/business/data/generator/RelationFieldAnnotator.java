@@ -47,12 +47,13 @@ public class RelationFieldAnnotator {
         this.foreignKeyAnnotator = new ForeignKeyAnnotator(codeGenerator);
     }
 
-    public void annotateRelationField(final JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
+    public void annotateRelationField(final JDefinedClass entityClass, final RelationField field,
+            final JFieldVar fieldVar) {
         JAnnotationUse relation = null;
         if (field.isCollection()) {
             relation = annotateMultipleReference(entityClass, field, fieldVar);
         } else {
-            relation = annotateSingleReference(entityClass,field, fieldVar);
+            relation = annotateSingleReference(entityClass, field, fieldVar);
         }
 
         if (field.isLazy()) {
@@ -70,7 +71,8 @@ public class RelationFieldAnnotator {
 
     }
 
-    private JAnnotationUse annotateSingleReference(JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
+    private JAnnotationUse annotateSingleReference(JDefinedClass entityClass, final RelationField field,
+            final JFieldVar fieldVar) {
         JAnnotationUse relation;
         if (field.getType() == Type.AGGREGATION) {
             relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
@@ -84,7 +86,8 @@ public class RelationFieldAnnotator {
         return relation;
     }
 
-    private JAnnotationUse annotateMultipleReference(final JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
+    private JAnnotationUse annotateMultipleReference(final JDefinedClass entityClass, final RelationField field,
+            final JFieldVar fieldVar) {
         JAnnotationUse relation;
         if (field.getType() == Type.AGGREGATION) {
             relation = codeGenerator.addAnnotation(fieldVar, ManyToMany.class);

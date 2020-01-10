@@ -17,6 +17,7 @@ package org.bonitasoft.engine.business.application.impl.filter;
  * @author Elias Ricken de Medeiros
  */
 public class SelectRange {
+
     private int startIndex;
     private int maxResults;
 
@@ -35,13 +36,17 @@ public class SelectRange {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SelectRange)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof SelectRange))
+            return false;
 
         SelectRange that = (SelectRange) o;
 
-        if (maxResults != that.maxResults) return false;
-        if (startIndex != that.startIndex) return false;
+        if (maxResults != that.maxResults)
+            return false;
+        if (startIndex != that.startIndex)
+            return false;
 
         return true;
     }

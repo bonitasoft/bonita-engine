@@ -38,10 +38,12 @@ public class AllConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
     private final static Logger LOGGER = LoggerFactory.getLogger(AllConfigurationResourceVisitor.class);
 
     private static final List<String> PLATFORM_FOLDERS = Arrays.asList(PLATFORM_PORTAL.name().toLowerCase(),
-            PLATFORM_INIT_ENGINE.name().toLowerCase(), PLATFORM_ENGINE.name().toLowerCase(), TENANT_TEMPLATE_ENGINE.name().toLowerCase(),
+            PLATFORM_INIT_ENGINE.name().toLowerCase(), PLATFORM_ENGINE.name().toLowerCase(),
+            TENANT_TEMPLATE_ENGINE.name().toLowerCase(),
             TENANT_TEMPLATE_SECURITY_SCRIPTS.name().toLowerCase(), TENANT_TEMPLATE_PORTAL.name().toLowerCase());
 
-    private static final List<String> TENANT_FOLDERS = Arrays.asList(TENANT_PORTAL.name().toLowerCase(), TENANT_ENGINE.name().toLowerCase(),
+    private static final List<String> TENANT_FOLDERS = Arrays.asList(TENANT_PORTAL.name().toLowerCase(),
+            TENANT_ENGINE.name().toLowerCase(),
             TENANT_SECURITY_SCRIPTS.name().toLowerCase());
 
     public AllConfigurationResourceVisitor(List<FullBonitaConfiguration> fullBonitaConfigurations) {
@@ -83,7 +85,8 @@ public class AllConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(buildMessage(path, tenantId, configurationType));
             }
-            fullBonitaConfigurations.add(new FullBonitaConfiguration(path.getFileName().toString(), Files.readAllBytes(path), configurationType, tenantId));
+            fullBonitaConfigurations.add(new FullBonitaConfiguration(path.getFileName().toString(),
+                    Files.readAllBytes(path), configurationType, tenantId));
         }
         return FileVisitResult.CONTINUE;
     }

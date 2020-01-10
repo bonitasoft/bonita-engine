@@ -27,7 +27,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 public class SDataDefinitionBuilderImpl implements SDataDefinitionBuilder {
 
     private final SDataDefinitionImpl dataDefinitionImpl;
-    
+
     public SDataDefinitionBuilderImpl(final SDataDefinitionImpl dataDefinitionImpl) {
         super();
         this.dataDefinitionImpl = dataDefinitionImpl;
@@ -39,11 +39,13 @@ public class SDataDefinitionBuilderImpl implements SDataDefinitionBuilder {
     }
 
     public SDataDefinitionBuilder setAsLongText(final boolean value) {
-        if (dataDefinitionImpl instanceof STextDefinitionImpl && dataDefinitionImpl.getClassName().equals(String.class.getName())) {
+        if (dataDefinitionImpl instanceof STextDefinitionImpl
+                && dataDefinitionImpl.getClassName().equals(String.class.getName())) {
             ((STextDefinitionImpl) dataDefinitionImpl).setIsLongText(value);
         }
         return this;
     }
+
     @Override
     public SDataDefinitionBuilder setName(final String name) {
         dataDefinitionImpl.setName(name);

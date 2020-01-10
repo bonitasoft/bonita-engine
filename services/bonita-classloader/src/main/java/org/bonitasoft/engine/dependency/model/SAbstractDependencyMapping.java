@@ -24,7 +24,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

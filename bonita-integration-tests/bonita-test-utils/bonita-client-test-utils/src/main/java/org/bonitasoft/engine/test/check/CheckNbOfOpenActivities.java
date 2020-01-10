@@ -30,7 +30,8 @@ public final class CheckNbOfOpenActivities extends WaitUntil {
     private final int nbActivities;
 
     @Deprecated
-    public CheckNbOfOpenActivities(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
+    public CheckNbOfOpenActivities(final int repeatEach, final int timeout, final boolean throwExceptions,
+            final ProcessInstance processInstance,
             final int nbActivities, final ProcessAPI processAPI) {
         super(repeatEach, timeout, throwExceptions);
         this.processInstance = processInstance;

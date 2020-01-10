@@ -32,7 +32,8 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
     }
 
     @Override
-    public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext,
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith,
+            final SExpressionContext expressionContext,
             final boolean shouldPersistValue)
             throws SOperationExecutionException {
         final Object objectToInvokeJavaMethodOn;
@@ -40,7 +41,8 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
         final String methodName = extractMethodName(operation);
         final String operatorType = extractParameterType(operation);
         try {
-            return new JavaMethodInvoker().invokeJavaMethod(operation.getRightOperand().getReturnType(), valueToSetObjectWith, objectToInvokeJavaMethodOn,
+            return new JavaMethodInvoker().invokeJavaMethod(operation.getRightOperand().getReturnType(),
+                    valueToSetObjectWith, objectToInvokeJavaMethodOn,
                     methodName, operatorType);
         } catch (final Exception e) {
             throw new SOperationExecutionException("Unable to evaluate operation " + operation, e);
@@ -60,7 +62,8 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
         return split[0];
     }
 
-    protected Object extractObjectToInvokeFromContext(final SOperation operation, final SExpressionContext expressionContext)
+    protected Object extractObjectToInvokeFromContext(final SOperation operation,
+            final SExpressionContext expressionContext)
             throws SOperationExecutionException {
         final Object objectToInvokeJavaMethodOn;
         final String dataToSet = operation.getLeftOperand().getName();

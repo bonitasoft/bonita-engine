@@ -16,8 +16,9 @@ package org.bonitasoft.engine.profile;
 import org.bonitasoft.engine.search.SearchOptions;
 
 /**
- * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for {@link Profile}s
- * 
+ * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for
+ * {@link Profile}s
+ *
  * @author Julien Mege
  * @author Celine Souchet
  * @see SearchOptions
@@ -28,7 +29,7 @@ public final class ProfileSearchDescriptor {
 
     /**
      * Used to filter or order by the {@link Profile} identifier
-     * 
+     *
      * @see ProfileEntry
      */
     public static final String ID = "id";

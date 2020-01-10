@@ -13,6 +13,12 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import java.io.Reader;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.sql.Clob;
+import java.sql.SQLException;
+
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.jdbc.CharacterStream;
@@ -20,13 +26,6 @@ import org.hibernate.engine.jdbc.internal.CharacterStreamImpl;
 import org.hibernate.type.descriptor.WrapperOptions;
 import org.hibernate.type.descriptor.java.AbstractTypeDescriptor;
 import org.hibernate.type.descriptor.java.DataHelper;
-import org.hibernate.type.descriptor.java.StringTypeDescriptor;
-
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.sql.Clob;
-import java.sql.SQLException;
 
 public class XMLTypeDescriptor
         extends AbstractTypeDescriptor<Serializable> {
@@ -34,7 +33,6 @@ public class XMLTypeDescriptor
     public XMLTypeDescriptor() {
         super(Serializable.class);
     }
-
 
     @Override
     public boolean areEqual(Serializable one, Serializable another) {

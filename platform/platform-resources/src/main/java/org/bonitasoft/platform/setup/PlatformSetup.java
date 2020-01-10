@@ -24,6 +24,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.io.FileUtils;
@@ -157,7 +158,7 @@ public class PlatformSetup {
 
     /**
      * push all configuration files and licenses
-     * 
+     *
      * @param forcePush shall we skip the check for removed folders?
      */
     public void push(boolean forcePush) throws PlatformException {
@@ -221,7 +222,8 @@ public class PlatformSetup {
 
     /**
      * Entry point to retrieve all configuration files and write them to folder
-     * each file will be located under sub folder according to its purpose. See {@link org.bonitasoft.platform.configuration.type.ConfigurationType} for all
+     * each file will be located under sub folder according to its purpose. See
+     * {@link org.bonitasoft.platform.configuration.type.ConfigurationType} for all
      * available values
      * For tenant specific files, a tenants/[TENANT_ID] folder is created prior to configuration type
      */

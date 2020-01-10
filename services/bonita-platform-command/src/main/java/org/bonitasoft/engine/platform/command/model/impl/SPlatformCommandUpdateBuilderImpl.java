@@ -23,7 +23,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 public class SPlatformCommandUpdateBuilderImpl implements SPlatformCommandUpdateBuilder {
 
     private final EntityUpdateDescriptor descriptor;
-    
+
     public SPlatformCommandUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
         super();
         this.descriptor = descriptor;

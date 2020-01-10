@@ -33,7 +33,8 @@ public class SearchWaitingEvents extends AbstractSearchEntity<WaitingEvent, SWai
 
     private final EventInstanceService eventInstanceService;
 
-    public SearchWaitingEvents(final SearchEntityDescriptor searchDescriptor, final SearchOptions options, final EventInstanceService eventInstanceService) {
+    public SearchWaitingEvents(final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
+            final EventInstanceService eventInstanceService) {
         super(searchDescriptor, options);
         this.eventInstanceService = eventInstanceService;
     }

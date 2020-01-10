@@ -25,19 +25,26 @@ public interface SWaitingMessageEventBuilderFactory extends SWaitingEventKeyProv
 
     int PROGRESS_IN_TREATMENT_KEY = 1;
 
-    SWaitingMessageEventBuilder createNewWaitingMessageStartEventInstance(long processdefinitionId, final String messageName, final String processName,
+    SWaitingMessageEventBuilder createNewWaitingMessageStartEventInstance(long processdefinitionId,
+            final String messageName, final String processName,
             final long flowNodeDefinitionId, final String flowNodeName);
 
-    SWaitingMessageEventBuilder createNewWaitingMessageEventSubProcInstance(final long processdefinitionId, final long parentProcessInstanceId,
-            final long rootProcessInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
+    SWaitingMessageEventBuilder createNewWaitingMessageEventSubProcInstance(final long processdefinitionId,
+            final long parentProcessInstanceId,
+            final long rootProcessInstanceId, final String messageName, final String processName,
+            final long flowNodeDefinitionId, final String flowNodeName,
             final long subProcessId);
 
-    SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(long processdefinitionId, final long rootProcessInstanceId,
-            final long processInstanceId, final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId,
+    SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(long processdefinitionId,
+            final long rootProcessInstanceId,
+            final long processInstanceId, final long flowNodeInstanceId, final String messageName,
+            final String processName, final long flowNodeDefinitionId,
             final String flowNodeName);
 
-    SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(long processdefinitionId, final long rootProcessInstanceId,
-            final long processInstanceId, final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId,
+    SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(long processdefinitionId,
+            final long rootProcessInstanceId,
+            final long processInstanceId, final long flowNodeInstanceId, final String messageName,
+            final String processName, final long flowNodeDefinitionId,
             final String flowNodeName);
 
     SWaitingMessageEventBuilder createNewInstance(SWaitingMessageEvent waitingMessage);

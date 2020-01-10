@@ -64,7 +64,8 @@ public class NormalStateTransitionsManagerTest {
     @Test
     public void getNextState_should_return_the_map_entry_value() throws Exception {
         // given
-        NormalStateTransitionsManager transitionsManager = new NormalStateTransitionsManager(stateTransitions, flowNodeInstance);
+        NormalStateTransitionsManager transitionsManager = new NormalStateTransitionsManager(stateTransitions,
+                flowNodeInstance);
 
         // when
         FlowNodeState nextState = transitionsManager.getNextState(normalNonTerminalState);
@@ -76,7 +77,8 @@ public class NormalStateTransitionsManagerTest {
     @Test
     public void getNextState_should_throw_SIllegalStateTransition_exception_if_there_is_no_entry_in_the_map() {
         // given
-        NormalStateTransitionsManager transitionsManager = new NormalStateTransitionsManager(stateTransitions, flowNodeInstance);
+        NormalStateTransitionsManager transitionsManager = new NormalStateTransitionsManager(stateTransitions,
+                flowNodeInstance);
 
         try {
             // when
@@ -87,7 +89,8 @@ public class NormalStateTransitionsManagerTest {
             String message = e.getMessage();
             assertThat(message).startsWith("no state found after");
             assertThat(message).contains("for flow node of type");
-            assertThat(message).endsWith("in state category " + SStateCategory.NORMAL + ". Flow node instance: " + flowNodeInstance.toString());
+            assertThat(message).endsWith("in state category " + SStateCategory.NORMAL + ". Flow node instance: "
+                    + flowNodeInstance.toString());
         }
 
     }

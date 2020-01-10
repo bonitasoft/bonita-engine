@@ -15,15 +15,16 @@ package org.bonitasoft.engine.persistence;
 
 import java.util.Map;
 
-import org.hibernate.query.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 /**
  * @author Baptiste Mesta
  */
 public class HQLQueryBuilder extends QueryBuilder {
 
-    HQLQueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings, char likeEscapeCharacter) {
+    HQLQueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings,
+            char likeEscapeCharacter) {
         super(baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter);
     }
 

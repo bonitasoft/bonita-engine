@@ -24,7 +24,7 @@ public interface EventTriggerInstance extends BaseElement {
 
     /**
      * Return the identifier of the {@link EventInstance} which it is attached.
-     * 
+     *
      * @return The identifier of the {@link EventInstance}
      * @since 6.4.0
      */

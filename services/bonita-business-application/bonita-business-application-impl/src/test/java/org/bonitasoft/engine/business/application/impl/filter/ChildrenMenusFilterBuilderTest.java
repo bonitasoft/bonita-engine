@@ -31,7 +31,8 @@ public class ChildrenMenusFilterBuilderTest {
     public void build_query_options_should_filter_on_parent_id() throws Exception {
         //given
         long parentId = 4L;
-        ChildrenMenusFilterBuilder builder = new ChildrenMenusFilterBuilder(new SelectRange(START_INDEX, MAX_RESULTS), parentId);
+        ChildrenMenusFilterBuilder builder = new ChildrenMenusFilterBuilder(new SelectRange(START_INDEX, MAX_RESULTS),
+                parentId);
 
         //when
         QueryOptions options = builder.buildQueryOptions();
@@ -40,8 +41,10 @@ public class ChildrenMenusFilterBuilderTest {
         assertThat(options).isNotNull();
         assertThat(options.getFromIndex()).isEqualTo(START_INDEX);
         assertThat(options.getNumberOfResults()).isEqualTo(MAX_RESULTS);
-        assertThat(options.getOrderByOptions()).containsExactly(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
-        assertThat(options.getFilters()).containsExactly(new FilterOption(SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentId));
+        assertThat(options.getOrderByOptions())
+                .containsExactly(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
+        assertThat(options.getFilters())
+                .containsExactly(new FilterOption(SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentId));
     }
 
 }

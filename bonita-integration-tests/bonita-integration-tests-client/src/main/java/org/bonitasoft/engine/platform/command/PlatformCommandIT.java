@@ -51,7 +51,8 @@ public class PlatformCommandIT extends CommonAPIIT {
     public void createPlatformCommand() throws BonitaException {
         try {
             platformCommandAPI.addDependency("commands", "jar".getBytes());
-            final CommandDescriptor command = platformCommandAPI.register("testPlatformCommand", "command description", "implementation");
+            final CommandDescriptor command = platformCommandAPI.register("testPlatformCommand", "command description",
+                    "implementation");
             assertNotNull(command);
             assertEquals("testPlatformCommand", command.getName());
             assertEquals("command description", command.getDescription());

@@ -148,7 +148,6 @@ public class DocumentImpl implements Document {
 
     }
 
-
     public String getVersion() {
         return version;
     }
@@ -165,8 +164,6 @@ public class DocumentImpl implements Document {
         this.description = description;
     }
 
-
-
     public void setIndex(int index) {
         this.index = index;
     }
@@ -178,28 +175,41 @@ public class DocumentImpl implements Document {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         DocumentImpl document = (DocumentImpl) o;
 
-        if (author != document.author) return false;
-        if (hasContent != document.hasContent) return false;
-        if (id != document.id) return false;
-        if (index != document.index) return false;
-        if (processInstanceId != document.processInstanceId) return false;
-        if (contentMimeType != null ? !contentMimeType.equals(document.contentMimeType) : document.contentMimeType != null)
+        if (author != document.author)
             return false;
-        if (contentStorageId != null ? !contentStorageId.equals(document.contentStorageId) : document.contentStorageId != null)
+        if (hasContent != document.hasContent)
+            return false;
+        if (id != document.id)
+            return false;
+        if (index != document.index)
+            return false;
+        if (processInstanceId != document.processInstanceId)
+            return false;
+        if (contentMimeType != null ? !contentMimeType.equals(document.contentMimeType)
+                : document.contentMimeType != null)
+            return false;
+        if (contentStorageId != null ? !contentStorageId.equals(document.contentStorageId)
+                : document.contentStorageId != null)
             return false;
         if (creationDate != null ? !creationDate.equals(document.creationDate) : document.creationDate != null)
             return false;
         if (description != null ? !description.equals(document.description) : document.description != null)
             return false;
-        if (fileName != null ? !fileName.equals(document.fileName) : document.fileName != null) return false;
-        if (name != null ? !name.equals(document.name) : document.name != null) return false;
-        if (url != null ? !url.equals(document.url) : document.url != null) return false;
-        if (version != null ? !version.equals(document.version) : document.version != null) return false;
+        if (fileName != null ? !fileName.equals(document.fileName) : document.fileName != null)
+            return false;
+        if (name != null ? !name.equals(document.name) : document.name != null)
+            return false;
+        if (url != null ? !url.equals(document.url) : document.url != null)
+            return false;
+        if (version != null ? !version.equals(document.version) : document.version != null)
+            return false;
 
         return true;
     }

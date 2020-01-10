@@ -69,7 +69,6 @@ public class SAMultiInstanceActivityInstance extends SAActivityInstance {
         return numberOfActiveInstances + numberOfCompletedInstances + numberOfTerminatedInstances;
     }
 
-
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SMultiInstanceActivityInstance.class;

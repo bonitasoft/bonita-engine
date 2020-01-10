@@ -28,13 +28,15 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
     private final DocumentDefinitionImpl documentDefinitionImpl;
 
     @Deprecated
-    public DocumentDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public DocumentDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String name, final String fileName) {
         this(processDefinitionBuilder, container, name);
         documentDefinitionImpl.setFileName(fileName);
     }
 
-    public DocumentDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public DocumentDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String name) {
         super(container, processDefinitionBuilder);
         documentDefinitionImpl = new DocumentDefinitionImpl(name);
@@ -44,6 +46,7 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
 
     /**
      * Sets description on this document
+     *
      * @param description description
      * @return the builder
      */
@@ -54,6 +57,7 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
 
     /**
      * Adds URL on this document
+     *
      * @param url URL
      * @return
      */
@@ -61,13 +65,15 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
         if (documentDefinitionImpl.getFile() == null) {
             documentDefinitionImpl.setUrl(url);
         } else {
-            getProcessBuilder().addError("Unable to add an url on a document that already have a file " + documentDefinitionImpl);
+            getProcessBuilder()
+                    .addError("Unable to add an url on a document that already have a file " + documentDefinitionImpl);
         }
         return this;
     }
 
     /**
      * Adds content file name on this document
+     *
      * @param contentFilename content file name
      * @return
      */
@@ -75,13 +81,15 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
         if (documentDefinitionImpl.getFileName() == null) {
             documentDefinitionImpl.setFileName(contentFilename);
         } else {
-            getProcessBuilder().addError("Unable to add file name on a document that already have a file name " + documentDefinitionImpl);
+            getProcessBuilder().addError(
+                    "Unable to add file name on a document that already have a file name " + documentDefinitionImpl);
         }
         return this;
     }
 
     /**
      * Adds a file on this document
+     *
      * @param file the complete file name
      * @return
      */
@@ -100,8 +108,11 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     /**
-     * Adds an initial value to the document, the initial value must be a {@link org.bonitasoft.engine.bpm.document.DocumentValue} or a {@link org.bonitasoft.engine.bpm.contract.FileInputValue}
+     * Adds an initial value to the document, the initial value must be a
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue} or a
+     * {@link org.bonitasoft.engine.bpm.contract.FileInputValue}
      * It overrides any value put in mime type, file, url or filename.
+     *
      * @param expression that is the initial value
      * @return the builder
      * @since 7.0.0

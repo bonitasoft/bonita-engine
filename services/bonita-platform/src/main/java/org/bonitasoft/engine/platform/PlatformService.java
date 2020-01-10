@@ -53,12 +53,13 @@ public interface PlatformService {
      */
     SPlatform getPlatform() throws SPlatformNotFoundException;
 
-
     /**
      * insert a new row in the Tenant table
-     * case 1 - create tenants tables if not already exists + insert rows where necessary (sequences for example) + insert default users (defined in
+     * case 1 - create tenants tables if not already exists + insert rows where necessary (sequences for example) +
+     * insert default users (defined in
      * configuration)
-     * case 2 - create tenants tables + insert rows where necessary (sequences for example) + insert default users (defined in configuration)
+     * case 2 - create tenants tables + insert rows where necessary (sequences for example) + insert default users
+     * (defined in configuration)
      *
      * @param tenant
      *        sTenant
@@ -84,7 +85,8 @@ public interface PlatformService {
      *         occurs when an exception is thrown during deleting an activated sTenant
      * @since 6.0
      */
-    void deleteTenant(long tenantId) throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
+    void deleteTenant(long tenantId)
+            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
 
     /**
      * Remove all rows from all tables where the tenantId matches
@@ -94,7 +96,8 @@ public interface PlatformService {
      * @throws STenantNotFoundException
      * @throws SDeletingActivatedTenantException
      */
-    void deleteTenantObjects(long tenantId) throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
+    void deleteTenantObjects(long tenantId)
+            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
 
     /**
      * Update a sTenant from given sTenant and new content.
@@ -165,7 +168,8 @@ public interface PlatformService {
      * @throws STenantException
      * @since 6.0
      */
-    List<STenant> getTenants(Collection<Long> ids, QueryOptions queryOptions) throws STenantNotFoundException, STenantException;
+    List<STenant> getTenants(Collection<Long> ids, QueryOptions queryOptions)
+            throws STenantNotFoundException, STenantException;
 
     /**
      * Set status of the tenant into activated
@@ -193,6 +197,7 @@ public interface PlatformService {
 
     /**
      * update status of tenant object to PAUSED
+     *
      * @param tenantId the id of the tenant to update
      */
     void pauseTenant(long tenantId) throws STenantUpdateException, STenantNotFoundException;
@@ -215,7 +220,8 @@ public interface PlatformService {
     boolean isPlatformCreated();
 
     /**
-     * Return a list of tenants by the given conditions, as one part of SearchResult that is search method's return value in platformApi
+     * Return a list of tenants by the given conditions, as one part of SearchResult that is search method's return
+     * value in platformApi
      *
      * @param options
      * @return a list of tenants by the given conditions
@@ -235,7 +241,8 @@ public interface PlatformService {
     List<STenant> getTenants(QueryOptions queryOptions) throws STenantException;
 
     /**
-     * Return a number of tenants by the given conditions, as one part of SearchResult that is search method's return value in platformApi
+     * Return a number of tenants by the given conditions, as one part of SearchResult that is search method's return
+     * value in platformApi
      *
      * @param options
      * @return a number of tenants by the given conditions

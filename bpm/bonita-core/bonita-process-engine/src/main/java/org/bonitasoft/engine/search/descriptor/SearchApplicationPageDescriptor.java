@@ -18,14 +18,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SearchApplicationPageDescriptor extends SearchEntityDescriptor {
 
@@ -36,9 +34,12 @@ public class SearchApplicationPageDescriptor extends SearchEntityDescriptor {
     SearchApplicationPageDescriptor() {
         keys = new HashMap<String, FieldDescriptor>(4);
         keys.put(ApplicationPageSearchDescriptor.ID, new FieldDescriptor(SApplicationPage.class, SApplicationPage.ID));
-        keys.put(ApplicationPageSearchDescriptor.TOKEN, new FieldDescriptor(SApplicationPage.class, SApplicationPage.TOKEN));
-        keys.put(ApplicationPageSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationPage.class, SApplicationPage.APPLICATION_ID));
-        keys.put(ApplicationPageSearchDescriptor.PAGE_ID, new FieldDescriptor(SApplicationPage.class, SApplicationPage.PAGE_ID));
+        keys.put(ApplicationPageSearchDescriptor.TOKEN,
+                new FieldDescriptor(SApplicationPage.class, SApplicationPage.TOKEN));
+        keys.put(ApplicationPageSearchDescriptor.APPLICATION_ID,
+                new FieldDescriptor(SApplicationPage.class, SApplicationPage.APPLICATION_ID));
+        keys.put(ApplicationPageSearchDescriptor.PAGE_ID,
+                new FieldDescriptor(SApplicationPage.class, SApplicationPage.PAGE_ID));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
 

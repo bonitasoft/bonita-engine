@@ -16,8 +16,8 @@ package org.bonitasoft.engine.operation;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -86,7 +86,8 @@ public class DocumentListLeftOperandHandlerTest {
 
     @Before
     public void setUp() throws SFlowNodeReadException, SFlowNodeNotFoundException {
-        handler = new DocumentListLeftOperandHandler(activityInstanceService, sessionAccessor, sessionService, documentService, documentHelper);
+        handler = new DocumentListLeftOperandHandler(activityInstanceService, sessionAccessor, sessionService,
+                documentService, documentHelper);
         doReturn(LOGGED_USER_ID).when(sessionService).getLoggedUserFromSession(sessionAccessor);
 
         SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
@@ -104,7 +105,8 @@ public class DocumentListLeftOperandHandlerTest {
     public void should_update_check_it_is_a_list() throws Exception {
         doThrow(SOperationExecutionException.class).when(documentHelper).toCheckedList(any());
         exception.expect(SOperationExecutionException.class);
-        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), new HashMap<>(), 45l, "container");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), new HashMap<>(), 45l,
+                "container");
     }
 
     @Test
@@ -112,7 +114,8 @@ public class DocumentListLeftOperandHandlerTest {
         doNothing().when(documentHelper).setDocumentList(anyList(), anyString(), anyLong(), anyLong());
         List<DocumentValue> newValue = Arrays.asList(documentValue("doc1"), documentValue("doc2"));
         doReturn(newValue).when(documentHelper).toCheckedList(newValue);
-        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), newValue, CONTAINER_ID, CONTAINER_TYPE);
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), newValue, CONTAINER_ID,
+                CONTAINER_TYPE);
         verify(documentHelper).setDocumentList(newValue, "myDoc", PROCESS_INSTANCE_ID, LOGGED_USER_ID);
     }
 

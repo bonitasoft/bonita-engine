@@ -66,7 +66,8 @@ public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implemen
     @XmlAttribute
     private String errorCode;
 
-    public ConnectorDefinitionImpl(final String name, final String connectorId, final String version, final ConnectorEvent actiationEvent) {
+    public ConnectorDefinitionImpl(final String name, final String connectorId, final String version,
+            final ConnectorEvent actiationEvent) {
         super(name);
         this.connectorId = connectorId;
         this.version = version;
@@ -137,9 +138,12 @@ public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implemen
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         ConnectorDefinitionImpl that = (ConnectorDefinitionImpl) o;
         return Objects.equals(connectorId, that.connectorId) &&
                 Objects.equals(inputs, that.inputs) &&
@@ -152,7 +156,8 @@ public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implemen
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), connectorId, inputs, outputs, activationEvent, version, failAction, errorCode);
+        return Objects.hash(super.hashCode(), connectorId, inputs, outputs, activationEvent, version, failAction,
+                errorCode);
     }
 
     @Override

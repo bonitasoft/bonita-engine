@@ -51,7 +51,8 @@ public class PlatformSetupAccessor {
     private static DataSource lookupDataSource() throws NamingException {
         Context ctx = new InitialContext();
         return (DataSource) ctx.lookup(
-                System.getProperty("sysprop.bonita.database.sequence.manager.datasource.name", "java:comp/env/bonitaSequenceManagerDS"));
+                System.getProperty("sysprop.bonita.database.sequence.manager.datasource.name",
+                        "java:comp/env/bonitaSequenceManagerDS"));
     }
 
     public static ConfigurationService getConfigurationService() throws NamingException {
@@ -59,6 +60,7 @@ public class PlatformSetupAccessor {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-        return new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, System.getProperty("sysprop.bonita.db.vendor"));
+        return new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate,
+                System.getProperty("sysprop.bonita.db.vendor"));
     }
 }

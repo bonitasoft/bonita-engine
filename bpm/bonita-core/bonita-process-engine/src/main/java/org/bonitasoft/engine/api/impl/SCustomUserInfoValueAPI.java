@@ -48,13 +48,15 @@ public class SCustomUserInfoValueAPI {
         this.service = service;
     }
 
-    public SearchResult<CustomUserInfoValue> search(SearchEntityDescriptor descriptor, final SearchOptions options) throws SBonitaException {
+    public SearchResult<CustomUserInfoValue> search(SearchEntityDescriptor descriptor, final SearchOptions options)
+            throws SBonitaException {
         SearchCustomUserInfoValues search = new SearchCustomUserInfoValues(service, descriptor, options);
         search.execute();
         return search.getResult();
     }
 
-    public SCustomUserInfoValue update(SCustomUserInfoValue value, CustomUserInfoValueUpdater updater) throws SIdentityException {
+    public SCustomUserInfoValue update(SCustomUserInfoValue value, CustomUserInfoValueUpdater updater)
+            throws SIdentityException {
         assertNoNull("Cannot update a value based on null parameters", value, updater);
         service.updateCustomUserInfoValue(value, updaterFactory.createNewInstance()
                 .updateValue(updater.getValue())
@@ -62,12 +64,11 @@ public class SCustomUserInfoValueAPI {
         return service.getCustomUserInfoValue(value.getId());
     }
 
-    public SCustomUserInfoValue set(long definitionId, long userId, String value) throws
-            SIdentityException,
+    public SCustomUserInfoValue set(long definitionId, long userId, String value) throws SIdentityException,
             SBonitaReadException {
 
         SCustomUserInfoValue customUserInfoValue = searchValue(definitionId, userId);
-        if(value == null || value.isEmpty()) {
+        if (value == null || value.isEmpty()) {
             delete(customUserInfoValue);
             return createValue(definitionId, userId, value);
         }
@@ -82,7 +83,7 @@ public class SCustomUserInfoValueAPI {
     }
 
     public void delete(SCustomUserInfoValue value) throws SIdentityException {
-        if(value != null) {
+        if (value != null) {
             service.deleteCustomUserInfoValue(value);
         }
     }
@@ -98,12 +99,12 @@ public class SCustomUserInfoValueAPI {
         List<SCustomUserInfoValue> result = service.searchCustomUserInfoValue(new QueryOptions(
                 0,
                 1,
-                Collections.<OrderByOption>emptyList(),
+                Collections.<OrderByOption> emptyList(),
                 Arrays.asList(
                         new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.DEFINITION_ID, definitionId),
                         new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID, userId)),
                 null));
-        if(result.size() == 0) {
+        if (result.size() == 0) {
             return null;
         }
         return result.get(0);

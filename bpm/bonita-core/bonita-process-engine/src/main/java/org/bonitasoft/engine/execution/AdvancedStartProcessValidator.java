@@ -50,7 +50,8 @@ public class AdvancedStartProcessValidator {
         this.expressionService = expressionService;
     }
 
-    public List<String> validate(List<String> flowNodeNames, Map<String, Serializable> processContractInputs) throws SBonitaException {
+    public List<String> validate(List<String> flowNodeNames, Map<String, Serializable> processContractInputs)
+            throws SBonitaException {
         List<String> problems = new ArrayList<>();
         if (flowNodeNames.isEmpty()) {
             problems.add("The list of activity names to start cannot be empty!");
@@ -67,20 +68,24 @@ public class AdvancedStartProcessValidator {
         return problems;
     }
 
-    private List<String> checkProcessContract(Map<String, Serializable> processContractInputs, SProcessDefinition processDefinition) {
+    private List<String> checkProcessContract(Map<String, Serializable> processContractInputs,
+            SProcessDefinition processDefinition) {
         return validateContract(processContractInputs, processDefinition.getContract(), processDefinition.getName());
     }
 
-    private List<String> validateContract(Map<String, Serializable> inputs, SContractDefinition contract, String element) {
+    private List<String> validateContract(Map<String, Serializable> inputs, SContractDefinition contract,
+            String element) {
         if (contract == null) {
             return Collections.emptyList();
         }
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(technicalLoggerService,
+        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(
+                technicalLoggerService,
                 expressionService);
         try {
             validator.validate(processDefinitionId, contract, inputs);
         } catch (SContractViolationException e) {
-            return e.getExplanations().isEmpty() ? Collections.singletonList(e.getSimpleMessage() + " on " + element) : appendElement(e, element);
+            return e.getExplanations().isEmpty() ? Collections.singletonList(e.getSimpleMessage() + " on " + element)
+                    : appendElement(e, element);
         }
         return Collections.emptyList();
     }
@@ -93,24 +98,28 @@ public class AdvancedStartProcessValidator {
         return strings;
     }
 
-    private List<String> checkFlowNodesContracts(List<String> flowNodeNames, Map<String, Map<String, Serializable>> activitiesContractInputs,
+    private List<String> checkFlowNodesContracts(List<String> flowNodeNames,
+            Map<String, Map<String, Serializable>> activitiesContractInputs,
             SProcessDefinition processDefinition) {
         List<String> problems = new ArrayList<>();
         for (String flowNodeName : flowNodeNames) {
             SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(flowNodeName);
             if (flowNode instanceof SUserTaskDefinition && ((SUserTaskDefinition) flowNode).getContract() != null) {
                 problems.addAll(validateContract(
-                        activitiesContractInputs == null ? Collections.<String, Serializable> emptyMap() : activitiesContractInputs.get(flowNodeName),
+                        activitiesContractInputs == null ? Collections.<String, Serializable> emptyMap()
+                                : activitiesContractInputs.get(flowNodeName),
                         ((SUserTaskDefinition) flowNode).getContract(), flowNodeName));
             }
         }
         return problems;
     }
 
-    private List<String> checkFlowNodesAreSupported(List<String> flowNodeNames, List<String> foundFlowNodes, SProcessDefinition processDefinition) {
+    private List<String> checkFlowNodesAreSupported(List<String> flowNodeNames, List<String> foundFlowNodes,
+            SProcessDefinition processDefinition) {
         List<String> problems = new ArrayList<>();
         for (SFlowNodeDefinition flowNode : processDefinition.getProcessContainer().getFlowNodes()) {
-            boolean invalidType = SFlowNodeType.BOUNDARY_EVENT.equals(flowNode.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNode.getType())
+            boolean invalidType = SFlowNodeType.BOUNDARY_EVENT.equals(flowNode.getType())
+                    || SFlowNodeType.SUB_PROCESS.equals(flowNode.getType())
                     || SFlowNodeType.GATEWAY.equals(flowNode.getType());
             if (flowNodeNames.contains(flowNode.getName())) {
                 foundFlowNodes.add(flowNode.getName());
@@ -122,7 +131,8 @@ public class AdvancedStartProcessValidator {
         return problems;
     }
 
-    private List<String> checkForNotFoundFlowNodes(List<String> flowNodeNames, List<String> foundFlowNodes, SProcessDefinition processDefinition) {
+    private List<String> checkForNotFoundFlowNodes(List<String> flowNodeNames, List<String> foundFlowNodes,
+            SProcessDefinition processDefinition) {
         List<String> problems = new ArrayList<>();
         for (String flowNodeName : flowNodeNames) {
             if (!foundFlowNodes.contains(flowNodeName)) {

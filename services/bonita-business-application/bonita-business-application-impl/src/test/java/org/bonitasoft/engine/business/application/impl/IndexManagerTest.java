@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.business.application.impl;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -49,12 +49,14 @@ public class IndexManagerTest {
         indexManager.organizeIndexesOnDelete(menuIndex);
 
         //then
-        verify(indexUpdater).decrementIndexes(menuIndex.getParentId(), menuIndex.getValue() + 1, menuIndex.getLastUsedIndex());
+        verify(indexUpdater).decrementIndexes(menuIndex.getParentId(), menuIndex.getValue() + 1,
+                menuIndex.getLastUsedIndex());
         verify(indexUpdater, never()).incrementIndexes(anyLong(), anyInt(), anyInt());
     }
 
     @Test
-    public void organizeIndexesOnUpdate_should_call_increment_index_when_move_up_and_parent_doesnt_change() throws Exception {
+    public void organizeIndexesOnUpdate_should_call_increment_index_when_move_up_and_parent_doesnt_change()
+            throws Exception {
         //given
         MenuIndex oldIndex = new MenuIndex(1L, 6, 15);
         MenuIndex newIndex = new MenuIndex(1L, 2, 15);
@@ -68,7 +70,8 @@ public class IndexManagerTest {
     }
 
     @Test
-    public void organizeIndexesOnUpdate_should_call_decrement_index_when_move_down_and_parent_doesnt_change() throws Exception {
+    public void organizeIndexesOnUpdate_should_call_decrement_index_when_move_down_and_parent_doesnt_change()
+            throws Exception {
         //given
         MenuIndex oldIndex = new MenuIndex(1L, 1, 15);
         MenuIndex newIndex = new MenuIndex(1L, 5, 15);
@@ -82,7 +85,8 @@ public class IndexManagerTest {
     }
 
     @Test
-    public void organizeIndexesOnUpdate_should_call_increment_on_new_parent_and_decrement_on_old_parent_when_parent_changes() throws Exception {
+    public void organizeIndexesOnUpdate_should_call_increment_on_new_parent_and_decrement_on_old_parent_when_parent_changes()
+            throws Exception {
         MenuIndex oldIndex = new MenuIndex(1L, 2, 15);
         MenuIndex newIndex = new MenuIndex(2L, 6, 9);
 
@@ -90,12 +94,14 @@ public class IndexManagerTest {
         indexManager.organizeIndexesOnUpdate(oldIndex, newIndex);
 
         //then
-        verify(indexUpdater).decrementIndexes(oldIndex.getParentId(), oldIndex.getValue() + 1, oldIndex.getLastUsedIndex());
+        verify(indexUpdater).decrementIndexes(oldIndex.getParentId(), oldIndex.getValue() + 1,
+                oldIndex.getLastUsedIndex());
         verify(indexUpdater).incrementIndexes(newIndex.getParentId(), newIndex.getValue(), newIndex.getLastUsedIndex());
     }
 
-    @Test (expected = SObjectModificationException.class)
-    public void organizeIndexesOnUpdate_should_throws_SObjectModificationException_when_new_menuIndex_is_invalid() throws Exception {
+    @Test(expected = SObjectModificationException.class)
+    public void organizeIndexesOnUpdate_should_throws_SObjectModificationException_when_new_menuIndex_is_invalid()
+            throws Exception {
         //given
         MenuIndex oldIndex = new MenuIndex(1L, 1, 15);
         MenuIndex newIndex = new MenuIndex(1L, 5, 4);

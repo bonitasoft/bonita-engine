@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.data.instance.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;

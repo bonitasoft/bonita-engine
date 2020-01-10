@@ -29,7 +29,7 @@ public class SUserMembershipUpdateBuilderImpl implements SUserMembershipUpdateBu
         super();
         this.descriptor = descriptor;
     }
-    
+
     @Override
     public EntityUpdateDescriptor done() {
         return descriptor;

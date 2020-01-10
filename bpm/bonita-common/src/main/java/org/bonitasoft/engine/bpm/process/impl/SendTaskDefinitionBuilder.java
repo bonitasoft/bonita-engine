@@ -23,7 +23,8 @@ import org.bonitasoft.engine.expression.Expression;
  */
 public class SendTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
-    public SendTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
+    public SendTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl process,
             final String taskName, final String messageName, final Expression targetProcess) {
         super(process, processDefinitionBuilder, new SendTaskDefinitionImpl(taskName, messageName, targetProcess));
         if (messageName == null || messageName.isEmpty()) {
@@ -33,6 +34,7 @@ public class SendTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Sets the target flow node.
+     *
      * @param targetFlowNode expression representing the flow node that will receive the message.
      * @return
      */
@@ -43,24 +45,29 @@ public class SendTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Adds a content to this message.
+     *
      * @param displayName expression representing the content display name.
      * @param messageContent expression representing the content value.
      * @return
      */
-    public DataDefinitionBuilder addMessageContentExpression(final Expression displayName, final Expression messageContent) {
+    public DataDefinitionBuilder addMessageContentExpression(final Expression displayName,
+            final Expression messageContent) {
         final String dataName = displayName.getContent(); // FIXME evaluate the expression
         final String className = messageContent.getReturnType();
-        return new DataDefinitionBuilder(getProcessBuilder(), getContainer(), (ThrowMessageEventTriggerDefinitionImpl) getActivity().getMessageTrigger(),
+        return new DataDefinitionBuilder(getProcessBuilder(), getContainer(),
+                (ThrowMessageEventTriggerDefinitionImpl) getActivity().getMessageTrigger(),
                 dataName, className, messageContent);
     }
 
     /**
      * Adds a correlation on this send task.
-     * <p> 
-     * It's possible to define up to five correlations. If more then five correlations are defined, the process becomes invalid.
      * <p>
-     * The expressions representing correlation key and correlation value are evaluated once during the flow node initialization. 
-     * 
+     * It's possible to define up to five correlations. If more then five correlations are defined, the process becomes
+     * invalid.
+     * <p>
+     * The expressions representing correlation key and correlation value are evaluated once during the flow node
+     * initialization.
+     *
      * @param correlationKey expression representing the correlation key.
      * @param value expression representing the correlation value.
      * @return

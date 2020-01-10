@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,17 +39,14 @@ import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
-import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberCreator;
 import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
-import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfileMember;
-import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -100,30 +96,35 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            return ModelConvertor.toProfiles(profileService.searchProfilesOfUser(userId, 0, 1000, "name", OrderByType.ASC));
+            return ModelConvertor
+                    .toProfiles(profileService.searchProfilesOfUser(userId, 0, 1000, "name", OrderByType.ASC));
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
     }
 
     @Override
-    public List<Profile> getProfilesForUser(final long userId, final int startIndex, final int maxResults, final ProfileCriterion criterion) {
+    public List<Profile> getProfilesForUser(final long userId, final int startIndex, final int maxResults,
+            final ProfileCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            return ModelConvertor.toProfiles(profileService.searchProfilesOfUser(userId, startIndex, maxResults, criterion.getField(),
-                    OrderByType.valueOf(criterion.getOrder().name())));
+            return ModelConvertor.toProfiles(
+                    profileService.searchProfilesOfUser(userId, startIndex, maxResults, criterion.getField(),
+                            OrderByType.valueOf(criterion.getOrder().name())));
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
     }
 
     @Override
-    public List<Profile> getProfilesWithNavigationForUser(final long userId, final int startIndex, final int maxResults, final ProfileCriterion criterion) {
+    public List<Profile> getProfilesWithNavigationForUser(final long userId, final int startIndex, final int maxResults,
+            final ProfileCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            return ModelConvertor.toProfiles(profileService.searchProfilesWithNavigationOfUser(userId, startIndex, maxResults, criterion.getField(),
+            return ModelConvertor.toProfiles(profileService.searchProfilesWithNavigationOfUser(userId, startIndex,
+                    maxResults, criterion.getField(),
                     OrderByType.valueOf(criterion.getOrder().name())));
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
@@ -135,7 +136,8 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchProfiles searchProfileTransaction = new SearchProfiles(profileService, searchEntitiesDescriptor.getSearchProfileDescriptor(), options);
+        final SearchProfiles searchProfileTransaction = new SearchProfiles(profileService,
+                searchEntitiesDescriptor.getSearchProfileDescriptor(), options);
         try {
             searchProfileTransaction.execute();
             return searchProfileTransaction.getResult();
@@ -173,12 +175,14 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public SearchResult<ProfileMember> searchProfileMembers(final String memberType, final SearchOptions options) throws SearchException {
+    public SearchResult<ProfileMember> searchProfileMembers(final String memberType, final SearchOptions options)
+            throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         try {
-            final SearchProfileMembersForProfile searchProfileMembersForProfile = new SearchProfileMembersForProfile(getProfileMemberQuerySuffix(memberType),
+            final SearchProfileMembersForProfile searchProfileMembersForProfile = new SearchProfileMembersForProfile(
+                    getProfileMemberQuerySuffix(memberType),
                     profileService, getProfileMemberDescriptor(searchEntitiesDescriptor, memberType), options);
             searchProfileMembersForProfile.execute();
             return searchProfileMembersForProfile.getResult();
@@ -187,7 +191,8 @@ public class ProfileAPIImpl implements ProfileAPI {
         }
     }
 
-    private SearchEntityDescriptor getProfileMemberDescriptor(final SearchEntitiesDescriptor searchEntitiesDescriptor, final String memberType)
+    private SearchEntityDescriptor getProfileMemberDescriptor(final SearchEntitiesDescriptor searchEntitiesDescriptor,
+            final String memberType)
             throws SBonitaReadException {
         if (ProfileMemberUtils.USER_TYPE.equals(memberType)) {
             return searchEntitiesDescriptor.getSearchProfileMemberUserDescriptor();
@@ -221,8 +226,10 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
-        final SearchProfileEntries searchProfileEntries = new SearchProfileEntries(profileService, tenantAccessor.getSearchEntitiesDescriptor()
-                .getSearchProfileEntryDescriptor(), options);
+        final SearchProfileEntries searchProfileEntries = new SearchProfileEntries(profileService,
+                tenantAccessor.getSearchEntitiesDescriptor()
+                        .getSearchProfileEntryDescriptor(),
+                options);
         try {
             searchProfileEntries.execute();
             return searchProfileEntries.getResult();
@@ -258,7 +265,8 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId)
+    public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId,
+            final Long roleId)
             throws CreationException,
             AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -266,10 +274,12 @@ public class ProfileAPIImpl implements ProfileAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final MemberType memberType = getMemberType(userId, groupId, roleId);
-            final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId,
+            final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService,
+                    profileId, userId, groupId, roleId,
                     memberType);
             try {
-                checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
+                checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId,
+                        memberType);
             } catch (final SBonitaException e1) {
                 throw new AlreadyExistsException(e1);
             }
@@ -286,17 +296,21 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public ProfileMember createProfileMember(final ProfileMemberCreator creator) throws CreationException, AlreadyExistsException {
+    public ProfileMember createProfileMember(final ProfileMemberCreator creator)
+            throws CreationException, AlreadyExistsException {
         if (creator == null) {
             throw new CreationException("Unable to create a profile member with a null creator!");
         }
 
         final SProfileMember sProfileMember = ModelConvertor.constructSProfileMember(creator);
-        return createProfileMember(sProfileMember.getProfileId(), sProfileMember.getUserId(), sProfileMember.getGroupId(), sProfileMember.getRoleId());
+        return createProfileMember(sProfileMember.getProfileId(), sProfileMember.getUserId(),
+                sProfileMember.getGroupId(), sProfileMember.getRoleId());
     }
 
-    protected void checkIfProfileMemberExists(final TenantServiceAccessor tenantAccessor, final ProfileService profileService, final Long profileId,
-            final Long userId, final Long groupId, final Long roleId, final MemberType memberType) throws SBonitaException {
+    protected void checkIfProfileMemberExists(final TenantServiceAccessor tenantAccessor,
+            final ProfileService profileService, final Long profileId,
+            final Long userId, final Long groupId, final Long roleId, final MemberType memberType)
+            throws SBonitaException {
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchEntityDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProfileMemberUserDescriptor();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
@@ -306,41 +320,49 @@ public class ProfileAPIImpl implements ProfileAPI {
 
         switch (memberType) {
             case USER:
-                searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForUser", profileService, searchDescriptor, searchOptionsBuilder.done());
+                searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForUser", profileService,
+                        searchDescriptor, searchOptionsBuilder.done());
                 searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.USER_ID, userId);
                 searchProfileMembersForProfile.execute();
                 if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SUserProfileMemberAlreadyExistsException("A profileMember with userId \"" + userId + "\" already exists");
+                    throw new SUserProfileMemberAlreadyExistsException(
+                            "A profileMember with userId \"" + userId + "\" already exists");
                 }
                 break;
             case GROUP:
-                searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForGroup", profileService, searchDescriptor, searchOptionsBuilder.done());
+                searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForGroup", profileService,
+                        searchDescriptor, searchOptionsBuilder.done());
                 searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.GROUP_ID, groupId);
                 searchProfileMembersForProfile.execute();
 
                 if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SGroupProfileMemberAlreadyExistsException("A profileMember with groupId \"" + groupId + "\" already exists");
+                    throw new SGroupProfileMemberAlreadyExistsException(
+                            "A profileMember with groupId \"" + groupId + "\" already exists");
                 }
                 break;
             case ROLE:
-                searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForRole", profileService, searchDescriptor, searchOptionsBuilder.done());
+                searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForRole", profileService,
+                        searchDescriptor, searchOptionsBuilder.done());
                 searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.ROLE_ID, roleId);
                 searchProfileMembersForProfile.execute();
 
                 if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SRoleProfileMemberAlreadyExistsException("A profileMember with roleId \"" + roleId + "\" already exists");
+                    throw new SRoleProfileMemberAlreadyExistsException(
+                            "A profileMember with roleId \"" + roleId + "\" already exists");
                 }
                 break;
             default:
-                searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForRoleAndGroup", profileService, searchDescriptor,
+                searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForRoleAndGroup", profileService,
+                        searchDescriptor,
                         searchOptionsBuilder.done());
                 searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.ROLE_ID, roleId);
                 searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.GROUP_ID, groupId);
                 searchProfileMembersForProfile.execute();
 
                 if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SUserMembershipProfileMemberAlreadyExistsException("A profileMember with groupId \"" + groupId + "\" and roleId \"" + roleId
-                            + "\" already exists");
+                    throw new SUserMembershipProfileMemberAlreadyExistsException(
+                            "A profileMember with groupId \"" + groupId + "\" and roleId \"" + roleId
+                                    + "\" already exists");
                 }
                 break;
         }

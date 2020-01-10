@@ -32,8 +32,10 @@ public class SearchUncategorizedProcessDeploymentInfosSupervisedBy extends Abstr
 
     private final long userId;
 
-    public SearchUncategorizedProcessDeploymentInfosSupervisedBy(final ProcessDefinitionService processDefinitionService,
-            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options, final long userId) {
+    public SearchUncategorizedProcessDeploymentInfosSupervisedBy(
+            final ProcessDefinitionService processDefinitionService,
+            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options,
+            final long userId) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
         this.userId = userId;
@@ -41,11 +43,13 @@ public class SearchUncategorizedProcessDeploymentInfosSupervisedBy extends Abstr
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-        return processDefinitionService.getNumberOfUncategorizedProcessDeploymentInfosSupervisedBy(userId, searchOptions);
+        return processDefinitionService.getNumberOfUncategorizedProcessDeploymentInfosSupervisedBy(userId,
+                searchOptions);
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions)
+            throws SBonitaReadException {
         return processDefinitionService.searchUncategorizedProcessDeploymentInfosSupervisedBy(userId, searchOptions);
     }
 

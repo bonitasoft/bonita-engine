@@ -145,7 +145,8 @@ public class HTTPServerAPIIT {
     private static final class BonitaHandler extends AbstractHandler {
 
         @Override
-        public void handle(final String s, final Request baseRequest, final HttpServletRequest request, final HttpServletResponse response) {
+        public void handle(final String s, final Request baseRequest, final HttpServletRequest request,
+                final HttpServletResponse response) {
             assertThat(request.getUserPrincipal().getName()).isEqualTo("john");
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_OK);

@@ -20,7 +20,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceA
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class SMultiInstanceActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SMultiInstanceActivityInstanceBuilder {
+public class SMultiInstanceActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl
+        implements SMultiInstanceActivityInstanceBuilder {
 
     public SMultiInstanceActivityInstanceBuilderImpl(final SMultiInstanceActivityInstance entity) {
         super(entity);

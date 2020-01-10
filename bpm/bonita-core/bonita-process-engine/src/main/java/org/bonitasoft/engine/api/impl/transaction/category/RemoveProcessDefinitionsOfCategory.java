@@ -55,17 +55,22 @@ public class RemoveProcessDefinitionsOfCategory implements TransactionContent {
     public void execute() throws SBonitaException {
         final FilterOption filterOption;
         if (categoryId != -1) {
-            filterOption = new FilterOption(SProcessCategoryMapping.class, BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getCategoryIdKey(), categoryId);
+            filterOption = new FilterOption(SProcessCategoryMapping.class,
+                    BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getCategoryIdKey(), categoryId);
         } else {
-            filterOption = new FilterOption(SProcessCategoryMapping.class, BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getProcessIdKey(), processDefinitionId);
+            filterOption = new FilterOption(SProcessCategoryMapping.class,
+                    BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getProcessIdKey(),
+                    processDefinitionId);
         }
-        final OrderByOption order = new OrderByOption(SProcessCategoryMapping.class, BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getIdKey(), OrderByType.ASC);
+        final OrderByOption order = new OrderByOption(SProcessCategoryMapping.class,
+                BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getIdKey(), OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(order),
                 Collections.singletonList(filterOption), null);
 
         long deletedProcessCategoryMappings;
         do {
-            final List<SProcessCategoryMapping> processCategoryMappings = categoryService.searchProcessCategoryMappings(queryOptions);
+            final List<SProcessCategoryMapping> processCategoryMappings = categoryService
+                    .searchProcessCategoryMappings(queryOptions);
             deletedProcessCategoryMappings = categoryService.deleteProcessCategoryMappings(processCategoryMappings);
         } while (deletedProcessCategoryMappings > 0);
     }

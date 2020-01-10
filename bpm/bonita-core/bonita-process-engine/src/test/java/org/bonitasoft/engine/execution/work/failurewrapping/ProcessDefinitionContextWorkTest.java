@@ -30,7 +30,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
@@ -54,7 +53,8 @@ public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest {
         doReturn(NAME).when(sProcessDefinitionDeployInfo).getName();
         doReturn(VERSION).when(sProcessDefinitionDeployInfo).getVersion();
 
-        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(PROCESS_DEFINITION_ID);
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService)
+                .getProcessDeploymentInfo(PROCESS_DEFINITION_ID);
         doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
 
         txBonitawork = spy(new ProcessDefinitionContextWork(wrappedWork, PROCESS_DEFINITION_ID));

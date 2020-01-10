@@ -13,16 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.contract.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
-import org.bonitasoft.engine.bpm.contract.Type;
-import org.junit.Test;
-
-
-
 public class SimpleInputDefinitionImplTest {
-
-
 
 }

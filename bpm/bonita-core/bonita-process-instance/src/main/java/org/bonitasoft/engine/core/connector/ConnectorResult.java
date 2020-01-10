@@ -22,7 +22,7 @@ import org.bonitasoft.engine.connector.Connector;
  * Contains the instantiated connector and its result
  * It is used to give make the connector service return both the instantiated connector and its result
  * in order to be able to call disconnect on it in the execute operation method
- * 
+ *
  * @author Baptiste Mesta
  */
 public class ConnectorResult {
@@ -50,7 +50,7 @@ public class ConnectorResult {
 
     /**
      * @param connector
-     *            the connector to set
+     *        the connector to set
      */
     public void setConnector(final Connector connector) {
         this.connector = connector;
@@ -68,7 +68,7 @@ public class ConnectorResult {
 
     /**
      * @param result
-     *            the result to set
+     *        the result to set
      */
     public void setResult(final Map<String, Object> result) {
         this.result = result;

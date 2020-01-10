@@ -36,7 +36,8 @@ public class ApplicationPageToNodeConverter {
      * @throws SObjectNotFoundException if the referenced page does not exist.
      * @throws SBonitaReadException if the referenced page cannot be retrieved.
      */
-    public ApplicationPageNode toPage(final SApplicationPage page) throws SBonitaReadException, SObjectNotFoundException {
+    public ApplicationPageNode toPage(final SApplicationPage page)
+            throws SBonitaReadException, SObjectNotFoundException {
         if (page == null) {
             throw new IllegalArgumentException("Application page to convert cannot be null");
         }

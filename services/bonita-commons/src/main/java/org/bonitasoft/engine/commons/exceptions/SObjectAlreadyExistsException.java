@@ -21,7 +21,7 @@ public class SObjectAlreadyExistsException extends SBonitaException {
     private static final long serialVersionUID = -4043938145910922261L;
 
     /**
-     * 
+     *
      */
     public SObjectAlreadyExistsException() {
         super();

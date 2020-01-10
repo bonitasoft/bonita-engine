@@ -45,7 +45,8 @@ public class SConnectorUserFilterAdapter implements SConnector {
     @Override
     public void setInputParameters(final Map<String, Object> parameters) {
         final APIAccessor apiAccessor = (APIAccessor) parameters.remove("connectorApiAccessor");
-        final EngineExecutionContext executionContext = (EngineExecutionContext) parameters.remove("engineExecutionContext");
+        final EngineExecutionContext executionContext = (EngineExecutionContext) parameters
+                .remove("engineExecutionContext");
         if (filter instanceof AbstractUserFilter) {
             ((AbstractUserFilter) filter).setAPIAccessor(apiAccessor);
             if (executionContext != null) {

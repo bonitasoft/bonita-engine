@@ -59,7 +59,8 @@ public class IsProcessOwnerRuleTest {
     long userId = 2L;
 
     @InjectMocks
-    IsProcessOwnerRule isProcessOwnerRule = new IsProcessOwnerRule(supervisorMappingService, sessionAccessor, sessionService, formMappingService);
+    IsProcessOwnerRule isProcessOwnerRule = new IsProcessOwnerRule(supervisorMappingService, sessionAccessor,
+            sessionService, formMappingService);
 
     @Before
     public void initMocks() throws Exception {

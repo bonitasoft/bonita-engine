@@ -17,8 +17,9 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 
 /**
- * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for {@link ProfileMember}s
- * 
+ * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for
+ * {@link ProfileMember}s
+ *
  * @author Julien Mege
  * @author Celine Souchet
  * @see SearchOptions
@@ -71,7 +72,8 @@ public final class ProfileMemberSearchDescriptor {
     public static final String USER_ID = "userId";
 
     /**
-     * Used to filter or order by the identifier of the {@link org.bonitasoft.engine.identity.Group} related to the {@link ProfileMember}
+     * Used to filter or order by the identifier of the {@link org.bonitasoft.engine.identity.Group} related to the
+     * {@link ProfileMember}
      *
      * @see org.bonitasoft.engine.identity.Group
      * @see ProfileMember
@@ -79,7 +81,8 @@ public final class ProfileMemberSearchDescriptor {
     public static final String GROUP_ID = "groupId";
 
     /**
-     * Used to filter or order by the identifier of the {@link org.bonitasoft.engine.identity.Role} related to the {@link ProfileMember}
+     * Used to filter or order by the identifier of the {@link org.bonitasoft.engine.identity.Role} related to the
+     * {@link ProfileMember}
      *
      * @see org.bonitasoft.engine.identity.Role
      * @see ProfileMember

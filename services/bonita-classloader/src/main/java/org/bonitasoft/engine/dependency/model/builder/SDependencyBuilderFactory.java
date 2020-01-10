@@ -17,13 +17,14 @@ import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 
 public class SDependencyBuilderFactory {
-    public SDependency createNewInstance(final String name, final long artifactId, final ScopeType artifactType, final String fileName,
-                                         final byte[] value) {
+
+    public SDependency createNewInstance(final String name, final long artifactId, final ScopeType artifactType,
+            final String fileName,
+            final byte[] value) {
         if (artifactType == ScopeType.PROCESS) {
             return new SDependency(artifactId + "_" + name, fileName, value);
         }
         return new SDependency(name, fileName, value);
     }
-
 
 }

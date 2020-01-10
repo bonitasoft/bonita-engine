@@ -43,8 +43,10 @@ public class ArchivedConnectorInstanceImpl extends NamedElementImpl implements A
 
     private final long sourceObjectId;
 
-    public ArchivedConnectorInstanceImpl(final String name, final Date archiveDate, final long containerId, final String containerType,
-            final String connectorId, final String version, final ConnectorEvent activationEvent, final ConnectorState state, final long sourceObjectId) {
+    public ArchivedConnectorInstanceImpl(final String name, final Date archiveDate, final long containerId,
+            final String containerType,
+            final String connectorId, final String version, final ConnectorEvent activationEvent,
+            final ConnectorState state, final long sourceObjectId) {
         super(name);
         this.archiveDate = archiveDate;
         this.containerId = containerId;
@@ -189,8 +191,10 @@ public class ArchivedConnectorInstanceImpl extends NamedElementImpl implements A
 
     @Override
     public String toString() {
-        return "ArchivedConnectorInstance [archiveDate=" + archiveDate + ", containerId=" + containerId + ", containerType=" + containerType + ", connectorId="
-                + connectorId + ", version=" + version + ", activationEvent=" + activationEvent + ", state=" + state + ", sourceObjectId=" + sourceObjectId
+        return "ArchivedConnectorInstance [archiveDate=" + archiveDate + ", containerId=" + containerId
+                + ", containerType=" + containerType + ", connectorId="
+                + connectorId + ", version=" + version + ", activationEvent=" + activationEvent + ", state=" + state
+                + ", sourceObjectId=" + sourceObjectId
                 + ", name=" + getName() + "]";
     }
 

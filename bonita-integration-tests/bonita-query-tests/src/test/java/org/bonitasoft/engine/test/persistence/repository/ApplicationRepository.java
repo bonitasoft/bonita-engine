@@ -18,8 +18,8 @@ import java.util.List;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -50,14 +50,16 @@ public class ApplicationRepository extends TestRepository {
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 
-    public SApplicationPage getApplicationPageByTokenAndApplicationToken(final String applicationToken, final String applicationPageToken) {
+    public SApplicationPage getApplicationPageByTokenAndApplicationToken(final String applicationToken,
+            final String applicationPageToken) {
         final Query namedQuery = getNamedQuery("getApplicationPageByTokenAndApplicationToken");
         namedQuery.setParameter("applicationToken", applicationToken);
         namedQuery.setParameter("applicationPageToken", applicationPageToken);
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 
-    public SApplicationPage getApplicationPageByTokenAndApplicationId(final long applicationId, final String applicationPageToken) {
+    public SApplicationPage getApplicationPageByTokenAndApplicationId(final long applicationId,
+            final String applicationPageToken) {
         final Query namedQuery = getNamedQuery("getApplicationPageByTokenAndApplicationId");
         namedQuery.setParameter("applicationId", applicationId);
         namedQuery.setParameter("applicationPageToken", applicationPageToken);

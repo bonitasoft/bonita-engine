@@ -46,13 +46,15 @@ public class EvaluateExpressionsDefinitionLevelTest {
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         Long processDefId = 15935777L;
         when(processDef.getId()).thenReturn(processDefId);
-        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class))).thenThrow(
-                new SExpressionEvaluationException("some msg", "some expressionName"));
+        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class)))
+                .thenThrow(
+                        new SExpressionEvaluationException("some msg", "some expressionName"));
 
         try {
             // when:
-            new EvaluateExpressionsDefinitionLevel(null, processDefId, expressionResolverService, processDefinitionService, null).evaluateExpression(null, null,
-                    processDef);
+            new EvaluateExpressionsDefinitionLevel(null, processDefId, expressionResolverService,
+                    processDefinitionService, null).evaluateExpression(null, null,
+                            processDef);
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {
             // then:
@@ -66,13 +68,15 @@ public class EvaluateExpressionsDefinitionLevelTest {
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         String processName = "my_process";
         when(processDef.getName()).thenReturn(processName);
-        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class))).thenThrow(
-                new SExpressionEvaluationException("some msg", "some expressionName"));
+        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class)))
+                .thenThrow(
+                        new SExpressionEvaluationException("some msg", "some expressionName"));
 
         try {
             // when:
-            new EvaluateExpressionsDefinitionLevel(null, 196584L, expressionResolverService, processDefinitionService, null).evaluateExpression(null, null,
-                    processDef);
+            new EvaluateExpressionsDefinitionLevel(null, 196584L, expressionResolverService, processDefinitionService,
+                    null).evaluateExpression(null, null,
+                            processDef);
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {
             // then:
@@ -86,13 +90,15 @@ public class EvaluateExpressionsDefinitionLevelTest {
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         String processVersion = "7.3.1";
         when(processDef.getVersion()).thenReturn(processVersion);
-        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class))).thenThrow(
-                new SExpressionEvaluationException("some msg", "some expressionName"));
+        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class)))
+                .thenThrow(
+                        new SExpressionEvaluationException("some msg", "some expressionName"));
 
         try {
             // when:
-            new EvaluateExpressionsDefinitionLevel(null, 6453241L, expressionResolverService, processDefinitionService, null).evaluateExpression(null, null,
-                    processDef);
+            new EvaluateExpressionsDefinitionLevel(null, 6453241L, expressionResolverService, processDefinitionService,
+                    null).evaluateExpression(null, null,
+                            processDef);
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {
             // then:

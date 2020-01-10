@@ -23,13 +23,17 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstan
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class SUserTaskInstanceBuilderFactoryImpl extends SHumanTaskInstanceBuilderFactoryImpl implements SUserTaskInstanceBuilderFactory {
+public class SUserTaskInstanceBuilderFactoryImpl extends SHumanTaskInstanceBuilderFactoryImpl
+        implements SUserTaskInstanceBuilderFactory {
 
     @Override
-    public SUserTaskInstanceBuilder createNewUserTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long actorId, final long processDefinitionId, final long rootProcessInstanceId,
+    public SUserTaskInstanceBuilder createNewUserTaskInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId, final long actorId, final long processDefinitionId,
+            final long rootProcessInstanceId,
             final long parentProcessInstanceId) {
-        final SUserTaskInstance activityInst = new SUserTaskInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, STaskPriority.NORMAL,
+        final SUserTaskInstance activityInst = new SUserTaskInstance(name, flowNodeDefinitionId, rootContainerId,
+                parentContainerId, actorId, STaskPriority.NORMAL,
                 processDefinitionId, rootProcessInstanceId);
         activityInst.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SUserTaskInstanceBuilderImpl(activityInst);

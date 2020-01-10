@@ -18,8 +18,8 @@ import java.util.List;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.resources.SBARResourceLight;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -37,6 +37,7 @@ public class ProcessResourceRepository extends TestRepository {
         namedQuery.setParameter("name", name);
         return (SBARResource) namedQuery.uniqueResult();
     }
+
     public List<SBARResource> getBARResourcesOfType(long processDefinitionId, BARResourceType type) {
         final Query namedQuery = getNamedQuery("getBARResourcesOfType");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
@@ -50,13 +51,12 @@ public class ProcessResourceRepository extends TestRepository {
         namedQuery.setParameter("type", type);
         return namedQuery.list();
     }
+
     public long getNumberOfBARResourcesOfType(long processDefinitionId, BARResourceType type) {
         final Query namedQuery = getNamedQuery("getNumberOfBARResourcesOfType");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         namedQuery.setParameter("type", type);
         return (long) namedQuery.uniqueResult();
     }
-
-
 
 }

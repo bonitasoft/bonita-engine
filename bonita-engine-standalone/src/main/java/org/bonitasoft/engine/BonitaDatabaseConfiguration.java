@@ -34,7 +34,6 @@ public class BonitaDatabaseConfiguration {
     private DatasourceConfiguration xaDatasource;
     private DatasourceConfiguration datasource;
 
-
     public boolean isEmpty() {
         return isNullOrEmpty(driverClassName) &&
                 isNullOrEmpty(url) &&

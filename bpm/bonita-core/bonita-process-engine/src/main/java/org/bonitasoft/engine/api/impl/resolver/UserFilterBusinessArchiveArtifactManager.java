@@ -16,8 +16,6 @@ package org.bonitasoft.engine.api.impl.resolver;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -30,6 +28,8 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.filter.UserFilterException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 
 /**
  * @author Baptiste Mesta
@@ -40,13 +40,15 @@ public class UserFilterBusinessArchiveArtifactManager extends BARResourceArtifac
 
     private final UserFilterService userFilterService;
 
-    public UserFilterBusinessArchiveArtifactManager(UserFilterService userFilterService, ProcessResourcesService processResourcesService) {
+    public UserFilterBusinessArchiveArtifactManager(UserFilterService userFilterService,
+            ProcessResourcesService processResourcesService) {
         super(processResourcesService);
         this.userFilterService = userFilterService;
     }
 
     @Override
-    public boolean deploy(final BusinessArchive businessArchive, final SProcessDefinition processDefinition) throws UserFilterException, SRecorderException {
+    public boolean deploy(final BusinessArchive businessArchive, final SProcessDefinition processDefinition)
+            throws UserFilterException, SRecorderException {
         try {
             saveResources(businessArchive, processDefinition, "userFilters", BARResourceType.USER_FILTER);
             return userFilterService.loadUserFilters(processDefinition.getId());
@@ -61,12 +63,14 @@ public class UserFilterBusinessArchiveArtifactManager extends BARResourceArtifac
     }
 
     @Override
-    public void delete(SProcessDefinition processDefinition) throws SObjectModificationException, SBonitaReadException, SRecorderException {
+    public void delete(SProcessDefinition processDefinition)
+            throws SObjectModificationException, SBonitaReadException, SRecorderException {
         userFilterService.removeUserFilters(processDefinition.getId());
     }
 
     @Override
-    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder) throws SBonitaException {
+    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder)
+            throws SBonitaException {
         exportResourcesToBusinessArchive(processDefinitionId, businessArchiveBuilder, BARResourceType.USER_FILTER);
     }
 

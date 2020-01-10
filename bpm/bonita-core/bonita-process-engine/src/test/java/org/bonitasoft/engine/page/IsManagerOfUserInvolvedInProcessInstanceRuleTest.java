@@ -80,27 +80,31 @@ public class IsManagerOfUserInvolvedInProcessInstanceRuleTest extends RuleTest {
     @Test
     public void should_allow_manager_if_processInvolvementDelegate_returns_true() throws Exception {
         // given:
-        doReturn(true).when(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
+        doReturn(true).when(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
 
         // when:
         final boolean allowed = rule.isAllowed(null, context);
 
         // then:
         assertThat(allowed).isTrue();
-        verify(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
+        verify(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
     }
 
     @Test
     public void should_not_allow_manager_if_processInvolvementDelegate_returns_false() throws Exception {
         // given:
-        doReturn(false).when(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
+        doReturn(false).when(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
 
         // when:
         final boolean allowed = rule.isAllowed(null, context);
 
         // then:
         assertThat(allowed).isFalse();
-        verify(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
+        verify(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -111,7 +115,8 @@ public class IsManagerOfUserInvolvedInProcessInstanceRuleTest extends RuleTest {
 
     @Test(expected = SExecutionException.class)
     public void should_throw_ExecutionException_if_processInvolvementDelegate_fails() throws Exception {
-        doThrow(new BonitaException("test")).when(processInvolvementDelegate).isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
+        doThrow(new BonitaException("test")).when(processInvolvementDelegate)
+                .isManagerOfUserInvolvedInProcessInstance(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
 
         rule.isAllowed(null, context);
     }

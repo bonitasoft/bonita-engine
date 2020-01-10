@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.document.model.builder;
 
-
 /**
  * @author Nicolas Chabanoles
  * @author Baptiste Mesta

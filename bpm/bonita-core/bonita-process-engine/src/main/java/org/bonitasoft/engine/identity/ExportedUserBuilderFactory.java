@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.identity;
 
-
 import org.bonitasoft.engine.identity.xml.ExportedUser;
 
 /**
  * Import / export version of the client User model
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  * @author Matthieu Chaffotte

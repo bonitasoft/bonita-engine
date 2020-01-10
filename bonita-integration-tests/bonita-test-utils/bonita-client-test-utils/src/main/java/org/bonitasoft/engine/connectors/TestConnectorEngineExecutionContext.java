@@ -28,7 +28,8 @@ public class TestConnectorEngineExecutionContext extends AbstractConnector {
 
     @Override
     protected void executeBusinessLogic() {
-        setOutputParameter(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(), getExecutionContext().getTaskAssigneeId());
+        setOutputParameter(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(),
+                getExecutionContext().getTaskAssigneeId());
     }
 
 }

@@ -13,15 +13,15 @@
  **/
 package org.bonitasoft.engine.services.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Baptiste Mesta

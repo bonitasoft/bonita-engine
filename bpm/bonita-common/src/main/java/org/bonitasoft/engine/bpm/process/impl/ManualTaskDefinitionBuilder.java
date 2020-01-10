@@ -29,7 +29,8 @@ import org.bonitasoft.engine.expression.InvalidExpressionException;
  */
 public class ManualTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
-    public ManualTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public ManualTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String name, final String actorName) {
         super(container, processDefinitionBuilder, getManualTask(name, actorName));
     }
@@ -40,19 +41,21 @@ public class ManualTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Adds a user filter on this manual task.
-     * 
+     *
      * @param name filter name in this task.
      * @param userFilterId user filter identifier.
      * @param version user filter version.
      * @return
      */
-    public UserFilterDefinitionBuilder addUserFilter(final String name, final String userFilterId, final String version) {
-        return new UserFilterDefinitionBuilder(getProcessBuilder(), getContainer(), name, userFilterId, version, (HumanTaskDefinitionImpl) getActivity());
+    public UserFilterDefinitionBuilder addUserFilter(final String name, final String userFilterId,
+            final String version) {
+        return new UserFilterDefinitionBuilder(getProcessBuilder(), getContainer(), name, userFilterId, version,
+                (HumanTaskDefinitionImpl) getActivity());
     }
 
     /**
      * Sets the expected duration for this human task.
-     * 
+     *
      * @param time how long (in milliseconds) this task is expected to take.
      * @return
      * @deprecated use
@@ -80,7 +83,7 @@ public class ManualTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Sets the task priority.
-     * 
+     *
      * @param priority task priority.
      * @return
      */

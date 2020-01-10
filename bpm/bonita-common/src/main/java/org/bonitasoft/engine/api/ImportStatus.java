@@ -18,15 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
-import lombok.NonNull;
 
 /**
- *
  * This object represents the status of the import of an entity
  * e.g. for an import of profile this object can be ImportStatus [name=MyProfile, status=ADDED, errors=[]]
  *
  * @author Baptiste Mesta
- * 
  * @since 6.3.1
  */
 @Data

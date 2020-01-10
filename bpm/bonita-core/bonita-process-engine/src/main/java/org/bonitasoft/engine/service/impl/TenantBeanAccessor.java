@@ -37,7 +37,7 @@ public class TenantBeanAccessor extends SpringBeanAccessor {
 
     @Override
     protected BonitaSpringContext createContext() {
-        return new BonitaSpringContext(parent, "Tenant "+tenantId);
+        return new BonitaSpringContext(parent, "Tenant " + tenantId);
     }
 
     @Override

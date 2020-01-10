@@ -82,13 +82,16 @@ public class CommandServiceImpl implements CommandService {
     private final int fetchSize;
 
     public CommandServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            final EventService eventService, final TechnicalLoggerService logger,
+            final QueriableLoggerService queriableLoggerService,
             CommandProvider defaultCommandProvider) {
-        this(persistenceService, recorder, eventService, logger, queriableLoggerService, defaultCommandProvider, FETCH_SIZE);
+        this(persistenceService, recorder, eventService, logger, queriableLoggerService, defaultCommandProvider,
+                FETCH_SIZE);
     }
 
     public CommandServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            final EventService eventService, final TechnicalLoggerService logger,
+            final QueriableLoggerService queriableLoggerService,
             CommandProvider defaultCommandProvider, int fetchSize) {
         super();
         this.persistenceService = persistenceService;
@@ -119,22 +122,26 @@ public class CommandServiceImpl implements CommandService {
     public void create(final SCommand command) throws SCommandAlreadyExistsException, SCommandCreationException {
         final boolean isTraceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (isTraceEnable) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "create"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "create"));
         }
         try {
             this.get(command.getName());
             throw new SCommandAlreadyExistsException("Command '" + command.getName() + "' already exists");
         } catch (final SCommandNotFoundException scmfe) {
-            final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new command with name " + command.getName());
+            final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.CREATED,
+                    "Creating a new command with name " + command.getName());
             try {
                 recorder.recordInsert(new InsertRecord(command), COMMAND);
                 log(command.getId(), SQueriableLog.STATUS_OK, logBuilder, "create");
                 if (isTraceEnable) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "create"));
+                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                            LogUtil.getLogAfterMethod(this.getClass(), "create"));
                 }
             } catch (final SRecorderException re) {
                 if (isTraceEnable) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "create", re));
+                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                            LogUtil.getLogOnExceptionMethod(this.getClass(), "create", re));
                 }
                 log(command.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "create");
                 throw new SCommandCreationException(re);
@@ -146,24 +153,29 @@ public class CommandServiceImpl implements CommandService {
     public void delete(final long commandId) throws SCommandNotFoundException, SCommandDeletionException {
         final boolean isTraceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (isTraceEnable) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "delete"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "delete"));
         }
-        final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting command with id " + commandId);
+        final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED,
+                "Deleting command with id " + commandId);
         final SCommand command = this.get(commandId);
         delete(command, logBuilder);
     }
 
-    protected void delete(final SCommand command, final SCommandLogBuilder logBuilder) throws SCommandDeletionException {
+    protected void delete(final SCommand command, final SCommandLogBuilder logBuilder)
+            throws SCommandDeletionException {
         final boolean isTraceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         try {
             recorder.recordDelete(new DeleteRecord(command), COMMAND);
             if (isTraceEnable) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "delete"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "delete"));
             }
             log(command.getId(), SQueriableLog.STATUS_OK, logBuilder, "delete");
         } catch (final SRecorderException re) {
             if (isTraceEnable) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "delete", re));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "delete", re));
             }
             log(command.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SCommandDeletionException(re);
@@ -172,10 +184,12 @@ public class CommandServiceImpl implements CommandService {
 
     @Override
     public void delete(final String commandName) throws SCommandNotFoundException, SCommandDeletionException {
-        final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting command with name " + commandName);
+        final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED,
+                "Deleting command with name " + commandName);
         final boolean isTraceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (isTraceEnable) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "delete"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "delete"));
         }
         final SCommand command = this.get(commandName);
         delete(command, logBuilder);
@@ -185,14 +199,16 @@ public class CommandServiceImpl implements CommandService {
     public void deleteAll() throws SCommandDeletionException {
         final boolean isTraceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (isTraceEnable) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteAll"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "deleteAll"));
         }
         List<SCommand> commands;
         try {
             do {
                 commands = getAllCommands(0, 1000, SCommandCriterion.NAME_ASC);
                 for (final SCommand command : commands) {
-                    final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting command with name " + command.getName());
+                    final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED,
+                            "Deleting command with name " + command.getName());
                     delete(command, logBuilder);
                 }
             } while (!commands.isEmpty());
@@ -200,7 +216,8 @@ public class CommandServiceImpl implements CommandService {
             throw new SCommandDeletionException(scge);
         }
         if (isTraceEnable) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteAll"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "deleteAll"));
         }
     }
 
@@ -209,7 +226,8 @@ public class CommandServiceImpl implements CommandService {
         final boolean trace = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         try {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "get"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogBeforeMethod(this.getClass(), "get"));
             }
             final SelectOneDescriptor<SCommand> descriptor = SelectDescriptorBuilder.getCommandByName(commandName);
             final SCommand scommand = persistenceService.selectOne(descriptor);
@@ -217,22 +235,26 @@ public class CommandServiceImpl implements CommandService {
                 throw new SCommandNotFoundException("command '" + commandName + "' does not exist");
             }
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "get"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "get"));
             }
             return scommand;
         } catch (final SBonitaReadException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "get", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "get", e));
             }
             throw new SCommandNotFoundException("Cannot get command: " + commandName, e);
         }
     }
 
     @Override
-    public List<SCommand> getAllCommands(final int startIndex, final int maxResults, final SCommandCriterion sCommandCriterion) throws SCommandGettingException {
+    public List<SCommand> getAllCommands(final int startIndex, final int maxResults,
+            final SCommandCriterion sCommandCriterion) throws SCommandGettingException {
         final boolean trace = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getAllCommands"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "getAllCommands"));
         }
         String field = null;
         OrderByType orderByType = null;
@@ -249,36 +271,44 @@ public class CommandServiceImpl implements CommandService {
                 throw new IllegalStateException();
         }
         try {
-            final SelectListDescriptor<SCommand> descriptor = SelectDescriptorBuilder.getCommands(field, orderByType, startIndex, maxResults);
+            final SelectListDescriptor<SCommand> descriptor = SelectDescriptorBuilder.getCommands(field, orderByType,
+                    startIndex, maxResults);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getAllCommands"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "getAllCommands"));
             }
             return persistenceService.selectList(descriptor);
         } catch (final SBonitaReadException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getAllCommands", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "getAllCommands", e));
             }
             throw new SCommandGettingException("can't get the commands", e);
         }
     }
 
     @Override
-    public void update(final SCommand command, final EntityUpdateDescriptor updateDescriptor) throws SCommandUpdateException {
+    public void update(final SCommand command, final EntityUpdateDescriptor updateDescriptor)
+            throws SCommandUpdateException {
         final boolean trace = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "update"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "update"));
         }
-        final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating command with name " + command.getName());
+        final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED,
+                "Updating command with name " + command.getName());
 
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(command, updateDescriptor), COMMAND);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "update"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "update"));
             }
             log(command.getId(), SQueriableLog.STATUS_OK, logBuilder, "update");
         } catch (final SRecorderException re) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "update", re));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "update", re));
             }
             log(command.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "update");
             throw new SCommandUpdateException(re);
@@ -286,11 +316,13 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public List<SCommand> getUserCommands(final int startIndex, final int maxResults, final SCommandCriterion sCommandCriterion)
+    public List<SCommand> getUserCommands(final int startIndex, final int maxResults,
+            final SCommandCriterion sCommandCriterion)
             throws SCommandGettingException {
         final boolean trace = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserCommands"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "getUserCommands"));
         }
         String field;
         OrderByType orderByType;
@@ -307,15 +339,18 @@ public class CommandServiceImpl implements CommandService {
                 throw new IllegalStateException();
         }
         try {
-            final SelectListDescriptor<SCommand> descriptor = SelectDescriptorBuilder.getUserCommands(field, orderByType, startIndex, maxResults);
+            final SelectListDescriptor<SCommand> descriptor = SelectDescriptorBuilder.getUserCommands(field,
+                    orderByType, startIndex, maxResults);
             final List<SCommand> selectList = persistenceService.selectList(descriptor);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUserCommands"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "getUserCommands"));
             }
             return selectList;
         } catch (final SBonitaReadException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserCommands", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserCommands", e));
             }
             throw new SCommandGettingException("can't get the commands", e);
         }
@@ -337,13 +372,16 @@ public class CommandServiceImpl implements CommandService {
 
     @Override
     public long getNumberOfCommands(final QueryOptions options) throws SBonitaReadException {
-        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfCommands"));
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfCommands"));
         try {
             final long number = persistenceService.getNumberOfEntities(SCommand.class, options, null);
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getNumberOfCommands"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "getNumberOfCommands"));
             return number;
         } catch (final SBonitaReadException bre) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfCommands", bre));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfCommands", bre));
             throw new SBonitaReadException(bre);
         }
     }
@@ -352,23 +390,27 @@ public class CommandServiceImpl implements CommandService {
     public List<SCommand> searchCommands(final QueryOptions options) throws SBonitaReadException {
         final boolean trace = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "searchCommands"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "searchCommands"));
         }
         try {
             final List<SCommand> commands = persistenceService.searchEntity(SCommand.class, options, null);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "searchCommands"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "searchCommands"));
             }
             return commands;
         } catch (final SBonitaReadException bre) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "searchCommands", bre));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "searchCommands", bre));
             }
             throw new SBonitaReadException(bre);
         }
     }
 
-    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerClassName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder,
+            final String callerClassName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -380,7 +422,8 @@ public class CommandServiceImpl implements CommandService {
 
     @Override
     public void start() throws SBonitaException {
-        Map<String, CommandDeployment> commandDeployments = toCommandDeploymentMap(defaultCommandProvider.getDefaultCommands());
+        Map<String, CommandDeployment> commandDeployments = toCommandDeploymentMap(
+                defaultCommandProvider.getDefaultCommands());
         Map<String, SCommand> availableSystemCommands = getAllAvailableSystemCommands();
         createAndUpdateCommands(commandDeployments, availableSystemCommands);
         deleteSystemCommandsNotPresentInDeployments(commandDeployments, availableSystemCommands);
@@ -399,7 +442,8 @@ public class CommandServiceImpl implements CommandService {
         }
     }
 
-    private void updateExistingCommandIfNecessary(final SCommand command, final CommandDeployment commandDeployment, final boolean infoEnabled)
+    private void updateExistingCommandIfNecessary(final SCommand command, final CommandDeployment commandDeployment,
+            final boolean infoEnabled)
             throws SCommandUpdateException {
         SCommandUpdateBuilderImpl updateBuilder = new SCommandUpdateBuilderImpl();
         if (!command.getDescription().equals(commandDeployment.getDescription())) {
@@ -411,16 +455,19 @@ public class CommandServiceImpl implements CommandService {
         EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
         if (!updateDescriptor.getFields().isEmpty()) {
             if (infoEnabled) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Updating system command. Before update: " + command + ". After update: " + commandDeployment);
+                logger.log(getClass(), TechnicalLogSeverity.INFO,
+                        "Updating system command. Before update: " + command + ". After update: " + commandDeployment);
             }
             update(command, updateDescriptor);
         }
     }
 
-    private void createMissingCommand(final CommandDeployment commandDeployment, final boolean infoEnabled) throws SCommandAlreadyExistsException,
+    private void createMissingCommand(final CommandDeployment commandDeployment, final boolean infoEnabled)
+            throws SCommandAlreadyExistsException,
             SCommandCreationException {
         if (infoEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Creating missing system command: " + commandDeployment);
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                    "Creating missing system command: " + commandDeployment);
         }
         create(SCommand.builder()
                 .name(commandDeployment.getName())
@@ -434,10 +481,12 @@ public class CommandServiceImpl implements CommandService {
         boolean infoEnabled = logger.isLoggable(getClass(), TechnicalLogSeverity.INFO);
         for (String commandName : availableSystemCommands.keySet()) {
             if (!commandDeployments.keySet().contains(commandName)) {
-                final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting command with name " + commandName);
+                final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED,
+                        "Deleting command with name " + commandName);
                 SCommand command = availableSystemCommands.get(commandName);
                 if (infoEnabled) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, "The following system command is not used any more and will be deleted: " + command);
+                    logger.log(getClass(), TechnicalLogSeverity.INFO,
+                            "The following system command is not used any more and will be deleted: " + command);
                 }
                 delete(command, logBuilder);
             }
@@ -457,8 +506,10 @@ public class CommandServiceImpl implements CommandService {
     }
 
     private List<SCommand> getSystemCommands(int fromIndex, int maxResults) throws SBonitaReadException {
-        QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, Collections.singletonList(new OrderByOption(SCommand.class, SCommand.ID,
-                OrderByType.ASC)), Collections.singletonList(new FilterOption(SCommand.class, SCommand.SYSTEM, true)), null);
+        QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults,
+                Collections.singletonList(new OrderByOption(SCommand.class, SCommand.ID,
+                        OrderByType.ASC)),
+                Collections.singletonList(new FilterOption(SCommand.class, SCommand.SYSTEM, true)), null);
         return searchCommands(queryOptions);
     }
 

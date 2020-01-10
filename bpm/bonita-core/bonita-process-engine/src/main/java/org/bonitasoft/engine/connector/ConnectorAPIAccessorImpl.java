@@ -60,7 +60,8 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
             final SessionAccessor sessionAccessor = tenantServiceAccessor.getSessionAccessor();
             final SessionService sessionService = tenantServiceAccessor.getSessionService();
             try {
-                final SSession session = sessionService.createSession(tenantId, ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the
+                final SSession session = sessionService.createSession(tenantId,
+                        ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the
                 sessionAccessor.setSessionInfo(session.getId(), tenantId);
                 apiSession = ModelConvertor.toAPISession(session, null);
             } catch (final BonitaRuntimeException e) {
@@ -124,7 +125,8 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     private static <T> T getAPI(final Class<T> clazz, final APISession session) {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
-        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz },
+                sessionInterceptor);
     }
 
 }

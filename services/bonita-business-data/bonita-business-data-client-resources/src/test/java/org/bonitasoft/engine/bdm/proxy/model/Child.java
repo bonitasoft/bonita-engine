@@ -41,7 +41,8 @@ public class Child implements Entity {
     public Child() {
     }
 
-    public Child(String name, Integer age, Date oldDate, LocalDate birthdate, LocalDateTime localDateTime, OffsetDateTime nextAppointment) {
+    public Child(String name, Integer age, Date oldDate, LocalDate birthdate, LocalDateTime localDateTime,
+            OffsetDateTime nextAppointment) {
         this.name = name;
         this.age = age;
         this.oldDate = oldDate;
@@ -122,8 +123,10 @@ public class Child implements Entity {
     }
 
     public String toJson() {
-        return "{\"name\" : \"" + name + "\", \"age\" : " + age + ", \"oldDate\" : " + (oldDate != null ? oldDate.getTime() : null)
-                + ", \"birthdate\" : " + (birthdate != null ? "\"" + birthdate.toString() + "\"" : null) + ", \"localDateTime\" : "
+        return "{\"name\" : \"" + name + "\", \"age\" : " + age + ", \"oldDate\" : "
+                + (oldDate != null ? oldDate.getTime() : null)
+                + ", \"birthdate\" : " + (birthdate != null ? "\"" + birthdate.toString() + "\"" : null)
+                + ", \"localDateTime\" : "
                 + (localDateTime != null ? "\"" + localDateTime.toString() + "\"" : null) + ", \"nextAppointment\" : "
                 + (nextAppointment != null ? "\""
                         // leave TimeZone offset as is, if any, as this is the Deserializer job to convert it to UTC:

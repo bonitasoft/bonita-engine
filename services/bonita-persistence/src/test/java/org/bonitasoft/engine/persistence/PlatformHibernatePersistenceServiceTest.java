@@ -16,6 +16,7 @@ package org.bonitasoft.engine.persistence;
 import static org.mockito.Mockito.*;
 
 import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;

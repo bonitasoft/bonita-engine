@@ -30,7 +30,8 @@ public class OffsetDateTimeXStreamConverter extends AbstractSingleValueConverter
     }
 
     public String toString(Object source) {
-        return source == null ? null : ((OffsetDateTime) source).withOffsetSameInstant(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return source == null ? null : ((OffsetDateTime) source).withOffsetSameInstant(ZoneOffset.UTC)
+                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     public Object fromString(String str) {

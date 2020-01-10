@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.internal.servlet;
 
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 

@@ -14,15 +14,13 @@
 package org.bonitasoft.engine.core.contract.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.bonitasoft.engine.commons.Pair.pair;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 
-import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.ContractDataRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,24 +42,26 @@ public class ContractDataTest {
     @Inject
     private JdbcTemplate jdbcTemplate;
 
-
     @Test
     public void should_be_able_to_add_contract_data() {
-        repository.add(SProcessContractData.builder().name("myProcessContractData").scopeId(123L).value("SerializedValue").build());
-        repository.add(STaskContractData.builder().name("myTaskContractData").scopeId(124L).value("SerializedValue").build());
+        repository.add(SProcessContractData.builder().name("myProcessContractData").scopeId(123L)
+                .value("SerializedValue").build());
+        repository.add(
+                STaskContractData.builder().name("myTaskContractData").scopeId(124L).value("SerializedValue").build());
 
         repository.flush();
 
-        List<Map<String, Object>> contractData = jdbcTemplate.queryForList("SELECT kind, name, scopeId, val from contract_data");
+        List<Map<String, Object>> contractData = jdbcTemplate
+                .queryForList("SELECT kind, name, scopeId, val from contract_data");
 
         assertThat(contractData).hasSize(2);
-        assertThat(contractData).anySatisfy(c->{
+        assertThat(contractData).anySatisfy(c -> {
             assertThat(c.get("kind")).isEqualTo("PROCESS");
             assertThat(c.get("name")).isEqualTo("myProcessContractData");
             assertThat(c.get("scopeId")).isEqualTo(123L);
             assertThat(c.get("val")).isEqualTo("<string>SerializedValue</string>");
         });
-        assertThat(contractData).anySatisfy(c->{
+        assertThat(contractData).anySatisfy(c -> {
             assertThat(c.get("kind")).isEqualTo("TASK");
             assertThat(c.get("name")).isEqualTo("myTaskContractData");
             assertThat(c.get("scopeId")).isEqualTo(124L);

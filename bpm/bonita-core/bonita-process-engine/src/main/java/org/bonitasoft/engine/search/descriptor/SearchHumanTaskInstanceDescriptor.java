@@ -48,26 +48,34 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getPriorityKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.DUE_DATE,
                 new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getExpectedEndDateKey()));
-        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SHumanTaskInstance.class,
-                keyProvider.getStateNameKey()));
-        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                keyProvider.getAssigneeIdKey()));
-        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                keyProvider.getProcessDefinitionKey()));
-        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                keyProvider.getRootProcessInstanceKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.STATE_NAME,
+                new FieldDescriptor(SHumanTaskInstance.class,
+                        keyProvider.getStateNameKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID,
+                new FieldDescriptor(SHumanTaskInstance.class,
+                        keyProvider.getAssigneeIdKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
+                new FieldDescriptor(SHumanTaskInstance.class,
+                        keyProvider.getProcessDefinitionKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SHumanTaskInstance.class,
+                        keyProvider.getRootProcessInstanceKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
                 new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getRootProcessInstanceKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,
                 new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getParentProcessInstanceKey()));
-        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                keyProvider.getParentActivityInstanceKey()));
-        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_CONTAINER_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                keyProvider.getParentContainerIdKey()));
-        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SHumanTaskInstance.class,
-                keyProvider.getDisplayNameKey()));
-        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE, new FieldDescriptor(SHumanTaskInstance.class,
-                keyProvider.getReachStateDateKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID,
+                new FieldDescriptor(SHumanTaskInstance.class,
+                        keyProvider.getParentActivityInstanceKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_CONTAINER_ID,
+                new FieldDescriptor(SHumanTaskInstance.class,
+                        keyProvider.getParentContainerIdKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.DISPLAY_NAME,
+                new FieldDescriptor(SHumanTaskInstance.class,
+                        keyProvider.getDisplayNameKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE,
+                new FieldDescriptor(SHumanTaskInstance.class,
+                        keyProvider.getReachStateDateKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.USER_ID,
                 new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.USER_ID_KEY));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.GROUP_ID,

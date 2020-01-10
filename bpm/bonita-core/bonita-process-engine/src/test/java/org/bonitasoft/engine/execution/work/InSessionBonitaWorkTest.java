@@ -180,7 +180,8 @@ public class InSessionBonitaWorkTest {
 
         txBonitawork.handleFailure(seee, context);
 
-        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), eq(seee.getClass().getName() + " : \"message\""), eq(seee));
+        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR),
+                eq(seee.getClass().getName() + " : \"message\""), eq(seee));
     }
 
     @Test
@@ -193,7 +194,8 @@ public class InSessionBonitaWorkTest {
 
         txBonitawork.handleFailure(seee, context);
 
-        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString(), any(Throwable.class));
+        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString(),
+                any(Throwable.class));
     }
 
 }

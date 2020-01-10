@@ -18,13 +18,12 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.io.IOException;
 
+import com.thoughtworks.xstream.converters.ConversionException;
 import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.thoughtworks.xstream.converters.ConversionException;
 
 public class XmlConverterTest {
 

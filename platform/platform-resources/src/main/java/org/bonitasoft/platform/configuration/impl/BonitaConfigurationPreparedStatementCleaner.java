@@ -32,7 +32,8 @@ public class BonitaConfigurationPreparedStatementCleaner implements BatchPrepare
     private final ConfigurationType type;
     private final long tenantId;
 
-    public BonitaConfigurationPreparedStatementCleaner(List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type, long tenantId) {
+    public BonitaConfigurationPreparedStatementCleaner(List<BonitaConfiguration> bonitaConfigurations,
+            ConfigurationType type, long tenantId) {
         this.bonitaConfigurations = bonitaConfigurations;
         this.type = type;
         this.tenantId = tenantId;

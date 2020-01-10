@@ -42,7 +42,8 @@ public class GetArchivedActivityInstances implements TransactionContentWithResul
 
     private List<SAActivityInstance> archivedActivityInstances;
 
-    public GetArchivedActivityInstances(final ActivityInstanceService activityInstanceService, final long processInstanceId,
+    public GetArchivedActivityInstances(final ActivityInstanceService activityInstanceService,
+            final long processInstanceId,
             final int pageIndex, final int numberPerPage, final String field, final OrderByType order) {
         this.activityInstanceService = activityInstanceService;
         this.processInstanceId = processInstanceId;
@@ -54,8 +55,10 @@ public class GetArchivedActivityInstances implements TransactionContentWithResul
 
     @Override
     public void execute() throws SBonitaException {
-        final QueryOptions queryOptions = new QueryOptions(pageIndex * numberPerPage, numberPerPage, SAActivityInstance.class, field, order);
-        archivedActivityInstances = activityInstanceService.getArchivedActivityInstances(processInstanceId, queryOptions);
+        final QueryOptions queryOptions = new QueryOptions(pageIndex * numberPerPage, numberPerPage,
+                SAActivityInstance.class, field, order);
+        archivedActivityInstances = activityInstanceService.getArchivedActivityInstances(processInstanceId,
+                queryOptions);
     }
 
     @Override

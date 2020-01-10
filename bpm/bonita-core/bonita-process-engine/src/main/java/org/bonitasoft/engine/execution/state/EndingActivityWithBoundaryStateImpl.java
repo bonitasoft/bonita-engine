@@ -37,18 +37,23 @@ public abstract class EndingActivityWithBoundaryStateImpl implements FlowNodeSta
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
-        final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
-                flowNodeInstance.getFlowNodeDefinitionId());
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
+        final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer()
+                .getFlowNode(
+                        flowNodeInstance.getFlowNodeDefinitionId());
         return !activityDef.getBoundaryEventDefinitions().isEmpty();
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
-        final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(instance.getFlowNodeDefinitionId());
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
+        final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer()
+                .getFlowNode(instance.getFlowNodeDefinitionId());
         if (!activityDef.getBoundaryEventDefinitions().isEmpty()) {
             final SActivityInstance activityInstance = (SActivityInstance) instance;
-            stateBehaviors.interruptAttachedBoundaryEvent(processDefinition, activityInstance, getBoundaryCategoryState());
+            stateBehaviors.interruptAttachedBoundaryEvent(processDefinition, activityInstance,
+                    getBoundaryCategoryState());
         }
         return StateCode.DONE;
     }
@@ -56,7 +61,8 @@ public abstract class EndingActivityWithBoundaryStateImpl implements FlowNodeSta
     public abstract SStateCategory getBoundaryCategoryState();
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return true;
     }
 

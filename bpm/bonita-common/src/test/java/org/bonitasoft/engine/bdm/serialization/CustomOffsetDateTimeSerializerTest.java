@@ -19,12 +19,11 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.core.JsonGenerator;
 
 /**
  * @author Emmanuel Duchastenier
@@ -41,7 +40,8 @@ public class CustomOffsetDateTimeSerializerTest {
         final CustomOffsetDateTimeSerializer serializer = new CustomOffsetDateTimeSerializer();
 
         // when:
-        serializer.serialize(OffsetDateTime.of(LocalDateTime.of(2018, 10, 23, 11, 21, 7), ZoneOffset.ofHours(2)), jsonGenerator, null);
+        serializer.serialize(OffsetDateTime.of(LocalDateTime.of(2018, 10, 23, 11, 21, 7), ZoneOffset.ofHours(2)),
+                jsonGenerator, null);
 
         // then:
         verify(jsonGenerator).writeString("2018-10-23T09:21:07Z");

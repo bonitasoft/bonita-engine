@@ -17,12 +17,13 @@ import java.util.Random;
 
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class PlatformRepository extends TestRepository {
+
     public PlatformRepository(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
@@ -34,7 +35,6 @@ public class PlatformRepository extends TestRepository {
         }
         return ((PersistentObject) namedQuery.uniqueResult());
     }
-
 
     public <T extends PersistentObject> T add(T entity) {
         if (entity.getId() <= 0) {

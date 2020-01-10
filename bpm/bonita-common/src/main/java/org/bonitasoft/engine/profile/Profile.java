@@ -29,7 +29,7 @@ public interface Profile extends NamedElement, BaseElement {
 
     /**
      * profile icons are removed in customer portal
-     * 
+     *
      * @since
      *        6.3.1
      * @return

@@ -25,12 +25,15 @@ import org.bonitasoft.engine.operation.Operation;
  */
 public class CallActivityBuilder extends ActivityDefinitionBuilder {
 
-    public CallActivityBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container, final String name,
+    public CallActivityBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container, final String name,
             final Expression callableElement, final Expression callableElementVersion) {
-        super(container, processDefinitionBuilder, createNewCallActivity(name, callableElement, callableElementVersion));
+        super(container, processDefinitionBuilder,
+                createNewCallActivity(name, callableElement, callableElementVersion));
     }
 
-    private static CallActivityDefinitionImpl createNewCallActivity(final String name, final Expression callableElement, final Expression callableElementVersion) {
+    private static CallActivityDefinitionImpl createNewCallActivity(final String name, final Expression callableElement,
+            final Expression callableElementVersion) {
         final CallActivityDefinitionImpl activity = new CallActivityDefinitionImpl(name);
         activity.setCallableElement(callableElement);
         activity.setCallableElementVersion(callableElementVersion);
@@ -40,7 +43,7 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Sets the name of target process
-     * 
+     *
      * @param callableElement
      *        expression representing the process name
      * @return
@@ -52,7 +55,7 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Sets the version of target process
-     * 
+     *
      * @param callableElementVersion
      *        expression representing the process version
      * @return
@@ -63,9 +66,10 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
     }
 
     /**
-     * Adds a data input operation on this call activity. Data input operations will be evaluated during the target process instantiation and can be used to
+     * Adds a data input operation on this call activity. Data input operations will be evaluated during the target
+     * process instantiation and can be used to
      * transfer data from the caller process to the called one
-     * 
+     *
      * @param dataInputOperation
      *        data input operation
      * @return
@@ -76,12 +80,14 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
     }
 
     /**
-     * Adds a process start contract input on this call activity. Process start contract inputs will be evaluated during the target process instantiation and
+     * Adds a process start contract input on this call activity. Process start contract inputs will be evaluated during
+     * the target process instantiation and
      * can be used to
      * transfer data or other types of Expressions from the caller process to the called one.
      *
      * @param inputName the name of the input, as defined in the target process
-     * @param value the Expression to evaluate to give the value of the input. It must return a value that is compatible to the target process contract input
+     * @param value the Expression to evaluate to give the value of the input. It must return a value that is compatible
+     *        to the target process contract input
      *        type.
      * @return this <code>CallActivityBuilder</code>
      */
@@ -91,9 +97,10 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
     }
 
     /**
-     * Adds a data output operation on this call activity. Data output operations will be evaluated during the target process completion and can be used to
+     * Adds a data output operation on this call activity. Data output operations will be evaluated during the target
+     * process completion and can be used to
      * transfer data from called process to the caller one
-     * 
+     *
      * @param dataOutputOperation
      *        data output operation
      * @return

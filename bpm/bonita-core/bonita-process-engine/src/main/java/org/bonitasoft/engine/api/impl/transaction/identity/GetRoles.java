@@ -39,7 +39,8 @@ public class GetRoles implements TransactionContentWithResult<List<SRole>> {
 
     private List<SRole> roleList;
 
-    public GetRoles(final IdentityService identityService, final int startIndex, final int maxResults, final String fieldExecutor,
+    public GetRoles(final IdentityService identityService, final int startIndex, final int maxResults,
+            final String fieldExecutor,
             final OrderByType orderExecutor) {
         this.startIndex = startIndex;
         this.fieldExecutor = fieldExecutor;

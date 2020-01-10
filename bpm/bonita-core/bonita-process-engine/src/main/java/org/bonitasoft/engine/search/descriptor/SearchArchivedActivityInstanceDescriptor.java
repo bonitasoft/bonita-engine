@@ -39,26 +39,36 @@ public class SearchArchivedActivityInstanceDescriptor extends SearchEntityDescri
         archivedActivityInstanceDescriptorKeys = new HashMap<>(10);
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.NAME,
                 new FieldDescriptor(SAActivityInstance.class, keyProvider.getNameKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PRIORITY, new FieldDescriptor(SAActivityInstance.class,
-                keyProvider.getPriorityKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(
-                SAActivityInstance.class, keyProvider.getProcessDefinitionKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, new FieldDescriptor(
-                SAActivityInstance.class, keyProvider.getRootProcessInstanceKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, new FieldDescriptor(
-                SAActivityInstance.class, keyProvider.getParentProcessInstanceKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(
-                SAActivityInstance.class, keyProvider.getParentActivityInstanceKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SAActivityInstance.class,
-                keyProvider.getStateNameKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.ASSIGNEE_ID, new FieldDescriptor(SAActivityInstance.class,
-                keyProvider.getAssigneeIdKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SAActivityInstance.class,
-                keyProvider.getDisplayNameKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.REACHED_STATE_DATE, new FieldDescriptor(SAActivityInstance.class,
-                keyProvider.getReachedStateDateKey()));
-        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.SOURCE_OBJECT_ID, new FieldDescriptor(SAActivityInstance.class,
-                keyProvider.getSourceObjectIdKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PRIORITY,
+                new FieldDescriptor(SAActivityInstance.class,
+                        keyProvider.getPriorityKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
+                new FieldDescriptor(
+                        SAActivityInstance.class, keyProvider.getProcessDefinitionKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(
+                        SAActivityInstance.class, keyProvider.getRootProcessInstanceKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(
+                        SAActivityInstance.class, keyProvider.getParentProcessInstanceKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID,
+                new FieldDescriptor(
+                        SAActivityInstance.class, keyProvider.getParentActivityInstanceKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.STATE_NAME,
+                new FieldDescriptor(SAActivityInstance.class,
+                        keyProvider.getStateNameKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.ASSIGNEE_ID,
+                new FieldDescriptor(SAActivityInstance.class,
+                        keyProvider.getAssigneeIdKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.DISPLAY_NAME,
+                new FieldDescriptor(SAActivityInstance.class,
+                        keyProvider.getDisplayNameKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.REACHED_STATE_DATE,
+                new FieldDescriptor(SAActivityInstance.class,
+                        keyProvider.getReachedStateDateKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.SOURCE_OBJECT_ID,
+                new FieldDescriptor(SAActivityInstance.class,
+                        keyProvider.getSourceObjectIdKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.ARCHIVE_DATE,
                 new FieldDescriptor(SAActivityInstance.class, keyProvider.getArchivedDateKey()));
 

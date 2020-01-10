@@ -22,14 +22,17 @@ public class NotSerializableException extends BonitaException {
 
     public NotSerializableException(final String connectorDefinitionId, final Throwable e) {
         super("Connector " + connectorDefinitionId
-                + " executed successfully but output cannot be read correctly. See Bonita Engine log file for technical details.", e);
+                + " executed successfully but output cannot be read correctly. See Bonita Engine log file for technical details.",
+                e);
     }
 
-    public NotSerializableException(final String connectorDefinitionId, final String connectorDefinitionVersion, final String key, final Object value) {
+    public NotSerializableException(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final String key, final Object value) {
         super(createMessage(connectorDefinitionId, connectorDefinitionVersion, key, value));
     }
 
-    private static String createMessage(final String connectorDefinitionId, final String connectorDefinitionVersion, final String key, final Object value) {
+    private static String createMessage(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final String key, final Object value) {
         final StringBuilder stringBuilder = new StringBuilder("the connector ");
         stringBuilder.append(connectorDefinitionId);
         stringBuilder.append(' ');

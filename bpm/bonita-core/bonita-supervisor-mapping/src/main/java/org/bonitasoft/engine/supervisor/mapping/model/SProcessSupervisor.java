@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.supervisor.mapping.model;
 
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,9 +22,6 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
-
-import javax.persistence.*;
-
 
 @Data
 @NoArgsConstructor
@@ -58,6 +57,5 @@ public class SProcessSupervisor implements PersistentObject {
     public SProcessSupervisor(final long processDefId) {
         this.processDefId = processDefId;
     }
-
 
 }

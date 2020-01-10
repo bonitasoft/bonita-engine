@@ -69,12 +69,14 @@ public class SearchActivityInstancesTest {
         searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.HUMAN_TASK);
         searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.AUTOMATIC_TASK);
 
-        final SearchActivityInstances searchActivityInstancesTransaction = new SearchActivityInstances(activityInstanceService, flowNodeStateManager,
+        final SearchActivityInstances searchActivityInstancesTransaction = new SearchActivityInstances(
+                activityInstanceService, flowNodeStateManager,
                 searchEntitiesDescriptor.getSearchActivityInstanceDescriptor(), searchOptionsBuilder.done());
 
         //then
         expectedException.expect(SBonitaReadException.class);
-        expectedException.expectMessage("Invalid query, filtering several times on 'ActivityInstanceSearchDescriptor.ACTIVITY_TYPE' is not supported.");
+        expectedException.expectMessage(
+                "Invalid query, filtering several times on 'ActivityInstanceSearchDescriptor.ACTIVITY_TYPE' is not supported.");
 
         //when
         searchActivityInstancesTransaction.execute();
@@ -87,7 +89,8 @@ public class SearchActivityInstancesTest {
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.HUMAN_TASK);
 
-        final SearchActivityInstances searchActivityInstancesTransaction = new SearchActivityInstances(activityInstanceService, flowNodeStateManager,
+        final SearchActivityInstances searchActivityInstancesTransaction = new SearchActivityInstances(
+                activityInstanceService, flowNodeStateManager,
                 searchEntitiesDescriptor.getSearchActivityInstanceDescriptor(), searchOptionsBuilder.done());
 
         //when

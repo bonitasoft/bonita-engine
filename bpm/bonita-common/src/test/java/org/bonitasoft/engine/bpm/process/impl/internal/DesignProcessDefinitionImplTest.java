@@ -13,11 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DesignProcessDefinitionImplTest {
 
@@ -30,13 +29,15 @@ public class DesignProcessDefinitionImplTest {
     @Test
     public void should_not_throw_exception_when_serializing_process_definition_design() throws Exception {
         ObjectMapper om = new ObjectMapper();
-        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("descProcess", "1.0");
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("descProcess",
+                "1.0");
         processBuilder.addDescription("processDescription");
         processBuilder.addActor(ACTOR_NAME).addDescription("actorDescription");
         processBuilder.addBooleanData("booleanProcessData", null).addDescription("descBooleanProcessData");
         processBuilder.addStartEvent("start");
         processBuilder.addGateway("gateway", GatewayType.PARALLEL).addDescription("descGateway");
-        processBuilder.addUserTask("userTask", ACTOR_NAME).addDescription("descUserTask").addBooleanData("booleanUserTaskData", null)
+        processBuilder.addUserTask("userTask", ACTOR_NAME).addDescription("descUserTask")
+                .addBooleanData("booleanUserTaskData", null)
                 .addDescription("descBooleanUserTaskData");
         processBuilder.addTransition("start", "gateway");
         processBuilder.addTransition("gateway", "userTask");

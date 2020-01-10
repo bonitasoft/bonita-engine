@@ -37,7 +37,8 @@ public class PropertyReader {
         // Any property value can be overridden by system property with the same name:
         final String sysPropValue = System.getProperty(propertyName);
         if (sysPropValue != null) {
-            LOGGER.info("System property '" + propertyName + "' set to '" + sysPropValue + "', overriding value from file database.properties.");
+            LOGGER.info("System property '" + propertyName + "' set to '" + sysPropValue
+                    + "', overriding value from file database.properties.");
             return sysPropValue;
         }
 

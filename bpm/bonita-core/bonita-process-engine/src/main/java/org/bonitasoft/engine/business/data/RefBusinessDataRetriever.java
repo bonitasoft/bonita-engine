@@ -42,7 +42,8 @@ public class RefBusinessDataRetriever {
     private final FlowNodeInstanceService flowNodeInstanceService;
     private ProcessInstanceService processInstanceService;
 
-    public RefBusinessDataRetriever(final RefBusinessDataService refBusinessDataService, FlowNodeInstanceService flowNodeInstanceService,
+    public RefBusinessDataRetriever(final RefBusinessDataService refBusinessDataService,
+            FlowNodeInstanceService flowNodeInstanceService,
             ProcessInstanceService processInstanceService) {
         this.refBusinessDataService = refBusinessDataService;
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -58,7 +59,8 @@ public class RefBusinessDataRetriever {
     }
 
     private SRefBusinessDataInstance getRefBusinessDataUsingFlowNodeContext(BusinessDataContext context)
-            throws SBonitaReadException, SFlowNodeReadException, SRefBusinessDataInstanceNotFoundException, SProcessInstanceReadException {
+            throws SBonitaReadException, SFlowNodeReadException, SRefBusinessDataInstanceNotFoundException,
+            SProcessInstanceReadException {
         SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInFlowNode(context);
         if (refBusinessDataInstance != null) {
             return refBusinessDataInstance;
@@ -66,12 +68,14 @@ public class RefBusinessDataRetriever {
         return getRefBusinessDataInProcess(context, getProcessInstanceIdFromFlowNode(context));
     }
 
-    private SRefBusinessDataInstance getRefBusinessDataInProcess(BusinessDataContext context, long rootProcessInstanceId)
+    private SRefBusinessDataInstance getRefBusinessDataInProcess(BusinessDataContext context,
+            long rootProcessInstanceId)
             throws SBonitaReadException, SRefBusinessDataInstanceNotFoundException {
         try {
             return refBusinessDataService.getRefBusinessDataInstance(context.getName(), rootProcessInstanceId);
         } catch (SRefBusinessDataInstanceNotFoundException e) {
-            SARefBusinessDataInstance saRefBusinessDataInstance = refBusinessDataService.getSARefBusinessDataInstance(context.getName(), rootProcessInstanceId);
+            SARefBusinessDataInstance saRefBusinessDataInstance = refBusinessDataService
+                    .getSARefBusinessDataInstance(context.getName(), rootProcessInstanceId);
             if (saRefBusinessDataInstance == null) {
                 return null;
             }
@@ -86,8 +90,10 @@ public class RefBusinessDataRetriever {
     private long getProcessInstanceIdFromFlowNode(BusinessDataContext context)
             throws SFlowNodeReadException, SBonitaReadException, SProcessInstanceReadException {
         try {
-            SFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(context.getContainer().getId());
-            SProcessInstance processInstance = processInstanceService.getProcessInstance(flowNodeInstance.getParentProcessInstanceId());
+            SFlowNodeInstance flowNodeInstance = flowNodeInstanceService
+                    .getFlowNodeInstance(context.getContainer().getId());
+            SProcessInstance processInstance = processInstanceService
+                    .getProcessInstance(flowNodeInstance.getParentProcessInstanceId());
             if (isSubProcess(processInstance)) {
                 return getParentOfSubProcess(processInstance);
             }
@@ -100,12 +106,15 @@ public class RefBusinessDataRetriever {
         }
     }
 
-    private SRefBusinessDataInstance getRefBusinessDataInFlowNode(BusinessDataContext context) throws SBonitaReadException {
+    private SRefBusinessDataInstance getRefBusinessDataInFlowNode(BusinessDataContext context)
+            throws SBonitaReadException {
         try {
-            return refBusinessDataService.getFlowNodeRefBusinessDataInstance(context.getName(), context.getContainer().getId());
+            return refBusinessDataService.getFlowNodeRefBusinessDataInstance(context.getName(),
+                    context.getContainer().getId());
         } catch (final SRefBusinessDataInstanceNotFoundException sbe) {
             try {
-                SARefBusinessDataInstance saFlowNodeRefBusinessDataInstance = refBusinessDataService.getSAFlowNodeRefBusinessDataInstance(context.getName(), context.getContainer().getId());
+                SARefBusinessDataInstance saFlowNodeRefBusinessDataInstance = refBusinessDataService
+                        .getSAFlowNodeRefBusinessDataInstance(context.getName(), context.getContainer().getId());
                 if (saFlowNodeRefBusinessDataInstance == null) {
                     return null;
                 }
@@ -117,16 +126,20 @@ public class RefBusinessDataRetriever {
     }
 
     private SRefBusinessDataInstance getRefBusinessDataUsingProcessContext(BusinessDataContext context)
-            throws SBonitaReadException, SRefBusinessDataInstanceNotFoundException, SProcessInstanceReadException, SProcessInstanceNotFoundException,
+            throws SBonitaReadException, SRefBusinessDataInstanceNotFoundException, SProcessInstanceReadException,
+            SProcessInstanceNotFoundException,
             SFlowNodeReadException, SFlowNodeNotFoundException {
-        return getRefBusinessDataInProcess(context, getProcessInstanceIdThatCanContainBusinessData(context.getContainer().getId()));
+        return getRefBusinessDataInProcess(context,
+                getProcessInstanceIdThatCanContainBusinessData(context.getContainer().getId()));
     }
 
     /*
-     * get the first process in hierarchy that can contains business data, i.e. the process instance itself or its parent if it is an event subprocess
+     * get the first process in hierarchy that can contains business data, i.e. the process instance itself or its
+     * parent if it is an event subprocess
      */
     private long getProcessInstanceIdThatCanContainBusinessData(long processInstanceId)
-            throws SProcessInstanceReadException, SBonitaReadException, SProcessInstanceNotFoundException, SFlowNodeReadException, SFlowNodeNotFoundException {
+            throws SProcessInstanceReadException, SBonitaReadException, SProcessInstanceNotFoundException,
+            SFlowNodeReadException, SFlowNodeNotFoundException {
         try {
             SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
             if (isSubProcess(processInstance)) {
@@ -143,7 +156,8 @@ public class RefBusinessDataRetriever {
         return SFlowNodeType.SUB_PROCESS.equals(processInstance.getCallerType());
     }
 
-    private long getParentOfSubProcess(SProcessInstance processInstance) throws SFlowNodeNotFoundException, SFlowNodeReadException {
+    private long getParentOfSubProcess(SProcessInstance processInstance)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException {
         return flowNodeInstanceService.getFlowNodeInstance(processInstance.getCallerId()).getParentProcessInstanceId();
     }
 

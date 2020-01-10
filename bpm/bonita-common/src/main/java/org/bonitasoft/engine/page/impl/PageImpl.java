@@ -15,9 +15,8 @@ package org.bonitasoft.engine.page.impl;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.page.Page;
-
 import lombok.ToString;
+import org.bonitasoft.engine.page.Page;
 
 /**
  * @author Laurent Leseigneur

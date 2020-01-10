@@ -78,7 +78,7 @@ public class ValidationRuleTest {
 
     /**
      * ValidationRule test implementation - return the given validationStatus
-     * 
+     *
      * @author Colin PUY
      */
     private class ExceptionRule extends ValidationRule<Exception, ValidationStatus> {

@@ -24,12 +24,12 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 public class SCustomUserInfoValueUpdateBuilderImpl implements SCustomUserInfoValueUpdateBuilder {
 
     private final EntityUpdateDescriptor descriptor;
-    
+
     public SCustomUserInfoValueUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
         super();
         this.descriptor = descriptor;
     }
-    
+
     @Override
     public EntityUpdateDescriptor done() {
         return this.descriptor;

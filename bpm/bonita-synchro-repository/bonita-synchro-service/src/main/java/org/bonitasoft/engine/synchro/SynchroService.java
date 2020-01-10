@@ -24,7 +24,8 @@ public interface SynchroService {
 
     void fireEvent(Map<String, Serializable> event, Serializable id);
 
-    Serializable waitForEvent(Map<String, Serializable> event, long timeout) throws InterruptedException, TimeoutException;
+    Serializable waitForEvent(Map<String, Serializable> event, long timeout)
+            throws InterruptedException, TimeoutException;
 
     void clearAllEvents();
 

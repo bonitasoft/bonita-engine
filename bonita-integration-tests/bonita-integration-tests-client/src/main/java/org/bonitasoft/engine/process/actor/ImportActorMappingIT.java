@@ -71,11 +71,13 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
     @Test
     public void importSimpleActorMapping() throws Exception {
         final User john = createUser(USERNAME, PASSWORD);
-        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("simpleActorMapping.xml");
+        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping(
+                "simpleActorMapping.xml");
         processDefinition = deployProcess(businessArchive.done());
         getProcessAPI().enableProcess(processDefinition.getId());
 
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -90,7 +92,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
 
     @Test
     public void importComplexActorMapping() throws Exception {
-        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
+        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping(
+                "complexActorMapping.xml");
         final User john = createUser("john", "bpm");
         final Group rd = createGroup("RD");
         final Role role = createRole("dev");
@@ -102,7 +105,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
 
     @Test
     public void importActorMappingWithWrongXMLFileBeforeDeploy() throws Exception {
-        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("actorMappingWithException.xml");
+        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping(
+                "actorMappingWithException.xml");
         checkProcessNotActivated(businessArchive);
     }
 
@@ -115,7 +119,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
 
     @Test
     public void importActorMappingWithUnknownUserBeforeDeploy() throws Exception {
-        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("simpleActorMapping.xml");
+        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping(
+                "simpleActorMapping.xml");
         checkProcessNotActivated(businessArchive);
     }
 
@@ -128,7 +133,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
 
     @Test
     public void importActorMappingWithUnknownGroupBeforeDeploy() throws Exception {
-        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
+        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping(
+                "complexActorMapping.xml");
         createUser("john", "bpm");
         createGroup("RD1");
         createRole("dev");
@@ -148,7 +154,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
 
     @Test
     public void importActorMappingWithUnknownRoleBeforeDeploy() throws Exception {
-        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
+        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping(
+                "complexActorMapping.xml");
         createUser("john", "bpm");
         createGroup("RD");
         createRole("dev1");
@@ -171,7 +178,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         createUser("john", "bpm");
         createGroup("RD2");
         createRole("dev");
-        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMappingWithUnkownGroup.xml");
+        final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping(
+                "complexActorMappingWithUnkownGroup.xml");
 
         // even if missing membership the process is resolved
         checkProcessActivated(businessArchive);
@@ -204,7 +212,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("resolve", "1.0").addActor("Leader", true).addUserTask("step1", "Leader");
         final DesignProcessDefinition processDesignDefinition = builder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDesignDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDesignDefinition).done();
         processDefinition = deployProcess(businessArchive);
         ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
@@ -229,7 +238,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
      * @throws Exception
      * @since 6.0
      */
-    private BusinessArchiveBuilder createAndDeployProcessDefinitionWithImportedActorMapping(final String xmlFileName) throws Exception {
+    private BusinessArchiveBuilder createAndDeployProcessDefinitionWithImportedActorMapping(final String xmlFileName)
+            throws Exception {
         final DesignProcessDefinition processDefinition = createProcessDefinitionBuilder().done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
@@ -262,16 +272,20 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
      * @since 6.0
      */
     private ProcessDefinitionBuilder createProcessDefinitionBuilder() {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1",
+                ACTOR_NAME);
         return processBuilder;
     }
 
     private void checkProcessNotActivated(final BusinessArchiveBuilder businessArchive) throws Exception {
         processDefinition = deployProcess(businessArchive.done());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
-        final List<Problem> processResolutionProblems = getProcessAPI().getProcessResolutionProblems(processDefinition.getId());
+        final List<Problem> processResolutionProblems = getProcessAPI()
+                .getProcessResolutionProblems(processDefinition.getId());
         assertEquals(1, processResolutionProblems.size());
         final Problem problem = processResolutionProblems.get(0);
         assertEquals("actor", problem.getResource());
@@ -279,7 +293,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
 
     private void checkProcessActivated(final BusinessArchiveBuilder businessArchive) throws Exception {
         processDefinition = deployProcess(businessArchive.done());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
     }
 
@@ -289,7 +304,8 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
      * @throws Exception
      * @since 6.0
      */
-    private void createProcessDefinitionAndCheckActorMappingImportException(final User user, final String xmlFileName) throws Exception {
+    private void createProcessDefinitionAndCheckActorMappingImportException(final User user, final String xmlFileName)
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = createProcessDefinitionBuilder();
         processDefinition = deployAndEnableProcessWithActor(processBuilder.getProcess(), ACTOR_NAME, user);
 
@@ -303,13 +319,16 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
      * @param definition
      * @since 6.0
      */
-    private void getAndCheckActors(final User user, final Group group, final Role role, final ProcessDefinition definition) {
-        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 15, ActorCriterion.NAME_DESC);
+    private void getAndCheckActors(final User user, final Group group, final Role role,
+            final ProcessDefinition definition) {
+        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 15,
+                ActorCriterion.NAME_DESC);
         final ActorInstance actorInstance = actors.get(0);
         final List<ActorMember> actorMembers = getProcessAPI().getActorMembers(actorInstance.getId(), 0, 15);
         assertEquals(4, actorMembers.size());
         for (final ActorMember actorMember : actorMembers) {
-            assertTrue(checkRole(actorMember, role.getId()) || checkGroup(actorMember, group.getId()) || checkUser(actorMember, user.getId())
+            assertTrue(checkRole(actorMember, role.getId()) || checkGroup(actorMember, group.getId())
+                    || checkUser(actorMember, user.getId())
                     || checkMembership(actorMember, role.getId(), group.getId()));
         }
     }

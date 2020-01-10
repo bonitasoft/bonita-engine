@@ -38,7 +38,8 @@ public class SearchFormMappingDescriptor extends SearchEntityDescriptor {
     public SearchFormMappingDescriptor() {
         searchEntityKeys = new HashMap<>(6);
         searchEntityKeys.put(FormMappingSearchDescriptor.ID, new FieldDescriptor(SFormMapping.class, "id"));
-        searchEntityKeys.put(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SFormMapping.class, "processDefinitionId"));
+        searchEntityKeys.put(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID,
+                new FieldDescriptor(SFormMapping.class, "processDefinitionId"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TYPE, new FieldDescriptor(SFormMapping.class, "type"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TASK, new FieldDescriptor(SFormMapping.class, "task"));
         searchEntityKeys.put(FormMappingSearchDescriptor.PAGE_ID, new FieldDescriptor(SPageMapping.class, "pageId"));

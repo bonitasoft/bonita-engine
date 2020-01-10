@@ -76,8 +76,10 @@ public class JDBCJobListenerTest {
         // Then
         verify(jobService).deleteJobDescriptor(JOB_DESCRIPTOR_ID);
     }
+
     @Test
-    public void should_not_delete_job_descriptor_when_job_may_not_fire_again_but_there_is_other_triggers() throws Exception {
+    public void should_not_delete_job_descriptor_when_job_may_not_fire_again_but_there_is_other_triggers()
+            throws Exception {
         // Given
         context.put(BonitaJobListener.JOB_DESCRIPTOR_ID, JOB_DESCRIPTOR_ID);
         context.put(BonitaJobListener.JOB_NAME, "myJob");
@@ -88,7 +90,7 @@ public class JDBCJobListenerTest {
         jdbcJobListener.jobWasExecuted(context, null);
 
         // Then
-        verify(jobService,never()).deleteJobDescriptor(JOB_DESCRIPTOR_ID);
+        verify(jobService, never()).deleteJobDescriptor(JOB_DESCRIPTOR_ID);
     }
 
     @Test

@@ -27,11 +27,11 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder@Entity
+@Builder
+@Entity
 @Table(name = "business_app_menu")
 @IdClass(PersistentObjectId.class)
 @Filter(name = "tenantFilter")
@@ -58,8 +58,8 @@ public class SApplicationMenu implements PersistentObject {
     @Column(name = "index_")
     private int index;
 
-
-    public SApplicationMenu(final String displayName, long applicationId, final Long applicationPageId, final int index) {
+    public SApplicationMenu(final String displayName, long applicationId, final Long applicationPageId,
+            final int index) {
         this.displayName = displayName;
         this.applicationId = applicationId;
         this.applicationPageId = applicationPageId;

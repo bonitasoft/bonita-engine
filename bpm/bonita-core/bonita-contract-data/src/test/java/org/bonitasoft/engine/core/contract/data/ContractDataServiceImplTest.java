@@ -86,7 +86,8 @@ public class ContractDataServiceImplTest {
 
     @Test(expected = SBonitaReadException.class)
     public void getUserTaskData_throws_an_exception_with_a_read_exception() throws Exception {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.getUserTaskDataValue(1983L, "id");
     }
@@ -114,7 +115,8 @@ public class ContractDataServiceImplTest {
         final STaskContractData contractData = new STaskContractData(1983L, "id", 54L);
         contractData.setId(10L);
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
-        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
 
         contractDataService.addUserTaskData(contractData);
     }
@@ -137,14 +139,16 @@ public class ContractDataServiceImplTest {
         data.add(new STaskContractData(1983L, "id", 456478L));
         data.add(new STaskContractData(1983L, "id2", 4564456478L));
         doReturn(data).when(persistenceService).selectList(any());
-        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         contractDataService.deleteUserTaskData(1983L);
     }
 
     @Test(expected = SContractDataDeletionException.class)
     public void deleteUserTaskData_throws_exception_when_retrieving_data() throws Exception {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectList(any(SelectListDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.deleteUserTaskData(1983L);
     }
@@ -169,7 +173,8 @@ public class ContractDataServiceImplTest {
     }
 
     @Test
-    public void archiveContractData_should_not_create_archive_data_when_archivingContractData_is_disabled() throws Exception {
+    public void archiveContractData_should_not_create_archive_data_when_archivingContractData_is_disabled()
+            throws Exception {
         final long usertTaskId = 1983L;
         final long time = 1010101010101001L;
         final List<STaskContractData> data = new ArrayList<STaskContractData>();
@@ -184,7 +189,6 @@ public class ContractDataServiceImplTest {
         doReturn(data).when(persistenceService).selectList(any());
 
         contractDataService.archiveAndDeleteUserTaskData(usertTaskId, time);
-
 
         verify(archiveService, never()).recordInserts(time, archivedata);
     }
@@ -202,10 +206,12 @@ public class ContractDataServiceImplTest {
     }
 
     @Test(expected = SObjectModificationException.class)
-    public void archiveUserTaskData_should_throw_exception_when_an_exception_occurs_when_getting_data() throws Exception {
+    public void archiveUserTaskData_should_throw_exception_when_an_exception_occurs_when_getting_data()
+            throws Exception {
         final long usertTaskId = 1983L;
         final long time = 1010101010101001L;
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectList(any(SelectListDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.archiveAndDeleteUserTaskData(usertTaskId, time);
     }
@@ -231,7 +237,8 @@ public class ContractDataServiceImplTest {
 
     @Test(expected = SBonitaReadException.class)
     public void getArchivedUserTaskData_throws_an_exception_with_a_read_exception() throws Exception {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.getArchivedUserTaskDataValue(1983L, "id");
     }
@@ -261,7 +268,8 @@ public class ContractDataServiceImplTest {
         final SProcessContractData contractData = new SProcessContractData(1983L, "id", 54L);
         contractData.setId(10L);
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
-        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
 
         contractDataService.addProcessData(contractData);
     }
@@ -286,7 +294,8 @@ public class ContractDataServiceImplTest {
 
     @Test(expected = SBonitaReadException.class)
     public void getProcessData_throws_an_exception_with_a_read_exception() throws Exception {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.getProcessDataValue(1983L, "id");
     }
@@ -309,14 +318,16 @@ public class ContractDataServiceImplTest {
         data.add(new SProcessContractData(1983L, "id", 456478L));
         data.add(new SProcessContractData(1983L, "id2", 4564456478L));
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
-        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         contractDataService.deleteProcessData(1983L);
     }
 
     @Test(expected = SContractDataDeletionException.class)
     public void deleteProcessData_throws_exception_when_retrieving_data() throws Exception {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectList(any(SelectListDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.deleteProcessData(1983L);
     }
@@ -353,10 +364,12 @@ public class ContractDataServiceImplTest {
     }
 
     @Test(expected = SObjectModificationException.class)
-    public void archiveProcessData_should_throw_exception_when_an_exception_occurs_when_getting_data() throws Exception {
+    public void archiveProcessData_should_throw_exception_when_an_exception_occurs_when_getting_data()
+            throws Exception {
         final long usertProcessId = 1983L;
         final long time = 1010101010101001L;
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectList(any(SelectListDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.archiveAndDeleteProcessData(usertProcessId, time);
     }
@@ -382,7 +395,8 @@ public class ContractDataServiceImplTest {
 
     @Test(expected = SBonitaReadException.class)
     public void getArchivedProcessData_throws_an_exception_with_a_read_exception() throws Exception {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.getArchivedProcessDataValue(1983L, "id");
     }

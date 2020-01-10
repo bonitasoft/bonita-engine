@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is enough to get a Datasource that spring creates using parameters provided in properties.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 @Component

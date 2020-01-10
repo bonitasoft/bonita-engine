@@ -16,11 +16,9 @@ package org.bonitasoft.engine.core.operation;
 import java.util.List;
 
 /**
- * 
  * Utility Bean to be able to provide easily {@link LeftOperandHandler} via spring
- * 
+ *
  * @author Baptiste Mesta
- * 
  */
 public class LeftOperandHandlerProvider {
 

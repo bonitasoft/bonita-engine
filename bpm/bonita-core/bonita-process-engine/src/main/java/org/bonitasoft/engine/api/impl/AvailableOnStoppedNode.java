@@ -19,9 +19,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to identify API methods that can be called if a Node is not started. All other API method calls will be rejected.
+ * Used to identify API methods that can be called if a Node is not started. All other API method calls will be
+ * rejected.
  * Used by the Bonita Engine server interceptor.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 @Target(ElementType.METHOD)

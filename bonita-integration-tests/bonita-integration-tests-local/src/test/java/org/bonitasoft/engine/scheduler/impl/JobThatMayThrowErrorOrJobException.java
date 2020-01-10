@@ -40,7 +40,6 @@ public class JobThatMayThrowErrorOrJobException extends GroupJob {
         return "throw error";
     }
 
-
     @Override
     public void setAttributes(Map<String, Serializable> attributes) {
         super.setAttributes(attributes);

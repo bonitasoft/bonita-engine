@@ -24,11 +24,10 @@ public class SCommandLogBuilderFactoryImpl extends CRUDELogBuilderFactory implem
     public SCommandLogBuilder createNewInstance() {
         return new SCommandLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return SCommandLogIndexesMapper.COMMAND_INDEX_NAME;
     }
-
 
 }

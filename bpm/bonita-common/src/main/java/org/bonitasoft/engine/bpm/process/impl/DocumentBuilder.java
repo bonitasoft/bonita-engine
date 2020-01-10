@@ -24,7 +24,9 @@ public class DocumentBuilder {
     private DocumentImpl document;
 
     /**
-     * Create a new instance of {@link Document}. This method is the entry point of this builder: it must be called before any other method.
+     * Create a new instance of {@link Document}. This method is the entry point of this builder: it must be called
+     * before any other method.
+     *
      * @param documentName document name
      * @param hasContent defines whether the document has content or not
      * @return
@@ -42,6 +44,7 @@ public class DocumentBuilder {
 
     /**
      * Sets the document file name
+     *
      * @param fileName file name
      * @return
      */
@@ -52,6 +55,7 @@ public class DocumentBuilder {
 
     /**
      * Sets the document URL
+     *
      * @param documentUrl document URL
      * @return
      */
@@ -62,18 +66,18 @@ public class DocumentBuilder {
 
     /**
      * Sets the description of the document
+     *
      * @param description the description of the document
      * @return
      */
-    public DocumentBuilder setDescription(final String description){
+    public DocumentBuilder setDescription(final String description) {
         document.setDescription(description);
         return this;
     }
 
-
-
     /**
      * Sets the document MIME type
+     *
      * @param documentContentMimeType document MIME type
      * @return
      */

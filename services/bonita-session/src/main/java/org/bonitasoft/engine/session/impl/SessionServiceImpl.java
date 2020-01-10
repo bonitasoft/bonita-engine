@@ -44,7 +44,8 @@ public class SessionServiceImpl implements SessionService {
 
     private final TechnicalLoggerService logger;
 
-    public SessionServiceImpl(final SessionProvider sessionProvider, final String applicationName, final TechnicalLoggerService logger) {
+    public SessionServiceImpl(final SessionProvider sessionProvider, final String applicationName,
+            final TechnicalLoggerService logger) {
         this.sessionProvider = sessionProvider;
         this.applicationName = applicationName;
         this.logger = logger;
@@ -56,12 +57,14 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public SSession createSession(final long tenantId, final long userId, final String userName, final boolean isTechnicalUser) throws SSessionException {
+    public SSession createSession(final long tenantId, final long userId, final String userName,
+            final boolean isTechnicalUser) throws SSessionException {
         return createSession(tenantId, userId, userName, isTechnicalUser, emptyList());
     }
 
     @Override
-    public SSession createSession(final long tenantId, final long userId, final String userName, final boolean isTechnicalUser, List<String> profiles) throws SSessionException {
+    public SSession createSession(final long tenantId, final long userId, final String userName,
+            final boolean isTechnicalUser, List<String> profiles) throws SSessionException {
         final long id = SessionIdGenerator.getNextId();
         Date now = new Date();
         SSession session = SSession.builder()
@@ -78,8 +81,9 @@ public class SessionServiceImpl implements SessionService {
                 .build();
         sessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "CreateSession with tenantId = <" + tenantId + ">, username = <" + userName + ">, id = <"
-                    + id + ">");
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    "CreateSession with tenantId = <" + tenantId + ">, username = <" + userName + ">, id = <"
+                            + id + ">");
         }
         return session;
     }

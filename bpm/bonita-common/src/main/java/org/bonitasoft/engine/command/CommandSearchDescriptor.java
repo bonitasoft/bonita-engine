@@ -14,7 +14,8 @@
 package org.bonitasoft.engine.command;
 
 /**
- * Contains constants to search for commands using {@link org.bonitasoft.engine.api.CommandAPI#searchCommands(org.bonitasoft.engine.search.SearchOptions)}
+ * Contains constants to search for commands using
+ * {@link org.bonitasoft.engine.api.CommandAPI#searchCommands(org.bonitasoft.engine.search.SearchOptions)}
  *
  * @author Yanyan Liu
  * @see org.bonitasoft.engine.api.CommandAPI#searchCommands(org.bonitasoft.engine.search.SearchOptions)

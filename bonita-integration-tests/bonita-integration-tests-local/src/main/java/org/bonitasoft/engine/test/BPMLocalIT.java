@@ -120,7 +120,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SCommentService commentService = tenantAccessor.getCommentService();
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
-        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestComment", "1.0");
+        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder()
+                .createNewInstance("processToTestComment", "1.0");
         processDef.addStartEvent("start");
         processDef.addUserTask("step1", ACTOR_NAME);
         processDef.addEndEvent("end");
@@ -144,23 +145,27 @@ public class BPMLocalIT extends CommonAPILocalIT {
             }
         };
         assertEquals(0, (long) transactionService.executeInTransaction(getNumberOfComments));
-        final long numberOfInitialArchivedComments = transactionService.executeInTransaction(getNumberOfArchivedComments);
+        final long numberOfInitialArchivedComments = transactionService
+                .executeInTransaction(getNumberOfArchivedComments);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final Long step1Id = waitForUserTask(processInstance, "step1");
         getProcessAPI().addProcessComment(processInstance.getId(), "kikoo lol");
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         assertEquals(1, (long) transactionService.executeInTransaction(getNumberOfComments));
-        assertEquals(numberOfInitialArchivedComments, (long) transactionService.executeInTransaction(getNumberOfArchivedComments));
+        assertEquals(numberOfInitialArchivedComments,
+                (long) transactionService.executeInTransaction(getNumberOfArchivedComments));
         assignAndExecuteStep(step1Id, john);
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         assertEquals(2, (long) transactionService.executeInTransaction(getNumberOfComments));// claim add a comment...
-        assertEquals(numberOfInitialArchivedComments, (long) transactionService.executeInTransaction(getNumberOfArchivedComments));
+        assertEquals(numberOfInitialArchivedComments,
+                (long) transactionService.executeInTransaction(getNumberOfArchivedComments));
         waitForProcessToFinish(processInstance);
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         assertEquals(0, (long) transactionService.executeInTransaction(getNumberOfComments));
-        assertEquals(numberOfInitialArchivedComments + 2, (long) transactionService.executeInTransaction(getNumberOfArchivedComments));
+        assertEquals(numberOfInitialArchivedComments + 2,
+                (long) transactionService.executeInTransaction(getNumberOfArchivedComments));
         disableAndDeleteProcess(definition);
     }
 
@@ -169,10 +174,12 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
-        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestComment", "1.0");
+        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder()
+                .createNewInstance("processToTestComment", "1.0");
         processDef.addShortTextData("kikoo", new ExpressionBuilder().createConstantStringExpression("lol"));
         processDef.addStartEvent("start");
-        processDef.addUserTask("step1", ACTOR_NAME).addShortTextData("kikoo2", new ExpressionBuilder().createConstantStringExpression("lol"));
+        processDef.addUserTask("step1", ACTOR_NAME).addShortTextData("kikoo2",
+                new ExpressionBuilder().createConstantStringExpression("lol"));
         processDef.addUserTask("step2", ACTOR_NAME);
         processDef.addEndEvent("end");
         processDef.addTransition("start", "step1");
@@ -187,7 +194,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
 
             @Override
             public List<SPendingActivityMapping> call() throws Exception {
-                final QueryOptions queryOptions = new QueryOptions(0, 100, SPendingActivityMapping.class, "id", OrderByType.ASC);
+                final QueryOptions queryOptions = new QueryOptions(0, 100, SPendingActivityMapping.class, "id",
+                        OrderByType.ASC);
                 return activityInstanceService.getPendingMappings(step1Id, queryOptions);
             }
         };
@@ -206,23 +214,27 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
-        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestTransitions", "1.0");
+        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder()
+                .createNewInstance("processToTestTransitions", "1.0");
         processDef.addStartEvent("start");
         processDef.addUserTask("step1", ACTOR_NAME);
         processDef.addEndEvent("end");
         processDef.addTransition("start", "step1");
         processDef.addTransition("step1", "end");
         processDef.addActor(ACTOR_NAME);
-        final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7};
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef.done())
+        final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7 };
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDef.done())
                 .addClasspathResource(new BarResource("myDep", content)).done();
         final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final Long step1Id = waitForUserTask(processInstance, "step1");
-        List<Long> dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0,
-                100));
+        List<Long> dependencyIds = transactionService
+                .executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0,
+                        100));
         assertEquals(1, dependencyIds.size());
-        final AbstractSDependency dependency = transactionService.executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
+        final AbstractSDependency dependency = transactionService
+                .executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
         assertTrue(dependency.getName().endsWith("myDep"));
         assertTrue(Arrays.equals(content, dependency.getValue()));
 
@@ -230,7 +242,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(definition);
 
-        dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0, 100));
+        dependencyIds = transactionService.executeInTransaction(
+                new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0, 100));
         assertEquals(0, dependencyIds.size());
     }
 
@@ -239,30 +252,37 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
-        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestTransitions", "1.0");
+        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder()
+                .createNewInstance("processToTestTransitions", "1.0");
         processDef.addStartEvent("start").addUserTask("step1", ACTOR_NAME).addEndEvent("end");
         processDef.addTransition("start", "step1").addTransition("step1", "end");
         processDef.addActor(ACTOR_NAME);
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef.done());
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDef.done());
         for (int i = 0; i < 25; i++) {
-            final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, (byte) (i >>> 24), (byte) (i >> 16 & 0xff), (byte) (i >> 8 & 0xff), (byte) (i & 0xff)};
+            final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, (byte) (i >>> 24), (byte) (i >> 16 & 0xff),
+                    (byte) (i >> 8 & 0xff), (byte) (i & 0xff) };
             businessArchiveBuilder.addClasspathResource(new BarResource("myDep" + i, content));
         }
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME,
+                john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final Long step1Id = waitForUserTask(processInstance, "step1");
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        List<Long> dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService,
-                0, 100));
+        List<Long> dependencyIds = transactionService
+                .executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService,
+                        0, 100));
         assertEquals(25, dependencyIds.size());
-        final AbstractSDependency dependency = transactionService.executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
+        final AbstractSDependency dependency = transactionService
+                .executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
         assertNotNull(dependency);
 
         assignAndExecuteStep(step1Id, john.getId());
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(definition);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0, 100));
+        dependencyIds = transactionService.executeInTransaction(
+                new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0, 100));
         assertEquals(0, dependencyIds.size());
     }
 
@@ -271,7 +291,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
         final String userTaskName = "actNaturally";
-        final ProcessDefinition definition = deployAndEnableProcessWithOneHumanTask("deletingProcessDeletesActors", "CandidateForOscarReward", userTaskName);
+        final ProcessDefinition definition = deployAndEnableProcessWithOneHumanTask("deletingProcessDeletesActors",
+                "CandidateForOscarReward", userTaskName);
 
         final ProcessInstance processInstanceId = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(processInstanceId, userTaskName);
@@ -297,7 +318,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
         final String userTaskName = "actNaturally";
-        final ProcessDefinition definition = deployAndEnableProcessWithOneHumanTask("deletingProcessDeletesActorMappings", "CandidateForOscarReward",
+        final ProcessDefinition definition = deployAndEnableProcessWithOneHumanTask(
+                "deletingProcessDeletesActorMappings", "CandidateForOscarReward",
                 userTaskName);
 
         final ProcessInstance processInstanceId = getProcessAPI().startProcess(definition.getId());
@@ -306,19 +328,21 @@ public class BPMLocalIT extends CommonAPILocalIT {
         disableAndDeleteProcess(definition);
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final List<SActorMember> actorMembers = transactionService.executeInTransaction(new Callable<List<SActorMember>>() {
+        final List<SActorMember> actorMembers = transactionService
+                .executeInTransaction(new Callable<List<SActorMember>>() {
 
-            @Override
-            public List<SActorMember> call() throws Exception {
-                return getTenantAccessor().getActorMappingService().getActorMembersOfUser(john.getId(), 0, 1);
-            }
-        });
+                    @Override
+                    public List<SActorMember> call() throws Exception {
+                        return getTenantAccessor().getActorMappingService().getActorMembersOfUser(john.getId(), 0, 1);
+                    }
+                });
 
         // Check there is no actor left:
         assertEquals(0, actorMembers.size());
     }
 
-    private ProcessDefinition deployAndEnableProcessWithOneHumanTask(final String processName, final String actorName, final String userTaskName)
+    private ProcessDefinition deployAndEnableProcessWithOneHumanTask(final String processName, final String actorName,
+            final String userTaskName)
             throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
@@ -339,7 +363,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final ProcessDefinitionBuilder builder1 = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
         builder1.addActor(ACTOR_NAME);
         builder1.addUserTask("step1", ACTOR_NAME);
-        builder1.addAutomaticTask("step2").addConnector("myConnector", "blocking-connector", "1.0", ConnectorEvent.ON_ENTER);
+        builder1.addAutomaticTask("step2").addConnector("myConnector", "blocking-connector", "1.0",
+                ConnectorEvent.ON_ENTER);
         builder1.addTransition("step1", "step2");
         builder1.addUserTask("ustep2", ACTOR_NAME);
         builder1.addTransition("step2", "ustep2");
@@ -347,9 +372,10 @@ public class BPMLocalIT extends CommonAPILocalIT {
                 .createNewBusinessArchive()
                 .setProcessDefinition(builder1.done())
                 .addConnectorImplementation(
-                        new BarResource("blocking-connector.impl", BuildTestUtil.buildConnectorImplementationFile("blocking-connector", "1.0",
-                                "blocking-connector-impl",
-                                "1.0", BlockingConnector.class.getName())))
+                        new BarResource("blocking-connector.impl",
+                                BuildTestUtil.buildConnectorImplementationFile("blocking-connector", "1.0",
+                                        "blocking-connector-impl",
+                                        "1.0", BlockingConnector.class.getName())))
                 .done();
         final ProcessDefinition p1 = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, john);
 
@@ -363,7 +389,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         builder2.addUserTask("step1", ACTOR_NAME);
         builder2.addAutomaticTask("step2").addOperation(
                 new OperationBuilder().createSetDataOperation("data",
-                        new ExpressionBuilder().createGroovyScriptExpression("blockingGroovyScript1", blockingGroovyScript1, String.class.getName())));
+                        new ExpressionBuilder().createGroovyScriptExpression("blockingGroovyScript1",
+                                blockingGroovyScript1, String.class.getName())));
         builder2.addTransition("step1", "step2");
         builder2.addUserTask("ustep2", ACTOR_NAME);
         builder2.addTransition("step2", "ustep2");
@@ -379,7 +406,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         builder3.addUserTask("step1", ACTOR_NAME);
         builder3.addAutomaticTask("step2");
         builder3.addTransition("step1", "step2",
-                new ExpressionBuilder().createGroovyScriptExpression("blockingGroovyScript2", blockingGroovyScript2, Boolean.class.getName()));
+                new ExpressionBuilder().createGroovyScriptExpression("blockingGroovyScript2", blockingGroovyScript2,
+                        Boolean.class.getName()));
         builder3.addUserTask("ustep2", ACTOR_NAME);
         builder3.addTransition("step2", "ustep2");
 
@@ -434,7 +462,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         disableAndDeleteProcess(p3.getId());
     }
 
-    private void retryFailedFlowNodes() throws SearchException, ActivityInstanceNotFoundException, ActivityExecutionException {
+    private void retryFailedFlowNodes()
+            throws SearchException, ActivityInstanceNotFoundException, ActivityExecutionException {
         List<FlowNodeInstance> failedFlowNodes = getFailedFlowNodes();
         for (FlowNodeInstance failedFlowNode : failedFlowNodes) {
             getProcessAPI().retryTask(failedFlowNode.getId());
@@ -504,8 +533,9 @@ public class BPMLocalIT extends CommonAPILocalIT {
 
         private final int maxResult;
 
-        public GetDependenciesIds(final APISession session, final long processDefinitionId, final DependencyService dependencyService,
-                                  final int startIndex, final int maxResult) {
+        public GetDependenciesIds(final APISession session, final long processDefinitionId,
+                final DependencyService dependencyService,
+                final int startIndex, final int maxResult) {
             this.session = session;
             this.processDefinitionId = processDefinitionId;
             this.dependencyService = dependencyService;
@@ -544,11 +574,11 @@ public class BPMLocalIT extends CommonAPILocalIT {
         TestHandler testHandler = new TestHandler();
         logger.addHandler(testHandler);
 
-        APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, Collections.<String, String>emptyMap());
+        APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, Collections.<String, String> emptyMap());
 
         //then
         String log = testHandler.getLogs();
-        APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String>emptyMap());
+        APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
 
         logger.removeHandler(testHandler);
 

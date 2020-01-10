@@ -38,7 +38,8 @@ public class UpdateGroup {
     private final IdentityService identityService;
     private EntityUpdateDescriptor iconUpdater;
 
-    public UpdateGroup(final long groupId, final EntityUpdateDescriptor changeDescriptor, final IdentityService identityService,
+    public UpdateGroup(final long groupId, final EntityUpdateDescriptor changeDescriptor,
+            final IdentityService identityService,
             EntityUpdateDescriptor iconUpdater) {
         this.groupId = groupId;
         this.changeDescriptor = changeDescriptor;
@@ -54,7 +55,8 @@ public class UpdateGroup {
         final String nameKey = SGroup.NAME;
         final Map<String, Object> fields = changeDescriptor.getFields();
         if (fields.containsKey(parentPathKey) || fields.containsKey(nameKey)) {
-            final String parentPath = fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey) : sGroup.getParentPath();
+            final String parentPath = fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey)
+                    : sGroup.getParentPath();
             final String groupName = fields.containsKey(nameKey) ? (String) fields.get(nameKey) : sGroup.getName();
             updateChildren(sGroup, parentPath, SGroup.ID, parentPathKey, groupName);
         }
@@ -62,12 +64,14 @@ public class UpdateGroup {
         return sGroup;
     }
 
-    private void updateChildren(final SGroup group, final String parentPath, final String idKey, final String parentPathKey, final String groupName)
+    private void updateChildren(final SGroup group, final String parentPath, final String idKey,
+            final String parentPathKey, final String groupName)
             throws SIdentityException {
         List<SGroup> groupChildren;
         int i = 0;
         do {
-            groupChildren = identityService.getGroupChildren(group.getId(), i * BATCH_SIZE, BATCH_SIZE, idKey, OrderByType.ASC);
+            groupChildren = identityService.getGroupChildren(group.getId(), i * BATCH_SIZE, BATCH_SIZE, idKey,
+                    OrderByType.ASC);
             i++;
             for (final SGroup child : groupChildren) {
                 if (parentPath != null) {

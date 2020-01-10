@@ -51,8 +51,10 @@ public class ProcessDeploymentInfoImpl extends NamedElementImpl implements Proce
 
     private final String description;
 
-    public ProcessDeploymentInfoImpl(final long id, final long processId, final String name, final String version, final String description,
-            final Date deploymentDate, final long deployedBy, final ActivationState activationState, final ConfigurationState configurationState,
+    public ProcessDeploymentInfoImpl(final long id, final long processId, final String name, final String version,
+            final String description,
+            final Date deploymentDate, final long deployedBy, final ActivationState activationState,
+            final ConfigurationState configurationState,
             final String displayName, final Date lastUpdateDate, final String iconPath,
             final String displayDescription) {
         super(name);

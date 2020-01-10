@@ -29,14 +29,16 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
  */
 public class FailedActivityStateImpl implements FlowNodeState {
 
-
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
         return StateCode.DONE;
     }
 
     @Override
-    public int getId() { return ID_ACTIVITY_FAILED; }
+    public int getId() {
+        return ID_ACTIVITY_FAILED;
+    }
 
     @Override
     public boolean isInterrupting() {
@@ -59,12 +61,14 @@ public class FailedActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return false;
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 

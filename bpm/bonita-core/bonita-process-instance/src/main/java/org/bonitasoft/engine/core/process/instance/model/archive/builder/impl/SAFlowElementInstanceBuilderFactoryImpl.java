@@ -18,7 +18,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowE
 /**
  * @author Emmanuel Duchastenier
  */
-public abstract class SAFlowElementInstanceBuilderFactoryImpl extends SANamedElementBuilderFactoryImpl implements SAFlowElementInstanceBuilderFactory {
+public abstract class SAFlowElementInstanceBuilderFactoryImpl extends SANamedElementBuilderFactoryImpl
+        implements SAFlowElementInstanceBuilderFactory {
 
     protected static final String DESCRIPTION_KEY = "description";
 

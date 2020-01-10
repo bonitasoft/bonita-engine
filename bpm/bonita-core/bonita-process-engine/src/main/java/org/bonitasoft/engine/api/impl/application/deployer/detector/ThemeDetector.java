@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl.application.deployer.detector;
 
-import java.io.File;
-
 import org.bonitasoft.engine.io.FileAndContent;
 
 /**

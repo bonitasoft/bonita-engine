@@ -40,9 +40,12 @@ public class SearchProcessSupervisorDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.ID_KEY));
         fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID,
                 new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.PROCESS_DEF_ID_KEY));
-        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USER_ID, new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.USER_ID_KEY));
-        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.GROUP_ID, new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.GROUP_ID_KEY));
-        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.ROLE_ID, new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.ROLE_ID_KEY));
+        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USER_ID,
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.USER_ID_KEY));
+        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.GROUP_ID,
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.GROUP_ID_KEY));
+        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.ROLE_ID,
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.ROLE_ID_KEY));
         // fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USER_FISRT_NAME, new FieldDescriptor(SUser.class, userBuilder.getFirstNameKey()));
         // fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USER_LAST_NAME, new FieldDescriptor(SUser.class, userBuilder.getLastNameKey()));
         // fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USERNAME, new FieldDescriptor(SUser.class, userBuilder.getUserNameKey()));

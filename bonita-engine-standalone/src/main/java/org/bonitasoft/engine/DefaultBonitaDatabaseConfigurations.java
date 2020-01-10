@@ -42,7 +42,6 @@ public class DefaultBonitaDatabaseConfigurations {
             .user("bonita")
             .password("bpm").build();
 
-
     public static BonitaDatabaseConfiguration defaultConfiguration(String dbVendor) {
         switch (dbVendor) {
             case "h2":

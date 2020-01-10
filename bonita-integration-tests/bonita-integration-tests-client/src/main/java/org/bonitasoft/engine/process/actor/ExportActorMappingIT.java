@@ -39,8 +39,10 @@ public class ExportActorMappingIT extends TestWithUser {
 
     @Test
     public void exportSimpleActorMapping() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("exportProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("exportProcess", "1.0");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1",
+                ACTOR_NAME);
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
 
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
@@ -58,8 +60,10 @@ public class ExportActorMappingIT extends TestWithUser {
     public void exportActorMappingWithDeletedGroup() throws Exception {
         final Group sales = createGroup("sales");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("exportProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("exportProcess", "1.0");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1",
+                ACTOR_NAME);
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, sales);
 
         deleteGroups(sales);
@@ -73,8 +77,10 @@ public class ExportActorMappingIT extends TestWithUser {
     public void exportActorMappingWithDeletedUser() throws Exception {
         final User john = createUser("john", "bpm");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("exportProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("exportProcess", "1.0");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1",
+                ACTOR_NAME);
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         deleteUsers(john);
@@ -86,8 +92,10 @@ public class ExportActorMappingIT extends TestWithUser {
 
     @Test
     public void exportActorMappingWithDeletedMembership() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("exportProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("exportProcess", "1.0");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1",
+                ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
@@ -112,8 +120,10 @@ public class ExportActorMappingIT extends TestWithUser {
 
     @Test
     public void exportActorMappingWithDeletedSubGroup() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("exportProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("exportProcess", "1.0");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1",
+                ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
@@ -139,8 +149,10 @@ public class ExportActorMappingIT extends TestWithUser {
     public void exportActorMappingWithDeletedRole() throws Exception {
         final Role sales = createRole("sales");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("exportProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("exportProcess", "1.0");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1",
+                ACTOR_NAME);
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
 
         deleteRoles(sales);
@@ -152,8 +164,10 @@ public class ExportActorMappingIT extends TestWithUser {
 
     @Test
     public void exportcomplexActorMapping() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("exportProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("exportProcess", "1.0");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addUserTask("userTask1",
+                ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);

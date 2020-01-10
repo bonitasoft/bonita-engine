@@ -47,7 +47,8 @@ public class FlowNodeTransitionsWrapperTest {
 
     @Test
     public void is_last_flowNode_if_no_valid_outgoing_transitions() {
-        flowNodeTransitionsWrapper.setValidOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
+        flowNodeTransitionsWrapper
+                .setValidOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
         assertTrue(flowNodeTransitionsWrapper.isLastFlowNode());
     }
 
@@ -112,7 +113,8 @@ public class FlowNodeTransitionsWrapperTest {
     public void isSimple_return_false_if_has_one_incoming_and_no_default_outgoing_transitions() {
         flowNodeTransitionsWrapper.setInputTransitionsSize(1);
         flowNodeTransitionsWrapper.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
-        flowNodeTransitionsWrapper.setValidOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
+        flowNodeTransitionsWrapper
+                .setValidOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
         assertFalse(flowNodeTransitionsWrapper.isSimpleMerge());
     }
 

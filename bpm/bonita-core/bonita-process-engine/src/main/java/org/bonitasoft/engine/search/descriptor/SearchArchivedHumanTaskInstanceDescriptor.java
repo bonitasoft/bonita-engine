@@ -37,8 +37,10 @@ public class SearchArchivedHumanTaskInstanceDescriptor extends SearchEntityDescr
     public SearchArchivedHumanTaskInstanceDescriptor() {
         final SAUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class);
         entityKeys = new HashMap<String, FieldDescriptor>(10);
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.NAME, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getNameKey()));
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PRIORITY, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getPriorityKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.NAME,
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getNameKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PRIORITY,
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getPriorityKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getProcessDefinitionKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
@@ -51,15 +53,18 @@ public class SearchArchivedHumanTaskInstanceDescriptor extends SearchEntityDescr
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getSourceObjectIdKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getParentActivityInstanceKey()));
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getStateNameKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME,
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getStateNameKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.ASSIGNEE_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getAssigneeIdKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.DISPLAY_NAME,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getDisplayNameKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getReachedStateDateKey()));
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.TERMINAL, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getTerminalKey()));
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.ARCHIVE_DATE, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getArchivedDateKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.TERMINAL,
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getTerminalKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.ARCHIVE_DATE,
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getArchivedDateKey()));
 
         humanTaskInstanceAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> humanFields = new HashSet<String>(2);

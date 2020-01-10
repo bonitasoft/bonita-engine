@@ -24,7 +24,7 @@ public interface GenericAuthenticationService {
 
     /**
      * Check user credentials by give user name and passwordHash
-     * 
+     *
      * @param credentials
      *        the credentials elements to use to authenticate
      * @return the username of the user authenticated.

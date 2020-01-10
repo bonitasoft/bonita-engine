@@ -36,8 +36,9 @@ public class ArtifactTypeDetector {
     private PageAndFormDetector pageAndFormDetector;
     private LayoutDetector layoutDetector;
 
-    public ArtifactTypeDetector(XmlDetector xmlDetector, CustomPageDetector customPageDetector, ProcessDetector processDetector,
-                                ThemeDetector themeDetector, PageAndFormDetector pageAndFormDetector, LayoutDetector layoutDetector) {
+    public ArtifactTypeDetector(XmlDetector xmlDetector, CustomPageDetector customPageDetector,
+            ProcessDetector processDetector,
+            ThemeDetector themeDetector, PageAndFormDetector pageAndFormDetector, LayoutDetector layoutDetector) {
         this.xmlDetector = xmlDetector;
         this.customPageDetector = customPageDetector;
         this.processDetector = processDetector;
@@ -70,7 +71,8 @@ public class ArtifactTypeDetector {
         return processDetector.isCompliant(file);
     }
 
-    public void detectAndStore(String fileName, InputStream content, ApplicationArchive.ApplicationArchiveBuilder builder) throws IOException {
+    public void detectAndStore(String fileName, InputStream content,
+            ApplicationArchive.ApplicationArchiveBuilder builder) throws IOException {
         FileAndContent file = FileAndContentUtils.file(fileName.substring(fileName.lastIndexOf('/') + 1), content);
         if (isApplication(file)) {
             logger.info("Found application file: '{}'. ", file.getFileName());

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.classloader;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,7 +32,6 @@ public class ClassLoaderIdentifier implements Serializable {
 
     private String type;
     private long id;
-
 
     public ScopeType getScopeType() {
         return ScopeType.valueOf(type);

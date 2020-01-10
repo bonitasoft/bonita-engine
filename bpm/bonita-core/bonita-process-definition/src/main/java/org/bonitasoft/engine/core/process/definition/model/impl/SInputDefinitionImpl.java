@@ -37,7 +37,8 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
         this(name, null, description, false, null);
     }
 
-    public SInputDefinitionImpl(final String name, final SType type, final String description, final boolean multiple, final List<SInputDefinition> inputDefinitions) {
+    public SInputDefinitionImpl(final String name, final SType type, final String description, final boolean multiple,
+            final List<SInputDefinition> inputDefinitions) {
         super(name);
         this.description = description;
         this.multiple = multiple;
@@ -61,7 +62,8 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
         convertAndAddInputDefinitions(input);
     }
 
-    public SInputDefinitionImpl(String name, String description, boolean multiple, List<SInputDefinition> inputDefinitions) {
+    public SInputDefinitionImpl(String name, String description, boolean multiple,
+            List<SInputDefinition> inputDefinitions) {
         this(name, null, description, multiple, inputDefinitions);
     }
 
@@ -105,9 +107,12 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         SInputDefinitionImpl that = (SInputDefinitionImpl) o;
         return Objects.equals(multiple, that.multiple) &&
                 Objects.equals(inputDefinitions, that.inputDefinitions) &&

@@ -21,9 +21,10 @@ import org.hibernate.type.descriptor.sql.VarcharTypeDescriptor;
  * @author Guillaume Rosinosky
  */
 public class PostgresMaterializedClobType extends AbstractSingleColumnStandardBasicType<String> {
+
     public PostgresMaterializedClobType() {
         // forcing VARCHAR to String as there is no real CLOB in PSQL
-        super(VarcharTypeDescriptor.INSTANCE , StringTypeDescriptor.INSTANCE);
+        super(VarcharTypeDescriptor.INSTANCE, StringTypeDescriptor.INSTANCE);
     }
 
     @Override

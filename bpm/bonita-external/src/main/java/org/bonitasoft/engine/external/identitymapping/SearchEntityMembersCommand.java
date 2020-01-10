@@ -29,9 +29,10 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityMemberUserDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Parameter keys: DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions, SEARCH_OPTIONS_KEY: the Search options to filter & sort
+ * Parameter keys: DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions,
+ * SEARCH_OPTIONS_KEY: the Search options to filter & sort
  * the results, MEMBER_TYPE_KEY: Member Type to search for (USER, GROUP, ROLE, or MEMBERSHIP).
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 public class SearchEntityMembersCommand extends EntityMemberCommand {
@@ -44,10 +45,12 @@ public class SearchEntityMembersCommand extends EntityMemberCommand {
         this.serviceAccessor = serviceAccessor;
 
         final String kind = getStringMandadoryParameter(parameters, DISCRIMINATOR_ID_KEY);
-        final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY, "Parameters map must contain an entry " + SEARCH_OPTIONS_KEY
-                + " with a SearchOptions value");
-        final MemberType memberType = getMandatoryParameter(parameters, MEMBER_TYPE_KEY, "Parameters map must contain an entry " + MEMBER_TYPE_KEY
-                + " with a MemberType value (USER, GROUP, ROLE, MEMBERSHIP)");
+        final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY,
+                "Parameters map must contain an entry " + SEARCH_OPTIONS_KEY
+                        + " with a SearchOptions value");
+        final MemberType memberType = getMandatoryParameter(parameters, MEMBER_TYPE_KEY,
+                "Parameters map must contain an entry " + MEMBER_TYPE_KEY
+                        + " with a MemberType value (USER, GROUP, ROLE, MEMBERSHIP)");
 
         final String querySuffix = getQuerySuffix(memberType);
         final SearchEntityMemberDescriptor searchDescriptor = getSearchDescriptor(memberType);

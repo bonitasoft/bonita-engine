@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -22,8 +23,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
-
-import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
@@ -33,7 +32,6 @@ import javax.persistence.*;
 @Filter(name = "tenantFilter")
 @MappedSuperclass
 public abstract class SAbstractConnectorInstance implements PersistentObject {
-
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -61,8 +59,9 @@ public abstract class SAbstractConnectorInstance implements PersistentObject {
     private String containerType;
     private int executionOrder;
 
-    public SAbstractConnectorInstance(final String name, final long containerId, final String containerType, final String connectorId, final String version,
-                                      final ConnectorEvent activationEvent) {
+    public SAbstractConnectorInstance(final String name, final long containerId, final String containerType,
+            final String connectorId, final String version,
+            final ConnectorEvent activationEvent) {
 
         this.name = name;
         this.containerId = containerId;

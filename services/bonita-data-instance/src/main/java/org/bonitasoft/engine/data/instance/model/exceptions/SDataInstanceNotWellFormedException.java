@@ -18,7 +18,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 /**
  * This exception is thrown if a SDataInstance is not well formed.
  * For example: when a string gets a too long value.
- * 
+ *
  * @Author: Frederic Bouquet
  */
 public class SDataInstanceNotWellFormedException extends SBonitaException {

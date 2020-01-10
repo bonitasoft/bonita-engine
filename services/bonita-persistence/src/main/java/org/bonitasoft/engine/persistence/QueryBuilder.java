@@ -23,8 +23,8 @@ import java.util.Set;
 
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 /**
  * @author Baptiste Mesta
@@ -37,7 +37,8 @@ abstract class QueryBuilder {
     private String likeEscapeCharacter;
     private OrderByBuilder orderByBuilder;
 
-    QueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings, char likeEscapeCharacter) {
+    QueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings,
+            char likeEscapeCharacter) {
         this.orderByBuilder = orderByBuilder;
         this.classAliasMappings = classAliasMappings;
         this.likeEscapeCharacter = String.valueOf(likeEscapeCharacter);
@@ -63,7 +64,8 @@ abstract class QueryBuilder {
                     final FilterOperationType prevOp = previousFilter.getFilterOperationType();
                     final FilterOperationType currOp = filterOption.getFilterOperationType();
                     // Auto add AND if previous operator was normal op or ')' and that current op is normal op or '(' :
-                    if ((isNormalOperator(prevOp) || prevOp == R_PARENTHESIS) && (isNormalOperator(currOp) || currOp == L_PARENTHESIS)) {
+                    if ((isNormalOperator(prevOp) || prevOp == R_PARENTHESIS)
+                            && (isNormalOperator(currOp) || currOp == L_PARENTHESIS)) {
                         stringQueryBuilder.append(" AND ");
                     }
                 }
@@ -84,8 +86,9 @@ abstract class QueryBuilder {
         final FilterOperationType type = filterOption.getFilterOperationType();
         StringBuilder completeField = null;
         if (filterOption.getPersistentClass() != null) {
-            completeField = new StringBuilder(classAliasMappings.get(filterOption.getPersistentClass().getName())).append('.').append(
-                    filterOption.getFieldName());
+            completeField = new StringBuilder(classAliasMappings.get(filterOption.getPersistentClass().getName()))
+                    .append('.').append(
+                            filterOption.getFieldName());
         }
         Object fieldValue = filterOption.getValue();
         fieldValue = processValue(fieldValue);
@@ -116,14 +119,17 @@ abstract class QueryBuilder {
                 clause.append(getInClause(completeField, filterOption));
                 break;
             case BETWEEN:
-                final Object from = filterOption.getFrom() instanceof String ? "'" + escapeString((String) filterOption.getFrom()) + "'"
+                final Object from = filterOption.getFrom() instanceof String
+                        ? "'" + escapeString((String) filterOption.getFrom()) + "'"
                         : filterOption.getFrom();
-                final Object to = filterOption.getTo() instanceof String ? "'" + escapeString((String) filterOption.getTo()) + "'" : filterOption.getTo();
+                final Object to = filterOption.getTo() instanceof String
+                        ? "'" + escapeString((String) filterOption.getTo()) + "'" : filterOption.getTo();
                 clause.append("(").append(from).append(" <= ").append(completeField);
                 clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
                 break;
             case LIKE:
-                clause.append(completeField).append(" LIKE '%").append(escapeTerm((String) filterOption.getValue())).append("%'");
+                clause.append(completeField).append(" LIKE '%").append(escapeTerm((String) filterOption.getValue()))
+                        .append("%'");
                 break;
             case L_PARENTHESIS:
                 clause.append(" (");
@@ -152,7 +158,8 @@ abstract class QueryBuilder {
         return fieldValue;
     }
 
-    private void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter, final Set<String> specificFilters,
+    private void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter,
+            final Set<String> specificFilters,
             final boolean enableWordSearch) {
         final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
         final Set<String> fields = new HashSet<>();
@@ -170,7 +177,8 @@ abstract class QueryBuilder {
         }
     }
 
-    private void applyFiltersOnQuery(final StringBuilder queryBuilder, final Set<String> fields, final List<String> terms, final boolean enableWordSearch) {
+    private void applyFiltersOnQuery(final StringBuilder queryBuilder, final Set<String> fields,
+            final List<String> terms, final boolean enableWordSearch) {
         if (!queryBuilder.toString().contains("WHERE")) {
             queryBuilder.append(" WHERE ");
         } else {
@@ -189,7 +197,8 @@ abstract class QueryBuilder {
         queryBuilder.append(")");
     }
 
-    private void buildLikeClauseForOneFieldMultipleTerms(final StringBuilder queryBuilder, final String currentField, final List<String> terms,
+    private void buildLikeClauseForOneFieldMultipleTerms(final StringBuilder queryBuilder, final String currentField,
+            final List<String> terms,
             final boolean enableWordSearch) {
         final Iterator<String> termIterator = terms.iterator();
         while (termIterator.hasNext()) {
@@ -203,7 +212,8 @@ abstract class QueryBuilder {
         }
     }
 
-    void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField, final String currentTerm,
+    void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField,
+            final String currentTerm,
             final boolean enableWordSearch) {
         // Search if a sentence starts with the term
         queryBuilder.append(currentField).append(buildLikeEscapeClause(currentTerm, "", "%"));
@@ -219,7 +229,8 @@ abstract class QueryBuilder {
      * Get like clause for given term with escaped sql query wildcards and escape character
      */
     private String buildLikeEscapeClause(final String term, final String prefixPattern, final String suffixPattern) {
-        return " LIKE '" + (prefixPattern != null ? prefixPattern : "") + escapeTerm(term) + (suffixPattern != null ? suffixPattern : "") + "' ESCAPE '"
+        return " LIKE '" + (prefixPattern != null ? prefixPattern : "") + escapeTerm(term)
+                + (suffixPattern != null ? suffixPattern : "") + "' ESCAPE '"
                 + likeEscapeCharacter + "'";
     }
 
@@ -262,7 +273,8 @@ abstract class QueryBuilder {
         return inValues.substring(0, inValues.length() - 1);
     }
 
-    void appendOrderByClause(List<OrderByOption> orderByOptions, Class<? extends PersistentObject> entityType) throws SBonitaReadException {
+    void appendOrderByClause(List<OrderByOption> orderByOptions, Class<? extends PersistentObject> entityType)
+            throws SBonitaReadException {
         stringQueryBuilder.append(" ORDER BY ");
         boolean startWithComma = false;
         boolean sortedById = false;
@@ -280,7 +292,8 @@ abstract class QueryBuilder {
                 sortedById = true;
             }
             fieldNameBuilder.append(fieldName);
-            orderByBuilder.appendOrderBy(stringQueryBuilder, fieldNameBuilder.toString(), orderByOption.getOrderByType());
+            orderByBuilder.appendOrderBy(stringQueryBuilder, fieldNameBuilder.toString(),
+                    orderByOption.getOrderByType());
             startWithComma = true;
         }
         if (!sortedById) {
@@ -294,7 +307,8 @@ abstract class QueryBuilder {
         }
     }
 
-    private void appendClassAlias(final StringBuilder builder, final Class<? extends PersistentObject> clazz) throws SBonitaReadException {
+    private void appendClassAlias(final StringBuilder builder, final Class<? extends PersistentObject> clazz)
+            throws SBonitaReadException {
         final String className = clazz.getName();
         final String classAlias = classAliasMappings.get(className);
         if (classAlias == null || classAlias.trim().isEmpty()) {

@@ -21,13 +21,17 @@ import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventIns
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SBoundaryEventInstanceBuilderFactoryImpl extends SEventInstanceBuilderFactoryImpl implements SBoundaryEventInstanceBuilderFactory {
+public class SBoundaryEventInstanceBuilderFactoryImpl extends SEventInstanceBuilderFactoryImpl
+        implements SBoundaryEventInstanceBuilderFactory {
 
     @Override
-    public SBoundaryEventInstanceBuilder createNewBoundaryEventInstance(final String name, final boolean isInterrupting, final long flowNodeDefinitionId,
-            final long rootContainerId, final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
+    public SBoundaryEventInstanceBuilder createNewBoundaryEventInstance(final String name, final boolean isInterrupting,
+            final long flowNodeDefinitionId,
+            final long rootContainerId, final long parentContainerId, final long processDefinitionId,
+            final long rootProcessInstanceId,
             final long parentProcessInstanceId, final long activityInstanceId) {
-        final SBoundaryEventInstance entity = new SBoundaryEventInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId);
+        final SBoundaryEventInstance entity = new SBoundaryEventInstance(name, flowNodeDefinitionId, rootContainerId,
+                parentContainerId, processDefinitionId, rootProcessInstanceId);
         entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         entity.setActivityInstanceId(activityInstanceId);
         entity.setInterrupting(isInterrupting);

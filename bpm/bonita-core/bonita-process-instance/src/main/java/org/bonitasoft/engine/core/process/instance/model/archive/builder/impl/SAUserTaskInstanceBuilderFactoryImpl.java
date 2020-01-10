@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserT
 /**
  * @author Baptiste Mesta
  */
-public class SAUserTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SAUserTaskInstanceBuilderFactory {
+public class SAUserTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SAUserTaskInstanceBuilderFactory {
 
     @Override
     public SAUserTaskInstanceBuilder createNewUserTaskInstance(final SUserTaskInstance sUserTaskInstance) {

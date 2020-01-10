@@ -21,9 +21,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-    class NameExpressionMap {
+class NameExpressionMap {
 
-        @XmlElement(name = "input")
-        public List<NameExpressionPair> nameExpressionPair = new ArrayList<>();
+    @XmlElement(name = "input")
+    public List<NameExpressionPair> nameExpressionPair = new ArrayList<>();
 
-    }
+}

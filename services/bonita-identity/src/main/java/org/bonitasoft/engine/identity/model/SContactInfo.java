@@ -29,7 +29,7 @@ import org.hibernate.annotations.Filter;
 
 /**
  * User contact info: can be personal or professional contact information.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 @Data

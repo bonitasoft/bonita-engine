@@ -29,7 +29,8 @@ public class WaitingErrorEventImpl extends WaitingEventImpl implements WaitingEr
     public WaitingErrorEventImpl() {
     }
 
-    public WaitingErrorEventImpl(final BPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
+    public WaitingErrorEventImpl(final BPMEventType eventType, final long processdefinitionId, final String processName,
+            final long flowNodeDefinitionId,
             final String errorCode) {
         super(eventType, processdefinitionId, processName, flowNodeDefinitionId);
         this.errorCode = errorCode;

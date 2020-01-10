@@ -94,8 +94,10 @@ public class ClientEventUtil {
         LOGGER.debug("commands deployed");
     }
 
-    public static Long executeWaitServerCommand(final CommandAPI commandAPI, final Map<String, Serializable> event, final int defaultTimeout)
-            throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException, TimeoutException {
+    public static Long executeWaitServerCommand(final CommandAPI commandAPI, final Map<String, Serializable> event,
+            final int defaultTimeout)
+            throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException,
+            TimeoutException {
         final Map<String, Serializable> parameters = new HashMap<>(2);
         parameters.put("event", (Serializable) event);
         parameters.put("timeout", defaultTimeout);
@@ -146,7 +148,8 @@ public class ClientEventUtil {
         return map;
     }
 
-    public static Map<String, Serializable> getFlowNodeInState(final long rootContainerId, final String state, final String flowNodeName) {
+    public static Map<String, Serializable> getFlowNodeInState(final long rootContainerId, final String state,
+            final String flowNodeName) {
         final Map<String, Serializable> map = new HashMap<>(4);
         map.put(TYPE, FLOW_NODE);
         map.put(ROOT_CONTAINER_ID, rootContainerId);
@@ -171,7 +174,8 @@ public class ClientEventUtil {
         return map;
     }
 
-    public static Map<String, Serializable> getFlowNodeInStateWithParentId(final long processInstanceId, final String state, final String flowNodeName) {
+    public static Map<String, Serializable> getFlowNodeInStateWithParentId(final long processInstanceId,
+            final String state, final String flowNodeName) {
         final Map<String, Serializable> map = new HashMap<>(4);
         map.put(TYPE, FLOW_NODE);
         map.put(PARENT_CONTAINER_ID, processInstanceId);

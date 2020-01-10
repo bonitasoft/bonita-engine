@@ -35,7 +35,8 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplication, Ap
 
     @Override
     SApplication _build() {
-        SApplication application = new SApplication(name, displayName, version, System.currentTimeMillis(), 21, SApplicationState.DEACTIVATED.name(), layoutId, themeId);
+        SApplication application = new SApplication(name, displayName, version, System.currentTimeMillis(), 21,
+                SApplicationState.DEACTIVATED.name(), layoutId, themeId);
         application.setIconPath(path);
         application.setProfileId(profileId);
         return application;

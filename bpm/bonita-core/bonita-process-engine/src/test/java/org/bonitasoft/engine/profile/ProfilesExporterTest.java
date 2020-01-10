@@ -58,7 +58,8 @@ public class ProfilesExporterTest {
         //when
         ProfilesNode exportedProfiles = profilesExporter.toProfiles(Arrays.asList(profile1, profile2));
         //then
-        assertThat(exportedProfiles.getProfiles()).containsOnly(new ProfileNode("MyProfile1", false), new ProfileNode("MyProfile2", false));
+        assertThat(exportedProfiles.getProfiles()).containsOnly(new ProfileNode("MyProfile1", false),
+                new ProfileNode("MyProfile2", false));
     }
 
     @Test
@@ -77,7 +78,8 @@ public class ProfilesExporterTest {
         ProfilesNode exportedProfiles = profilesExporter.toProfiles(Collections.singletonList((SProfile) profile1));
         //then
         ProfileNode myProfile1 = new ProfileNode("MyProfile1", false);
-        myProfile1.setParentProfileEntries(Arrays.asList(new ParentProfileEntryNode("p1"), new ParentProfileEntryNode("p2")));
+        myProfile1.setParentProfileEntries(
+                Arrays.asList(new ParentProfileEntryNode("p1"), new ParentProfileEntryNode("p2")));
         assertThat(exportedProfiles.getProfiles()).containsOnly(myProfile1);
     }
 

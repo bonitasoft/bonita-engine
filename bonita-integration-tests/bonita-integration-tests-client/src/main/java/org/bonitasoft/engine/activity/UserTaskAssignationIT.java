@@ -13,6 +13,13 @@
  **/
 package org.bonitasoft.engine.activity;
 
+import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import net.jodah.concurrentunit.Waiter;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -36,16 +43,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.*;
-
-
 public class UserTaskAssignationIT extends TestWithTechnicalUser {
-
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -92,7 +90,8 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
     public void getAssignedHumanTasksWithStartedState() throws Exception {
         assignAndExecuteStep(step2, john);
 
-        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
+        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10,
+                null);
 
         // Task is in STARTED state so should not be retrieved:
         assertEquals(0, toDoTasks.size());
@@ -109,7 +108,8 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
     public void assignUserTask() throws Exception {
         getProcessAPI().assignUserTask(step2.getId(), john.getId());
 
-        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
+        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10,
+                null);
         assertEquals(1, toDoTasks.size());
         assertEquals(john.getId(), toDoTasks.get(0).getAssigneeId());
     }
@@ -219,7 +219,8 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
         getProcessAPI().releaseUserTask(taskId);
         assertTrue("Fail to release task", new CheckNbPendingTaskOf(getProcessAPI(), 30, 2000,
                 false, 1, john).waitUntil());
-        assertNull("Claimed date not unset during release", getProcessAPI().getHumanTaskInstance(taskId).getClaimedDate());
+        assertNull("Claimed date not unset during release",
+                getProcessAPI().getHumanTaskInstance(taskId).getClaimedDate());
 
         // Second assign
         getProcessAPI().assignUserTask(taskId, john.getId());
@@ -227,7 +228,7 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
                 2000, false, 1, john).waitUntil());
         final HumanTaskInstance task = getProcessAPI().getHumanTaskInstance(taskId);
         assertNotNull("Claimed date not set during first assignment", task.getClaimedDate());
-        assertNotEquals("Claimed date not updated", firstClaimedDate,task.getClaimedDate());
+        assertNotEquals("Claimed date not updated", firstClaimedDate, task.getClaimedDate());
 
     }
 
@@ -244,7 +245,8 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
         }
         HumanTaskInstance task = getProcessAPI().getHumanTaskInstance(taskId);
         assertNotNull("Last update date not set during first assignment", task.getLastUpdateDate());
-        assertFalse("Last update date not updated during first assignment", task.getLastUpdateDate().equals(previousUpdateDate));
+        assertFalse("Last update date not updated during first assignment",
+                task.getLastUpdateDate().equals(previousUpdateDate));
         previousUpdateDate = task.getLastUpdateDate();
 
         // Release
@@ -259,15 +261,18 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
             fail("Fail to claim task for the second time");
         }
         task = getProcessAPI().getHumanTaskInstance(taskId);
-        assertFalse("Last update date not updated during second assignment", previousUpdateDate.equals(task.getLastUpdateDate()));
+        assertFalse("Last update date not updated during second assignment",
+                previousUpdateDate.equals(task.getLastUpdateDate()));
     }
 
     private ProcessDefinition deployAndEnableSimpleProcess()
             throws BonitaException, InvalidProcessDefinitionException {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2"), Arrays.asList(false, true));
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(
+                        Arrays.asList("step1", "step2"), Arrays.asList(false, true));
         return deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
     }
+
     @Test
     public void assignUserTaskIfNotAssigned() throws Exception {
         getProcessAPI().assignUserTaskIfNotAssigned(step2.getId(), john.getId());
@@ -378,10 +383,12 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
         getProcessAPI().releaseUserTask(taskId);
         assertTrue("Fail to release task", new CheckNbPendingTaskOf(getProcessAPI(), 30, 2000,
                 false, 1, john).waitUntil());
-        assertNull("Claimed date not unset during release", getProcessAPI().getHumanTaskInstance(taskId).getClaimedDate());
+        assertNull("Claimed date not unset during release",
+                getProcessAPI().getHumanTaskInstance(taskId).getClaimedDate());
 
         getProcessAPI().assignUserTaskIfNotAssigned(taskId, john.getId());
-        assertTrue("Fail to claim task for the second time", new CheckNbAssignedTaskOf(getProcessAPI(), 30, 2000, false, 1, john).waitUntil());
+        assertTrue("Fail to claim task for the second time",
+                new CheckNbAssignedTaskOf(getProcessAPI(), 30, 2000, false, 1, john).waitUntil());
         final HumanTaskInstance task = getProcessAPI().getHumanTaskInstance(taskId);
         assertNotNull("Claimed date not set during first assignment", task.getClaimedDate());
         assertNotEquals("Claimed date not updated", firstClaimedDate, task.getClaimedDate());
@@ -393,25 +400,27 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
         loginOnDefaultTenantWith(JACK, "bpm");
         ProcessAPI pAPI = getProcessAPI();
         Waiter waiter = new Waiter();
-        Boolean[] exceptionThreads = new Boolean[]{false,false};
-        Thread thread1 = new Thread () {
-            public void run () {
+        Boolean[] exceptionThreads = new Boolean[] { false, false };
+        Thread thread1 = new Thread() {
+
+            public void run() {
                 try {
                     pAPI.assignUserTaskIfNotAssigned(taskId, john.getId());
-                }catch (Exception e){
+                } catch (Exception e) {
                     exceptionThreads[0] = true;
-                }finally{
+                } finally {
                     waiter.resume();
                 }
             }
         };
-        Thread thread2 = new Thread () {
-            public void run () {
+        Thread thread2 = new Thread() {
+
+            public void run() {
                 try {
                     pAPI.assignUserTaskIfNotAssigned(taskId, jack.getId());
-                }catch (Exception e){
+                } catch (Exception e) {
                     exceptionThreads[0] = true;
-                }finally{
+                } finally {
                     waiter.resume();
                 }
             }
@@ -421,9 +430,8 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
         thread2.start();
         waiter.await(1, TimeUnit.SECONDS, 2);
         //Assert only one failed;
-        assertNotEquals("Both assigments failed", exceptionThreads[0]||exceptionThreads[1] , false);
-        assertNotEquals("Both assigments took place",exceptionThreads[0]&&exceptionThreads[1], true);
-
+        assertNotEquals("Both assigments failed", exceptionThreads[0] || exceptionThreads[1], false);
+        assertNotEquals("Both assigments took place", exceptionThreads[0] && exceptionThreads[1], true);
 
     }
 
@@ -433,25 +441,27 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
         loginOnDefaultTenantWith(JACK, "bpm");
         ProcessAPI pAPI = getProcessAPI();
         Waiter waiter = new Waiter();
-        Boolean[] exceptionThreads = new Boolean[]{false,false};
-        Thread thread1 = new Thread () {
-            public void run () {
+        Boolean[] exceptionThreads = new Boolean[] { false, false };
+        Thread thread1 = new Thread() {
+
+            public void run() {
                 try {
                     pAPI.assignUserTask(taskId, john.getId());
-                }catch (Exception e){
+                } catch (Exception e) {
                     exceptionThreads[0] = true;
-                }finally{
+                } finally {
                     waiter.resume();
                 }
             }
         };
-        Thread thread2 = new Thread () {
-            public void run () {
+        Thread thread2 = new Thread() {
+
+            public void run() {
                 try {
                     pAPI.assignUserTask(taskId, jack.getId());
-                }catch (Exception e){
+                } catch (Exception e) {
                     exceptionThreads[0] = true;
-                }finally{
+                } finally {
                     waiter.resume();
                 }
             }
@@ -461,7 +471,7 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
         thread2.start();
         waiter.await(1, TimeUnit.SECONDS, 2);
         //Assert only one failed;
-        assertEquals("Both assigments took place",exceptionThreads[0]||exceptionThreads[1], false);
+        assertEquals("Both assigments took place", exceptionThreads[0] || exceptionThreads[1], false);
 
     }
 }

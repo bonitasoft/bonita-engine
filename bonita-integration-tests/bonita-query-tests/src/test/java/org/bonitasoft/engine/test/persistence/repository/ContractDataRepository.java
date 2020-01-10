@@ -23,6 +23,4 @@ public class ContractDataRepository extends TestRepository {
         super(sessionFactory);
     }
 
-
-
 }

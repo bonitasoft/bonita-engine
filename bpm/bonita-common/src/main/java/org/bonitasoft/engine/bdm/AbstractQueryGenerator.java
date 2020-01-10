@@ -98,9 +98,11 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
     protected abstract String getListReturnType();
 
     @Override
-    public Query createQueryForUniqueConstraint(final BusinessObject businessObject, final UniqueConstraint uniqueConstraint) {
+    public Query createQueryForUniqueConstraint(final BusinessObject businessObject,
+            final UniqueConstraint uniqueConstraint) {
         final String name = createQueryNameForUniqueConstraint(uniqueConstraint);
-        final String content = createQueryContentForUniqueConstraint(businessObject.getQualifiedName(), uniqueConstraint);
+        final String content = createQueryContentForUniqueConstraint(businessObject.getQualifiedName(),
+                uniqueConstraint);
         final Query q = new Query(name, content, getQualifiedReturnType(businessObject));
         for (final String fieldName : uniqueConstraint.getFieldNames()) {
             final Field f = getField(fieldName, businessObject);
@@ -155,7 +157,7 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
 
     private Field getField(String fieldName, BusinessObject businessObject) {
         Field field = businessObject.getField(fieldName);
-        if(field == null) {
+        if (field == null) {
             throw new IllegalArgumentException(fieldName + " doesn't exist in " + businessObject.getQualifiedName());
         }
         return field;

@@ -20,13 +20,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.bonitasoft.engine.api.NoSessionRequired;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.session.Session;
@@ -41,7 +39,6 @@ public class ClientInterceptor implements InvocationHandler, Serializable {
      * It is used to (and only to) convert the call into a "serverAPI" call
      * Server API has only one operation
      * This interceptor is used to login as we do not transmit any session to server side.
-     * 
      * For other operations, a child of this class is used: ClientSessionInterceptor
      */
     private static final long serialVersionUID = -6284726148297940515L;
@@ -79,14 +76,16 @@ public class ClientInterceptor implements InvocationHandler, Serializable {
             options = new HashMap<>();
             options.put("session", this.session);
             // invoke ServerAPI unique method
-            final Object object = this.api.invokeMethod(options, this.interfaceName, method.getName(), classNameParameters, args);
+            final Object object = this.api.invokeMethod(options, this.interfaceName, method.getName(),
+                    classNameParameters, args);
             if (LOGGER.isLoggable(FINEST)) {
                 LOGGER.log(FINEST, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName());
             }
             return object;
         } catch (final ServerWrappedException | RemoteException e) {
             if (LOGGER.isLoggable(FINEST)) {
-                LOGGER.log(FINEST, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName() + " with exception " + e.getMessage());
+                LOGGER.log(FINEST, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName()
+                        + " with exception " + e.getMessage());
             }
             throw e.getCause();
         }

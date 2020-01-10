@@ -28,7 +28,8 @@ public class UserFilterDefinitionBuilder extends FlowElementContainerBuilder {
 
     private final ProcessDefinitionBuilder processDefinitionBuilder;
 
-    UserFilterDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container, final String name,
+    UserFilterDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container, final String name,
             final String filterId, final String version, final HumanTaskDefinitionImpl humanTaskDefinition) {
         super(container, processDefinitionBuilder);
         this.processDefinitionBuilder = processDefinitionBuilder;
@@ -46,13 +47,15 @@ public class UserFilterDefinitionBuilder extends FlowElementContainerBuilder {
 
     /**
      * Adds a user filter input.
+     *
      * @param name input name.
      * @param value expression representing the input value.
      * @return
      */
     public UserFilterDefinitionBuilder addInput(final String name, final Expression value) {
         if (value == null) {
-            processDefinitionBuilder.addError("The input " + name + " of user filter " + userFilterDefinition.getName() + " is null");
+            processDefinitionBuilder
+                    .addError("The input " + name + " of user filter " + userFilterDefinition.getName() + " is null");
         }
         userFilterDefinition.addInput(name, value);
         return this;

@@ -44,8 +44,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDes
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
-import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -71,7 +69,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -115,7 +112,8 @@ public class ProcessDefinitionServiceImplTest {
         sProcessDefinitionDeployInfo.setDesignContent(designContent);
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(PROCESS_ID);
         designProcessDefinition = new DesignProcessDefinitionImpl("THE NAME", "THE VERSION");
-        doReturn(designProcessDefinition).when(processDefinitionBARContribution).convertXmlToProcess(THE_PROCESS_XML_CONTENT);
+        doReturn(designProcessDefinition).when(processDefinitionBARContribution)
+                .convertXmlToProcess(THE_PROCESS_XML_CONTENT);
         processDefinitionServiceImpl.processDefinitionBARContribution = processDefinitionBARContribution;
     }
 
@@ -128,10 +126,12 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfos() throws Exception {
         // Given
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfos(0, 10, "id", OrderByType.ASC);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfos(0, 10, "id", OrderByType.ASC);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -140,20 +140,23 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDeploymentInfosThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfos(0, 10, "id", OrderByType.ASC);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getNumberOfProcessDeploymentInfos()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getNumberOfProcessDeploymentInfos()}.
      */
     @Test
     public void getNumberOfProcessDeploymentInfos() throws Exception {
         // Given
         final long numberOfProcessDeploymentInfos = 9;
-        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
+        doReturn(numberOfProcessDeploymentInfos).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any());
 
         // When
         final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfos();
@@ -165,20 +168,23 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any());
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfos();
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getProcessDeploymentInfo(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getProcessDeploymentInfo(long)}.
      */
     @Test
     public void getProcessDeploymentInfoById() throws Exception {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         final SProcessDefinitionDeployInfo result = processDefinitionServiceImpl.getProcessDeploymentInfo(2);
@@ -190,7 +196,8 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDeploymentInfoByIdThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfo(2);
@@ -205,10 +212,12 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfProcessDeploymentInfosByActivationState() throws Exception {
         // Given
         final long numberOfProcessDeploymentInfos = 9;
-        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
+        doReturn(numberOfProcessDeploymentInfos).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any());
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosByActivationState(ActivationState.DISABLED);
+        final long result = processDefinitionServiceImpl
+                .getNumberOfProcessDeploymentInfosByActivationState(ActivationState.DISABLED);
 
         // Then
         assertEquals(numberOfProcessDeploymentInfos, result);
@@ -217,7 +226,8 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosByActivationStateThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any());
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosByActivationState(ActivationState.DISABLED);
@@ -232,7 +242,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDefinitionIdsByActivationState() throws Exception {
         // Given
         final List<Long> processDefinitionIds = Arrays.asList(3L);
-        doReturn(processDefinitionIds).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<Long>>any());
+        doReturn(processDefinitionIds).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any());
 
         // When
         final List<Long> result = processDefinitionServiceImpl.getProcessDefinitionIds(ActivationState.DISABLED, 0, 10);
@@ -244,20 +255,23 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDefinitionIdsByActivationStateThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDefinitionIds(ActivationState.DISABLED, 0, 10);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getProcessDefinitionIds(int, int)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getProcessDefinitionIds(int, int)}.
      */
     @Test
     public void getProcessDefinitionIds() throws Exception {
         // Given
         final List<Long> processDefinitionIds = Arrays.asList(3L);
-        doReturn(processDefinitionIds).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<Long>>any());
+        doReturn(processDefinitionIds).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any());
 
         // When
         final List<Long> result = processDefinitionServiceImpl.getProcessDefinitionIds(0, 10);
@@ -269,22 +283,26 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDefinitionIdsThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDefinitionIds(0, 10);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getLatestProcessDefinitionId(java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getLatestProcessDefinitionId(java.lang.String)}.
      */
     @Test
     public void getLatestProcessDefinitionId() throws Exception {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
         doReturn(6L).when(sProcessDefinitionDeployInfo).getProcessId();
-        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = Arrays.asList(sProcessDefinitionDeployInfo);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = Arrays
+                .asList(sProcessDefinitionDeployInfo);
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         final long processDeploymentInfoId = processDefinitionServiceImpl.getLatestProcessDefinitionId("name");
@@ -296,7 +314,8 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getLatestProcessDefinitionIdThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getLatestProcessDefinitionId("name");
@@ -306,14 +325,16 @@ public class ProcessDefinitionServiceImplTest {
      * Test method for {@link ProcessDefinitionService#getProcessDefinitionId(String, String)}.
      */
     @Test
-    public void getProcessDefinitionId_should_return_id_of_process_definition_with_given_name_and_version() throws Exception {
+    public void getProcessDefinitionId_should_return_id_of_process_definition_with_given_name_and_version()
+            throws Exception {
         // Given
         final Map<String, Object> parameters = new HashMap<>();
         String name = "proc";
         String version = "1.0";
         parameters.put("name", name);
         parameters.put("version", version);
-        SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<>("getProcessDefinitionIdByNameAndVersion", parameters,
+        SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<>(
+                "getProcessDefinitionIdByNameAndVersion", parameters,
                 SProcessDefinitionDeployInfo.class, Long.class);
 
         final long processId = 9;
@@ -327,14 +348,16 @@ public class ProcessDefinitionServiceImplTest {
     }
 
     @Test(expected = SProcessDefinitionNotFoundException.class)
-    public void getProcessDefinitionId_should_return_throw_SProcessDefinitionNotFoundException_when_persistenceSservice_returns_null() throws Exception {
+    public void getProcessDefinitionId_should_return_throw_SProcessDefinitionNotFoundException_when_persistenceSservice_returns_null()
+            throws Exception {
         // Given
         final Map<String, Object> parameters = new HashMap<>();
         String name = "proc";
         String version = "1.0";
         parameters.put("name", name);
         parameters.put("version", version);
-        SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<>("getProcessDefinitionIdByNameAndVersion", parameters,
+        SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<>(
+                "getProcessDefinitionIdByNameAndVersion", parameters,
                 SProcessDefinitionDeployInfo.class, Long.class);
 
         doReturn(null).when(persistenceService).selectOne(selectOneDescriptor);
@@ -346,9 +369,11 @@ public class ProcessDefinitionServiceImplTest {
     }
 
     @Test(expected = SBonitaReadException.class)
-    public void getProcessDefinitionId_should_throw_SBonitaReadException_when_persistenceSservice_throws_exception() throws Exception {
+    public void getProcessDefinitionId_should_throw_SBonitaReadException_when_persistenceSservice_throws_exception()
+            throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDefinitionId("name", "version");
@@ -358,7 +383,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDefinition_from_cache() throws Exception {
         sProcessDefinitionDeployInfo.setLastUpdateDate(5478L);
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("a", "b");
-        doReturn(new Pair<Long, SProcessDefinition>(5478L, sProcessDefinition)).when(processDefinitionServiceImpl).getSProcessDefinitionFromCache(PROCESS_ID);
+        doReturn(new Pair<Long, SProcessDefinition>(5478L, sProcessDefinition)).when(processDefinitionServiceImpl)
+                .getSProcessDefinitionFromCache(PROCESS_ID);
 
         final SProcessDefinition processDefinition = processDefinitionServiceImpl.getProcessDefinition(PROCESS_ID);
 
@@ -370,7 +396,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDefinition_from_database() throws Exception {
         sProcessDefinitionDeployInfo.setLastUpdateDate(5478L);
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("a", "b");
-        doReturn(sProcessDefinition).when(processDefinitionServiceImpl).convertDesignProcessDefinition(designProcessDefinition);
+        doReturn(sProcessDefinition).when(processDefinitionServiceImpl)
+                .convertDesignProcessDefinition(designProcessDefinition);
 
         final SProcessDefinition processDefinition = processDefinitionServiceImpl.getProcessDefinition(PROCESS_ID);
 
@@ -383,8 +410,10 @@ public class ProcessDefinitionServiceImplTest {
         sProcessDefinitionDeployInfo.setLastUpdateDate(5478L);
         final SProcessDefinitionImpl processDefinitionB = new SProcessDefinitionImpl("a", "b");
         final SProcessDefinitionImpl processDefinitionC = new SProcessDefinitionImpl("a", "c");
-        doReturn(new Pair<Long, SProcessDefinition>(5477L, processDefinitionB)).when(processDefinitionServiceImpl).getSProcessDefinitionFromCache(PROCESS_ID);
-        doReturn(processDefinitionC).when(processDefinitionServiceImpl).convertDesignProcessDefinition(designProcessDefinition);
+        doReturn(new Pair<Long, SProcessDefinition>(5477L, processDefinitionB)).when(processDefinitionServiceImpl)
+                .getSProcessDefinitionFromCache(PROCESS_ID);
+        doReturn(processDefinitionC).when(processDefinitionServiceImpl)
+                .convertDesignProcessDefinition(designProcessDefinition);
         final SProcessDefinition processDefinition = processDefinitionServiceImpl.getProcessDefinition(PROCESS_ID);
 
         assertThat(processDefinition).as("returned process definition from cache").isEqualTo(processDefinitionC);
@@ -401,14 +430,17 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
 
-        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
+        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory
+                .get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
 
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final SProcessDefinitionDeployInfo result = processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done());
+        final SProcessDefinitionDeployInfo result = processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3,
+                updateBuilder.done());
 
         // Then
         assertNotNull(result);
@@ -420,10 +452,12 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         doReturn(true).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
+        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory
+                .get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done(), "the business log");
@@ -437,7 +471,8 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         doReturn(true).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
+        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory
+                .get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
         doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(any());
@@ -460,11 +495,13 @@ public class ProcessDefinitionServiceImplTest {
         doReturn(5478L).when(sProcessDefinitionDeployInfo).getLastUpdateDate();
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("a", "b");
         sProcessDefinition.setId(56L);
-        doReturn(new Pair<Long, SProcessDefinition>(541L, sProcessDefinition)).when(cacheService).get(anyString(), any());
+        doReturn(new Pair<Long, SProcessDefinition>(541L, sProcessDefinition)).when(cacheService).get(anyString(),
+                any());
         // When
         processDefinitionServiceImpl.updateSProcessDefinitionTimestampInCache(56L, sProcessDefinitionDeployInfo);
         // Then
-        verify(cacheService).store(ProcessDefinitionService.PROCESS_CACHE_NAME, 56L, new Pair<Long, SProcessDefinition>(5478L, sProcessDefinition));
+        verify(cacheService).store(ProcessDefinitionService.PROCESS_CACHE_NAME, 56L,
+                new Pair<Long, SProcessDefinition>(5478L, sProcessDefinition));
     }
 
     @Test
@@ -480,9 +517,11 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SProcessDefinitionNotFoundException.class)
     public final void updateProcessDefinitionDeployInfoNotExists() throws Exception {
         // Given
-        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
+        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory
+                .get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
-        doReturn(null).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(null).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(4, updateBuilder.done());
@@ -493,7 +532,8 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
 
-        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
+        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory
+                .get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
 
@@ -516,10 +556,12 @@ public class ProcessDefinitionServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         final long startedBy = 9;
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "StartedBy", options,
-                Collections.singletonMap("startedBy", (Object) startedBy))).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                Collections.singletonMap("startedBy", (Object) startedBy)))
+                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchProcessDeploymentInfosStartedBy(startedBy, options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchProcessDeploymentInfosStartedBy(startedBy, options);
 
         // Then
         assertNotNull(result);
@@ -578,10 +620,12 @@ public class ProcessDefinitionServiceImplTest {
     public void searchProcessDeploymentInfos() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, options, null)).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, options, null))
+                .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchProcessDeploymentInfos(options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchProcessDeploymentInfos(options);
 
         // Then
         assertNotNull(result);
@@ -591,7 +635,8 @@ public class ProcessDefinitionServiceImplTest {
     public void searchProcessDeploymentInfosThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, options, null)).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, options, null))
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.searchProcessDeploymentInfos(options);
@@ -619,7 +664,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfProcessDeploymentInfosByOptionsThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, options, null)).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, options, null))
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfos(options);
@@ -636,10 +682,12 @@ public class ProcessDefinitionServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UserCanStart", options,
-                Collections.singletonMap("userId", (Object) userId))).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                Collections.singletonMap("userId", (Object) userId)))
+                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchProcessDeploymentInfosCanBeStartedBy(userId, options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchProcessDeploymentInfosCanBeStartedBy(userId, options);
 
         // Then
         assertNotNull(result);
@@ -671,7 +719,8 @@ public class ProcessDefinitionServiceImplTest {
                 Collections.singletonMap("userId", (Object) userId))).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosCanBeStartedBy(userId, options);
+        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosCanBeStartedBy(userId,
+                options);
 
         // Then
         assertEquals(1L, result);
@@ -700,7 +749,8 @@ public class ProcessDefinitionServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart", options,
-                Collections.singletonMap("managerUserId", (Object) userId))).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                Collections.singletonMap("managerUserId", (Object) userId)))
+                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
         final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
@@ -732,11 +782,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart",
+                options,
                 Collections.singletonMap("managerUserId", (Object) userId))).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosCanBeStartedByUsersManagedBy(userId, options);
+        final long result = processDefinitionServiceImpl
+                .getNumberOfProcessDeploymentInfosCanBeStartedByUsersManagedBy(userId, options);
 
         // Then
         assertEquals(1L, result);
@@ -747,7 +799,8 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart",
+                options,
                 Collections.singletonMap("managerUserId", (Object) userId))).thenThrow(new SBonitaReadException(""));
 
         // When
@@ -766,10 +819,12 @@ public class ProcessDefinitionServiceImplTest {
         final long userId = 9;
         final String querySuffix = "suffix";
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, querySuffix, options,
-                Collections.singletonMap("userId", (Object) userId))).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                Collections.singletonMap("userId", (Object) userId)))
+                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchProcessDeploymentInfos(userId, options, querySuffix);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchProcessDeploymentInfos(userId, options, querySuffix);
 
         // Then
         assertNotNull(result);
@@ -803,7 +858,8 @@ public class ProcessDefinitionServiceImplTest {
                 Collections.singletonMap("userId", (Object) userId))).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfos(userId, options, querySuffix);
+        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfos(userId, options,
+                querySuffix);
 
         // Then
         assertEquals(1L, result);
@@ -831,11 +887,13 @@ public class ProcessDefinitionServiceImplTest {
     public void searchUncategorizedProcessDeploymentInfos() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "Uncategorized", options, null)).thenReturn(
-                new ArrayList<SProcessDefinitionDeployInfo>());
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "Uncategorized", options, null))
+                .thenReturn(
+                        new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchUncategorizedProcessDeploymentInfos(options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchUncategorizedProcessDeploymentInfos(options);
 
         // Then
         assertNotNull(result);
@@ -845,7 +903,8 @@ public class ProcessDefinitionServiceImplTest {
     public void searchUncategorizedProcessDeploymentInfosThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "Uncategorized", options, null)).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "Uncategorized", options, null))
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.searchUncategorizedProcessDeploymentInfos(options);
@@ -860,7 +919,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfUncategorizedProcessDeploymentInfos() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "Uncategorized", options, null)).thenReturn(1L);
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "Uncategorized", options, null))
+                .thenReturn(1L);
 
         // When
         final long result = processDefinitionServiceImpl.getNumberOfUncategorizedProcessDeploymentInfos(options);
@@ -890,11 +950,14 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UncategorizedAndWithSupervisor", options,
-                Collections.singletonMap("userId", (Object) userId))).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UncategorizedAndWithSupervisor",
+                options,
+                Collections.singletonMap("userId", (Object) userId)))
+                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchUncategorizedProcessDeploymentInfosSupervisedBy(userId, options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchUncategorizedProcessDeploymentInfosSupervisedBy(userId, options);
 
         // Then
         assertNotNull(result);
@@ -905,7 +968,8 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UncategorizedAndWithSupervisor", options,
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UncategorizedAndWithSupervisor",
+                options,
                 Collections.singletonMap("userId", (Object) userId))).thenThrow(new SBonitaReadException(""));
 
         // When
@@ -922,11 +986,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UncategorizedAndWithSupervisor", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class,
+                "UncategorizedAndWithSupervisor", options,
                 Collections.singletonMap("userId", (Object) userId))).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfUncategorizedProcessDeploymentInfosSupervisedBy(userId, options);
+        final long result = processDefinitionServiceImpl
+                .getNumberOfUncategorizedProcessDeploymentInfosSupervisedBy(userId, options);
 
         // Then
         assertEquals(1L, result);
@@ -937,7 +1003,8 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UncategorizedAndWithSupervisor", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class,
+                "UncategorizedAndWithSupervisor", options,
                 Collections.singletonMap("userId", (Object) userId))).thenThrow(new SBonitaReadException(""));
 
         // When
@@ -955,10 +1022,12 @@ public class ProcessDefinitionServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
         when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UncategorizedUserCanStart", options,
-                Collections.singletonMap("userId", (Object) userId))).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+                Collections.singletonMap("userId", (Object) userId)))
+                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchUncategorizedProcessDeploymentInfosCanBeStartedBy(userId, options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchUncategorizedProcessDeploymentInfosCanBeStartedBy(userId, options);
 
         // Then
         assertNotNull(result);
@@ -986,11 +1055,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UncategorizedUserCanStart", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UncategorizedUserCanStart",
+                options,
                 Collections.singletonMap("userId", (Object) userId))).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfUncategorizedProcessDeploymentInfosCanBeStartedBy(userId, options);
+        final long result = processDefinitionServiceImpl
+                .getNumberOfUncategorizedProcessDeploymentInfosCanBeStartedBy(userId, options);
 
         // Then
         assertEquals(1L, result);
@@ -1001,7 +1072,8 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UncategorizedUserCanStart", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UncategorizedUserCanStart",
+                options,
                 Collections.singletonMap("userId", (Object) userId))).thenThrow(new SBonitaReadException(""));
 
         // When
@@ -1017,11 +1089,13 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosUnrelatedToCategory() throws Exception {
         // Given
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosUnrelatedToCategory(9, 0, 10,
-                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfosUnrelatedToCategory(9, 0, 10,
+                        ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1030,10 +1104,12 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDeploymentInfosUnrelatedToCategoryThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        processDefinitionServiceImpl.getProcessDeploymentInfosUnrelatedToCategory(9, 0, 10, ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
+        processDefinitionServiceImpl.getProcessDeploymentInfosUnrelatedToCategory(9, 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
     }
 
     /**
@@ -1044,7 +1120,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfProcessDeploymentInfosUnrelatedToCategory() throws Exception {
         // Given
         final long numberOfProcessDeploymentInfos = 9;
-        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
+        doReturn(numberOfProcessDeploymentInfos).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any());
 
         // When
         final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosUnrelatedToCategory(9);
@@ -1056,7 +1133,8 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosUnrelatedToCategoryThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any());
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosUnrelatedToCategory(9);
@@ -1072,10 +1150,12 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.searchProcessDeploymentInfosOfCategory(9, options);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .searchProcessDeploymentInfosOfCategory(9, options);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1085,7 +1165,8 @@ public class ProcessDefinitionServiceImplTest {
     public void searchProcessDeploymentInfosOfCategoryThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.searchProcessDeploymentInfosOfCategory(9, options);
@@ -1101,10 +1182,12 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfos(options);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfos(options);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1114,7 +1197,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithOptionsThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfos(options);
@@ -1130,11 +1214,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForGroup(9,
-                options);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfosWithActorOnlyForGroup(9,
+                        options);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1144,7 +1230,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForGroupThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForGroup(9, options);
@@ -1160,11 +1247,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForGroups(
-                Arrays.asList(9L), options);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfosWithActorOnlyForGroups(
+                        Arrays.asList(9L), options);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1174,7 +1263,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForGroupsThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForGroups(Arrays.asList(9L), options);
@@ -1190,11 +1280,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForRole(9,
-                options);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfosWithActorOnlyForRole(9,
+                        options);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1204,7 +1296,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForRoleThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForRole(9, options);
@@ -1220,11 +1313,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForRoles(
-                Arrays.asList(9L), options);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfosWithActorOnlyForRoles(
+                        Arrays.asList(9L), options);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1234,7 +1329,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForRolesThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForRoles(Arrays.asList(9L), options);
@@ -1250,11 +1346,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForUser(9,
-                options);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfosWithActorOnlyForUser(9,
+                        options);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1264,7 +1362,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForUserThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForUser(9, options);
@@ -1280,11 +1379,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
-        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForUsers(
-                Arrays.asList(9L), options);
+        final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl
+                .getProcessDeploymentInfosWithActorOnlyForUsers(
+                        Arrays.asList(9L), options);
 
         // Then
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
@@ -1294,7 +1395,8 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForUsersThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(9L), options);
@@ -1311,10 +1413,12 @@ public class ProcessDefinitionServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         final long processDefinitionId = 9;
         when(persistenceService.searchEntity(SUser.class, "WhoCanStartProcess", options,
-                Collections.singletonMap("processId", (Object) processDefinitionId))).thenReturn(new ArrayList<SUser>());
+                Collections.singletonMap("processId", (Object) processDefinitionId)))
+                        .thenReturn(new ArrayList<SUser>());
 
         // When
-        final List<SUser> result = processDefinitionServiceImpl.searchUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, options);
+        final List<SUser> result = processDefinitionServiceImpl
+                .searchUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, options);
 
         // Then
         assertNotNull(result);
@@ -1326,7 +1430,8 @@ public class ProcessDefinitionServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         final long processDefinitionId = 9;
         when(persistenceService.searchEntity(SUser.class, "WhoCanStartProcess", options,
-                Collections.singletonMap("processId", (Object) processDefinitionId))).thenThrow(new SBonitaReadException(""));
+                Collections.singletonMap("processId", (Object) processDefinitionId)))
+                        .thenThrow(new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.searchUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, options);
@@ -1346,7 +1451,8 @@ public class ProcessDefinitionServiceImplTest {
                 Collections.singletonMap("processId", (Object) processDefinitionId))).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, options);
+        final long result = processDefinitionServiceImpl
+                .getNumberOfUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, options);
 
         // Then
         assertEquals(1L, result);
@@ -1358,7 +1464,8 @@ public class ProcessDefinitionServiceImplTest {
         final QueryOptions options = new QueryOptions(0, 10);
         final long processDefinitionId = 9;
         when(persistenceService.getNumberOfEntities(SUser.class, "WhoCanStartProcess", options,
-                Collections.singletonMap("processId", (Object) processDefinitionId))).thenThrow(new SBonitaReadException(""));
+                Collections.singletonMap("processId", (Object) processDefinitionId)))
+                        .thenThrow(new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.getNumberOfUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, options);
@@ -1374,13 +1481,16 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor", options,
-                Collections.singletonMap("userId", (Object) userId))).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor",
+                options,
+                Collections.singletonMap("userId", (Object) userId)))
+                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(
-                userId,
-                options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(
+                        userId,
+                        options);
 
         // Then
         assertNotNull(result);
@@ -1391,7 +1501,8 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor", options,
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor",
+                options,
                 Collections.singletonMap("userId", (Object) userId))).thenThrow(new SBonitaReadException(""));
 
         // When
@@ -1408,11 +1519,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class,
+                "WithAssignedOrPendingHumanTasksFor", options,
                 Collections.singletonMap("userId", (Object) userId))).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(userId, options);
+        final long result = processDefinitionServiceImpl
+                .getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(userId, options);
 
         // Then
         assertEquals(1L, result);
@@ -1423,11 +1536,13 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class,
+                "WithAssignedOrPendingHumanTasksFor", options,
                 Collections.singletonMap("userId", (Object) userId))).thenThrow(new SBonitaReadException(""));
 
         // When
-        processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(userId, options);
+        processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(userId,
+                options);
     }
 
     /**
@@ -1440,28 +1555,34 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksSupervisedBy", options,
-                Collections.singletonMap("userId", (Object) userId))).thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class,
+                "WithAssignedOrPendingHumanTasksSupervisedBy", options,
+                Collections.singletonMap("userId", (Object) userId)))
+                        .thenReturn(new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(
-                userId,
-                options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(
+                        userId,
+                        options);
 
         // Then
         assertNotNull(result);
     }
 
     @Test(expected = SBonitaReadException.class)
-    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByThrowException() throws Exception {
+    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByThrowException()
+            throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksSupervisedBy", options,
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class,
+                "WithAssignedOrPendingHumanTasksSupervisedBy", options,
                 Collections.singletonMap("userId", (Object) userId))).thenThrow(new SBonitaReadException(""));
 
         // When
-        processDefinitionServiceImpl.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, options);
+        processDefinitionServiceImpl.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId,
+                options);
     }
 
     /**
@@ -1474,26 +1595,31 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksSupervisedBy", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class,
+                "WithAssignedOrPendingHumanTasksSupervisedBy", options,
                 Collections.singletonMap("userId", (Object) userId))).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, options);
+        final long result = processDefinitionServiceImpl
+                .getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, options);
 
         // Then
         assertEquals(1L, result);
     }
 
     @Test(expected = SBonitaReadException.class)
-    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByThrowException() throws Exception {
+    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByThrowException()
+            throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final long userId = 9;
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksSupervisedBy", options,
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class,
+                "WithAssignedOrPendingHumanTasksSupervisedBy", options,
                 Collections.singletonMap("userId", (Object) userId))).thenThrow(new SBonitaReadException(""));
 
         // When
-        processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, options);
+        processDefinitionServiceImpl
+                .getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, options);
     }
 
     /**
@@ -1505,11 +1631,13 @@ public class ProcessDefinitionServiceImplTest {
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", options, null)).thenReturn(
-                new ArrayList<SProcessDefinitionDeployInfo>());
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks",
+                options, null)).thenReturn(
+                        new ArrayList<SProcessDefinitionDeployInfo>());
 
         // When
-        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
 
         // Then
         assertNotNull(result);
@@ -1519,8 +1647,9 @@ public class ProcessDefinitionServiceImplTest {
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", options, null)).thenThrow(
-                new SBonitaReadException(""));
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks",
+                options, null)).thenThrow(
+                        new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
@@ -1535,10 +1664,12 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", options, null)).thenReturn(1L);
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class,
+                "WithAssignedOrPendingHumanTasks", options, null)).thenReturn(1L);
 
         // When
-        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
+        final long result = processDefinitionServiceImpl
+                .getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
 
         // Then
         assertEquals(1L, result);
@@ -1548,8 +1679,9 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", options, null)).thenThrow(
-                new SBonitaReadException(""));
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class,
+                "WithAssignedOrPendingHumanTasks", options, null)).thenThrow(
+                        new SBonitaReadException(""));
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
@@ -1558,7 +1690,8 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SObjectModificationException.class)
     public void updateExpressionContentShouldThrowProcessNotFoundIfReadException() throws Exception {
         final long processDefinitionId = 415L;
-        doThrow(SBonitaReadException.class).when(processDefinitionServiceImpl).getProcessDeploymentInfo(processDefinitionId);
+        doThrow(SBonitaReadException.class).when(processDefinitionServiceImpl)
+                .getProcessDeploymentInfo(processDefinitionId);
 
         processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, 77L, "string");
     }
@@ -1567,7 +1700,8 @@ public class ProcessDefinitionServiceImplTest {
     public void updateExpressionContentShouldThrowObjectModificationIfUpdateException() throws Exception {
         final long processDefinitionId = 415L;
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
-        doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
+        doReturn(designProcessDefinition).when(processDefinitionServiceImpl)
+                .getDesignProcessDefinition(processDefinitionId);
 
         processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, 77L, "string");
     }
@@ -1577,8 +1711,10 @@ public class ProcessDefinitionServiceImplTest {
         final long processDefinitionId = 415L;
         final long expressionDefinitionId = 77L;
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
-        doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
-        doReturn(null).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
+        doReturn(designProcessDefinition).when(processDefinitionServiceImpl)
+                .getDesignProcessDefinition(processDefinitionId);
+        doReturn(null).when(processDefinitionServiceImpl).getExpression(designProcessDefinition,
+                expressionDefinitionId);
 
         processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
     }
@@ -1588,19 +1724,22 @@ public class ProcessDefinitionServiceImplTest {
         final long processDefinitionId = 415L;
         final long expressionDefinitionId = 77L;
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
-        doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
-        doReturn(mock(ExpressionImpl.class)).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
-
+        doReturn(designProcessDefinition).when(processDefinitionServiceImpl)
+                .getDesignProcessDefinition(processDefinitionId);
+        doReturn(mock(ExpressionImpl.class)).when(processDefinitionServiceImpl).getExpression(designProcessDefinition,
+                expressionDefinitionId);
 
         processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
     }
 
     @Test(expected = SProcessDefinitionNotFoundException.class)
-    public void getDesignProcessDefinition_Should_Throw_Exception_On_Unknown_Process() throws SProcessDefinitionNotFoundException,
+    public void getDesignProcessDefinition_Should_Throw_Exception_On_Unknown_Process()
+            throws SProcessDefinitionNotFoundException,
             SBonitaReadException {
         int processDefinitionId = 456;
-        doThrow(new SProcessDefinitionNotFoundException("impossible to find process")).when(processDefinitionServiceImpl).getProcessDeploymentInfo(
-                processDefinitionId);
+        doThrow(new SProcessDefinitionNotFoundException("impossible to find process"))
+                .when(processDefinitionServiceImpl).getProcessDeploymentInfo(
+                        processDefinitionId);
         processDefinitionServiceImpl.getDesignProcessDefinition(processDefinitionId);
     }
 
@@ -1608,10 +1747,12 @@ public class ProcessDefinitionServiceImplTest {
     public void getDesignProcessDefinition_Should_Throw_Exception_On_UnparsableContent() throws Exception {
         int processDefinitionId = 123;
         SProcessDefinitionDeployInfo processDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(processDefinitionId);
+        doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl)
+                .getProcessDeploymentInfo(processDefinitionId);
         SProcessDefinitionDesignContent processDefinitionDesignContent = mock(SProcessDefinitionDesignContent.class);
         when(processDefinitionDeployInfo.getDesignContent()).thenReturn(processDefinitionDesignContent);
-        when(processDefinitionBARContribution.convertXmlToProcess(null)).thenThrow(new IOException("impossible to parse content"));
+        when(processDefinitionBARContribution.convertXmlToProcess(null))
+                .thenThrow(new IOException("impossible to parse content"));
         processDefinitionServiceImpl.getDesignProcessDefinition(processDefinitionId);
     }
 
@@ -1619,12 +1760,14 @@ public class ProcessDefinitionServiceImplTest {
     public void getDesignProcessDefinition_Should_return_XML_correctly() throws Exception {
         int processDefinitionId = 123;
         SProcessDefinitionDeployInfo processDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(processDefinitionId);
+        doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl)
+                .getProcessDeploymentInfo(processDefinitionId);
         SProcessDefinitionDesignContent processDefinitionDesignContent = mock(SProcessDefinitionDesignContent.class);
         when(processDefinitionDeployInfo.getDesignContent()).thenReturn(processDefinitionDesignContent);
         DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
         when(processDefinitionBARContribution.convertXmlToProcess(null)).thenReturn(designProcessDefinition);
-        DesignProcessDefinition designProcessDefinitionResult = processDefinitionServiceImpl.getDesignProcessDefinition(processDefinitionId);
+        DesignProcessDefinition designProcessDefinitionResult = processDefinitionServiceImpl
+                .getDesignProcessDefinition(processDefinitionId);
         assertThat(designProcessDefinitionResult).isSameAs(designProcessDefinition);
     }
 
@@ -1634,13 +1777,15 @@ public class ProcessDefinitionServiceImplTest {
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
         doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(PROCESS_ID);
         final ExpressionImpl expression = mock(ExpressionImpl.class);
-        doReturn(expression).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
+        doReturn(expression).when(processDefinitionServiceImpl).getExpression(designProcessDefinition,
+                expressionDefinitionId);
         doReturn("someXMLContent").when(processDefinitionServiceImpl).getProcessContent(designProcessDefinition);
         doReturn(true).when(processDefinitionServiceImpl).isValidExpressionTypeToUpdate(nullable(String.class));
 
         processDefinitionServiceImpl.updateExpressionContent(PROCESS_ID, expressionDefinitionId, "string");
 
-        verify(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(PROCESS_ID), any(EntityUpdateDescriptor.class),
+        verify(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(PROCESS_ID),
+                any(EntityUpdateDescriptor.class),
                 eq("Update expression <77>, old content is <null>"));
     }
 
@@ -1649,10 +1794,12 @@ public class ProcessDefinitionServiceImplTest {
         final long processDefinitionId = 415L;
         final long expressionDefinitionId = 77L;
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
-        doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
+        doReturn(designProcessDefinition).when(processDefinitionServiceImpl)
+                .getDesignProcessDefinition(processDefinitionId);
         final ExpressionImpl expression = mock(ExpressionImpl.class);
         doReturn(ExpressionType.TYPE_VARIABLE.name()).when(expression).getExpressionType();
-        doReturn(expression).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
+        doReturn(expression).when(processDefinitionServiceImpl).getExpression(designProcessDefinition,
+                expressionDefinitionId);
 
         processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
     }
@@ -1664,10 +1811,12 @@ public class ProcessDefinitionServiceImplTest {
             switch (expressionType) {
                 case TYPE_CONSTANT:
                 case TYPE_READ_ONLY_SCRIPT:
-                    assertThat(isValid).as("Expression of type " + expressionType + " should be valid for update").isTrue();
+                    assertThat(isValid).as("Expression of type " + expressionType + " should be valid for update")
+                            .isTrue();
                     break;
                 default:
-                    assertThat(isValid).as("Expression of type " + expressionType + " should NOT be valid for update").isFalse();
+                    assertThat(isValid).as("Expression of type " + expressionType + " should NOT be valid for update")
+                            .isFalse();
             }
         }
     }
@@ -1675,8 +1824,10 @@ public class ProcessDefinitionServiceImplTest {
     @Test
     public void getLatestProcessDefinitionId_should_query_processes_order_by_deploymentDate_DESC() throws Exception {
         // given:
-        final List<SProcessDefinitionDeployInfo> processes = Collections.<SProcessDefinitionDeployInfo>singletonList(new SProcessDefinitionDeployInfo());
-        doReturn(processes).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        final List<SProcessDefinitionDeployInfo> processes = Collections
+                .<SProcessDefinitionDeployInfo> singletonList(new SProcessDefinitionDeployInfo());
+        doReturn(processes).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
 
         // when:
         processDefinitionServiceImpl.getLatestProcessDefinitionId("MySimpleProcess");

@@ -39,14 +39,17 @@ public class FormMappingModelBuilder {
     }
 
     public FormMappingModelBuilder addProcessStartForm(String form, FormMappingTarget target) {
-        return withFormMapping(FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.PROCESS_START,target).build());
+        return withFormMapping(
+                FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.PROCESS_START, target).build());
     }
 
     public FormMappingModelBuilder addProcessOverviewForm(String form, FormMappingTarget target) {
-        return withFormMapping(FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.PROCESS_OVERVIEW,target).build());
+        return withFormMapping(
+                FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.PROCESS_OVERVIEW, target).build());
     }
 
     public FormMappingModelBuilder addTaskForm(String form, FormMappingTarget target, String task) {
-        return withFormMapping(FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.TASK,target).withTaskname(task).build());
+        return withFormMapping(FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.TASK, target)
+                .withTaskname(task).build());
     }
 }

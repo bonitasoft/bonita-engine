@@ -27,9 +27,11 @@ import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
- * Retrieve a String parameter from the ParameterService. The content of the expression must be the parameter name, as a String.
- * The dependency map must contain a value for 'processDefinitionId' key to identify the process definition context to evaluate the parameter.
- * 
+ * Retrieve a String parameter from the ParameterService. The content of the expression must be the parameter name, as a
+ * String.
+ * The dependency map must contain a value for 'processDefinitionId' key to identify the process definition context to
+ * evaluate the parameter.
+ *
  * @see {@link ParameterService}
  * @author Zhao Na
  * @author Celine Souchet
@@ -45,16 +47,20 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         try {
             if (context != null && !context.isEmpty()) {
                 if (context.containsKey(PROCESS_DEFINITION_ID)) {
                     final long processDefinitionId = (Long) context.get(PROCESS_DEFINITION_ID);
                     final SParameter parameter = parameterService.get(processDefinitionId, expressionContent);
-                    if(parameter== null){
-                        throw new SExpressionEvaluationException("Referenced parameter '" + expressionContent + "' does not exist", expression.getName());
+                    if (parameter == null) {
+                        throw new SExpressionEvaluationException(
+                                "Referenced parameter '" + expressionContent + "' does not exist",
+                                expression.getName());
                     }
                     try {
                         final String returnType = expression.getReturnType();
@@ -68,15 +74,18 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
                             return parameter.getValue();
                         }
                     } catch (final NumberFormatException e) {
-                        throw new SExpressionEvaluationException("Can't convert value = " + parameter.getValue() + " in type = returnType", e,
+                        throw new SExpressionEvaluationException(
+                                "Can't convert value = " + parameter.getValue() + " in type = returnType", e,
                                 expression.getName());
                     }
                 } else {
-                    throw new SExpressionDependencyMissingException("Mandatory dependency processDefinitionId is missing.");
+                    throw new SExpressionDependencyMissingException(
+                            "Mandatory dependency processDefinitionId is missing.");
                 }
             }
         } catch (SBonitaReadException e) {
-            throw new SExpressionEvaluationException("Unable to read references parameter '" + expressionContent + "' ", e, expression.getName());
+            throw new SExpressionEvaluationException("Unable to read references parameter '" + expressionContent + "' ",
+                    e, expression.getName());
         }
         return null;
     }
@@ -86,7 +95,9 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
         super.validate(expression);
         // $ can be part of variable name
         if (!expression.getContent().matches("(^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]*")) {
-            throw new SInvalidExpressionException("The expression content does not matches with (^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]* in expression: " + expression,
+            throw new SInvalidExpressionException(
+                    "The expression content does not matches with (^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]* in expression: "
+                            + expression,
                     expression.getName());
         }
 
@@ -98,8 +109,10 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, context, resolvedExpressions, containerState));

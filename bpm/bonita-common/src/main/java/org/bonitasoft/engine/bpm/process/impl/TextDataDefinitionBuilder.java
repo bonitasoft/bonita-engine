@@ -26,25 +26,31 @@ import org.bonitasoft.engine.expression.Expression;
  */
 public class TextDataDefinitionBuilder extends DataDefinitionBuilder {
 
-    public TextDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
+    public TextDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl process,
             final String name, final String className, final Expression defaultValue) {
         super(processDefinitionBuilder, process, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
-    public TextDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
-            final ActivityDefinitionImpl activity, final String name, final String className, final Expression defaultValue) {
+    public TextDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl process,
+            final ActivityDefinitionImpl activity, final String name, final String className,
+            final Expression defaultValue) {
         super(processDefinitionBuilder, process, activity, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
-    public TextDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-            final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className, final Expression defaultValue) {
+    public TextDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
+            final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className,
+            final Expression defaultValue) {
         super(processDefinitionBuilder, container, messageEventTrigger, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
-    private static TextDataDefinitionImpl getTextData(final String name, final String className, final Expression defaultValue) {
+    private static TextDataDefinitionImpl getTextData(final String name, final String className,
+            final Expression defaultValue) {
         final TextDataDefinitionImpl text = new TextDataDefinitionImpl(name, defaultValue);
         text.setClassName(className);
         return text;
@@ -52,6 +58,7 @@ public class TextDataDefinitionBuilder extends DataDefinitionBuilder {
 
     /**
      * Sets this data as long text (more than 255 characters).
+     *
      * @return
      */
     public TextDataDefinitionBuilder isLongText() {

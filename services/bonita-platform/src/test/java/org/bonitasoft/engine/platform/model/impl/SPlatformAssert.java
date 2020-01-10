@@ -22,160 +22,169 @@ import org.bonitasoft.engine.platform.model.SPlatform;
  */
 public class SPlatformAssert extends AbstractAssert<SPlatformAssert, SPlatform> {
 
-  /**
-   * Creates a new <code>{@link SPlatformAssert}</code> to make assertions on actual SPlatformImpl.
-   * @param actual the SPlatformImpl we want to make assertions on.
-   */
-  public SPlatformAssert(SPlatform actual) {
-    super(actual, SPlatformAssert.class);
-  }
-
-  /**
-   * An entry point for SPlatformImplAssert to follow AssertJ standard <code>assertThat()</code> statements.<br>
-   * With a static import, one can write directly: <code>assertThat(mySPlatformImpl)</code> and get specific assertion with code completion.
-   * @param actual the SPlatformImpl we want to make assertions on.
-   * @return a new <code>{@link SPlatformAssert}</code>
-   */
-  public static SPlatformAssert assertThat(SPlatform actual) {
-    return new SPlatformAssert(actual);
-  }
-
-  /**
-   * Verifies that the actual SPlatformImpl's created is equal to the given one.
-   * @param created the given created to compare the actual SPlatformImpl's created to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's created is not equal to the given one.
-   */
-  public SPlatformAssert hasCreated(long created) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected created of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // check
-    long actualCreated = actual.getCreated();
-    if (actualCreated != created) {
-      failWithMessage(assertjErrorMessage, actual, created, actualCreated);
+    /**
+     * Creates a new <code>{@link SPlatformAssert}</code> to make assertions on actual SPlatformImpl.
+     *
+     * @param actual the SPlatformImpl we want to make assertions on.
+     */
+    public SPlatformAssert(SPlatform actual) {
+        super(actual, SPlatformAssert.class);
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
-   * Verifies that the actual SPlatformImpl's createdBy is equal to the given one.
-   * @param createdBy the given createdBy to compare the actual SPlatformImpl's createdBy to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's createdBy is not equal to the given one.
-   */
-  public SPlatformAssert hasCreatedBy(String createdBy) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected createdBy of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualCreatedBy = actual.getCreatedBy();
-    if (!Objects.areEqual(actualCreatedBy, createdBy)) {
-      failWithMessage(assertjErrorMessage, actual, createdBy, actualCreatedBy);
+    /**
+     * An entry point for SPlatformImplAssert to follow AssertJ standard <code>assertThat()</code> statements.<br>
+     * With a static import, one can write directly: <code>assertThat(mySPlatformImpl)</code> and get specific assertion
+     * with code completion.
+     *
+     * @param actual the SPlatformImpl we want to make assertions on.
+     * @return a new <code>{@link SPlatformAssert}</code>
+     */
+    public static SPlatformAssert assertThat(SPlatform actual) {
+        return new SPlatformAssert(actual);
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual SPlatformImpl's created is equal to the given one.
+     *
+     * @param created the given created to compare the actual SPlatformImpl's created to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual SPlatformImpl's created is not equal to the given one.
+     */
+    public SPlatformAssert hasCreated(long created) {
+        // check that actual SPlatformImpl we want to make assertions on is not null.
+        isNotNull();
 
-  /**
-   * Verifies that the actual SPlatformImpl's information is equal to the given one.
-   * @param information the given information to compare the actual SPlatformImpl's information to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's information is not equal to the given one.
-   */
-  public SPlatformAssert hasInformation(String information) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected created of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected information of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualInformation = actual.getInformation();
-    if (!Objects.areEqual(actualInformation, information)) {
-      failWithMessage(assertjErrorMessage, actual, information, actualInformation);
+        // check
+        long actualCreated = actual.getCreated();
+        if (actualCreated != created) {
+            failWithMessage(assertjErrorMessage, actual, created, actualCreated);
+        }
+
+        // return the current assertion for method chaining
+        return this;
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual SPlatformImpl's createdBy is equal to the given one.
+     *
+     * @param createdBy the given createdBy to compare the actual SPlatformImpl's createdBy to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual SPlatformImpl's createdBy is not equal to the given one.
+     */
+    public SPlatformAssert hasCreatedBy(String createdBy) {
+        // check that actual SPlatformImpl we want to make assertions on is not null.
+        isNotNull();
 
-  /**
-   * Verifies that the actual SPlatformImpl's initialVersion is equal to the given one.
-   * @param initialVersion the given initialVersion to compare the actual SPlatformImpl's initialVersion to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's initialVersion is not equal to the given one.
-   */
-  public SPlatformAssert hasInitialVersion(String initialVersion) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected createdBy of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected initialVersion of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualInitialVersion = actual.getInitialVersion();
-    if (!Objects.areEqual(actualInitialVersion, initialVersion)) {
-      failWithMessage(assertjErrorMessage, actual, initialVersion, actualInitialVersion);
+        // null safe check
+        String actualCreatedBy = actual.getCreatedBy();
+        if (!Objects.areEqual(actualCreatedBy, createdBy)) {
+            failWithMessage(assertjErrorMessage, actual, createdBy, actualCreatedBy);
+        }
+
+        // return the current assertion for method chaining
+        return this;
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual SPlatformImpl's information is equal to the given one.
+     *
+     * @param information the given information to compare the actual SPlatformImpl's information to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual SPlatformImpl's information is not equal to the given one.
+     */
+    public SPlatformAssert hasInformation(String information) {
+        // check that actual SPlatformImpl we want to make assertions on is not null.
+        isNotNull();
 
-  /**
-   * Verifies that the actual SPlatformImpl's previousVersion is equal to the given one.
-   * @param previousVersion the given previousVersion to compare the actual SPlatformImpl's previousVersion to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's previousVersion is not equal to the given one.
-   */
-  public SPlatformAssert hasPreviousVersion(String previousVersion) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected information of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected previousVersion of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualPreviousVersion = actual.getPreviousVersion();
-    if (!Objects.areEqual(actualPreviousVersion, previousVersion)) {
-      failWithMessage(assertjErrorMessage, actual, previousVersion, actualPreviousVersion);
+        // null safe check
+        String actualInformation = actual.getInformation();
+        if (!Objects.areEqual(actualInformation, information)) {
+            failWithMessage(assertjErrorMessage, actual, information, actualInformation);
+        }
+
+        // return the current assertion for method chaining
+        return this;
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual SPlatformImpl's initialVersion is equal to the given one.
+     *
+     * @param initialVersion the given initialVersion to compare the actual SPlatformImpl's initialVersion to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual SPlatformImpl's initialVersion is not equal to the given one.
+     */
+    public SPlatformAssert hasInitialVersion(String initialVersion) {
+        // check that actual SPlatformImpl we want to make assertions on is not null.
+        isNotNull();
 
-  /**
-   * Verifies that the actual SPlatformImpl's version is equal to the given one.
-   * @param version the given version to compare the actual SPlatformImpl's version to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's version is not equal to the given one.
-   */
-  public SPlatformAssert hasVersion(String version) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected initialVersion of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected version of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualVersion = actual.getVersion();
-    if (!Objects.areEqual(actualVersion, version)) {
-      failWithMessage(assertjErrorMessage, actual, version, actualVersion);
+        // null safe check
+        String actualInitialVersion = actual.getInitialVersion();
+        if (!Objects.areEqual(actualInitialVersion, initialVersion)) {
+            failWithMessage(assertjErrorMessage, actual, initialVersion, actualInitialVersion);
+        }
+
+        // return the current assertion for method chaining
+        return this;
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual SPlatformImpl's previousVersion is equal to the given one.
+     *
+     * @param previousVersion the given previousVersion to compare the actual SPlatformImpl's previousVersion to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual SPlatformImpl's previousVersion is not equal to the given one.
+     */
+    public SPlatformAssert hasPreviousVersion(String previousVersion) {
+        // check that actual SPlatformImpl we want to make assertions on is not null.
+        isNotNull();
+
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected previousVersion of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+
+        // null safe check
+        String actualPreviousVersion = actual.getPreviousVersion();
+        if (!Objects.areEqual(actualPreviousVersion, previousVersion)) {
+            failWithMessage(assertjErrorMessage, actual, previousVersion, actualPreviousVersion);
+        }
+
+        // return the current assertion for method chaining
+        return this;
+    }
+
+    /**
+     * Verifies that the actual SPlatformImpl's version is equal to the given one.
+     *
+     * @param version the given version to compare the actual SPlatformImpl's version to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual SPlatformImpl's version is not equal to the given one.
+     */
+    public SPlatformAssert hasVersion(String version) {
+        // check that actual SPlatformImpl we want to make assertions on is not null.
+        isNotNull();
+
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected version of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+
+        // null safe check
+        String actualVersion = actual.getVersion();
+        if (!Objects.areEqual(actualVersion, version)) {
+            failWithMessage(assertjErrorMessage, actual, version, actualVersion);
+        }
+
+        // return the current assertion for method chaining
+        return this;
+    }
 
 }

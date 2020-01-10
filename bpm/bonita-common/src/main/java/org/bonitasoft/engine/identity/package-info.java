@@ -12,7 +12,8 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 /**
- * <p>Manages information about an organization, that is, the set of users who can act in processes and the groups and the organization's roles and the relation
+ * <p>Manages information about an organization, that is, the set of users who can act in processes and the groups and
+ * the organization's roles and the relation
  * between them.
  * <p>Contains helpers to create and updates organization's groups, roles, users and memberships</p>
  *

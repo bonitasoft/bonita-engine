@@ -29,6 +29,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("receive")
 public class SAReceiveTaskInstance extends SAActivityInstance {
+
     public SAReceiveTaskInstance(final SReceiveTaskInstance sReceiveTaskInstance) {
         super(sReceiveTaskInstance);
     }

@@ -44,7 +44,6 @@ public class MessagesRestartHandlerTest {
     @Spy
     private MessagesRestartHandler messagesRestartHandler;
 
-
     @Test
     public void handleRestartShouldLog4Infos() throws Exception {
         // when:

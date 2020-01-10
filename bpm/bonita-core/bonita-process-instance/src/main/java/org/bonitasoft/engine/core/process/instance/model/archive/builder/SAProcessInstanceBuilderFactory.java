@@ -25,7 +25,7 @@ public interface SAProcessInstanceBuilderFactory {
     /**
      * create a new Server Archived Process Instance from a Server Process Instance
      * the id is kept
-     * 
+     *
      * @param processInstance
      * @return
      */

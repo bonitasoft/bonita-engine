@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bdm.validator.assertion;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
-
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 public class ValidationStatusAssert extends AbstractAssert<ValidationStatusAssert, ValidationStatus> {

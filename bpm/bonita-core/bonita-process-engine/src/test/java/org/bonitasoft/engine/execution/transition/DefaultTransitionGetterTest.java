@@ -68,14 +68,16 @@ public class DefaultTransitionGetterTest {
         wrapper.setDefaultTransition(transition);
 
         //when
-        STransitionDefinition defaultTransition = defaultTransitionGetter.getDefaultTransition(wrapper, processDefinition, flowNodeInstance);
+        STransitionDefinition defaultTransition = defaultTransitionGetter.getDefaultTransition(wrapper,
+                processDefinition, flowNodeInstance);
 
         //then
         assertThat(defaultTransition).isEqualTo(transition);
     }
 
     @Test
-    public void getDefaultTransition_should_throw_SActivityExecutionException_when_default_transition_is_not_set() throws Exception {
+    public void getDefaultTransition_should_throw_SActivityExecutionException_when_default_transition_is_not_set()
+            throws Exception {
         //given
         FlowNodeTransitionsWrapper wrapper = new FlowNodeTransitionsWrapper();
 

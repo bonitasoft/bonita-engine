@@ -15,11 +15,10 @@ package org.bonitasoft.engine.tenant;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Handles the restart of elements when the tenant is started (strategy is different in cluster)
@@ -34,7 +33,7 @@ public class TenantElementsRestarter {
     private long tenantId;
 
     public TenantElementsRestarter(List<TenantRestartHandler> tenantRestartHandlers, TenantRestarter tenantRestarter,
-                                   TenantElementsRestartSupervisor tenantElementsRestartSupervisor, @Value("${tenantId}") long tenantId) {
+            TenantElementsRestartSupervisor tenantElementsRestartSupervisor, @Value("${tenantId}") long tenantId) {
         this.tenantRestartHandlers = tenantRestartHandlers;
         this.tenantRestarter = tenantRestarter;
         this.tenantElementsRestartSupervisor = tenantElementsRestartSupervisor;

@@ -44,11 +44,8 @@ public class BusinessDataObjectMapperTest {
                 .isEqualTo(getJsonContent("simpleInvoice.json"));
     }
 
-
     private static String getJsonContent(String jsonFileName) throws IOException {
         return new String(IOUtils.toByteArray(BusinessDataObjectMapperTest.class.getResourceAsStream(jsonFileName)));
     }
-
-
 
 }

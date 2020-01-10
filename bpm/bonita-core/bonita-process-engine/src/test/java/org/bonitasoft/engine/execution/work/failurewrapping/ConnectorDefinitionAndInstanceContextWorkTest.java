@@ -31,7 +31,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
@@ -52,7 +51,8 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
     @Override
     @Before
     public void before() throws SBonitaException {
-        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID));
+        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME,
+                CONNECTOR_INSTANCE_ID));
         super.before();
     }
 
@@ -73,7 +73,8 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
     @Test
     public void handleFailureWithNameAndIdAndActivationEvent() throws Throwable {
-        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID,
+        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME,
+                CONNECTOR_INSTANCE_ID,
                 ACTIVATION_EVENT));
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         final SBonitaException e = new SBonitaException() {

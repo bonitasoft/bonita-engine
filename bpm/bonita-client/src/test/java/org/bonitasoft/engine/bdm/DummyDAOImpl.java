@@ -17,7 +17,6 @@ import org.bonitasoft.engine.session.APISession;
 
 /**
  * @author Romain Bioteau
- *
  */
 public class DummyDAOImpl implements DummyDAO {
 

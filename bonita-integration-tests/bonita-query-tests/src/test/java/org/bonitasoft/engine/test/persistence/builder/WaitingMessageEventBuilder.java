@@ -23,7 +23,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
  * @author Emmanuel Duchastenier
  * @author Laurent Leseigneur
  */
-public class WaitingMessageEventBuilder extends PersistentObjectBuilder<SWaitingMessageEvent, WaitingMessageEventBuilder> {
+public class WaitingMessageEventBuilder
+        extends PersistentObjectBuilder<SWaitingMessageEvent, WaitingMessageEventBuilder> {
 
     private SWaitingMessageEvent event = new SWaitingMessageEvent();
 
@@ -44,7 +45,7 @@ public class WaitingMessageEventBuilder extends PersistentObjectBuilder<SWaiting
         return event;
     }
 
-    public WaitingMessageEventBuilder withEventType(SBPMEventType eventType){
+    public WaitingMessageEventBuilder withEventType(SBPMEventType eventType) {
         event.setEventType(eventType);
         return this;
     }

@@ -37,6 +37,7 @@ import org.hibernate.annotations.Filter;
 @IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")
 public abstract class SRefBusinessDataInstance implements PersistentObject {
+
     @Id
     private long id;
     @Id

@@ -20,7 +20,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class SpringPlatformInitServiceAccessor implements PlatformInitServiceAccessor {
 
-
     private SpringBeanAccessor platformInitBeanAccessor;
 
     public SpringPlatformInitServiceAccessor(SpringBeanAccessor platformInitBeanAccessor) {

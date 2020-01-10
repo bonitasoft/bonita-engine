@@ -22,16 +22,15 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -39,7 +38,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Filter(name = "tenantFilter")
-@Table(name="form_mapping")
+@Table(name = "form_mapping")
 @IdClass(PersistentObjectId.class)
 public class SFormMapping implements PersistentObject {
 
@@ -61,9 +60,9 @@ public class SFormMapping implements PersistentObject {
     private String task;
     private String target;
     @ManyToOne
-    @JoinColumns( {
-            @JoinColumn(name = "page_mapping_tenant_id",referencedColumnName = "tenantId"),
-            @JoinColumn(name = "page_mapping_id",referencedColumnName = "id")
+    @JoinColumns({
+            @JoinColumn(name = "page_mapping_tenant_id", referencedColumnName = "tenantId"),
+            @JoinColumn(name = "page_mapping_id", referencedColumnName = "id")
     })
     private SPageMapping pageMapping;
     private Integer type;
@@ -79,10 +78,14 @@ public class SFormMapping implements PersistentObject {
 
     public String getProcessElementName() {
         switch (FormMappingType.getTypeFromId(this.getType())) {
-            case TASK: return this.getTask();
-            case PROCESS_OVERVIEW: return FormMappingType.PROCESS_OVERVIEW.toString();
-            case PROCESS_START: return FormMappingType.PROCESS_START.toString();
-            default: return null;
+            case TASK:
+                return this.getTask();
+            case PROCESS_OVERVIEW:
+                return FormMappingType.PROCESS_OVERVIEW.toString();
+            case PROCESS_START:
+                return FormMappingType.PROCESS_START.toString();
+            default:
+                return null;
         }
     }
 }

@@ -100,7 +100,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
 
     }
 
-    private void taskAssigneeOnHumanTask(final SFlowNodeType flowNodeType, final SHumanTaskInstance humanTaskInstance) throws SExpressionEvaluationException,
+    private void taskAssigneeOnHumanTask(final SFlowNodeType flowNodeType, final SHumanTaskInstance humanTaskInstance)
+            throws SExpressionEvaluationException,
             SFlowNodeNotFoundException, SFlowNodeReadException {
         when(activityInstanceService.getFlowNodeInstance(CONTAINER_ID)).thenReturn(humanTaskInstance);
         expression.setContent(TASK_ASSIGNEE_ID.getEngineConstantName());
@@ -109,7 +110,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         when(humanTaskInstance.getAssigneeId()).thenReturn(taskAssigneeId);
         when(humanTaskInstance.getType()).thenReturn(flowNodeType);
 
-        final long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),
+        final long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, dependencies,
+                Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
         assertEquals(taskAssigneeId, evaluatedTaskAssigneeId);
     }
@@ -120,7 +122,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         when(activityInstanceService.getFlowNodeInstance(CONTAINER_ID)).thenReturn(mock(SAutomaticTaskInstance.class));
         expression.setContent(TASK_ASSIGNEE_ID.getEngineConstantName());
 
-        final long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),
+        final long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, dependencies,
+                Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
         assertEquals(-1L, evaluatedTaskAssigneeId);
 
@@ -131,7 +134,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         dependencies.put(SExpressionContext.CONTAINER_TYPE_KEY, DataInstanceContainer.PROCESS_INSTANCE.name());
         expression.setContent(TASK_ASSIGNEE_ID.getEngineConstantName());
 
-        final Serializable evaluatedTaskAssigneeId = strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),
+        final Serializable evaluatedTaskAssigneeId = strategy.evaluate(expression, dependencies,
+                Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
         assertEquals(-1L, evaluatedTaskAssigneeId);
 
@@ -148,8 +152,9 @@ public class EngineConstantExpressionExecutorStrategyTest {
         when(taskInstance.getAssigneeId()).thenReturn(taskAssigneeId);
         when(taskInstance.getType()).thenReturn(SFlowNodeType.USER_TASK);
 
-        final EngineExecutionContext engineExecutionContext = (EngineExecutionContext) strategy.evaluate(expression, dependencies,
-                Collections.<Integer, Object>emptyMap(), ContainerState.ACTIVE);
+        final EngineExecutionContext engineExecutionContext = (EngineExecutionContext) strategy.evaluate(expression,
+                dependencies,
+                Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
         assertEquals(taskAssigneeId, engineExecutionContext.getTaskAssigneeId());
 
     }
@@ -164,7 +169,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
         dependencies.put(ENGINE_EXECUTION_CONTEXT.getEngineConstantName(), engineExecutionContext);
 
         final Long evaluatedTaskAssigneeId = (Long) strategy
-                .evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(), ContainerState.ACTIVE);
+                .evaluate(expression, dependencies, Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
         assertEquals(taskAssigneeId, evaluatedTaskAssigneeId);
 
         verify(activityInstanceService, never()).getActivityInstance(anyLong());
@@ -180,7 +185,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         engineExecutionContext.setProcessInstanceId(processInstanceId);
         dependencies.put(ENGINE_EXECUTION_CONTEXT.getEngineConstantName(), engineExecutionContext);
 
-        final Long evaluatedProcessInstanceId = (Long) strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),
+        final Long evaluatedProcessInstanceId = (Long) strategy.evaluate(expression, dependencies,
+                Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
         assertEquals(processInstanceId, evaluatedProcessInstanceId.longValue());
 
@@ -192,7 +198,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
 
         final long processInstanceId = 799451L;
 
-        final Serializable noValue = strategy.evaluate(expression, new HashMap<String, Object>(0), Collections.<Integer, Object>emptyMap(), ContainerState.ACTIVE);
+        final Serializable noValue = strategy.evaluate(expression, new HashMap<String, Object>(0),
+                Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
         assertFalse(("" + processInstanceId).equals(String.valueOf(noValue)));
 
     }
@@ -201,7 +208,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
     public void engineConstantNotFound() throws Exception {
         expression.setContent("unexisting_constant_value");
 
-        strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(), ContainerState.ACTIVE);
+        strategy.evaluate(expression, dependencies, Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
     }
 
     @Test(expected = SInvalidExpressionException.class)
@@ -228,8 +235,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         expression.setContent(LOGGED_USER_ID.getEngineConstantName());
         doReturn(USER_ID).when(sessionService).getLoggedUserFromSession(sessionAccessor);
 
-
-        Serializable loggerUserId = strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),
+        Serializable loggerUserId = strategy.evaluate(expression, dependencies,
+                Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
         assertThat(loggerUserId).as("logged user id").isEqualTo(USER_ID);
     }
@@ -240,7 +247,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         expression.setContent(LOGGED_USER_ID.getEngineConstantName());
         taskInstance.setAssigneeId(USER_ID);
         //when
-        Serializable loggerUserId = strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),
+        Serializable loggerUserId = strategy.evaluate(expression, dependencies,
+                Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
         //then
         assertThat(loggerUserId).as("logged user id").isEqualTo(USER_ID);
@@ -264,7 +272,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         expression.setContent(LOGGED_USER_ID.getEngineConstantName());
         dependencies.put(TASK_ASSIGNEE_ID.getEngineConstantName(), USER_ID);
         //when
-        Serializable loggerUserId = strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),
+        Serializable loggerUserId = strategy.evaluate(expression, dependencies,
+                Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
         //then
         assertThat(loggerUserId).as("logged user id").isEqualTo(USER_ID);

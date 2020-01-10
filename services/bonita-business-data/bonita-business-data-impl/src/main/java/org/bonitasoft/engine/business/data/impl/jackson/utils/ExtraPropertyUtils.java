@@ -42,7 +42,7 @@ public class ExtraPropertyUtils {
     }
 
     private static boolean shouldAddExtraProperty(JavaType javaType) {
-        if (javaType.getClass().isAssignableFrom(CollectionType.class)){
+        if (javaType.getClass().isAssignableFrom(CollectionType.class)) {
             CollectionType collectionType = (CollectionType) javaType;
             return shouldAddExtraProperty(collectionType.getContentType());
         }

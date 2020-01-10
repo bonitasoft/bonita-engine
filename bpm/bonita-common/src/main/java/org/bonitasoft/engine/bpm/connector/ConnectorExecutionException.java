@@ -17,12 +17,13 @@ import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
  * Thrown when it's not possible to execute correctly the connector.
- * 
- * The class ConnectorExecutionException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
+ * The class ConnectorExecutionException is a form of Throwable that indicates conditions that a reasonable application
+ * might want to catch.
  * The class ConnectorExecutionException that is not also subclasses of {@link RuntimeException} are checked exceptions.
- * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
+ * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by
+ * the execution of the method or
  * constructor and propagate outside the method or constructor boundary.
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
@@ -32,10 +33,11 @@ public class ConnectorExecutionException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
-     *            cause is nonexistent or unknown.)
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
      */
     public ConnectorExecutionException(final Throwable cause) {
         super(cause);
@@ -43,12 +45,13 @@ public class ConnectorExecutionException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail message and cause.
-     * 
+     *
      * @param message
-     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      * @param cause
-     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
-     *            cause is nonexistent or unknown.)
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
      */
     public ConnectorExecutionException(final String message, final Throwable cause) {
         super(message, cause);
@@ -56,9 +59,9 @@ public class ConnectorExecutionException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail message.
-     * 
+     *
      * @param message
-     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      */
     public ConnectorExecutionException(final String message) {
         super(message);

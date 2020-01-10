@@ -39,16 +39,20 @@ public class BusinessDataAPIImpl implements BusinessDataAPI {
     }
 
     @Override
-    public BusinessDataReference getProcessBusinessDataReference(final String businessDataName, final long processInstanceId) throws DataNotFoundException {
+    public BusinessDataReference getProcessBusinessDataReference(final String businessDataName,
+            final long processInstanceId) throws DataNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
-            final SRefBusinessDataInstance sReference = refBusinessDataService.getRefBusinessDataInstance(businessDataName,
+            final SRefBusinessDataInstance sReference = refBusinessDataService.getRefBusinessDataInstance(
+                    businessDataName,
                     processInstanceId);
             if (sReference instanceof SSimpleRefBusinessDataInstance) {
-                return BusinessDataModelConverter.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference);
+                return BusinessDataModelConverter
+                        .toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference);
             } else {
-                return BusinessDataModelConverter.toMultipleBusinessDataReference((SProcessMultiRefBusinessDataInstance) sReference);
+                return BusinessDataModelConverter
+                        .toMultipleBusinessDataReference((SProcessMultiRefBusinessDataInstance) sReference);
             }
         } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
             throw new DataNotFoundException(srbdnfe);
@@ -58,17 +62,21 @@ public class BusinessDataAPIImpl implements BusinessDataAPI {
     }
 
     @Override
-    public List<BusinessDataReference> getProcessBusinessDataReferences(final long processInstanceId, final int startIndex, final int maxResults) {
+    public List<BusinessDataReference> getProcessBusinessDataReferences(final long processInstanceId,
+            final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
-            final List<SRefBusinessDataInstance> sReferences = refBusinessDataService.getRefBusinessDataInstances(processInstanceId, startIndex, maxResults);
+            final List<SRefBusinessDataInstance> sReferences = refBusinessDataService
+                    .getRefBusinessDataInstances(processInstanceId, startIndex, maxResults);
             final List<BusinessDataReference> references = new ArrayList<BusinessDataReference>();
             for (final SRefBusinessDataInstance sReference : sReferences) {
                 if (sReference instanceof SSimpleRefBusinessDataInstance) {
-                    references.add(BusinessDataModelConverter.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference));
+                    references.add(BusinessDataModelConverter
+                            .toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference));
                 } else {
-                    references.add(BusinessDataModelConverter.toMultipleBusinessDataReference((SProcessMultiRefBusinessDataInstance) sReference));
+                    references.add(BusinessDataModelConverter
+                            .toMultipleBusinessDataReference((SProcessMultiRefBusinessDataInstance) sReference));
                 }
             }
             return references;

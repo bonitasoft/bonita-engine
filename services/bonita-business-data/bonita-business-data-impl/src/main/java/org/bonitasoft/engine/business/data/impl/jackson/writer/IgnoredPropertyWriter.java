@@ -15,16 +15,15 @@ package org.bonitasoft.engine.business.data.impl.jackson.writer;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonStreamContext;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.impl.jackson.utils.Link;
 import org.bonitasoft.engine.business.data.impl.jackson.utils.LinkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonStreamContext;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 
 /**
  * This implementation does not serialize fields by calling the JsonGenerator. Instead, it creates and stores link
@@ -52,7 +51,8 @@ public class IgnoredPropertyWriter extends BeanPropertyWriter {
             String uriPattern = LinkUtils.getUriPatternFromContext(prov);
             LOG.trace("URI Pattern retrieved from the context: {}", uriPattern);
 
-            Link link = new Link(ignoredFieldName, buildURI((Entity) currentlyProcessedObject, uriPattern, ignoredFieldName));
+            Link link = new Link(ignoredFieldName,
+                    buildURI((Entity) currentlyProcessedObject, uriPattern, ignoredFieldName));
             LinkUtils.addLinkToContext(currentlyProcessedObject, link, prov);
         }
     }

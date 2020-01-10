@@ -22,7 +22,6 @@ public class A implements Entity {
     private B b;
     private A a;
 
-
     @Override
     public Long getPersistenceId() {
         return persistenceId;

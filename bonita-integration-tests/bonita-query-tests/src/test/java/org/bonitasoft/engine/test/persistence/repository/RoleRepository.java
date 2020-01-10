@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.test.persistence.repository;
 
 import org.bonitasoft.engine.identity.model.SRole;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -34,6 +34,5 @@ public class RoleRepository extends TestRepository {
         namedQuery.setParameter("name", name);
         return ((SRole) namedQuery.uniqueResult());
     }
-
 
 }

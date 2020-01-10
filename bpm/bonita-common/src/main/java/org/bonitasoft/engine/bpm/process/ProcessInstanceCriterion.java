@@ -16,9 +16,10 @@ package org.bonitasoft.engine.bpm.process;
 /**
  * Sort criterion used to specify the sort order of the {@link ProcessInstance}. <br>
  * Used by {@link org.bonitasoft.engine.api.ProcessRuntimeAPI} methods like
- * {@link org.bonitasoft.engine.api.ProcessRuntimeAPI#getProcessInstances(int, int, ProcessInstanceCriterion)} to indicate in what order we should return the
+ * {@link org.bonitasoft.engine.api.ProcessRuntimeAPI#getProcessInstances(int, int, ProcessInstanceCriterion)} to
+ * indicate in what order we should return the
  * list of the results.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Yanyan Liu
  * @author Celine Souchet

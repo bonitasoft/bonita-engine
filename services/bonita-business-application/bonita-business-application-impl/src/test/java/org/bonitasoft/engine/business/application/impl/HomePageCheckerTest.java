@@ -32,7 +32,6 @@ public class HomePageCheckerTest {
     public static final long APPLICATION_ID = 10L;
     public static final long APPLICATION_PAGE_ID = 2L;
 
-
     @Mock
     private ApplicationService applicationService;
 
@@ -53,26 +52,26 @@ public class HomePageCheckerTest {
     }
 
     @Test
-    public void isHomePage_should_return_true_if_application_home_page_id_is_equals_to_applicationPage_id() throws Exception {
+    public void isHomePage_should_return_true_if_application_home_page_id_is_equals_to_applicationPage_id()
+            throws Exception {
         //given
         given(application.getHomePageId()).willReturn(APPLICATION_PAGE_ID);
 
         //when
         boolean isHomePage = checker.isHomePage(page);
 
-
         //then
         assertThat(isHomePage).isTrue();
     }
 
     @Test
-    public void isHomePage_should_return_false_if_application_home_page_id_is_different_of_applicationPage_id() throws Exception {
+    public void isHomePage_should_return_false_if_application_home_page_id_is_different_of_applicationPage_id()
+            throws Exception {
         //given
         given(application.getHomePageId()).willReturn(1L);
 
         //when
         boolean isHomePage = checker.isHomePage(page);
-
 
         //then
         assertThat(isHomePage).isFalse();

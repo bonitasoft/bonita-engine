@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 
 /**
  * @author Baptiste Mesta
@@ -45,9 +45,11 @@ public class SMultiInstanceActivityInstance extends SActivityInstance {
     private int numberOfTerminatedInstances;
     private int loopCardinality;
 
-    public SMultiInstanceActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                              final long processDefinitionId, final long rootProcessInstanceId, final boolean isSequential) {
-        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId);
+    public SMultiInstanceActivityInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId, final long parentContainerId,
+            final long processDefinitionId, final long rootProcessInstanceId, final boolean isSequential) {
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+                rootProcessInstanceId);
         sequential = isSequential;
     }
 

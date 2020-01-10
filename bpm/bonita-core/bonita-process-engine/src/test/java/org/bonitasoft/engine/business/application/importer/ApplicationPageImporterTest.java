@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.business.application.importer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.ImportError;
@@ -82,7 +82,8 @@ public class ApplicationPageImporterTest {
     }
 
     @Test(expected = ImportException.class)
-    public void importApplicationPage_should_throw_Exception_when_create_applicationPage_throws_exception() throws Exception {
+    public void importApplicationPage_should_throw_Exception_when_create_applicationPage_throws_exception()
+            throws Exception {
         //given
         SApplication application = mock(SApplication.class);
         ApplicationPageNode applicationPageNode = mock(ApplicationPageNode.class);

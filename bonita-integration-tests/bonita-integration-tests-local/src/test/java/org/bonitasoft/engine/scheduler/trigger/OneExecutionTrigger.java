@@ -32,7 +32,8 @@ public class OneExecutionTrigger implements Trigger {
         this(name, startDate, priority, MisfireRestartPolicy.ALL);
     }
 
-    public OneExecutionTrigger(final String name, final Date startDate, final int priority, final MisfireRestartPolicy misfireHandlingPolicy) {
+    public OneExecutionTrigger(final String name, final Date startDate, final int priority,
+            final MisfireRestartPolicy misfireHandlingPolicy) {
         this.name = name;
         this.startDate = startDate;
         this.priority = priority;

@@ -57,11 +57,14 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
 
     @Test
     public void processWithCustomData() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithCustomData", "1.0");
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithCustomData", "1.0");
         builder.addUserTask("step1", "actor");
         builder.addActor("actor");
-        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("initEmployee", "import org.bonitasoft.engine.process.Employee; \n"
-                + "return new Employee(\"TÃ¤htikuja\", \"firstName48\")", "org.bonitasoft.engine.process.Employee");
+        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("initEmployee",
+                "import org.bonitasoft.engine.process.Employee; \n"
+                        + "return new Employee(\"TÃ¤htikuja\", \"firstName48\")",
+                "org.bonitasoft.engine.process.Employee");
         builder.addData("address", "org.bonitasoft.engine.process.Employee", expression);
 
         final BusinessArchive businessArchive = addClasspathRessource(builder).done();
@@ -76,33 +79,48 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
     @Test
     public void callActivityWith2CustomDatasOnActivityUsingSameExternalLibrairy() throws Exception {
         final String targetProcessName = "targetProcess";
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+        final Expression targetProcessNameExpr = new ExpressionBuilder()
+                .createConstantStringExpression(targetProcessName);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                .createConstantStringExpression(PROCESS_VERSION);
 
         // Build target process
-        final Expression defaultValueForEmployeeOnTStep1 = new ExpressionBuilder().createGroovyScriptExpression("initEmployee",
-                "import org.bonitasoft.engine.process.Employee; \n" + "return new Employee(\"TÃ¤htikuja\", \"firstName48\")",
+        final Expression defaultValueForEmployeeOnTStep1 = new ExpressionBuilder().createGroovyScriptExpression(
+                "initEmployee",
+                "import org.bonitasoft.engine.process.Employee; \n"
+                        + "return new Employee(\"TÃ¤htikuja\", \"firstName48\")",
                 "org.bonitasoft.engine.process.Employee");
-        final ProcessDefinitionBuilder targetProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(targetProcessName, PROCESS_VERSION);
+        final ProcessDefinitionBuilder targetProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(targetProcessName, PROCESS_VERSION);
         targetProcessDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("tStart");
-        targetProcessDefinitionBuilder.addUserTask("tStep1", ACTOR_NAME).addData("data", Employee.class.getName(), defaultValueForEmployeeOnTStep1);
+        targetProcessDefinitionBuilder.addUserTask("tStep1", ACTOR_NAME).addData("data", Employee.class.getName(),
+                defaultValueForEmployeeOnTStep1);
         targetProcessDefinitionBuilder.addEndEvent("tEnd");
         targetProcessDefinitionBuilder.addTransition("tStart", "tStep1").addTransition("tStep1", "tEnd");
-        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(targetProcessDefinitionBuilder).done(),
+        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(
+                addClasspathRessource(targetProcessDefinitionBuilder).done(),
                 ACTOR_NAME, cebolinha);
 
         // Build main process
-        final Expression defaultValueForEmployeeOnStep1 = new ExpressionBuilder().createGroovyScriptExpression("initEmployee",
-                "import org.bonitasoft.engine.process.Employee; \n" + "return new Employee(\"name\", \"firstName\")", "org.bonitasoft.engine.process.Employee");
-        final ProcessDefinitionBuilder callingProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        final Expression defaultValueForEmployeeOnStep1 = new ExpressionBuilder().createGroovyScriptExpression(
+                "initEmployee",
+                "import org.bonitasoft.engine.process.Employee; \n" + "return new Employee(\"name\", \"firstName\")",
+                "org.bonitasoft.engine.process.Employee");
+        final ProcessDefinitionBuilder callingProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("callingProcess", PROCESS_VERSION);
         callingProcessDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("start");
-        callingProcessDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addData("data", Employee.class.getName(), defaultValueForEmployeeOnStep1);
+        callingProcessDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addData("data", Employee.class.getName(),
+                defaultValueForEmployeeOnStep1);
         callingProcessDefinitionBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
-                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName")).addDescription("callActivityDescription")
-                .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName"))
+                .addDescription("callActivityDescription")
+                .addDisplayDescription(
+                        new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
         callingProcessDefinitionBuilder.addEndEvent("end");
-        callingProcessDefinitionBuilder.addTransition("start", "step1").addTransition("step1", "callActivity").addTransition("callActivity", "end");
-        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(),
+        callingProcessDefinitionBuilder.addTransition("start", "step1").addTransition("step1", "callActivity")
+                .addTransition("callActivity", "end");
+        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(
+                addClasspathRessource(callingProcessDefinitionBuilder).done(),
                 ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
@@ -125,34 +143,46 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
         final String dataName = "data";
         final String dataType = Employee.class.getName();
         final String targetProcessName = "targetProcess";
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+        final Expression targetProcessNameExpr = new ExpressionBuilder()
+                .createConstantStringExpression(targetProcessName);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                .createConstantStringExpression(PROCESS_VERSION);
 
         // Build target process
-        final ProcessDefinitionBuilder targetProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(targetProcessName, PROCESS_VERSION);
+        final ProcessDefinitionBuilder targetProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(targetProcessName, PROCESS_VERSION);
         targetProcessDefinitionBuilder.addActor(ACTOR_NAME + 2).addStartEvent("tStart");
         targetProcessDefinitionBuilder.addUserTask("tStep1", ACTOR_NAME + 2);
         targetProcessDefinitionBuilder.addData(dataName, dataType, null);
         targetProcessDefinitionBuilder.addEndEvent("tEnd").addTerminateEventTrigger();
         targetProcessDefinitionBuilder.addTransition("tStart", "tStep1").addTransition("tStep1", "tEnd");
-        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(targetProcessDefinitionBuilder).done(),
+        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(
+                addClasspathRessource(targetProcessDefinitionBuilder).done(),
                 ACTOR_NAME + 2, cebolinha);
 
         // Build main process
-        final Expression defaultValueForEmployeeOnStep1 = new ExpressionBuilder().createGroovyScriptExpression("initEmployee",
-                "import org.bonitasoft.engine.process.Employee; \n" + "return new Employee(\"name\", \"firstName\")", "org.bonitasoft.engine.process.Employee");
-        final ProcessDefinitionBuilder callingProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        final Expression defaultValueForEmployeeOnStep1 = new ExpressionBuilder().createGroovyScriptExpression(
+                "initEmployee",
+                "import org.bonitasoft.engine.process.Employee; \n" + "return new Employee(\"name\", \"firstName\")",
+                "org.bonitasoft.engine.process.Employee");
+        final ProcessDefinitionBuilder callingProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("callingProcess", PROCESS_VERSION);
         callingProcessDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("start");
         callingProcessDefinitionBuilder.addData(dataName, dataType, defaultValueForEmployeeOnStep1);
         callingProcessDefinitionBuilder.addUserTask("Step1", ACTOR_NAME);
-        final CallActivityBuilder callActivity = callingProcessDefinitionBuilder.addCallActivity("callActivity", targetProcessNameExpr,
+        final CallActivityBuilder callActivity = callingProcessDefinitionBuilder.addCallActivity("callActivity",
+                targetProcessNameExpr,
                 targetProcessVersionExpr);
         final Expression rightOperand = new ExpressionBuilder().createDataExpression(dataName, dataType);
-        callActivity.addDataInputOperation(BuildTestUtil.buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
-        callActivity.addDataOutputOperation(BuildTestUtil.buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
+        callActivity.addDataInputOperation(
+                BuildTestUtil.buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
+        callActivity.addDataOutputOperation(
+                BuildTestUtil.buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
         callingProcessDefinitionBuilder.addEndEvent("end");
-        callingProcessDefinitionBuilder.addTransition("start", "callActivity").addTransition("callActivity", "Step1").addTransition("Step1", "end");
-        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(),
+        callingProcessDefinitionBuilder.addTransition("start", "callActivity").addTransition("callActivity", "Step1")
+                .addTransition("Step1", "end");
+        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(
+                addClasspathRessource(callingProcessDefinitionBuilder).done(),
                 ACTOR_NAME, cebolinha);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
@@ -170,8 +200,9 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
 
     private BusinessArchiveBuilder addClasspathRessource(final ProcessDefinitionBuilder targetProcessDefinitionBuilder)
             throws InvalidProcessDefinitionException, IOException {
-        final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                targetProcessDefinitionBuilder.done());
+        final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(
+                        targetProcessDefinitionBuilder.done());
         archiveBuilder.addClasspathResource(new BarResource("Employee.jar", IOUtil.generateJar(Employee.class)));
         return archiveBuilder;
     }

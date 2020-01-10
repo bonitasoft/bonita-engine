@@ -20,8 +20,10 @@ import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 
 public interface ParentContainerResolver {
 
-    List<DataContainer> getContainerHierarchy(final DataContainer currentContainer) throws SObjectNotFoundException, SObjectReadException;
+    List<DataContainer> getContainerHierarchy(final DataContainer currentContainer)
+            throws SObjectNotFoundException, SObjectReadException;
 
-    List<DataContainer> getArchivedContainerHierarchy(final DataContainer currentContainer) throws SObjectNotFoundException, SObjectReadException;
+    List<DataContainer> getArchivedContainerHierarchy(final DataContainer currentContainer)
+            throws SObjectNotFoundException, SObjectReadException;
 
 }

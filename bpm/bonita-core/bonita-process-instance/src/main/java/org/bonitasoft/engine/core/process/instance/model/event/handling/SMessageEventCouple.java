@@ -19,7 +19,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 @Data
 @NoArgsConstructor
@@ -29,7 +28,8 @@ public class SMessageEventCouple implements PersistentObject {
     private SBPMEventType waitingMessageEventType;
     private long messageInstanceId;
 
-    public SMessageEventCouple(final long waitingMessageId, final SBPMEventType waitingMessageEventType, final long messageInstanceId) {
+    public SMessageEventCouple(final long waitingMessageId, final SBPMEventType waitingMessageEventType,
+            final long messageInstanceId) {
         this.waitingMessageId = waitingMessageId;
         this.waitingMessageEventType = waitingMessageEventType;
         this.messageInstanceId = messageInstanceId;

@@ -38,27 +38,35 @@ public abstract class OnEnterAndFinishConnectorState implements FlowNodeState {
         this.stateBehaviors = stateBehaviors;
     }
 
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
         // Retrieve the phase to execute depending on which connectors to execute and when to execute them:
         try {
             //get all element to check where we are in the state execution
-            List<SConnectorDefinition> onEnterConnectors = stateBehaviors.getConnectorDefinitions(processDefinition, flowNodeInstance, ConnectorEvent.ON_ENTER);
-            final SConnectorInstance onEnterConnectorToExecute = stateBehaviors.getNextConnectorInstance(onEnterConnectors, flowNodeInstance,
+            List<SConnectorDefinition> onEnterConnectors = stateBehaviors.getConnectorDefinitions(processDefinition,
+                    flowNodeInstance, ConnectorEvent.ON_ENTER);
+            final SConnectorInstance onEnterConnectorToExecute = stateBehaviors.getNextConnectorInstance(
+                    onEnterConnectors, flowNodeInstance,
                     ConnectorEvent.ON_ENTER);
-            boolean noConnectorStartedOnEnter = stateBehaviors.noConnectorHasStartedInCurrentList(onEnterConnectors, onEnterConnectorToExecute);
+            boolean noConnectorStartedOnEnter = stateBehaviors.noConnectorHasStartedInCurrentList(onEnterConnectors,
+                    onEnterConnectorToExecute);
 
-            List<SConnectorDefinition> onFinishConnectors = stateBehaviors.getConnectorDefinitions(processDefinition, flowNodeInstance,
+            List<SConnectorDefinition> onFinishConnectors = stateBehaviors.getConnectorDefinitions(processDefinition,
+                    flowNodeInstance,
                     ConnectorEvent.ON_FINISH);
-            final SConnectorInstance onFinishConnectorToExecute = stateBehaviors.getNextConnectorInstance(onFinishConnectors, flowNodeInstance,
+            final SConnectorInstance onFinishConnectorToExecute = stateBehaviors.getNextConnectorInstance(
+                    onFinishConnectors, flowNodeInstance,
                     ConnectorEvent.ON_FINISH);
-            boolean noConnectorStartedOnFinish = stateBehaviors.noConnectorHasStartedInCurrentList(onFinishConnectors, onFinishConnectorToExecute);
+            boolean noConnectorStartedOnFinish = stateBehaviors.noConnectorHasStartedInCurrentList(onFinishConnectors,
+                    onFinishConnectorToExecute);
 
             //if no connector has started neither on enter or on finish we can do the beforeOnEnter phase
             if (noConnectorStartedOnEnter && noConnectorStartedOnFinish) {
                 beforeOnEnter(processDefinition, flowNodeInstance);
             }
             if (onEnterConnectorToExecute != null) {
-                stateBehaviors.executeConnector(processDefinition, flowNodeInstance, onEnterConnectors, onEnterConnectorToExecute);
+                stateBehaviors.executeConnector(processDefinition, flowNodeInstance, onEnterConnectors,
+                        onEnterConnectorToExecute);
                 return StateCode.EXECUTING;
             }
 
@@ -66,7 +74,8 @@ public abstract class OnEnterAndFinishConnectorState implements FlowNodeState {
                 onEnterToOnFinish(processDefinition, flowNodeInstance);
             }
             if (onFinishConnectorToExecute != null) {
-                stateBehaviors.executeConnector(processDefinition, flowNodeInstance, onFinishConnectors, onFinishConnectorToExecute);
+                stateBehaviors.executeConnector(processDefinition, flowNodeInstance, onFinishConnectors,
+                        onFinishConnectorToExecute);
                 return StateCode.EXECUTING;
             }
             afterOnFinish(processDefinition, flowNodeInstance);
@@ -76,12 +85,15 @@ public abstract class OnEnterAndFinishConnectorState implements FlowNodeState {
         }
     }
 
-    protected abstract void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    protected abstract void beforeOnEnter(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException;
 
-    protected abstract void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    protected abstract void onEnterToOnFinish(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException;
 
-    protected abstract void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    protected abstract void afterOnFinish(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException;
 }

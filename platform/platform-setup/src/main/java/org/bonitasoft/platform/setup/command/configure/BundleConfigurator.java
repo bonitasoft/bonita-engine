@@ -146,7 +146,8 @@ abstract class BundleConfigurator {
         } catch (IOException e) {
             throw new PlatformException(
                     "Fail to copy driver file lib/" + srcDriverFile.getFileName() + " to "
-                            + targetDriverFile.toAbsolutePath() + ": " + e.getMessage(), e);
+                            + targetDriverFile.toAbsolutePath() + ": " + e.getMessage(),
+                    e);
         }
     }
 
@@ -190,7 +191,8 @@ abstract class BundleConfigurator {
                 Files.move(backupFile, bonitaXmlFile);
             }
         } catch (IOException e) {
-            throw new PlatformException("Fail to restore original file for " + bonitaXmlFile + ": " + e.getMessage(), e);
+            throw new PlatformException("Fail to restore original file for " + bonitaXmlFile + ": " + e.getMessage(),
+                    e);
         }
     }
 

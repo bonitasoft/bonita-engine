@@ -80,11 +80,13 @@ public class ExpressionFinderTest {
         userTask.setDefaultTransition(userTaskDefaultTransition);
         userTask.addIncomingTransition(new TransitionDefinitionImpl("incommingTransition"));
         userTask.addOutgoingTransition(new TransitionDefinitionImpl("outgoingTransition"));
-        userTask.addConnector(new ConnectorDefinitionImpl("connectorOnTask", "connDefId_", "conneVersion_", ConnectorEvent.ON_FINISH));
+        userTask.addConnector(new ConnectorDefinitionImpl("connectorOnTask", "connDefId_", "conneVersion_",
+                ConnectorEvent.ON_FINISH));
         userTask.addDataDefinition(new DataDefinitionImpl("myTaskData", new ExpressionImpl()));
         userTask.addBusinessDataDefinition(new BusinessDataDefinitionImpl("myBizData", new ExpressionImpl()));
         userTask.addBoundaryEventDefinition(new BoundaryEventDefinitionImpl("myBoundaryEvent"));
-        final UserFilterDefinitionImpl userFilterDefinition = new UserFilterDefinitionImpl("myUserFiler", "someId", "someVersion");
+        final UserFilterDefinitionImpl userFilterDefinition = new UserFilterDefinitionImpl("myUserFiler", "someId",
+                "someVersion");
         userFilterDefinition.addInput("input_name", new ExpressionImpl());
         userTask.setUserFilter(userFilterDefinition);
         userTask.setLoopCharacteristics(new MultiInstanceLoopCharacteristicsImpl(true, new ExpressionImpl()));
@@ -93,7 +95,8 @@ public class ExpressionFinderTest {
         processContainer.addBusinessDataDefinition(bizData);
         final DataDefinitionImpl data = new DataDefinitionImpl("data", new ExpressionImpl());
         processContainer.addDataDefinition(data);
-        final ConnectorDefinitionImpl connectorDefinition = new ConnectorDefinitionImpl("connector", "connDefId", "conneVersion", ConnectorEvent.ON_ENTER);
+        final ConnectorDefinitionImpl connectorDefinition = new ConnectorDefinitionImpl("connector", "connDefId",
+                "conneVersion", ConnectorEvent.ON_ENTER);
         connectorDefinition.addInput("input", new ExpressionImpl());
         final OperationImpl operation = new OperationImpl();
         operation.setRightOperand(new ExpressionImpl());
@@ -105,7 +108,8 @@ public class ExpressionFinderTest {
         processContainer.addDocumentDefinition(new DocumentDefinitionImpl("myDoc"));
         processContainer.addDocumentListDefinition(new DocumentListDefinitionImpl("myDocList"));
         processContainer.addActivity(new SendTaskDefinitionImpl("sendTask", "messageName", new ExpressionImpl()));
-        final CatchMessageEventTriggerDefinitionImpl receiveMessage = new CatchMessageEventTriggerDefinitionImpl("receiveMessage");
+        final CatchMessageEventTriggerDefinitionImpl receiveMessage = new CatchMessageEventTriggerDefinitionImpl(
+                "receiveMessage");
         receiveMessage.addCorrelation(new ExpressionImpl(), new ExpressionImpl());
         final OperationImpl msgOperation = new OperationImpl();
         msgOperation.setRightOperand(new ExpressionImpl());
@@ -123,7 +127,8 @@ public class ExpressionFinderTest {
         message.addDataDefinition(new DataDefinitionImpl("dataMsgName", new ExpressionImpl()));
         processContainer.addActivity(new SendTaskDefinitionImpl(451L, "sendTask", message));
         final AutomaticTaskDefinitionImpl autoTask = new AutomaticTaskDefinitionImpl("autoTask");
-        final IntermediateThrowEventDefinitionImpl intermediateThrow = new IntermediateThrowEventDefinitionImpl("intermediateThrow");
+        final IntermediateThrowEventDefinitionImpl intermediateThrow = new IntermediateThrowEventDefinitionImpl(
+                "intermediateThrow");
         intermediateThrow.addMessageEventTriggerDefinition(new ThrowMessageEventTriggerDefinitionImpl("someMessage"));
         processContainer.addIntermediateThrowEvent(intermediateThrow);
         processContainer.addActivity(autoTask);
@@ -132,11 +137,13 @@ public class ExpressionFinderTest {
         startEvent.setDisplayName(new ExpressionImpl());
         processContainer.addStartEvent(startEvent);
 
-        final IntermediateCatchEventDefinitionImpl intermediate_catch = new IntermediateCatchEventDefinitionImpl("intermediate_catch");
+        final IntermediateCatchEventDefinitionImpl intermediate_catch = new IntermediateCatchEventDefinitionImpl(
+                "intermediate_catch");
         intermediate_catch.addMessageEventTrigger(new CatchMessageEventTriggerDefinitionImpl("blabla"));
         processContainer.addIntermediateCatchEvent(intermediate_catch);
 
-        final IntermediateThrowEventDefinitionImpl intermediate_throw = new IntermediateThrowEventDefinitionImpl("intermediate_throw");
+        final IntermediateThrowEventDefinitionImpl intermediate_throw = new IntermediateThrowEventDefinitionImpl(
+                "intermediate_throw");
         processContainer.addIntermediateThrowEvent(intermediate_throw);
 
         expressionFinder.find(def, 999L);

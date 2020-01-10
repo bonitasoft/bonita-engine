@@ -37,8 +37,10 @@ public class SearchFlowNodeInstanceSupervisedBy extends AbstractSearchEntity<Flo
 
     private final Long supervisorId;
 
-    public SearchFlowNodeInstanceSupervisedBy(final Long supervisorId, final FlowNodeInstanceService flowNodeInstanceService,
-            final FlowNodeStateManager flowNodeStateManager, final SearchEntityDescriptor searchDescriptor, final SearchOptions searchOptions) {
+    public SearchFlowNodeInstanceSupervisedBy(final Long supervisorId,
+            final FlowNodeInstanceService flowNodeInstanceService,
+            final FlowNodeStateManager flowNodeStateManager, final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions);
         this.supervisorId = supervisorId;
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -47,12 +49,14 @@ public class SearchFlowNodeInstanceSupervisedBy extends AbstractSearchEntity<Flo
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-        return flowNodeInstanceService.getNumberOfFlowNodeInstancesSupervisedBy(supervisorId, SFlowNodeInstance.class, searchOptions);
+        return flowNodeInstanceService.getNumberOfFlowNodeInstancesSupervisedBy(supervisorId, SFlowNodeInstance.class,
+                searchOptions);
     }
 
     @Override
     public List<SFlowNodeInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
-        return flowNodeInstanceService.searchFlowNodeInstancesSupervisedBy(supervisorId, SFlowNodeInstance.class, searchOptions);
+        return flowNodeInstanceService.searchFlowNodeInstancesSupervisedBy(supervisorId, SFlowNodeInstance.class,
+                searchOptions);
     }
 
     @Override

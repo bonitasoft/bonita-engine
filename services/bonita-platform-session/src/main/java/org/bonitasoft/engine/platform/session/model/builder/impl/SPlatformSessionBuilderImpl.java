@@ -25,7 +25,7 @@ import org.bonitasoft.engine.platform.session.model.impl.SPlatformSessionImpl;
 public class SPlatformSessionBuilderImpl implements SPlatformSessionBuilder {
 
     private final SPlatformSessionImpl entity;
-    
+
     public SPlatformSessionBuilderImpl(final SPlatformSessionImpl entity) {
         super();
         this.entity = entity;

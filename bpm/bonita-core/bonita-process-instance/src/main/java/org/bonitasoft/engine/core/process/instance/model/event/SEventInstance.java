@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event;
 
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-
-import javax.persistence.Entity;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -28,8 +28,10 @@ import javax.persistence.Entity;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public abstract class SEventInstance extends SFlowNodeInstance {
-    public SEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                              final long logicalGroup1, final long logicalGroup2) {
+
+    public SEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
     }
 }

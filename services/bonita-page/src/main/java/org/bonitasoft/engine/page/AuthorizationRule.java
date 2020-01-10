@@ -26,7 +26,7 @@ public interface AuthorizationRule {
 
     /**
      * Execute this rule and, according to the context, says whether the rule is valid.
-     * 
+     *
      * @param key the page mapping key
      * @param context the information necessary to execute this rule.
      * @return true if allowed, false otherwise.If determination cannot be fulfilled, an Exception should be thrown.

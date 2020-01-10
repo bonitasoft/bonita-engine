@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -80,8 +81,9 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     private TenantResourcesService tenantResourcesService;
     private long tenantId;
 
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, ClassLoaderService classLoaderService, final SchemaManager schemaManager,
-                                           TenantResourcesService tenantResourcesService, long tenantId) {
+    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService,
+            ClassLoaderService classLoaderService, final SchemaManager schemaManager,
+            TenantResourcesService tenantResourcesService, long tenantId) {
         this.dependencyService = dependencyService;
         this.classLoaderService = classLoaderService;
         this.schemaManager = schemaManager;
@@ -163,7 +165,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
-            final AbstractSDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar,
+            final AbstractSDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME,
+                    serverBdmJar,
                     BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
@@ -290,7 +293,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             try {
                 final byte[] content = IOUtil.getAllContentFrom(resource);
                 final URL xsd = BusinessObjectModel.class.getResource("/bom.xsd");
-                final BusinessObjectModel model = IOUtils.unmarshallXMLtoObject(content, BusinessObjectModel.class, xsd);
+                final BusinessObjectModel model = IOUtils.unmarshallXMLtoObject(content, BusinessObjectModel.class,
+                        xsd);
                 final List<Exception> exceptions = schemaManager.drop(model.getBusinessObjectsClassNames());
                 if (!exceptions.isEmpty()) {
                     throw new SBusinessDataRepositoryDeploymentException("Updating schema fails due to: " + exceptions);

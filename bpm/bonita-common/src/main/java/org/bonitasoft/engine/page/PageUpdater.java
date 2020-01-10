@@ -65,7 +65,7 @@ public class PageUpdater implements Serializable {
     }
 
     public PageUpdater setHidden(Boolean hidden) {
-        fields.put(PageUpdateField.HIDDEN,hidden);
+        fields.put(PageUpdateField.HIDDEN, hidden);
         return this;
     }
 

@@ -26,7 +26,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 public class SOperationBuilderImpl implements SOperationBuilder {
 
     private final SOperationImpl operation;
-    
+
     public SOperationBuilderImpl(final SOperationImpl operation) {
         super();
         this.operation = operation;

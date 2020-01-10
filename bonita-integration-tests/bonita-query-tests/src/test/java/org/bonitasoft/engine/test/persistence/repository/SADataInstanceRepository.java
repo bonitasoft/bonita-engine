@@ -16,8 +16,8 @@ package org.bonitasoft.engine.test.persistence.repository;
 import java.util.List;
 
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,7 +27,8 @@ public class SADataInstanceRepository extends TestRepository {
         super(sessionFactory);
     }
 
-    public List<SADataInstance> getSADataInstancesByDataInstanceIdAndArchiveDate(final List<Long> dataInstanceIds, final long time, final long tenantId) {
+    public List<SADataInstance> getSADataInstancesByDataInstanceIdAndArchiveDate(final List<Long> dataInstanceIds,
+            final long time, final long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         final Query namedQuery = getNamedQuery("getSADataInstancesByDataInstanceIdAndArchiveDate");
         namedQuery.setParameterList("dataInstanceIds", dataInstanceIds);

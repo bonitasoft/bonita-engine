@@ -23,7 +23,8 @@ public class DependencyServiceRegistrator {
     private ClassLoaderService classLoaderService;
     private long tenantId;
 
-    public DependencyServiceRegistrator(TenantDependencyService tenantDependencyService, ClassLoaderService classLoaderService, long tenantId) {
+    public DependencyServiceRegistrator(TenantDependencyService tenantDependencyService,
+            ClassLoaderService classLoaderService, long tenantId) {
         this.tenantDependencyService = tenantDependencyService;
         this.classLoaderService = classLoaderService;
         this.tenantId = tenantId;

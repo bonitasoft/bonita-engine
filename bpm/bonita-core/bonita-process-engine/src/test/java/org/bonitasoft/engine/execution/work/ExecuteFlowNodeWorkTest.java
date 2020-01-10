@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
@@ -67,13 +66,16 @@ public class ExecuteFlowNodeWorkTest {
     }
 
     @Test
-    public void should_throw_exception_if_executing_human_task_not_ready_when_isReadyHumanTask_flag_is_true() throws Exception {
+    public void should_throw_exception_if_executing_human_task_not_ready_when_isReadyHumanTask_flag_is_true()
+            throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, false, false, false);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, false, false,
+                false);
         sHumanTaskInstance.setStateId(2);
         //when
         expectedException.expect(SWorkPreconditionException.class);
-        expectedException.expectMessage("Unable to execute flow node " + FLOW_NODE_INSTANCE_ID + " because it is not in the expected state " +
+        expectedException.expectMessage("Unable to execute flow node " + FLOW_NODE_INSTANCE_ID
+                + " because it is not in the expected state " +
                 "( expected state: 4, transitioning: false, aborting: false, canceling: false, " +
                 "but got  state: 2, transitioning: false, aborting: false, canceling: false). Someone probably already called execute on it.");
         executeFlowNodeWork.work(context);

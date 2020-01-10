@@ -40,7 +40,8 @@ public class LicensesResourceVisitorTest {
         Files.write(licenseFolder.resolve("license1.lic"), "license 1 content".getBytes());
         Files.write(licenseFolder.resolve("license2.lic"), "license 2 content".getBytes());
         Files.write(licenseFolder.resolve("not_a_license"), "this is not a license".getBytes());
-        Files.write(licenseFolder.resolve("subFolder").resolve("ignoreMe.lic"), "this is an ignored license".getBytes());
+        Files.write(licenseFolder.resolve("subFolder").resolve("ignoreMe.lic"),
+                "this is an ignored license".getBytes());
         final List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
         BonitaConfiguration expectedLicense1 = new BonitaConfiguration("license1.lic", "license 1 content".getBytes());
         BonitaConfiguration expectedLicense2 = new BonitaConfiguration("license2.lic", "license 2 content".getBytes());

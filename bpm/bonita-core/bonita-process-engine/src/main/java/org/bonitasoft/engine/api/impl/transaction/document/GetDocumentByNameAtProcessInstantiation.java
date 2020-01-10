@@ -48,8 +48,10 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
 
     private final ProcessDefinitionService processDefinitionService;
 
-    public GetDocumentByNameAtProcessInstantiation(final DocumentService documentService, final ProcessInstanceService processInstanceService,
-            final ProcessDefinitionService processDefinitionService, final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId,
+    public GetDocumentByNameAtProcessInstantiation(final DocumentService documentService,
+            final ProcessInstanceService processInstanceService,
+            final ProcessDefinitionService processDefinitionService,
+            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId,
             final String documentName) {
         this.documentService = documentService;
         this.processDefinitionService = processDefinitionService;
@@ -61,9 +63,12 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
 
     @Override
     public void execute() throws SBonitaException {
-        final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                processDefinitionService, searchEntitiesDescriptor, processInstanceId, 0, 1, BuilderFactory.get(SAProcessInstanceBuilderFactory.class)
-                        .getIdKey(), OrderByType.ASC);
+        final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(
+                processInstanceService,
+                processDefinitionService, searchEntitiesDescriptor, processInstanceId, 0, 1,
+                BuilderFactory.get(SAProcessInstanceBuilderFactory.class)
+                        .getIdKey(),
+                OrderByType.ASC);
         getArchivedProcessInstanceList.execute();
         final ArchivedProcessInstance saProcessInstance = getArchivedProcessInstanceList.getResult().get(0);
         final Date startDate = saProcessInstance.getStartDate();

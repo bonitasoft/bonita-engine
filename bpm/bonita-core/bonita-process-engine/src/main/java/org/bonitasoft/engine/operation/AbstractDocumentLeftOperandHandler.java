@@ -40,14 +40,16 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
 
-    public AbstractDocumentLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
-                                              final SessionService sessionService) {
+    public AbstractDocumentLeftOperandHandler(final ActivityInstanceService activityInstanceService,
+            final SessionAccessor sessionAccessor,
+            final SessionService sessionService) {
         this.activityInstanceService = activityInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
     }
 
-    protected long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException {
+    protected long getProcessInstanceId(final long containerId, final String containerType)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException {
         long processInstanceId;
         if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
             processInstanceId = containerId;
@@ -74,12 +76,14 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
     }
 
     @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext) {
         //do nothing
     }
 
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext)
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext)
             throws SBonitaReadException {
         //do nothing
     }

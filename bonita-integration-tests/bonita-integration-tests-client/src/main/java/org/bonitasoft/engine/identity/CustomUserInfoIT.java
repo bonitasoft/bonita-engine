@@ -48,7 +48,8 @@ public class CustomUserInfoIT extends TestWithUser {
     @Test
     public void createCustomUserInfoDefinition_should_return_the_new_created_object() throws Exception {
         // given
-        final CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(DEFAULT_NAME, "The user skills.");
+        final CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(DEFAULT_NAME,
+                "The user skills.");
 
         // when
         final CustomUserInfoDefinition info = getIdentityAPI().createCustomUserInfoDefinition(creator);
@@ -59,11 +60,15 @@ public class CustomUserInfoIT extends TestWithUser {
     }
 
     @Test
-    public void getCustomUserInfoDefinitions_return_objects_according_to_pagination_size_and_ordered_by_name_asc() throws Exception {
+    public void getCustomUserInfoDefinitions_return_objects_according_to_pagination_size_and_ordered_by_name_asc()
+            throws Exception {
         // given
-        final CustomUserInfoDefinition skills = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(DEFAULT_NAME));
-        final CustomUserInfoDefinition a = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("A"));
-        final CustomUserInfoDefinition b = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("B"));
+        final CustomUserInfoDefinition skills = getIdentityAPI()
+                .createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(DEFAULT_NAME));
+        final CustomUserInfoDefinition a = getIdentityAPI()
+                .createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("A"));
+        final CustomUserInfoDefinition b = getIdentityAPI()
+                .createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("B"));
         final int pagegSize = 2;
 
         // when
@@ -82,8 +87,10 @@ public class CustomUserInfoIT extends TestWithUser {
     @Test
     public void getCustomUserInfo_should_return_all_info_even_when_value_is_null() throws Exception {
         // given
-        final CustomUserInfoDefinition job = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
-        final CustomUserInfoDefinition skill = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("skill"));
+        final CustomUserInfoDefinition job = getIdentityAPI()
+                .createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
+        final CustomUserInfoDefinition skill = getIdentityAPI()
+                .createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("skill"));
         getIdentityAPI().setCustomUserInfoValue(skill.getId(), user.getId(), "java");
 
         // when
@@ -100,16 +107,19 @@ public class CustomUserInfoIT extends TestWithUser {
     @Test
     public void setCustomUserInfoValue_should_delete_CustomUserInfoValue_when_set_to_null() throws Exception {
         // given
-        final CustomUserInfoDefinition job = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
+        final CustomUserInfoDefinition job = getIdentityAPI()
+                .createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
         getIdentityAPI().setCustomUserInfoValue(job.getId(), user.getId(), "code slayer");
-        final CustomUserInfoDefinition skill = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("skill"));
+        final CustomUserInfoDefinition skill = getIdentityAPI()
+                .createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("skill"));
         getIdentityAPI().setCustomUserInfoValue(skill.getId(), user.getId(), "java");
 
         // when
         getIdentityAPI().setCustomUserInfoValue(skill.getId(), user.getId(), null);
 
         // then
-        final List<CustomUserInfoValue> values = getIdentityAPI().searchCustomUserInfoValues(new SearchOptionsBuilder(0, 10).done()).getResult();
+        final List<CustomUserInfoValue> values = getIdentityAPI()
+                .searchCustomUserInfoValues(new SearchOptionsBuilder(0, 10).done()).getResult();
         assertThat(values.get(0).getDefinitionId()).isEqualTo(job.getId());
         assertThat(values.get(0).getUserId()).isEqualTo(user.getId());
         assertThat(values.get(0).getValue()).isEqualTo("code slayer");
@@ -118,14 +128,16 @@ public class CustomUserInfoIT extends TestWithUser {
     @Test
     public void setCustomUserInfoValue_should_update_CustomUserInfoValue_when_one_already_exist() throws Exception {
         // given
-        final CustomUserInfoDefinition job = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
+        final CustomUserInfoDefinition job = getIdentityAPI()
+                .createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
         getIdentityAPI().setCustomUserInfoValue(job.getId(), user.getId(), "code slayer");
 
         // when
         getIdentityAPI().setCustomUserInfoValue(job.getId(), user.getId(), "or not");
 
         // then
-        final List<CustomUserInfoValue> values = getIdentityAPI().searchCustomUserInfoValues(new SearchOptionsBuilder(0, 10).done()).getResult();
+        final List<CustomUserInfoValue> values = getIdentityAPI()
+                .searchCustomUserInfoValues(new SearchOptionsBuilder(0, 10).done()).getResult();
         assertThat(values.get(0).getDefinitionId()).isEqualTo(job.getId());
         assertThat(values.get(0).getUserId()).isEqualTo(user.getId());
         assertThat(values.get(0).getValue()).isEqualTo("or not");
@@ -190,9 +202,12 @@ public class CustomUserInfoIT extends TestWithUser {
         getIdentityAPI().setCustomUserInfoValue(info.getId(), user2.getId(), "C++");
 
         //when
-        final List<Long> userIdsExactMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "C++", false, 0, 10);
-        final List<Long> userIdsExactMatchNoResults = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", false, 0, 10);
-        final List<Long> userIdsPartialMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", true, 0, 10);
+        final List<Long> userIdsExactMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "C++", false,
+                0, 10);
+        final List<Long> userIdsExactMatchNoResults = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av",
+                false, 0, 10);
+        final List<Long> userIdsPartialMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", true,
+                0, 10);
 
         //then
         assertThat(userIdsExactMatch).containsExactly(user2.getId());

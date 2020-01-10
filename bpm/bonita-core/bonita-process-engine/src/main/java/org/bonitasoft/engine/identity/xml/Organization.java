@@ -60,7 +60,8 @@ public class Organization {
         this.customUserInfoDefinition = new ArrayList<>();
     }
 
-    public Organization(final List<ExportedUser> users, final List<ExportedRole> roles, final List<ExportedGroup> groups,
+    public Organization(final List<ExportedUser> users, final List<ExportedRole> roles,
+            final List<ExportedGroup> groups,
             final List<ExportedUserMembership> memberships,
             List<ExportedCustomUserInfoDefinition> customUserInfoDefinition) {
         this.users = users;

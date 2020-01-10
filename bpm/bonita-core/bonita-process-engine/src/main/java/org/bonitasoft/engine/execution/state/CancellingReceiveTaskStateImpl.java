@@ -29,7 +29,8 @@ public class CancellingReceiveTaskStateImpl extends CancellingActivityWithBounda
 
     private final WaitingEventsInterrupter waitingEventsInterrupter;
 
-    public CancellingReceiveTaskStateImpl(final StateBehaviors stateBehaviors, WaitingEventsInterrupter waitingEventsInterrupter) {
+    public CancellingReceiveTaskStateImpl(final StateBehaviors stateBehaviors,
+            WaitingEventsInterrupter waitingEventsInterrupter) {
         super(stateBehaviors);
         this.waitingEventsInterrupter = waitingEventsInterrupter;
     }
@@ -40,7 +41,8 @@ public class CancellingReceiveTaskStateImpl extends CancellingActivityWithBounda
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
         try {
             final SReceiveTaskInstance receiveTaskInstance = (SReceiveTaskInstance) instance;
             waitingEventsInterrupter.interruptWaitingEvents(receiveTaskInstance);
@@ -51,7 +53,8 @@ public class CancellingReceiveTaskStateImpl extends CancellingActivityWithBounda
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 

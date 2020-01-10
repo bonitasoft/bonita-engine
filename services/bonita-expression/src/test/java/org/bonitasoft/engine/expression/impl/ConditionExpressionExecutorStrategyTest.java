@@ -66,9 +66,12 @@ public class ConditionExpressionExecutorStrategyTest {
     @Before
     public void initialiseDependencies() {
 
-        final SExpression constExpr1 = buildExpression("5", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        final SExpression constExpr2 = buildExpression("7", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        final SExpression constExpr3 = buildExpression("2", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
+        final SExpression constExpr1 = buildExpression("5", SExpression.TYPE_CONSTANT, Integer.class.getName(), null,
+                null);
+        final SExpression constExpr2 = buildExpression("7", SExpression.TYPE_CONSTANT, Integer.class.getName(), null,
+                null);
+        final SExpression constExpr3 = buildExpression("2", SExpression.TYPE_CONSTANT, Integer.class.getName(), null,
+                null);
 
         dependFirstLtSecond = new ArrayList<SExpression>(2);
         dependFirstLtSecond.add(constExpr1);
@@ -88,7 +91,8 @@ public class ConditionExpressionExecutorStrategyTest {
         resolvedDependencies.put(constExpr3.getDiscriminant(), 2);
     }
 
-    private SExpression buildExpression(final String content, final String expressionType, final String returnType, final String interpreter,
+    private SExpression buildExpression(final String content, final String expressionType, final String returnType,
+            final String interpreter,
             final List<SExpression> dependencies) {
         final SExpressionImpl eb = new SExpressionImpl();
         eb.setName(content);
@@ -100,7 +104,8 @@ public class ConditionExpressionExecutorStrategyTest {
         return eb;
     }
 
-    protected List<Object> evaluate(final List<SExpression> expression, final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
+    protected List<Object> evaluate(final List<SExpression> expression, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
             throws SExpressionEvaluationException {
         return strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, containerState);
     }
@@ -108,9 +113,12 @@ public class ConditionExpressionExecutorStrategyTest {
     @Test
     public void evaluate_lstOfExpressions_should_return_list_of_results() throws Exception {
         //given
-        final SExpression expr1 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        final SExpression expr2 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        final SExpression expr3 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
+        final SExpression expr1 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null,
+                dependFirstGtSecond);
+        final SExpression expr2 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null,
+                dependFirstLtSecond);
+        final SExpression expr3 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null,
+                dependEquals);
 
         Map<String, Object> context = Collections.emptyMap();
         ConditionExpressionExecutorStrategy mockedStrategy = spy(strategy);
@@ -119,14 +127,16 @@ public class ConditionExpressionExecutorStrategyTest {
         given(mockedStrategy.evaluate(expr3, context, resolvedDependencies, ContainerState.ACTIVE)).willReturn(null);
 
         //when
-        List<Object> resolvedExpressions = mockedStrategy.evaluate(Arrays.asList(expr1, expr2, expr3), context, resolvedDependencies, ContainerState.ACTIVE);
+        List<Object> resolvedExpressions = mockedStrategy.evaluate(Arrays.asList(expr1, expr2, expr3), context,
+                resolvedDependencies, ContainerState.ACTIVE);
 
         //then
         assertThat(resolvedExpressions).containsExactly(true, false, null);
     }
 
     @Test
-    public void evaluate_should_return_result_of_LogicalComplementExecutor_when_content_is_logical_complement_operator() throws Exception {
+    public void evaluate_should_return_result_of_LogicalComplementExecutor_when_content_is_logical_complement_operator()
+            throws Exception {
         //given
         Map<Integer, Object> resolvedExpressions = Collections.emptyMap();
         SExpression expression = mock(SExpression.class);
@@ -135,14 +145,16 @@ public class ConditionExpressionExecutorStrategyTest {
         given(logicalComplementExecutor.evaluate(resolvedExpressions, expression)).willReturn(true);
 
         //when
-        Object value = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, ContainerState.ACTIVE);
+        Object value = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions,
+                ContainerState.ACTIVE);
 
         //then
         assertThat(value).isEqualTo(true);
     }
 
     @Test
-    public void evaluate_should_return_result_of_BinaryComparatorExecutor_when_content_is_a_binary_operator() throws Exception {
+    public void evaluate_should_return_result_of_BinaryComparatorExecutor_when_content_is_a_binary_operator()
+            throws Exception {
         //given
         Map<Integer, Object> resolvedExpressions = Collections.emptyMap();
         SExpression expression = mock(SExpression.class);
@@ -151,7 +163,8 @@ public class ConditionExpressionExecutorStrategyTest {
         given(binaryComparatorExecutor.evaluate(resolvedExpressions, expression)).willReturn(true);
 
         //when
-        Object value = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, ContainerState.ACTIVE);
+        Object value = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions,
+                ContainerState.ACTIVE);
 
         //then
         assertThat(value).isEqualTo(true);

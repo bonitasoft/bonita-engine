@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Utility methods to get maps that match process as wanted
- * 
+ *
  * @author Baptiste Mesta
  */
 public class PerfEventUtil {
@@ -53,7 +53,8 @@ public class PerfEventUtil {
         return map;
     }
 
-    public static Map<String, Serializable> getFlowNodeReachStateEvent(final long processInstanceId, final String taskName, final int stateId) {
+    public static Map<String, Serializable> getFlowNodeReachStateEvent(final long processInstanceId,
+            final String taskName, final int stateId) {
         final HashMap<String, Serializable> map = new HashMap<String, Serializable>(4);
         map.put(TYPE, FLOW_NODE);
         map.put(ID, processInstanceId);

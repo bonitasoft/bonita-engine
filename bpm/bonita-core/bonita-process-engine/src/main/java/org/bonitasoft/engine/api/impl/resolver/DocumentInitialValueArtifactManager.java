@@ -16,8 +16,6 @@ package org.bonitasoft.engine.api.impl.resolver;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -28,6 +26,8 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 
 /**
  * @author Baptiste Mesta
@@ -41,7 +41,8 @@ public class DocumentInitialValueArtifactManager extends BARResourceArtifactMana
     }
 
     @Override
-    public boolean deploy(BusinessArchive businessArchive, SProcessDefinition processDefinition) throws BonitaException, SBonitaException {
+    public boolean deploy(BusinessArchive businessArchive, SProcessDefinition processDefinition)
+            throws BonitaException, SBonitaException {
         saveResources(businessArchive, processDefinition, FOLDER, BARResourceType.DOCUMENT);
         return true;
     }
@@ -52,12 +53,14 @@ public class DocumentInitialValueArtifactManager extends BARResourceArtifactMana
     }
 
     @Override
-    public void delete(SProcessDefinition processDefinition) throws SObjectModificationException, SBonitaReadException, SRecorderException {
-        processResourcesService.removeAll(processDefinition.getId(),BARResourceType.DOCUMENT);
+    public void delete(SProcessDefinition processDefinition)
+            throws SObjectModificationException, SBonitaReadException, SRecorderException {
+        processResourcesService.removeAll(processDefinition.getId(), BARResourceType.DOCUMENT);
     }
 
     @Override
-    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder) throws SBonitaException {
+    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder)
+            throws SBonitaException {
         exportResourcesToBusinessArchive(processDefinitionId, businessArchiveBuilder, BARResourceType.DOCUMENT);
     }
 

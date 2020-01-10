@@ -25,7 +25,8 @@ public class QueryOptionsTest {
     @Test
     public void getNextPageShouldPreserveOrderOptions() throws Exception {
         // given:
-        final QueryOptions queryOptions = new QueryOptions(0, 10, list(new OrderByOption(PersistentObject.class, "fieldName", OrderByType.ASC)),
+        final QueryOptions queryOptions = new QueryOptions(0, 10,
+                list(new OrderByOption(PersistentObject.class, "fieldName", OrderByType.ASC)),
                 list(new FilterOption(PersistentObject.class, "fieldName")), null);
 
         // when:
@@ -39,7 +40,8 @@ public class QueryOptionsTest {
     @Test
     public void getNextPageShouldPreserveFilters() throws Exception {
         // given:
-        final QueryOptions queryOptions = new QueryOptions(0, 10, list(new OrderByOption(PersistentObject.class, "fieldName", OrderByType.ASC)),
+        final QueryOptions queryOptions = new QueryOptions(0, 10,
+                list(new OrderByOption(PersistentObject.class, "fieldName", OrderByType.ASC)),
                 list(new FilterOption(PersistentObject.class, "fieldName")), null);
 
         // when:
@@ -53,7 +55,8 @@ public class QueryOptionsTest {
     @Test
     public void getNextPageShouldPreserveSearchFields() throws Exception {
         // given:
-        final QueryOptions queryOptions = new QueryOptions(0, 10, list(new OrderByOption(PersistentObject.class, "fieldName", OrderByType.ASC)),
+        final QueryOptions queryOptions = new QueryOptions(0, 10,
+                list(new OrderByOption(PersistentObject.class, "fieldName", OrderByType.ASC)),
                 list(new FilterOption(PersistentObject.class, "fieldName")), new SearchFields(null, null));
 
         // when:

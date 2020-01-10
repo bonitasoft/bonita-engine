@@ -85,8 +85,10 @@ public class ProfileServiceTest extends CommonBPMServicesTest {
                 .build());
 
         final List<OrderByOption> orderByOptions = getOrderByOptions();
-        final QueryOptions queryOptions = new QueryOptions(0, 10, orderByOptions, Collections.singletonList(new FilterOption(SProfileMember.class, "profileId",
-                profile.getId())), null);
+        final QueryOptions queryOptions = new QueryOptions(0, 10, orderByOptions,
+                Collections.singletonList(new FilterOption(SProfileMember.class, "profileId",
+                        profile.getId())),
+                null);
 
         List<SProfileMember> profileMembers = profileService.searchProfileMembers("ForUser", queryOptions);
         Assert.assertEquals(0, profileMembers.size());
@@ -99,8 +101,10 @@ public class ProfileServiceTest extends CommonBPMServicesTest {
                 .lastName("Doe");
         final SUser jane = identityService.createUser(userBuilder.build());
 
-        final SProfileMember johnProfileMember = profileService.addUserToProfile(profile.getId(), john.getId(), "John", "Doe", "john");
-        final SProfileMember janeProfileMember = profileService.addUserToProfile(profile.getId(), jane.getId(), "Jane", "Doe", "jane");
+        final SProfileMember johnProfileMember = profileService.addUserToProfile(profile.getId(), john.getId(), "John",
+                "Doe", "john");
+        final SProfileMember janeProfileMember = profileService.addUserToProfile(profile.getId(), jane.getId(), "Jane",
+                "Doe", "jane");
         profileMembers = profileService.searchProfileMembers("ForUser", queryOptions);
         Assert.assertEquals(2, profileMembers.size());
 
@@ -136,17 +140,22 @@ public class ProfileServiceTest extends CommonBPMServicesTest {
         final SUser john = createUser("john", "bpm");
         final SUser jane = createUser("jane", "bpm");
 
-        List<SProfile> profilesOfUser = profileService.searchProfilesOfUser(john.getId(), 0, 10, "name", OrderByType.ASC);
+        List<SProfile> profilesOfUser = profileService.searchProfilesOfUser(john.getId(), 0, 10, "name",
+                OrderByType.ASC);
         Assert.assertEquals(0, profilesOfUser.size());
 
-        final SProfileMember johnProfileMember = profileService.addUserToProfile(profile.getId(), john.getId(), "John", "Doe", "john");
-        final SProfileMember janeProfileMember = profileService.addUserToProfile(profile.getId(), jane.getId(), "Jane", "Doe", "jane");
+        final SProfileMember johnProfileMember = profileService.addUserToProfile(profile.getId(), john.getId(), "John",
+                "Doe", "john");
+        final SProfileMember janeProfileMember = profileService.addUserToProfile(profile.getId(), jane.getId(), "Jane",
+                "Doe", "jane");
 
         profilesOfUser = profileService.searchProfilesOfUser(john.getId(), 0, 10, "name", OrderByType.ASC);
         Assert.assertEquals(1, profilesOfUser.size());
 
-        final QueryOptions countOptions = new QueryOptions(0, 10, null, Collections.singletonList(new FilterOption(SProfileMember.class, "profileId", profile
-                .getId())), null);
+        final QueryOptions countOptions = new QueryOptions(0, 10, null,
+                Collections.singletonList(new FilterOption(SProfileMember.class, "profileId", profile
+                        .getId())),
+                null);
 
         Assert.assertEquals(2, profileService.getNumberOfProfileMembers("ForUser", countOptions));
 

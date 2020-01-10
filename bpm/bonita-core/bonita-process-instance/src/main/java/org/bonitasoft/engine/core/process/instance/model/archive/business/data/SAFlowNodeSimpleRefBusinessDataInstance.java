@@ -32,6 +32,7 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusin
 @Entity
 @DiscriminatorValue("fn_simple_ref")
 public class SAFlowNodeSimpleRefBusinessDataInstance extends SASimpleRefBusinessDataInstance {
+
     @Column(name = "orig_fn_inst_id")
     private long flowNodeInstanceId;
 

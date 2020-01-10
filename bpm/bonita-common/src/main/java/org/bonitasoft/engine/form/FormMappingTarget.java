@@ -39,8 +39,10 @@ public enum FormMappingTarget {
     UNDEFINED,
 
     /**
-     * The form mapping is not defined and IS NOT necessary. This value is automatically set when nothing is specified at design-time.
-     * It does not prevent the process to be resolved. It can be used when user tasks are meant to be executed out of a web form context.
+     * The form mapping is not defined and IS NOT necessary. This value is automatically set when nothing is specified
+     * at design-time.
+     * It does not prevent the process to be resolved. It can be used when user tasks are meant to be executed out of a
+     * web form context.
      */
     NONE
 }

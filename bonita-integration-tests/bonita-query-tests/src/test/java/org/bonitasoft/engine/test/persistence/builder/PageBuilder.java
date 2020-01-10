@@ -51,7 +51,8 @@ public class PageBuilder extends PersistentObjectBuilder<AbstractSPage, PageBuil
 
     @Override
     public SPageWithContent _build() {
-        final SPage sPage = new SPage(name, description, displayName, installationDate, installedBy, provided, hidden, lastModificationDate, lastUpdatedBy,
+        final SPage sPage = new SPage(name, description, displayName, installationDate, installedBy, provided, hidden,
+                lastModificationDate, lastUpdatedBy,
                 contentName);
         sPage.setProcessDefinitionId(processDefinitionId);
 

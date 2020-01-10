@@ -28,7 +28,8 @@ public class GetLatestProcessDefinitionId implements TransactionContentWithResul
 
     private long processDefId;
 
-    public GetLatestProcessDefinitionId(final ProcessDefinitionService processDefinitionService, final String processName) {
+    public GetLatestProcessDefinitionId(final ProcessDefinitionService processDefinitionService,
+            final String processName) {
         this.processDefinitionService = processDefinitionService;
         this.processName = processName;
     }

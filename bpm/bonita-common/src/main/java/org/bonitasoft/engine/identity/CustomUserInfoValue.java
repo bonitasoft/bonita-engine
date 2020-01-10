@@ -27,6 +27,7 @@ public interface CustomUserInfoValue extends BonitaObject {
 
     /**
      * Retrieves the {@link User} identifier
+     *
      * @return the {@code User} identifier
      * @since 6.3
      * @see org.bonitasoft.engine.identity.User
@@ -35,6 +36,7 @@ public interface CustomUserInfoValue extends BonitaObject {
 
     /**
      * Retrieves the related {@link CustomUserInfoDefinition} identifier
+     *
      * @return the related {@link CustomUserInfoDefinition} identifier
      * @since 6.3
      * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
@@ -43,6 +45,7 @@ public interface CustomUserInfoValue extends BonitaObject {
 
     /**
      * Retrieves the {@code CustomUserInfoValue} value
+     *
      * @return the {@code CustomUserInfoValue} value
      * @since 6.3
      */

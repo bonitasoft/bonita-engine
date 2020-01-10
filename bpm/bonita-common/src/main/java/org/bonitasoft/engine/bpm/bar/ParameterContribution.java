@@ -40,7 +40,8 @@ public class ParameterContribution implements BusinessArchiveContribution {
         final Properties properties = PropertiesManager.getProperties(file);
         final Map<String, String> parameters = new HashMap<>(properties.size());
         for (final Entry<Object, Object> property : properties.entrySet()) {
-            parameters.put((String) property.getKey(), (String) (NULL.equals(property.getValue()) ? null : property.getValue()));
+            parameters.put((String) property.getKey(),
+                    (String) (NULL.equals(property.getValue()) ? null : property.getValue()));
         }
         businessArchive.setParameters(parameters);
         return true;

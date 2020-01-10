@@ -19,6 +19,9 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 
+import com.arjuna.ats.jta.TransactionManager;
+import com.arjuna.ats.jta.UserTransaction;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.managed.BasicManagedDataSource;
 import org.bonitasoft.engine.api.ApiAccessType;
@@ -35,11 +38,6 @@ import org.bonitasoft.engine.util.APITypeManager;
 import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.springframework.jndi.JndiTemplate;
-
-import com.arjuna.ats.jta.TransactionManager;
-import com.arjuna.ats.jta.UserTransaction;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class BonitaEngine {

@@ -30,28 +30,28 @@ public interface SFlowNodeDefinition extends SNamedElement {
 
     /**
      * Gets the outgoing transitions of the activity.
-     * 
+     *
      * @return the outgoing transitions of the activity
      */
     List<STransitionDefinition> getOutgoingTransitions();
 
     /**
      * Gets the incoming transitions of the activity.
-     * 
+     *
      * @return the incoming transitions of the activity
      */
     List<STransitionDefinition> getIncomingTransitions();
 
     /**
      * Checks whether the activity has outgoing transitions.
-     * 
+     *
      * @return true if the activity contains outgoing transitions; false otherwise;
      */
     boolean hasOutgoingTransitions();
 
     /**
      * Checks whether the activity contains incoming transitions.
-     * 
+     *
      * @return true if the activity contains incoming transitions; false otherwise
      */
     boolean hasIncomingTransitions();
@@ -61,14 +61,12 @@ public interface SFlowNodeDefinition extends SNamedElement {
     List<SConnectorDefinition> getConnectors();
 
     /**
-     * 
      * @return
      * @since 6.3
      */
     boolean hasConnectors();
 
     /**
-     * 
      * @param name
      * @return
      * @since 6.1

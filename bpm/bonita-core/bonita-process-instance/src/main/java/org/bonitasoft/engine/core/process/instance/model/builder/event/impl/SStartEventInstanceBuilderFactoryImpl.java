@@ -22,12 +22,16 @@ import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstan
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class SStartEventInstanceBuilderFactoryImpl extends SEventInstanceBuilderFactoryImpl implements SStartEventInstanceBuilderFactory {
+public class SStartEventInstanceBuilderFactoryImpl extends SEventInstanceBuilderFactoryImpl
+        implements SStartEventInstanceBuilderFactory {
 
     @Override
-    public SStartEventInstanceBuilder createNewStartEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        final SStartEventInstance entity = new SStartEventInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId);
+    public SStartEventInstanceBuilder createNewStartEventInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
+            final long parentProcessInstanceId) {
+        final SStartEventInstance entity = new SStartEventInstance(name, flowNodeDefinitionId, rootContainerId,
+                parentContainerId, processDefinitionId, rootProcessInstanceId);
         entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SStartEventInstanceBuilderImpl(entity);
     }

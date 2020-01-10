@@ -32,7 +32,8 @@ public class SearchArchivedActivityInstances extends AbstractArchiveActivityInst
 
     private final ActivityInstanceService activityInstanceService;
 
-    public SearchArchivedActivityInstances(final ActivityInstanceService activityInstanceService, final FlowNodeStateManager flowNodeStateManager,
+    public SearchArchivedActivityInstances(final ActivityInstanceService activityInstanceService,
+            final FlowNodeStateManager flowNodeStateManager,
             final SearchArchivedActivityInstanceDescriptor searchDescriptor, final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions, flowNodeStateManager);
         this.activityInstanceService = activityInstanceService;

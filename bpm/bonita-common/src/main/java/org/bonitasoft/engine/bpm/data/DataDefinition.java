@@ -18,8 +18,10 @@ import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
- * It forms part of the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition}. It is used to define a date in the context of a
- * {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} or a {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}.
+ * It forms part of the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition}. It is used to define a date in the
+ * context of a
+ * {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} or a
+ * {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}.
  *
  * @author Matthieu Chaffotte
  * @author Feng Hui

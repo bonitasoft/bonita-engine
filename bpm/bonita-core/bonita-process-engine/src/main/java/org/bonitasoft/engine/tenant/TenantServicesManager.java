@@ -40,6 +40,7 @@ public class TenantServicesManager {
     public enum TenantServiceState {
         STOPPED, STARTING, STARTED, STOPPING
     }
+
     private SessionAccessor sessionAccessor;
 
     private SessionService sessionService;
@@ -51,9 +52,11 @@ public class TenantServicesManager {
     private Long tenantId;
     private TenantElementsRestarter tenantElementsRestarter;
     private TenantServiceState tenantServiceState = TenantServiceState.STOPPED;
+
     public TenantServicesManager(SessionAccessor sessionAccessor, SessionService sessionService,
             TransactionService transactionService, ClassLoaderService classLoaderService,
-            TenantConfiguration tenantConfiguration, @Value("${tenantId}") Long tenantId, TenantElementsRestarter tenantElementsRestarter) {
+            TenantConfiguration tenantConfiguration, @Value("${tenantId}") Long tenantId,
+            TenantElementsRestarter tenantElementsRestarter) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.transactionService = transactionService;

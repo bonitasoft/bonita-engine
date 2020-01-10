@@ -33,7 +33,8 @@ public class EntitiesActionsExecutor {
      * @param action the action to be executed
      * @return the initial object after executing the action.
      */
-    public Object executeAction(final Object value, final BusinessDataContext businessDataContext, final EntityAction action) throws SEntityActionExecutionException {
+    public Object executeAction(final Object value, final BusinessDataContext businessDataContext,
+            final EntityAction action) throws SEntityActionExecutionException {
         if (value == null) {
             action.handleNull(businessDataContext);
             return null;
@@ -44,7 +45,8 @@ public class EntitiesActionsExecutor {
         if (value instanceof List<?>) {
             return action.execute((List<Entity>) value, businessDataContext);
         }
-        throw new SEntityActionExecutionException(value.getClass().getName() + " is not a valid type. Expected an Entity or a List<Entity>");
+        throw new SEntityActionExecutionException(
+                value.getClass().getName() + " is not a valid type. Expected an Entity or a List<Entity>");
     }
 
 }

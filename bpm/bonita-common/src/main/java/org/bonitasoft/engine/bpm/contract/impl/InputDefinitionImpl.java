@@ -41,7 +41,8 @@ public class InputDefinitionImpl extends InputContainerDefinitionImpl implements
     @XmlAttribute
     private final boolean multiple;
 
-    public InputDefinitionImpl(final String name, final String description, final boolean multiple, Type type, final List<InputDefinition> inputDefinitions) {
+    public InputDefinitionImpl(final String name, final String description, final boolean multiple, Type type,
+            final List<InputDefinition> inputDefinitions) {
         super(inputDefinitions == null ? new ArrayList<InputDefinition>() : inputDefinitions);
         this.description = description;
         this.name = name;
@@ -75,11 +76,13 @@ public class InputDefinitionImpl extends InputContainerDefinitionImpl implements
         this(name, description, false, null, null);
     }
 
-    public InputDefinitionImpl(final String name, final String description, final List<InputDefinition> inputDefinitions) {
+    public InputDefinitionImpl(final String name, final String description,
+            final List<InputDefinition> inputDefinitions) {
         this(name, description, false, null, inputDefinitions);
     }
 
-    public InputDefinitionImpl(final String name, final String description, final boolean multiple, final List<InputDefinition> inputDefinitions) {
+    public InputDefinitionImpl(final String name, final String description, final boolean multiple,
+            final List<InputDefinition> inputDefinitions) {
         this(name, description, multiple, null, inputDefinitions);
     }
 

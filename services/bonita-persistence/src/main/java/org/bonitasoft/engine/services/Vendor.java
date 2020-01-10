@@ -45,7 +45,7 @@ public enum Vendor {
     /**
      * Get database vendor from databases metadata
      */
-    public static Vendor fromHibernateConfiguration(Configuration configuration){
+    public static Vendor fromHibernateConfiguration(Configuration configuration) {
         String hibernateDialect = configuration.getProperty("hibernate.dialect");
         return fromHibernateDialectProperty(hibernateDialect);
     }

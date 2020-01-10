@@ -56,7 +56,8 @@ public class OperationServiceImpl implements OperationService {
     private final OperationExecutorStrategyProvider operationExecutorStrategyProvider;
 
     public OperationServiceImpl(final OperationExecutorStrategyProvider operationExecutorStrategyProvider,
-            final LeftOperandHandlerProvider leftOperandHandlerProvider, final ExpressionResolverService expressionResolverService,
+            final LeftOperandHandlerProvider leftOperandHandlerProvider,
+            final ExpressionResolverService expressionResolverService,
             final PersistRightOperandResolver persistRightOperandResolver,
             final TechnicalLoggerService logger) {
         super();
@@ -72,56 +73,70 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void execute(final SOperation operation, final long containerId, final String containerType, final SExpressionContext expressionContext)
+    public void execute(final SOperation operation, final long containerId, final String containerType,
+            final SExpressionContext expressionContext)
             throws SOperationExecutionException {
         execute(Arrays.asList(operation), containerId, containerType, expressionContext);
     }
 
     @Override
-    public void execute(final List<SOperation> operations, final SExpressionContext expressionContext) throws SOperationExecutionException {
-        execute(operations, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);
+    public void execute(final List<SOperation> operations, final SExpressionContext expressionContext)
+            throws SOperationExecutionException {
+        execute(operations, expressionContext.getContainerId(), expressionContext.getContainerType(),
+                expressionContext);
     }
 
     @Override
-    public void execute(final List<SOperation> operations, final long leftOperandContainerId, final String leftOperandContainerType,
+    public void execute(final List<SOperation> operations, final long leftOperandContainerId,
+            final String leftOperandContainerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         if (operations.isEmpty()) {
             return;
         }
         // retrieve all left operand to set and put it in context
-        retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, leftOperandContainerId, leftOperandContainerType, expressionContext);
+        retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, leftOperandContainerId,
+                leftOperandContainerType, expressionContext);
 
         // execute operation and put it in context again
-        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandUpdates = executeOperators(operations, expressionContext);
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandUpdates = executeOperators(operations,
+                expressionContext);
         // update data
         updateLeftOperands(leftOperandUpdates, leftOperandContainerId, leftOperandContainerType, expressionContext);
     }
 
-    Map<SLeftOperand, LeftOperandUpdateStatus> executeOperators(final List<SOperation> operations, final SExpressionContext expressionContext)
+    Map<SLeftOperand, LeftOperandUpdateStatus> executeOperators(final List<SOperation> operations,
+            final SExpressionContext expressionContext)
             throws SOperationExecutionException {
         final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandsToUpdate = new HashMap<>();
         for (int i = 0; i < operations.size(); i++) {
             final SOperation currentOperation = operations.get(i);
             final boolean shouldPersistValue = persistRightOperandResolver.shouldPersistByPosition(i, operations);
-            final LeftOperandUpdateStatus currentUpdateStatus = calculateRightOperandValue(currentOperation, expressionContext, shouldPersistValue);
-            if (shouldUpdateLeftOperandContext(leftOperandsToUpdate, currentOperation.getLeftOperand(), currentUpdateStatus)) {
+            final LeftOperandUpdateStatus currentUpdateStatus = calculateRightOperandValue(currentOperation,
+                    expressionContext, shouldPersistValue);
+            if (shouldUpdateLeftOperandContext(leftOperandsToUpdate, currentOperation.getLeftOperand(),
+                    currentUpdateStatus)) {
                 leftOperandsToUpdate.put(currentOperation.getLeftOperand(), currentUpdateStatus);
             }
         }
         return leftOperandsToUpdate;
     }
 
-    private LeftOperandUpdateStatus calculateRightOperandValue(final SOperation operation, final SExpressionContext expressionContext,
+    private LeftOperandUpdateStatus calculateRightOperandValue(final SOperation operation,
+            final SExpressionContext expressionContext,
             boolean shouldPersistValue)
             throws SOperationExecutionException {
         final SLeftOperand leftOperand = operation.getLeftOperand();
         final LeftOperandUpdateStatus currentUpdateStatus = new LeftOperandUpdateStatus(operation.getType());
         if (currentUpdateStatus.shouldUpdate()) {
-            final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
-            final Object rightOperandValue = evaluateRightOperandExpression(operation, expressionContext, operation.getRightOperand());
+            final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider
+                    .getOperationExecutorStrategy(operation);
+            final Object rightOperandValue = evaluateRightOperandExpression(operation, expressionContext,
+                    operation.getRightOperand());
             shouldPersistValue = persistRightOperandResolver
-                    .shouldPersistByValue(rightOperandValue, shouldPersistValue, operationExecutorStrategy.shouldPersistOnNullValue());
-            final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext,
+                    .shouldPersistByValue(rightOperandValue, shouldPersistValue,
+                            operationExecutorStrategy.shouldPersistOnNullValue());
+            final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue,
+                    expressionContext,
                     shouldPersistValue);
             expressionContext.getInputValues().put(leftOperand.getName(), value);
             logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
@@ -129,19 +144,23 @@ public class OperationServiceImpl implements OperationService {
         return currentUpdateStatus;
     }
 
-    boolean shouldUpdateLeftOperandContext(final Map<SLeftOperand, LeftOperandUpdateStatus> updateLeftOperands, final SLeftOperand leftOperand,
+    boolean shouldUpdateLeftOperandContext(final Map<SLeftOperand, LeftOperandUpdateStatus> updateLeftOperands,
+            final SLeftOperand leftOperand,
             final LeftOperandUpdateStatus currentUpdateStatus) {
         final LeftOperandUpdateStatus previousStatus = updateLeftOperands.get(leftOperand);
         return previousStatus == null || !previousStatus.shouldDelete() && currentUpdateStatus.shouldDelete();
     }
 
-    void updateLeftOperands(final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandUpdates, final long leftOperandContainerId,
-            final String leftOperandContainerType, final SExpressionContext expressionContext) throws SOperationExecutionException {
+    void updateLeftOperands(final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandUpdates,
+            final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext)
+            throws SOperationExecutionException {
         for (final Entry<SLeftOperand, LeftOperandUpdateStatus> update : leftOperandUpdates.entrySet()) {
             final SLeftOperand leftOperand = update.getKey();
             final LeftOperandHandler leftOperandHandler = getLeftOperandHandler(leftOperand.getType());
             if (update.getValue().shouldUpdate()) {
-                leftOperandHandler.update(leftOperand, expressionContext.getInputValues(), expressionContext.getInputValues().get(leftOperand.getName()),
+                leftOperandHandler.update(leftOperand, expressionContext.getInputValues(),
+                        expressionContext.getInputValues().get(leftOperand.getName()),
                         leftOperandContainerId, leftOperandContainerType);
             } else {
                 leftOperandHandler.delete(leftOperand, leftOperandContainerId, leftOperandContainerType);
@@ -157,7 +176,8 @@ public class OperationServiceImpl implements OperationService {
         return leftOperandHandler;
     }
 
-    void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final long leftOperandContainerId,
+    void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations,
+            final long leftOperandContainerId,
             final String leftOperandContainerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
 
@@ -181,15 +201,18 @@ public class OperationServiceImpl implements OperationService {
         for (final Entry<String, List<SLeftOperand>> leftOperandByType : leftOperandHashMap.entrySet()) {
             try {
                 getLeftOperandHandler(leftOperandByType.getKey())
-                        .loadLeftOperandInContext(leftOperandByType.getValue(), leftOperandContainerId, leftOperandContainerType, expressionContext);
+                        .loadLeftOperandInContext(leftOperandByType.getValue(), leftOperandContainerId,
+                                leftOperandContainerType, expressionContext);
             } catch (final SBonitaReadException e) {
-                throw new SOperationExecutionException("Unable to retrieve value for operation " + leftOperandByType.getValue(), e);
+                throw new SOperationExecutionException(
+                        "Unable to retrieve value for operation " + leftOperandByType.getValue(), e);
             }
         }
 
     }
 
-    protected Object evaluateRightOperandExpression(final SOperation operation, final SExpressionContext expressionContext, final SExpression sExpression)
+    protected Object evaluateRightOperandExpression(final SOperation operation,
+            final SExpressionContext expressionContext, final SExpression sExpression)
             throws SOperationExecutionException {
         if (sExpression == null) {
             return null;
@@ -197,14 +220,17 @@ public class OperationServiceImpl implements OperationService {
         try {
             return expressionResolverService.evaluate(sExpression, expressionContext);
         } catch (final ClassCastException e) {
-            throw new SOperationExecutionException("Unable to execute operation on " + operation.getLeftOperand().getName()
-                    + " with a new value which is not Serializable", e);
+            throw new SOperationExecutionException(
+                    "Unable to execute operation on " + operation.getLeftOperand().getName()
+                            + " with a new value which is not Serializable",
+                    e);
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
     }
 
-    private void logOperation(final TechnicalLogSeverity severity, final SOperation operation, final Object operationValue,
+    private void logOperation(final TechnicalLogSeverity severity, final SOperation operation,
+            final Object operationValue,
             final SExpressionContext expressionContext) {
         if (logger.isLoggable(this.getClass(), severity)) {
             final String message = buildLogMessage(operation, operationValue, expressionContext);
@@ -212,7 +238,8 @@ public class OperationServiceImpl implements OperationService {
         }
     }
 
-    private String buildLogMessage(final SOperation operation, final Object operationValue, final SExpressionContext expressionContext) {
+    private String buildLogMessage(final SOperation operation, final Object operationValue,
+            final SExpressionContext expressionContext) {
         String stb = "Executed operation on container [id: '" +
                 expressionContext.getContainerId() +
                 "', type: '" +

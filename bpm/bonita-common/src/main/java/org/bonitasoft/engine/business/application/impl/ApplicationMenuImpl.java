@@ -16,10 +16,8 @@ package org.bonitasoft.engine.business.application.impl;
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationMenu {
 
@@ -30,7 +28,8 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
     private Long parentId;
     private final int index;
 
-    public ApplicationMenuImpl(final String displayName, long applicationId, final Long applicationPageId, final int index) {
+    public ApplicationMenuImpl(final String displayName, long applicationId, final Long applicationPageId,
+            final int index) {
         this.displayName = displayName;
         this.applicationId = applicationId;
         this.applicationPageId = applicationPageId;
@@ -68,7 +67,8 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
 
     @Override
     public String toString() {
-        return "ApplicationMenuImpl [displayName=" + displayName + ", applicationPageId=" + applicationPageId + ", applicationId=" + applicationId
+        return "ApplicationMenuImpl [displayName=" + displayName + ", applicationPageId=" + applicationPageId
+                + ", applicationId=" + applicationId
                 + ", parentId=" + parentId + ", index=" + index + "]";
     }
 

@@ -45,11 +45,13 @@ public class ParameterContributionTest {
         writePropertyFile(file, myProcessKey, NULL);
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("NULL_parameter_value", "check").done());
+        businessArchiveBuilder.setProcessDefinition(
+                new ProcessDefinitionBuilder().createNewInstance("NULL_parameter_value", "check").done());
         final BusinessArchive businessArchive = businessArchiveBuilder.done();
 
         // when:
-        final boolean hasRead = new ParameterContribution().readFromBarFolder(businessArchive, temporaryFolder.getRoot());
+        final boolean hasRead = new ParameterContribution().readFromBarFolder(businessArchive,
+                temporaryFolder.getRoot());
 
         // then:
         assertThat(hasRead).isTrue();
@@ -66,11 +68,13 @@ public class ParameterContributionTest {
         writePropertyFile(file, myProcessKey, someValueToRead);
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("non_null_parameter", "read").done());
+        businessArchiveBuilder.setProcessDefinition(
+                new ProcessDefinitionBuilder().createNewInstance("non_null_parameter", "read").done());
         final BusinessArchive businessArchive = businessArchiveBuilder.done();
 
         // when:
-        final boolean hasRead = new ParameterContribution().readFromBarFolder(businessArchive, temporaryFolder.getRoot());
+        final boolean hasRead = new ParameterContribution().readFromBarFolder(businessArchive,
+                temporaryFolder.getRoot());
 
         // then:
         assertThat(hasRead).isTrue();
@@ -83,7 +87,8 @@ public class ParameterContributionTest {
         final File parametersFile = temporaryFolder.newFile(PARAMETERS_FILE);
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("parameter_value_equals_null", "check").done());
+        businessArchiveBuilder.setProcessDefinition(
+                new ProcessDefinitionBuilder().createNewInstance("parameter_value_equals_null", "check").done());
         final String myKeyWithNullValue = "myKeyWithNullValue";
         businessArchiveBuilder.setParameters(Collections.<String, String> singletonMap(myKeyWithNullValue, null));
         final BusinessArchive businessArchive = businessArchiveBuilder.done();
@@ -102,7 +107,8 @@ public class ParameterContributionTest {
         final File parametersFile = temporaryFolder.newFile(PARAMETERS_FILE);
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("non_null_parameter", "write").done());
+        businessArchiveBuilder.setProcessDefinition(
+                new ProcessDefinitionBuilder().createNewInstance("non_null_parameter", "write").done());
         final String myKeyWithNullValue = "myKeyWithNullValue";
         final String someValue = "someValue";
         businessArchiveBuilder.setParameters(Collections.<String, String> singletonMap(myKeyWithNullValue, someValue));

@@ -30,7 +30,8 @@ public class OffsetDateTimeXStreamConverterTest {
     public void toString_should_OffsetDateTime_converted_to_UTC() throws Exception {
         // given:
         final OffsetDateTimeXStreamConverter offsetDateTimeConverter = new OffsetDateTimeXStreamConverter();
-        final OffsetDateTime offsetDateTime = OffsetDateTime.of(LocalDateTime.of(1973, 10, 17, 13, 42, 0), ZoneOffset.ofHours(-4));
+        final OffsetDateTime offsetDateTime = OffsetDateTime.of(LocalDateTime.of(1973, 10, 17, 13, 42, 0),
+                ZoneOffset.ofHours(-4));
 
         // when:
         final String toString = offsetDateTimeConverter.toString(offsetDateTime);
@@ -49,7 +50,8 @@ public class OffsetDateTimeXStreamConverterTest {
         final Object offsetDateTime = offsetDateTimeConverter.fromString(dateAsString);
 
         // then:
-        assertThat(offsetDateTime).isEqualTo(OffsetDateTime.of(LocalDateTime.of(1973, 10, 17, 13, 50, 0), ZoneOffset.UTC));
+        assertThat(offsetDateTime)
+                .isEqualTo(OffsetDateTime.of(LocalDateTime.of(1973, 10, 17, 13, 50, 0), ZoneOffset.UTC));
     }
 
     @Test

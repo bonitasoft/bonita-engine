@@ -25,14 +25,16 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 /**
  * <b>Creates {@link BusinessArchive}</b>
  * <p>
- * A typical use of this class is to build programatically Business archive in order to deploy it using the {@link org.bonitasoft.engine.api.ProcessAPI} <p>
+ * A typical use of this class is to build programatically Business archive in order to deploy it using the
+ * {@link org.bonitasoft.engine.api.ProcessAPI} <p>
  * <p>
  * If you wish to deploy a BusinessArchived stored in a .bar file use {@link BusinessArchiveFactory} instead.
  * <p>
  * <p>
  * <p>
  * Usage example:
- * <p> {@code BusinessArchive businessArchive = BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();}
+ * <p>
+ * {@code BusinessArchive businessArchive = BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();}
  *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -55,7 +57,8 @@ public class BusinessArchiveBuilder {
 
     /**
      * Set the process definition of the {@link BusinessArchive} that is currently build
-     * <p> {@link DesignProcessDefinition} can be constructed using {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
+     * <p> {@link DesignProcessDefinition} can be constructed using
+     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
      *
      * @see org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder
      * @param processDefinition
@@ -71,7 +74,8 @@ public class BusinessArchiveBuilder {
      * Set the parameters values
      * <p>
      * Parameters must also be defined in the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} using
-     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder} <p> {@link DesignProcessDefinition} can be
+     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder} <p> {@link DesignProcessDefinition} can
+     * be
      * constructed using {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
      *
      * @see org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder
@@ -106,9 +110,11 @@ public class BusinessArchiveBuilder {
     /**
      * Add connector implementation descriptor to the business archive.
      * <p>
-     * This resource must be a connector implementation descriptor file (.impl) and must be compliant to the connector-implementation-descriptor.xsd
+     * This resource must be a connector implementation descriptor file (.impl) and must be compliant to the
+     * connector-implementation-descriptor.xsd
      * <p>
-     * A connector definition should also be added in the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} using
+     * A connector definition should also be added in the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition}
+     * using
      * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.connector.ConnectorEvent)}
      * or
      * {@link org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.connector.ConnectorEvent)}
@@ -141,12 +147,14 @@ public class BusinessArchiveBuilder {
 
     /**
      * Set the actor mapping for this {@link BusinessArchive} <p>
-     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link org.bonitasoft.engine.bpm.actor.ActorDefinition} of
+     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each
+     * {@link org.bonitasoft.engine.bpm.actor.ActorDefinition} of
      * the process who it is in the
      * organization.
      * <p>
      * It is not mandatory to set it in the {@link BusinessArchive}, it can be set after the process was deployed using
-     * {@link org.bonitasoft.engine.api.ProcessAPI#addUserToActor(long, long)}, {@link org.bonitasoft.engine.api.ProcessAPI#addGroupToActor(long, long)},
+     * {@link org.bonitasoft.engine.api.ProcessAPI#addUserToActor(long, long)},
+     * {@link org.bonitasoft.engine.api.ProcessAPI#addGroupToActor(long, long)},
      * {@link org.bonitasoft.engine.api.ProcessAPI#addRoleToActor(long, long)} or
      * {@link org.bonitasoft.engine.api.ProcessAPI#addRoleAndGroupToActor(long, long, long)}
      *
@@ -213,7 +221,8 @@ public class BusinessArchiveBuilder {
         final String resourcePath = path + resource.getName();
         final byte[] resourceContent = resource.getContent();
         if (resourceContent == null || resourceContent.length == 0) {
-            throw new IllegalArgumentException("You are trying to add file " + resourcePath + " with empty content into the BusinessArchive (bar file)."
+            throw new IllegalArgumentException("You are trying to add file " + resourcePath
+                    + " with empty content into the BusinessArchive (bar file)."
                     + " Either add content to this file, or remove it from the resources.");
         }
         entity.addResource(resourcePath, resourceContent);
@@ -230,11 +239,13 @@ public class BusinessArchiveBuilder {
             throw new InvalidBusinessArchiveFormatException("missing process definition");
         }
         final ArrayList<String> errors = new ArrayList<>();
-        for (final DocumentDefinition document : entity.getProcessDefinition().getProcessContainer().getDocumentDefinitions()) {
+        for (final DocumentDefinition document : entity.getProcessDefinition().getProcessContainer()
+                .getDocumentDefinitions()) {
             if (document.getFile() != null && !document.getFile().isEmpty()) {
                 final byte[] resources = entity.getResource("documents/" + document.getFile());
                 if (resources == null) {
-                    errors.add("missing document in the business archive that is present in the process definition " + document.getFile());
+                    errors.add("missing document in the business archive that is present in the process definition "
+                            + document.getFile());
                 }
             }
         }

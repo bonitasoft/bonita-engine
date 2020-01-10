@@ -56,7 +56,8 @@ public class PersistenceUnitBuilderTest {
         for (int i = 0; i < nodeList.getLength(); i++) {
             classnames.add(nodeList.item(i).getTextContent());
         }
-        assertThat(classnames).containsOnly("org.bonitasoft.businessdata.Employee", "org.bonitasoft.businessdata.LeaveRequesst");
+        assertThat(classnames).containsOnly("org.bonitasoft.businessdata.Employee",
+                "org.bonitasoft.businessdata.LeaveRequesst");
     }
 
 }

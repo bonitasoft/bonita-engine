@@ -19,7 +19,6 @@ import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * author Emmanuel Duchastenier
@@ -30,7 +29,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("PROCESS")
 public class SAProcessContractData extends SAContractData {
-
 
     public SAProcessContractData(SProcessContractData processContract) {
         super(processContract);

@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.parameter;
 
+import javax.persistence.*;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
 
 /**
  * @author Matthieu Chaffotte

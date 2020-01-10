@@ -37,7 +37,8 @@ public class FolderResolverTest {
         Path LicFolder = temporaryFolder.newFolder("licenses").toPath();
         FolderResolver folderResolver = new FolderResolver(confFolder, LicFolder);
 
-        FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("licence1.lic", "license content".getBytes(),
+        FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("licence1.lic",
+                "license content".getBytes(),
                 ConfigurationType.LICENSES.name(), 0L);
 
         //then
@@ -52,11 +53,13 @@ public class FolderResolverTest {
         Path LicFolder = temporaryFolder.newFolder("licenses").toPath();
         FolderResolver folderResolver = new FolderResolver(confFolder, LicFolder);
 
-        FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("conf.properties", "key=value".getBytes(),
+        FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("conf.properties",
+                "key=value".getBytes(),
                 ConfigurationType.PLATFORM_ENGINE.name(), 0L);
 
         //then
-        Assertions.assertThat(folderResolver.getFolder(fullBonitaConfiguration)).isEqualTo(confFolder.resolve("platform_engine").toFile());
+        Assertions.assertThat(folderResolver.getFolder(fullBonitaConfiguration))
+                .isEqualTo(confFolder.resolve("platform_engine").toFile());
 
     }
 
@@ -67,11 +70,13 @@ public class FolderResolverTest {
         Path LicFolder = temporaryFolder.newFolder("licenses").toPath();
         FolderResolver folderResolver = new FolderResolver(confFolder, LicFolder);
 
-        FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("conf.properties", "key=value".getBytes(),
+        FullBonitaConfiguration fullBonitaConfiguration = new FullBonitaConfiguration("conf.properties",
+                "key=value".getBytes(),
                 ConfigurationType.TENANT_PORTAL.name(), 55L);
 
         //then
-        Assertions.assertThat(folderResolver.getFolder(fullBonitaConfiguration)).isEqualTo(confFolder.resolve("tenants").resolve("55").resolve("tenant_portal").toFile());
+        Assertions.assertThat(folderResolver.getFolder(fullBonitaConfiguration))
+                .isEqualTo(confFolder.resolve("tenants").resolve("55").resolve("tenant_portal").toFile());
 
     }
 

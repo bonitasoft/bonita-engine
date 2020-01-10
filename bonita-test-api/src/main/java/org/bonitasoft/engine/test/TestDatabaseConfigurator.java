@@ -15,10 +15,9 @@ package org.bonitasoft.engine.test;
 
 import static org.bonitasoft.engine.DefaultBonitaDatabaseConfigurations.defaultConfiguration;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.BonitaEngine;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 class TestDatabaseConfigurator {

@@ -20,13 +20,14 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorLogBuild
 /**
  * @author Yanyan Liu
  */
-public class SProcessSupervisorLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SProcessSupervisorLogBuilderFactory {
+public class SProcessSupervisorLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SProcessSupervisorLogBuilderFactory {
 
     @Override
     public SProcessSupervisorLogBuilder createNewInstance() {
         return new SProcessSupervisorLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return SProcessSupervisorLogIndexesMapper.SUPERVISOR_INDEX_NAME;

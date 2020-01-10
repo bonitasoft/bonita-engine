@@ -21,7 +21,7 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 
 /**
  * Wrapper over entity getter method
- * 
+ *
  * @author Colin Puy
  */
 public class EntityGetter {
@@ -54,7 +54,8 @@ public class EntityGetter {
 
     public String getAssociatedNamedQuery() {
         String targetEntityName = getTargetEntityClass().getSimpleName();
-        return targetEntityName + ".find" + getCapitalizedFieldName() + "By" + getSourceEntityName() + Capitalizer.capitalize(Field.PERSISTENCE_ID);
+        return targetEntityName + ".find" + getCapitalizedFieldName() + "By" + getSourceEntityName()
+                + Capitalizer.capitalize(Field.PERSISTENCE_ID);
     }
 
     public boolean returnsList() {

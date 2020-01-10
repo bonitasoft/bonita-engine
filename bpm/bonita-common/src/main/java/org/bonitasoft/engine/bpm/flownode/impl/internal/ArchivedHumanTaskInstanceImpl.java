@@ -22,7 +22,8 @@ import org.bonitasoft.engine.bpm.flownode.TaskPriority;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public abstract class ArchivedHumanTaskInstanceImpl extends ArchivedActivityInstanceImpl implements ArchivedHumanTaskInstance {
+public abstract class ArchivedHumanTaskInstanceImpl extends ArchivedActivityInstanceImpl
+        implements ArchivedHumanTaskInstance {
 
     private static final long serialVersionUID = -5566250139796838252L;
 

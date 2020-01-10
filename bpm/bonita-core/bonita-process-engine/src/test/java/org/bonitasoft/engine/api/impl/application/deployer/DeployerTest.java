@@ -96,18 +96,18 @@ public class DeployerTest {
                 .page(new FileAndContent("page.zip", zip(file("page.properties", "name=page"))))
                 .layout(new FileAndContent("layout.zip", zip(file("page.properties", "name=layout"))))
                 .theme(new FileAndContent("theme.zip", zip(file("page.properties", "name=theme"))))
-                .restAPIExtension(new FileAndContent("restApiExtension.zip", zip(file("page.properties", "name=restApiExtension")))).build();
+                .restAPIExtension(new FileAndContent("restApiExtension.zip",
+                        zip(file("page.properties", "name=restApiExtension"))))
+                .build();
         doReturn(mock(Page.class)).when(pageAPI).createPage(anyString(), any(byte[].class));
 
         deployer.deploy(applicationArchive);
-
 
         verify(pageAPI).createPage("page", zip(file("page.properties", "name=page")));
         verify(pageAPI).createPage("layout", zip(file("page.properties", "name=layout")));
         verify(pageAPI).createPage("theme", zip(file("page.properties", "name=theme")));
         verify(pageAPI).createPage("restApiExtension", zip(file("page.properties", "name=restApiExtension")));
     }
-
 
     @Test
     public void should_deploy_application_containing_living_applications() throws Exception {
@@ -116,7 +116,8 @@ public class DeployerTest {
 
         deployer.deploy(applicationArchive);
 
-        verify(livingApplicationAPI).importApplications("content".getBytes(), ApplicationImportPolicy.REPLACE_DUPLICATES);
+        verify(livingApplicationAPI).importApplications("content".getBytes(),
+                ApplicationImportPolicy.REPLACE_DUPLICATES);
     }
 
     @Test
@@ -128,13 +129,12 @@ public class DeployerTest {
         doReturn(myProcess).when(processAPI).deploy(any(BusinessArchive.class));
         hasConfigurationState(myProcess, ConfigurationState.RESOLVED);
 
-
         deployer.deploy(applicationArchive);
 
-        verify(processAPI).deploy(ArgumentMatchers.<BusinessArchive>argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
+        verify(processAPI).deploy(ArgumentMatchers
+                .<BusinessArchive> argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
         verify(processAPI).enableProcess(123L);
     }
-
 
     @Test
     public void should_deploy_only_unresolved_process() throws Exception {
@@ -145,13 +145,12 @@ public class DeployerTest {
         doReturn(myProcess).when(processAPI).deploy(any(BusinessArchive.class));
         hasConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
 
-
         deployer.deploy(applicationArchive);
 
-        verify(processAPI).deploy(ArgumentMatchers.<BusinessArchive>argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
+        verify(processAPI).deploy(ArgumentMatchers
+                .<BusinessArchive> argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
         verify(processAPI, never()).enableProcess(anyLong());
     }
-
 
     @Test
     public void should_replace_existing_process() throws Exception {
@@ -159,7 +158,8 @@ public class DeployerTest {
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .process(new FileAndContent("process.bar", barContent)).build();
         ProcessDefinition myProcess = aProcessDefinition(123L);
-        when(processAPI.deploy(any(BusinessArchive.class))).thenThrow(new AlreadyExistsException("already exists")).thenReturn(myProcess);
+        when(processAPI.deploy(any(BusinessArchive.class))).thenThrow(new AlreadyExistsException("already exists"))
+                .thenReturn(myProcess);
         doReturn(456L).when(processAPI).getProcessDefinitionId("myProcess", "1.0");
         hasConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
         doReturn(new SearchResultImpl<>(0, emptyList())).when(processAPI).searchProcessInstances(any());
@@ -169,7 +169,8 @@ public class DeployerTest {
 
         verify(processAPI).disableProcess(456L);
         verify(processAPI).deleteProcessDefinition(456L);
-        verify(processAPI, times(2)).deploy(ArgumentMatchers.<BusinessArchive>argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
+        verify(processAPI, times(2)).deploy(ArgumentMatchers
+                .<BusinessArchive> argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
     }
 
     private ProcessDefinitionImpl aProcessDefinition(long id) {
@@ -178,15 +179,18 @@ public class DeployerTest {
         return myProcess;
     }
 
-
-    private void hasConfigurationState(ProcessDefinition myProcess, ConfigurationState state) throws ProcessDefinitionNotFoundException {
+    private void hasConfigurationState(ProcessDefinition myProcess, ConfigurationState state)
+            throws ProcessDefinitionNotFoundException {
         ProcessDeploymentInfo processDeploymentInfo = mock(ProcessDeploymentInfo.class);
         doReturn(state).when(processDeploymentInfo).getConfigurationState();
         doReturn(processDeploymentInfo).when(processAPI).getProcessDeploymentInfo(myProcess.getId());
     }
 
-    private byte[] createValidBusinessArchive() throws InvalidBusinessArchiveFormatException, InvalidProcessDefinitionException, IOException {
-        BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").done()).done();
+    private byte[] createValidBusinessArchive()
+            throws InvalidBusinessArchiveFormatException, InvalidProcessDefinitionException, IOException {
+        BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").done())
+                .done();
         File businessArchiveFile = temporaryFolder.newFile();
         businessArchiveFile.delete();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, businessArchiveFile);

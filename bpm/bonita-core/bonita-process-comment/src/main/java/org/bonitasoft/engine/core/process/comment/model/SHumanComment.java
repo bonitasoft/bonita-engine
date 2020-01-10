@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @DiscriminatorValue("human")
 public class SHumanComment extends SComment {
+
     public SHumanComment(long processInstanceId, String content, Long userId) {
         super(processInstanceId, content);
         this.setUserId(userId);

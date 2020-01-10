@@ -136,7 +136,8 @@ public class BusinessObject {
         return addQuery(name, null, queryContent, returnType);
     }
 
-    public Query addQuery(final String name, final String description, final String queryContent, final String returnType) {
+    public Query addQuery(final String name, final String description, final String queryContent,
+            final String returnType) {
         final Query query = new Query(name, description, queryContent, returnType);
         queries.add(query);
         return query;

@@ -58,12 +58,14 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends OnEnterConn
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return false;
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 
@@ -83,14 +85,16 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends OnEnterConn
     }
 
     @Override
-    protected void beforeConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void beforeConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
         stateBehaviors.createData(processDefinition, flowNodeInstance);
         stateBehaviors.createAttachedBoundaryEvents(processDefinition, (SActivityInstance) flowNodeInstance);
         stateBehaviors.mapActors(flowNodeInstance, processDefinition.getProcessContainer());
     }
 
     @Override
-    protected void afterConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void afterConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
         stateBehaviors.updateExpectedDuration(processDefinition, flowNodeInstance);
         stateBehaviors.addAssignmentSystemCommentIfTaskWasAutoAssign(flowNodeInstance);

@@ -55,7 +55,8 @@ public class HttpAPIServletCall extends ServletCall {
 
     private XmlConverter xmlConverter;
 
-    public HttpAPIServletCall(final HttpServletRequest request, final HttpServletResponse response) throws FileUploadException, IOException {
+    public HttpAPIServletCall(final HttpServletRequest request, final HttpServletResponse response)
+            throws FileUploadException, IOException {
         super(request, response);
         xmlConverter = new XmlConverter();
     }
@@ -108,7 +109,8 @@ public class HttpAPIServletCall extends ServletCall {
 
             final Object invokeMethod;
             try {
-                invokeMethod = getServerAPI().invokeMethod(myOptions, apiInterfaceName, methodName, myClassNameParameters, myParametersValues);
+                invokeMethod = getServerAPI().invokeMethod(myOptions, apiInterfaceName, methodName,
+                        myClassNameParameters, myParametersValues);
             } catch (ServerWrappedException e) {
                 // merge stack trace of the server exception
                 throw StackTraceTransformer.mergeStackTraces(e);

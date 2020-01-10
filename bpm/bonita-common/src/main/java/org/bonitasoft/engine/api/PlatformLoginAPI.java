@@ -29,7 +29,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
  * <li>{@link PlatformAPI}</li>
  * <li>{@link PlatformCommandAPI}</li>
  * </ul>
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
@@ -39,29 +39,30 @@ public interface PlatformLoginAPI {
 
     /**
      * Login with username and password of the platform administrator defined in {@code bonita-platform.properties}
-     * 
+     *
      * @param userName
-     *            the platform administrator name
+     *        the platform administrator name
      * @param password
-     *            the platform administrator password
+     *        the platform administrator password
      * @return
      *         the session created for you, can be used to retrieve platform APIs
      * @throws PlatformLoginException
-     *             occurs when an exception is thrown during login the platform
+     *         occurs when an exception is thrown during login the platform
      * @throws InvalidPlatformCredentialsException
-     *             occurs when thr username or password is not valid
+     *         occurs when thr username or password is not valid
      */
-    PlatformSession login(String userName, String password) throws PlatformLoginException, InvalidPlatformCredentialsException;
+    PlatformSession login(String userName, String password)
+            throws PlatformLoginException, InvalidPlatformCredentialsException;
 
     /**
      * Logout from a platform.
-     * 
+     *
      * @param session
-     *            the platform session to logout from.
+     *        the platform session to logout from.
      * @throws PlatformLogoutException
-     *             occurs when an exception is thrown during logout the platform
+     *         occurs when an exception is thrown during logout the platform
      * @throws SessionNotFoundException
-     *             if the session is not found on the server side. This may occurs when the session has expired.
+     *         if the session is not found on the server side. This may occurs when the session has expired.
      */
     void logout(PlatformSession session) throws PlatformLogoutException, SessionNotFoundException;
 

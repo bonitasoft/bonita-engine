@@ -61,9 +61,12 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     private RefBusinessDataService refBusinessDataService;
     private ProcessInstanceInterruptor processInstanceInterruptor;
 
-    public EndingCallActivityExceptionStateImpl(ProcessInstanceService processInstanceService, ArchiveService archiveService, final SCommentService commentService,
-                                                final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
-                                                final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService, ProcessInstanceInterruptor processInstanceInterruptor) {
+    public EndingCallActivityExceptionStateImpl(ProcessInstanceService processInstanceService,
+            ArchiveService archiveService, final SCommentService commentService,
+            final DocumentService documentService, final TechnicalLoggerService logger,
+            final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService,
+            RefBusinessDataService refBusinessDataService, ProcessInstanceInterruptor processInstanceInterruptor) {
         super();
         this.processInstanceService = processInstanceService;
         this.archiveService = archiveService;
@@ -78,12 +81,14 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         try {
             final SCallActivityInstance callActivity = (SCallActivityInstance) flowNodeInstance;
             final boolean hasActiveChild = callActivity.getTokenCount() > 0;
             if (hasActiveChild) {
-                final SProcessInstance targetProcessInstance = processInstanceService.getChildOfActivity(flowNodeInstance.getId());
+                final SProcessInstance targetProcessInstance = processInstanceService
+                        .getChildOfActivity(flowNodeInstance.getId());
                 processInstanceInterruptor.interruptProcessInstance(targetProcessInstance.getId(), getStateCategory());
             } else {
                 archiveChildProcessInstance(flowNodeInstance);
@@ -95,30 +100,37 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
         // archive process target process instance
         try {
             archiveChildProcessInstance(instance);
         } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException("Unable to found the process instance called by call activity with id " + instance.getId(), e);
+            throw new SActivityStateExecutionException(
+                    "Unable to found the process instance called by call activity with id " + instance.getId(), e);
         }
         return StateCode.DONE;
     }
 
-    private void archiveChildProcessInstance(final SFlowNodeInstance instance) throws SProcessInstanceNotFoundException, SArchivingException,
+    private void archiveChildProcessInstance(final SFlowNodeInstance instance)
+            throws SProcessInstanceNotFoundException, SArchivingException,
             SBonitaReadException {
         try {
             final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
-            new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
-                    commentService, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+            new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService,
+                    documentService, logger,
+                    commentService, processDefinitionService, connectorInstanceService, classLoaderService,
+                    refBusinessDataService);
         } catch (SProcessInstanceNotFoundException ignored) {
             logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "No target process instance found when archiving the call activity " + instance.getId() + " in state " + getName());
+                    "No target process instance found when archiving the call activity " + instance.getId()
+                            + " in state " + getName());
         }
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return true;
     }
 

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.comment.api;
 
 /**
  * @author Hongwen Zang
- * 
  */
 public enum SystemCommentType {
     STATE_CHANGE,

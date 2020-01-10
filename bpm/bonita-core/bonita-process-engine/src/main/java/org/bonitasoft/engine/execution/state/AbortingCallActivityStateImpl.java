@@ -32,12 +32,16 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class AbortingCallActivityStateImpl extends EndingCallActivityExceptionStateImpl {
 
-    public AbortingCallActivityStateImpl(final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final SCommentService commentService,
-                                         final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
-                                         final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService,
-                                         ProcessInstanceInterruptor processInstanceInterruptor) {
+    public AbortingCallActivityStateImpl(final ProcessInstanceService processInstanceService,
+            final ArchiveService archiveService, final SCommentService commentService,
+            final DocumentService documentService, final TechnicalLoggerService logger,
+            final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService,
+            RefBusinessDataService refBusinessDataService,
+            ProcessInstanceInterruptor processInstanceInterruptor) {
         super(processInstanceService, archiveService, commentService, documentService,
-                logger, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService, processInstanceInterruptor);
+                logger, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService,
+                processInstanceInterruptor);
     }
 
     @Override

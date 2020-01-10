@@ -18,7 +18,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowN
 /**
  * @author Elias Ricken de Medeiros
  */
-public abstract class SAFlowNodeInstanceBuilderFactoryImpl extends SAFlowElementInstanceBuilderFactoryImpl implements SAFlowNodeInstanceBuilderFactory {
+public abstract class SAFlowNodeInstanceBuilderFactoryImpl extends SAFlowElementInstanceBuilderFactoryImpl
+        implements SAFlowNodeInstanceBuilderFactory {
 
     protected static final String STATE_ID_KEY = "stateId";
 

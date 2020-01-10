@@ -15,14 +15,13 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
-import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -54,6 +53,7 @@ public class ProcessInstanceRepository extends TestRepository {
         namedQuery.setParameter("humanTaskInstanceId", activityInstanceId);
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
+
     @SuppressWarnings("unchecked")
     public List<SUser> searchSUserWhoCanStartProcess(final long processId) {
         final Query namedQuery = getNamedQuery("searchSUserWhoCanStartProcess");
@@ -117,7 +117,8 @@ public class ProcessInstanceRepository extends TestRepository {
     public long getNumberOfSProcessInstanceFailedForProcessDefinition(final long processDefinitionId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("getNumberOfSProcessInstanceFailed");
-        namedQuery = getSession().createQuery(namedQuery.getQueryString() + " AND p.processDefinitionId = " + processDefinitionId);
+        namedQuery = getSession()
+                .createQuery(namedQuery.getQueryString() + " AND p.processDefinitionId = " + processDefinitionId);
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
 
@@ -125,7 +126,8 @@ public class ProcessInstanceRepository extends TestRepository {
     public List<SProcessInstance> searchSProcessInstanceFailedForProcessDefinition(final long processDefinitionId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("searchSProcessInstanceFailed");
-        namedQuery = getSession().createQuery(namedQuery.getQueryString() + " AND p.processDefinitionId = " + processDefinitionId);
+        namedQuery = getSession()
+                .createQuery(namedQuery.getQueryString() + " AND p.processDefinitionId = " + processDefinitionId);
         return namedQuery.list();
     }
 
@@ -155,18 +157,21 @@ public class ProcessInstanceRepository extends TestRepository {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("getNumberOfSTimerEventTriggerInstanceByProcessInstance");
         if (jobTriggerName != null) {
-            namedQuery = getSession().createQuery(namedQuery.getQueryString() + " AND e.name = '" + jobTriggerName + "'");
+            namedQuery = getSession()
+                    .createQuery(namedQuery.getQueryString() + " AND e.name = '" + jobTriggerName + "'");
         }
         namedQuery.setParameter("processInstanceId", processInstanceId);
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
 
     @SuppressWarnings("unchecked")
-    public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(final long processInstanceId, final String jobTriggerName) {
+    public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(final long processInstanceId,
+            final String jobTriggerName) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("searchSTimerEventTriggerInstanceByProcessInstance");
         if (jobTriggerName != null) {
-            namedQuery = getSession().createQuery(namedQuery.getQueryString() + " AND e.name = '" + jobTriggerName + "'");
+            namedQuery = getSession()
+                    .createQuery(namedQuery.getQueryString() + " AND e.name = '" + jobTriggerName + "'");
         }
         namedQuery.setParameter("processInstanceId", processInstanceId);
         return namedQuery.list();

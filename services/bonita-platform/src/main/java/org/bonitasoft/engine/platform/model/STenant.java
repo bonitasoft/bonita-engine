@@ -54,7 +54,8 @@ public class STenant implements PersistentObject {
     private String createdBy;
     private boolean defaultTenant;
 
-    public STenant(final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
+    public STenant(final String name, final String createdBy, final long created, final String status,
+            final boolean defaultTenant) {
         super();
         this.name = name;
         this.createdBy = createdBy;
@@ -80,7 +81,6 @@ public class STenant implements PersistentObject {
     public boolean isPaused() {
         return PAUSED.equals(status);
     }
-
 
     @Override
     public void setTenantId(long id) {

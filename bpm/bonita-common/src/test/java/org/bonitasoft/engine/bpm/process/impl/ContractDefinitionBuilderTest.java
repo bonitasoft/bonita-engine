@@ -120,16 +120,20 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addComplexInputWithChildren() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput("name", Type.TEXT, "the name of the user");
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput("name", Type.TEXT,
+                "the name of the user");
         builder.addComplexInput("addresses", "the addresses").addInput("address", Type.TEXT, "the address", true);
 
         //then
         assertThat(activity.getContract().getInputs()).hasSize(2);
-        assertThat(activity.getContract().getInputs().get(0)).isEqualTo(new InputDefinitionImpl("name", Type.TEXT, "the name of the user", false));
-        assertThat(activity.getContract().getInputs().get(1)).isEqualToIgnoringGivenFields(new InputDefinitionImpl("addresses", "the addresses", false),
+        assertThat(activity.getContract().getInputs().get(0))
+                .isEqualTo(new InputDefinitionImpl("name", Type.TEXT, "the name of the user", false));
+        assertThat(activity.getContract().getInputs().get(1)).isEqualToIgnoringGivenFields(
+                new InputDefinitionImpl("addresses", "the addresses", false),
                 "inputs");
         assertThat(activity.getContract().getInputs().get(1).getInputs()).hasSize(1);
-        assertThat(activity.getContract().getInputs().get(1).getInputs().get(0)).isEqualTo(new InputDefinitionImpl("address", Type.TEXT, "the address", true));
+        assertThat(activity.getContract().getInputs().get(1).getInputs().get(0))
+                .isEqualTo(new InputDefinitionImpl("address", Type.TEXT, "the address", true));
         checkBuilder(builder);
     }
 
@@ -146,7 +150,8 @@ public class ContractDefinitionBuilderTest {
 
     @Test
     public void addFileComplexInputTest() throws Exception {
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addFileInput("document", "It is a simple document");
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addFileInput("document",
+                "It is a simple document");
 
         final List<InputDefinition> complexInputs = activity.getContract().getInputs();
         assertThat(complexInputs).hasSize(1);
@@ -164,7 +169,8 @@ public class ContractDefinitionBuilderTest {
 
     @Test
     public void addMultipleFileInputTest() throws Exception {
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addFileInput("document", "It is a simple document", true);
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addFileInput("document",
+                "It is a simple document", true);
 
         final List<InputDefinition> complexInputs = activity.getContract().getInputs();
         assertThat(complexInputs).hasSize(1);
@@ -183,7 +189,8 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addRuleTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addConstraint(name, "expression", "explanation", "inputName");
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addConstraint(name, "expression",
+                "explanation", "inputName");
 
         //then
         assertThat(activity.getContract().getConstraints()).hasSize(1);

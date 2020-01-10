@@ -42,7 +42,8 @@ public class BusinessDataExpressionExecutorStrategy extends CommonBusinessDataEx
 
     private final BusinessDataRetriever businessDataRetriever;
 
-    public BusinessDataExpressionExecutorStrategy(final RefBusinessDataRetriever refBusinessDataRetriever, BusinessDataRetriever businessDataRetriever) {
+    public BusinessDataExpressionExecutorStrategy(final RefBusinessDataRetriever refBusinessDataRetriever,
+            BusinessDataRetriever businessDataRetriever) {
         super();
         this.refBusinessDataRetriever = refBusinessDataRetriever;
         this.businessDataRetriever = businessDataRetriever;
@@ -54,8 +55,9 @@ public class BusinessDataExpressionExecutorStrategy extends CommonBusinessDataEx
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-                           final ContainerState containerState) throws SExpressionEvaluationException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final String businessDataName = expression.getContent();
         if (context.containsKey(businessDataName)) {
             return context.get(businessDataName);
@@ -63,11 +65,13 @@ public class BusinessDataExpressionExecutorStrategy extends CommonBusinessDataEx
         final Long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
         final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
         try {
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataRetriever.getRefBusinessDataInstance(new BusinessDataContext(
-                    businessDataName, new Container(containerId, containerType)));
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataRetriever
+                    .getRefBusinessDataInstance(new BusinessDataContext(
+                            businessDataName, new Container(containerId, containerType)));
             return businessDataRetriever.getBusinessData(refBusinessDataInstance);
         } catch (final SBonitaReadException | SFlowNodeReadException e) {
-            throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + businessDataName, e, businessDataName);
+            throw new SExpressionEvaluationException(
+                    "Unable to retrieve business data instance with name " + businessDataName, e, businessDataName);
         } catch (final SBonitaException e) {
             setProcessInstanceId(containerId, containerType, e);
             throw new SExpressionEvaluationException(e, expression.getName());
@@ -75,8 +79,9 @@ public class BusinessDataExpressionExecutorStrategy extends CommonBusinessDataEx
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-                                 final ContainerState containerState) throws SExpressionEvaluationException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> bizData = new ArrayList<>(expressions.size());
         final List<String> alreadyEvaluatedExpressionContent = new ArrayList<>();
         for (final SExpression expression : expressions) {

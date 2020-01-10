@@ -86,8 +86,9 @@ public class SApplication implements PersistentObject {
     @Column
     private Long themeId;
 
-    public SApplication(final String token, final String displayName, final String version, final long creationDate, final long createdBy,
-                            final String state, final Long layoutId, final Long themeId) {
+    public SApplication(final String token, final String displayName, final String version, final long creationDate,
+            final long createdBy,
+            final String state, final Long layoutId, final Long themeId) {
         super();
         this.token = token;
         this.displayName = displayName;
@@ -100,6 +101,5 @@ public class SApplication implements PersistentObject {
         this.layoutId = layoutId;
         this.themeId = themeId;
     }
-
 
 }

@@ -41,7 +41,8 @@ public class BusinessObjectModelValidationRule extends ValidationRule<BusinessOb
     public ValidationStatus validate(final BusinessObjectModel bom) {
         final ValidationStatus status = new ValidationStatus();
         if (bom.getBusinessObjects().isEmpty()) {
-            status.addError(StatusCode.EMPTY_BDM, "Business object model must have at least one business object declared");
+            status.addError(StatusCode.EMPTY_BDM,
+                    "Business object model must have at least one business object declared");
         } else {
             validateQueries(bom, status);
         }

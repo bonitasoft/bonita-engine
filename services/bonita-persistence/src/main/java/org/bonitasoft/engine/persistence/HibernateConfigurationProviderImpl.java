@@ -51,8 +51,8 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
     private List<Class<? extends PersistentObject>> mappedClasses = new ArrayList<>();
 
     public HibernateConfigurationProviderImpl(final Properties properties,
-                                              final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider,
-                                              final List<String> mappingExclusions) {
+            final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider,
+            final List<String> mappingExclusions) {
         this.properties = properties;
         this.hibernateResourcesConfigurationProvider = hibernateResourcesConfigurationProvider;
         this.mappingExclusions = mappingExclusions;
@@ -96,8 +96,8 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
                 break;
         }
 
+        MetadataSources metadataSources = new MetadataSources(standardRegistry) {
 
-        MetadataSources metadataSources = new MetadataSources(standardRegistry){
             @Override
             public MetadataBuilder getMetadataBuilder() {
                 MetadataBuilder metadataBuilder = super.getMetadataBuilder();
@@ -114,7 +114,6 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         for (Class entity : hibernateResourcesConfigurationProvider.getEntities()) {
             metadataSources.addAnnotatedClass(entity);
         }
-
 
         Metadata metadata = metadataSources.buildMetadata();
         SessionFactoryBuilder sessionFactoryBuilder = metadata.getSessionFactoryBuilder();
@@ -139,7 +138,8 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         }
     }
 
-    protected Properties gatherAllProperties(Properties extraHibernateProperties, StandardServiceRegistryBuilder standardRegistryBuilder) {
+    protected Properties gatherAllProperties(Properties extraHibernateProperties,
+            StandardServiceRegistryBuilder standardRegistryBuilder) {
         Properties allProps = new Properties();
         for (Map.Entry<Object, Object> extraProp : properties.entrySet()) {
             allProps.put(extraProp.getKey(), extraProp.getValue());

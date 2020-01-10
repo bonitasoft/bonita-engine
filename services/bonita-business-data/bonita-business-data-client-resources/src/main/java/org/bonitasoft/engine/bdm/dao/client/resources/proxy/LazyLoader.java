@@ -19,14 +19,13 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer;
+import org.bonitasoft.engine.bdm.dao.client.resources.utils.BDMQueryCommandParameters;
+import org.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
-
-import org.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer;
-import org.bonitasoft.engine.bdm.dao.client.resources.utils.BDMQueryCommandParameters;
-import org.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 
 public class LazyLoader {
 
@@ -44,7 +43,8 @@ public class LazyLoader {
     public Object load(final Method method, final long persistenceId) {
         try {
             EntityGetter getter = new EntityGetter(method);
-            final Map<String, Serializable> commandParameters = BDMQueryCommandParameters.createCommandParameters(getter, persistenceId);
+            final Map<String, Serializable> commandParameters = BDMQueryCommandParameters
+                    .createCommandParameters(getter, persistenceId);
             final byte[] serializedResult = (byte[]) getCommandAPI().execute("executeBDMQuery", commandParameters);
             if (getter.returnsList()) {
                 return deserializer.deserializeList(serializedResult, getter.getTargetEntityClass());

@@ -44,7 +44,8 @@ public class SQLNameValidator {
     }
 
     private void initializeSQLKeywords() {
-        try (InputStream resourceAsStream = SQLNameValidator.class.getResourceAsStream("/sql_keywords"); Scanner scanner = new Scanner(resourceAsStream)) {
+        try (InputStream resourceAsStream = SQLNameValidator.class.getResourceAsStream("/sql_keywords");
+                Scanner scanner = new Scanner(resourceAsStream)) {
             while (scanner.hasNext()) {
                 final String word = scanner.nextLine();
                 sqlKeywords.add(word.trim());

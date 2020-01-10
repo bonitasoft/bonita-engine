@@ -79,7 +79,8 @@ public class BusinessObjectModelConverterTest {
 
     @Test
     public void should_be_backward_compatible() throws Exception {
-        final byte[] xml = org.apache.commons.io.IOUtils.toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_6.3.0.xml"));
+        final byte[] xml = org.apache.commons.io.IOUtils
+                .toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_6.3.0.xml"));
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final BusinessObjectModel bom = convertor.unmarshall(xml);
         // expect no unmarshalling exception
@@ -90,7 +91,8 @@ public class BusinessObjectModelConverterTest {
 
     @Test
     public void should_be_backward_compatible_with_version() throws Exception {
-        final byte[] xml = org.apache.commons.io.IOUtils.toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_7.2.0.xml"));
+        final byte[] xml = org.apache.commons.io.IOUtils
+                .toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_7.2.0.xml"));
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final BusinessObjectModel bom = convertor.unmarshall(xml);
         // expect no unmarshalling exception

@@ -16,9 +16,6 @@ package org.bonitasoft.engine.connector;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.connector.exception.SConnectorException;
-import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
-
 /**
  * @author Feng Hui
  */

@@ -79,10 +79,12 @@ public interface SchedulerService extends PlatformLifecycleService {
      * @throws SSchedulerException
      *         if an exception occurs.
      */
-    void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> parameters, Trigger trigger) throws SSchedulerException;
+    void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> parameters, Trigger trigger)
+            throws SSchedulerException;
 
     /**
      * Execute a job again
+     *
      * @param jobDescriptorId the job to re execute
      * @param delayInMillis
      */
@@ -90,7 +92,6 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Retry a job once
-     *
      * In addition to executing the job again, this will also delete failed job logs
      *
      * @param jobDescriptorId the job to retry
@@ -99,7 +100,6 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Change parameters of a job and retry it once
-     *
      * In addition to executing the job again, this will also delete failed job logs
      *
      * @param jobDescriptorId the job to retry

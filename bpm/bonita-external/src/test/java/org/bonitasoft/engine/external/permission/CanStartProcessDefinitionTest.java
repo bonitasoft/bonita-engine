@@ -39,7 +39,8 @@ public class CanStartProcessDefinitionTest {
      * {@link org.bonitasoft.engine.external.permission.CanStartProcessDefinition#execute(java.util.Map, org.bonitasoft.engine.service.TenantServiceAccessor)}.
      */
     @Test(expected = SCommandParameterizationException.class)
-    public final void should_throw_exception_when_Execute_with_wrong_parameter() throws SCommandParameterizationException, SCommandExecutionException {
+    public final void should_throw_exception_when_Execute_with_wrong_parameter()
+            throws SCommandParameterizationException, SCommandExecutionException {
         // Given
         final CanStartProcessDefinition canStartProcessDefinition = new CanStartProcessDefinition();
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
@@ -50,7 +51,8 @@ public class CanStartProcessDefinitionTest {
     }
 
     @Test(expected = SCommandParameterizationException.class)
-    public final void should_throw_exception_when_Execute_with_non_existent_user() throws SCommandParameterizationException, SCommandExecutionException {
+    public final void should_throw_exception_when_Execute_with_non_existent_user()
+            throws SCommandParameterizationException, SCommandExecutionException {
         // Given
         final CanStartProcessDefinition canStartProcessDefinition = new CanStartProcessDefinition();
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();

@@ -36,7 +36,8 @@ public class CustomIsProcessInitiatorRule extends AuthorizationRuleWithParameter
     private SessionAccessor sessionAccessor;
 
     // autowired by spring
-    public CustomIsProcessInitiatorRule(ProcessInstanceService processInstanceService, SessionService sessionService, SessionAccessor sessionAccessor) {
+    public CustomIsProcessInitiatorRule(ProcessInstanceService processInstanceService, SessionService sessionService,
+            SessionAccessor sessionAccessor) {
         this.processInstanceService = processInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;

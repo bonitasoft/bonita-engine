@@ -29,7 +29,7 @@ public interface State<T> {
 
     /**
      * Checks whether the state can be interrupted.
-     * 
+     *
      * @return true if the state can be interrupted; false otherwise
      */
     boolean isInterrupting();
@@ -42,7 +42,7 @@ public interface State<T> {
 
     /**
      * Checks whether the state is a terminal one.
-     * 
+     *
      * @return true is the state is a terminal one; false otherwise
      */
     boolean isTerminal();

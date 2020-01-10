@@ -34,7 +34,7 @@ public interface Theme extends BaseElement {
 
     /**
      * This theme is default, or not.
-     * 
+     *
      * @return True if this theme is default, false otherwise.
      * @since 6.2
      */
@@ -42,7 +42,7 @@ public interface Theme extends BaseElement {
 
     /**
      * Get the date when this theme was last modified.
-     * 
+     *
      * @return The date when this theme was last modified.
      * @since 6.2
      */
@@ -50,7 +50,7 @@ public interface Theme extends BaseElement {
 
     /**
      * Get the type of this theme
-     * 
+     *
      * @return The type of this theme
      * @since 6.2
      */

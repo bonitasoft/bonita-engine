@@ -23,9 +23,11 @@ import org.bonitasoft.engine.service.ModelConvertor;
 /**
  * @author Baptiste Mesta
  */
-public abstract class AbstractArchivedConnectorInstanceSearchEntity extends AbstractSearchEntity<ArchivedConnectorInstance, SAConnectorInstance> {
+public abstract class AbstractArchivedConnectorInstanceSearchEntity
+        extends AbstractSearchEntity<ArchivedConnectorInstance, SAConnectorInstance> {
 
-    public AbstractArchivedConnectorInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+    public AbstractArchivedConnectorInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
     }
 

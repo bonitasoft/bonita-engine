@@ -34,7 +34,8 @@ public class SearchArchivedProcessInstancesWithoutSubProcess extends AbstractArc
     private final ProcessInstanceService processInstanceService;
 
     public SearchArchivedProcessInstancesWithoutSubProcess(final ProcessInstanceService processInstanceService,
-            final ProcessDefinitionService processDefinitionService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+            final ProcessDefinitionService processDefinitionService, final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options, processDefinitionService);
         this.processInstanceService = processInstanceService;
     }

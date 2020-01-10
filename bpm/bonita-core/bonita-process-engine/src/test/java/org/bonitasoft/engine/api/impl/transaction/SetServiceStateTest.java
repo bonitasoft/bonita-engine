@@ -18,37 +18,24 @@ import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.Service
 import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.RESUME;
 import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.START;
 import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.STOP;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -84,7 +71,6 @@ public class SetServiceStateTest {
         return setServiceState;
     }
 
-
     @Test
     public void should_not_refresh_classloaders_on_start() throws Exception {
         // when:
@@ -110,6 +96,7 @@ public class SetServiceStateTest {
         verify(tenantService1).start();
         verify(tenantService2).start();
     }
+
     @Test
     public void should_call_stop_on_tenant_services() throws Exception {
         createService(STOP).call();
@@ -117,6 +104,7 @@ public class SetServiceStateTest {
         verify(tenantService1).stop();
         verify(tenantService2).stop();
     }
+
     @Test
     public void should_call_resume_on_tenant_services() throws Exception {
         createService(RESUME).call();
@@ -124,6 +112,7 @@ public class SetServiceStateTest {
         verify(tenantService1).resume();
         verify(tenantService2).resume();
     }
+
     @Test
     public void should_call_pause_on_tenant_services() throws Exception {
         createService(PAUSE).call();

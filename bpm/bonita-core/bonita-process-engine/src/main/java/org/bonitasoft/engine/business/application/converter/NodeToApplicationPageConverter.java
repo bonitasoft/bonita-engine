@@ -32,7 +32,8 @@ public class NodeToApplicationPageConverter {
     private final PageService pageService;
     private final ApplicationImportValidator importValidator;
 
-    public NodeToApplicationPageConverter(final PageService pageService, final ApplicationImportValidator importValidator) {
+    public NodeToApplicationPageConverter(final PageService pageService,
+            final ApplicationImportValidator importValidator) {
         this.pageService = pageService;
         this.importValidator = importValidator;
     }
@@ -42,7 +43,8 @@ public class NodeToApplicationPageConverter {
      * @param application the {@link SApplication} where the {@code SApplicationPage} will be attached
      * @return an ApplicationPageImportResult containing the converted {@code SApplicationPage} and an error (if any)
      */
-    public ApplicationPageImportResult toSApplicationPage(ApplicationPageNode applicationPageNode, SApplication application) throws SBonitaReadException, ImportException {
+    public ApplicationPageImportResult toSApplicationPage(ApplicationPageNode applicationPageNode,
+            SApplication application) throws SBonitaReadException, ImportException {
         String token = applicationPageNode.getToken();
         importValidator.validate(token);
         long pageId = 0;
@@ -53,7 +55,9 @@ public class NodeToApplicationPageConverter {
         } else {
             importError = new ImportError(applicationPageNode.getCustomPage(), ImportError.Type.PAGE);
         }
-        return new ApplicationPageImportResult(SApplicationPage.builder().applicationId(application.getId()).pageId(pageId).token(token).build(), importError);
+        return new ApplicationPageImportResult(
+                SApplicationPage.builder().applicationId(application.getId()).pageId(pageId).token(token).build(),
+                importError);
     }
 
 }

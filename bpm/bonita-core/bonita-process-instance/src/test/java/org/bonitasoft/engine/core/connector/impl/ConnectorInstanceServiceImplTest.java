@@ -167,7 +167,8 @@ public class ConnectorInstanceServiceImplTest {
         final String retrievedMessage = (String) updateRecord.getFields().get(EXCEPTION_MESSAGE);
         assertEquals(longMessage.substring(0, 255), retrievedMessage);
         assertTrue(stackTrace.startsWith(Exception.class.getName() + ": " + longMessage));
-        assertTrue(stackTrace.contains(getClass().getName() + ".setConnectorInstanceFailureExceptionMessageGreaterThen255"));
+        assertTrue(stackTrace
+                .contains(getClass().getName() + ".setConnectorInstanceFailureExceptionMessageGreaterThen255"));
     }
 
     @Test
@@ -178,18 +179,21 @@ public class ConnectorInstanceServiceImplTest {
         parameters.put("containerType", "flowNode");
         parameters.put("state", "failed");
 
-        List<SConnectorInstanceWithFailureInfo> connectors = Arrays.asList(mock(SConnectorInstanceWithFailureInfo.class),
+        List<SConnectorInstanceWithFailureInfo> connectors = Arrays.asList(
+                mock(SConnectorInstanceWithFailureInfo.class),
                 mock(SConnectorInstanceWithFailureInfo.class));
         given(
                 readPersistenceService.selectList(new SelectListDescriptor<SConnectorInstanceWithFailureInfo>(
                         "getConnectorInstancesWithFailureInfoInState",
                         parameters,
-                        SConnectorInstanceWithFailureInfo.class, new QueryOptions(0, 100, SConnectorInstanceWithFailureInfo.class, "id", OrderByType.ASC))))
-                .willReturn(connectors);
+                        SConnectorInstanceWithFailureInfo.class,
+                        new QueryOptions(0, 100, SConnectorInstanceWithFailureInfo.class, "id", OrderByType.ASC))))
+                                .willReturn(connectors);
 
         //when
-        List<SConnectorInstanceWithFailureInfo> retrievedConnectors = connectorInstanceServiceImpl.getConnectorInstancesWithFailureInfo(1L, "flowNode",
-                "failed", 0, 100);
+        List<SConnectorInstanceWithFailureInfo> retrievedConnectors = connectorInstanceServiceImpl
+                .getConnectorInstancesWithFailureInfo(1L, "flowNode",
+                        "failed", 0, 100);
 
         //then
         assertThat(retrievedConnectors).isEqualTo(connectors);

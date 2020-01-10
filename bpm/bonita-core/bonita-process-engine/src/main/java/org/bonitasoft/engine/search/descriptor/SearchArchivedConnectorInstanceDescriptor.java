@@ -34,9 +34,11 @@ public class SearchArchivedConnectorInstanceDescriptor extends SearchEntityDescr
     private final Map<Class<? extends PersistentObject>, Set<String>> archivedConnectorssAllFields;
 
     SearchArchivedConnectorInstanceDescriptor() {
-        final SAConnectorInstanceBuilderFactory keyProvider = BuilderFactory.get(SAConnectorInstanceBuilderFactory.class);
+        final SAConnectorInstanceBuilderFactory keyProvider = BuilderFactory
+                .get(SAConnectorInstanceBuilderFactory.class);
         searchEntityKeys = new HashMap<String, FieldDescriptor>(7);
-        searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.NAME, new FieldDescriptor(SAConnectorInstance.class, keyProvider.getNameKey()));
+        searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.NAME,
+                new FieldDescriptor(SAConnectorInstance.class, keyProvider.getNameKey()));
         searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.ACTIVATION_EVENT,
                 new FieldDescriptor(SAConnectorInstance.class, keyProvider.getActivationEventKey()));
         searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_ID,

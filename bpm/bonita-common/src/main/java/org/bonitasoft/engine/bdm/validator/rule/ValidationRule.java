@@ -38,7 +38,8 @@ public abstract class ValidationRule<T, R> {
     @SuppressWarnings("unchecked")
     public R checkRule(Object modelElement) {
         if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(this.getClass().getName() + " doesn't handle validation for " + modelElement.getClass().getName());
+            throw new IllegalArgumentException(
+                    this.getClass().getName() + " doesn't handle validation for " + modelElement.getClass().getName());
         }
         return validate((T) modelElement);
     }

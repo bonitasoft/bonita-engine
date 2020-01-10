@@ -53,7 +53,8 @@ public class CountQueryGeneratorTest {
     public void should_generate_query_name() {
         //when then
         assertThat(queryGenerator.getQueryName()).isEqualTo("countForFind");
-        assertThat(queryGenerator.getQueryName("lastName", "firstName")).isEqualTo("countForFindByLastNameAndFirstName");
+        assertThat(queryGenerator.getQueryName("lastName", "firstName"))
+                .isEqualTo("countForFindByLastNameAndFirstName");
     }
 
     @Test
@@ -74,7 +75,8 @@ public class CountQueryGeneratorTest {
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
 
         //when
-        final String countQueryNameForUniqueConstraint = queryGenerator.createQueryNameForUniqueConstraint(uniqueConstraint);
+        final String countQueryNameForUniqueConstraint = queryGenerator
+                .createQueryNameForUniqueConstraint(uniqueConstraint);
 
         //then
         assertThat(countQueryNameForUniqueConstraint).isEqualTo("countForFindByName");
@@ -127,12 +129,15 @@ public class CountQueryGeneratorTest {
         CountQueryGenerator countQueryGenerator = new CountQueryGenerator();
         BusinessObject employeeBo = BusinessObjectBuilder.aBO(EMPLOYEE_QUALIFIED_CLASS_NAME).build();
         BusinessObject addressBo = BusinessObjectBuilder.aBO(ADDRESS_QUALIFIED_CLASS_NAME).build();
-        RelationField multipleRelation = aRelationField().withName("addresses").ofType(RelationField.Type.AGGREGATION).lazy().referencing(addressBo).multiple()
+        RelationField multipleRelation = aRelationField().withName("addresses").ofType(RelationField.Type.AGGREGATION)
+                .lazy().referencing(addressBo).multiple()
                 .build();
-        RelationField singleRelation = aRelationField().withName("address").ofType(RelationField.Type.AGGREGATION).lazy().referencing(addressBo).build();
+        RelationField singleRelation = aRelationField().withName("address").ofType(RelationField.Type.AGGREGATION)
+                .lazy().referencing(addressBo).build();
 
         //when
-        final Query queryForMultipleLazyField = countQueryGenerator.createQueryForLazyField(employeeBo, multipleRelation);
+        final Query queryForMultipleLazyField = countQueryGenerator.createQueryForLazyField(employeeBo,
+                multipleRelation);
         final Query queryForSingleLazyField = countQueryGenerator.createQueryForLazyField(employeeBo, singleRelation);
 
         //then

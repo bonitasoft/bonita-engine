@@ -29,7 +29,8 @@ public class GetNumberOfProcessDeploymentInfosUnrelatedToCategory implements Tra
 
     private Long count;
 
-    public GetNumberOfProcessDeploymentInfosUnrelatedToCategory(final long categoryId, final ProcessDefinitionService processDefinitionService) {
+    public GetNumberOfProcessDeploymentInfosUnrelatedToCategory(final long categoryId,
+            final ProcessDefinitionService processDefinitionService) {
         this.categoryId = categoryId;
         this.processDefinitionService = processDefinitionService;
     }

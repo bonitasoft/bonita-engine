@@ -18,10 +18,9 @@ import java.util.List;
 import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
-
 
 @Repository
 public class TenantResourceRepository extends TestRepository {
@@ -58,7 +57,5 @@ public class TenantResourceRepository extends TestRepository {
         namedQuery.setParameter("type", type);
         return (long) namedQuery.uniqueResult();
     }
-
-
 
 }

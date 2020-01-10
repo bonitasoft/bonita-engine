@@ -29,7 +29,8 @@ import org.bonitasoft.engine.platform.authentication.SInvalidUserException;
 public class PlatformAuthenticationChecker implements PlatformAuthenticationService {
 
     @Override
-    public void checkUserCredentials(final String userName, final String password) throws SInvalidUserException, SInvalidPasswordException {
+    public void checkUserCredentials(final String userName, final String password)
+            throws SInvalidUserException, SInvalidPasswordException {
         try {
             final Properties properties = BonitaHomeServer.getInstance().getPlatformProperties();
             final String userProperty = properties.getProperty("platformAdminUsername");

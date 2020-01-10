@@ -50,8 +50,10 @@ public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTrigg
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ErrorEventTriggerDefinitionImpl that = (ErrorEventTriggerDefinitionImpl) o;
         return Objects.equals(errorCode, that.errorCode);
     }

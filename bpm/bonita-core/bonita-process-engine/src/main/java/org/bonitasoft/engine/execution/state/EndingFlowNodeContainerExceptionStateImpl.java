@@ -36,7 +36,8 @@ public abstract class EndingFlowNodeContainerExceptionStateImpl implements FlowN
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         if (flowNodeInstance.getTokenCount() > 0) {
             try {
                 stateBehaviors.interruptSubActivities(flowNodeInstance, getStateCategory());
@@ -49,12 +50,14 @@ public abstract class EndingFlowNodeContainerExceptionStateImpl implements FlowN
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
         return StateCode.DONE;
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return parentInstance.getTokenCount() == 0;
     }
 

@@ -50,7 +50,8 @@ public class TestUtil {
         }
     }
 
-    public static void stopScheduler(final SchedulerService scheduler, final TransactionService txService) throws Exception {
+    public static void stopScheduler(final SchedulerService scheduler, final TransactionService txService)
+            throws Exception {
         if (scheduler.isStarted() && !scheduler.isStopped()) {
             try {
                 txService.executeInTransaction((Callable<Void>) () -> {
@@ -78,7 +79,8 @@ public class TestUtil {
         }
     }
 
-    public static void createSessionOn(final SessionAccessor sessionAccessor, final SessionService sessionService, final long tenantId)
+    public static void createSessionOn(final SessionAccessor sessionAccessor, final SessionService sessionService,
+            final long tenantId)
             throws SBonitaException {
         try {
             sessionService.deleteSession(sessionAccessor.getSessionId());

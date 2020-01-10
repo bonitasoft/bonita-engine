@@ -15,8 +15,9 @@ package org.bonitasoft.engine.bpm.process;
 
 /**
  * Search descriptors are used to filter / sort results of a generic search. <br>
- * ArchivedProcessInstancesSearchDescriptor defines the fields that can be used as filters or sort fields on <code>List&lt;ArchivedProcessInstance&gt;</code> returning methods.
- * 
+ * ArchivedProcessInstancesSearchDescriptor defines the fields that can be used as filters or sort fields on
+ * <code>List&lt;ArchivedProcessInstance&gt;</code> returning methods.
+ *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -68,7 +69,8 @@ public class ArchivedProcessInstancesSearchDescriptor {
     public static final String STARTED_BY = "startedBy";
 
     /**
-     * The field corresponding to the identifier of the user who started the process instance for the user in {@link ProcessInstance#getStartedBy()}.
+     * The field corresponding to the identifier of the user who started the process instance for the user in
+     * {@link ProcessInstance#getStartedBy()}.
      */
     public static final String STARTED_BY_SUBSTITUTE = "startedBySubstitute";
 

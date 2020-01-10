@@ -37,7 +37,8 @@ public class FlowNodeRetrier {
     private final FlowNodeStateManager stateManager;
     private final ConnectorResetStrategy strategy;
 
-    public FlowNodeRetrier(ContainerRegistry containerRegistry, FlowNodeExecutor flowNodeExecutor, ActivityInstanceService activityInstanceService,
+    public FlowNodeRetrier(ContainerRegistry containerRegistry, FlowNodeExecutor flowNodeExecutor,
+            ActivityInstanceService activityInstanceService,
             FlowNodeStateManager stateManager, final ConnectorResetStrategy strategy) {
         this.containerRegistry = containerRegistry;
         this.flowNodeExecutor = flowNodeExecutor;
@@ -69,9 +70,11 @@ public class FlowNodeRetrier {
     private void validateCurrentState(final SFlowNodeInstance flowNodeInstance) throws ActivityExecutionException {
         FlowNodeState currentState = stateManager.getState(flowNodeInstance.getStateId());
         if (!ActivityStates.FAILED_STATE.equals(currentState.getName())) {
-            throw new ActivityExecutionException("Unable to retry the flow node instance [name=" + flowNodeInstance.getName() + ", id="
-                    + flowNodeInstance.getId() + "] because it is not in failed state. The current state for this flow node instance is '"
-                    + currentState.getName() + "'");
+            throw new ActivityExecutionException(
+                    "Unable to retry the flow node instance [name=" + flowNodeInstance.getName() + ", id="
+                            + flowNodeInstance.getId()
+                            + "] because it is not in failed state. The current state for this flow node instance is '"
+                            + currentState.getName() + "'");
         }
     }
 

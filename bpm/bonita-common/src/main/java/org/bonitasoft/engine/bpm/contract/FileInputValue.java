@@ -30,11 +30,11 @@ public class FileInputValue implements Serializable {
     public FileInputValue(String fileName, byte[] content) {
         this(fileName, null, content, null);
     }
-    
+
     public FileInputValue(String fileName, String contentType, byte[] content) {
         this(fileName, contentType, content, null);
     }
-    
+
     public FileInputValue(String fileName, String contentType, byte[] content, String id) {
         this.id = id;
         this.fileName = fileName;
@@ -65,11 +65,11 @@ public class FileInputValue implements Serializable {
     public void setContent(byte[] content) {
         this.content = content;
     }
-    
+
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public String getId() {
         return id;
     }
@@ -84,8 +84,10 @@ public class FileInputValue implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         final FileInputValue that = (FileInputValue) o;
         return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) &&
                 Arrays.equals(content, that.content);

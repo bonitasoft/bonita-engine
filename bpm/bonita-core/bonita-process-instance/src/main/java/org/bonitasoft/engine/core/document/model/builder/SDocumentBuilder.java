@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.document.model.SDocument;
  */
 public class SDocumentBuilder {
 
-
     private final SDocument entity;
 
     public SDocumentBuilder() {

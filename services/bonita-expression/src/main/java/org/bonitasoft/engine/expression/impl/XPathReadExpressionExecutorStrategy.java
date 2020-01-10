@@ -55,7 +55,7 @@ import org.xml.sax.SAXException;
  * <li>org.w3c.dom.Node</li>
  * <li>org.w3c.dom.NodeList</li>
  * </ul>
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -63,19 +63,24 @@ import org.xml.sax.SAXException;
 public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         if (expression.getDependencies().size() != 1 || expression.getDependencies().get(0) == null) {
-            throw new SExpressionDependencyMissingException("XPathReadExpressionExecutorStrategy must have exactly one dependency");
+            throw new SExpressionDependencyMissingException(
+                    "XPathReadExpressionExecutorStrategy must have exactly one dependency");
         }
 
         final String expressionName = expression.getName();
         final String returnType = expression.getReturnType();
-        final String messageForException = "Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy";
+        final String messageForException = "Error evaluating expression " + expression
+                + " with strategy XPathReadExpressionExecutorStrategy";
         try {
             final QName qname = getXPathConstants(returnType);
             if (qname == null) {
-                throw new SExpressionEvaluationException("XPathReadExpressionExecutorStrategy return type not supported: " + expression.getReturnType(),
+                throw new SExpressionEvaluationException(
+                        "XPathReadExpressionExecutorStrategy return type not supported: " + expression.getReturnType(),
                         expressionName);
             }
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -84,7 +89,8 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
             final SExpression dep = expression.getDependencies().get(0);
             final String xmlContent = (String) resolvedExpressions.get(dep.getDiscriminant());
             if (xmlContent == null || xmlContent.isEmpty()) {
-                throw new SExpressionEvaluationException("The content of the xml is nul or empty: " + expression, expressionName);
+                throw new SExpressionEvaluationException("The content of the xml is nul or empty: " + expression,
+                        expressionName);
             }
             final Document document = builder.parse(new InputSource(new StringReader(xmlContent)));
             final XPathFactory xpFactory = XPathFactory.newInstance();
@@ -133,7 +139,8 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
     private QName getXPathConstants(final String expReturnType) {
         if (String.class.getName().equals(expReturnType)) {
             return XPathConstants.STRING;
-        } else if (Long.class.getName().equals(expReturnType) || Double.class.getName().equals(expReturnType) || Float.class.getName().equals(expReturnType)
+        } else if (Long.class.getName().equals(expReturnType) || Double.class.getName().equals(expReturnType)
+                || Float.class.getName().equals(expReturnType)
                 || Integer.class.getName().equals(expReturnType)) {
             return XPathConstants.STRING;
         } else if (Boolean.class.getName().equals(expReturnType)) {
@@ -153,7 +160,8 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
         }
         final String expressionContent = expression.getContent();
         if (expressionContent == null) {
-            throw new SInvalidExpressionException("The expression content cannot be null : " + expression, expression.getName());
+            throw new SInvalidExpressionException("The expression content cannot be null : " + expression,
+                    expression.getName());
         }
     }
 
@@ -163,8 +171,10 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, context, resolvedExpressions, containerState));

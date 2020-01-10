@@ -82,18 +82,21 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public void setState(final SAbstractConnectorInstance sConnectorInstance, final String state) throws SConnectorInstanceModificationException {
+    public void setState(final SAbstractConnectorInstance sConnectorInstance, final String state)
+            throws SConnectorInstanceModificationException {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(SConnectorInstance.STATE_KEY, state);
         try {
-            recorder.recordUpdate(UpdateRecord.buildSetFields(sConnectorInstance, entityUpdateDescriptor), CONNECTOR_INSTANCE_STATE);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(sConnectorInstance, entityUpdateDescriptor),
+                    CONNECTOR_INSTANCE_STATE);
         } catch (final SRecorderException e) {
             throw new SConnectorInstanceModificationException(e);
         }
     }
 
     @Override
-    public void setConnectorInstanceFailureException(final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, final Throwable throwable)
+    public void setConnectorInstanceFailureException(
+            final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, final Throwable throwable)
             throws SConnectorInstanceModificationException {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(SConnectorInstanceWithFailureInfo.EXCEPTION_MESSAGE,
@@ -105,7 +108,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             throw new SConnectorInstanceModificationException(e);
         }
         try {
-            recorder.recordUpdate(UpdateRecord.buildSetFields(connectorInstanceWithFailure, entityUpdateDescriptor), CONNECTOR_INSTANCE);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(connectorInstanceWithFailure, entityUpdateDescriptor),
+                    CONNECTOR_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SConnectorInstanceModificationException(e);
         }
@@ -145,7 +149,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public void createConnectorInstance(final SConnectorInstance connectorInstance) throws SConnectorInstanceCreationException {
+    public void createConnectorInstance(final SConnectorInstance connectorInstance)
+            throws SConnectorInstanceCreationException {
         try {
             recorder.recordInsert(new InsertRecord(connectorInstance), CONNECTOR_INSTANCE);
         } catch (final SRecorderException e) {
@@ -154,15 +159,18 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public List<SConnectorInstance> getConnectorInstances(final long containerId, final String containerType, final ConnectorEvent activationEvent,
+    public List<SConnectorInstance> getConnectorInstances(final long containerId, final String containerType,
+            final ConnectorEvent activationEvent,
             final int from, final int numberOfResult, final String state) throws SConnectorInstanceReadException {
         final Map<String, Object> inputParameters = new HashMap<>(4);
         inputParameters.put("containerId", containerId);
         inputParameters.put("containerType", containerType);
         inputParameters.put("activationEvent", activationEvent);
         inputParameters.put("state", state);
-        final SelectListDescriptor<SConnectorInstance> selectListDescriptor = new SelectListDescriptor<>("getConnectorInstancesWithState",
-                inputParameters, SConnectorInstance.class, new QueryOptions(from, numberOfResult, SConnectorInstance.class, "id", OrderByType.ASC));
+        final SelectListDescriptor<SConnectorInstance> selectListDescriptor = new SelectListDescriptor<>(
+                "getConnectorInstancesWithState",
+                inputParameters, SConnectorInstance.class,
+                new QueryOptions(from, numberOfResult, SConnectorInstance.class, "id", OrderByType.ASC));
         try {
             return persistenceService.selectList(selectListDescriptor);
         } catch (final SBonitaReadException e) {
@@ -171,13 +179,16 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public List<SConnectorInstance> getConnectorInstances(final long containerId, final String containerType, final int from, final int numberOfResult,
+    public List<SConnectorInstance> getConnectorInstances(final long containerId, final String containerType,
+            final int from, final int numberOfResult,
             final String fieldName, final OrderByType orderByType) throws SConnectorInstanceReadException {
         final Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("containerId", containerId);
         inputParameters.put("containerType", containerType);
-        final SelectListDescriptor<SConnectorInstance> selectListDescriptor = new SelectListDescriptor<>("getConnectorInstances",
-                inputParameters, SConnectorInstance.class, new QueryOptions(from, numberOfResult, SConnectorInstance.class, fieldName, orderByType));
+        final SelectListDescriptor<SConnectorInstance> selectListDescriptor = new SelectListDescriptor<>(
+                "getConnectorInstances",
+                inputParameters, SConnectorInstance.class,
+                new QueryOptions(from, numberOfResult, SConnectorInstance.class, fieldName, orderByType));
         try {
             return persistenceService.selectList(selectListDescriptor);
         } catch (final SBonitaReadException e) {
@@ -185,12 +196,14 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
     }
 
-    private List<SConnectorInstance> getConnectorInstancesOrderedById(final long containerId, final String containerType, final int from,
+    private List<SConnectorInstance> getConnectorInstancesOrderedById(final long containerId,
+            final String containerType, final int from,
             final int numberOfResult) throws SConnectorInstanceReadException {
         final Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("containerId", containerId);
         inputParameters.put("containerType", containerType);
-        final SelectListDescriptor<SConnectorInstance> selectListDescriptor = new SelectListDescriptor<>("getConnectorInstancesOrderedById",
+        final SelectListDescriptor<SConnectorInstance> selectListDescriptor = new SelectListDescriptor<>(
+                "getConnectorInstancesOrderedById",
                 inputParameters, SConnectorInstance.class, new QueryOptions(from, numberOfResult));
         try {
             return persistenceService.selectList(selectListDescriptor);
@@ -200,13 +213,15 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public SConnectorInstance getNextExecutableConnectorInstance(final long containerId, final String containerType, final ConnectorEvent activationEvent)
+    public SConnectorInstance getNextExecutableConnectorInstance(final long containerId, final String containerType,
+            final ConnectorEvent activationEvent)
             throws SConnectorInstanceReadException {
         final Map<String, Object> inputParameters = new HashMap<>(3);
         inputParameters.put("containerId", containerId);
         inputParameters.put("containerType", containerType);
         inputParameters.put("activationEvent", activationEvent);
-        final SelectListDescriptor<SConnectorInstance> selectOneDescriptor = new SelectListDescriptor<>("getNextExecutableConnectorInstance",
+        final SelectListDescriptor<SConnectorInstance> selectOneDescriptor = new SelectListDescriptor<>(
+                "getNextExecutableConnectorInstance",
                 inputParameters, SConnectorInstance.class, new QueryOptions(0, 1));
         try {
             final List<SConnectorInstance> selectList = persistenceService.selectList(selectOneDescriptor);
@@ -220,11 +235,13 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public long getNumberOfConnectorInstances(final long containerId, final String containerType) throws SConnectorInstanceReadException {
+    public long getNumberOfConnectorInstances(final long containerId, final String containerType)
+            throws SConnectorInstanceReadException {
         final Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("containerId", containerId);
         inputParameters.put("containerType", containerType);
-        final SelectOneDescriptor<Long> selectListDescriptor = new SelectOneDescriptor<>("getNumberOfConnectorInstances", inputParameters,
+        final SelectOneDescriptor<Long> selectListDescriptor = new SelectOneDescriptor<>(
+                "getNumberOfConnectorInstances", inputParameters,
                 SConnectorInstance.class);
         try {
             return persistenceService.selectOne(selectListDescriptor);
@@ -234,7 +251,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public SConnectorInstance getConnectorInstance(final long connectorInstanceId) throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException {
+    public SConnectorInstance getConnectorInstance(final long connectorInstanceId)
+            throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException {
         final SelectByIdDescriptor<SConnectorInstance> selectByIdDescriptor = new SelectByIdDescriptor<>(
                 SConnectorInstance.class, connectorInstanceId);
         try {
@@ -249,12 +267,14 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public SConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInfo(final long connectorInstanceId) throws SConnectorInstanceReadException,
+    public SConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInfo(final long connectorInstanceId)
+            throws SConnectorInstanceReadException,
             SConnectorInstanceNotFoundException {
         final SelectByIdDescriptor<SConnectorInstanceWithFailureInfo> selectByIdDescriptor = new SelectByIdDescriptor<>(
                 SConnectorInstanceWithFailureInfo.class, connectorInstanceId);
         try {
-            final SConnectorInstanceWithFailureInfo connectorInstance = persistenceService.selectById(selectByIdDescriptor);
+            final SConnectorInstanceWithFailureInfo connectorInstance = persistenceService
+                    .selectById(selectByIdDescriptor);
             if (connectorInstance == null) {
                 throw new SConnectorInstanceNotFoundException(connectorInstanceId);
             }
@@ -265,7 +285,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(final long containerId, final String containerType, final String state,
+    public List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(final long containerId,
+            final String containerType, final String state,
             final int from, final int maxResults) throws SConnectorInstanceReadException {
         final Map<String, Object> inputParameters = new HashMap<>(3);
         inputParameters.put("containerId", containerId);
@@ -273,7 +294,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         inputParameters.put("state", state);
         final SelectListDescriptor<SConnectorInstanceWithFailureInfo> selectListDescriptor = new SelectListDescriptor<>(
                 "getConnectorInstancesWithFailureInfoInState",
-                inputParameters, SConnectorInstanceWithFailureInfo.class, new QueryOptions(from, maxResults, SConnectorInstanceWithFailureInfo.class, "id",
+                inputParameters, SConnectorInstanceWithFailureInfo.class,
+                new QueryOptions(from, maxResults, SConnectorInstanceWithFailureInfo.class, "id",
                         OrderByType.ASC));
         try {
             return persistenceService.selectList(selectListDescriptor);
@@ -289,12 +311,14 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
 
     // charles
     @Override
-    public List<SConnectorInstance> searchConnectorInstances(final QueryOptions searchOptions) throws SBonitaReadException {
+    public List<SConnectorInstance> searchConnectorInstances(final QueryOptions searchOptions)
+            throws SBonitaReadException {
         return persistenceService.searchEntity(SConnectorInstance.class, searchOptions, null);
     }
 
     @Override
-    public void archiveConnectorInstance(final SConnectorInstance connectorInstance, final long archiveDate) throws SConnectorInstanceCreationException {
+    public void archiveConnectorInstance(final SConnectorInstance connectorInstance, final long archiveDate)
+            throws SConnectorInstanceCreationException {
         if (connectorInstance != null) {
             final SAConnectorInstance saConnectorInstance = BuilderFactory.get(SAConnectorInstanceBuilderFactory.class)
                     .createNewArchivedConnectorInstance(connectorInstance).done();
@@ -302,13 +326,15 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             try {
                 archiveService.recordInsert(archiveDate, insertRecord);
             } catch (final SBonitaException e) {
-                throw new SConnectorInstanceCreationException("Unable to archive the connectorInstance instance with id " + connectorInstance.getId(), e);
+                throw new SConnectorInstanceCreationException(
+                        "Unable to archive the connectorInstance instance with id " + connectorInstance.getId(), e);
             }
         }
     }
 
     @Override
-    public void deleteConnectorInstance(final SConnectorInstance connectorInstance) throws SConnectorInstanceDeletionException {
+    public void deleteConnectorInstance(final SConnectorInstance connectorInstance)
+            throws SConnectorInstanceDeletionException {
         try {
             recorder.recordDelete(new DeleteRecord(connectorInstance), CONNECTOR_INSTANCE);
         } catch (final SRecorderException e) {
@@ -318,19 +344,22 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public long getNumberArchivedConnectorInstance(final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
+    public long getNumberArchivedConnectorInstance(final QueryOptions searchOptions,
+            final ReadPersistenceService persistenceService)
             throws SBonitaReadException {
         return persistenceService.getNumberOfEntities(SAConnectorInstance.class, searchOptions, null);
     }
 
     @Override
-    public List<SAConnectorInstance> searchArchivedConnectorInstance(final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
+    public List<SAConnectorInstance> searchArchivedConnectorInstance(final QueryOptions searchOptions,
+            final ReadPersistenceService persistenceService)
             throws SBonitaReadException {
         return persistenceService.searchEntity(SAConnectorInstance.class, searchOptions, null);
     }
 
     @Override
-    public void deleteArchivedConnectorInstances(List<Long> containerIds, String containerType) throws SBonitaException {
+    public void deleteArchivedConnectorInstances(List<Long> containerIds, String containerType)
+            throws SBonitaException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("containerIds", containerIds);
         map.put("containerType", containerType);
@@ -338,7 +367,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public void deleteConnectors(final long containerId, final String containerType) throws SConnectorInstanceReadException,
+    public void deleteConnectors(final long containerId, final String containerType)
+            throws SConnectorInstanceReadException,
             SConnectorInstanceDeletionException {
         List<SConnectorInstance> connetorInstances;
         do {

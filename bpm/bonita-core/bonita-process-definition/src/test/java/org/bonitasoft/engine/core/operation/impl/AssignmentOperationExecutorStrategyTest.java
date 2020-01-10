@@ -63,7 +63,8 @@ public class AssignmentOperationExecutorStrategyTest {
     public void testGetValue() throws Exception {
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", "value"));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_DATA);
-        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
+        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value,
+                expressionContext, false);
         assertThat(returnedValue).isEqualTo("value");
     }
 
@@ -71,14 +72,16 @@ public class AssignmentOperationExecutorStrategyTest {
     public void testGetValueOnExternalData() throws Exception {
         // return type is not compatible
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
-        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
+        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value,
+                expressionContext, false);
         assertThat(returnedValue).isEqualTo("value");
     }
 
     @Test(expected = SOperationExecutionException.class)
     public void testGetValueWithWrongType() throws Exception {
         // return type is not compatible
-        when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
+        when(expressionContext.getInputValues())
+                .thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_DATA);
         assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
     }

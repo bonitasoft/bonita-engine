@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
-import org.hibernate.query.Query;
-import org.hibernate.SessionFactory;
-import org.springframework.stereotype.Repository;
+import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl.QUERY_RESET_IN_PROGRESS_WAITING_EVENTS;
 
 import java.util.List;
 
-import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl.QUERY_RESET_IN_PROGRESS_WAITING_EVENTS;
+import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Emmanuel Duchastenier

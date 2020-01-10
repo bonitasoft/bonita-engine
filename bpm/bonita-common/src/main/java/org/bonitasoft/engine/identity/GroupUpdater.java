@@ -34,7 +34,9 @@ public class GroupUpdater implements Serializable {
      * represents the available {@link Group} fields
      */
     public enum GroupField {
-        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated ICON_NAME, @Deprecated ICON_PATH, PARENT_PATH, ICON_FILENAME, ICON_CONTENT
+        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated
+        ICON_NAME, @Deprecated
+        ICON_PATH, PARENT_PATH, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<GroupField, Serializable> fields;

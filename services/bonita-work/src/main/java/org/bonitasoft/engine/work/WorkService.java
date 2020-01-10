@@ -25,7 +25,8 @@ import org.bonitasoft.engine.commons.TenantLifecycleService;
 public interface WorkService extends TenantLifecycleService {
 
     /**
-     * This operation MUST be called within an active transaction. If no active transaction is found, a SWorkRegisterException is thrown
+     * This operation MUST be called within an active transaction. If no active transaction is found, a
+     * SWorkRegisterException is thrown
      *
      * @param workDescriptor
      * @throws SWorkRegisterException

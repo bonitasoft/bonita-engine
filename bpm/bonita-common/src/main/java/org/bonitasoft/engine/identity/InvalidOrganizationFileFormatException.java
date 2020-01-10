@@ -21,7 +21,8 @@ import org.bonitasoft.engine.InvalidFileFormatException;
  * @author Danila Mazour
  * @since 7.9.0
  */
-public class InvalidOrganizationFileFormatException extends OrganizationImportException implements InvalidFileFormatException {
+public class InvalidOrganizationFileFormatException extends OrganizationImportException
+        implements InvalidFileFormatException {
 
     /**
      * create a new exception instance with the given message

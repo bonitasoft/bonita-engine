@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl.business.data;
 
-
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
@@ -23,7 +22,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
 /**
  * @author Matthieu Chaffotte
  */
-public class SRefBusinessDataInstanceLogBuilderImpl extends CRUDELogBuilder implements SRefBusinessDataInstanceLogBuilder {
+public class SRefBusinessDataInstanceLogBuilderImpl extends CRUDELogBuilder
+        implements SRefBusinessDataInstanceLogBuilder {
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {

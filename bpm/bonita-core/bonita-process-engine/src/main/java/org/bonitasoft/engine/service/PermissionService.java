@@ -23,15 +23,18 @@ import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 public interface PermissionService extends TenantLifecycleService {
 
     /**
-     * execute the {@link org.bonitasoft.engine.api.permission.PermissionRule} having the class name in parameter using the given context
-     * 
+     * execute the {@link org.bonitasoft.engine.api.permission.PermissionRule} having the class name in parameter using
+     * the given context
+     *
      * @param className
      *        the class name of the rule to execute
      * @param context
      *        the context of the api call to check
      * @param reload
-     *        reload class when calling this method, warning if some class were called with reload set to false, they will never be reloadable
+     *        reload class when calling this method, warning if some class were called with reload set to false, they
+     *        will never be reloadable
      * @return true if the security script allows the user to make the api call
      */
-    boolean checkAPICallWithScript(String className, APICallContext context, boolean reload) throws SExecutionException, ClassNotFoundException;
+    boolean checkAPICallWithScript(String className, APICallContext context, boolean reload)
+            throws SExecutionException, ClassNotFoundException;
 }

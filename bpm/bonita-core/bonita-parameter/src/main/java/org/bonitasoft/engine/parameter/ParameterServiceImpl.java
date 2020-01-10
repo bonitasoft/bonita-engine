@@ -101,7 +101,8 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     /**
-     * Handle null values. If input is {@link org.bonitasoft.engine.bpm.bar.ParameterContribution#NULL}, convert it to <code>null</code>
+     * Handle null values. If input is {@link org.bonitasoft.engine.bpm.bar.ParameterContribution#NULL}, convert it to
+     * <code>null</code>
      */
     protected String interpretParameterValue(String s) {
         return ParameterContribution.NULL.equals(s) ? null : s;
@@ -115,7 +116,8 @@ public class ParameterServiceImpl implements ParameterService {
         }
     }
 
-    void addOrUpdate(long processDefinitionId, String name, String value) throws SObjectCreationException, SBonitaReadException, SObjectModificationException {
+    void addOrUpdate(long processDefinitionId, String name, String value)
+            throws SObjectCreationException, SBonitaReadException, SObjectModificationException {
         final SParameter currentParameter = get(processDefinitionId, name);
         if (currentParameter != null) {
             update(currentParameter, value);
@@ -134,7 +136,8 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     @Override
-    public Map<String, String> getAll(long processDefinitionId) throws SParameterProcessNotFoundException, SBonitaReadException {
+    public Map<String, String> getAll(long processDefinitionId)
+            throws SParameterProcessNotFoundException, SBonitaReadException {
         Map<String, String> parameters = new HashMap<>();
         int fromIndex = 0;
         List<SParameter> sParameters;
@@ -150,7 +153,8 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     @Override
-    public void deleteAll(long processDefinitionId) throws SParameterProcessNotFoundException, SBonitaReadException, SObjectModificationException {
+    public void deleteAll(long processDefinitionId)
+            throws SParameterProcessNotFoundException, SBonitaReadException, SObjectModificationException {
         List<SParameter> toDelete;
         do {
             toDelete = get(processDefinitionId, 0, PAGE_SIZE, null);
@@ -165,7 +169,8 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     @Override
-    public List<SParameter> get(long processDefinitionId, int fromIndex, int numberOfResult, OrderBy order) throws SBonitaReadException {
+    public List<SParameter> get(long processDefinitionId, int fromIndex, int numberOfResult, OrderBy order)
+            throws SBonitaReadException {
         return persistenceService.selectList(
                 new SelectListDescriptor<>("getParameters",
                         Collections.singletonMap(PROCESS_DEFINITION_ID_KEY, processDefinitionId),
@@ -186,7 +191,8 @@ public class ParameterServiceImpl implements ParameterService {
             throws SParameterProcessNotFoundException, SBonitaReadException {
         return persistenceService.selectList(new SelectListDescriptor<>("getParametersWithNullValues",
                 Collections.singletonMap(
-                PROCESS_DEFINITION_ID_KEY, processDefinitionId), SParameter.class, new QueryOptions(fromIndex, numberOfResult, getOrderByOptions(order))));
+                        PROCESS_DEFINITION_ID_KEY, processDefinitionId),
+                SParameter.class, new QueryOptions(fromIndex, numberOfResult, getOrderByOptions(order))));
     }
 
     private List<OrderByOption> getOrderByOptions(OrderBy order) {
