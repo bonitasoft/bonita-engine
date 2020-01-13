@@ -25,7 +25,6 @@ dependencyManagement {
         }
         dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
         dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
-        dependency "commons-collections:commons-collections:${Deps.commonsCollectionsVersion}"
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
         dependency "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"

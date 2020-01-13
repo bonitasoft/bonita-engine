@@ -5,7 +5,6 @@ class Deps {
     public static String commonsCodecVersion = "1.7"
     public static String commonsIOVersion = "2.5"
     public static String commonsBeanutilsVersion = "1.9.4"
-    public static String commonsCollectionsVersion = "3.2.2"
     public static String commonsCollections4Version = "4.4"
     public static String commonsLangVersion = "3.9"
     public static String commonsDbcp2Version = "2.5.0"
