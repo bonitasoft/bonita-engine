@@ -99,7 +99,6 @@ import org.bonitasoft.engine.api.impl.transaction.task.AssignOrUnassignUserTask;
 import org.bonitasoft.engine.api.impl.transaction.task.AssignUserTaskIfNotAssigned;
 import org.bonitasoft.engine.api.impl.transaction.task.GetAssignedTasks;
 import org.bonitasoft.engine.api.impl.transaction.task.GetHumanTaskInstance;
-import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfAssignedUserTaskInstances;
 import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOpenTasksForUsers;
 import org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -2301,13 +2300,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     public long getNumberOfAssignedHumanTaskInstances(final long userId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-
         try {
-            final TransactionContentWithResult<Long> transactionContent = new GetNumberOfAssignedUserTaskInstances(
-                    userId, activityInstanceService);
-            transactionContent.execute();
-            return transactionContent.getResult();
-        } catch (final SBonitaException e) {
+            return activityInstanceService.getNumberOfAssignedHumanTaskInstances(userId);
+        } catch (final SActivityReadException e) {
             throw new RetrieveException(e);
         }
     }

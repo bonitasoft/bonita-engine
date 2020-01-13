@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -40,6 +41,7 @@ import org.hibernate.annotations.Filter;
 @Table(name = "user_contactinfo")
 @Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
+@Cacheable(false)
 public class SContactInfo implements PersistentObject {
 
     public static final String ID = "id";

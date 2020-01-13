@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.scheduler.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -37,6 +38,7 @@ import org.hibernate.annotations.Filter;
 @IdClass(PersistentObjectId.class)
 @Filter(name = "tenantFilter")
 @Table(name = "job_log")
+@Cacheable(false)
 public class SJobLog implements PersistentObject {
 
     @Id

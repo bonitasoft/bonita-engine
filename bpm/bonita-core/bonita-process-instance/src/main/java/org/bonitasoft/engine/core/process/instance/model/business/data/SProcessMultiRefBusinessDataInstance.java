@@ -15,7 +15,14 @@ package org.bonitasoft.engine.core.process.instance.model.business.data;
 
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OrderColumn;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +36,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("proc_multi_ref")
+@Cacheable(false)
 public class SProcessMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
 
     @ElementCollection

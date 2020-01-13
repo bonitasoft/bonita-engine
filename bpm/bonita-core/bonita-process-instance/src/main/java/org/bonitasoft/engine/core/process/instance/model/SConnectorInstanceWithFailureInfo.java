@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -32,6 +33,7 @@ import org.hibernate.annotations.Type;
 @SuperBuilder
 @Entity
 @Table(name = "connector_instance")
+@Cacheable(false)
 public class SConnectorInstanceWithFailureInfo extends SAbstractConnectorInstance {
 
     public static final String EXCEPTION_MESSAGE = "exceptionMessage";

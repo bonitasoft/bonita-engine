@@ -15,6 +15,7 @@ package org.bonitasoft.engine.scheduler.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -38,6 +39,7 @@ import org.hibernate.annotations.Type;
 @IdClass(PersistentObjectId.class)
 @Filter(name = "tenantFilter")
 @Table(name = "job_param")
+@Cacheable(false)
 public class SJobParameter implements PersistentObject {
 
     public static final String JOB_DESCRIPTOR_ID = "jobDescriptorId";

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -27,6 +28,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Entity
 @Table(name = "pdependencymapping")
+@Cacheable(false)
 public class SPlatformDependencyMapping extends SAbstractDependencyMapping {
 
     public SPlatformDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {

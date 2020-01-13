@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -30,6 +31,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "document_mapping")
+@Cacheable(false)
 public class SMappedDocument extends AbstractSMappedDocument {
 
     public SMappedDocument(AbstractSDocumentMapping documentMapping, SDocument document) {
