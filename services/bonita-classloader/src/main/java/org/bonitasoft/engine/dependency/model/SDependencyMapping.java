@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -33,6 +34,7 @@ import org.hibernate.annotations.Filter;
 @Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 @Table(name = "dependencymapping")
+@Cacheable(false)
 public class SDependencyMapping extends SAbstractDependencyMapping {
 
     @Id

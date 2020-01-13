@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.SharedCacheMode;
+
 import org.bonitasoft.engine.services.Vendor;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
@@ -104,6 +106,7 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
                 for (BasicType typeOverride : CustomDataTypesRegistration.getTypeOverrides()) {
                     metadataBuilder.applyBasicType(typeOverride);
                 }
+                applyCacheMode(metadataBuilder);
                 return metadataBuilder;
             }
         };
@@ -136,6 +139,10 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         for (PersistentClass entityBinding : metadata.getEntityBindings()) {
             mappedClasses.add(entityBinding.getMappedClass());
         }
+    }
+
+    protected void applyCacheMode(MetadataBuilder metadataBuilder) {
+        metadataBuilder.applySharedCacheMode(SharedCacheMode.NONE);
     }
 
     protected Properties gatherAllProperties(Properties extraHibernateProperties,

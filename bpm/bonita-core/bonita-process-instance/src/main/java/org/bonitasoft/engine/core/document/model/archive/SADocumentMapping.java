@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.document.model.archive;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "arch_document_mapping")
+@Cacheable(false)
 public class SADocumentMapping extends AbstractSDocumentMapping implements ArchivedPersistentObject {
 
     public static final String ID = "id";

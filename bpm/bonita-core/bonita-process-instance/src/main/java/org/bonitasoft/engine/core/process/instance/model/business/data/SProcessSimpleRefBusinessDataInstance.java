@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.business.data;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -29,6 +30,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("proc_simple_ref")
+@Cacheable(false)
 public class SProcessSimpleRefBusinessDataInstance extends SSimpleRefBusinessDataInstance {
 
     @Column(name = "proc_inst_id")

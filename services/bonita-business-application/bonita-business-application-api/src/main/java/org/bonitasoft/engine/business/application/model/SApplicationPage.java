@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -38,6 +39,7 @@ import org.hibernate.annotations.Filter;
 @Table(name = "business_app_page")
 @IdClass(PersistentObjectId.class)
 @Filter(name = "tenantFilter")
+@Cacheable(false)
 public class SApplicationPage implements PersistentObject {
 
     public static final String ID = "id";

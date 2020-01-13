@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -32,6 +33,7 @@ import org.hibernate.annotations.Type;
 @SuperBuilder
 @Entity
 @Table(name = "document")
+@Cacheable(false)
 public class SDocument extends AbstractSDocument {
 
     public static final String ID = "id";

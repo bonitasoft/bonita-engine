@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.category.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -34,6 +35,7 @@ import org.hibernate.annotations.Filter;
 @Table(name = "processcategorymapping")
 @IdClass(PersistentObjectId.class)
 @Filter(name = "tenantFilter")
+@Cacheable(false)
 public class SProcessCategoryMapping implements PersistentObject {
 
     @Id

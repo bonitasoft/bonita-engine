@@ -52,6 +52,7 @@ import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.hibernate.Hibernate;
 import org.hibernate.QueryException;
+import org.hibernate.boot.archive.scan.internal.DisabledScanner;
 import org.hibernate.proxy.HibernateProxy;
 
 /**
@@ -85,7 +86,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         this.classLoaderService = classLoaderService;
         this.tenantId = tenantId;
         this.configuration = new HashMap<>(configuration);
-        this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
+        this.configuration.put("hibernate.archive.scanner", DisabledScanner.class.getName());
     }
 
     @Override
