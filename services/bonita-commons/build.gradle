@@ -2,7 +2,6 @@ dependencies {
     compile(group: 'commons-beanutils', name: 'commons-beanutils', version: Deps.commonsBeanutilsVersion) {
         exclude(module: 'commons-collections')
     }
-    compile "commons-collections:commons-collections:${Deps.commonsCollectionsVersion}"
     compile "org.springframework:spring-context:${Deps.springVersion}"
     compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"

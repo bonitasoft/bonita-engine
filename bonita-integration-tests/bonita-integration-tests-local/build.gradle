@@ -5,7 +5,6 @@ dependencies {
     compile "org.assertj:assertj-core:${Deps.assertjVersion}"
     compile project(':bonita-integration-tests:bonita-integration-tests-client')
     compile project(':bpm:bonita-server')
-    compile 'commons-collections:commons-collections:3.2.1'
     compile project(':bonita-integration-tests:bonita-test-utils:bonita-server-test-utils')
     compile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
     compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
