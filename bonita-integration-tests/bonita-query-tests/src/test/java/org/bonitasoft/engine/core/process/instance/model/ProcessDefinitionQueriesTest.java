@@ -63,6 +63,10 @@ public class ProcessDefinitionQueriesTest {
         repository.add(aUserMembership().forUser(walter).memberOf(G2, ROLE_ID).build());
         repository.add(aUserMembership().forUser(marie).memberOf(G3, ROLE_ID).build());
 
+        // John is mapped through membership, but also through direct mapping.
+        // He should only be returned once:
+        repository.add(anActorMember().forActor(actor).withUserId(john.getId()).build());
+
         final List<SUser> users = repository.searchSUserWhoCanStartProcess(PROCESS_ID);
 
         assertThat(users).hasSize(2).contains(john, paul);
