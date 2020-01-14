@@ -712,61 +712,87 @@
 
     <sql-query name="getNumberOfSUserWhoCanStartProcess">
         <return-scalar column="count" type="long" />
-        SELECT count(distinct user_.id) as count
-        FROM actormember
-        join actor on (
-            actor.id = actormember.actorid
-            and actor.tenantid = :tenantId
-            and actormember.tenantid = :tenantId
-            and actor.scopeid = :processId
-            and actor.initiator = :trueValue
-        ) left join user_membership on (
-            user_membership.tenantid = actormember.tenantid
-            and (
-                 (actormember.groupId = user_membership.groupId and actormember.roleId &lt;= 0)
-                  or
-                 (actormember.roleId = user_membership.roleId and actormember.groupId &lt;= 0)
-                  or
-                 (actormember.groupId = user_membership.groupId and actormember.roleId = user_membership.roleId)
-            )
-        ) join user_ on (
-           user_.tenantid=:tenantId
-            and (
-                user_membership.userid = user_.id
-                or actormember.userid=user_.id
-            )
-            and user_.enabled = :trueValue
-        )
-    </sql-query>
-    <sql-query name="searchSUserWhoCanStartProcess">
-        <return alias="user_" class="org.bonitasoft.engine.identity.model.SUser" />
-        SELECT DISTINCT user_.*
-        FROM actormember
-        join actor on (
-            actor.id = actormember.actorid
-            and actor.tenantid = :tenantId
-            and actormember.tenantid = :tenantId
-            and actor.scopeid = :processId
-            and actor.initiator = :trueValue
-        ) left join user_membership on (
-            user_membership.tenantid = actormember.tenantid
-            and (
-                 (actormember.groupId = user_membership.groupId and actormember.roleId &lt;= 0)
-                  or
-                 (actormember.roleId = user_membership.roleId and actormember.groupId &lt;= 0)
-                  or
-                 (actormember.groupId = user_membership.groupId and actormember.roleId = user_membership.roleId)
-            )
-        ) join user_ on (
-           user_.tenantid=:tenantId
-            and (
-                user_membership.userid = user_.id
-                or actormember.userid=user_.id
-            )
-            and user_.enabled = :trueValue
-        )
+        SELECT count(id) as count FROM (
+			SELECT DISTINCT user_.*
+			FROM actormember
+			JOIN actor ON (
+				actor.id = actormember.actorid
+				and actor.tenantid = :tenantId
+				and actormember.tenantid = :tenantId
+				and actor.scopeid = :processId
+				and actor.initiator = :trueValue
+			) JOIN user_membership ON (
+				user_membership.tenantid = actormember.tenantid
+				and (
+					(actormember.groupId = user_membership.groupId and actormember.roleId &lt;= 0)
+					or
+					(actormember.roleId = user_membership.roleId and actormember.groupId &lt;= 0)
+					or
+					(actormember.groupId = user_membership.groupId and actormember.roleId = user_membership.roleId)
+				)
+			) JOIN user_ ON (
+				user_.tenantid=:tenantId
+				and user_membership.userid = user_.id
+				and user_.enabled = :trueValue
+			)
+			UNION
+			SELECT DISTINCT user_.*
+			FROM actormember
+			JOIN actor ON (
+				actor.id = actormember.actorid
+				and actor.tenantid = :tenantId
+				and actormember.tenantid = :tenantId
+				and actor.scopeid = :processId
+				and actor.initiator = :trueValue
+			) JOIN user_ ON (
+				user_.tenantid = :tenantId
+				and actormember.userid = user_.id
+				and user_.enabled = :trueValue
+			)
+		) user_
     </sql-query>
 
+    <sql-query name="searchSUserWhoCanStartProcess">
+        <return alias="user_" class="org.bonitasoft.engine.identity.model.SUser" />
+		SELECT user_.* FROM (
+			SELECT DISTINCT user_.*
+			FROM actormember
+			JOIN actor ON (
+				actor.id = actormember.actorid
+				and actor.tenantid = :tenantId
+				and actormember.tenantid = :tenantId
+				and actor.scopeid = :processId
+				and actor.initiator = :trueValue
+			) JOIN user_membership ON (
+				user_membership.tenantid = actormember.tenantid
+				and (
+					 (actormember.groupId = user_membership.groupId and actormember.roleId &lt;= 0)
+					  or
+					 (actormember.roleId = user_membership.roleId and actormember.groupId &lt;= 0)
+					  or
+					 (actormember.groupId = user_membership.groupId and actormember.roleId = user_membership.roleId)
+				)
+			) JOIN user_ ON (
+			   user_.tenantid=:tenantId
+				and user_membership.userid = user_.id
+				and user_.enabled = :trueValue
+			)
+			UNION
+			SELECT DISTINCT user_.*
+			FROM actormember
+			JOIN actor ON (
+				actor.id = actormember.actorid
+				and actor.tenantid = :tenantId
+				and actormember.tenantid = :tenantId
+				and actor.scopeid = :processId
+				and actor.initiator = :trueValue
+			) JOIN user_ ON (
+				user_.tenantid = :tenantId
+				and actormember.userid = user_.id
+				and user_.enabled = :trueValue
+			)
+		) user_
+    </sql-query>
 
     <query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor">
         SELECT COUNT(DISTINCT process_definition.id)
