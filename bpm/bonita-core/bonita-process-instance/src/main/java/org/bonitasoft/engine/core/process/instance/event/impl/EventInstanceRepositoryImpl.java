@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Iterables;
+import org.apache.commons.collections4.ListUtils;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
@@ -320,7 +320,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public void deleteMessageInstanceByIds(List<Long> ids) throws SMessageModificationException {
-        Iterable<List<Long>> listAsFragment = Iterables.partition(ids, IN_REQUEST_SIZE);
+        List<List<Long>> listAsFragment = ListUtils.partition(ids, IN_REQUEST_SIZE);
         for (List<Long> fragmentIds : listAsFragment) {
             try {
                 Map<String, Object> parameters = new HashMap<>();

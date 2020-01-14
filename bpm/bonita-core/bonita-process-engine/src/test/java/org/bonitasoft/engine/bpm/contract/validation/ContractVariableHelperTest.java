@@ -125,7 +125,8 @@ public class ContractVariableHelperTest {
         expenseLines.add(taxiExpenseLine);
         expenseLines.add(hotelExpenseLine);
 
-        final Map<String, Serializable> expenseReport = aMap().put("expenseReport", (Serializable) expenseLines)
+        final Map<String, Serializable> expenseReport = aMap()
+                .put("expenseReport", (Serializable) expenseLines)
                 .build();
 
         final List<Map<String, Serializable>> expenseReports = new ArrayList<Map<String, Serializable>>();
@@ -134,7 +135,8 @@ public class ContractVariableHelperTest {
         expenseReports.add(expenseReport);
         expenseReports.add(expenseReport);
 
-        variables = aMap().put("user", (Serializable) user).put("expenseReport", (Serializable) expenseReports).build();
+        variables = aMap().put("user", (Serializable) user)
+                .put("expenseReport", (Serializable) expenseReports).build();
         return variables;
     }
 
