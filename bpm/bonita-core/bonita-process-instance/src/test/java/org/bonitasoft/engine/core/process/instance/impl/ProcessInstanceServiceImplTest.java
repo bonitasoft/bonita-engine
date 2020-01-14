@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -807,21 +806,6 @@ public class ProcessInstanceServiceImplTest {
                 new SBonitaReadException("error"));
 
         processInstanceService.getNumberOfProcessInstances(45L);
-    }
-
-    @Test
-    public void getPartitionFromLargeList_should_never_return_more_than_IN_REQUEST_SIZE_results() {
-        // given:
-        final Long[] longs = new Long[1200];
-        Arrays.fill(longs, 1L);
-
-        // when:
-        final Iterable<List<Long>> smallerList = processInstanceService.getPartitionFromLargeList(Arrays.asList(longs));
-
-        // then:
-        for (List<Long> listOfLongs : smallerList) {
-            assertThat(listOfLongs.size()).isLessThanOrEqualTo(IN_REQUEST_SIZE);
-        }
     }
 
     @Test

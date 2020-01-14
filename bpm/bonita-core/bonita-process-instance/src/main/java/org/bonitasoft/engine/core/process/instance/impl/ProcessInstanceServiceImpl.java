@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Iterables;
+import org.apache.commons.collections4.ListUtils;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -237,10 +237,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    protected Iterable<List<Long>> getPartitionFromLargeList(Iterable<Long> allSourceObjectIds) {
-        return Iterables.partition(allSourceObjectIds, IN_REQUEST_SIZE);
-    }
-
     @Override
     public int deleteArchivedProcessInstances(List<Long> sourceProcessInstanceIds) throws SBonitaException {
         //delete all flow node having as root process instances these processes
@@ -251,10 +247,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         Set<Long> allSourceObjectIds = new HashSet<>();
         allSourceObjectIds.addAll(sourceProcessInstanceIds);
         allSourceObjectIds.addAll(archivedChildrenProcessInstances);
+        // Easier to partition than a set
+        List<Long> allSourceObjectIdsList = new ArrayList<>(allSourceObjectIds);
         int numberOfDeletedInstances = 0;
         // Verify that the resulting IN statement in the request has a reasonable size, if not split in smaller requests
         // See BS-19316
-        Iterable<List<Long>> sourceObjectIdsPartitions = getPartitionFromLargeList(allSourceObjectIds);
+        Iterable<List<Long>> sourceObjectIdsPartitions = ListUtils.partition(allSourceObjectIdsList, IN_REQUEST_SIZE);
         for (List<Long> sourceObjectIds2k : sourceObjectIdsPartitions) {
             //delete all elements
             deleteElementsOfArchivedProcessInstances(new ArrayList<>(sourceObjectIds2k));
@@ -284,8 +282,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         if (!flowNodesSourceObjectIds.isEmpty()) {
             // Verify that the resulting IN statement in the request has a reasonable size, if not split it in smaller requests
             // See BS-19316
-            Iterable<List<Long>> flowNodesSourceObjectIdsPartitions = getPartitionFromLargeList(
-                    flowNodesSourceObjectIds);
+            List<List<Long>> flowNodesSourceObjectIdsPartitions = ListUtils.partition(flowNodesSourceObjectIds,
+                    IN_REQUEST_SIZE);
             for (List<Long> flowNodesSourceObjectIds2k : flowNodesSourceObjectIdsPartitions) {
                 connectorInstanceService.deleteArchivedConnectorInstances(flowNodesSourceObjectIds2k,
                         SConnectorInstance.FLOWNODE_TYPE);

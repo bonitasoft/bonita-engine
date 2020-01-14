@@ -17,14 +17,23 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import org.assertj.core.data.MapEntry;
 
 public class MapBuilder {
 
-    public static Builder<String, Serializable> aMap() {
-        return ImmutableMap.builder();
+    HashMap<String, Serializable> theMap = new HashMap<>();
+
+    public MapBuilder put(String k, Serializable v) {
+        theMap.put(k, v);
+        return this;
+    }
+
+    public static MapBuilder aMap() {
+        return new MapBuilder();
+    }
+
+    public Map<String, Serializable> build() {
+        return theMap;
     }
 
     public static Map<String, Serializable> contractInputMap(final MapEntry... entries) {

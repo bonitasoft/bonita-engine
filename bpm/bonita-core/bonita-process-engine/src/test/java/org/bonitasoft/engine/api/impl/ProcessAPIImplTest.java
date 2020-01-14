@@ -54,7 +54,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import com.google.common.collect.Lists;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -591,12 +590,12 @@ public class ProcessAPIImplTest {
         final int nbResults = 100;
         final int startIndex = 0;
         final SDataInstance sDataInstance = mock(SDataInstance.class);
-        final List<SDataInstance> sDataInstances = Lists.newArrayList(sDataInstance);
+        final List<SDataInstance> sDataInstances = Arrays.asList(sDataInstance);
         when(transientDataService.getDataInstances(FLOW_NODE_INSTANCE_ID,
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults))
                         .thenReturn(sDataInstances);
         final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
-        doReturn(Lists.newArrayList(dataInstance)).when(processAPI).convertModelToDataInstances(sDataInstances);
+        doReturn(Arrays.asList(dataInstance)).when(processAPI).convertModelToDataInstances(sDataInstances);
 
         final List<DataInstance> dis = processAPI.getActivityTransientDataInstances(FLOW_NODE_INSTANCE_ID, startIndex,
                 nbResults);

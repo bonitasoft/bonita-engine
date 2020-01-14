@@ -147,7 +147,7 @@ public class ContractStructureValidatorTest {
         final Map<String, Serializable> taskInputs = aMap()
                 .put("aText", "hello")
                 .put("aBoolean", true)
-                .put("complex", aMap().put("embedded", "aValue").build())
+                .put("complex", (Serializable) aMap().put("embedded", "aValue").build())
                 .build();
 
         validator.validate(contract, taskInputs);
@@ -188,7 +188,8 @@ public class ContractStructureValidatorTest {
         final SContractDefinition contract = aContract()
                 .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")))
                 .build();
-        final Map<String, Serializable> map = aMap().put("complex", aMap().build()).build();
+        final Map<String, Serializable> map = aMap().put("complex", (Serializable) aMap().build())
+                .build();
         try {
             validator.validate(contract, map);
             fail("expected exception has not been thrown");
@@ -272,7 +273,8 @@ public class ContractStructureValidatorTest {
                         .withInput(aSimpleInput(TEXT).withName("name").build()))
                 .build();
 
-        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) Collections.emptyList())
+        final Map<String, Serializable> taskInputs = aMap()
+                .put("complex", (Serializable) Collections.emptyList())
                 .build();
 
         validator.validate(contract, taskInputs);
@@ -288,7 +290,8 @@ public class ContractStructureValidatorTest {
         final List<Map<String, Serializable>> complexList = new ArrayList<>();
         complexList.add(null);
 
-        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) complexList).build();
+        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) complexList)
+                .build();
 
         validator.validate(contract, taskInputs);
     }
@@ -305,7 +308,8 @@ public class ContractStructureValidatorTest {
         complexList.add(null);
         complexList.add(aMap().put("plic", "value2").build());
 
-        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) complexList).build();
+        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) complexList)
+                .build();
 
         try {
             validator.validate(contract, taskInputs);
