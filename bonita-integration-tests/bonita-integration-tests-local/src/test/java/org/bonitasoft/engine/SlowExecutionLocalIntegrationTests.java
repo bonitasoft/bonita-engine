@@ -44,9 +44,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
         // Same suites as in LocalIntegrationTests below:
         LocalIntegrationTests.class,
-
 })
-public class SlowExecutionLocalIntegrationTests extends LocalIntegrationTests {
+public class SlowExecutionLocalIntegrationTests {
 
     @BeforeClass
     public static void beforeClass() {
