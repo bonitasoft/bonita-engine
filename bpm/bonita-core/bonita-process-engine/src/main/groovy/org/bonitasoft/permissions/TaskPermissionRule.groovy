@@ -96,8 +96,8 @@ class TaskPermissionRule implements PermissionRule {
         } else if (filters.containsKey("processId")) {
             def long processId = Long.valueOf(filters.get("processId"))
             return processAPI.isUserProcessSupervisor(processId, currentUserId)
-        } else if (filters.containsKey("caseId")) {
-            def long caseId = Long.valueOf(filters.get("caseId"))
+        } else if (filters.containsKey("caseId") || filters.containsKey("parentCaseId")) {
+            def long caseId = filters.containsKey("caseId") ? Long.parseLong(filters.get("caseId")) : Long.parseLong(filters.get("parentCaseId"))
             return processAPI.isUserProcessSupervisor(processAPI.getProcessInstance(caseId).getProcessDefinitionId(), currentUserId)
         } else {
             return false
