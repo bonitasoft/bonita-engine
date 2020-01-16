@@ -29,7 +29,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.document.model.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -54,8 +53,6 @@ public class DocumentServiceImplTest {
     private ReadPersistenceService persistenceService;
     @Mock
     private SDocumentDownloadURLProvider urlProvider;
-    @Mock
-    private TechnicalLoggerService technicalLogger;
     @Mock
     private ArchiveService archiveService;
 

@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.document.api.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * @author Nicolas Chabanoles
  */
@@ -27,9 +30,19 @@ public class SDocumentDownloadURLProviderImpl implements SDocumentDownloadURLPro
     @Override
     public String generateURL(String documentName, String contentStorageId) {
         final StringBuffer buffer = new StringBuffer(servletUrl);
-        buffer.append("?fileName=").append(documentName);
+        buffer.append("?fileName=").append(getUrlEncodedValue(documentName));
         buffer.append("&contentStorageId=").append(contentStorageId);
         return buffer.toString();
     }
 
+    private String getUrlEncodedValue(String documentName) {
+        String encoding = "UTF-8";
+        try {
+            return URLEncoder.encode(documentName, encoding);
+        } catch (UnsupportedEncodingException e) {
+            // This exception should never occur,
+            // as UnsupportedEncodingException is thrown only if the named encoding is not supported
+            throw new IllegalStateException("the named encoding " + encoding + " is not supported.", e);
+        }
+    }
 }
