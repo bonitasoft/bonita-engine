@@ -1,13 +1,9 @@
 dependencies {
     compile project(':bonita-test-api')
-    compile "org.springframework:spring-context:${Deps.springVersion}"
     compile "junit:junit:${Deps.junit4Version}"
     compile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     compile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
-    compile "commons-dbcp:commons-dbcp:${Deps.commonsDbcpVersion}"
-    compile "commons-pool:commons-pool:${Deps.commonsPoolVersion}"
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
-    compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
     compile project(':bpm:bonita-common')
     compile project(':bpm:bonita-client')
     compile project(':bonita-integration-tests:bonita-test-utils:bonita-common-test-utils')

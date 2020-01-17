@@ -85,7 +85,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             String message = "Unable to build a new Cache Manager as the existing one is still alive: " + cacheManager
                     + ". ";
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                message += ". Last creation was: \n" + cacheManagerLastCreation;
+                message += " Last creation was: \n" + cacheManagerLastCreation;
             }
             throw new SCacheException(message);
         }

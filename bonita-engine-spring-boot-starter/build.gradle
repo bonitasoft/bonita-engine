@@ -16,7 +16,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-test:${Deps.springBootVersion}")
     testImplementation("junit:junit:${Deps.junit4Version}")
     testImplementation("org.assertj:assertj-core:${Deps.assertjVersion}")
-    testImplementation("org.awaitility:awaitility:${Deps.awaitilityVersion}")
 }
 
 task sourcesJar(type: Jar) {

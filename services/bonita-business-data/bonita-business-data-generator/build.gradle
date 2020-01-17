@@ -10,7 +10,6 @@ dependencies {
     compile project(':bpm:bonita-common')
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"
-    compile "org.javassist:javassist:${Deps.javassistVersion}"
     compile "org.eclipse.jdt.core.compiler:ecj:${Deps.eclipseCompilerVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
@@ -18,7 +17,6 @@ dependencies {
     testCompile project(':services:bonita-business-data:bonita-business-data-client-resources')
     testCompile project(':bpm:bonita-util:bonita-common-util-test')
     testCompile project(':services:bonita-business-data:bonita-business-data-api')
-    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }
 
 group = 'org.bonitasoft.engine.data'

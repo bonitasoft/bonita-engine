@@ -3,12 +3,13 @@ plugins { id 'bonita-docker-database' }
 dependencies {
     compile "junit:junit:${Deps.junit4Version}"
     compile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     compile project(':bonita-integration-tests:bonita-integration-tests-client')
     compile project(':bpm:bonita-server')
     compile project(':bonita-integration-tests:bonita-test-utils:bonita-server-test-utils')
-    compile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
-    compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
-    compile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    runtime "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    runtime "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+    runtime "org.postgresql:postgresql:${Deps.postgresqlVersion}"
 }
 
 task testsJar(type: Jar) {
