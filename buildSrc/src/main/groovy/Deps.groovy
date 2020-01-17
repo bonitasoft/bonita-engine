@@ -4,7 +4,8 @@ class Deps {
     public static String springBootVersion = "2.2.2.RELEASE"
     public static String commonsCodecVersion = "1.7"
     public static String commonsIOVersion = "2.6"
-    public static String commonsFileupload = "1.4"
+    //fileupload 1.4 does not work on web-side.
+    public static String commonsFileupload = "1.3.3"
     public static String commonsBeanutilsVersion = "1.9.4"
     public static String commonsCollections4Version = "4.4"
     public static String commonsLangVersion = "3.9"
