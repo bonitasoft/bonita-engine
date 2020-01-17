@@ -5,8 +5,6 @@ dependencies {
     compile project(':bpm:bonita-server')
     compile project(':bpm:bonita-common')
     compile project(':bonita-integration-tests:bonita-test-utils:bonita-client-test-utils')
-    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    compile "junit:junit:${Deps.junit4Version}"
 }
 
 group = 'org.bonitasoft.engine.test'

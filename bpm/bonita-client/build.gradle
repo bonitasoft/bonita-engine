@@ -8,11 +8,9 @@ dependencies {
     compile "commons-codec:commons-codec:${Deps.commonsCodecVersion}"
     runtime "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
     runtime "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}"
-    testCompile "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testCompile 'org.eclipse.jetty:jetty-server:8.1.14.v20131031'
     testCompile 'org.eclipse.jetty:jetty-jndi:8.1.14.v20131031'
     testCompile 'org.eclipse.jetty:jetty-webapp:8.1.14.v20131031'

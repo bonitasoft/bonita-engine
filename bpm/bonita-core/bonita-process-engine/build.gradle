@@ -65,7 +65,6 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 
     testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    testCompile "org.projectlombok:lombok:${Deps.lombokVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
@@ -74,8 +73,8 @@ dependencies {
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     compileOnly project(':bpm:bonita-common')
     testCompile project(':bpm:bonita-common')
-    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }
 jaxb {
     schemaGen {
