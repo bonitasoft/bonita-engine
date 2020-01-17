@@ -24,6 +24,7 @@ dependencyManagement {
             exclude 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec'
         }
         dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
+        dependency "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
         dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
