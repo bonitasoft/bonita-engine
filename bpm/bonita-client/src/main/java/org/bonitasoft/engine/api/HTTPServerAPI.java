@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -45,6 +44,7 @@ import org.bonitasoft.engine.api.impl.XmlConverter;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.digest.DigestUtils;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 /**
@@ -192,8 +192,8 @@ public class HTTPServerAPI implements ServerAPI {
         if (basicAuthenticationActive) {
             final StringBuilder credentials = new StringBuilder();
             credentials.append(basicAuthenticationUserName).append(":").append(basicAuthenticationPassword);
-            final Base64 encoder = new Base64();
-            final String encodedCredentials = encoder.encodeAsString(credentials.toString().getBytes("UTF-8"));
+            final String encodedCredentials = DigestUtils
+                    .encodeBase64AsUtf8String(credentials.toString().getBytes(UTF_8));
             httpPost.setHeader("Authorization", "Basic " + encodedCredentials);
         }
 

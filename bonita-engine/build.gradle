@@ -6,7 +6,6 @@ plugins {
 }
 dependencyManagement {
     dependencies {
-        dependency "commons-codec:commons-codec:${Deps.commonsCodecVersion}"
         dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
             entry 'slf4j-api'
             entry 'slf4j-simple'
