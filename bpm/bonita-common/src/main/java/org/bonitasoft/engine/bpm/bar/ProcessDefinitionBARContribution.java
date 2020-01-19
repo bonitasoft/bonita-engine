@@ -30,8 +30,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
@@ -51,6 +49,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.StartEventDefinitionImpl
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
+import org.bonitasoft.engine.digest.DigestUtils;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.xml.sax.SAXException;
@@ -295,7 +294,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     protected String getProcessInfos(final String infos) {
-        return Base64.encodeBase64String(DigestUtils.md5(infos)).trim();
+        return DigestUtils.encodeBase64AsUtf8String(DigestUtils.md5(infos)).trim();
     }
 
     @Override

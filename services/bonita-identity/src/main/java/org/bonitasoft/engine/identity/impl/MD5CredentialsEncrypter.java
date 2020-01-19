@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.impl;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.bonitasoft.engine.digest.DigestUtils;
 
 /**
  * @author Matthieu Chaffotte
@@ -24,7 +23,7 @@ public class MD5CredentialsEncrypter implements CredentialsEncrypter {
     @Override
     public String hash(final String password) {
         final byte[] hash = DigestUtils.md5(password);
-        return Base64.encodeBase64String(hash);
+        return DigestUtils.encodeBase64AsUtf8String(hash);
     }
 
     @Override

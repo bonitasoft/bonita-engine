@@ -5,7 +5,6 @@ dependencies {
     compile "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
     compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
     compile "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"
-    compile "commons-codec:commons-codec:${Deps.commonsCodecVersion}"
     runtime "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
     runtime "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
