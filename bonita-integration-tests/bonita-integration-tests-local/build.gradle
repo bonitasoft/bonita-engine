@@ -32,7 +32,7 @@ publishing {
 tests {
     testPattern = ""
     integrationTestsSuite = "org/bonitasoft/engine/LocalIntegrationTests.class"
-    slowTestsSuite = "org/bonitasoft/engine/LocalIntegrationTests.class"
+    slowTestsSuite = "org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.class"
 }
 
 databaseIntegrationTest { include 'org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.class' }
