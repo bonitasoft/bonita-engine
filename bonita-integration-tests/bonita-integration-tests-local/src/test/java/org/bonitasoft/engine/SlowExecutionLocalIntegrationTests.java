@@ -26,6 +26,8 @@ import org.bonitasoft.engine.platform.PlatformLoginIT;
 import org.bonitasoft.engine.tenant.TenantMaintenanceIT;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({
@@ -45,6 +47,7 @@ import org.junit.runners.Suite.SuiteClasses;
         // Same suites as in LocalIntegrationTests below:
         LocalIntegrationTests.class,
 })
+@RunWith(Suite.class)
 public class SlowExecutionLocalIntegrationTests {
 
     @BeforeClass
