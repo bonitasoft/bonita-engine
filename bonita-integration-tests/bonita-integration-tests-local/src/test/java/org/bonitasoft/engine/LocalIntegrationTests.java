@@ -30,6 +30,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+@RunWith(Suite.class)
 @SuiteClasses({
         TestShades.class,
         BPMLocalSuiteTests.class,
@@ -48,7 +49,6 @@ import org.junit.runners.Suite.SuiteClasses;
         // last test suite because it breaks the platform
         AllBPMTests.class,
 })
-@RunWith(Suite.class)
 public class LocalIntegrationTests {
 
     @BeforeClass
