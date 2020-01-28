@@ -26,6 +26,7 @@ import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.flownode.*
+import org.bonitasoft.engine.bpm.process.ProcessInstance
 import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.search.SearchOptions
@@ -250,10 +251,60 @@ public class TaskPermissionRuleTest {
         doThrow(FlowNodeInstanceNotFoundException.class).when(processAPI).getFlowNodeInstance(4)
         doReturn(archivedTask).when(processAPI).getArchivedFlowNodeInstance(4)
         doReturn(currentUserId).when(archivedTask).getExecutedBy()
-
+        //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
+    }
+
+
+    @Test
+    public void should_GET_humanTasks_providing_a_parentCaseId() {
+        //given
+        havingFilters([parentCaseId: "4"])
+        doReturn("humanTask").when(apiCallContext).getResourceName()
+
+        def processInstance = mock(ProcessInstance.class)
+        doReturn(processInstance).when(processAPI).getProcessInstance(4l)
+        doReturn(10l).when(processInstance).getProcessDefinitionId()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void should_GET_humanTasks_providing_a_caseId() {
+        //given
+        havingFilters([caseId: "5"])
+        doReturn("humanTask").when(apiCallContext).getResourceName()
+
+        def processInstance = mock(ProcessInstance.class)
+        doReturn(processInstance).when(processAPI).getProcessInstance(5l)
+        doReturn(10l).when(processInstance).getProcessDefinitionId()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void should_not_GET_humanTasks_providing_a_caseId_if_not_supervisor() {
+        //given
+        havingFilters([caseId: "5"])
+        doReturn("humanTask").when(apiCallContext).getResourceName()
+
+        def processInstance = mock(ProcessInstance.class)
+        doReturn(processInstance).when(processAPI).getProcessInstance(5l)
+        doReturn(10l).when(processInstance).getProcessDefinitionId()
+
+        doReturn(false).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isFalse()
     }
 
     def havingResource(String resourceName) {

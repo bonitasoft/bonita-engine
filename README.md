@@ -2,8 +2,6 @@
 
 ![Travis CI](https://img.shields.io/travis/bonitasoft/bonita-engine/master?label=Travis%20build&logo=travis)
 
-[![Github Actions status](https://github.com/bonitasoft/bonita-engine/workflows/Build%20Engine%20Community/badge.svg)](https://github.com/bonitasoft/bonita-engine/actions)
-
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.bonitasoft.engine/bonita-server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.bonitasoft.engine/bonita-server)
 
 Deploy, execute, manage applications made with Bonita Studio.
