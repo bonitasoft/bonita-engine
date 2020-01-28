@@ -57,7 +57,7 @@ dependencyManagement {
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.naranayaVersion}"
         dependency "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
         dependency "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
-        dependency "javax.activation:activation:${Deps.javaxActivationVersion}"
+        dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
     }
 }
 publishing {

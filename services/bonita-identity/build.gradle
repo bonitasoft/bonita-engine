@@ -10,7 +10,7 @@ dependencies {
     compile project(':services:bonita-commons')
     compile project(':services:bonita-events')
     compile "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
-    runtime "javax.activation:activation:${Deps.javaxActivationVersion}"
+    compile "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
