@@ -36,6 +36,10 @@ dependencies {
     testCompile "javax.transaction:jta:${Deps.javaxJtaVersion}"
     compileOnly "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
     testCompile "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
+
+    // Property Based Test framework:
+    testImplementation("com.pholser:junit-quickcheck-core:${Deps.junitQuickCheck}")
+    testImplementation("com.pholser:junit-quickcheck-generators:${Deps.junitQuickCheck}")
 }
 
 // run:
