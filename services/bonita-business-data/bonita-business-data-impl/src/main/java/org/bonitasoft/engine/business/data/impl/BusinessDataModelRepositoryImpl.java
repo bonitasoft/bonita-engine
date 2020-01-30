@@ -111,7 +111,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             Optional returnedId = dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT,
                     BDR_DEPENDENCY_FILENAME);
             if (returnedId.isPresent()) {
-                return String.valueOf(returnedId);
+                return String.valueOf(returnedId.get());
             }
         } catch (SBonitaReadException e) {
             throw new SBusinessDataRepositoryException(e);
