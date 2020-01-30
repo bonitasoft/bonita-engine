@@ -52,6 +52,7 @@ class Deps {
     public static String jsonUnitVersion = "1.25.1"
     public static String systemRulesVersion = "1.19.0"
     public static String concurrentUnitVersion = "0.4.0"
+    public static String junitQuickCheck = "0.9.1"
     public static String jettyVersion = "9.4.9.v20180320"
     public static String javaxAnnotationsVersion = "1.3.2"
 

@@ -30,6 +30,10 @@ dependencies {
     testRuntimeOnly "mysql:mysql-connector-java:${Deps.mysqlVersion}"
     testRuntimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testRuntimeOnly "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+
+    // Property Based Test framework:
+    testImplementation("com.pholser:junit-quickcheck-core:${Deps.junitQuickCheck}")
+    testImplementation("com.pholser:junit-quickcheck-generators:${Deps.junitQuickCheck}")
 }
 
 // run:
