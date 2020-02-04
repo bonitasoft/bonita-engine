@@ -13,32 +13,94 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.services.Vendor;
-import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 /**
  * @author Baptiste Mesta
  */
+@Slf4j
 public class QueryBuilderFactory {
 
     private Vendor vendor;
+    private OrderByCheckingMode orderByCheckingMode;
+    private OrderByBuilder orderByBuilder = new DefaultOrderByBuilder();
+    private Map<String, String> classAliasMappings;
+    private char likeEscapeCharacter;
+    private final Set<Class<? extends PersistentObject>> wordSearchExclusionMappings = new HashSet<>();
+    private final boolean enableWordSearch;
 
-    public QueryBuilder createQueryBuilderFor(Query query, Class<? extends PersistentObject> entityType,
-            OrderByBuilder orderByBuilder,
-            Map<String, String> classAliasMappings, char likeEscapeCharacter) {
-        if (query instanceof SQLQuery) {
-            return new SQLQueryBuilder(query.getQueryString(), vendor, entityType, orderByBuilder, classAliasMappings,
-                    likeEscapeCharacter);
+    public QueryBuilderFactory(OrderByCheckingMode orderByCheckingMode, Map<String, String> classAliasMappings,
+            char likeEscapeCharacter, boolean enableWordSearch, Set<String> wordSearchExclusionMappings)
+            throws Exception {
+        this.orderByCheckingMode = orderByCheckingMode;
+        this.classAliasMappings = classAliasMappings;
+        this.likeEscapeCharacter = likeEscapeCharacter;
+        this.enableWordSearch = enableWordSearch;
+        initializeWordSearchExclusions(enableWordSearch, wordSearchExclusionMappings);
+    }
+
+    private void initializeWordSearchExclusions(boolean enableWordSearch, Set<String> wordSearchExclusionMappings)
+            throws Exception {
+        if (enableWordSearch) {
+            log.warn("The word based search feature is experimental, using it in production may impact performances.");
+        }
+        if (wordSearchExclusionMappings != null && !wordSearchExclusionMappings.isEmpty()) {
+            if (!enableWordSearch) {
+                log.info("You defined an exclusion mapping for the word based search feature, but it is not enabled.");
+            }
+            for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
+                final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
+                if (!PersistentObject.class.isAssignableFrom(clazz)) {
+                    throw new IllegalArgumentException(
+                            "Unable to add a word search exclusion mapping for class " + clazz
+                                    + " because it does not implements "
+                                    + PersistentObject.class);
+                }
+                this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
+            }
+        }
+    }
+
+    public <T> QueryBuilder createQueryBuilderFor(Session session,
+            SelectListDescriptor<T> selectDescriptor) {
+        Query query = session.getNamedQuery(selectDescriptor.getQueryName());
+        boolean wordSearchEnabled = isWordSearchEnabled(selectDescriptor.getEntityType());
+        if (query instanceof NativeQuery) {
+            return new SQLQueryBuilder<>(session, query, vendor, orderByBuilder, classAliasMappings,
+                    likeEscapeCharacter,
+                    wordSearchEnabled, orderByCheckingMode, selectDescriptor);
         } else {
-            return new HQLQueryBuilder(query.getQueryString(), orderByBuilder, classAliasMappings, likeEscapeCharacter);
+            return new HQLQueryBuilder<>(session, query, orderByBuilder, classAliasMappings, likeEscapeCharacter,
+                    wordSearchEnabled, orderByCheckingMode, selectDescriptor);
         }
     }
 
     public void setVendor(Vendor vendor) {
         this.vendor = vendor;
+    }
+
+    public void setOrderByBuilder(OrderByBuilder orderByBuilder) {
+        this.orderByBuilder = orderByBuilder;
+    }
+
+    protected boolean isWordSearchEnabled(final Class<? extends PersistentObject> entityClass) {
+        if (!enableWordSearch || entityClass == null) {
+            return false;
+        }
+        for (final Class<? extends PersistentObject> exclusion : wordSearchExclusionMappings) {
+            if (exclusion.isAssignableFrom(entityClass)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

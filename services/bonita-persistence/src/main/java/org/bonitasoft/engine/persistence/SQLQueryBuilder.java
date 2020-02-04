@@ -14,19 +14,21 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.services.Vendor;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryRootReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryScalarReturn;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
-import org.hibernate.type.LongType;
 
 /**
  * @author Baptiste Mesta
  */
-public class SQLQueryBuilder extends QueryBuilder {
+public class SQLQueryBuilder<T> extends QueryBuilder<T> {
 
     public static final String TRUE_VALUE_PARAMETER = "trueValue";
     private static Map<String, String> hqlToSqlAlias = new HashMap<>();
@@ -36,26 +38,20 @@ public class SQLQueryBuilder extends QueryBuilder {
     }
 
     private final Vendor vendor;
-    private Class<? extends PersistentObject> entityType;
 
-    SQLQueryBuilder(String baseQuery, Vendor vendor, Class<? extends PersistentObject> entityType,
+    SQLQueryBuilder(Session session, Query baseQuery, Vendor vendor,
             OrderByBuilder orderByBuilder,
-            Map<String, String> classAliasMappings, char likeEscapeCharacter) {
-        super(baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter);
+            Map<String, String> classAliasMappings, char likeEscapeCharacter,
+            boolean wordSearchEnabled,
+            OrderByCheckingMode orderByCheckingMode,
+            SelectListDescriptor<T> selectDescriptor) {
+        super(session, baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter, wordSearchEnabled,
+                orderByCheckingMode,
+                selectDescriptor, useIntegerForBoolean(vendor));
         this.vendor = vendor;
-        this.entityType = entityType;
     }
 
-    Query buildQuery(Session session) {
-        String builtQuery = stringQueryBuilder.toString();
-        builtQuery = replaceHQLAliasesBySQLAliases(builtQuery);
-        NativeQuery sqlQuery = session.createSQLQuery(builtQuery);
-        addConstantsAsParameters(sqlQuery);
-        setReturnType(builtQuery, sqlQuery);
-        return sqlQuery;
-    }
-
-    private void addConstantsAsParameters(SQLQuery sqlQuery) {
+    public void addConstantsAsParameters(Query sqlQuery) {
         if (sqlQuery.getQueryString().contains(":" + TRUE_VALUE_PARAMETER)) {
             if (useIntegerForBoolean(vendor)) {
                 sqlQuery.setParameter(TRUE_VALUE_PARAMETER, 1);
@@ -65,24 +61,10 @@ public class SQLQueryBuilder extends QueryBuilder {
         }
     }
 
-    private void setReturnType(String builtQuery, SQLQuery sqlQuery) {
-        if (isCountQuery(builtQuery)) {
-            sqlQuery.addScalar("count", LongType.INSTANCE);
-        } else {
-            String hqlAlias = classAliasMappings.get(entityType.getName());
-            String sqlAlias = hqlToSqlAlias.containsKey(hqlAlias) ? hqlAlias.replace("user", "user_") : hqlAlias;
-            sqlQuery.addEntity(sqlAlias, entityType.getName());
-        }
-    }
-
-    private boolean isCountQuery(String builtQuery) {
-        return builtQuery.contains("count(");
-    }
-
     private String replaceHQLAliasesBySQLAliases(String builtQuery) {
-        for (String aliasToReplace : hqlToSqlAlias.keySet()) {
-            if (builtQuery.contains(aliasToReplace + ".")) {
-                builtQuery = builtQuery.replace(aliasToReplace + ".", hqlToSqlAlias.get(aliasToReplace) + ".");
+        for (Map.Entry<String, String> aliasToReplace : hqlToSqlAlias.entrySet()) {
+            if (builtQuery.contains(aliasToReplace.getKey() + ".")) {
+                builtQuery = builtQuery.replace(aliasToReplace.getKey() + ".", aliasToReplace.getValue() + ".");
             }
         }
         return builtQuery;
@@ -95,23 +77,28 @@ public class SQLQueryBuilder extends QueryBuilder {
         }
     }
 
-    @Override
-    protected Object processValue(Object fieldValue) {
-        Object value = super.processValue(fieldValue);
-        if (value instanceof Boolean) {
-            if (useIntegerForBoolean(vendor)) {
-                value = (Boolean) value ? 1 : 0;
-            }
-        }
-        return value;
-    }
-
-    private boolean useIntegerForBoolean(Vendor vendor) {
+    private static boolean useIntegerForBoolean(Vendor vendor) {
         return Vendor.ORACLE.equals(vendor) || Vendor.SQLSERVER.equals(vendor);
     }
 
     @Override
-    boolean hasChanged() {
-        return true;//always rebuild the query because we need to replace vendor specific things
+    Query rebuildQuery(AbstractSelectDescriptor<T> selectDescriptor, Session session, Query query) {
+        String builtQuery = stringQueryBuilder.toString();
+        builtQuery = replaceHQLAliasesBySQLAliases(builtQuery);
+        NativeQuery generatedSqlQuery = session.createSQLQuery(builtQuery);
+        for (NativeSQLQueryReturn queryReturn : (List<NativeSQLQueryReturn>) ((NativeQuery) query)
+                .getQueryReturns()) {
+            if (queryReturn instanceof NativeSQLQueryScalarReturn) {
+                generatedSqlQuery.addScalar(((NativeSQLQueryScalarReturn) queryReturn).getColumnAlias(),
+                        ((NativeSQLQueryScalarReturn) queryReturn).getType());
+            } else if (queryReturn instanceof NativeSQLQueryRootReturn) {
+                generatedSqlQuery.addEntity(((NativeSQLQueryRootReturn) queryReturn).getAlias(),
+                        ((NativeSQLQueryRootReturn) queryReturn).getReturnEntityName());
+            } else {
+                throw new IllegalStateException(
+                        "Not yet implemented. Query return type " + queryReturn.getClass().getName());
+            }
+        }
+        return generatedSqlQuery;
     }
 }

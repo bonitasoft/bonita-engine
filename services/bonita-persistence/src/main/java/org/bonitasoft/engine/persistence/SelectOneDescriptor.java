@@ -31,4 +31,28 @@ public final class SelectOneDescriptor<T> extends AbstractSelectWithParametersDe
         super(queryName, inputParameters, entityType, returnType);
     }
 
+    @Override
+    public int getStartIndex() {
+        return 0;
+    }
+
+    @Override
+    public int getPageSize() {
+        return 1;
+    }
+
+    @Override
+    public boolean hasAFilter() {
+        return false;
+    }
+
+    @Override
+    public QueryOptions getQueryOptions() {
+        return QueryOptions.ONE_RESULT;
+    }
+
+    @Override
+    public boolean hasOrderByParameters() {
+        return false;
+    }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2020 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,123 +13,17 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sequence.SequenceManager;
-import org.bonitasoft.engine.services.SPersistenceException;
-import org.bonitasoft.engine.services.UpdateDescriptor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.junit.Test;
 
-public class AbstractDBPersistenceServiceTest {
+public class QueryBuilderFactoryTest {
 
-    /**
-     * Dummy implementation for testing purpose : we are not interested in the data manipulation behaviour.
-     *
-     * @author Laurent Vaills
-     */
-    class DummyDBPersistenceService extends AbstractDBPersistenceService {
-
-        public DummyDBPersistenceService(final String name,
-                final char likeEscapeCharacter, final SequenceManager sequenceManager,
-                final DataSource datasource, final boolean enableWordSearch,
-                final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
-                throws ClassNotFoundException {
-            super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
-                    wordSearchExclusionMappings, logger);
-        }
-
-        @Override
-        public <T> T selectOne(final SelectOneDescriptor<T> selectDescriptor) throws SBonitaReadException {
-            return null;
-        }
-
-        @Override
-        public <T> List<T> selectList(final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
-            return null;
-        }
-
-        @Override
-        public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor)
-                throws SBonitaReadException {
-            return null;
-        }
-
-        @Override
-        public void update(final UpdateDescriptor desc) throws SPersistenceException {
-
-        }
-
-        @Override
-        public void insertInBatch(final List<? extends PersistentObject> entities) throws SPersistenceException {
-
-        }
-
-        @Override
-        public void insert(final PersistentObject entity) throws SPersistenceException {
-
-        }
-
-        @Override
-        public void flushStatements() throws SPersistenceException {
-
-        }
-
-        @Override
-        public void deleteByTenant(final Class<? extends PersistentObject> entityClass,
-                final List<FilterOption> filters) throws SPersistenceException {
-
-        }
-
-        @Override
-        public void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
-
-        }
-
-        @Override
-        public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass)
-                throws SPersistenceException {
-
-        }
-
-        @Override
-        public void delete(final long id, final Class<? extends PersistentObject> entityClass)
-                throws SPersistenceException {
-
-        }
-
-        @Override
-        public void delete(final PersistentObject entity) throws SPersistenceException {
-
-        }
-
-        @Override
-        protected long getTenantId() throws STenantIdNotSetException {
-            return 0;
-        }
-
-        @Override
-        public int update(final String updateQueryName) throws SPersistenceException {
-            return 0;
-        }
-
-        @Override
-        public int update(final String updateQueryName, final Map<String, Object> inputParameters)
-                throws SPersistenceException {
-            return 0;
-        }
-    }
-
-    class ParentDummyPersistentObject implements PersistentObject {
+    static class ParentDummyPersistentObject implements PersistentObject {
 
         private static final long serialVersionUID = 1L;
 
@@ -191,6 +85,7 @@ public class AbstractDBPersistenceServiceTest {
         final boolean expectedResult = false;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+
     }
 
     @Test
@@ -275,15 +170,11 @@ public class AbstractDBPersistenceServiceTest {
     private void executeIsWordSearchEnabled(final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings,
             final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
-            throws ClassNotFoundException {
-        final SequenceManager sequenceManager = mock(SequenceManager.class);
-        final DataSource datasource = mock(DataSource.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", '#',
-                sequenceManager,
-                datasource, enableWordSearch, wordSearchExclusionMappings, logger);
+            throws Exception {
+        QueryBuilderFactory queryBuilderFactory = new QueryBuilderFactory(OrderByCheckingMode.NONE, emptyMap(), '%',
+                enableWordSearch, wordSearchExclusionMappings);
 
-        assertThat(persistenceService.isWordSearchEnabled(entityClass)).isEqualTo(expectedResult);
+        assertThat(queryBuilderFactory.isWordSearchEnabled(entityClass)).isEqualTo(expectedResult);
     }
 
 }

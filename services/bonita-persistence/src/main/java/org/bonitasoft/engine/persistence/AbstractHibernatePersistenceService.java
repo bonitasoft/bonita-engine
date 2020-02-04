@@ -55,8 +55,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private final SessionFactory sessionFactory;
 
-    private final OrderByCheckingMode orderByCheckingMode;
-
     private final Map<String, String> classAliasMappings;
 
     private final Map<String, String> cacheQueries;
@@ -64,57 +62,47 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     private final List<Class<? extends PersistentObject>> classMapping;
 
     private final List<String> mappingExclusions;
-    final OrderByBuilder orderByBuilder;
     private Statistics statistics;
     private int stat_display_count;
-    private QueryBuilderFactory queryBuilderFactory = new QueryBuilderFactory();
+    private QueryBuilderFactory queryBuilderFactory;
 
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory,
             final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
-            throws ClassNotFoundException {
-        super("TEST", '#', enableWordSearch, wordSearchExclusionMappings, logger);
+            throws Exception {
+        super("TEST", logger);
         this.sessionFactory = sessionFactory;
         this.classAliasMappings = classAliasMappings;
         this.classMapping = classMapping;
-        orderByCheckingMode = getOrderByCheckingMode();
         statistics = sessionFactory.getStatistics();
         cacheQueries = Collections.emptyMap();
         mappingExclusions = Collections.emptyList();
-        orderByBuilder = new DefaultOrderByBuilder();
+        queryBuilderFactory = new QueryBuilderFactory(OrderByCheckingMode.NONE, classAliasMappings, '#',
+                enableWordSearch, wordSearchExclusionMappings);
     }
 
     public AbstractHibernatePersistenceService(final String name,
             final HibernateConfigurationProvider hbmConfigurationProvider,
-            final Properties extraHibernateProperties, final char likeEscapeCharacter,
+            final Properties extraHibernateProperties,
             final TechnicalLoggerService logger,
-            final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings)
+            final SequenceManager sequenceManager, final DataSource datasource, QueryBuilderFactory queryBuilderFactory)
             throws Exception {
-        super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
-                wordSearchExclusionMappings, logger);
-        orderByCheckingMode = getOrderByCheckingMode();
+        super(name, sequenceManager, datasource, logger);
         hbmConfigurationProvider.bootstrap(extraHibernateProperties);
         Vendor vendor = hbmConfigurationProvider.getVendor();
         sessionFactory = hbmConfigurationProvider.getSessionFactory();
-        queryBuilderFactory.setVendor(vendor);
+
+        this.queryBuilderFactory = queryBuilderFactory;
+        this.queryBuilderFactory.setVendor(vendor);
         if (vendor == Vendor.SQLSERVER) {
-            this.orderByBuilder = new SQLServerOrderByBuilder();
-        } else {
-            this.orderByBuilder = new DefaultOrderByBuilder();
+            this.queryBuilderFactory.setOrderByBuilder(new SQLServerOrderByBuilder());
         }
         statistics = sessionFactory.getStatistics();
         classMapping = hbmConfigurationProvider.getMappedClasses();
         classAliasMappings = hbmConfigurationProvider.getClassAliasMappings();
         mappingExclusions = hbmConfigurationProvider.getMappingExclusions();
         cacheQueries = hbmConfigurationProvider.getCacheQueries();
-    }
-
-    private OrderByCheckingMode getOrderByCheckingMode() {
-        final String property = System.getProperty("sysprop.bonita.orderby.checking.mode");
-        return property != null && !property.isEmpty() ? OrderByCheckingMode.valueOf(property)
-                : OrderByCheckingMode.NONE;
     }
 
     /**
@@ -359,8 +347,12 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
+    private boolean isCacheEnabled(String queryName) {
+        return cacheQueries != null && cacheQueries.containsKey(queryName);
+    }
+
     private void setQueryCache(final Query query, final String name) {
-        if (cacheQueries != null && cacheQueries.containsKey(name)) {
+        if (isCacheEnabled(name)) {
             query.setCacheable(true);
         }
     }
@@ -373,34 +365,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
             final Session session = getSession(true);
 
-            Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-            QueryBuilder queryBuilder = queryBuilderFactory.createQueryBuilderFor(query,
-                    selectDescriptor.getEntityType(), orderByBuilder, classAliasMappings, likeEscapeCharacter);
-            if (selectDescriptor.hasAFilter()) {
-                final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-                final boolean enableWordSearch = isWordSearchEnabled(selectDescriptor.getEntityType());
-                queryBuilder.appendFilters(queryOptions.getFilters(), queryOptions.getMultipleFilter(),
-                        enableWordSearch);
-            }
-            if (selectDescriptor.hasOrderByParameters()) {
-                queryBuilder.appendOrderByClause(selectDescriptor.getQueryOptions().getOrderByOptions(),
-                        selectDescriptor.getEntityType());
-            }
-
-            if (queryBuilder.hasChanged()) {
-                query = queryBuilder.buildQuery(session);
-            }
-            setQueryCache(query, selectDescriptor.getQueryName());
-            try {
-                queryBuilder.setTenantId(query, getTenantId());
-            } catch (STenantIdNotSetException e) {
-                throw new SBonitaReadException(e);
-            }
-            setParameters(query, selectDescriptor.getInputParameters());
-            query.setFirstResult(selectDescriptor.getStartIndex());
-            query.setMaxResults(selectDescriptor.getPageSize());
-
-            checkOrderByClause(query);
+            org.hibernate.query.Query query = queryBuilderFactory.createQueryBuilderFor(session, selectDescriptor)
+                    .tenantId(getTenantId())
+                    .cache(isCacheEnabled(selectDescriptor.getQueryName()))
+                    .build();
 
             @SuppressWarnings("unchecked")
             final List<T> list = query.list();
@@ -411,7 +379,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             return Collections.emptyList();
         } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
             throw new SRetryableException(e);
-        } catch (final HibernateException | SPersistenceException e) {
+        } catch (final HibernateException | SPersistenceException | STenantIdNotSetException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
     }
@@ -429,27 +397,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             disconnectEntityFromSession(session, object);
         }
         return object;
-    }
-
-    void checkOrderByClause(final Query query) {
-        if (!query.getQueryString().toLowerCase().contains("order by")) {
-            switch (orderByCheckingMode) {
-                case NONE:
-                    break;
-                case WARNING:
-                    logger.log(
-                            AbstractHibernatePersistenceService.class,
-                            TechnicalLogSeverity.WARNING,
-                            "Query '"
-                                    + query.getQueryString()
-                                    + "' does not contain 'ORDER BY' clause. It's better to modify your query to order the result, especially if you use the pagination.");
-                    break;
-                case STRICT:
-                default:
-                    throw new IllegalArgumentException("Query " + query.getQueryString()
-                            + " does not contain 'ORDER BY' clause hence is not allowed. Please specify ordering before re-sending the query");
-            }
-        }
     }
 
     private void setParameters(final Query query, final Map<String, Object> inputParameters) {

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.persistence;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -24,6 +23,7 @@ import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -52,13 +52,12 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
 
     public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
-            final char likeEscapeCharacter,
             final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings, HibernateMetricsBinder hibernateMetricsBinder)
+            HibernateMetricsBinder hibernateMetricsBinder,
+            QueryBuilderFactory queryBuilderFactory)
             throws Exception {
-        super(name, hbmConfigurationProvider, extraHibernateProperties, likeEscapeCharacter, logger,
-                sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
+        super(name, hbmConfigurationProvider, extraHibernateProperties, logger,
+                sequenceManager, datasource, queryBuilderFactory);
         this.sessionAccessor = sessionAccessor;
         hibernateMetricsBinder.bindMetrics(getSessionFactory());
     }
@@ -176,18 +175,25 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             final Session session = getSession(true);
             final String entityClassName = entityClass.getCanonicalName();
-            final boolean enableWordSearch = isWordSearchEnabled(entityClass);
 
             boolean hasFilters = filters != null && !filters.isEmpty();
             String baseQuery = "DELETE FROM " + entityClassName + " "
                     + (hasFilters ? getClassAliasMappings().get(entityClassName) : "")
                     + " WHERE tenantId= :tenantId";
-            QueryBuilder queryBuilder = new HQLQueryBuilder(baseQuery, orderByBuilder, getClassAliasMappings(),
-                    likeEscapeCharacter);
+
             if (hasFilters) {
-                queryBuilder.appendFilters(filters, null, enableWordSearch);
+                if (filters.stream().anyMatch(f -> f.getFilterOperationType() == FilterOperationType.LIKE)) {
+                    throw new IllegalStateException("Delete queries do not support queries with LIKE");
+                }
+                String whereClause = new QueryGeneratorForFilters(getClassAliasMappings(), false, '%'/*
+                                                                                                      * there is no
+                                                                                                      * 'like' in these
+                                                                                                      * delete queries
+                                                                                                      */)
+                        .generate(filters).getKey();
+                baseQuery += " AND ( " + whereClause + " )";
             }
-            final Query query = queryBuilder.buildQuery(session);
+            Query query = session.createQuery(baseQuery);
             query.setLong(TENANT_ID, getTenantId());
             query.executeUpdate();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {

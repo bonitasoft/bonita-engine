@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static java.util.Collections.emptyMap;
+import static org.bonitasoft.engine.persistence.QueryOptions.ONE_RESULT;
+
+import java.util.Map;
+
 /**
  * @author Charles Souillard
  * @author Matthieu Chaffotte
@@ -41,4 +46,33 @@ public class SelectByIdDescriptor<T extends PersistentObject> extends AbstractSe
         return readonly;
     }
 
+    @Override
+    public Map<String, Object> getInputParameters() {
+        return emptyMap();
+    }
+
+    @Override
+    public int getStartIndex() {
+        return 0;
+    }
+
+    @Override
+    public int getPageSize() {
+        return 1;
+    }
+
+    @Override
+    public boolean hasAFilter() {
+        return false;
+    }
+
+    @Override
+    public QueryOptions getQueryOptions() {
+        return ONE_RESULT;
+    }
+
+    @Override
+    public boolean hasOrderByParameters() {
+        return false;
+    }
 }
