@@ -19,6 +19,7 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     testCompile "org.projectlombok:lombok:${Deps.lombokVersion}"
 }

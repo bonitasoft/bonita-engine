@@ -14,17 +14,14 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -41,89 +38,32 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
  */
 public abstract class AbstractDBPersistenceService implements TenantPersistenceService {
 
-    final char likeEscapeCharacter;
-
     private final String name;
 
     private final SequenceManager sequenceManager;
 
     protected final DataSource datasource;
 
-    private final Set<Class<? extends PersistentObject>> wordSearchExclusionMappings = new HashSet<Class<? extends PersistentObject>>();
-
-    private final boolean enableWordSearch;
-
     protected final TechnicalLoggerService logger;
 
-    public AbstractDBPersistenceService(final String name, final char likeEscapeCharacter,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
-            final TechnicalLoggerService logger) throws ClassNotFoundException {
+    public AbstractDBPersistenceService(final String name, final TechnicalLoggerService logger) {
         this.name = name;
         sequenceManager = null;
         datasource = null;
-        this.likeEscapeCharacter = likeEscapeCharacter;
-        this.enableWordSearch = enableWordSearch;
-        if (wordSearchExclusionMappings != null) {
-            for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
-                final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
-                if (!PersistentObject.class.isAssignableFrom(clazz)) {
-                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz
-                            + " because it does not implements "
-                            + PersistentObject.class);
-                }
-                this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
-            }
-        }
         this.logger = logger;
     }
 
-    public AbstractDBPersistenceService(final String name,
-            final char likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
-            final TechnicalLoggerService logger) throws ClassNotFoundException {
+    public AbstractDBPersistenceService(final String name, final SequenceManager sequenceManager,
+            final DataSource datasource, final TechnicalLoggerService logger) {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
-        this.likeEscapeCharacter = likeEscapeCharacter;
-        this.enableWordSearch = enableWordSearch;
         this.logger = logger;
-
-        if (enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "The word based search feature is experimental, using it in production may impact performances.");
-        }
-        if (wordSearchExclusionMappings != null && !wordSearchExclusionMappings.isEmpty()) {
-            if (!enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO,
-                        "You defined an exclusion mapping for the word based search feature, but it is not enabled.");
-            }
-            for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
-                final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
-                if (!PersistentObject.class.isAssignableFrom(clazz)) {
-                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz
-                            + " because it does not implements "
-                            + PersistentObject.class);
-                }
-                this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
-            }
-        }
     }
 
     @Override
     public String getName() {
         return name;
-    }
-
-    protected boolean isWordSearchEnabled(final Class<? extends PersistentObject> entityClass) {
-        if (!enableWordSearch || entityClass == null) {
-            return false;
-        }
-        for (final Class<? extends PersistentObject> exclusion : wordSearchExclusionMappings) {
-            if (exclusion.isAssignableFrom(entityClass)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
@@ -222,10 +162,6 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
                 throw new SPersistenceException("Problem while saving entity: " + entity + " with id: " + id, e);
             }
         }
-    }
-
-    protected String getLikeEscapeCharacter() {
-        return String.valueOf(likeEscapeCharacter);
     }
 
 }

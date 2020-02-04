@@ -14,17 +14,14 @@
 package org.bonitasoft.engine.persistence;
 
 import static java.util.Collections.singletonMap;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import java.util.Collections;
 import java.util.Map;
 
-import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.services.Vendor;
-import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -37,92 +34,52 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class SQLQueryBuilderTest {
 
     @Mock
-    private Session session;
-    @Mock
     private NativeQuery mockedQuery;
+    @Mock
+    private Query query;
     private static final char LIKE_ESCAPE_CHARACTER = '§';
     private Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
 
-    private QueryBuilder createQueryBuilder(String baseQuery, Vendor vendor) {
-        return new SQLQueryBuilder(baseQuery, vendor, TestObject.class, new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+    private SQLQueryBuilder createQueryBuilder(String baseQuery, Vendor vendor) {
+        doReturn(baseQuery).when(query).getQueryString();
+        return new SQLQueryBuilder(null, query, vendor, new DefaultOrderByBuilder(),
+                classAliasMappings,
+                LIKE_ESCAPE_CHARACTER, false, OrderByCheckingMode.NONE, null);
     }
 
     @Test
     public void should_generate_query_with_boolean_parameter() throws Exception {
         //given
-        doReturn(mockedQuery).when(session).createSQLQuery(anyString());
         String baseQuery = "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue";
         doReturn(baseQuery).when(mockedQuery).getQueryString();
+        SQLQueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.POSTGRES);
         //when
-        QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.POSTGRES);
+        queryBuilder.addConstantsAsParameters(mockedQuery);
         //then
-        queryBuilder.buildQuery(session);
-        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue");
         verify(mockedQuery).setParameter("trueValue", true);
     }
 
     @Test
     public void should_generate_query_with_boolean_parameter_replaced_by_int_on_oracle() throws Exception {
         //given
-        doReturn(mockedQuery).when(session).createSQLQuery(anyString());
         String baseQuery = "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue";
         doReturn(baseQuery).when(mockedQuery).getQueryString();
+        SQLQueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.ORACLE);
         //when
-        QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.ORACLE);
-        queryBuilder.buildQuery(session);
+        queryBuilder.addConstantsAsParameters(mockedQuery);
         //then
-        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue");
         verify(mockedQuery).setParameter("trueValue", 1);
     }
 
     @Test
     public void should_generate_query_with_boolean_parameter_replaced_by_int_on_sqlserver() throws Exception {
         //given
-        doReturn(mockedQuery).when(session).createSQLQuery(anyString());
         String baseQuery = "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue";
         doReturn(baseQuery).when(mockedQuery).getQueryString();
+        SQLQueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.SQLSERVER);
         //when
-        QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.SQLSERVER);
-        queryBuilder.buildQuery(session);
+        queryBuilder.addConstantsAsParameters(mockedQuery);
         //then
-        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue");
         verify(mockedQuery).setParameter("trueValue", 1);
-    }
-
-    @Test
-    public void should_not_replace_parameters_of_type_boolean_on_postgres() throws Exception {
-        //given
-        doReturn(mockedQuery).when(session).createSQLQuery(anyString());
-        String baseQuery = "SELECT testObj.* FROM test_object testObj";
-        doReturn(baseQuery).when(mockedQuery).getQueryString();
-        //when
-        QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.POSTGRES);
-        queryBuilder.appendFilters(
-                Collections.singletonList(
-                        new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)),
-                null,
-                false);
-        queryBuilder.buildQuery(session);
-        //then
-        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE (testObj.enabled = true)");
-    }
-
-    @Test
-    public void should_replace_parameters_of_type_boolean_on_oracle() throws Exception {
-        //given
-        doReturn(mockedQuery).when(session).createSQLQuery(anyString());
-        String baseQuery = "SELECT testObj.* FROM test_object testObj";
-        doReturn(baseQuery).when(mockedQuery).getQueryString();
-        //when
-        QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.ORACLE);
-        queryBuilder.appendFilters(
-                Collections.singletonList(
-                        new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)),
-                null,
-                false);
-        queryBuilder.buildQuery(session);
-        //then
-        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE (testObj.enabled = 1)");
     }
 }

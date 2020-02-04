@@ -37,19 +37,18 @@ public class PlatformHibernatePersistenceService extends AbstractHibernatePersis
             final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings,
-            final TechnicalLoggerService logger) throws ClassNotFoundException {
+            final TechnicalLoggerService logger) throws Exception {
         super(sessionFactory, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings, logger);
     }
 
     public PlatformHibernatePersistenceService(final String name,
             final HibernateConfigurationProvider hbmConfigurationProvider,
             final Properties extraHibernateProperties,
-            final char likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
-            final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings)
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager,
+            final DataSource datasource, QueryBuilderFactory queryBuilderFactory)
             throws Exception {
-        super(name, hbmConfigurationProvider, extraHibernateProperties, likeEscapeCharacter, logger,
-                sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
+        super(name, hbmConfigurationProvider, extraHibernateProperties, logger,
+                sequenceManager, datasource, queryBuilderFactory);
     }
 
     @Override

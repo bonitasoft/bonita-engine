@@ -40,6 +40,7 @@ public class QueryOptions implements Serializable {
     public static final int UNLIMITED_NUMBER_OF_RESULTS = Integer.MAX_VALUE;
 
     public static final QueryOptions ALL_RESULTS = new QueryOptions(0, UNLIMITED_NUMBER_OF_RESULTS);
+    public static final QueryOptions ONE_RESULT = new QueryOptions(0, 1);
 
     public QueryOptions(final QueryOptions queryOptions) {
         super();

@@ -13,37 +13,54 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
+import static java.util.Collections.emptySet;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.commons.EnumToObjectConvertible;
-import org.bonitasoft.engine.persistence.search.FilterOperationType;
+import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.commons.Pair;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 /**
  * @author Baptiste Mesta
  */
-abstract class QueryBuilder {
+@Slf4j
+abstract class QueryBuilder<T> {
 
-    private final String baseQuery;
+    private final Query baseQuery;
+    private final boolean wordSearchEnabled;
+    private final OrderByCheckingMode orderByCheckingMode;
+    private final AbstractSelectDescriptor<T> selectDescriptor;
+    private final QueryGeneratorForFilters queryGeneratorForFilters;
+    private final QueryGeneratorForSearchTerm queryGeneratorForSearchTerm;
+    private final QueryGeneratorForOrderBy queryGeneratorForOrderBy;
     StringBuilder stringQueryBuilder;
-    Map<String, String> classAliasMappings;
-    private String likeEscapeCharacter;
-    private OrderByBuilder orderByBuilder;
+    private Map<String, String> classAliasMappings;
+    private Session session;
+    private long tenantId;
+    private boolean cacheEnabled;
 
-    QueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings,
-            char likeEscapeCharacter) {
-        this.orderByBuilder = orderByBuilder;
+    QueryBuilder(Session session, Query baseQuery, OrderByBuilder orderByBuilder,
+            Map<String, String> classAliasMappings,
+            char likeEscapeCharacter, boolean wordSearchEnabled, OrderByCheckingMode orderByCheckingMode,
+            AbstractSelectDescriptor<T> selectDescriptor, boolean useIntegerForBoolean) {
+        this.session = session;
         this.classAliasMappings = classAliasMappings;
-        this.likeEscapeCharacter = String.valueOf(likeEscapeCharacter);
-        stringQueryBuilder = new StringBuilder(baseQuery);
+        stringQueryBuilder = new StringBuilder(baseQuery.getQueryString());
         this.baseQuery = baseQuery;
+        this.wordSearchEnabled = wordSearchEnabled;
+        this.orderByCheckingMode = orderByCheckingMode;
+        this.selectDescriptor = selectDescriptor;
+        this.queryGeneratorForFilters = new QueryGeneratorForFilters(classAliasMappings, useIntegerForBoolean,
+                likeEscapeCharacter);
+        this.queryGeneratorForSearchTerm = new QueryGeneratorForSearchTerm(likeEscapeCharacter);
+        this.queryGeneratorForOrderBy = new QueryGeneratorForOrderBy(classAliasMappings, orderByBuilder);
+
     }
 
     public String getQuery() {
@@ -51,111 +68,21 @@ abstract class QueryBuilder {
     }
 
     void appendFilters(List<FilterOption> filters, SearchFields multipleFilter, boolean enableWordSearch) {
-        final Set<String> specificFilters = new HashSet<>(filters.size());
+        Set<String> specificFilters = emptySet();
         if (!filters.isEmpty()) {
-            FilterOption previousFilter = null;
-            if (!this.stringQueryBuilder.toString().contains("WHERE")) {
+            if (!stringQueryBuilder.toString().contains("WHERE")) {
                 stringQueryBuilder.append(" WHERE (");
             } else {
                 stringQueryBuilder.append(" AND (");
             }
-            for (final FilterOption filterOption : filters) {
-                if (previousFilter != null) {
-                    final FilterOperationType prevOp = previousFilter.getFilterOperationType();
-                    final FilterOperationType currOp = filterOption.getFilterOperationType();
-                    // Auto add AND if previous operator was normal op or ')' and that current op is normal op or '(' :
-                    if ((isNormalOperator(prevOp) || prevOp == R_PARENTHESIS)
-                            && (isNormalOperator(currOp) || currOp == L_PARENTHESIS)) {
-                        stringQueryBuilder.append(" AND ");
-                    }
-                }
-                final StringBuilder aliasBuilder = appendFilterClause(stringQueryBuilder, filterOption);
-                if (aliasBuilder != null) {
-                    specificFilters.add(aliasBuilder.toString());
-                }
-                previousFilter = filterOption;
-            }
+            Pair<String, Set<String>> whereClause = queryGeneratorForFilters.generate(filters);
+            specificFilters = whereClause.getRight();
+            stringQueryBuilder.append(whereClause.getLeft());
             stringQueryBuilder.append(")");
         }
         if (multipleFilter != null && multipleFilter.getTerms() != null && !multipleFilter.getTerms().isEmpty()) {
             handleMultipleFilters(stringQueryBuilder, multipleFilter, specificFilters, enableWordSearch);
         }
-    }
-
-    private StringBuilder appendFilterClause(final StringBuilder clause, final FilterOption filterOption) {
-        final FilterOperationType type = filterOption.getFilterOperationType();
-        StringBuilder completeField = null;
-        if (filterOption.getPersistentClass() != null) {
-            completeField = new StringBuilder(classAliasMappings.get(filterOption.getPersistentClass().getName()))
-                    .append('.').append(
-                            filterOption.getFieldName());
-        }
-        Object fieldValue = filterOption.getValue();
-        fieldValue = processValue(fieldValue);
-        switch (type) {
-            case EQUALS:
-                if (fieldValue == null) {
-                    clause.append(completeField).append(" IS NULL");
-                } else {
-                    clause.append(completeField).append(" = ").append(fieldValue);
-                }
-                break;
-            case GREATER:
-                clause.append(completeField).append(" > ").append(fieldValue);
-                break;
-            case GREATER_OR_EQUALS:
-                clause.append(completeField).append(" >= ").append(fieldValue);
-                break;
-            case LESS:
-                clause.append(completeField).append(" < ").append(fieldValue);
-                break;
-            case LESS_OR_EQUALS:
-                clause.append(completeField).append(" <= ").append(fieldValue);
-                break;
-            case DIFFERENT:
-                clause.append(completeField).append(" != ").append(fieldValue);
-                break;
-            case IN:
-                clause.append(getInClause(completeField, filterOption));
-                break;
-            case BETWEEN:
-                final Object from = filterOption.getFrom() instanceof String
-                        ? "'" + escapeString((String) filterOption.getFrom()) + "'"
-                        : filterOption.getFrom();
-                final Object to = filterOption.getTo() instanceof String
-                        ? "'" + escapeString((String) filterOption.getTo()) + "'" : filterOption.getTo();
-                clause.append("(").append(from).append(" <= ").append(completeField);
-                clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
-                break;
-            case LIKE:
-                clause.append(completeField).append(" LIKE '%").append(escapeTerm((String) filterOption.getValue()))
-                        .append("%'");
-                break;
-            case L_PARENTHESIS:
-                clause.append(" (");
-                break;
-            case R_PARENTHESIS:
-                clause.append(" )");
-                break;
-            case AND:
-                clause.append(" AND ");
-                break;
-            case OR:
-                clause.append(" OR ");
-                break;
-            default:
-                break;
-        }
-        return completeField;
-    }
-
-    protected Object processValue(Object fieldValue) {
-        if (fieldValue instanceof String) {
-            fieldValue = "'" + escapeString((String) fieldValue) + "'";
-        } else if (fieldValue instanceof EnumToObjectConvertible) {
-            fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
-        }
-        return fieldValue;
     }
 
     private void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter,
@@ -186,58 +113,110 @@ abstract class QueryBuilder {
         }
         queryBuilder.append("(");
 
-        final Iterator<String> fieldIterator = fields.iterator();
-        while (fieldIterator.hasNext()) {
-            buildLikeClauseForOneFieldMultipleTerms(queryBuilder, fieldIterator.next(), terms, enableWordSearch);
-            if (fieldIterator.hasNext()) {
-                queryBuilder.append(" OR ");
-            }
-        }
+        String result = queryGeneratorForSearchTerm.generate(fields, terms, enableWordSearch);
+        queryBuilder.append(result);
 
         queryBuilder.append(")");
     }
 
-    private void buildLikeClauseForOneFieldMultipleTerms(final StringBuilder queryBuilder, final String currentField,
-            final List<String> terms,
-            final boolean enableWordSearch) {
-        final Iterator<String> termIterator = terms.iterator();
-        while (termIterator.hasNext()) {
-            final String currentTerm = termIterator.next();
+    void appendOrderByClause(List<OrderByOption> orderByOptions, Class<? extends PersistentObject> entityType)
+            throws SBonitaReadException {
+        String result = queryGeneratorForOrderBy.generate(orderByOptions, entityType);
+        stringQueryBuilder.append(result);
+    }
 
-            buildLikeClauseForOneFieldOneTerm(queryBuilder, currentField, currentTerm, enableWordSearch);
+    boolean hasChanged() {
+        return !baseQuery.getQueryString().equals(stringQueryBuilder.toString());
+    }
 
-            if (termIterator.hasNext()) {
-                queryBuilder.append(" OR ");
+    public abstract void setTenantId(Query query, long tenantId);
+
+    abstract Query rebuildQuery(AbstractSelectDescriptor<T> selectDescriptor, Session session, Query query);
+
+    void manageFiltersAndParameters(AbstractSelectDescriptor<T> selectDescriptor, boolean enableWordSearch)
+            throws SBonitaReadException {
+        if (selectDescriptor.hasAFilter()) {
+            final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
+            appendFilters(queryOptions.getFilters(), queryOptions.getMultipleFilter(),
+                    enableWordSearch);
+        }
+        if (selectDescriptor.hasOrderByParameters()) {
+            appendOrderByClause(selectDescriptor.getQueryOptions().getOrderByOptions(),
+                    selectDescriptor.getEntityType());
+        }
+    }
+
+    public QueryBuilder tenantId(long tenantId) {
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    public QueryBuilder cache(boolean cacheEnabled) {
+        this.cacheEnabled = cacheEnabled;
+        return this;
+    }
+
+    private void setParameters(final Query query, final Map<String, Object> inputParameters) {
+        for (final Map.Entry<String, Object> entry : inputParameters.entrySet()) {
+            final Object value = entry.getValue();
+            if (value instanceof Collection<?>) {
+                query.setParameterList(entry.getKey(), (Collection<?>) value);
+            } else {
+                query.setParameter(entry.getKey(), value);
             }
         }
     }
 
-    void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField,
-            final String currentTerm,
-            final boolean enableWordSearch) {
-        // Search if a sentence starts with the term
-        queryBuilder.append(currentField).append(buildLikeEscapeClause(currentTerm, "", "%"));
+    public Query build() throws SBonitaReadException {
+        manageFiltersAndParameters(selectDescriptor, wordSearchEnabled);
+        Query query = baseQuery;
+        if (hasChanged()) {
+            query = rebuildQuery(selectDescriptor, session, baseQuery);
+        }
+        addConstantsAsParameters(query);
+        setTenantId(query, tenantId);
+        setParameters(query, selectDescriptor.getInputParameters());
+        query.setFirstResult(selectDescriptor.getStartIndex());
+        query.setMaxResults(selectDescriptor.getPageSize());
+        query.setCacheable(cacheEnabled);
+        checkOrderByClause(query);
+        return query;
+    }
 
-        if (enableWordSearch) {
-            // Search also if a word starts with the term
-            // We do not want to search for %currentTerm% to ensure we can use Lucene-like library.
-            queryBuilder.append(" OR ").append(currentField).append(buildLikeEscapeClause(currentTerm, "% ", "%"));
+    protected abstract void addConstantsAsParameters(Query query);
+
+    private void checkOrderByClause(final Query query) {
+        if (!query.getQueryString().toLowerCase().contains("order by")) {
+            switch (orderByCheckingMode) {
+                case NONE:
+                    break;
+                case WARNING:
+                    log.warn(
+                            "Query '{}' does not contain 'ORDER BY' clause. It's better to modify your query to order" +
+                                    " the result, especially if you use the pagination.",
+                            query.getQueryString());
+                    break;
+                case STRICT:
+                default:
+                    throw new IllegalArgumentException("Query " + query.getQueryString()
+                            + " does not contain 'ORDER BY' clause hence is not allowed. Please specify ordering before re-sending the query");
+            }
         }
     }
 
-    /**
-     * Get like clause for given term with escaped sql query wildcards and escape character
+    /*
+     * escape for other things than like
      */
-    private String buildLikeEscapeClause(final String term, final String prefixPattern, final String suffixPattern) {
-        return " LIKE '" + (prefixPattern != null ? prefixPattern : "") + escapeTerm(term)
-                + (suffixPattern != null ? suffixPattern : "") + "' ESCAPE '"
-                + likeEscapeCharacter + "'";
+    static String escapeString(final String term) {
+        // 1) escape ' character by adding another ' character
+        return term
+                .replaceAll("'", "''");
     }
 
     /*
      * escape for like
      */
-    private final String escapeTerm(final String term) {
+    static String escapeTerm(final String term, String likeEscapeCharacter) {
         // 1) escape ' character by adding another ' character
         // 2) protect escape character if this character is used in data
         // 3) escape % character (sql query wildcard) by adding escape character
@@ -249,80 +228,4 @@ abstract class QueryBuilder {
                 .replace("_", likeEscapeCharacter + "_");
     }
 
-    /*
-     * escape for other things than like
-     */
-    String escapeString(final String term) {
-        // 1) escape ' character by adding another ' character
-        return term
-                .replaceAll("'", "''");
-    }
-
-    private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
-        return completeField + " in (" +
-                getInValues(filterOption) +
-                ")";
-    }
-
-    private String getInValues(final FilterOption filterOption) {
-        final StringBuilder stb = new StringBuilder();
-        for (final Object element : filterOption.getIn()) {
-            stb.append(element).append(",");
-        }
-        final String inValues = stb.toString();
-        return inValues.substring(0, inValues.length() - 1);
-    }
-
-    void appendOrderByClause(List<OrderByOption> orderByOptions, Class<? extends PersistentObject> entityType)
-            throws SBonitaReadException {
-        stringQueryBuilder.append(" ORDER BY ");
-        boolean startWithComma = false;
-        boolean sortedById = false;
-        for (final OrderByOption orderByOption : orderByOptions) {
-            if (startWithComma) {
-                stringQueryBuilder.append(',');
-            }
-            StringBuilder fieldNameBuilder = new StringBuilder();
-            final Class<? extends PersistentObject> clazz = orderByOption.getClazz();
-            if (clazz != null) {
-                appendClassAlias(fieldNameBuilder, clazz);
-            }
-            final String fieldName = orderByOption.getFieldName();
-            if ("id".equalsIgnoreCase(fieldName) || "sourceObjectId".equalsIgnoreCase(fieldName)) {
-                sortedById = true;
-            }
-            fieldNameBuilder.append(fieldName);
-            orderByBuilder.appendOrderBy(stringQueryBuilder, fieldNameBuilder.toString(),
-                    orderByOption.getOrderByType());
-            startWithComma = true;
-        }
-        if (!sortedById) {
-            if (startWithComma) {
-                stringQueryBuilder.append(',');
-            }
-            appendClassAlias(stringQueryBuilder, entityType);
-            stringQueryBuilder.append("id");
-            stringQueryBuilder.append(' ');
-            stringQueryBuilder.append("ASC");
-        }
-    }
-
-    private void appendClassAlias(final StringBuilder builder, final Class<? extends PersistentObject> clazz)
-            throws SBonitaReadException {
-        final String className = clazz.getName();
-        final String classAlias = classAliasMappings.get(className);
-        if (classAlias == null || classAlias.trim().isEmpty()) {
-            throw new SBonitaReadException("No class alias found for class " + className);
-        }
-        builder.append(classAlias);
-        builder.append('.');
-    }
-
-    boolean hasChanged() {
-        return !baseQuery.equals(stringQueryBuilder.toString());
-    }
-
-    abstract Query buildQuery(Session session);
-
-    public abstract void setTenantId(Query query, long tenantId);
 }

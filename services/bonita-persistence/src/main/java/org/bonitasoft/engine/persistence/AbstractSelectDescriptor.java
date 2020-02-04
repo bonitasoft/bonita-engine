@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import java.util.Map;
+
 /**
  * @author Charles Souillard
  * @author Matthieu Chaffotte
@@ -96,4 +98,15 @@ public abstract class AbstractSelectDescriptor<T> {
         return true;
     }
 
+    public abstract Map<String, Object> getInputParameters();
+
+    public abstract int getStartIndex();
+
+    public abstract int getPageSize();
+
+    public abstract boolean hasAFilter();
+
+    public abstract QueryOptions getQueryOptions();
+
+    public abstract boolean hasOrderByParameters();
 }

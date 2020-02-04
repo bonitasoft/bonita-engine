@@ -21,19 +21,30 @@ import org.hibernate.query.Query;
 /**
  * @author Baptiste Mesta
  */
-public class HQLQueryBuilder extends QueryBuilder {
+public class HQLQueryBuilder<T> extends QueryBuilder<T> {
 
-    HQLQueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings,
-            char likeEscapeCharacter) {
-        super(baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter);
-    }
-
-    Query buildQuery(Session session) {
-        return session.createQuery(stringQueryBuilder.toString());
+    HQLQueryBuilder(Session session, Query baseQuery, OrderByBuilder orderByBuilder,
+            Map<String, String> classAliasMappings,
+            char likeEscapeCharacter,
+            boolean wordSearchEnabled,
+            OrderByCheckingMode orderByCheckingMode,
+            SelectListDescriptor<T> selectDescriptor) {
+        super(session, baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter, wordSearchEnabled,
+                orderByCheckingMode, selectDescriptor, false);
     }
 
     @Override
     public void setTenantId(Query query, long tenantId) {
         //set using filters
+    }
+
+    @Override
+    Query rebuildQuery(AbstractSelectDescriptor<T> selectDescriptor, Session session, Query query) {
+        return session.createQuery(stringQueryBuilder.toString());
+    }
+
+    @Override
+    protected void addConstantsAsParameters(Query query) {
+        // nothing to do, Native queries require to inject constant parameters here
     }
 }

@@ -13,8 +13,14 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +30,15 @@ import java.util.TreeSet;
 
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 /**
  * @author Baptiste Mesta
@@ -33,6 +47,24 @@ public class QueryBuilderTest {
 
     private static final char LIKE_ESCAPE_CHARACTER = '§';
     public Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
+
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Mock
+    private Session session;
+    @Mock
+    private Query query;
+
+    @Before
+    public void before() {
+        when(session.createQuery(anyString())).thenAnswer(a -> {
+            Query mock = mock(Query.class);
+            doReturn(a.getArgument(0)).when(mock).getQueryString();
+            return mock;
+        });
+    }
 
     @Test
     public void should_hasChanged_return_false_if_query_has_not_changed() throws Exception {
@@ -44,8 +76,15 @@ public class QueryBuilderTest {
     }
 
     private QueryBuilder createQueryBuilder(String baseQuery) {
-        return new HQLQueryBuilder(baseQuery, new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        return createQueryBuilder(baseQuery, null, OrderByCheckingMode.NONE);
+    }
+
+    private HQLQueryBuilder createQueryBuilder(String baseQuery, SelectListDescriptor<TestObject> selectListDescriptor,
+            OrderByCheckingMode orderByCheckingMode) {
+        doReturn(baseQuery).when(query).getQueryString();
+        return new HQLQueryBuilder<>(session, query, new DefaultOrderByBuilder(),
+                classAliasMappings,
+                LIKE_ESCAPE_CHARACTER, false, orderByCheckingMode, selectListDescriptor);
     }
 
     @Test
@@ -285,40 +324,8 @@ public class QueryBuilderTest {
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age < 25)");
     }
 
-    @Test
-    public void should_escapeString_escape_quote() {
-        final String s = createBaseQueryBuilder().escapeString("toto'toto");
-
-        assertThat(s).isEqualTo("toto''toto");
-    }
-
-    @Test
-    public void should_escapeString_do_not_escape_like_wildcard() {
-        final String s = createBaseQueryBuilder().escapeString("%to'to%t_oto%");
-
-        assertThat(s).isEqualTo("%to''to%t_oto%");
-    }
-
     private QueryBuilder createBaseQueryBuilder() {
         return createQueryBuilder("SELECT testObj.* FROM test_object testObj");
-    }
-
-    @Test
-    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_enabled() {
-        final StringBuilder queryBuilder = new StringBuilder();
-        createBaseQueryBuilder().buildLikeClauseForOneFieldOneTerm(queryBuilder, "myField", "foo", true);
-
-        assertThat(queryBuilder.toString())
-                .as("query should contains like to check if the field start with foo and if the field contains a word starting by foo")
-                .contains("LIKE 'foo%'").contains("LIKE '% foo%'");
-    }
-
-    @Test
-    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_not_enabled() {
-        final StringBuilder queryBuilder = new StringBuilder();
-        createBaseQueryBuilder().buildLikeClauseForOneFieldOneTerm(queryBuilder, "myField", "foo", false);
-
-        assertThat(queryBuilder.toString()).contains("LIKE 'foo%'").doesNotContain("LIKE '% foo%'");
     }
 
     @Test
@@ -459,6 +466,77 @@ public class QueryBuilderTest {
         public Object fromEnum() {
             return ordinal();
         }
+    }
+
+    @Test
+    public final void should_log_nothing_when_no_ORDER_BY_clause_in_query_and_no_checking_mode() throws Exception {
+
+        HQLQueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj",
+                descriptorWithoutOrderBy(), OrderByCheckingMode.NONE);
+
+        queryBuilder.build();
+
+        assertThat(systemOutRule.getLog()).isEmpty();
+    }
+
+    @Test
+    public final void should_log_nothing_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_NONE()
+            throws Exception {
+        HQLQueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj",
+                descriptorWithoutOrderBy(), OrderByCheckingMode.NONE);
+
+        queryBuilder.build();
+
+        assertThat(systemOutRule.getLog()).isEmpty();
+    }
+
+    @Test
+    public final void should_log_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_WARNING() throws Exception {
+        HQLQueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj",
+                descriptorWithoutOrderBy(), OrderByCheckingMode.WARNING);
+
+        queryBuilder.build();
+
+        assertThat(systemOutRule.getLog())
+                .contains("Query 'SELECT testObj.* FROM test_object testObj' does not contain 'ORDER BY' clause");
+    }
+
+    @Test
+    public final void should_log_nothing_when_ORDER_BY_clause_in_query_and_checking_mode_is_STRICT()
+            throws Exception {
+        HQLQueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj",
+                descriptorWithOrderBy(), OrderByCheckingMode.NONE);
+
+        queryBuilder.build();
+
+        assertThat(systemOutRule.getLog()).isEmpty();
+    }
+
+    private SelectListDescriptor<TestObject> descriptorWithOrderBy() {
+        return new SelectListDescriptor<>("someQuery", emptyMap(), TestObject.class, new QueryOptions(0, 100,
+                singletonList(new OrderByOption(TestObject.class, "someField", OrderByType.ASC))));
+    }
+
+    private SelectListDescriptor<TestObject> descriptorWithoutOrderBy() {
+        return new SelectListDescriptor<>("someQuery", emptyMap(), TestObject.class, new QueryOptions(0, 100));
+    }
+
+    @Test
+    public void should_escapeString_escape_quote() {
+        new QueryGeneratorForFilters(emptyMap(), false, '%');
+        // 1) escape ' character by adding another ' character
+        final String s = QueryBuilder.escapeString("toto'toto");
+
+        assertThat(s).isEqualTo("toto''toto");
+    }
+
+    @Test
+    public void should_escapeString_do_not_escape_like_wildcard() {
+        new QueryGeneratorForFilters(emptyMap(), false, '%');
+        // 1) escape ' character by adding another ' character
+        final String s = QueryBuilder.escapeString("%to'to%t_oto%");
+
+        assertThat(s).isEqualTo("%to''to%t_oto%");
     }
 
 }
