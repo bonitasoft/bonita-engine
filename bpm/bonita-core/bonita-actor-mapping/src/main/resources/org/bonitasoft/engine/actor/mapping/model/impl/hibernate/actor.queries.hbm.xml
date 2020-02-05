@@ -166,29 +166,32 @@
         ORDER BY actormember.id ASC
     </query>
 
-    <query name="getPossibleUserIdsOfActorId">
-        SELECT user.id
-        FROM org.bonitasoft.engine.identity.model.SUser AS user,
-        org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
-        org.bonitasoft.engine.actor.mapping.model.SActor AS actor
-        WHERE actor.id = :actorId
-        AND actor.id = actormember.actorId
-        AND (
-        actormember.userId = user.id
-        OR actormember.id IN (
-        SELECT actormember.id
-        FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
-        org.bonitasoft.engine.identity.model.SUserMembership as um
-        WHERE um.userId = user.id
-        AND (
-        (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-        OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-        OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
-        )
-        )
-        )
-        GROUP BY user.id
-        ORDER BY MIN(user.userName)
-    </query>
-
+    <sql-query name="getPossibleUserIdsOfActorId">
+        <return-scalar column="id" type="long" />
+        SELECT user_.id, user_.username FROM (
+            SELECT user_.id, user_.username
+            FROM user_,
+            actormember,
+            actor
+            WHERE actor.id = :actorId
+            AND actor.id = actormember.actorId
+            AND actormember.userId = user_.id
+            UNION (
+                SELECT user_.id, user_.username
+                FROM user_,
+                actormember,
+                actor,
+                user_membership um
+                WHERE actor.id = :actorId
+                AND um.userId = user_.id
+                AND actor.id = actormember.actorId
+                AND (
+                    (actormember.groupId = um.groupId AND actormember.roleId = -1 )
+                    OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
+                    OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+                )
+            )
+        ) user_
+        ORDER BY user_.username
+    </sql-query>
 </hibernate-mapping>
