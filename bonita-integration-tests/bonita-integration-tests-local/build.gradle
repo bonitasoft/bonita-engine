@@ -6,7 +6,6 @@ dependencies {
     compile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     compile project(':bonita-integration-tests:bonita-integration-tests-client')
     compile project(':bpm:bonita-server')
-    compile project(':bonita-integration-tests:bonita-test-utils:bonita-server-test-utils')
     runtime "mysql:mysql-connector-java:${Deps.mysqlVersion}"
     runtime "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     runtime "org.postgresql:postgresql:${Deps.postgresqlVersion}"

@@ -6,8 +6,7 @@ dependencies {
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     compile project(':bpm:bonita-common')
     compile project(':bpm:bonita-client')
-    compile project(':bonita-integration-tests:bonita-test-utils:bonita-common-test-utils')
-    compile project(':bonita-integration-tests:bonita-test-utils:bonita-client-test-utils')
+    compile project(':bonita-integration-tests:bonita-test-utils')
     compile "org.assertj:assertj-core:${Deps.assertjVersion}"
     compile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     compile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
