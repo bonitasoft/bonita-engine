@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     compile "com.github.jengelman.gradle.plugins:shadow:2.0.4"
-    compile "com.bmuschko:gradle-docker-plugin:4.6.2"
+    compile "com.bmuschko:gradle-docker-plugin:4.10.0"
 }
 
 gradlePlugin {
