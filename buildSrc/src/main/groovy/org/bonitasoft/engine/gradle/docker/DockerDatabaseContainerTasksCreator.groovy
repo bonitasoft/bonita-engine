@@ -31,10 +31,10 @@ class DockerDatabaseContainerTasksCreator {
 
     def static vendors = [
             [name       : 'oracle',
-             repository : 'registry.rd.lan/bonitasoft/oracle-12c-ee',
-             tag        : '0.1.1',
+             repository : 'registry.rd.lan/bonitasoft/oracle-19c-ee',
+             tag        : '0.0.1',
              portBinding: 1521,
-             uriTemplate: 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1.localdomain',
+             uriTemplate: 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1',
             ],
             [name       : 'postgres',
              repository : 'registry.rd.lan/bonitasoft/postgres-11',

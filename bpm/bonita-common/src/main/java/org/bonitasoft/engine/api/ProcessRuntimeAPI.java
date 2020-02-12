@@ -900,7 +900,26 @@ public interface ProcessRuntimeAPI {
     DataInstance getProcessDataInstance(String dataName, long processInstanceId) throws DataNotFoundException;
 
     /**
-     * Update the value of a named data item in a specified process instance.
+     * <p>
+     * Update the value of a named process variable of a specified process instance.
+     * </p>
+     * <p>
+     * <u>Warning</u>: there is a known limitation about the usage of this method: if the new data value is of a custom
+     * data type AND
+     * the call to this method is performed from a java client configured to access Bonita Engine through HTTP,
+     * the API method call fails because the class of the custom data type cannot be loaded yet.
+     * The workaround to this limitation is to put the jar file containing your custom data
+     * type classes into the classloader of Bonita ([BONITA_INSTALLATION_FOLDER]/server/lib/bonita folder in a standard
+     * installation),
+     * and REMOVE it from the libraries of all the processes that use them.
+     * </p>
+     * <p>
+     * If the call is made from a standard Bonita bundle, the calls to Engine APIs are performed locally (and not
+     * through HTTP),
+     * so it does NOT fall into this limitation. So in a standard Bonita installation, it is safe to call this
+     * method in code like
+     * Rest API Extensions, Groovy scripts, Custom connector implementations...
+     * </p>
      *
      * @param dataName
      *        The name of the data item.
@@ -918,7 +937,26 @@ public interface ProcessRuntimeAPI {
             throws UpdateException;
 
     /**
-     * Update the value of a named data item in a specified process instance.
+     * <p>
+     * Update the value of named process variables of a specified process instance.
+     * </p>
+     * <p>
+     * <u>Warning</u>: there is a known limitation about the usage of this method: if the new data value is of a custom
+     * data type AND
+     * the call to this method is performed from a java client configure to access Bonita Engine through HTTP,
+     * the API method call fails because the class of the custom data type cannot be loaded yet.
+     * The workaround to this limitation is to put the jar file containing your custom data
+     * type classes into the classloader of Bonita ([BONITA_INSTALLATION_FOLDER]/server/lib/bonita folder in a standard
+     * installation),
+     * and REMOVE it from the libraries of all the processes that use them.
+     * </p>
+     * <p>
+     * If the call is made from a standard Bonita bundle, the calls to Engine APIs are performed locally (and not
+     * through HTTP),
+     * so it does NOT fall into this limitation. So in a standard Bonita installation, it is safe to call this
+     * method in code like
+     * Rest API Extensions, Groovy scripts, Custom connector implementations...
+     * </p>
      *
      * @param processInstanceId
      *        The identifier of the process instance.
@@ -964,13 +1002,27 @@ public interface ProcessRuntimeAPI {
     DataInstance getActivityDataInstance(String dataName, long activityInstanceId) throws DataNotFoundException;
 
     /**
-     * Update the value of a named data instance in a specified activity instance.<br>
-     * <br>
-     * <b>WARNING</b>: this method is not supported for updating a Custom Data Instance variable with a remote Engine
-     * API connection,
-     * because the custom data type is not present in the remote classloader that deserializes the API call parameters.
-     * <br>
-     * use {@link ProcessRuntimeAPI#updateActivityInstanceVariables(List, long, Map)} instead
+     * <p>
+     * Update the value of a named activity variable of a specified activity instance.
+     * </p>
+     * <p>
+     * <u>Warning</u>: there is a known limitation about the usage of this method: if the new data value is of a custom
+     * data type AND
+     * the call to this method is performed from a java client configure to access Bonita Engine through HTTP,
+     * the API method call fails because the class of the custom data type cannot be loaded yet.
+     * The workaround to this limitation is to put the jar file containing your custom data
+     * type classes into the classloader of Bonita ([BONITA_INSTALLATION_FOLDER]/server/lib/bonita folder in a standard
+     * installation),
+     * and REMOVE it from the libraries of all the processes that use them.
+     * Or use {@link ProcessRuntimeAPI#updateActivityInstanceVariables(List, long, Map)} instead
+     * </p>
+     * <p>
+     * If the call is made from a standard Bonita bundle, the calls to Engine APIs are performed locally (and not
+     * through HTTP),
+     * so it does NOT fall into this limitation. So in a standard Bonita installation, it is safe to call this
+     * method in code like
+     * Rest API Extensions, Groovy scripts, Custom connector implementations...
+     * </p>
      *
      * @param dataName
      *        The name of the data instance.
@@ -1053,8 +1105,26 @@ public interface ProcessRuntimeAPI {
     Date getActivityReachedStateDate(long activityInstanceId, String state);
 
     /**
-     * Update the given variables of an activity instance.
-     * The updates are treated as a single transaction, so if any variable update fails, none of the values is changed.
+     * <p>
+     * Update the value of named activity variables of a specified activity instance.
+     * </p>
+     * <p>
+     * <u>Warning</u>: there is a known limitation about the usage of this method: if the new data value is of a custom
+     * data type AND
+     * the call to this method is performed from a java client configure to access Bonita Engine through HTTP,
+     * the API method call fails because the class of the custom data type cannot be loaded yet.
+     * The workaround to this limitation is to put the jar file containing your custom data
+     * type classes into the classloader of Bonita ([BONITA_INSTALLATION_FOLDER]/server/lib/bonita folder in a standard
+     * installation),
+     * and REMOVE it from the libraries of all the processes that use them.
+     * Or use {@link ProcessRuntimeAPI#updateActivityInstanceVariables(List, long, Map)} instead
+     * </p>
+     * <p>
+     * If the call is made from a standard Bonita bundle, the calls to Engine APIs are performed locally (and not
+     * through HTTP),
+     * so it does NOT fall into this limitation. So in a standard Bonita installation, it is safe to call this
+     * method in code like Rest API Extensions, Groovy scripts, Custom connector implementations...
+     * </p>
      *
      * @param activityInstanceId
      *        The activity identifier.
@@ -1085,8 +1155,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     void updateActivityInstanceVariables(List<Operation> operations, long activityInstanceId,
-            Map<String, Serializable> expressionContexts)
-            throws UpdateException;
+            Map<String, Serializable> expressionContexts) throws UpdateException;
 
     /**
      * Update the due date of a task.
