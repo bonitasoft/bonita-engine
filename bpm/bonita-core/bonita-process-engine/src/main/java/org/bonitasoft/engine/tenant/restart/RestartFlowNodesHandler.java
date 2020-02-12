@@ -77,22 +77,21 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
             // As we retrieve only the id we can use a greater page size
             QueryOptions queryOptions = new QueryOptions(0, 50000);
             List<Long> ids;
-            logInfo(logger, "Restarting flow nodes...");
+            logInfo("Start detecting flow nodes to restart on tenant " + tenantId + "...");
             do {
                 ids = flowNodeInstanceService.getFlowNodeInstanceIdsToRestart(queryOptions);
                 flownodesToRestart.addAll(ids);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
 
             } while (ids.size() == queryOptions.getNumberOfResults());
-            logInfo(logger, "Found " + flownodesToRestart.size() + " flow nodes to restart on tenant " + tenantId);
+            logInfo("Found " + flownodesToRestart.size() + " flow nodes to restart on tenant " + tenantId);
         } catch (final SBonitaReadException e) {
-            throw new RestartException("unable to flag elements as to be restarted", e);
+            throw new RestartException("Unable to detect flow nodes as to be restarted on tenant " + tenantId, e);
         }
     }
 
-    private void logInfo(final TechnicalLoggerService logger, final String message) {
-        final boolean isInfo = logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO);
-        if (isInfo) {
+    private void logInfo(final String message) {
+        if (logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO)) {
             logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO, message);
         }
     }
@@ -102,8 +101,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
             throws RestartException {
         final List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantId);
 
-        logger.log(getClass(), TechnicalLogSeverity.INFO,
-                "Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
+        logInfo("Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
         try {
             final Iterator<Long> iterator = flownodesIds.iterator();
             do {
@@ -115,6 +113,6 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         } catch (final Exception e) {
             throw new RestartException("Unable to restart elements", e);
         }
-
+        logInfo("All flow nodes to be restarted on tenant " + tenantId + " have been handled");
     }
 }
