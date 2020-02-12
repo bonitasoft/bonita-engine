@@ -114,7 +114,7 @@ public interface OrganizationAPI {
      *         If an exception occurs during the organization import
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @since 7.5.2 Replaces {@link OrganizationAPI#importOrganizationWithWarnings(String, ImportPolicy)}
+     * @since 7.5.2 Replaces {@link OrganizationAPI#importOrganization(String, ImportPolicy)}
      */
     List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy)
             throws OrganizationImportException;

@@ -36,6 +36,15 @@ Among other things, it also generates the javadoc used by Bonita Studio.
 The command above runs all unit tests. To skip them, add the `-x test`
 option.
 
+### Version
+Due to the Gradle plugin **com.bonitasoft.gradle.bonita-release**, the version of the artifacts is automatically calculated from the last tag of the current branch.
+
+To override the current version on build, use the parameter **forceCurrentVersion** like:
+
+```
+ ./gradlew -PforceCurrentVersion=7.9.3 <tasks>
+```
+
 ### Running unit / integration tests
 
 To run all **unit + integration tests** (on the default embedded H2
@@ -54,7 +63,7 @@ The project is composed of several modules. Unit tests are contained in the modu
 * `buildSrc` : Internal Gradle plugins used to build Bonita Engine
 * `platform` : Services that handle the platform creation/configuration
 * `services` : Generic services used by the engine
- 
+
 ## How to contribute
 In order to contribute to the project, read the [guide][guide].
 To report an issue use the official [bugtracker][bugtracker].

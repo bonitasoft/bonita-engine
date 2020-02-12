@@ -163,13 +163,12 @@ public class RestartProcessHandler implements TenantRestartHandler {
 
     //the handler is executed on one tenant only but we keep a map by tenant because this class is a singleton
     //It should not be a singleton but have a factory to create it
-    private final Map<Long, List<Long>> processInstancesByTenant = new HashMap<Long, List<Long>>();
+    private final Map<Long, List<Long>> processInstancesByTenant = new HashMap<>();
 
     @Override
-    public void beforeServicesStart()
-            throws RestartException {
-
-        final List<Long> ids = new ArrayList<Long>();
+    public void beforeServicesStart() throws RestartException {
+        logInfo(logger, "Start detecting processes to restart on tenant " + tenantId + "...");
+        final List<Long> ids = new ArrayList<>();
         processInstancesByTenant.put(tenantId, ids);
         QueryOptions queryOptions = new QueryOptions(0, 1000, SProcessInstance.class, "id", OrderByType.ASC);
         try {
@@ -186,19 +185,15 @@ public class RestartProcessHandler implements TenantRestartHandler {
             } while (processInstances.size() == queryOptions.getNumberOfResults());
             logInfo(logger, "Found " + ids.size() + " process to restart on tenant " + tenantId);
         } catch (final SProcessInstanceReadException e) {
-            handleException(e, "Unable to restart process: can't read process instances");
+            throw new RestartException("Unable to detect processes as to be restarted on tenant " + tenantId
+                    + ": can't read process instances", e);
         }
-
     }
 
     protected void logInfo(final TechnicalLoggerService logger, final String msg) {
         if (logger.isLoggable(RestartProcessHandler.class, TechnicalLogSeverity.INFO)) {
             logger.log(RestartProcessHandler.class, TechnicalLogSeverity.INFO, msg);
         }
-    }
-
-    private void handleException(final Exception e, final String message) throws RestartException {
-        throw new RestartException(message, e);
     }
 
     private ProcessInstanceState getState(final int stateId) {
@@ -215,7 +210,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
 
         final List<Long> list = processInstancesByTenant.get(tenantId);
         final Iterator<Long> iterator = list.iterator();
-        logger.log(getClass(), TechnicalLogSeverity.INFO,
+        logInfo(logger,
                 "Restarting " + list.size() + " processes for tenant " + tenantId);
         ExecuteProcesses exec;
         try {
@@ -228,7 +223,8 @@ public class RestartProcessHandler implements TenantRestartHandler {
         } catch (final Exception e) {
             throw new RestartException("Unable to restart process instance", e);
         }
-
+        logInfo(logger,
+                "All processes to be restarted on tenant " + tenantId + " have been handled");
     }
 
     protected void handleCompletion(final SProcessInstance processInstance, final TechnicalLoggerService logger,
