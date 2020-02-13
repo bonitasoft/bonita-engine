@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.contract.FileInputValue;
  * @author Matthieu Chaffotte
  */
 public enum SType {
+
     TEXT(String.class, Character.class), BOOLEAN(Boolean.class), DATE(Date.class), INTEGER(Integer.class, Long.class,
             BigInteger.class, Short.class, Byte.class), DECIMAL(Float.class, Double.class, BigDecimal.class,
                     Integer.class, Long.class, BigInteger.class, Short.class,
