@@ -460,6 +460,7 @@ public class QueryBuilderTest {
     }
 
     private enum TEST_ENUM implements EnumToObjectConvertible {
+
         TEST1;
 
         @Override

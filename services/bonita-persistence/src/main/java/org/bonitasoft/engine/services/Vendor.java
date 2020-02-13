@@ -24,6 +24,7 @@ import org.hibernate.cfg.Configuration;
  * @author Baptiste Mesta
  */
 public enum Vendor {
+
     ORACLE, SQLSERVER, POSTGRES, MYSQL, OTHER;
 
     /**

@@ -17,6 +17,7 @@ package org.bonitasoft.engine.bpm.contract.impl;
  * @author Julien Reboul
  */
 public enum NaiveEqualityResult {
+
     CONTINUE, RETURN_FALSE, RETURN_TRUE;
 
     public static NaiveEqualityResult checkEquality(final Object obj1, final Object obj2) {

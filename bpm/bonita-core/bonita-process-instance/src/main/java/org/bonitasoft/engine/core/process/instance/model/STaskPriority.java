@@ -19,6 +19,7 @@ import org.bonitasoft.engine.commons.EnumToObjectConvertible;
  * @author Emmanuel Duchastenier
  */
 public enum STaskPriority implements EnumToObjectConvertible {
+
     LOWEST, UNDER_NORMAL, NORMAL, ABOVE_NORMAL, HIGHEST;
 
     @Override
