@@ -92,7 +92,7 @@ public class EngineStarter {
             System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", "jbossts-properties.xml");
             if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
                 //force it to local if not specified
-                APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
+                APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.emptyMap());
             }
             if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
                 prepareEnvironment();
