@@ -1,3 +1,7 @@
+plugins {
+    id("bonita-http-test")
+    id("bonita-license-extractor")
+}
 dependencies {
     compile project(':bonita-test-api')
     compile "junit:junit:${Deps.junit4Version}"
@@ -40,4 +44,9 @@ publishing {
     publications {
         mavenJava(MavenPublication) { from project.components.java }
     }
+}
+
+
+httpTests {
+    integrationTestsSuite = "org/bonitasoft/engine/BPMRemoteTestsForServers.class"
 }
