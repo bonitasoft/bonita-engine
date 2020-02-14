@@ -4,9 +4,14 @@ dependencies {
     compile "junit:junit:${Deps.junit4Version}"
     compile(project(':platform:platform-resources'))
 
+    // for http tests:
+    compileOnly("org.eclipse.jetty:jetty-server:${Deps.jettyVersion}")
+    compileOnly("org.eclipse.jetty:jetty-servlet:${Deps.jettyVersion}")
+    compileOnly(project(':bpm:bonita-api:bonita-server-api-http'))
+
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
-    
+
     testCompile project(':bpm:bonita-server')
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"

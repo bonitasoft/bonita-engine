@@ -15,6 +15,7 @@ package org.bonitasoft.engine.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.BonitaDatabaseConfiguration;
+import org.bonitasoft.engine.test.http.BonitaHttpServer;
 import org.bonitasoft.engine.test.internal.EngineCommander;
 import org.bonitasoft.engine.test.internal.EngineStarter;
 
@@ -28,6 +29,7 @@ public class TestEngineImpl implements TestEngine {
     private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
     private BonitaDatabaseConfiguration businessDataDatabaseConfiguration;
     private TestDatabaseConfigurator testDatabaseConfigurator = new TestDatabaseConfigurator();
+    BonitaHttpServer httpServer = new BonitaHttpServer();
 
     private static TestEngineImpl createTestEngine() {
         return new TestEngineImpl(EngineStarter.create(), new EngineCommander());
@@ -68,6 +70,9 @@ public class TestEngineImpl implements TestEngine {
         if (!started) {
             doStart();
             started = true;
+            // Starting HTTP server must be done AFTER engine start, as the API Type will be overridden to HTTP
+            // (See EngineStarter logic):
+            httpServer.startIfNeeded();
             return true;
         }
         return false;
@@ -89,7 +94,6 @@ public class TestEngineImpl implements TestEngine {
 
     protected synchronized void doStart() throws Exception {
         engineStarter.start();
-
     }
 
     @Override
@@ -97,6 +101,7 @@ public class TestEngineImpl implements TestEngine {
         if (started) {
             doStop();
             started = false;
+            httpServer.stopIfNeeded();
         }
     }
 
