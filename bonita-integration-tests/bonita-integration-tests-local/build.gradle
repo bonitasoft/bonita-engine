@@ -9,6 +9,7 @@ dependencies {
     runtime "mysql:mysql-connector-java:${Deps.mysqlVersion}"
     runtime "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     runtime "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }
 
 task testsJar(type: Jar) {
