@@ -8,7 +8,7 @@
     </appender>
 
     <logger name="org.bonitasoft" level="INFO" />
-    <logger name="org.hibernate.cache.ehcache.AbstractEhcacheRegionFactory" level="ERROR" />
+    <logger name="org.hibernate.orm.cache" level="ERROR" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />
