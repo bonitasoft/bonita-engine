@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
@@ -35,10 +36,12 @@ public class ClassLoaderEnvironment extends FileSystem {
 
     private final ClassLoader classLoader;
     private final Map<String, IBinaryType> loadedClassFiles;
+    private Set<String> classesToBeCompiled;
 
-    public ClassLoaderEnvironment(ClassLoader classLoader) {
+    public ClassLoaderEnvironment(ClassLoader classLoader, Set<String> classesToBeCompiled) {
         super(new String[] {}, null, "UTF-8");
         this.classLoader = classLoader;
+        this.classesToBeCompiled = classesToBeCompiled;
         loadedClassFiles = new HashMap<>();
     }
 
@@ -95,10 +98,14 @@ public class ClassLoaderEnvironment extends FileSystem {
     }
 
     @Override
-    public boolean isPackage(char[][] parentPackageName,
-            char[] className) {
-        return !Character.isUpperCase(className[0])
-                && isPackage(getClassName(toPointedNotation(parentPackageName), new String(className)));
+    public boolean isPackage(char[][] parentPackageName, char[] className) {
+        // Is considered as a package if:
+        // * not a class we just generated AND
+        // * starts with lowercase character AND
+        // * parent is also a package
+        String qualifiedName = getClassName(toPointedNotation(parentPackageName), new String(className));
+        return !classesToBeCompiled.contains(qualifiedName) && !Character.isUpperCase(className[0])
+                && isPackage(qualifiedName);
     }
 
     String getClassName(String parentPackage, String className) {
