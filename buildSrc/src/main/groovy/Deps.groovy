@@ -25,7 +25,7 @@ class Deps {
     public static String xstreamVersion = "1.4.11.1"
     public static String hibernateJpaVersion = "1.0.2.Final"
     public static String ehcacheVersion = "2.10.6"
-    public static String eclipseCompilerVersion = "4.6.1"
+    public static String eclipseCompilerVersion = "3.20.0"
     public static String jbcryptVersion = "0.3m"
     public static String activationVersion = "1.2.1"
     public static String quartzVersion = "2.3.2"
