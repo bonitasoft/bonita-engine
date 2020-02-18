@@ -27,8 +27,14 @@ public class ClientBDMJarBuilder extends AbstractBDMJarBuilder {
 
     private ResourcesLoader resourcesLoader;
 
+    @Deprecated
     public ClientBDMJarBuilder(final JDTCompiler compiler, ResourcesLoader resourcesLoader) {
         super(new ClientBDMCodeGenerator(), compiler);
+        this.resourcesLoader = resourcesLoader;
+    }
+
+    public ClientBDMJarBuilder(ResourcesLoader resourcesLoader) {
+        super(new ClientBDMCodeGenerator());
         this.resourcesLoader = resourcesLoader;
     }
 

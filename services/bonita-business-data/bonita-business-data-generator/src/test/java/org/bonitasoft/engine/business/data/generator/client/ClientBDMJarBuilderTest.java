@@ -20,7 +20,6 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer;
 import org.bonitasoft.engine.business.data.generator.BOMBuilder;
-import org.bonitasoft.engine.business.data.generator.compiler.JDTCompiler;
 import org.bonitasoft.engine.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,9 +32,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ClientBDMJarBuilderTest {
 
     @Mock
-    private JDTCompiler compiler;
-
-    @Mock
     private ResourcesLoader resourcesLoader;
 
     @InjectMocks
@@ -43,7 +39,7 @@ public class ClientBDMJarBuilderTest {
 
     @Before
     public void setUp() {
-        clientBDMJarBuilder = new ClientBDMJarBuilder(compiler, resourcesLoader);
+        clientBDMJarBuilder = new ClientBDMJarBuilder(resourcesLoader);
     }
 
     @Test

@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.business.data.generator.compiler;
 
+import static java.lang.String.join;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintWriter;
@@ -20,9 +24,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.batch.Main;
 
@@ -46,16 +52,59 @@ public class JDTCompiler {
      * @throws CompilationException
      *         if compilation errors occurs
      */
-    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, ClassLoader classLoader)
+    @Deprecated
+    public void compile(final Collection<File> filesToBeCompiled, final File outputDirectory, ClassLoader classLoader)
             throws CompilationException {
-        this.classLoader = classLoader;
-        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory);
-        launchCompiler(commandLine);
+        compile(filesToBeCompiled, outputDirectory, classLoader, emptySet());
     }
 
-    public void compile(final File srcDirectory, ClassLoader classLoader) throws CompilationException {
-        final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[] { "java" }, true);
-        compile(files, srcDirectory, classLoader);
+    public void compile(final File srcDirectory, File outputDirectory, ClassLoader classLoader)
+            throws CompilationException {
+        Map<String, File> sourceFiles = listJavaFilesAndClasses(srcDirectory);
+        compile(sourceFiles.values(), outputDirectory, classLoader, sourceFiles.keySet());
+    }
+
+    private Map<String, File> listJavaFilesAndClasses(File srcFile) {
+        Map<String, File> result = new HashMap<>();
+        File[] files = srcFile.listFiles();
+        if (files == null) {
+            return result;
+        }
+        for (File file : files) {
+            doListJavaFilesAndClasses(file, result, emptyList());
+        }
+        return result;
+    }
+
+    private void doListJavaFilesAndClasses(File srcFile, Map<String, File> files, List<String> parentPath) {
+        if (!srcFile.exists()) {
+            return;
+        }
+        if (srcFile.isFile() && srcFile.getName().endsWith(".java")) {
+            files.put(join(".", getPath(parentPath, srcFile)), srcFile);
+        } else {
+            List<String> path = getPath(parentPath, srcFile);
+            File[] children = srcFile.listFiles();
+            if (children == null) {
+                return;
+            }
+            for (File file : children) {
+                doListJavaFilesAndClasses(file, files, path);
+            }
+        }
+    }
+
+    private List<String> getPath(List<String> parentPath, File srcFile) {
+        List<String> path = new ArrayList<>(parentPath);
+        path.add(srcFile.getName().replace(".java", ""));
+        return path;
+    }
+
+    private void compile(Collection<File> filesToBeCompiled, File outputDirectory,
+            ClassLoader classLoader, Set<String> classesToBeCompiled) throws CompilationException {
+        this.classLoader = classLoader;
+        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputDirectory);
+        launchCompiler(commandLine, classesToBeCompiled);
     }
 
     private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory) {
@@ -82,7 +131,8 @@ public class JDTCompiler {
         return Arrays.asList("-d", outputdirectory.getAbsolutePath());
     }
 
-    private void launchCompiler(final String[] commandLine) throws CompilationException {
+    private void launchCompiler(final String[] commandLine, Set<String> classesToBeCompiled)
+            throws CompilationException {
         final PrintWriter outWriter = new PrintWriter(new ByteArrayOutputStream());
         // closing outwriter since we don't want to see compilation out stream
         outWriter.close();
@@ -90,7 +140,7 @@ public class JDTCompiler {
         final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
         final PrintWriter errorWriter = new PrintWriter(errorStream);
         try {
-            doCompilation(commandLine, outWriter, errorStream, errorWriter);
+            doCompilation(commandLine, outWriter, errorStream, errorWriter, classesToBeCompiled);
         } finally {
             // no need to close OutputStream, printWriter is doing it for us
             errorWriter.close();
@@ -98,7 +148,7 @@ public class JDTCompiler {
     }
 
     private void doCompilation(final String[] commandLine, final PrintWriter outWriter,
-            final ByteArrayOutputStream errorStream, final PrintWriter errorWriter)
+            final ByteArrayOutputStream errorStream, final PrintWriter errorWriter, Set<String> classesToBeCompiled)
             throws CompilationException {
         final Main mainCompiler = new Main(outWriter, errorWriter, false /* systemExit */, null /* options */,
                 new DummyCompilationProgress()) {
@@ -106,7 +156,7 @@ public class JDTCompiler {
             @Override
             public FileSystem getLibraryAccess() {
                 final ClassLoader contextClassLoader = classLoader;
-                return new ClassLoaderEnvironment(contextClassLoader);
+                return new ClassLoaderEnvironment(contextClassLoader, classesToBeCompiled);
             }
         };
         final boolean succeeded = mainCompiler.compile(commandLine);

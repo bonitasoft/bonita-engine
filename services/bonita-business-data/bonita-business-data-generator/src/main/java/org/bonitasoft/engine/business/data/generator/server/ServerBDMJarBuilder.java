@@ -34,8 +34,13 @@ import org.w3c.dom.Document;
  */
 public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
 
+    @Deprecated
     public ServerBDMJarBuilder(final JDTCompiler compiler) {
         super(new ServerBDMCodeGenerator(), compiler);
+    }
+
+    public ServerBDMJarBuilder() {
+        super(new ServerBDMCodeGenerator());
     }
 
     @Override
