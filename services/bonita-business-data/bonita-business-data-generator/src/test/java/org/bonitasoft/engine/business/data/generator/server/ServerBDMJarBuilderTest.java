@@ -14,12 +14,14 @@
 package org.bonitasoft.engine.business.data.generator.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
 
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.generator.compiler.JDTCompiler;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +48,8 @@ public class ServerBDMJarBuilderTest {
 
     @Test
     public void should_addPersistenceUnittestGetPersistenceFileContentFor() throws Exception {
-        final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder());
+        final JDTCompiler compiler = mock(JDTCompiler.class);
+        final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder(compiler));
 
         builder.addPersistenceFile(directory, bom);
 

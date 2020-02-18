@@ -18,7 +18,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
 
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.junit.Before;
@@ -37,7 +36,7 @@ public class ClassLoaderEnvironmentTest {
 
     @Before
     public void before() {
-        classLoaderEnvironment = new ClassLoaderEnvironment(classloader, Collections.emptySet());
+        classLoaderEnvironment = new ClassLoaderEnvironment(classloader);
     }
 
     @Test

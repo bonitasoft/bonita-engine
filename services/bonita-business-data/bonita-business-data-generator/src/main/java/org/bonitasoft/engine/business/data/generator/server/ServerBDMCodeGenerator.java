@@ -79,6 +79,7 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
         addNewInstanceMethodBody(method, entity);
     }
 
+    // TODO unused ?
     protected JFieldVar addConstructor(final JDefinedClass implClass) {
         final JClass serviceClass = getModel().ref("org.bonitasoft.engine.business.data.BusinessDataRepository");
         final JFieldVar service = addField(implClass, "businessDataRepository", serviceClass);
@@ -149,13 +150,9 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     protected String toDaoImplClassname(final BusinessObject bo) {
-        return serverDAOQualifiedName(bo.getQualifiedName());
-    }
-
-    private String serverDAOQualifiedName(final String boQualifiedName) {
-        int pointIdx = boQualifiedName.lastIndexOf('.');
-        return boQualifiedName.substring(0, pointIdx + 1) + SERVER_DAO_PACKAGE_NAME
-                + boQualifiedName.substring(pointIdx + 1)
+        final String boName = bo.getQualifiedName();
+        final int pointIdx = boName.lastIndexOf('.');
+        return boName.substring(0, pointIdx + 1) + SERVER_DAO_PACKAGE_NAME + boName.substring(pointIdx + 1)
                 + DAO_IMPL_SUFFIX;
     }
 

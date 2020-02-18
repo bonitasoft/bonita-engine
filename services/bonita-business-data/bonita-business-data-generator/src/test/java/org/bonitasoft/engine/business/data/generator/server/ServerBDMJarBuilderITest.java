@@ -16,6 +16,7 @@ package org.bonitasoft.engine.business.data.generator.server;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
 import org.bonitasoft.engine.business.data.generator.BOMBuilder;
+import org.bonitasoft.engine.business.data.generator.compiler.JDTCompiler;
 import org.junit.Test;
 
 public class ServerBDMJarBuilderITest {
@@ -23,26 +24,30 @@ public class ServerBDMJarBuilderITest {
     /* Just to test we have no errors in full chain. Must be improved */
     @Test
     public void jar_builder_should_go_well_without_errors() throws Exception {
-        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder();
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler);
         bdmJarBuilder.build(BOMBuilder.aBOM().build(), TrueFileFilter.TRUE);
     }
 
     @Test
     public void jar_builder_should_go_well_without_errors_with_queries() throws Exception {
-        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder();
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler);
         final BOMBuilder builder = new BOMBuilder();
         bdmJarBuilder.build(builder.buildComplex(), TrueFileFilter.TRUE);
     }
 
     @Test
     public void jar_builder_should_go_well_without_errors_with_queries2() throws Exception {
-        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder();
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler);
         bdmJarBuilder.build(BOMBuilder.aBOM().buildPerson(), TrueFileFilter.TRUE);
     }
 
     @Test
     public void jar_builder_should_go_well_with_multipleBoolean() throws Exception {
-        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder();
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler);
         final BOMBuilder builder = new BOMBuilder();
         bdmJarBuilder.build(builder.buildModelWithMultipleBoolean(), TrueFileFilter.TRUE);
     }

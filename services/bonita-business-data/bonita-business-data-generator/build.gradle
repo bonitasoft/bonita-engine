@@ -10,7 +10,7 @@ dependencies {
     compile project(':bpm:bonita-common')
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"
-    compile "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
+    compile "org.eclipse.jdt.core.compiler:ecj:${Deps.eclipseCompilerVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
