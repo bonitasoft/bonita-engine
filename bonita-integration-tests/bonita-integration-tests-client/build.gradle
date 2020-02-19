@@ -1,6 +1,5 @@
 plugins {
     id("bonita-http-test")
-    id("bonita-license-extractor")
 }
 dependencies {
     compile project(':bonita-test-api')
