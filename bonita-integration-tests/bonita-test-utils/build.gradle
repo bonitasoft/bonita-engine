@@ -8,3 +8,8 @@ dependencies {
     compile "org.assertj:assertj-core:${Deps.assertjVersion}"
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
+}
