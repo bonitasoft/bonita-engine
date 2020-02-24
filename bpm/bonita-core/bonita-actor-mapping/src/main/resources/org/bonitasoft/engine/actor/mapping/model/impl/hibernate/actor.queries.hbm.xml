@@ -63,8 +63,8 @@
         org.bonitasoft.engine.identity.model.SUserMembership as um
         WHERE um.userId = :userId
         AND (
-        (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-        OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+        (actormember.groupId = um.groupId AND actormember.roleId = -1)
+        OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
         OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
         )
         )
@@ -193,8 +193,8 @@
                 AND um.tenantId = :tenantId
                 AND actormember.tenantId = :tenantId
                 AND (
-                    (actormember.groupId = um.groupId AND actormember.roleId = -1 )
-                    OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
+        (actormember.groupId = um.groupId AND actormember.roleId = -1)
+        OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
                     OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
                 )
             )
