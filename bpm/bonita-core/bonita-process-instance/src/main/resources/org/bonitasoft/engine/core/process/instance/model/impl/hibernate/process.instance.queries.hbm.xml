@@ -242,8 +242,8 @@
 							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
-								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								(actormember.groupId = um.groupId AND actormember.roleId = -1)
+								OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 							)
 						)
@@ -274,8 +274,8 @@
 							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
-								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								(actormember.groupId = um.groupId AND actormember.roleId = -1)
+								OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 							)
 						)
@@ -310,8 +310,8 @@
 									FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
-										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										(actormember.groupId = um.groupId AND actormember.roleId = -1)
+										OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 									)
 								)
@@ -348,8 +348,8 @@
 									FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
-										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										(actormember.groupId = um.groupId AND actormember.roleId = -1)
+										OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 									)
 								)
@@ -1082,8 +1082,8 @@
                               	     				FROM org.bonitasoft.engine.identity.model.SUser AS u
                               	     				WHERE u.managerUserId = :managerUserId)
 								AND (
-									(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-									OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+									(actormember.groupId = um.groupId AND actormember.roleId = -1)
+									OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 									OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId))
 								 )
                     		)
@@ -1124,8 +1124,8 @@
                              	     				FROM org.bonitasoft.engine.identity.model.SUser AS u
                              	     				WHERE u.managerUserId = :managerUserId)
 							AND (
-								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								(actormember.groupId = um.groupId AND actormember.roleId = -1)
+								OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId))
 							 )
                    		)
@@ -1167,8 +1167,8 @@
 							org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId 
 							AND (
-								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								(actormember.groupId = um.groupId AND actormember.roleId = -1)
+								OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 							)
 						)
@@ -1865,8 +1865,8 @@
 									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
-										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										(actormember.groupId = um.groupId AND actormember.roleId = -1)
+										OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 									)
 								)
@@ -1910,8 +1910,8 @@
 									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
-										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										(actormember.groupId = um.groupId AND actormember.roleId = -1)
+										OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 									)
 								)
@@ -1956,8 +1956,8 @@
 									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = user.id
 									AND (
-										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										(actormember.groupId = um.groupId AND actormember.roleId = -1)
+										OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 									)
 								)
@@ -2002,8 +2002,8 @@
 									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = user.id
 									AND (
-										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										(actormember.groupId = um.groupId AND actormember.roleId = -1)
+										OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
 										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 									)
 								)
