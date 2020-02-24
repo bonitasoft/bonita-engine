@@ -1583,4 +1583,22 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
                 "TestConnectorThatThrowException.jar");
     }
 
+    @Test
+    public void should_be_able_to_execute_process_connector_without_flownode() throws Exception {
+
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithoutFlownodes", "1.0");
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder
+                .addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput(TestConnector.INPUT1,
+                        new ExpressionBuilder().createConstantStringExpression("valueOfInput1"));
+
+        ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector(processBuilder, ACTOR_NAME, user);
+
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForProcessToFinish(processInstance);
+    }
+
 }

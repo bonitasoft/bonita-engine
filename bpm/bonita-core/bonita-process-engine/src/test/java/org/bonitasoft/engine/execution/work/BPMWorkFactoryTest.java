@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
@@ -143,6 +144,24 @@ public class BPMWorkFactoryTest {
         assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start2))
                 .isTrue();
         assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start3))
+                .isFalse();
+    }
+
+    @Test
+    public void should_be_able_to_create_execute_connector_work_with_empty_flownode_selector() {
+        SProcessDefinitionImpl definition = new SProcessDefinitionImpl("name", "version");
+        SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
+        definition.setProcessContainer(processContainer);
+        SStartEventDefinitionImpl start1 = new SStartEventDefinitionImpl(1L, "start1");
+        processContainer.addEvent(start1);
+        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition,
+                new FlowNodeNameFilter(emptyList()));
+
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory
+                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                        flowNodeSelector));
+
+        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start1))
                 .isFalse();
     }
 
