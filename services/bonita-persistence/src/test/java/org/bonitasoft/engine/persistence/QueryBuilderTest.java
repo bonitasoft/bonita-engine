@@ -540,4 +540,66 @@ public class QueryBuilderTest {
         assertThat(s).isEqualTo("%to''to%t_oto%");
     }
 
+    @Test
+    public void should_detect_WHERE_when_in_root_query() {
+        assertThat(QueryBuilder.hasWHEREInRootQuery("" +
+                "Select * \n" +
+                "from user_\n" +
+                "WHERE\n" +
+                "something\n" +
+                "ORDER BY name\n")).isTrue();
+    }
+
+    @Test
+    public void should_detect_WHERE_when_in_root_query_when_lowercase() {
+        assertThat(QueryBuilder.hasWHEREInRootQuery("" +
+                "Select * \n" +
+                "from user_\n" +
+                "where\n" +
+                "something\n" +
+                "ORDER BY name\n")).isTrue();
+    }
+
+    @Test
+    public void should_not_detect_WHERE_when_only_in_sub_query() {
+        assertThat(QueryBuilder.hasWHEREInRootQuery("" +
+                "Select * \n" +
+                "from (\n" +
+                "   Select * \n" +
+                "   from user_\n" +
+                "   WHERE\n" +
+                "   something)\n" +
+                ")\n" +
+                "ORDER BY name")).isFalse();
+    }
+
+    @Test
+    public void should_not_detect_WHERE_when_not_present() {
+        assertThat(QueryBuilder.hasWHEREInRootQuery("" +
+                "Select * \n" +
+                "from user_\n" +
+                "ORDER BY name\n")).isFalse();
+    }
+
+    @Test
+    public void should_detect_WHERE_when_select_has_parenthesis() {
+        assertThat(QueryBuilder.hasWHEREInRootQuery("" +
+                "Select count(*) \n" +
+                "from user_\n" +
+                "WHERE (something)\n" +
+                "ORDER BY name\n")).isTrue();
+    }
+
+    @Test
+    public void should_not_detect_WHERE_with_subqueries() {
+        assertThat(QueryBuilder.hasWHEREInRootQuery("" +
+                "Select * \n" +
+                "from (\n" +
+                "   Select * \n" +
+                "   from user_\n" +
+                "   WHERE\n" +
+                "   something\n" +
+                ") user_\n" +
+                "WHERE \n (somethings)")).isTrue();
+    }
 }
