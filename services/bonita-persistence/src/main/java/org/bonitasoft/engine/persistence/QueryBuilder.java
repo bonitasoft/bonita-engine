@@ -70,7 +70,7 @@ abstract class QueryBuilder<T> {
     void appendFilters(List<FilterOption> filters, SearchFields multipleFilter, boolean enableWordSearch) {
         Set<String> specificFilters = emptySet();
         if (!filters.isEmpty()) {
-            if (!stringQueryBuilder.toString().contains("WHERE")) {
+            if (!hasWHEREInRootQuery(stringQueryBuilder.toString())) {
                 stringQueryBuilder.append(" WHERE (");
             } else {
                 stringQueryBuilder.append(" AND (");
@@ -83,6 +83,38 @@ abstract class QueryBuilder<T> {
         if (multipleFilter != null && multipleFilter.getTerms() != null && !multipleFilter.getTerms().isEmpty()) {
             handleMultipleFilters(stringQueryBuilder, multipleFilter, specificFilters, enableWordSearch);
         }
+    }
+
+    /**
+     * check if there is a `where` inside the root query
+     */
+    static boolean hasWHEREInRootQuery(String query) {
+        // We simply remove all blocks that are in parenthesis in order to remove all subqueries
+        // Then we check if there is the `where` word here
+        return removeAllParenthesisBlocks(query.toLowerCase()).contains("where");
+    }
+
+    /**
+     * remove all blocks that are inside parenthesis
+     */
+    private static String removeAllParenthesisBlocks(String q) {
+        StringBuilder stringBuilder = new StringBuilder(q.length());
+        int depthCounter = 0;
+        for (char c : q.toCharArray()) {
+            switch (c) {
+                case '(':
+                    depthCounter++;
+                    break;
+                case ')':
+                    depthCounter--;
+                    break;
+                default:
+                    if (depthCounter == 0) {
+                        stringBuilder.append(c);
+                    }
+            }
+        }
+        return stringBuilder.toString();
     }
 
     private void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter,
@@ -106,7 +138,7 @@ abstract class QueryBuilder<T> {
 
     private void applyFiltersOnQuery(final StringBuilder queryBuilder, final Set<String> fields,
             final List<String> terms, final boolean enableWordSearch) {
-        if (!queryBuilder.toString().contains("WHERE")) {
+        if (!hasWHEREInRootQuery(queryBuilder.toString())) {
             queryBuilder.append(" WHERE ");
         } else {
             queryBuilder.append(" AND ");

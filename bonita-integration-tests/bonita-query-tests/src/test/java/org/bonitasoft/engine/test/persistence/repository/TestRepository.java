@@ -15,6 +15,7 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
+import java.util.List;
 import java.util.Random;
 
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -103,6 +104,16 @@ public class TestRepository {
             namedQuery.setParameter(((String) parameter.getKey()), parameter.getValue());
         }
         return ((PersistentObject) namedQuery.uniqueResult());
+    }
+
+    /**
+     * Utility method to run native queries on tables while developping tests:
+     * e.g.
+     * `repository.list("SELECT user_.* from user_ where user_.username = 'walter.bates'", SUser.class)`
+     * will return the list of object SUser from database
+     */
+    public List<Object[]> list(String sqlQuery, Class type) {
+        return getSession().createSQLQuery(sqlQuery).addEntity(type).list();
     }
 
     public <T extends PersistentObject> T add(T entity) {
