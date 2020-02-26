@@ -75,8 +75,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
-        final boolean isTraceEnable = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
-        if (isTraceEnable) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                     LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
         }
@@ -101,7 +100,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             new ReturnTypeChecker().checkReturnType(expression, expressionResult, dependencyValues);
         }
 
-        if (isTraceEnable) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                     LogUtil.getLogAfterMethod(this.getClass(), "evaluate"));
         }

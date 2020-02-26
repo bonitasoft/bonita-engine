@@ -57,8 +57,6 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
 
     private final TechnicalLoggerService logger;
 
-    private final boolean debugEnabled;
-
     private static int counter;
 
     public GroovyScriptExpressionExecutorCacheStrategy(final CacheService cacheService,
@@ -67,7 +65,6 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         this.cacheService = cacheService;
         this.classLoaderService = classLoaderService;
         this.logger = logger;
-        debugEnabled = logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG);
     }
 
     protected synchronized String generateScriptName() {
@@ -106,7 +103,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         GroovyShell shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
         if (shell == null) {
             ClassLoader classLoader = getClassLoaderForShell(definitionId);
-            if (debugEnabled) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
                         "Create a new groovy classloader for " + definitionId + " " + classLoader);
             }
@@ -121,7 +118,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         if (definitionId == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
             //do not has listener, should not happen...
-            if (debugEnabled) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 IllegalStateException illegalStateException = new IllegalStateException();
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
                         "Creating a shell without definition id, might cause issue when reloading classes",

@@ -117,8 +117,7 @@ public class ExecuteFlowNodes {
     }
 
     private void logInfo(final TechnicalLoggerService logger, final String message) {
-        final boolean isInfo = logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO);
-        if (isInfo) {
+        if (logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO)) {
             logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO, message);
         }
     }
