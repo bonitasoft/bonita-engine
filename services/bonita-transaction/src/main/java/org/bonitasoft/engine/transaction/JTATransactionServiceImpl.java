@@ -41,8 +41,6 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final ThreadLocal<TransactionServiceContext> txContextThreadLocal;
 
-    private boolean isTraceLoggable;
-
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
         if (txManager == null) {
@@ -50,7 +48,10 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
         this.txManager = txManager;
         txContextThreadLocal = new TransactionServiceContextThreadLocal();
-        isTraceLoggable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
+    }
+
+    private boolean isTraceLoggable() {
+        return logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
     }
 
     public static TransactionState convert(int status) {
@@ -82,7 +83,7 @@ public class JTATransactionServiceImpl implements TransactionService {
                 //do not open transaction because it was open externally
                 return;
             }
-            if (isTraceLoggable) {
+            if (isTraceLoggable()) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE,
                         "Beginning transaction in thread " + Thread.currentThread().getId() + " "
                                 + txManager.getTransaction());
@@ -135,7 +136,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         if (txContext.isInScopeOfBonitaTransaction) {
             String message = "We do not support nested calls to the transaction service. Current state is: " + status
                     + ". ";
-            if (isTraceLoggable) {
+            if (isTraceLoggable()) {
                 message += "Last begin made by: " + txContext.stackTraceThatMadeLastBegin;
             }
             throw new STransactionCreationException(message);
@@ -158,7 +159,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         // Depending of the txManager status we either commit or rollback.
         final TransactionServiceContext txContext = getTransactionServiceContext();
         try {
-            if (isTraceLoggable) {
+            if (isTraceLoggable()) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE,
                         "Completing transaction in thread " + Thread.currentThread().getId() + " "
                                 + txManager.getTransaction().toString());
@@ -171,7 +172,7 @@ public class JTATransactionServiceImpl implements TransactionService {
                 return; // We do not manage the transaction boundaries
             }
             if (status == Status.STATUS_MARKED_ROLLBACK) {
-                if (isTraceLoggable) {
+                if (isTraceLoggable()) {
                     logger.log(getClass(), TechnicalLogSeverity.TRACE,
                             "Rolling back transaction in thread " + Thread.currentThread().getId() + " "
                                     + txManager.getTransaction().toString());
