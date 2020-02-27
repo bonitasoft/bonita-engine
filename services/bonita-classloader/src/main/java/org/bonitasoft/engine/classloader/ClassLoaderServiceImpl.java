@@ -72,7 +72,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private boolean shuttingDown = false;
 
     private final EventService eventService;
-    private boolean traceEnabled;
     private PlatformDependencyService platformDependencyService;
     private Map<Long, TenantDependencyService> dependencyServicesByTenant = new HashMap<>();
     private SessionAccessor sessionAccessor;
@@ -89,7 +88,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         this.eventService = eventService;
-        traceEnabled = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
         this.platformDependencyService = platformDependencyService;
         this.sessionAccessor = sessionAccessor;
         this.userTransactionService = userTransactionService;
@@ -172,7 +170,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void createClassLoader(ClassLoaderIdentifier identifier) {
-        if (traceEnabled) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "creating classloader with key " + identifier);
         }
         VirtualClassLoader parent = getParentClassLoader(identifier);
@@ -197,7 +195,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException {
-        if (traceEnabled) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                     "Removing local classloader for type " + type + " of id " + id);
         }
@@ -209,7 +207,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void destroyLocalClassLoader(final ClassLoaderIdentifier key) throws SClassLoaderException {
-        if (traceEnabled) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying local classloader with key: " + key);
         }
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
@@ -271,7 +269,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void start() {
-        if (traceEnabled) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                     "Starting classloader service, creating the platform classloader");
         }
@@ -281,7 +279,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void stop() throws SClassLoaderException {
-        if (traceEnabled) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                     "Stopping classloader service, destroying all classloaders");
         }
@@ -290,7 +288,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void destroyAllLocalClassLoaders() throws SClassLoaderException {
-        if (traceEnabled) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying all classloaders");
         }
         //remove elements only that don't have children
