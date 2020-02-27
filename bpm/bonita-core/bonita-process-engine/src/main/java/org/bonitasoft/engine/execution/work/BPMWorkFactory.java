@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.work;
 
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import java.util.HashMap;
@@ -115,8 +116,7 @@ public class BPMWorkFactory implements WorkFactory {
         String connectorDefinitionName = workDescriptor.getString(CONNECTOR_DEFINITION_NAME);
         ConnectorEvent activationEvent = (ConnectorEvent.valueOf(workDescriptor.getString(ACTIVATION_EVENT)));
         String flowNodeIds = workDescriptor.getString(FLOW_NODE_DEFINITIONS_FILTER);
-        List<Long> flowNodeDefinitionsFilter = flowNodeIds != null
-                ? stream(flowNodeIds.split(",")).map(Long::valueOf).collect(toList()) : null;
+        List<Long> flowNodeDefinitionsFilter = getListOfFlowNodeDefinitionsToStart(flowNodeIds);
         Long subProcessDefinitionId = workDescriptor.getLong(SUB_PROCESS_DEFINITION_ID);
 
         BonitaWork wrappedWork = withConnectorContext(connectorInstanceId, connectorDefinitionName, activationEvent,
@@ -127,6 +127,19 @@ public class BPMWorkFactory implements WorkFactory {
                                 rootProcessInstanceId, activationEvent, flowNodeDefinitionsFilter,
                                 subProcessDefinitionId)));
         return withSession(wrappedWork);
+    }
+
+    private List<Long> getListOfFlowNodeDefinitionsToStart(String flowNodeIds) {
+        if (flowNodeIds == null) {
+            //no flow node selector
+            return null;
+        }
+        if (flowNodeIds.isEmpty()) {
+            //a flow node selector that selects no elements
+            return emptyList();
+        }
+        return stream(flowNodeIds.split(",")).map(Long::valueOf).collect(toList());
+
     }
 
     public WorkDescriptor createExecuteConnectorOfProcessDescriptor(final long processDefinitionId,
