@@ -13,14 +13,17 @@
  **/
 package org.bonitasoft.engine.message;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -33,6 +36,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -70,7 +74,10 @@ public class MessagesHandlingServiceTest {
     private MeterRegistry meterRegistry;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        when(userTransactionService.executeInTransaction(any())).thenAnswer(a -> ((Callable) a.getArgument(0)).call());
+        when(loggerService.asLogger(any())).thenReturn(mock(TechnicalLogger.class));
+
         meterRegistry = new SimpleMeterRegistry(
                 // So that micrometer updates its counters every 1 ms:
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
@@ -95,7 +102,7 @@ public class MessagesHandlingServiceTest {
         when(couple3.getWaitingMessageId()).thenReturn(30L);
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<>(3);
-        messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
+        messageCouples.addAll(asList(couple1, couple2, couple3));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
@@ -126,7 +133,7 @@ public class MessagesHandlingServiceTest {
         when(couple3.getWaitingMessageId()).thenReturn(30L);
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<>(3);
-        messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
+        messageCouples.addAll(asList(couple1, couple2, couple3));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
@@ -155,7 +162,7 @@ public class MessagesHandlingServiceTest {
         when(couple2.getWaitingMessageEventType()).thenReturn(SBPMEventType.START_EVENT);
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<>(3);
-        messageCouples.addAll(Arrays.asList(couple1, couple2));
+        messageCouples.addAll(asList(couple1, couple2));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
@@ -184,7 +191,7 @@ public class MessagesHandlingServiceTest {
         when(couple2.getWaitingMessageEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<>(3);
-        messageCouples.addAll(Arrays.asList(couple1, couple2));
+        messageCouples.addAll(asList(couple1, couple2));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
@@ -217,7 +224,7 @@ public class MessagesHandlingServiceTest {
         when(couple4.getWaitingMessageId()).thenReturn(20L);
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<>(4);
-        messageCouples.addAll(Arrays.asList(couple1, couple2, couple3, couple4));
+        messageCouples.addAll(asList(couple1, couple2, couple3, couple4));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
@@ -244,12 +251,56 @@ public class MessagesHandlingServiceTest {
         // then:
         assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_EXECUTED).counter().count())
                 .isEqualTo(1);
-
     }
 
     @Test
     public void should_have_tenant_id_in_all_meters() {
         assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_EXECUTED)
                 .tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)
+                .tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)
+                .tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
     }
+
+    @Test
+    public void should_increment_metrics_on_executed_and_potential_couples_when_matching_messages() throws Exception {
+        doReturn(new SWaitingMessageEvent()).when(eventInstanceService).getWaitingMessage(anyLong());
+        doReturn(new SMessageInstance()).when(eventInstanceService).getMessageInstance(anyLong());
+        doReturn(asList(
+                new SMessageEventCouple(51, SBPMEventType.INTERMEDIATE_CATCH_EVENT, 61),
+                new SMessageEventCouple(52, SBPMEventType.INTERMEDIATE_CATCH_EVENT, 62),
+                new SMessageEventCouple(53, SBPMEventType.INTERMEDIATE_CATCH_EVENT, 63),
+                new SMessageEventCouple(53, SBPMEventType.INTERMEDIATE_CATCH_EVENT, 64)// waiting event already matched
+        )).when(eventInstanceService).getMessageEventCouples(anyInt(), anyInt());
+
+        messagesHandlingService.matchEventCoupleAndTriggerExecution();
+
+        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_EXECUTED).counter().count())
+                .isEqualTo(3);
+        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_POTENTIAL_MATCHED).counter().count())
+                .isEqualTo(4);
+        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS).counter()
+                .count())
+                        .isEqualTo(0);
+
+    }
+
+    @Test
+    public void should_increment_metric_on_retriggered_taskls_when_matching_more_couples_than_the_maximum()
+            throws Exception {
+        doReturn(new SWaitingMessageEvent()).when(eventInstanceService).getWaitingMessage(anyLong());
+        doReturn(new SMessageInstance()).when(eventInstanceService).getMessageInstance(anyLong());
+        List<SMessageEventCouple> couples = Stream.iterate(1, i -> i + 1).limit(100) // 100 == MAX_COUPLES
+                .map(i -> new SMessageEventCouple(i, null, i))
+                .collect(Collectors.toList());
+        doReturn(couples).when(eventInstanceService).getMessageEventCouples(anyInt(), anyInt());
+
+        messagesHandlingService.matchEventCoupleAndTriggerExecution();
+
+        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS).counter()
+                .count())
+                        .isEqualTo(1);
+    }
+
 }
