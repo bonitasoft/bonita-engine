@@ -75,13 +75,12 @@ public class TestEngineImpl implements TestEngine {
 
     private void initializeDatabaseConfigurations() {
         if (bonitaDatabaseConfiguration == null || businessDataDatabaseConfiguration == null) {
-            BonitaDatabaseConfiguration configuration = testDatabaseConfigurator.getDatabaseConfiguration();
             if (bonitaDatabaseConfiguration == null) {
-                bonitaDatabaseConfiguration = configuration;
+                bonitaDatabaseConfiguration = testDatabaseConfigurator.getDatabaseConfiguration();
                 engineStarter.setBonitaDatabaseConfiguration(bonitaDatabaseConfiguration);
             }
             if (businessDataDatabaseConfiguration == null) {
-                businessDataDatabaseConfiguration = configuration;
+                businessDataDatabaseConfiguration = testDatabaseConfigurator.getBDMDatabaseConfiguration();
                 engineStarter.setBusinessDataDatabaseConfiguration(businessDataDatabaseConfiguration);
             }
         }
