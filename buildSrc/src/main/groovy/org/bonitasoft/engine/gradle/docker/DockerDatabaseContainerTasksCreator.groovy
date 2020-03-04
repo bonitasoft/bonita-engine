@@ -40,19 +40,19 @@ class DockerDatabaseContainerTasksCreator {
              repository : 'registry.rd.lan/bonitasoft/postgres-11',
              tag        : '0.0.2',
              portBinding: 5432,
-             uriTemplate: 'jdbc:postgresql://%s:%s/bonita',
+             uriTemplate: 'jdbc:postgresql://%s:%s/%s',
             ],
             [name       : 'mysql',
              repository : 'registry.rd.lan/bonitasoft/mysql-8.0.14',
              tag        : '1.0.2-UTF8MB4',
              portBinding: 3306,
-             uriTemplate: 'jdbc:mysql://%s:%s/bonita?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
+             uriTemplate: 'jdbc:mysql://%s:%s/%s?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
             ],
             [name       : 'sqlserver',
              repository : 'registry.rd.lan/bonitasoft/sqlserver-2017',
-             tag        : 'CU16-1.0.0',
+             tag        : 'CU17-1.0.0',
              portBinding: 1433,
-             uriTemplate: 'jdbc:sqlserver://%s:%s;database=bonita',
+             uriTemplate: 'jdbc:sqlserver://%s:%s;database=%s',
             ]
     ]
 
@@ -75,6 +75,7 @@ class DockerDatabaseContainerTasksCreator {
             def uniqueName = "${vendor.name.capitalize()}"
 
             DbParser.DbConnectionSettings dbConnectionSettings = new DbParser.DbConnectionSettings()
+            DbParser.DbConnectionSettings bdmDbConnectionSettings = new DbParser.DbConnectionSettings()
             Task inspectContainer
             Task removeContainer
 
@@ -131,11 +132,12 @@ class DockerDatabaseContainerTasksCreator {
                         if (exposedPort.port == vendor.portBinding) {
                             int portBinding = bindingArr.first().hostPortSpec as int
                             def dockerHost = getDockerHost()
-                            def url = String.format(vendor.uriTemplate, dockerHost, portBinding)
-                            project.logger.info "Container url: ${url}"
-                            dbConnectionSettings.dbUrl = url
+                            dbConnectionSettings.dbUrl = vendor.name == "oracle" ? String.format(vendor.uriTemplate, dockerHost, portBinding) : String.format(vendor.uriTemplate, dockerHost, portBinding, "bonita")
                             dbConnectionSettings.serverName = dockerHost
                             dbConnectionSettings.portNumber = portBinding
+                            bdmDbConnectionSettings.dbUrl = vendor.name == "oracle" ? String.format(vendor.uriTemplate, dockerHost, portBinding) : String.format(vendor.uriTemplate, dockerHost, portBinding, "business_data")
+                            bdmDbConnectionSettings.serverName = dockerHost
+                            bdmDbConnectionSettings.portNumber = portBinding
                             project.logger.quiet("db.url set to ${dbConnectionSettings.dbUrl}")
                         }
                     }
@@ -163,12 +165,14 @@ class DockerDatabaseContainerTasksCreator {
                     def dbValues = [
                             "sysprop.bonita.db.vendor"    : vendor.name,
                             "sysprop.bonita.bdm.db.vendor": vendor.name,
-                            "db.url"                      : dbUrl,
-                            "db.user"                     : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'bonita'),
-                            "db.password"                 : project.hasProperty('db.password') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_PASSWORD) ? System.getProperty(SYS_PROP_DB_PASSWORD) : 'bpm'),
-                            "db.server.name"              : connectionSettings.serverName,
-                            "db.server.port"              : connectionSettings.portNumber,
-                            "db.database.name"            : connectionSettings.databaseName
+                            "db.url"          : dbUrl,
+                            "db.user"         : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'bonita'),
+                            "db.password"     : project.hasProperty('db.password') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_PASSWORD) ? System.getProperty(SYS_PROP_DB_PASSWORD) : 'bpm'),
+                            "bdm.db.url"      : bdmDbConnectionSettings.dbUrl,
+                            "bdm.db.user"      : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'business_data'),
+                            "db.server.name"  : connectionSettings.serverName,
+                            "db.server.port"  : connectionSettings.portNumber,
+                            "db.database.name": connectionSettings.databaseName
                     ]
 
                     if ('oracle' == vendor.name) {
