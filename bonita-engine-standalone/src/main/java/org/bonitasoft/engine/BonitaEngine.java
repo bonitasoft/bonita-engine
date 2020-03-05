@@ -76,7 +76,8 @@ public class BonitaEngine {
 
     private void initializeBonitaDatabaseConfiguration() {
         if (bonitaDatabaseConfiguration == null || bonitaDatabaseConfiguration.isEmpty()) {
-            bonitaDatabaseConfiguration = createDefaultDBConfiguration(BONITA_DB_VENDOR);
+            bonitaDatabaseConfiguration = DefaultBonitaDatabaseConfigurations
+                    .defaultConfiguration(System.getProperty(BONITA_DB_VENDOR, "h2"), "bonita");
         }
         setSystemPropertyIfNotSet(BONITA_DB_VENDOR, bonitaDatabaseConfiguration.getDbVendor());
         log.info("Using database configuration for bonita {}", bonitaDatabaseConfiguration);
@@ -84,15 +85,11 @@ public class BonitaEngine {
 
     private void initializeBusinessDataDatabaseConfiguration() {
         if (businessDataDatabaseConfiguration == null || businessDataDatabaseConfiguration.isEmpty()) {
-            businessDataDatabaseConfiguration = createDefaultDBConfiguration(BONITA_BDM_DB_VENDOR);
+            businessDataDatabaseConfiguration = DefaultBonitaDatabaseConfigurations
+                    .defaultConfiguration(System.getProperty(BONITA_BDM_DB_VENDOR, "h2"), "business_data");
         }
         setSystemPropertyIfNotSet(BONITA_BDM_DB_VENDOR, businessDataDatabaseConfiguration.getDbVendor());
-        log.info("Using database configuration for business data {}", bonitaDatabaseConfiguration);
-    }
-
-    private BonitaDatabaseConfiguration createDefaultDBConfiguration(String dbVendorSystemPropertyName) {
-        String bonitaDBVendor = System.getProperty(dbVendorSystemPropertyName, "h2");
-        return DefaultBonitaDatabaseConfigurations.defaultConfiguration(bonitaDBVendor);
+        log.info("Using database configuration for business data {}", businessDataDatabaseConfiguration);
     }
 
     private void setSystemPropertyIfNotSet(String systemPropertyName, String defaultValue) {
