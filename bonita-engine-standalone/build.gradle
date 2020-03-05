@@ -26,6 +26,8 @@ dependencies{
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testCompile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    testCompile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
 
 }
 

@@ -15,6 +15,7 @@ package org.bonitasoft.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
@@ -30,7 +31,7 @@ public class BonitaEngineTest {
         BonitaEngine bonitaEngine = newBonitaEngine();
         bonitaEngine.setBonitaDatabaseConfiguration(BonitaDatabaseConfiguration.builder()
                 .dbVendor("postgres")
-                .url("url")
+                .url("jdbc:postgresql://someServer:5433/bonitadb")
                 .user("user")
                 .build());
 
@@ -54,8 +55,10 @@ public class BonitaEngineTest {
 
         bonitaEngine.initializeEnvironment();
 
-        assertThat(bonitaEngine.getBonitaDataSource().getUrl()).contains("h2");
-        assertThat(bonitaEngine.getBonitaDataSource().getDriverClassName()).containsIgnoringCase("h2");
+        JdbcDataSource xaDataSourceInstance = (JdbcDataSource) bonitaEngine.getBonitaDataSource()
+                .getXaDataSourceInstance();
+        assertThat(xaDataSourceInstance.getURL()).contains("h2");
+        assertThat(xaDataSourceInstance.getDescription()).contains("RawDataSource of h2");
 
     }
 
