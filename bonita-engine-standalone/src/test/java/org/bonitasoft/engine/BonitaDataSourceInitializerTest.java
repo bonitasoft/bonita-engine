@@ -93,7 +93,7 @@ public class BonitaDataSourceInitializerTest {
     }
 
     @Test
-    public void should_set_pool_size_according_to_configuration() {
+    public void should_set_pool_size_according_to_configuration() throws Exception {
         BonitaDatabaseConfiguration configuration = BonitaDatabaseConfiguration.builder()
                 .dbVendor("mysql")
                 .url("jdbc::localhost")

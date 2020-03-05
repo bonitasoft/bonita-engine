@@ -13,26 +13,32 @@
  **/
 package org.bonitasoft.engine.message;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.iterate;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.EVENT_SUB_PROCESS;
+import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.INTERMEDIATE_CATCH_EVENT;
+import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.START_EVENT;
+import static org.bonitasoft.engine.message.MessagesHandlingService.*;
 import static org.mockito.Mockito.*;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -70,7 +76,10 @@ public class MessagesHandlingServiceTest {
     private MeterRegistry meterRegistry;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        when(userTransactionService.executeInTransaction(any())).thenAnswer(a -> ((Callable) a.getArgument(0)).call());
+        when(loggerService.asLogger(any())).thenReturn(mock(TechnicalLogger.class));
+
         meterRegistry = new SimpleMeterRegistry(
                 // So that micrometer updates its counters every 1 ms:
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
@@ -82,154 +91,83 @@ public class MessagesHandlingServiceTest {
     @Test
     public void getMessageUniqueCouplesWithDuplicateMessage() {
         // Given
-        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        when(couple1.getMessageInstanceId()).thenReturn(1L);
-        when(couple1.getWaitingMessageId()).thenReturn(10L);
-
-        final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        when(couple2.getMessageInstanceId()).thenReturn(2L);
-        when(couple2.getWaitingMessageId()).thenReturn(20L);
-
-        final SMessageEventCouple couple3 = mock(SMessageEventCouple.class);
-        when(couple3.getMessageInstanceId()).thenReturn(1L);
-        when(couple3.getWaitingMessageId()).thenReturn(30L);
-
-        final List<SMessageEventCouple> messageCouples = new ArrayList<>(3);
-        messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
+        final List<SMessageEventCouple> messageCouples = asList( //
+                msgEventCouple(1L, 10L), //
+                msgEventCouple(2L, 20L), //
+                msgEventCouple(1L, 30L));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
 
         // Then
-        assertEquals(2, uniqueCouples.size());
-        final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstanceId());
-        assertEquals(10L, first.getWaitingMessageId());
-        final SMessageEventCouple second = uniqueCouples.get(1);
-        assertEquals(2L, second.getMessageInstanceId());
-        assertEquals(20L, second.getWaitingMessageId());
+        assertThat(uniqueCouples).containsExactly(
+                msgEventCouple(1L, 10L), //
+                msgEventCouple(2L, 20L));
     }
 
     @Test
     public void getMessageUniqueCouplesWithDuplicateWaitingEvent() {
         // Given
-        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        when(couple1.getMessageInstanceId()).thenReturn(1L);
-        when(couple1.getWaitingMessageId()).thenReturn(10L);
-
-        final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        when(couple2.getMessageInstanceId()).thenReturn(2L);
-        when(couple2.getWaitingMessageId()).thenReturn(10L);
-
-        final SMessageEventCouple couple3 = mock(SMessageEventCouple.class);
-        when(couple3.getMessageInstanceId()).thenReturn(3L);
-        when(couple3.getWaitingMessageId()).thenReturn(30L);
-
-        final List<SMessageEventCouple> messageCouples = new ArrayList<>(3);
-        messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
+        final List<SMessageEventCouple> messageCouples = asList( //
+                msgEventCouple(1L, 10L), //
+                msgEventCouple(2L, 10L), //
+                msgEventCouple(3L, 30L));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
 
         // Then
-        assertEquals(2, uniqueCouples.size());
-        final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstanceId());
-        assertEquals(10L, first.getWaitingMessageId());
-        final SMessageEventCouple second = uniqueCouples.get(1);
-        assertEquals(3L, second.getMessageInstanceId());
-        assertEquals(30L, second.getWaitingMessageId());
+        assertThat(uniqueCouples).containsExactly(
+                msgEventCouple(1L, 10L), //
+                msgEventCouple(3L, 30L));
     }
 
     @Test
-    public void couplesWithDuplicateStartWaitingEventsAreConsideredTwice() throws SEventTriggerInstanceReadException {
+    public void couplesWithDuplicateStartWaitingEventsAreConsideredTwice() {
         // Given
-        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        when(couple1.getMessageInstanceId()).thenReturn(1L);
-        when(couple1.getWaitingMessageId()).thenReturn(10L);
-        when(couple1.getWaitingMessageEventType()).thenReturn(SBPMEventType.START_EVENT);
-
-        final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        when(couple2.getMessageInstanceId()).thenReturn(2L);
-        when(couple2.getWaitingMessageId()).thenReturn(10L);
-        when(couple2.getWaitingMessageEventType()).thenReturn(SBPMEventType.START_EVENT);
-
-        final List<SMessageEventCouple> messageCouples = new ArrayList<>(3);
-        messageCouples.addAll(Arrays.asList(couple1, couple2));
+        final List<SMessageEventCouple> messageCouples = asList(
+                msgEventCouple(1L, 10L, START_EVENT), //
+                msgEventCouple(2L, 10L, START_EVENT));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
 
         // Then
-        assertEquals(2, uniqueCouples.size());
-        final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstanceId());
-        assertEquals(10L, first.getWaitingMessageId());
-        final SMessageEventCouple second = uniqueCouples.get(1);
-        assertEquals(2L, second.getMessageInstanceId());
-        assertEquals(10L, second.getWaitingMessageId());
+        assertThat(uniqueCouples).containsExactly(
+                msgEventCouple(1L, 10L, START_EVENT), //
+                msgEventCouple(2L, 10L, START_EVENT));
     }
 
     @Test
-    public void couplesWithDuplicateEventSubProcessesAreConsideredOnlyOnce() throws SEventTriggerInstanceReadException {
+    public void couplesWithDuplicateEventSubProcessesAreConsideredOnlyOnce() {
         // Given
-        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        when(couple1.getMessageInstanceId()).thenReturn(1L);
-        when(couple1.getWaitingMessageId()).thenReturn(10L);
-        when(couple1.getWaitingMessageEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
-
-        final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        when(couple2.getMessageInstanceId()).thenReturn(2L);
-        when(couple2.getWaitingMessageId()).thenReturn(10L);
-        when(couple2.getWaitingMessageEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
-
-        final List<SMessageEventCouple> messageCouples = new ArrayList<>(3);
-        messageCouples.addAll(Arrays.asList(couple1, couple2));
+        final List<SMessageEventCouple> messageCouples = asList(
+                msgEventCouple(1L, 10L, EVENT_SUB_PROCESS), //
+                msgEventCouple(2L, 10L, EVENT_SUB_PROCESS));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
 
         // Then
-        assertEquals(1, uniqueCouples.size());
-        final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstanceId());
-        assertEquals(10L, first.getWaitingMessageId());
+        assertThat(uniqueCouples).containsExactly(msgEventCouple(1L, 10L, EVENT_SUB_PROCESS));
     }
 
     @Test
-    public void getMessageUniqueCouplesWithDuplicateMessagesAndWaitingEvent()
-            throws SEventTriggerInstanceReadException {
+    public void getMessageUniqueCouplesWithDuplicateMessagesAndWaitingEvent() {
         // Given
-        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        when(couple1.getMessageInstanceId()).thenReturn(1L);
-        when(couple1.getWaitingMessageId()).thenReturn(10L);
-
-        final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        when(couple2.getMessageInstanceId()).thenReturn(2L);
-        when(couple2.getWaitingMessageId()).thenReturn(20L);
-
-        final SMessageEventCouple couple3 = mock(SMessageEventCouple.class);
-        when(couple3.getMessageInstanceId()).thenReturn(2L);
-        when(couple3.getWaitingMessageId()).thenReturn(10L);
-
-        final SMessageEventCouple couple4 = mock(SMessageEventCouple.class);
-        when(couple4.getMessageInstanceId()).thenReturn(2L);
-        when(couple4.getWaitingMessageId()).thenReturn(20L);
-
-        final List<SMessageEventCouple> messageCouples = new ArrayList<>(4);
-        messageCouples.addAll(Arrays.asList(couple1, couple2, couple3, couple4));
+        final List<SMessageEventCouple> messageCouples = asList( //
+                msgEventCouple(1L, 10L), //
+                msgEventCouple(2L, 20L), //
+                msgEventCouple(2L, 10L), //
+                msgEventCouple(2L, 20L));
 
         // When
         final List<SMessageEventCouple> uniqueCouples = messagesHandlingService.getMessageUniqueCouples(messageCouples);
 
         // Then
-        assertEquals(2, uniqueCouples.size());
-        final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstanceId());
-        assertEquals(10L, first.getWaitingMessageId());
-        final SMessageEventCouple second = uniqueCouples.get(1);
-        assertEquals(2L, second.getMessageInstanceId());
-        assertEquals(20L, second.getWaitingMessageId());
+        assertThat(uniqueCouples).containsExactly(
+                msgEventCouple(1L, 10L), //
+                msgEventCouple(2L, 20L));
     }
 
     @Test
@@ -242,14 +180,67 @@ public class MessagesHandlingServiceTest {
         messagesHandlingService.executeMessageCouple(1L, 2L);
 
         // then:
-        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_EXECUTED).counter().count())
-                .isEqualTo(1);
-
+        assertThat(counterValue(NUMBER_OF_MESSAGES_EXECUTED)).isEqualTo(1);
     }
 
     @Test
     public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_EXECUTED)
-                .tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_EXECUTED)).isNotNull();
+        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)).isNotNull();
+        assertThat(counterForDefaultTenant(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)).isNotNull();
     }
+
+    @Test
+    public void should_increment_metrics_on_executed_and_potential_couples_when_matching_messages() throws Exception {
+        doReturn(new SWaitingMessageEvent()).when(eventInstanceService).getWaitingMessage(anyLong());
+        doReturn(new SMessageInstance()).when(eventInstanceService).getMessageInstance(anyLong());
+        doReturn(asList(
+                new SMessageEventCouple(51, INTERMEDIATE_CATCH_EVENT, 61),
+                new SMessageEventCouple(52, INTERMEDIATE_CATCH_EVENT, 62),
+                new SMessageEventCouple(53, INTERMEDIATE_CATCH_EVENT, 63),
+                new SMessageEventCouple(53, INTERMEDIATE_CATCH_EVENT, 64)// waiting event already matched
+        )).when(eventInstanceService).getMessageEventCouples(anyInt(), anyInt());
+
+        messagesHandlingService.matchEventCoupleAndTriggerExecution();
+
+        assertThat(counterValue(NUMBER_OF_MESSAGES_EXECUTED)).isEqualTo(3);
+        assertThat(counterValue(NUMBER_OF_MESSAGES_POTENTIAL_MATCHED)).isEqualTo(4);
+        assertThat(counterValue(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)).isEqualTo(0);
+    }
+
+    @Test
+    public void should_increment_metric_on_retriggered_taskls_when_matching_more_couples_than_the_maximum()
+            throws Exception {
+        doReturn(new SWaitingMessageEvent()).when(eventInstanceService).getWaitingMessage(anyLong());
+        doReturn(new SMessageInstance()).when(eventInstanceService).getMessageInstance(anyLong());
+        List<SMessageEventCouple> couples = iterate(1, i -> i + 1).limit(100) // 100 == MAX_COUPLES
+                .map(i -> msgEventCouple(i, i))
+                .collect(toList());
+        doReturn(couples).when(eventInstanceService).getMessageEventCouples(anyInt(), anyInt());
+
+        messagesHandlingService.matchEventCoupleAndTriggerExecution();
+
+        assertThat(counterValue(NUMBER_OF_MESSAGES_MATCHING_RETRIGGERED_TASKS)).isEqualTo(1);
+    }
+
+    // =================================================================================================================
+    // UTILS
+    // =================================================================================================================
+
+    private Counter counterForDefaultTenant(String counterName) {
+        return meterRegistry.find(counterName).tag("tenant", String.valueOf(TENANT_ID)).counter();
+    }
+
+    private double counterValue(String counterName) {
+        return meterRegistry.find(counterName).counter().count();
+    }
+
+    private static SMessageEventCouple msgEventCouple(long msgId, long eventId) {
+        return new SMessageEventCouple(eventId, null, msgId);
+    }
+
+    private static SMessageEventCouple msgEventCouple(long msgId, long eventId, SBPMEventType eventType) {
+        return new SMessageEventCouple(eventId, eventType, msgId);
+    }
+
 }
