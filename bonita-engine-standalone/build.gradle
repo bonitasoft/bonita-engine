@@ -27,6 +27,7 @@ dependencies{
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testCompile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testCompile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    testCompile "com.h2database:h2:${Deps.h2Version}"
 
 }
 
