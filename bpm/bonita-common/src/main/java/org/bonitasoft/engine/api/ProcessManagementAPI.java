@@ -940,28 +940,11 @@ public interface ProcessManagementAPI {
      * resource.
      *
      * <pre>
-     * eg.processAPI().getProcessResources(processDefinitionId, ".{@literal *}/.*\\.txt")
+     * eg.processAPI().getProcessResources(processDefinitionId, {@literal "resources/folder/.*}\\.jpg")
      * </pre>
      *
-     * would retrieve all .txt files in a first-level subfolder. The key in the map is the path for each matching
+     * would retrieve all .jpg files in the folder `resources/folder`. The key in the map is the path for each matching
      * resource.
-     * <p>
-     * <u>Note</u> that this method is <b>expensive</b>, as it rebuilds the business archive with all its resources. If
-     * you need to retrieve several resources,
-     * instead of calling this method several times, consider using the following code:
-     *
-     * <pre>
-     *  {@code
-     *
-     *      final BusinessArchive businessArchive = BusinessArchiveFactory
-     *          .readBusinessArchive(new ByteArrayInputStream(getProcessAPI().exportBarProcessContentUnderHome(processDefinitionId)));
-     *      // loop here if needed: for (String myPattern : myPatterns)
-     * Map<String, byte[]> myResources = businessArchive.getResources(myPattern);
-     * // deal with myResources here
-     * } }
-     * </pre>
-     *
-     * </p>
      *
      * @param processDefinitionId
      *        The identifier of the process definition.
