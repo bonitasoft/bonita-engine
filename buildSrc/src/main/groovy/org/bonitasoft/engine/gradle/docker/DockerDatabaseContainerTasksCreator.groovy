@@ -50,7 +50,7 @@ class DockerDatabaseContainerTasksCreator {
             ],
             [name       : 'sqlserver',
              repository : 'registry.rd.lan/bonitasoft/sqlserver-2017',
-             tag        : 'CU17-1.0.0',
+             tag        : 'CU19-1.0.0',
              portBinding: 1433,
              uriTemplate: 'jdbc:sqlserver://%s:%s;database=%s',
             ]
