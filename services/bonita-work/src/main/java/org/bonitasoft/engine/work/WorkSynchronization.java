@@ -20,8 +20,12 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkSynchronization implements BonitaTransactionSynchronization {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WorkSynchronization.class);
 
     private final Collection<WorkDescriptor> works;
 
@@ -64,6 +68,9 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
                 work.setTenantId(tenantId);
                 workExecutorService.execute(work);
             }
+        } else {
+            LOG.debug("Transaction completion with state {} != COMMITTED. Not triggering subsequent works: {}",
+                    transactionStatus, works);
         }
         workService.removeSynchronization();
     }
