@@ -52,6 +52,8 @@ import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptiste Mesta
@@ -62,6 +64,8 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Matthieu Chaffotte
  */
 public class FlowNodeExecutorImpl implements FlowNodeExecutor {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FlowNodeExecutorImpl.class);
 
     private final FlowNodeStateManager flowNodeStateManager;
     private final ActivityInstanceService activityInstanceService;
@@ -156,6 +160,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final FlowNodeState state = updateState(flowNodeInstance, processDefinition);
             if (!flowNodeInstance.isStateExecuting() && state != null) {
                 registerWork(state, flowNodeInstance);
+            } else {
+                LOG.debug("stepForward: no work to register on state {} for flowNode {}", state, flowNodeInstance);
             }
             return state;
         } catch (final SFlowNodeExecutionException e) {
@@ -199,6 +205,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             registerExecuteFlowNodeWork(sFlowNodeInstance);
         } else if (state.isTerminal()) {
             registerNotifyFinishWork(sFlowNodeInstance);
+        } else {
+            LOG.debug("registerWork: nothing to register on state {} for flownode {}", state,
+                    sFlowNodeInstance.toString());
         }
     }
 
@@ -280,6 +289,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             } else {
                 stepForward(activityInstanceParent, null, null);
             }
+        } else {
+            LOG.debug("childFinished: no work to register when hit() => false for child flownode {}", flowNodeInstance);
         }
     }
 
