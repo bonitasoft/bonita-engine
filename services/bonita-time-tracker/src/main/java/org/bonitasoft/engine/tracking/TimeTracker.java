@@ -92,7 +92,10 @@ public class TimeTracker implements TenantLifecycleService {
         log(TechnicalLogSeverity.INFO, getStatus());
     }
 
-    List<FlushEventListener> getActiveFlushEventListeners() {
+    /**
+     * get the list of Active Listener
+     */
+   public List<FlushEventListener> getActiveFlushEventListeners() {
         final List<FlushEventListener> active = new ArrayList<>();
         for (final FlushEventListener flushEventListener : this.flushEventListeners.values()) {
             if (flushEventListener.isActive()) {
@@ -101,6 +104,12 @@ public class TimeTracker implements TenantLifecycleService {
         }
         return active;
     }
+   /**
+    * return all Event Listeners, active or not
+    */
+   public List<FlushEventListener> getFlushEventListeners() {
+       return new ArrayList(this.flushEventListeners.values());
+   }
 
     /**
      * reference a new flushEventListener. The key of the reference is the flushEventListener.name().
