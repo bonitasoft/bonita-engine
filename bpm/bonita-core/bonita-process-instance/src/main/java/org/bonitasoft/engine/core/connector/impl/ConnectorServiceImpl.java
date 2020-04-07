@@ -70,7 +70,7 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -99,7 +99,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     private final OperationService operationService;
     private final DependencyService dependencyService;
     private final ClassLoaderService classLoaderService;
-    private final TechnicalLoggerService logger;
+    private final TechnicalLogger logger;
     private final TimeTracker timeTracker;
     private final ProcessResourcesService processResourcesService;
 
@@ -118,7 +118,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         this.processResourcesService = processResourcesService;
         this.operationService = operationService;
         this.dependencyService = dependencyService;
-        this.logger = logger;
+        this.logger = logger.asLogger(getClass());
         this.timeTracker = timeTracker;
         try {
             jaxbContext = JAXBContext.newInstance(SConnectorImplementationDescriptor.class);
@@ -166,10 +166,9 @@ public class ConnectorServiceImpl implements ConnectorService {
             SConnectorImplementationDescriptor connectorImplementationDescriptor, final ClassLoader classLoader,
             final Map<String, Object> inputParameters) throws SConnectorException {
         final String implementationClassName = connectorImplementationDescriptor.getImplementationClassName();
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            final String message = "Executing connector " + buildConnectorContextMessage(sConnectorInstance)
-                    + buildConnectorInputMessage(inputParameters);
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Executing connector {} {}", buildConnectorContextMessage(sConnectorInstance),
+                    buildConnectorInputMessage(inputParameters));
         }
         return executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
     }
@@ -288,10 +287,9 @@ public class ConnectorServiceImpl implements ConnectorService {
         } catch (InterruptedException | ExecutionException e) {
             throw new SConnectorException(e);
         }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed connector <" + implementationClassName
-                    + "> with definition id <" + connectorDefinitionId + ">, version <" + connectorDefinitionVersion
-                    + ">, " + buildConnectorInputMessage(inputParameters));
+        if (logger.isDebugEnabled()) {
+            logger.debug("Executed connector <{}> with definition id <{}>, version <{}>, {}", implementationClassName,
+                    connectorDefinitionId, connectorDefinitionVersion, buildConnectorInputMessage(inputParameters));
         }
         return connectorResult;
     }
@@ -480,13 +478,15 @@ public class ConnectorServiceImpl implements ConnectorService {
                 if (existingDependency != null) {
                     //a dependency with this name did exists event if it was not declared as a dependency of the connector inside the connector impl file
                     if (connectorImplementationDescriptorToReplace != null) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                                "Updating a dependency of the connector "
-                                        + connectorImplementationDescriptorToReplace.getDefinitionId() + " in version "
-                                        + connectorImplementationDescriptorToReplace.getDefinitionVersion() +
-                                        " of process definition " + processDefinitionId + ". The jar file "
-                                        + file.getKey()
-                                        + " was not declared in the previous connector implementation but is in the dependencies of the process. The jar is still updated but this can lead to inconsistencies.");
+                        logger.warn(
+                                "Updating a dependency of the connector {} in version {} of process definition {}. " +
+                                        "The jar file {} was not declared in the previous connector implementation but is in the dependencies of the process."
+                                        +
+                                        " The jar is still updated but this can lead to inconsistencies.",
+                                connectorImplementationDescriptorToReplace.getDefinitionId(),
+                                connectorImplementationDescriptorToReplace.getDefinitionVersion(),
+                                processDefinitionId,
+                                file.getKey());
                     }
                     dependencyService.updateDependencyOfArtifact(file.getKey(), file.getValue(), file.getKey(),
                             processDefinitionId, ScopeType.PROCESS);
