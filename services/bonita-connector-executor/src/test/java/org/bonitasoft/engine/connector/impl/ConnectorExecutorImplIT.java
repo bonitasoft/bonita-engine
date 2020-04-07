@@ -13,16 +13,23 @@
  **/
 package org.bonitasoft.engine.connector.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.connector.AbstractSConnector;
+import org.bonitasoft.engine.connector.ConnectorExecutionResult;
+import org.bonitasoft.engine.connector.exception.SConnectorException;
+import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -38,9 +45,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ConnectorExecutorImplIT {
 
     @Mock
-    private TechnicalLoggerService loggerService;
-
-    @Mock
     private SessionAccessor sessionAccessor;
 
     @Mock
@@ -53,7 +57,8 @@ public class ConnectorExecutorImplIT {
 
     @Before
     public void setUp() {
-        connectorExecutor = new ConnectorExecutorImpl(10, 5, loggerService, 100, 100, sessionAccessor, sessionService,
+        connectorExecutor = new ConnectorExecutorImpl(10, 5, new TechnicalLoggerSLF4JImpl(), 100, 100, sessionAccessor,
+                sessionService,
                 timeTracker, new SimpleMeterRegistry(), 12L, new DefaultExecutorServiceMetricsProvider());
         connectorExecutor.start();
     }
@@ -88,6 +93,15 @@ public class ConnectorExecutorImplIT {
         }
     }
 
+    @Test
+    public void should_return_execution_time_of_the_connector() throws Exception {
+        ConnectorExecutionResult connectorExecutionResult = connectorExecutor
+                .execute(new SleepConnector(50), Collections.emptyMap(), Thread.currentThread().getContextClassLoader())
+                .get();
+
+        assertThat(connectorExecutionResult.getExecutionTimeMillis()).isGreaterThanOrEqualTo(50).isLessThan(1000);
+    }
+
     private Callable<Void> buildConnectorExecutionCallable(final String resourceName) {
         return () -> {
             connectorExecutor.execute(new ResourceConnector(resourceName), null, new ResourceClassLoader(resourceName));
@@ -95,4 +109,38 @@ public class ConnectorExecutorImplIT {
         };
     }
 
+    private static class SleepConnector extends AbstractSConnector {
+
+        private int sleepMillis;
+
+        public SleepConnector(int sleepMillis) {
+            this.sleepMillis = sleepMillis;
+        }
+
+        @Override
+        public void validate() throws SConnectorValidationException {
+
+        }
+
+        @Override
+        public Map<String, Object> execute() throws SConnectorException {
+            try {
+                sleepMillis = 100;
+                Thread.sleep(sleepMillis);
+            } catch (InterruptedException e) {
+                throw new SConnectorException(e);
+            }
+            return null;
+        }
+
+        @Override
+        public void connect() throws SConnectorException {
+
+        }
+
+        @Override
+        public void disconnect() throws SConnectorException {
+
+        }
+    }
 }

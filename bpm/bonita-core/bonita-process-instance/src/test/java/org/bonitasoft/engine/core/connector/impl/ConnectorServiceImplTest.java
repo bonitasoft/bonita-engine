@@ -34,6 +34,7 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
+import org.bonitasoft.engine.connector.ConnectorExecutionResult;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.connector.SConnector;
@@ -225,7 +226,8 @@ public class ConnectorServiceImplTest {
                 "impplVersion", "defId", "defVersion", new ArrayList<>(Collections.<String> emptyList()));
         SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
         when(connectorExecutor.execute(any(), any(), any()))
-                .thenReturn(CompletableFuture.completedFuture(Collections.emptyMap()));
+                .thenReturn(CompletableFuture
+                        .completedFuture(ConnectorExecutionResult.result(Collections.emptyMap()).tookMillis(100)));
 
         //when
         Map<String, Object> inputParameters = Collections.<String, Object> singletonMap("key", "value");
@@ -581,7 +583,8 @@ public class ConnectorServiceImplTest {
         SConnectorInstance connectorInstance = new SConnectorInstance("myConnectorInstance", 123L, "containerType",
                 "connectorId", "connectorVersion", ConnectorEvent.ON_ENTER);
         when(connectorExecutor.execute(any(), any(), any()))
-                .thenReturn(CompletableFuture.completedFuture(Collections.emptyMap()));
+                .thenReturn(CompletableFuture
+                        .completedFuture(ConnectorExecutionResult.result(Collections.emptyMap()).tookMillis(100)));
         systemOutRule.clearLog();
         //when
         Map<String, Object> inputParameters = new HashMap<>();

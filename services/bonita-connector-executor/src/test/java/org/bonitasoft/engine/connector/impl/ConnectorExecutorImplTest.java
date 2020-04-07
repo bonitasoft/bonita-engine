@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.connector.AbstractSConnector;
+import org.bonitasoft.engine.connector.ConnectorExecutionResult;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -109,12 +110,12 @@ public class ConnectorExecutorImplTest {
             }
         };
         when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
-        final Map<String, Object> result = connectorExecutorImpl.execute(connector,
+        final ConnectorExecutionResult result = connectorExecutorImpl.execute(connector,
                 Collections.singletonMap("key", "value"), Thread.currentThread().getContextClassLoader())
                 .get(100, TimeUnit.MILLISECONDS);
 
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get("result")).isEqualTo("resultValue");
+        assertThat(result.getOutputs().size()).isEqualTo(1);
+        assertThat(result.getOutputs().get("result")).isEqualTo("resultValue");
     }
 
     @Test(expected = SConnectorException.class)

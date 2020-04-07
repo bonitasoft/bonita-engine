@@ -39,7 +39,7 @@ public interface ConnectorExecutor extends TenantLifecycleService {
      * @throws SConnectorException
      *         Error thrown when error occurs in connector executing
      */
-    CompletableFuture<Map<String, Object>> execute(SConnector sConnector, Map<String, Object> inputParameters,
+    CompletableFuture<ConnectorExecutionResult> execute(SConnector sConnector, Map<String, Object> inputParameters,
             ClassLoader classLoader) throws SConnectorException;
 
     /**

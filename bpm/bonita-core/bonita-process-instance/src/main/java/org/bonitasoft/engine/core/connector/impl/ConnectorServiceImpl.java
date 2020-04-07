@@ -303,7 +303,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             Connector connector = (Connector) classLoader.loadClass(implementationClassName).newInstance();
             final SConnectorAdapter sConnectorAdapter = new SConnectorAdapter(connector);
             return connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader)
-                    .thenApply(result -> new ConnectorResult(connector, result));
+                    .thenApply(result -> new ConnectorResult(connector, result.getOutputs()));
         } catch (final ClassNotFoundException e) {
             throw new SConnectorException(implementationClassName + " can not be found.", e);
         } catch (final InstantiationException e) {

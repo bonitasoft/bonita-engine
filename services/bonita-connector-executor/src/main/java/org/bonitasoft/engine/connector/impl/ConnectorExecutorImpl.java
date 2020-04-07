@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.connector.impl;
 
+import static org.bonitasoft.engine.connector.ConnectorExecutionResult.result;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -33,6 +35,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.connector.ConnectorExecutionResult;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -128,7 +131,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     }
 
     @Override
-    public CompletableFuture<Map<String, Object>> execute(final SConnector sConnector,
+    public CompletableFuture<ConnectorExecutionResult> execute(final SConnector sConnector,
             final Map<String, Object> inputParameters, final ClassLoader classLoader) throws SConnectorException {
         if (executorService == null) {
             throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
@@ -146,7 +149,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         return execute(sConnector, task);
     }
 
-    protected CompletableFuture<Map<String, Object>> execute(SConnector sConnector,
+    protected CompletableFuture<ConnectorExecutionResult> execute(SConnector sConnector,
             InterruptibleCallable<Map<String, Object>> task) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -158,13 +161,14 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }, executorService);
     }
 
-    private Callable<Map<String, Object>> wrapForStats(final Callable<Map<String, Object>> task) {
+    private Callable<ConnectorExecutionResult> wrapForStats(final Callable<Map<String, Object>> task) {
         return () -> {
             runningWorks.incrementAndGet();
             try {
+                long startTime = System.currentTimeMillis();
                 Map<String, Object> call = task.call();
                 executedWorkCounter.increment();
-                return call;
+                return result(call).tookMillis(System.currentTimeMillis() - startTime);
             } finally {
                 runningWorks.decrementAndGet();
             }
