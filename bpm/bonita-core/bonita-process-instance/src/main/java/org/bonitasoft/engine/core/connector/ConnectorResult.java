@@ -16,6 +16,8 @@ package org.bonitasoft.engine.core.connector;
 import java.util.Collections;
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.bonitasoft.engine.connector.Connector;
 
 /**
@@ -25,96 +27,18 @@ import org.bonitasoft.engine.connector.Connector;
  *
  * @author Baptiste Mesta
  */
+@Data
+@AllArgsConstructor
 public class ConnectorResult {
 
     private Connector connector;
-
     private Map<String, Object> result;
 
-    /**
-     * @param connector
-     * @param result
-     */
-    public ConnectorResult(final Connector connector, final Map<String, Object> result) {
-        super();
-        this.connector = connector;
-        this.result = result;
-    }
-
-    /**
-     * @return the connector
-     */
-    public Connector getConnector() {
-        return connector;
-    }
-
-    /**
-     * @param connector
-     *        the connector to set
-     */
-    public void setConnector(final Connector connector) {
-        this.connector = connector;
-    }
-
-    /**
-     * @return the result
-     */
     public Map<String, Object> getResult() {
         if (result == null) {
             return Collections.emptyMap();
         }
         return Collections.unmodifiableMap(result);
-    }
-
-    /**
-     * @param result
-     *        the result to set
-     */
-    public void setResult(final Map<String, Object> result) {
-        this.result = result;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (connector == null ? 0 : connector.hashCode());
-        result = prime * result + (this.result == null ? 0 : this.result.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ConnectorResult other = (ConnectorResult) obj;
-        if (connector == null) {
-            if (other.connector != null) {
-                return false;
-            }
-        } else if (!connector.equals(other.connector)) {
-            return false;
-        }
-        if (result == null) {
-            if (other.result != null) {
-                return false;
-            }
-        } else if (!result.equals(other.result)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "ConnectorResult [connector=" + connector + ", result=" + result + "]";
     }
 
 }
