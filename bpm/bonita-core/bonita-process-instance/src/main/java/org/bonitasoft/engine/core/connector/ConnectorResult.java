@@ -33,6 +33,7 @@ public class ConnectorResult {
 
     private Connector connector;
     private Map<String, Object> result;
+    private long executionTimeMillis;
 
     public Map<String, Object> getResult() {
         if (result == null) {

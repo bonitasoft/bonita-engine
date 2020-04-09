@@ -129,7 +129,7 @@ public class ExecuteConnectorWorkTest {
     public void should_execute_do_operations_in_a_lock() throws Exception {
         //given
         CompletableFuture<ConnectorResult> toBeReturned = completedFuture(
-                new ConnectorResult(null, Collections.emptyMap()));
+                new ConnectorResult(null, Collections.emptyMap(), 100));
         when(connectorService.executeConnector(anyLong(), any(), any(), any(), any())).thenReturn(toBeReturned);
 
         //when

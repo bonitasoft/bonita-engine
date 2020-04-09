@@ -101,6 +101,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     private final ClassLoaderService classLoaderService;
     private final TechnicalLogger logger;
     private final TimeTracker timeTracker;
+    private ConnectorExecutionTimeLogger connectorExecutionTimeLogger;
     private final ProcessResourcesService processResourcesService;
 
     private final JAXBContext jaxbContext;
@@ -110,7 +111,8 @@ public class ConnectorServiceImpl implements ConnectorService {
             final ExpressionResolverService expressionResolverService, final OperationService operationService,
             final DependencyService dependencyService, ClassLoaderService classLoaderService,
             final TechnicalLoggerService logger, final TimeTracker timeTracker,
-            ProcessResourcesService processResourcesService) {
+            ProcessResourcesService processResourcesService,
+            ConnectorExecutionTimeLogger connectorExecutionTimeLogger) {
         this.cacheService = cacheService;
         this.connectorExecutor = connectorExecutor;
         this.expressionResolverService = expressionResolverService;
@@ -120,6 +122,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         this.dependencyService = dependencyService;
         this.logger = logger.asLogger(getClass());
         this.timeTracker = timeTracker;
+        this.connectorExecutionTimeLogger = connectorExecutionTimeLogger;
         try {
             jaxbContext = JAXBContext.newInstance(SConnectorImplementationDescriptor.class);
             URL schemaURL = ConnectorServiceImpl.class.getResource("/connectors-impl.xsd");
@@ -170,7 +173,12 @@ public class ConnectorServiceImpl implements ConnectorService {
             logger.debug("Executing connector {} {}", buildConnectorContextMessage(sConnectorInstance),
                     buildConnectorInputMessage(inputParameters));
         }
-        return executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
+        return executeConnectorInClassloader(implementationClassName, classLoader, inputParameters)
+                .thenApply(result -> {
+                    connectorExecutionTimeLogger.log(processDefinitionId, sConnectorInstance, result.getConnector(),
+                            inputParameters, result.getExecutionTimeMillis());
+                    return result;
+                });
     }
 
     @Override
@@ -303,7 +311,8 @@ public class ConnectorServiceImpl implements ConnectorService {
             Connector connector = (Connector) classLoader.loadClass(implementationClassName).newInstance();
             final SConnectorAdapter sConnectorAdapter = new SConnectorAdapter(connector);
             return connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader)
-                    .thenApply(result -> new ConnectorResult(connector, result.getOutputs()));
+                    .thenApply(result -> new ConnectorResult(connector, result.getOutputs(),
+                            result.getExecutionTimeMillis()));
         } catch (final ClassNotFoundException e) {
             throw new SConnectorException(implementationClassName + " can not be found.", e);
         } catch (final InstantiationException e) {

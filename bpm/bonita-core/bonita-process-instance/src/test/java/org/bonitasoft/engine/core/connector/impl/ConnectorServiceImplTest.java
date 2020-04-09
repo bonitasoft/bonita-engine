@@ -84,6 +84,8 @@ public class ConnectorServiceImplTest {
     @Mock
     private ProcessResourcesService processResourcesService;
     @Mock
+    private ConnectorExecutionTimeLogger connectorExecutionTimeLogger;
+    @Mock
     private ConnectorExecutor connectorExecutor;
     @Mock
     private ExpressionResolverService expressionResolverService;
@@ -110,7 +112,8 @@ public class ConnectorServiceImplTest {
         TechnicalLoggerSLF4JImpl logger = new TechnicalLoggerSLF4JImpl();
         connectorService = new ConnectorServiceImpl(cacheService, connectorExecutor, expressionResolverService,
                 operationService,
-                dependencyService, classLoaderService, logger, timeTracker, processResourcesService);
+                dependencyService, classLoaderService, logger, timeTracker, processResourcesService,
+                connectorExecutionTimeLogger);
         processDefinition = new SProcessDefinitionImpl("proc", "1");
         processDefinition.setId(PROCESS_DEFINITION_ID);
     }
@@ -240,6 +243,26 @@ public class ConnectorServiceImplTest {
         SConnector sConnector = connectorArgumentCaptor.getValue();
         assertThat(sConnector).isInstanceOf(SConnectorAdapter.class);
         assertThat(((SConnectorAdapter) sConnector).getConnector()).isInstanceOf(MyTestConnector.class);
+    }
+
+    @Test
+    public void should_log_execution_time_when_executing_connector() throws Exception {
+        //given
+        SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(
+                MyTestConnector.class.getName(), "implId",
+                "impplVersion", "defId", "defVersion", new ArrayList<>(Collections.emptyList()));
+        SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
+        when(connectorExecutor.execute(any(), any(), any())).thenReturn(CompletableFuture
+                .completedFuture(ConnectorExecutionResult.result(Collections.emptyMap()).tookMillis(100)));
+
+        //when
+        Map<String, Object> inputParameters = Collections.singletonMap("key", "value");
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor,
+                contextClassLoader, inputParameters);
+        //then
+        verify(connectorExecutionTimeLogger).log(eq(PROCESS_DEFINITION_ID), eq(connectorInstance),
+                any(MyTestConnector.class), eq(inputParameters), eq(100L));
     }
 
     private void checkGetConnectorImplementationUsesCache(final int givenCacheSizeToBeReturned,
