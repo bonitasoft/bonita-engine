@@ -21,7 +21,7 @@ public class ConnectorResultTest {
 
     @Test
     public void test() {
-        final ConnectorResult result = new ConnectorResult(null, null);
+        final ConnectorResult result = new ConnectorResult(null, null, 100);
         assertTrue(result.getResult().isEmpty());
     }
 

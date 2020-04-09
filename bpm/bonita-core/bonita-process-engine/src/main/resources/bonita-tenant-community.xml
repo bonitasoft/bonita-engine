@@ -1548,6 +1548,11 @@
         <constructor-arg name="connectorService" ref="connectorServiceSub" />
     </bean>
 
+    <bean id="connectorTimeExecutionLogger" class="org.bonitasoft.engine.core.connector.impl.ConnectorExecutionTimeLogger">
+        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService"/>
+        <constructor-arg name="warnWhenLongerThanMillis" value="${bonita.tenant.connector.warnWhenLongerThanMillis}" />
+    </bean>
+
     <bean id="connectorInstanceService" class="org.bonitasoft.engine.core.connector.impl.ConnectorInstanceServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />

@@ -60,7 +60,7 @@ public class ConnectorServiceDecoratorTest {
         final Map<String, Object> result = new HashMap<String, Object>(connectorInputParameters);
         parameters.put("connectorApiAccessor", EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression());
         parameters.put("engineExecutionContext", EngineConstantExpressionBuilder.getEngineExecutionContext());
-        final ConnectorResult toBeReturned = new ConnectorResult(null, result);
+        final ConnectorResult toBeReturned = new ConnectorResult(null, result, 100);
         doReturn(toBeReturned).when(connectorService).executeMultipleEvaluation(processDefinitionId,
                 connectorDefinitionId,
                 connectorDefinitionVersion, parameters, inputValues, classLoader, sexpContext);
