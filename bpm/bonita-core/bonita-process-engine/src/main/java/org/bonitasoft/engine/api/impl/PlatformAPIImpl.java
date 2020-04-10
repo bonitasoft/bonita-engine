@@ -236,7 +236,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new PlatformNotFoundException(e);
         }
         final SPlatform sPlatform = transactionContent.getResult();
-        return ModelConvertor.toPlatform(sPlatform);
+        return ModelConvertor.toPlatform(sPlatform, platformAccessor.getPlatformService().getSPlatformProperties());
     }
 
     private void createDefaultTenant(final PlatformServiceAccessor platformAccessor,

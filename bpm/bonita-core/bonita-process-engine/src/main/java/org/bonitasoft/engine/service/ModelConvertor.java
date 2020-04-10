@@ -278,6 +278,7 @@ import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
 import org.bonitasoft.engine.platform.impl.PlatformImpl;
 import org.bonitasoft.engine.platform.model.SPlatform;
+import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileMember;
@@ -324,8 +325,8 @@ public class ModelConvertor {
         return apiSession;
     }
 
-    public static Platform toPlatform(final SPlatform sPlatform) {
-        return new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(),
+    public static Platform toPlatform(final SPlatform sPlatform, SPlatformProperties sPlatformProperties) {
+        return new PlatformImpl(sPlatformProperties.getPlatformVersion(), sPlatform.getInitialBonitaVersion(),
                 sPlatform.getCreatedBy(),
                 sPlatform.getCreated());
     }

@@ -40,20 +40,14 @@ public interface Platform extends Serializable {
     String getVersion();
 
     /**
-     * Retrieves the <code>platform</code> previous version. This information only will be set if you have installed the
-     * <code>Bonita engine</code> in a
-     * previous
-     * version before upgrading to a new version using the <code>Bonita Migration Tool</code>. Otherwise, this method
-     * will return an empty string.
-     * <p>
-     * For instance, if you have migrated from version 6.3.3 to version 6.3.4, <code>getPreviousVersion</code> will
-     * return 6.3.3 and {@link #getVersion()} will
-     * return 6.3.4.
+     * This method is deprecated. It used to return the previous version of bonita if the platform was migrated.
+     * However this previous version was always exactly the n-1 version compared to the current one.
      *
-     * @return a String representing the <code>platform</code> previous version
-     * @see #getVersion()
-     * @see #getInitialVersion()
+     * @return an empty string (deprecated)
+     * @deprecated since 7.11.0. There is no replacement for this method because previous version is always
+     *             deterministic
      */
+    @Deprecated
     String getPreviousVersion();
 
     /**

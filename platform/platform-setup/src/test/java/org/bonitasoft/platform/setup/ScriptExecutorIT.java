@@ -95,7 +95,7 @@ public class ScriptExecutorIT {
         assertThat(platformRows).isEqualTo(1);
         final Map<String, Object> row = jdbcTemplate.queryForMap("select * from platform");
         assertThat("" + row.get("id")).isEqualTo("1"); // convert to String as not all RDBMS convert the same way (long, int, bigDecimal...)
-        assertThat(row.get("createdby")).isEqualTo("platformAdmin");
+        assertThat(row.get("created_by")).isEqualTo("platformAdmin");
     }
 
     @Test

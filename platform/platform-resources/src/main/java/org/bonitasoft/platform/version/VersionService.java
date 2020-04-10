@@ -25,7 +25,7 @@ public interface VersionService {
      *
      * @return platform current version
      */
-    String getPlatformVersion() throws PlatformException;
+    String retrieveDatabaseSchemaVersion() throws PlatformException;
 
     /**
      * Retrieves the platform setup tool version
@@ -33,6 +33,11 @@ public interface VersionService {
      * @return platform setup tool current version
      */
     String getPlatformSetupVersion();
+
+    /**
+     * @return the version of the database schema used by this setup tool
+     */
+    String getSupportedDatabaseSchemaVersion();
 
     /**
      * Check if platform an platform setup tool are in same version

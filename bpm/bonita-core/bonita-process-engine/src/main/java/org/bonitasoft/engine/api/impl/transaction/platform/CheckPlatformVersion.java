@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
+import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.SPlatform;
-import org.bonitasoft.engine.platform.model.SPlatformProperties;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,10 +27,6 @@ public class CheckPlatformVersion implements Callable<Boolean> {
 
     private final PlatformService platformService;
 
-    private SPlatform platform;
-
-    private SPlatformProperties platformProperties;
-
     public CheckPlatformVersion(final PlatformService platformService) {
         this.platformService = platformService;
     }
@@ -40,35 +35,30 @@ public class CheckPlatformVersion implements Callable<Boolean> {
 
     @Override
     public Boolean call() throws SBonitaException {
-        // the database version
-        platform = platformService.getPlatform();
-        final String dbVersion = platform.getVersion();
+        // the database  schema version
+        String databaseSchemaVersion = platformService.getPlatform().getDbSchemaVersion();
         // the version in jars
-        platformProperties = platformService.getSPlatformProperties();
-        final String jarVersion = platformProperties.getPlatformVersion();
-        // the version in bonita home
-        final String platformMinorVersion = format(dbVersion);
-        final String propertiesMinorVersion = format(jarVersion);
-        boolean same = platformMinorVersion.equals(propertiesMinorVersion);
-        if (!same) {
-            errorMessage = "The version of the platform in database is not the same as expected: bonita-server version is <"
-                    + jarVersion
-                    + "> and database version is <" + dbVersion + ">";
+        String supportedDatabaseSchemaVersion = extractMinorVersion(
+                platformService.getSPlatformProperties().getPlatformVersion());
+
+        boolean isDatabaseSchemaSupported = databaseSchemaVersion.equals(supportedDatabaseSchemaVersion);
+        if (!isDatabaseSchemaSupported) {
+            errorMessage = MessageFormat.format("The version of the platform in database is not the same as expected:" +
+                    " Supported database schema version is <{0}> and current database schema version is <{1}>",
+                    supportedDatabaseSchemaVersion, databaseSchemaVersion);
         }
-        return same;
+        return isDatabaseSchemaSupported;
     }
 
-    private String format(final String version) {
-        final String trimVersion = version.trim();
-        final int endIndex = trimVersion.indexOf('.', 2);
-        if (endIndex == -1) {
-            return trimVersion;
-        }
-        return trimVersion.substring(0, endIndex);
-    }
-
-    public SPlatform getPlatform() {
-        return platform;
+    /**
+     * This method is duplicate in class VersionServiceImpl.
+     * This is accepted to limit over-engineering just to extract an util method.
+     */
+    private String extractMinorVersion(String version) {
+        String major = version.substring(0, version.indexOf('.'));
+        String minor = version.substring(version.indexOf('.') + 1);
+        minor = minor.substring(0, minor.indexOf('.'));
+        return major + "." + minor;
     }
 
     public String getErrorMessage() {
