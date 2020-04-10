@@ -96,7 +96,7 @@ public class PlatformManagerTest {
                 });
         doReturn(tenant1Manager).when(platformManager).getTenantStateManager(argThat(t -> t.getId() == TENANT_1));
         doReturn(tenant2Manager).when(platformManager).getTenantStateManager(argThat(t -> t.getId() == TENANT_2));
-        doReturn(new SPlatform("1.3.0", "1.2.0", "1.1.0", "someUser", 123455)).when(platformService).getPlatform();
+        doReturn(new SPlatform("1.3", "1.1.0", "someUser", 123455)).when(platformService).getPlatform();
         doReturn(new SPlatformPropertiesImpl("1.3.0")).when(platformService).getSPlatformProperties();
         tenant1 = new STenant();
         tenant1.setId(TENANT_1);

@@ -14,14 +14,12 @@
 package org.bonitasoft.platform.version.impl;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.version.VersionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,8 +33,6 @@ public class VersionServiceImpl implements VersionService {
 
     private static final String SQL_PLATFORM_VERSION = "SELECT p.version FROM platform p ORDER BY p.id";
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(VersionServiceImpl.class);
-
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -45,7 +41,7 @@ public class VersionServiceImpl implements VersionService {
     }
 
     @Override
-    public String getPlatformVersion() throws PlatformException {
+    public String retrieveDatabaseSchemaVersion() throws PlatformException {
         final List<String> strings;
         try {
             strings = jdbcTemplate.query(SQL_PLATFORM_VERSION, new PlatformRowMapper());
@@ -64,19 +60,37 @@ public class VersionServiceImpl implements VersionService {
 
     @Override
     public String getPlatformSetupVersion() {
-        String version = null;
+        return getVersionProperty("PLATFORM_ENGINE_VERSION");
+    }
+
+    @Override
+    public String getSupportedDatabaseSchemaVersion() {
+        // right now the supported database schema version is equal to the minor version of the product:
+        return extractMinorVersion(getPlatformSetupVersion());
+    }
+
+    /**
+     * This method is duplicate in class CheckPlatformVersion.
+     * This is accepted to limit over-engineering just to extract an util method.
+     */
+    private String extractMinorVersion(String version) {
+        String major = version.substring(0, version.indexOf('.'));
+        String minor = version.substring(version.indexOf('.') + 1);
+        minor = minor.substring(0, minor.indexOf('.'));
+        return major + "." + minor;
+    }
+
+    private String getVersionProperty(String versionFileName) {
         try {
-            version = IOUtils.toString(this.getClass().getResource("/PLATFORM_ENGINE_VERSION"),
-                    Charset.forName("UTF-8"));
+            return IOUtils.toString(this.getClass().getResource("/" + versionFileName), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            LOGGER.error("unable to read version.");
+            throw new IllegalStateException(versionFileName + " file in jar resources does not exists");
         }
-        return version;
     }
 
     @Override
     public boolean isValidPlatformVersion() throws PlatformException {
-        return getPlatformVersion().equals(getPlatformSetupVersion());
+        return getSupportedDatabaseSchemaVersion().equals(retrieveDatabaseSchemaVersion());
     }
 
 }

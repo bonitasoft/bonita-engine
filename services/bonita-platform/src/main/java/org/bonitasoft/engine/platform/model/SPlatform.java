@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.platform.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -42,18 +43,19 @@ public class SPlatform implements PersistentObject {
     @Id
     private long id;
     private long created;
+    @Column(name = "created_by")
     private String createdBy;
-    private String initialVersion;
-    private String previousVersion;
-    private String version;
+    @Column(name = "initial_bonita_version")
+    private String initialBonitaVersion;
+    @Column(name = "version")
+    private String dbSchemaVersion;
     @Type(type = "materialized_clob")
     private String information;
 
-    public SPlatform(final String version, final String previousVersion, final String initialVersion,
+    public SPlatform(final String dbSchemaVersion, final String initialBonitaVersion,
             final String createdBy, final long created) {
-        this.version = version;
-        this.previousVersion = previousVersion;
-        this.initialVersion = initialVersion;
+        this.dbSchemaVersion = dbSchemaVersion;
+        this.initialBonitaVersion = initialBonitaVersion;
         this.createdBy = createdBy;
         this.created = created;
     }

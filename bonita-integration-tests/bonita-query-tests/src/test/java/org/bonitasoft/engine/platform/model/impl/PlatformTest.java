@@ -45,9 +45,8 @@ public class PlatformTest {
     @Test
     public void should_save_and_get_SPlatform() {
         SPlatform platform = repository.add(SPlatform.builder()
-                .initialVersion("5.9.0")
-                .previousVersion("7.8.0")
-                .version("7.10.0")
+                .initialBonitaVersion("5.9.0")
+                .dbSchemaVersion("1.2")
                 .created(345L)
                 .information("some infos XYZ")
                 .createdBy("The almighty")
@@ -61,10 +60,9 @@ public class PlatformTest {
         assertThat(platformAsMap).containsOnly(
                 entry("ID", platform.getId()),
                 entry("CREATED", 345L),
-                entry("CREATEDBY", "The almighty"),
-                entry("INITIALVERSION", "5.9.0"),
-                entry("PREVIOUSVERSION", "7.8.0"),
-                entry("VERSION", "7.10.0"),
+                entry("CREATED_BY", "The almighty"),
+                entry("INITIAL_BONITA_VERSION", "5.9.0"),
+                entry("VERSION", "1.2"),
                 entry("INFORMATION", "some infos XYZ"));
     }
 

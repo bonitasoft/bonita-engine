@@ -97,9 +97,11 @@ public class ScriptExecutor {
 
     protected void insertPlatform() {
         String version = versionService.getPlatformSetupVersion();
-        final String sql = "INSERT INTO platform (id, version, previousversion, initialversion, created, createdby) VALUES (1, '"
-                + version + "', '', '"
-                + version + "', " + System.currentTimeMillis() + ", 'platformAdmin')";
+        String databaseSchemaVersion = versionService.getSupportedDatabaseSchemaVersion();
+        final String sql = String.format("INSERT INTO platform " +
+                "(id, version, initial_bonita_version, created, created_by) " +
+                "VALUES (1, '%s', '%s', %d, 'platformAdmin')",
+                databaseSchemaVersion, version, System.currentTimeMillis());
         new JdbcTemplate(datasource).update(sql);
     }
 

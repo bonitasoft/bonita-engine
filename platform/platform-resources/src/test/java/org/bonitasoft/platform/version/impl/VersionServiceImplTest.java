@@ -55,7 +55,7 @@ public class VersionServiceImplTest {
                 ArgumentMatchers.any(PlatformRowMapper.class));
 
         //when
-        final String platformVersion = versionService.getPlatformVersion();
+        final String platformVersion = versionService.retrieveDatabaseSchemaVersion();
 
         //then
         Assertions.assertThat(platformVersion).as("should return same version").isEqualTo("a.b.c");

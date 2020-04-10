@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.platform.version.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import javax.sql.DataSource;
 
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.platform.setup.PlatformSetupApplication;
 import org.bonitasoft.platform.setup.ScriptExecutor;
 import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
@@ -44,7 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
         "org.bonitasoft.platform.version" })
 @PropertySource("classpath:/application.properties")
 @Component
-public class VersionServiceImplT {
+public class VersionServiceImplIT {
 
     @Autowired
     MemoryJNDISetup memoryJNDISetup;
@@ -77,17 +78,17 @@ public class VersionServiceImplT {
     @Test
     public void should_insert_version_in_database() throws Exception {
         //when
-        final String platformVersion = versionService.getPlatformVersion();
+        final String platformVersion = versionService.retrieveDatabaseSchemaVersion();
 
         //then
-        Assertions.assertThat(platformVersion).as("should return same version")
-                .isEqualTo(versionService.getPlatformSetupVersion());
+        assertThat(platformVersion).as("should return same version")
+                .isEqualTo(versionService.getSupportedDatabaseSchemaVersion());
     }
 
     @Test
     public void should_have_same_version() throws Exception {
         //then
-        Assertions.assertThat(versionService.isValidPlatformVersion()).as("should insert valid version").isTrue();
+        assertThat(versionService.isValidPlatformVersion()).as("should insert valid version").isTrue();
     }
 
     @Test
@@ -96,7 +97,7 @@ public class VersionServiceImplT {
         jdbcTemplate.execute("UPDATE platform set version='a.b.c' ");
 
         //then
-        Assertions.assertThat(versionService.isValidPlatformVersion()).as("should insert valid version").isFalse();
+        assertThat(versionService.isValidPlatformVersion()).as("should insert valid version").isFalse();
     }
 
 }

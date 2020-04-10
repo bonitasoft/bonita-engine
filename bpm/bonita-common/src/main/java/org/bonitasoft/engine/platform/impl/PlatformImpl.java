@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.platform.impl;
 
+import lombok.ToString;
 import org.bonitasoft.engine.platform.Platform;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@ToString
 public class PlatformImpl implements Platform {
 
     private static final long serialVersionUID = -8493649294374229877L;
@@ -28,14 +30,11 @@ public class PlatformImpl implements Platform {
 
     private final String initialVersion;
 
-    private final String previousVersion;
-
     private final String version;
 
-    public PlatformImpl(final String version, final String previousVersion, final String initialVersion,
+    public PlatformImpl(final String version, final String initialVersion,
             final String createdBy, final long created) {
         this.version = version;
-        this.previousVersion = previousVersion;
         this.initialVersion = initialVersion;
         this.createdBy = createdBy;
         this.created = created;
@@ -57,31 +56,14 @@ public class PlatformImpl implements Platform {
     }
 
     @Override
+    @Deprecated
     public String getPreviousVersion() {
-        return this.previousVersion;
+        return "";
     }
 
     @Override
     public String getVersion() {
         return this.version;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder stb = new StringBuilder();
-        stb.append("PlatformImpl [created=");
-        stb.append(this.created);
-        stb.append(", createdBy=");
-        stb.append(this.createdBy);
-        stb.append(", initialVersion=");
-        stb.append(this.initialVersion);
-        stb.append(", previousVersion=");
-        stb.append(this.previousVersion);
-        stb.append(", version=");
-        stb.append(this.version);
-        stb.append("]");
-
-        return stb.toString();
     }
 
 }

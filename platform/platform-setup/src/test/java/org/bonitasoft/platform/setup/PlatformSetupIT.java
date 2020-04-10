@@ -474,7 +474,7 @@ public class PlatformSetupIT {
         //then
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage(
-                "Platform version [bad version] is not supported by current platform setup version ["
+                "Database schema version [bad version] is not supported by current platform setup version ["
                         + versionService.getPlatformSetupVersion() + "]");
 
         //when
@@ -493,7 +493,7 @@ public class PlatformSetupIT {
         //then
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage(
-                "Platform version [bad version] is not supported by current platform setup version ["
+                "Database schema version [bad version] is not supported by current platform setup version ["
                         + versionService.getPlatformSetupVersion() + "]");
 
         //when

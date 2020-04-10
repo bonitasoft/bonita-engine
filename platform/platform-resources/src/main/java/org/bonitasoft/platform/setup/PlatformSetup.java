@@ -278,7 +278,7 @@ public class PlatformSetup {
 
     private void checkPlatformVersion() throws PlatformException {
         if (!versionService.isValidPlatformVersion()) {
-            throw new PlatformException("Platform version [" + versionService.getPlatformVersion() +
+            throw new PlatformException("Database schema version [" + versionService.retrieveDatabaseSchemaVersion() +
                     "] is not supported by current platform setup version [" + versionService.getPlatformSetupVersion()
                     + "]");
         }
