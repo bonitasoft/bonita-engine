@@ -16,14 +16,19 @@ package org.bonitasoft.engine.api.impl.transaction.platform;
 import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.EngineInitializer;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
 public class CheckPlatformVersion implements Callable<Boolean> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EngineInitializer.class);
 
     private final PlatformService platformService;
 
@@ -38,8 +43,10 @@ public class CheckPlatformVersion implements Callable<Boolean> {
         // the database  schema version
         String databaseSchemaVersion = platformService.getPlatform().getDbSchemaVersion();
         // the version in jars
-        String supportedDatabaseSchemaVersion = extractMinorVersion(
-                platformService.getSPlatformProperties().getPlatformVersion());
+        final String platformVersionFromBinaries = platformService.getSPlatformProperties().getPlatformVersion();
+        String supportedDatabaseSchemaVersion = extractMinorVersion(platformVersionFromBinaries);
+        LOGGER.info("Bonita platform version (binaries): {}", platformVersionFromBinaries);
+        LOGGER.info("Bonita database schema version: {}", databaseSchemaVersion);
 
         boolean isDatabaseSchemaSupported = databaseSchemaVersion.equals(supportedDatabaseSchemaVersion);
         if (!isDatabaseSchemaSupported) {

@@ -16,16 +16,22 @@ package org.bonitasoft.engine.api.impl.transaction.platform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class CheckPlatformVersionTest {
+
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Mock
     private PlatformService platformService;
@@ -101,6 +107,22 @@ public class CheckPlatformVersionTest {
         assertThat(sameVersion).isFalse();
         assertThat(checkPlatformVersion.getErrorMessage())
                 .contains("Supported database schema version is <6.10> and current database schema version is <6.1>");
+    }
+
+    @Test
+    public void check_should_log_bonita_and_database_versions() throws SBonitaException {
+        // given:
+        givenDatabaseSchemaVersion("7.12");
+        givenBinaryVersion("7.12.3");
+
+        systemOutRule.clearLog();
+
+        // when:
+        checkPlatformVersion.call();
+
+        // then:
+        assertThat(systemOutRule.getLog()).contains("Bonita platform version (binaries): 7.12.3",
+                "Bonita database schema version: 7.12");
     }
 
     private void givenBinaryVersion(String jarVersion) {
