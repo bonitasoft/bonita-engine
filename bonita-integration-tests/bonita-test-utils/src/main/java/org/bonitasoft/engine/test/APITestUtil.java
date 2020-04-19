@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -89,6 +90,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
+import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -113,6 +115,8 @@ import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.page.Page;
+import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -1332,6 +1336,22 @@ public class APITestUtil extends PlatformTestUtil {
                 getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
             }
         }
+    }
+
+    protected void cleanApplications() throws SearchException, DeletionException {
+        final SearchResult<Application> applications = getApplicationAPI()
+                .searchApplications(new SearchOptionsBuilder(0, 100).done());
+        for (Application application : applications.getResult()) {
+            getApplicationAPI().deleteApplication(application.getId());
+        }
+    }
+
+    protected void cleanPages() throws SearchException, DeletionException {
+        getPageAPI().deletePages(getPageAPI()
+                .searchPages(new SearchOptionsBuilder(0, 100)
+                        .filter(PageSearchDescriptor.PROVIDED, false).done())
+                .getResult()
+                .stream().map(Page::getId).collect(Collectors.toList()));
     }
 
     protected void cleanProcessInstances() throws DeletionException {
