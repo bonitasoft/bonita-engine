@@ -19,17 +19,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.filter.user.GroupUserFilter;
 import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
@@ -37,10 +33,6 @@ import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.page.Page;
-import org.bonitasoft.engine.page.PageSearchDescriptor;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.junit.Rule;
@@ -82,20 +74,6 @@ public abstract class CommonAPIIT extends APITestUtil {
         cleanRoles();
         cleanSupervisors();
         logoutOnTenant();
-    }
-
-    private void cleanApplications() throws SearchException, DeletionException {
-        final SearchResult<Application> applications = getApplicationAPI()
-                .searchApplications(new SearchOptionsBuilder(0, 100).done());
-        for (Application application : applications.getResult()) {
-            getApplicationAPI().deleteApplication(application.getId());
-        }
-    }
-
-    private void cleanPages() throws SearchException, DeletionException {
-        final SearchResult<Page> result = getPageAPI()
-                .searchPages(new SearchOptionsBuilder(0, 100).filter(PageSearchDescriptor.PROVIDED, false).done());
-        getPageAPI().deletePages(result.getResult().stream().map(Page::getId).collect(Collectors.toList()));
     }
 
     public BarResource getResource(final String path, final String name) throws IOException {
