@@ -21,8 +21,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -184,6 +186,10 @@ public class APITestUtil extends PlatformTestUtil {
     protected static final String COUNT_ADDRESS = "countAddress";
     private static final String PERSON_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Person";
     protected static final String FIND_EMPLOYEE_WITH_FIRSTNAMES = "findEmployeeWithFirstNames";
+
+    private static final List<String> DEFAULT_METHODS = Arrays.asList("wait", "equals", "toString", "hashCode",
+            "getClass",
+            "notify", "notifyAll");
 
     private final APIClient apiClient = new APIClient();
 
@@ -1793,4 +1799,37 @@ public class APITestUtil extends PlatformTestUtil {
         model.addBusinessObject(catalogBO);
         return model;
     }
+
+    protected void checkAllParametersAreSerializable(final Class<?> api) {
+        final Method[] methods = api.getMethods();
+        for (final Method method : methods) {
+            if (!isADefaultMethod(method)) {
+                final Class<?>[] parameterTypes = method.getParameterTypes();
+                for (final Class<?> parameterType : parameterTypes) {
+                    if (!parameterType.isPrimitive() && !Collection.class.isAssignableFrom(parameterType)
+                            && !Map.class.isAssignableFrom(parameterType)) {
+                        final boolean assignableFrom = Serializable.class.isAssignableFrom(parameterType);
+                        assertTrue(
+                                "Method: " + method.getName() + " of API: " + api.getName()
+                                        + " contains an unserializable parameter " + parameterType,
+                                assignableFrom);
+                    }
+                }
+                final Class<?> returnType = method.getReturnType();
+                if (!returnType.isPrimitive() && !Collection.class.isAssignableFrom(returnType)
+                        && !Map.class.isAssignableFrom(returnType)) {
+                    final boolean assignableFrom = Serializable.class.isAssignableFrom(returnType);
+                    assertTrue(
+                            "Method: " + method.getName() + " of API: " + api.getName()
+                                    + " contains an unserializable return type " + returnType,
+                            assignableFrom);
+                }
+            }
+        }
+    }
+
+    private boolean isADefaultMethod(final Method method) {
+        return DEFAULT_METHODS.contains(method.getName());
+    }
+
 }

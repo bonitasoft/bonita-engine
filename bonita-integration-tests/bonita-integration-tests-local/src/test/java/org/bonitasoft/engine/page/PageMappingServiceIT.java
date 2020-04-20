@@ -18,12 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.transaction.STransactionCommitException;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
-import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
@@ -38,32 +33,33 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
 
     private static final long PAGE_ID = 12345L;
     private static final long NEW_PAGE_ID = 88854L;
+
     private TransactionService transactionService;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     private PageMappingService pageMappingService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         transactionService = getTransactionService();
         pageMappingService = getTenantAccessor().getPageMappingService();
     }
 
     @After
-    public void tearDown() throws SBonitaReadException, SObjectModificationException, STransactionCreationException,
-            STransactionCommitException, STransactionRollbackException {
+    public void tearDown() {
     }
 
     @Test
     public void getByKey() throws Exception {
         transactionService.begin();
         final SPageMapping internal = pageMappingService.create("getByKey/process1/12.0", PAGE_ID,
-                Collections.<String> emptyList());
+                Collections.emptyList());
         final SPageMapping external = pageMappingService.create("getByKey/process2/12.0", "http://www.google.com", null,
-                Collections.<String> emptyList());
+                Collections.emptyList());
         final SPageMapping externalWithAdapter = pageMappingService.create("getByKey/process3/12.0",
                 "http://www.google.com", "theAdapter",
-                Collections.<String> emptyList());
+                Collections.emptyList());
 
         transactionService.complete();
 
@@ -88,7 +84,7 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
     public void delete() throws Exception {
         transactionService.begin();
         final SPageMapping internal = pageMappingService.create("delete/process1/12.0", PAGE_ID,
-                Collections.<String> emptyList());
+                Collections.emptyList());
         transactionService.complete();
 
         transactionService.begin();
@@ -109,7 +105,7 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
 
         final String key = "theKey/process1/12.0";
         transactionService.begin();
-        pageMappingService.create(key, PAGE_ID, Collections.<String> emptyList());
+        pageMappingService.create(key, PAGE_ID, Collections.emptyList());
         transactionService.complete();
 
         transactionService.begin();

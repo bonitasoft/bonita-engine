@@ -29,11 +29,11 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class CustomIsProcessInitiatorRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 
-    private ProcessInstanceService processInstanceService;
+    private final ProcessInstanceService processInstanceService;
 
-    private SessionService sessionService;
+    private final SessionService sessionService;
 
-    private SessionAccessor sessionAccessor;
+    private final SessionAccessor sessionAccessor;
 
     // autowired by spring
     public CustomIsProcessInitiatorRule(ProcessInstanceService processInstanceService, SessionService sessionService,

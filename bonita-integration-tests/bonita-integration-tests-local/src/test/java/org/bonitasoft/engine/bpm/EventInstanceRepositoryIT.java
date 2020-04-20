@@ -32,7 +32,7 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
 
     private EventInstanceRepository eventInstanceRepository;
     private TransactionService transactionService;
-    private long oneMinuteAgo = Instant.now().minusSeconds(60).toEpochMilli();
+    private final long oneMinuteAgo = Instant.now().minusSeconds(60).toEpochMilli();
 
     @Before
     public void before() throws Exception {

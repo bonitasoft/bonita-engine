@@ -1,5 +1,3 @@
-plugins { id 'bonita-docker-database' }
-
 dependencies {
     compile "junit:junit:${Deps.junit4Version}"
     compile "org.assertj:assertj-core:${Deps.assertjVersion}"
@@ -27,11 +25,3 @@ publishing {
         }
     }
 }
-
-tests {
-    testPattern = ""
-    integrationTestsSuite = "org/bonitasoft/engine/LocalIntegrationTests.class"
-    slowTestsSuite = "org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.class"
-}
-
-databaseIntegrationTest { include 'org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.class' }

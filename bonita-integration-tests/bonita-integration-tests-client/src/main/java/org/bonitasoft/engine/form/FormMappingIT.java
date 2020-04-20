@@ -47,7 +47,7 @@ import org.junit.rules.ExpectedException;
 public class FormMappingIT extends TestWithUser {
 
     private final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN,
-            (Serializable) true);
+            true);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -188,8 +188,7 @@ public class FormMappingIT extends TestWithUser {
 
         // try to resolve url:
         try {
-            getPageAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step",
-                    Collections.<String, Serializable> emptyMap(), true);
+            getPageAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.emptyMap(), true);
         } finally {
             deleteProcess(processDefinition);
         }

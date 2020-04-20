@@ -71,9 +71,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         userTransactionService = getTenantAccessor().getUserTransactionService();
         jobService = getTenantAccessor().getJobService();
         TestUtil.stopScheduler(schedulerService, getTransactionService());
-        if (!schedulerService.isStarted()) {
-            schedulerService.start();
-        }
+        TestUtil.startScheduler(schedulerService);
         getTenantAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
     }
 

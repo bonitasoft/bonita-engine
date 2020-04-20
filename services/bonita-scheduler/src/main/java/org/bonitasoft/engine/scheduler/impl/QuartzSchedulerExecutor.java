@@ -290,6 +290,10 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public void shutdown() throws SSchedulerException {
         try {
             if (scheduler != null && !scheduler.isShutdown()) {
+                //                System.err.println("/////////////////// shutting down scheduler ////////////////////");
+                //                for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+                //                    System.err.println(element);
+                //                }
                 scheduler.shutdown(true);
             }
         } catch (final SchedulerException e) {

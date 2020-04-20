@@ -13,39 +13,43 @@
  **/
 package org.bonitasoft.engine.data.instance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.data.instance.TransientDataService;
-import org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl;
+import org.bonitasoft.engine.data.ParentContainerResolverImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
+import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.After;
 import org.junit.Before;
@@ -59,44 +63,50 @@ import org.junit.Test;
  * @author Emmanuel Duchastenier
  */
 @SuppressWarnings("javadoc")
-public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
+public class DataInstanceServiceIT extends CommonBPMServicesTest {
 
     private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.emptyMap();
 
     protected ExpressionService expressionService;
-    protected CacheService cacheService;
 
-    protected TransientDataService dataInstanceService;
+    protected DataInstanceService dataInstanceService;
+
+    protected ParentContainerResolverImpl parentContainerResolver;
 
     @Before
-    public void setup() {
+    public void setupDataInstanceService() {
+        final Recorder recorder = getTenantAccessor().getRecorder();
+        final ReadPersistenceService persistenceService = getTenantAccessor().getReadPersistenceService();
+        final TechnicalLoggerService technicalLoggerService = getTenantAccessor().getTechnicalLoggerService();
+        final ArchiveService archiveService = getTenantAccessor().getArchiveService();
         expressionService = getTenantAccessor().getExpressionService();
-        cacheService = getTenantAccessor().getCacheService();
+        parentContainerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
+        dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService,
+                technicalLoggerService);
+        parentContainerResolver.setAllowUnknownContainer(true);
+        final CacheService cacheService = getTenantAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
                 cacheService.start();
-            } catch (SBonitaException e) {
+            } catch (final SBonitaException e) {
                 throw new RuntimeException(e);
             }
         }
-        dataInstanceService = new TransientDataServiceImpl(cacheService,
-                getTenantAccessor().getExpressionResolverService(),
-                getTenantAccessor().getActivityInstanceService(),
-                getTenantAccessor().getProcessDefinitionService(),
-                getTenantAccessor().getTechnicalLoggerService());
     }
 
     @After
-    public void after() {
+    public void tearDown() {
+        final CacheService cacheService = getTenantAccessor().getCacheService();
         try {
             cacheService.stop();
             cacheService.start();
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new RuntimeException(e);
         }
+        parentContainerResolver.setAllowUnknownContainer(false);
     }
 
-    private SDataInstance buildDataInstance(final String instanceName, final String className, final String description,
+    public SDataInstance buildDataInstance(final String instanceName, final String className, final String description,
             final String content,
             final long containerId, final String containerType, final boolean isTransient) throws SBonitaException {
         // create definition
@@ -105,7 +115,6 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         initializeBuilder(dataDefinitionBuilder, description, content, className, isTransient);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
 
-        // create data instance
         final SDataInstanceBuilder dataInstanceBuilder = SDataInstanceBuilder.createNewInstance(dataDefinition);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
@@ -130,7 +139,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final SExpression expression = dataDefinition.getDefaultValueExpression();
         if (expression != null) {
             dataInstanceBuilder.setValue((Serializable) expressionService.evaluate(expression,
-                    Collections.singletonMap("processDefinitionId", 546l), EMPTY_RESOLVED_EXPRESSIONS,
+                    Collections.singletonMap("processDefinitionId", 546L), EMPTY_RESOLVED_EXPRESSIONS,
                     ContainerState.ACTIVE));
         }
     }
@@ -151,6 +160,34 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.done();
     }
+
+    @Test
+    public void testCreateAndRetrieveDateDataInstance() throws Exception {
+        final long time = System.currentTimeMillis();
+        verifyCreateAndRetrieveDataInstance("createDate", Date.class.getName(), "creates new Date",
+                "new java.util.Date(" + time + ")", 9L, "process", false,
+                new Date(time));
+    }
+
+    @Test
+    public void createAndRetrieveNullDateDataInstanceShouldBeSupported() throws Exception {
+        verifyCreateAndRetrieveDataInstance("createNullDate", Date.class.getName(), "creates a null Date", "null", 9L,
+                "process", false, null);
+    }
+
+    //    private SDataInstance buildDateDataInstance(final String instanceName, final String description, final String content, final long containerId,
+    //            final String containerType, final Boolean isTransient) throws SBonitaException {
+    //        // create definition
+    //        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, Date.class.getName());
+    //
+    //        initializeBuilder(dataDefinitionBuilder, description, content, Date.class.getName(), isTransient);
+    //        final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
+    //        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition)
+    //                .setContainerId(containerId).setContainerType(containerType);
+    //        // create data instance
+    //        evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
+    //        return dataInstanceBuilder.done();
+    //    }
 
     private SDataInstance buildXMLDataInstance(final String instanceName, final String description,
             final String namespace, final String xmlElement,
@@ -261,32 +298,29 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
 
     private void insertDataInstance(final SDataInstance dataInstance) throws SBonitaException {
         getTransactionService().begin();
-        try {
-            // create data instance
-            dataInstanceService.createDataInstance(dataInstance);
-        } finally {
-            getTransactionService().complete();
-        }
+        // create data instance
+        dataInstanceService.createDataInstance(dataInstance);
+        getTransactionService().complete();
     }
 
     private SDataInstance getDataInstance(final long dataInstanceId) throws SBonitaException {
         getTransactionService().begin();
-        try {
-            return dataInstanceService.getDataInstance(dataInstanceId);
-        } finally {
-            getTransactionService().complete();
-        }
+
+        final SDataInstance dataInstanceRes = dataInstanceService.getDataInstance(dataInstanceId);
+        getTransactionService().complete();
+
+        return dataInstanceRes;
     }
 
     private SDataInstance getDataInstanceByNameAndContainer(final String dataName, final long containerId,
             final String containerType) throws SBonitaException {
         getTransactionService().begin();
-        try {
-            // get the data instance by several conditions
-            return dataInstanceService.getDataInstance(dataName, containerId, containerType);
-        } finally {
-            getTransactionService().complete();
-        }
+        // get the data instance by several conditions
+        final SDataInstance dataInstanceRes = dataInstanceService.getLocalDataInstance(dataName, containerId,
+                containerType);
+        getTransactionService().complete();
+
+        return dataInstanceRes;
     }
 
     private String getLongText() {
@@ -299,27 +333,21 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
 
     private void deleteDataInstance(final SDataInstance dataInstance) throws SBonitaException {
         getTransactionService().begin();
-        try {
-            dataInstanceService.deleteDataInstance(dataInstance);
-        } finally {
-            getTransactionService().complete();
-        }
+        dataInstanceService.deleteDataInstance(dataInstance);
+        getTransactionService().complete();
     }
 
     private void updateDataInstance(final String dataName, final Long containerId, final String containerType,
             final String newDescription,
             final Serializable value) throws SBonitaException {
         getTransactionService().begin();
-        try {
-            // retrieve the data instance
-            final SDataInstance dataInstanceRes = dataInstanceService.getDataInstance(dataName, containerId,
-                    containerType);
-            // update the data instance and this step must be with an activity data Instance in same transaction.
-            final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newDescription, value);
-            dataInstanceService.updateDataInstance(dataInstanceRes, updateDescriptor);
-        } finally {
-            getTransactionService().complete();
-        }
+        // retrieve the data instance
+        final SDataInstance dataInstanceRes = dataInstanceService.getLocalDataInstance(dataName, containerId,
+                containerType);
+        // update the data instance and this step must be with an activity data Instance in same transaction.
+        final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newDescription, value);
+        dataInstanceService.updateDataInstance(dataInstanceRes, updateDescriptor);
+        getTransactionService().complete();
     }
 
     private void verifyCreateAndRetrieveDataInstance(final String name, final String classType,
@@ -382,19 +410,28 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
                 "some transient data", null, containerId, containerType,
                 true);
         insertDataInstance(data2Instance);
+        getTransactionService().begin();
+        getTransactionService().complete();
 
         final List<String> dataNames = new ArrayList<>(2);
         dataNames.add(instance1Name);
         dataNames.add(instance2Name);
         getTransactionService().begin();
-        List<SDataInstance> dataInstances = null;
-        try {
-            dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType);
-        } finally {
-            getTransactionService().complete();
-        }
+        final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, containerId,
+                containerType, parentContainerResolver);
+        getTransactionService().complete();
         assertEquals(2, dataInstances.size());
         Assertions.assertThat(dataInstances).extracting("name").containsOnly(instance1Name, instance2Name);
+    }
+
+    @Test
+    public void getSADataInstancesWithEmptyList() throws Exception {
+        getTransactionService().begin();
+        final List<SADataInstance> dataInstances = dataInstanceService.getSADataInstances(13544L, "dummyContainerType",
+                parentContainerResolver,
+                Collections.emptyList(), 1111111L);
+        getTransactionService().complete();
+        assertEquals(0, dataInstances.size());
     }
 
     @Test
@@ -1052,23 +1089,17 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
     }
 
     private String buildSimpleXML1() {
-        final StringBuilder stb = new StringBuilder();
-        stb.append("<root>");
-        stb.append("<child>");
-        stb.append("value");
-        stb.append("</child>");
-        stb.append("</root>");
-        final String xmlContent = stb.toString();
-        return xmlContent;
+        return "<root>" +
+                "<child>" +
+                "value" +
+                "</child>" +
+                "</root>";
     }
 
     private String buildSimpleXML2() {
-        final StringBuilder stb = new StringBuilder();
-        stb.append("<root>");
-        stb.append("<child/>");
-        stb.append("</root>");
-        final String xmlContent = stb.toString();
-        return xmlContent;
+        return "<root>" +
+                "<child/>" +
+                "</root>";
     }
 
     @Test
@@ -1145,5 +1176,40 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
                 containerType, "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement");
 
         deleteDataInstance(dataInstanceRes);
+    }
+
+    @Test
+    public void testGetSADataInstance() throws Exception {
+        final String classType = Integer.class.getName();
+        final SDataInstance dataInstance = buildDataInstance("updateInteger", classType, "testUpdateDescription",
+                "new Integer(5)", 111L, "miniTask", false);
+        insertDataInstance(dataInstance);
+        Thread.sleep(10);
+
+        final long beforeUpdateDate = System.currentTimeMillis();
+        Thread.sleep(10);
+        updateDataInstance(dataInstance.getName(), dataInstance.getContainerId(), dataInstance.getContainerType(),
+                "testUpdateDescription2", 8);
+
+        final SDataInstance dataInstanceRes = getDataInstance(dataInstance.getId());
+        checkDataInstance(dataInstanceRes, "updateInteger", "testUpdateDescription2", false, classType, 8, 111L,
+                "miniTask");
+        deleteDataInstance(dataInstanceRes);
+        final long dataInstanceId = dataInstance.getId();
+
+        getTransactionService().begin();
+        try {
+            final SADataInstance beforeUpdate = dataInstanceService.getSADataInstance(dataInstanceId, beforeUpdateDate);
+            assertEquals(5, beforeUpdate.getValue());
+            assertTrue(beforeUpdate.getArchiveDate() <= beforeUpdateDate);
+
+            final SADataInstance afterUpdate = dataInstanceService.getSADataInstance(dataInstanceId,
+                    System.currentTimeMillis());
+            assertEquals(8, afterUpdate.getValue());
+            assertTrue(afterUpdate.getArchiveDate() <= System.currentTimeMillis()
+                    && afterUpdate.getArchiveDate() >= beforeUpdateDate);
+        } finally {
+            getTransactionService().complete();
+        }
     }
 }
