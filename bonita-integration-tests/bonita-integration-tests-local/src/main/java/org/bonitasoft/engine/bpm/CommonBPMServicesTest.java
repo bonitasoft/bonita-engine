@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
@@ -61,7 +62,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -153,7 +153,7 @@ public class CommonBPMServicesTest {
     }
 
     @Before
-    public void doNotOverrideBefore() throws Exception {
+    public void commonSetup() throws Exception {
         tenantServiceAccessors = new HashMap<>();
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         tenantId = apiSession.getTenantId();
@@ -272,8 +272,17 @@ public class CommonBPMServicesTest {
         final OrderByOption orderByOption = new OrderByOption(SProcessInstance.class, SProcessInstance.LAST_UPDATE_KEY,
                 OrderByType.DESC);
         final QueryOptions queryOptions = new QueryOptions(0, nb, Collections.singletonList(orderByOption),
-                Collections.<FilterOption> emptyList(), null);
+                Collections.emptyList(), null);
         return getTenantAccessor().getProcessInstanceService().searchProcessInstances(queryOptions);
+    }
+
+    public List<SAProcessInstance> getFirstArchivedProcessInstances(final int nb) throws SBonitaReadException {
+        // we are already in a transaction context here:
+        final OrderByOption orderByOption = new OrderByOption(SAProcessInstance.class, SProcessInstance.LAST_UPDATE_KEY,
+                OrderByType.DESC);
+        final QueryOptions queryOptions = new QueryOptions(0, nb, Collections.singletonList(orderByOption),
+                Collections.emptyList(), null);
+        return getTenantAccessor().getProcessInstanceService().searchArchivedProcessInstances(queryOptions);
     }
 
     protected SProcessInstance createSProcessInstance() throws SBonitaException {

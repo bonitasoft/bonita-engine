@@ -1,5 +1,6 @@
 plugins {
     id("bonita-http-test")
+    id("bonita-docker-database")
 }
 dependencies {
     compile project(':bonita-test-api')
@@ -45,7 +46,14 @@ publishing {
     }
 }
 
-
 httpTests {
     integrationTestsSuite = "org/bonitasoft/engine/BPMRemoteTestsForServers.class"
 }
+
+tests {
+    testPattern = ""
+    integrationTestsSuite = "org/bonitasoft/engine/LocalIntegrationTests.class"
+    slowTestsSuite = "org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.class"
+}
+
+databaseIntegrationTest { include "org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.class" }

@@ -33,7 +33,7 @@ public class JobThatMayThrowErrorOrJobException extends GroupJob {
     private boolean throwsError;
     private boolean failOnce;
     private boolean failOnceWithRetryable;
-    private VariableStorage variableStorage = VariableStorage.getInstance();
+    private final VariableStorage variableStorage = VariableStorage.getInstance();
 
     @Override
     public String getDescription() {
