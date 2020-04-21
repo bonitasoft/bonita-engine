@@ -35,17 +35,10 @@ public class TaskResult<T> {
         this.throwable = e;
     }
 
-    /**
-     * @param result
-     */
     public TaskResult(final T result) {
         this.result = result;
     }
 
-    /**
-     * @param timeout
-     * @param timeunit
-     */
     public TaskResult(final Long timeout, final TimeUnit timeunit) {
         this.timeout = timeout;
         this.timeunit = timeunit;
@@ -97,7 +90,7 @@ public class TaskResult<T> {
     }
 
     /**
-     * @return the timeunit
+     * @return the time unit
      */
     public TimeUnit getTimeunit() {
         return timeunit;

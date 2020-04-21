@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -46,19 +45,21 @@ public class PlatformManager {
     private final PlatformService platformService;
     private final List<PlatformLifecycleService> platformServices;
     private final PlatformStateProvider platformStateProvider;
+    private final PlatformVersionChecker platformVersionChecker;
 
     public PlatformManager(NodeConfiguration nodeConfiguration,
             UserTransactionService transactionService,
             PlatformService platformService,
             List<PlatformLifecycleService> platformServices,
             PlatformStateProvider platformStateProvider,
-            BonitaTaskExecutor bonitaTaskExecutor) {
+            BonitaTaskExecutor bonitaTaskExecutor, PlatformVersionChecker platformVersionChecker) {
         this.nodeConfiguration = nodeConfiguration;
         this.transactionService = transactionService;
         this.platformService = platformService;
         this.platformServices = platformServices;
         this.platformStateProvider = platformStateProvider;
         this.bonitaTaskExecutor = bonitaTaskExecutor;
+        this.platformVersionChecker = platformVersionChecker;
     }
 
     /**
@@ -132,9 +133,8 @@ public class PlatformManager {
     }
 
     private void checkPlatformVersion() throws Exception {
-        final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService);
-        if (!transactionService.executeInTransaction(checkPlatformVersion)) {
-            throw new StartNodeException(checkPlatformVersion.getErrorMessage());
+        if (!platformVersionChecker.verifyPlatformVersion()) {
+            throw new StartNodeException(platformVersionChecker.getErrorMessage());
         }
     }
 
