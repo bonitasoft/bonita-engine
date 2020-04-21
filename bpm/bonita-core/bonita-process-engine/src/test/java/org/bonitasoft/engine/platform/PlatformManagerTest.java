@@ -71,6 +71,8 @@ public class PlatformManagerTest {
     private PlatformStateProvider platformStateProvider;
     @Mock
     private BonitaTaskExecutor bonitaTaskExecutor;
+    @Mock
+    private PlatformVersionChecker platformVersionChecker;
 
     private PlatformManager platformManager;
     private STenant tenant1;
@@ -86,7 +88,7 @@ public class PlatformManagerTest {
                 .getPlatformRestartHandlers();
         platformManager = spy(new PlatformManager(nodeConfiguration, transactionService, platformService,
                 asList(platformLifecycleService1, platformLifecycleService2), platformStateProvider,
-                bonitaTaskExecutor));
+                bonitaTaskExecutor, platformVersionChecker));
         when(transactionService.executeInTransaction(any()))
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         when(bonitaTaskExecutor.execute(any(RunnableWithException.class)))
@@ -103,6 +105,7 @@ public class PlatformManagerTest {
         tenant2 = new STenant();
         tenant2.setId(TENANT_2);
         doReturn(asList(tenant1, tenant2)).when(platformService).getTenants(any());
+        doReturn(true).when(platformVersionChecker).verifyPlatformVersion();
     }
 
     @Test
