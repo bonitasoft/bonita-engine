@@ -983,6 +983,8 @@ public class MessageEventIT extends AbstractEventIT {
 
     @Test
     public void can_delete_message_by_creationDate() throws Exception {
+        //clean any existing messages
+        getProcessAPI().deleteMessageByCreationDate(System.currentTimeMillis(), null);
 
         final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression("p1");
         final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression("step1");

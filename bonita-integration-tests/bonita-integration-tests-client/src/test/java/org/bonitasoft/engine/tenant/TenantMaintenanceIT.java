@@ -22,7 +22,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.TenantStatusException;
+import org.bonitasoft.engine.platform.LoginException;
 import org.junit.Test;
 
 /**
@@ -58,9 +58,9 @@ public class TenantMaintenanceIT extends TestWithUser {
         try {
             loginOnDefaultTenantWith(USERNAME, PASSWORD);
             fail("Expected that user is not able to do login, but he is");
-        } catch (Exception e) {
-            assertThat(e.getCause()).isInstanceOf(TenantStatusException.class);
-            assertThat(e.getCause().getMessage()).contains("in pause");
+        } catch (LoginException e) {
+            assertThat(e.getMessage())
+                    .contains("is in pause, unable to login with other user than the technical user.");
         }
     }
 
