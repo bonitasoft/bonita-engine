@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
+import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
@@ -42,6 +43,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.Test;
 
 public class ProcessDataInstanceIT extends TestWithUser {
@@ -545,6 +547,11 @@ public class ProcessDataInstanceIT extends TestWithUser {
 
     @Test
     public void getCustomTypeDataInstance() throws Exception {
+        if (APITypeManager.getAPIType() != ApiAccessType.LOCAL) {
+            //FIXME this test does not work in remote engine (class does not exists in client)
+            // Migrate to Junit5 and add an annotation to disable this test
+            return;
+        }
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessWithPlopp", "1.0");

@@ -36,7 +36,7 @@ import org.junit.Before;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class ConnectorExecutionIT extends TestWithUser {
+public abstract class ConnectorExecutionIT extends TestWithUser {
 
     protected long userId;
 

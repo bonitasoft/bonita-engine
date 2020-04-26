@@ -13,11 +13,12 @@
  **/
 package org.bonitasoft.engine;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
+import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.Test;
 
 /**
@@ -32,23 +33,24 @@ public class RemoteEngineIT extends TestWithTechnicalUser {
      * client
      */
     @Test
-    public void check_remote_exception_is_given_to_client() {
+    public void check_remote_exception_is_given_to_client() throws Exception {
         try {
             getProcessAPI().getFlowNodeInstance(123456789L);
             fail("should fail");
         } catch (final FlowNodeInstanceNotFoundException e) {
-            e.printStackTrace();
-            assertTrue(containsStack(e.getStackTrace(), "SFlowNodeNotFoundException"));
-            assertNull(e.getCause());
-        }
-    }
-
-    private boolean containsStack(final StackTraceElement[] stackTrace, final String string) {
-        for (final StackTraceElement stackTraceElement : stackTrace) {
-            if (stackTraceElement.getClassName().contains(string)) {
-                return true;
+            //in local, check root cause is here
+            if (APITypeManager.getAPIType() == ApiAccessType.LOCAL) {
+                Throwable rootCause = e;
+                while (rootCause.getCause() != null) {
+                    rootCause = rootCause.getCause();
+                }
+                assertThat(rootCause.getClass().getSimpleName()).isEqualTo("SFlowNodeNotFoundException");
+            } else {
+                //in remote, check the stack trace is preserved
+                assertThat(e.getStackTrace()).anyMatch(s -> s.getClassName().contains("SFlowNodeNotFoundException"));
+                assertThat(e.getCause()).isNull();
             }
         }
-        return false;
+
     }
 }

@@ -21,7 +21,7 @@ dependencies {
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }
 
-integrationTest.doFirst {
+test.doFirst {
     def emptyFile = new File("$project.buildDir/bonita_home_client_HTTP/engine-client/conf/bonita-client-custom.properties")
     emptyFile.getParentFile().mkdirs()
     emptyFile.text = ""
@@ -47,13 +47,11 @@ publishing {
 }
 
 httpTests {
-    integrationTestsSuite = "org/bonitasoft/engine/BPMRemoteTestsForServers.class"
+    integrationTestsSuite = "**/*IT.class"
 }
 
 tests {
-    testPattern = ""
-    integrationTestsSuite = "org/bonitasoft/engine/LocalIntegrationTests.class"
-    slowTestsSuite = "org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.class"
+    slowTestsSuite = "**/*IT.class"
 }
 
-databaseIntegrationTest { include "org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.class" }
+databaseIntegrationTest { include "**/*IT.class" }

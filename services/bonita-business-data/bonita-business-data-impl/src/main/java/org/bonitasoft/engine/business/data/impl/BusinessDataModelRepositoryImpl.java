@@ -294,7 +294,13 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                         xsd);
                 final List<Exception> exceptions = schemaManager.drop(model.getBusinessObjectsClassNames());
                 if (!exceptions.isEmpty()) {
-                    throw new SBusinessDataRepositoryDeploymentException("Updating schema fails due to: " + exceptions);
+                    if (exceptions.size() == 1) {
+                        throw new SBusinessDataRepositoryDeploymentException("Drop of the schema failed.",
+                                exceptions.get(0));
+                    } else {
+                        throw new SBusinessDataRepositoryDeploymentException(
+                                "Drop of the schema failed due multiple exceptions: " + exceptions, exceptions.get(0));
+                    }
                 }
                 uninstall(tenantId);
             } catch (final IOException | JAXBException | SAXException ioe) {
