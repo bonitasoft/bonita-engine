@@ -90,6 +90,33 @@ public class BusinessObjectModelConverterTest {
     }
 
     @Test
+    public void should_unmarshall_bom_with_namespace() throws Exception {
+        final byte[] xml = org.apache.commons.io.IOUtils
+                .toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_7.11.0.xml"));
+        final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        final BusinessObjectModel bom = convertor.unmarshall(xml);
+        // expect no unmarshalling exception
+
+        assertThat(bom.getModelVersion()).isEqualTo("1.0");
+        assertThat(bom.getProductVersion()).isEqualTo("7.11.0");
+    }
+
+    @Test
+    public void should_add_namespace_when_missing() throws Exception {
+        byte[] xml = org.apache.commons.io.IOUtils
+                .toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_6.3.0.xml"));
+        String str = new String(xml);
+        assertThat(str).doesNotContain("xmlns=\"http://documentation.bonitasoft.com/bdm-xml-schema/1.0\"");
+
+        BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        BusinessObjectModel bom = convertor.unmarshall(xml);
+
+        xml = convertor.marshall(bom);
+        str = new String(xml);
+        assertThat(str).contains("xmlns=\"http://documentation.bonitasoft.com/bdm-xml-schema/1.0\"");
+    }
+
+    @Test
     public void should_be_backward_compatible_with_version() throws Exception {
         final byte[] xml = org.apache.commons.io.IOUtils
                 .toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_7.2.0.xml"));

@@ -32,6 +32,8 @@ public class BusinessObjectModelConverter {
 
     private static final String BOM_XML = "bom.xml";
 
+    private static final String BDM_NAMESPACE = "http://documentation.bonitasoft.com/bdm-xml-schema/1.0";
+
     private final URL xsdUrl;
 
     public BusinessObjectModelConverter() {
@@ -64,7 +66,16 @@ public class BusinessObjectModelConverter {
     }
 
     public BusinessObjectModel unmarshall(final byte[] bomXML) throws JAXBException, IOException, SAXException {
-        return IOUtils.unmarshallXMLtoObject(bomXML, BusinessObjectModel.class, xsdUrl);
+        return IOUtils.unmarshallXMLtoObject(addNamespace(bomXML), BusinessObjectModel.class, xsdUrl);
+    }
+
+    private byte[] addNamespace(byte[] content) {
+        String contentStr = new String(content);
+        if (!contentStr.contains(BDM_NAMESPACE)) {
+            String tagToFind = "<businessObjectModel";
+            contentStr = contentStr.replace(tagToFind, String.format("%s xmlns=\"%s\"", tagToFind, BDM_NAMESPACE));
+        }
+        return contentStr.getBytes();
     }
 
 }

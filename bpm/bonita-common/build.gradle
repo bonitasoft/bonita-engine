@@ -95,7 +95,7 @@ jaxb {
         }
         bom {
             javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/bdm/model/**/*.java')
-            namespaceconfigs = ['': 'bom.xsd']
+            namespaceconfigs = ['http://documentation.bonitasoft.com/bdm-xml-schema/1.0': 'bom.xsd']
             outputDir = project.file("build/generated/jaxb/schemas/bom")
         }
         profile {
