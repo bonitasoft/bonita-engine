@@ -29,12 +29,14 @@ import org.bonitasoft.engine.bdm.model.BusinessObject;
 @XmlType
 public class RelationField extends Field {
 
-    @XmlType
+    // required, package-info doesn't apply to inner class
+    @XmlType(namespace = "http://documentation.bonitasoft.com/bdm-xml-schema/1.0")
     public enum Type {
         AGGREGATION, COMPOSITION;
     }
 
-    @XmlType
+    // required, package-info doesn't apply to inner class
+    @XmlType(namespace = "http://documentation.bonitasoft.com/bdm-xml-schema/1.0")
     public enum FetchType {
         EAGER, LAZY
     }
