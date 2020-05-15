@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.connector.EngineExecutionContext;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
+import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
 import org.bonitasoft.engine.filter.AbstractUserFilter;
 import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.filter.UserFilterException;
@@ -57,8 +59,12 @@ public class SConnectorUserFilterAdapter implements SConnector {
     }
 
     @Override
-    public void validate() {
-
+    public void validate() throws SConnectorValidationException {
+        try {
+            filter.validateInputParameters();
+        } catch (ConnectorValidationException e) {
+            throw new SConnectorValidationException(e);
+        }
     }
 
     @Override

@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
@@ -160,32 +159,30 @@ public class UserFilterServiceImpl implements UserFilterService {
             ClassLoader classLoader, SExpressionContext expressionContext, String actorName,
             String implementationClassName,
             UserFilterImplementationDescriptor descriptor) {
-        final StringBuilder stb = new StringBuilder();
-        stb.append(" Flow node instance id: <");
-        stb.append(expressionContext.getContainerId());
-        stb.append(">");
-        stb.append("\n Current Thread ID : <");
-        stb.append(Thread.currentThread().getId());
-        stb.append(">, Current Thread State : <");
-        stb.append(Thread.currentThread().getState());
-        stb.append(">,\n ProcessDefinitionID : <");
-        stb.append(processDefinitionId);
-        stb.append(">, SUserFilterDefinition : <");
-        stb.append(sUserFilterDefinition);
-        stb.append(">, Inputs : <");
-        stb.append(inputs.toString());
-        stb.append(">, ClassLoader : <");
-        stb.append(classLoader.toString());
-        stb.append(">, ExpressionContext : <");
-        stb.append(expressionContext);
-        stb.append(">, ActorName : <");
-        stb.append(actorName);
-        stb.append(">, UserFilterImplementationDescriptor : <");
-        stb.append(descriptor);
-        stb.append(">, ImplementationClassName : <");
-        stb.append(implementationClassName);
-        stb.append(">");
-        return stb.toString();
+        return " Flow node instance id: <" +
+                expressionContext.getContainerId() +
+                ">" +
+                "\n Current Thread ID : <" +
+                Thread.currentThread().getId() +
+                ">, Current Thread State : <" +
+                Thread.currentThread().getState() +
+                ">,\n ProcessDefinitionID : <" +
+                processDefinitionId +
+                ">, SUserFilterDefinition : <" +
+                sUserFilterDefinition +
+                ">, Inputs : <" +
+                inputs.toString() +
+                ">, ClassLoader : <" +
+                classLoader.toString() +
+                ">, ExpressionContext : <" +
+                expressionContext +
+                ">, ActorName : <" +
+                actorName +
+                ">, UserFilterImplementationDescriptor : <" +
+                descriptor +
+                ">, ImplementationClassName : <" +
+                implementationClassName +
+                ">";
     }
 
     private UserFilterImplementationDescriptor getDescriptor(final long processDefinitionId,
@@ -198,7 +195,7 @@ public class UserFilterServiceImpl implements UserFilterService {
 
     private String getUserFilterImplementationIdInCache(final long processDefinitionId, final String userFilterId,
             final String version) {
-        return String.valueOf(processDefinitionId) + ":" + userFilterId + "-" + version;
+        return processDefinitionId + ":" + userFilterId + "-" + version;
     }
 
     protected FilterResult executeFilterInClassloader(final String implementationClassName,
@@ -208,17 +205,13 @@ public class UserFilterServiceImpl implements UserFilterService {
             IllegalAccessException, ClassNotFoundException, SUserFilterExecutionException,
             SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException, SConnectorException,
-            InterruptedException, ExecutionException, TimeoutException {
+            InterruptedException, ExecutionException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
             final UserFilter filter = (UserFilter) Class.forName(implementationClassName, true, classLoader)
                     .newInstance();
-            if (filter == null) {
-                throw new SUserFilterExecutionException(
-                        "Can not instantiate UserFilter " + implementationClassName + ". It is null.");
-            }
-            final SConnectorUserFilterAdapter sConnectorAdapter = new SConnectorUserFilterAdapter(filter, actorName);
+            final SConnectorUserFilterAdapter adapter = new SConnectorUserFilterAdapter(filter, actorName);
             final HashMap<String, Object> inputParameters = new HashMap<>(parameters.size());
             for (final Entry<String, SExpression> input : parameters.entrySet()) {
                 if (expressionContext != null) {
@@ -228,9 +221,9 @@ public class UserFilterServiceImpl implements UserFilterService {
                     inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
                 }
             }
-            connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader).get();
-            return new FilterResultImpl(sConnectorAdapter.getUserIds(),
-                    sConnectorAdapter.shouldAutoAssignTaskIfSingleResult());
+            connectorExecutor.execute(adapter, inputParameters, classLoader).get();
+            return new FilterResultImpl(adapter.getUserIds(),
+                    adapter.shouldAutoAssignTaskIfSingleResult());
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
@@ -252,8 +245,7 @@ public class UserFilterServiceImpl implements UserFilterService {
                 name = file.getName();
                 if (pattern.matcher(name).matches()) {
                     UserFilterImplementationDescriptor userFilterImplementationDescriptor;
-                    final Object objectFromXML = convert(file.getContent());
-                    userFilterImplementationDescriptor = (UserFilterImplementationDescriptor) objectFromXML;
+                    userFilterImplementationDescriptor = convert(file.getContent());
                     if (userFilterImplementationDescriptor == null) {
                         throw new SUserFilterLoadingException(
                                 "Can not parse ConnectorImplementation XML. The file name is " + name);
