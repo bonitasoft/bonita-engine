@@ -160,6 +160,7 @@ public class UserFilterServiceImplTest {
 
     }
 
+    @Test
     public void executeFilter_should_throw_a_SUserFilterExecutionException_when_receiving_SConnectorException_with_null_cause()
             throws Exception {
 
