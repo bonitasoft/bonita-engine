@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.*;
+import static org.bonitasoft.engine.tenant.TenantServicesManager.ServiceAction.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -21,7 +21,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -35,6 +34,7 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.tenant.TenantServicesManager.ServiceAction;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
