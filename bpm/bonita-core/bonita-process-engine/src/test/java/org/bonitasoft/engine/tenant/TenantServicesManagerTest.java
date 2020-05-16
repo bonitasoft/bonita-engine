@@ -20,6 +20,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
@@ -27,6 +28,7 @@ import java.util.concurrent.Callable;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -40,6 +42,7 @@ import org.mockito.junit.MockitoRule;
 
 public class TenantServicesManagerTest {
 
+    public static final long TENANT_ID = 12L;
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -68,8 +71,23 @@ public class TenantServicesManagerTest {
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         tenantServicesManager = new TenantServicesManager(sessionAccessor, sessionService, transactionService,
                 classLoaderService,
-                tenantConfiguration, 12L, tenantElementsRestarter);
+                tenantConfiguration, TENANT_ID, tenantElementsRestarter);
         doReturn(true).when(sessionAccessor).isTenantSession();
+    }
+
+    @Test
+    public void should_not_refresh_classloaders_on_start() throws Exception {
+        tenantServicesManager.start();
+
+        verify(classLoaderService).getLocalClassLoader(ScopeType.TENANT.name(), TENANT_ID);
+        verifyNoMoreInteractions(classLoaderService);
+    }
+
+    @Test
+    public void should_not_get_classloader_on_pause_and_stop() throws Exception {
+        tenantServicesManager.stop();
+
+        verifyNoMoreInteractions(classLoaderService);
     }
 
     @Test

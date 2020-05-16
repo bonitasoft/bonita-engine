@@ -23,19 +23,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.BroadcastService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TaskResult;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkException;
 import org.junit.Before;
@@ -57,17 +52,11 @@ public class TenantStateManagerTest {
     @Mock
     private UserTransactionService userTransactionService;
     @Mock
-    private TransactionService transactionService;
-    @Mock
     private SchedulerService schedulerService;
     @Mock
     private PlatformService platformService;
     @Mock
     private NodeConfiguration nodeConfiguration;
-    @Mock
-    private PlatformServiceAccessor platformServiceAccessor;
-    @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
     @Mock
     private SessionService sessionService;
     @Mock
@@ -80,14 +69,9 @@ public class TenantStateManagerTest {
     public void before() throws Exception {
         when(userTransactionService.executeInTransaction(any()))
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
-        tenantStateManager = spy(new TenantStateManager(userTransactionService,
+        tenantStateManager = new TenantStateManager(userTransactionService,
                 platformService, nodeConfiguration, sessionService,
-                TENANT_ID, schedulerService, broadcastService, tenantServicesManager));
-        doReturn(platformServiceAccessor).when(tenantStateManager).getPlatformAccessor();
-        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(TENANT_ID);
-        doReturn(nodeConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
-        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
-        doReturn(SSession.builder().id(123).build()).when(sessionService).createSession(anyLong(), any());
+                TENANT_ID, schedulerService, broadcastService, tenantServicesManager);
         tenant = new STenant();
         when(platformService.getTenant(TENANT_ID)).thenReturn(tenant);
     }
@@ -144,7 +128,7 @@ public class TenantStateManagerTest {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(5L, TimeUnit.HOURS);
         doReturn(singletonMap("workService", taskResult)).when(broadcastService)
-                .executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
+                .executeOnOthersAndWait(any(), eq(TENANT_ID));
 
         // When a tenant moved to available mode
         tenantStateManager.resume();
@@ -163,7 +147,7 @@ public class TenantStateManagerTest {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(new SWorkException("plop"));
         doReturn(singletonMap("workService", taskResult)).when(broadcastService)
-                .executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
+                .executeOnOthersAndWait(any(), eq(TENANT_ID));
 
         // When a tenant moved to available mode
         tenantStateManager.resume();
@@ -172,7 +156,7 @@ public class TenantStateManagerTest {
     @Test
     public void pause_should_update_tenant_in_pause() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(), eq(TENANT_ID));
 
         tenantStateManager.pause();
 
@@ -210,7 +194,7 @@ public class TenantStateManagerTest {
     @Test
     public void pause_should_delete_sessions() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(), eq(TENANT_ID));
 
         tenantStateManager.pause();
 
@@ -220,7 +204,7 @@ public class TenantStateManagerTest {
     @Test
     public void resume_should_delete_sessions() throws Exception {
         whenTenantIsInState(STenant.PAUSED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(), eq(TENANT_ID));
 
         tenantStateManager.resume();
 
