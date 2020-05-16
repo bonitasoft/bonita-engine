@@ -13,12 +13,15 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.*;
+import static org.bonitasoft.engine.tenant.TenantServicesManager.ServiceAction.*;
 
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
-import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.service.RunnableWithException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -37,20 +40,22 @@ public class TenantServicesManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TenantServicesManager.class);
 
+    public enum ServiceAction {
+        START, STOP, PAUSE, RESUME
+    }
+
     public enum TenantServiceState {
         STOPPED, STARTING, STARTED, STOPPING
     }
 
-    private SessionAccessor sessionAccessor;
+    private final SessionAccessor sessionAccessor;
+    private final SessionService sessionService;
+    private final TransactionService transactionService;
+    private final ClassLoaderService classLoaderService;
+    private final TenantConfiguration tenantConfiguration;
+    private final Long tenantId;
+    private final TenantElementsRestarter tenantElementsRestarter;
 
-    private SessionService sessionService;
-
-    private TransactionService transactionService;
-
-    private ClassLoaderService classLoaderService;
-    private TenantConfiguration tenantConfiguration;
-    private Long tenantId;
-    private TenantElementsRestarter tenantElementsRestarter;
     private TenantServiceState tenantServiceState = TenantServiceState.STOPPED;
 
     public TenantServicesManager(SessionAccessor sessionAccessor, SessionService sessionService,
@@ -87,7 +92,7 @@ public class TenantServicesManager {
         doStop(PAUSE);
     }
 
-    private void doStart(SetServiceState.ServiceAction serviceAction) throws Exception {
+    private void doStart(ServiceAction serviceAction) throws Exception {
         LOGGER.debug("Starting services of tenant {}", tenantId);
         if (tenantServiceState != TenantServiceState.STOPPED) {
             LOGGER.debug("Tenant services cannot be started, they are {}", tenantServiceState);
@@ -96,7 +101,7 @@ public class TenantServicesManager {
         tenantServiceState = TenantServiceState.STARTING;
         inTenantSession(() -> {
             tenantElementsRestarter.prepareRestartOfElements();
-            changeServiceState(serviceAction);
+            transactionService.executeInTransaction(() -> doChangeServiceState(serviceAction));
             tenantElementsRestarter.restartElements();
         });
         //FIXME handle state on exception
@@ -104,21 +109,58 @@ public class TenantServicesManager {
         LOGGER.debug("Services of tenant {} are started.", tenantId);
     }
 
-    private void doStop(SetServiceState.ServiceAction serviceAction) throws Exception {
+    private void doStop(ServiceAction serviceAction) throws Exception {
         LOGGER.debug("Stopping services of tenant {}", tenantId);
         if (tenantServiceState != TenantServiceState.STARTED) {
             LOGGER.debug("Tenant services cannot be stopped, they are {}", tenantServiceState);
             return;
         }
         tenantServiceState = TenantServiceState.STOPPING;
-        changeServiceState(serviceAction);
+        transactionService.executeInTransaction(() -> doChangeServiceState(serviceAction));
         tenantServiceState = TenantServiceState.STOPPED;
         LOGGER.debug("Services of tenant {} are stopped.", tenantId);
     }
 
-    private void changeServiceState(SetServiceState.ServiceAction serviceAction) throws Exception {
-        transactionService.executeInTransaction(() -> new SetServiceState(tenantId, serviceAction)
-                .changeServiceState(classLoaderService, tenantConfiguration));
+    private Void doChangeServiceState(ServiceAction action) throws SClassLoaderException, UpdateException {
+        final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+
+            // Set the right classloader only on start and resume because we destroy it on stop and pause anyway
+            if (action == START || action == RESUME) {
+                final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(),
+                        tenantId);
+                Thread.currentThread().setContextClassLoader(serverClassLoader);
+            }
+
+            for (final TenantLifecycleService tenantService : tenantConfiguration.getLifecycleServices()) {
+                LOGGER.info("{} tenant-level service {} on tenant with ID {}", action,
+                        tenantService.getClass().getName(), tenantId);
+
+                try {
+                    switch (action) {
+                        case START:
+                            tenantService.start();
+                            break;
+                        case STOP:
+                            tenantService.stop();
+                            break;
+                        case PAUSE:
+                            tenantService.pause();
+                            break;
+                        case RESUME:
+                            tenantService.resume();
+                            break;
+                    }
+                } catch (final SBonitaException sbe) {
+                    throw new UpdateException("Unable to " + action + " service: " + tenantService.getClass().getName(),
+                            sbe);
+                }
+            }
+            return null;
+        } finally {
+            // reset previous class loader:
+            Thread.currentThread().setContextClassLoader(baseClassLoader);
+        }
     }
 
     protected Long createSession(final long tenantId, final SessionService sessionService) throws SBonitaException {
