@@ -177,7 +177,7 @@ public class ServerProxyfierTest {
     }
 
     @Test
-    public void unProxy_should_remove_a_proxy_on_an_list_attribute_of_an_entity() {
+    public void unProxy_should_remove_a_proxy_on_a_list_attribute_of_an_entity() {
         final List<Address> addresses = new ArrayList<>();
         addresses.add(new Address());
         addresses.add(serverProxyfier.proxify(new Address()));
@@ -189,6 +189,47 @@ public class ServerProxyfierTest {
         for (final Address address : entity.getAddresses()) {
             assertThat(ServerProxyfier.isLazyMethodProxyfied(address)).isFalse();
         }
+    }
+
+    @Test
+    public void unproxify_should_not_fail_on_a_first_null_object_in_a_list_attribute_of_an_entity() {
+        final List<Address> addresses = new ArrayList<>();
+        addresses.add(null);
+        final Address address = new Address();
+        addresses.add(serverProxyfier.proxify(address));
+        final Employee employee = new Employee(11L, 42L, "Ol", "Delaf");
+        employee.setAddresses(addresses);
+
+        final Employee entity = (Employee) ServerProxyfier.unProxifyIfNeeded(employee);
+
+        assertThat(entity.getAddresses()).hasSize(2).containsExactly(null, address);
+    }
+
+    @Test
+    public void unproxify_should_not_fail_on_a_later_null_object_in_a_list_attribute_of_an_entity() {
+        final List<Address> addresses = new ArrayList<>();
+        final Address address = new Address();
+        addresses.add(serverProxyfier.proxify(address));
+        addresses.add(null);
+        final Employee employee = new Employee(11L, 42L, "Ol", "Delaf");
+        employee.setAddresses(addresses);
+
+        final Employee entity = (Employee) ServerProxyfier.unProxifyIfNeeded(employee);
+
+        assertThat(entity.getAddresses()).hasSize(2).containsExactly(address, null);
+    }
+
+    @Test
+    public void unproxify_should_not_fail_when_all_objects_in_a_list_attribute_of_an_entity_are_null() {
+        final List<Address> addresses = new ArrayList<>();
+        addresses.add(null);
+        addresses.add(null);
+        final Employee employee = new Employee(11L, 42L, "Ol", "Delaf");
+        employee.setAddresses(addresses);
+
+        final Employee entity = (Employee) ServerProxyfier.unProxifyIfNeeded(employee);
+
+        assertThat(entity.getAddresses()).hasSize(2).containsExactly(null, null);
     }
 
     @Test

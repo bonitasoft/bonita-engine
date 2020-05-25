@@ -175,7 +175,7 @@ public class ServerProxyfier {
         return unProxifyIfNeeded(entity, visitedEntities);
     }
 
-    private static Entity unProxifyIfNeeded(Entity entity, Set<Entity> alreadyUnproxyfied) {
+    private static Entity unProxifyIfNeeded(Entity entity, Set<Entity> alreadyUnproxyfiedEntities) {
         Entity detachedEntity = entity;
         if (entity != null && isLazyMethodProxyfied(entity)) {
             detachedEntity = ((LazyMethodHandler) ProxyFactory.getHandler((Proxy) entity)).getEntity();
@@ -183,7 +183,8 @@ public class ServerProxyfier {
         if (detachedEntity == null) {
             return null;
         }
-        boolean wasNotAlreadyUnproxified = alreadyUnproxyfied.add(detachedEntity);
+        boolean wasNotAlreadyUnproxified = alreadyUnproxyfiedEntities.add(detachedEntity);
+        // If we just unproxified this entity, we must also unproxify its related Entity fields:
         if (wasNotAlreadyUnproxified) {
             final Field[] declaredFields = detachedEntity.getClass().getDeclaredFields();
             for (final Field field : declaredFields) {
@@ -191,13 +192,13 @@ public class ServerProxyfier {
                     if (Entity.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
                         field.set(detachedEntity,
-                                unProxifyIfNeeded((Entity) field.get(detachedEntity), alreadyUnproxyfied));
+                                unProxifyIfNeeded((Entity) field.get(detachedEntity), alreadyUnproxyfiedEntities));
                     } else if (List.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
                         final List list = (List) field.get(detachedEntity);
-                        if (list != null && !list.isEmpty() && Entity.class.isAssignableFrom(list.get(0).getClass())) {
+                        if (list != null && !list.isEmpty() && isThereAnyNonNullEntityInTheList(list)) {
                             final List<Entity> realEntities = ((List<Entity>) list).stream()
-                                    .map(element -> unProxifyIfNeeded(element, alreadyUnproxyfied))
+                                    .map(element -> unProxifyIfNeeded(element, alreadyUnproxyfiedEntities))
                                     .collect(Collectors.toList());
                             list.clear();
                             list.addAll(realEntities);
@@ -210,5 +211,9 @@ public class ServerProxyfier {
             }
         }
         return detachedEntity;
+    }
+
+    private static boolean isThereAnyNonNullEntityInTheList(List<?> list) {
+        return list.stream().anyMatch(e -> e != null && Entity.class.isAssignableFrom(e.getClass()));
     }
 }
