@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
@@ -71,7 +70,7 @@ public class ServerProxyfier {
             classForProxy = classForProxy.getSuperclass();
         }
         factory.setSuperclass(classForProxy);
-        factory.setFilter(new AllMethodFilter());
+        factory.setFilter((Method m) -> true);
         try {
             return (Entity) factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(entity, lazyLoader));
         } catch (final Exception e) {
@@ -79,7 +78,8 @@ public class ServerProxyfier {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    // This methods seems unused but is called by reflection, I think:
+    @SuppressWarnings({ "unchecked", "unused" })
     public <T extends Entity> List<T> proxify(final List<T> entities) {
         if (entities == null) {
             return null;
@@ -154,18 +154,6 @@ public class ServerProxyfier {
 
         private boolean isGetter(final Method method) {
             return method.getName().startsWith("get");
-        }
-
-    }
-
-    /**
-     * Filter all methods
-     */
-    private class AllMethodFilter implements MethodFilter {
-
-        @Override
-        public boolean isHandled(final Method m) {
-            return true;
         }
 
     }
