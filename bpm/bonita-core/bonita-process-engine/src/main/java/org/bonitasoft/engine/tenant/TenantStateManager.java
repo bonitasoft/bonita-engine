@@ -146,7 +146,12 @@ public class TenantStateManager {
             throw new UpdateException("Can't resume a tenant in state " + tenant.getStatus());
         }
         activateTenantInTransaction();
-        tenantServicesManager.resume();
+        try {
+            tenantServicesManager.resume();
+        } catch (Exception e) {
+            pauseTenantInTransaction();
+            throw e;
+        }
         resumeServicesOnOtherNodes();
         schedulerService.resumeJobs(tenantId);
 
