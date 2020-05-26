@@ -62,7 +62,39 @@ public interface FlowNodeInstance extends DescriptionElement, BaseElement {
     long getParentProcessInstanceId();
 
     /**
-     * Returns a String representation of this FlowNodeInstance state.
+     * Returns the name of the state the flow node instance is in.
+     * <p>
+     * List of existing states:
+     * <p>
+     * States that are transitional:
+     * <ul>
+     * <li>initializing: preparing for execution</li>
+     * <li>executing: executing logic, e.g. operations</li>
+     * <li>completing: executing logic before completion, e.g. ON_FINISH connectors of call activity</li>
+     * <li>completing activity with boundary: completing related boundary events</li>
+     * <li>cancelling: waiting for related elements to be cancelled</li>
+     * <li>aborting: waiting for related elements to be aborted</li>
+     * <li>aborting activity with boundary: waiting for boundaries to be aborted</li>
+     * <li>aborting call activity: waiting for called element to be aborted</li>
+     * <li>canceling call activity: waiting for called element to be cancelled</li>
+     * <li>cancelling subtasks: waiting for cancellation of sub tasks</li>
+     * </ul>
+     * <p>
+     * States where flow node is waiting for something:
+     * <ul>
+     * <li>ready: human task is ready to be executed</li>
+     * <li>waiting: flow node is waiting for a non-human interaction, e.g. a BPMN message</li>
+     * <li>failed: when an error occurred, flow node can be skipped or replayed</li>
+     * </ul>
+     * <p>
+     * Final States:
+     * <ul>
+     * <li>completed: final state</li>
+     * <li>aborted: flow node was aborted by another flow of the process</li>
+     * <li>skipped: flow node was manually skipped</li>
+     * <li>interrupted: final state, interrupted</li>
+     * <li>cancelled: flow node was cancelled by a human</li>
+     * </ul>
      *
      * @return this FlowNodeInstance state
      */
