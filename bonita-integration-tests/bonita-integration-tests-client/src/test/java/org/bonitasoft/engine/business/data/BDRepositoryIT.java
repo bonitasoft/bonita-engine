@@ -33,10 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -66,6 +65,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
@@ -83,6 +83,7 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -104,7 +105,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.xml.sax.SAXException;
 
 public class BDRepositoryIT extends CommonAPIIT {
 
@@ -206,17 +206,32 @@ public class BDRepositoryIT extends CommonAPIIT {
         return processDefinition;
     }
 
-    private BusinessObjectModel buildSimpleBom(final String boQualifiedName)
-            throws IOException, JAXBException, SAXException {
+    private BusinessObjectModel buildSimpleBom(final String boQualifiedName) {
+        return businessObjectModel(bom -> {
+            bom.addBusinessObject(businessObject(boQualifiedName, (businessObject) -> {
+                businessObject.addField(stringField("aField"));
+            }));
+        });
+    }
+
+    private BusinessObjectModel businessObjectModel(Consumer<BusinessObjectModel> apply) {
+        BusinessObjectModel businessObjectModel = new BusinessObjectModel();
+        apply.accept(businessObjectModel);
+        return businessObjectModel;
+    }
+
+    private BusinessObject businessObject(String boQualifiedName, Consumer<BusinessObject> apply) {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
+        apply.accept(bo);
+        return bo;
+    }
+
+    private SimpleField stringField(String name) {
         final SimpleField field = new SimpleField();
-        field.setName("aField");
+        field.setName(name);
         field.setType(FieldType.STRING);
-        bo.addField(field);
-        final BusinessObjectModel model = new BusinessObjectModel();
-        model.addBusinessObject(bo);
-        return model;
+        return field;
     }
 
     @Test
@@ -2038,6 +2053,61 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(employee).isEqualTo(
                 "Employee [firstName=John, lastName=Smith, address=null, addresses.count=2, birthDate = 1984-10-24 ]");
         disableAndDeleteProcess(definition.getId());
+    }
+
+    @Test
+    public void should_be_able_to_redeploy_invalid_custom_query() throws Exception {
+        BusinessObjectModel businessObjectModel = businessObjectModel(
+                bom -> bom.addBusinessObject(businessObject("com.acme.Cat",
+                        bo -> {
+                            bo.addField(stringField("name"));
+                            bo.addField(stringField("color"));
+                            bo.addField(stringField("furType"));
+                            bo.addQuery("findCatByColor", "SELECT c from cat c WHERE c.color = :color",
+                                    "com.acme.Cat");// there is an error: it should be "from com.acme.Cat"
+                        })));
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        getTenantAdministrationAPI()
+                .installBusinessDataModel(new BusinessObjectModelConverter().zip(businessObjectModel));
+        try {
+            getTenantAdministrationAPI().resume();
+            fail("Resume of service with invalid bdm should fail because of invalid query");
+        } catch (UpdateException e) {
+            //TODO add a better message in the exception of the JTATransactionServiceImpl#start
+            assertThat(e).hasMessageContaining(
+                    "Error while executing the RESUME of the service org.bonitasoft.engine.transaction.JTATransactionServiceImpl")
+                    .hasMessageContaining("PersistenceUnit: BDR");
+            //                    .hasMessageContaining("Errors in named queries")
+            //                    .hasMessageContaining("cat is not mapped");
+        }
+        //uninstall bdm and restart services
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        getTenantAdministrationAPI().resume();
+
+        ProcessDefinition deploy = getProcessAPI()
+                .deploy(new ProcessDefinitionBuilder().createNewInstance("catClinicProcess", "1.0")
+                        .addBusinessData("catPatient", "com.acme.Cat", null).getProcess());
+        // this should have resolution problem: no BDM deployed
+        assertThat(getProcessAPI().getProcessResolutionProblems(deploy.getId())).hasSize(1).anySatisfy(p -> {
+            assertThat(p.getLevel()).isEqualTo(Problem.Level.ERROR);
+            assertThat(p.getResource()).isEqualTo("business data");
+            assertThat(p.getResourceId()).isEqualTo("catPatient");// the catPatient business data is not handled by the bdm (no bdm deployed)
+        });
+
+        //fix the BDM
+        installBusinessDataModel(businessObjectModel(
+                bom -> bom.addBusinessObject(businessObject("com.acme.Cat",
+                        bo -> {
+                            bo.addField(stringField("name"));
+                            bo.addField(stringField("color"));
+                            bo.addField(stringField("furType"));
+                            bo.addQuery("findCatByColor", "SELECT c from com.acme.Cat c WHERE c.color = :color",
+                                    "com.acme.Cat");
+                        }))));
+
+        // process should be ok
+        assertThat(getProcessAPI().getProcessResolutionProblems(deploy.getId())).isEmpty();
     }
 
     @Test
