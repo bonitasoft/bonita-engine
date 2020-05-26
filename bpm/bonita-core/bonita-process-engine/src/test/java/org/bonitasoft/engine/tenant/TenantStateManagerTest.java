@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.commons.exceptions.SLifecycleException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
@@ -182,6 +183,15 @@ public class TenantStateManagerTest {
         whenTenantIsInState(STenant.ACTIVATED);
 
         tenantStateManager.resume();
+    }
+
+    @Test
+    public void resume_should_keep_tenant_paused_on_error() throws Exception {
+        whenTenantIsInState(STenant.PAUSED);
+        doThrow(SLifecycleException.class).when(tenantServicesManager).resume();
+
+        assertThatThrownBy(() -> tenantStateManager.resume()).isInstanceOf(SLifecycleException.class);
+        verify(platformService).pauseTenant(TENANT_ID);
     }
 
     @Test(expected = UpdateException.class)
