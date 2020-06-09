@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.archive;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.bonitasoft.engine.SArchivingException;
@@ -198,11 +197,9 @@ public class ProcessArchiver {
             archiveService.recordInsert(archiveDate, insertRecord);
 
             if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.DEBUG)) {
-                final StringBuilder builder = new StringBuilder();
-                builder.append("Archiving " + processInstance.getClass().getSimpleName());
-                builder.append("with id = <" + processInstance.getId() + ">");
                 logger.log(ProcessArchiver.class, TechnicalLogSeverity.DEBUG,
-                        MessageFormat.format(" and state {2}", processInstance.getStateId()));
+                        "Archiving process instance with id = <" + processInstance.getId() + ">" +
+                                " and state " + processInstance.getStateId());
             }
             try {
                 processInstanceService.deleteProcessInstance(processInstance.getId());
