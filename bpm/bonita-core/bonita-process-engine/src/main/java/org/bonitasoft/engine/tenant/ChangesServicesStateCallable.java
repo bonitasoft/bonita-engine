@@ -16,7 +16,6 @@ package org.bonitasoft.engine.tenant;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 
 /**
@@ -24,10 +23,10 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
  */
 class ChangesServicesStateCallable implements Callable<Void>, Serializable {
 
-    private SetServiceState.ServiceAction action;
+    private TenantServicesManager.ServiceAction action;
     private Long tenantId;
 
-    public ChangesServicesStateCallable(SetServiceState.ServiceAction action, Long tenantId) {
+    public ChangesServicesStateCallable(TenantServicesManager.ServiceAction action, Long tenantId) {
         this.action = action;
         this.tenantId = tenantId;
     }

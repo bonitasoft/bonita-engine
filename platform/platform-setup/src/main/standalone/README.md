@@ -20,7 +20,6 @@ To run the tool:
 
 * extract the Zip file
 * configure access to the database in file `database.properties` at the root directory.
-* add you database drivers in /lib folder (for Oracle only, as open-source drivers are already included for other databases)
 * run `./setup.sh [init | push | pull | configure | help]`
 
 More details
