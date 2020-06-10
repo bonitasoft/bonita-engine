@@ -102,6 +102,8 @@ CREATE TABLE process_comment (
   content VARCHAR(512) NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx1_process_comment on process_comment (processInstanceId, tenantid);
+
 CREATE TABLE process_definition (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,

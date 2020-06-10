@@ -121,6 +121,8 @@ CREATE TABLE process_comment (
   PRIMARY KEY (tenantid, id)
 )
 GO
+CREATE INDEX idx1_process_comment on process_comment (processInstanceId, tenantid)
+GO
 CREATE TABLE process_definition (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,

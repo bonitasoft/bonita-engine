@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2018 Bonitasoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2020 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,14 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+package org.bonitasoft.engine.commons.exceptions;
 
-package org.bonitasoft.engine.gradle.docker
+/**
+ * Exception happening during a life cycle operation such as start/stop of tenant services
+ */
+public class SLifecycleException extends SBonitaException {
 
-class JdbcDriverDependencies {
-
-    final static String mysql = "mysql:mysql-connector-java:${Deps.mysqlVersion}"
-    final static String oracle = "com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}"
-    final static String postgres = "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    final static String sqlserver = "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
-
+    public SLifecycleException(String message, Exception cause) {
+        super(message, cause);
+    }
 }

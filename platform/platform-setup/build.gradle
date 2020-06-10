@@ -20,6 +20,14 @@ dependencies {
     compile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
     compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     compile "com.h2database:h2:${Deps.h2Version}"
+    compile("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
+        exclude(module: "ons")
+        exclude(module: "oraclepki")
+        exclude(module: "osdt_cert")
+        exclude(module: "osdt_core")
+        exclude(module: "ucp")
+        exclude(module: "simplefan")
+    }
     compile "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
     compile(project(":platform:platform-resources"))
     runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
