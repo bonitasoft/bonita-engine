@@ -68,7 +68,7 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
 
         assertEquals("stringFromPublicMethod", task.getDisplayName());
         assertThat(processDeployLog)
-                .containsOnlyOnce("Refreshing classloader with key: PROCESS:" + processDefinition.getId());
+                .containsOnlyOnce(" Refreshing class loader of type PROCESS with id " + processDefinition.getId());
     }
 
     @Test
