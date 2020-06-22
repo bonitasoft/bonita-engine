@@ -24,8 +24,6 @@ import static org.mockito.Mockito.*;
 import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -33,6 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -45,6 +44,9 @@ import org.mockito.junit.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ClassLoaderServiceImplTest {
+
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     private ParentClassLoaderResolver parentClassLoaderResolver = new ParentClassLoaderResolver() {
 
@@ -68,8 +70,6 @@ public class ClassLoaderServiceImplTest {
             }
         }
     };
-    @Mock
-    private TechnicalLoggerService logger;
     @Mock
     private EventService eventService;
     @Mock
@@ -100,7 +100,7 @@ public class ClassLoaderServiceImplTest {
 
     @Before
     public void before() throws Exception {
-        classLoaderService = new ClassLoaderServiceImpl(parentClassLoaderResolver, logger, eventService,
+        classLoaderService = new ClassLoaderServiceImpl(parentClassLoaderResolver, eventService,
                 platformDependencyService, sessionAccessor, userTransactionService, broadcastService,
                 classLoaderUpdater);
         //tenant in theses tests is 0L
@@ -235,7 +235,7 @@ public class ClassLoaderServiceImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void should_create_throw_an_exception_if_bad_resolver() {
         //given
-        classLoaderService = new ClassLoaderServiceImpl(badParentClassLoaderResolver, logger, eventService,
+        classLoaderService = new ClassLoaderServiceImpl(badParentClassLoaderResolver, eventService,
                 platformDependencyService, sessionAccessor, userTransactionService, broadcastService,
                 classLoaderUpdater);
         //when
@@ -324,10 +324,10 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_only_warn_when_refreshing_classloader_on_not_existing_tenant() throws Exception {
         doReturn(55L).when(sessionAccessor).getTenantId();
+        systemOutRule.clearLog();
 
         classLoaderService.refreshClassLoaderImmediately(TENANT, 55L);
-        verify(logger).log(any(), eq(TechnicalLogSeverity.WARNING), contains("No dependency service is initialized"),
-                eq(55L));
+        assertThat(systemOutRule.getLog()).contains("No dependency service is initialized");
     }
 
     @Test

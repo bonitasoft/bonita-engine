@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.classloader.listeners.ClassReflectorClearer;
 import org.bonitasoft.engine.classloader.listeners.JacksonCacheClearer;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
@@ -37,8 +38,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.home.BonitaResource;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -52,13 +51,12 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final Object synchroLock = new Object();
     private final ThreadLocal<RefreshClassloaderSynchronization> currentRefreshTask = new ThreadLocal<>();
     private final ParentClassLoaderResolver parentClassLoaderResolver;
-
-    private final TechnicalLoggerService logger;
 
     private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(ClassLoaderIdentifier.GLOBAL_TYPE,
             ClassLoaderIdentifier.GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
@@ -80,13 +78,11 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private ClassLoaderUpdater classLoaderUpdater;
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver,
-            final TechnicalLoggerService logger,
             final EventService eventService, PlatformDependencyService platformDependencyService,
             SessionAccessor sessionAccessor,
             UserTransactionService userTransactionService, BroadcastService broadcastService,
             ClassLoaderUpdater classLoaderUpdater) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
-        this.logger = logger;
         this.eventService = eventService;
         this.platformDependencyService = platformDependencyService;
         this.sessionAccessor = sessionAccessor;
@@ -130,9 +126,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void warnOnShuttingDown(final ClassLoaderIdentifier key) {
-        if (shuttingDown && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "Using local classloader on after ClassLoaderService shuttingdown: " + key);
+        if (shuttingDown) {
+            log.warn("Using local classloader on after ClassLoaderService shuttingdown: " + key);
         }
     }
 
@@ -170,9 +165,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void createClassLoader(ClassLoaderIdentifier identifier) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "creating classloader with key " + identifier);
-        }
+        log.debug("creating classloader with key {}", identifier);
         VirtualClassLoader parent = getParentClassLoader(identifier);
         final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(),
                 parent);
@@ -195,10 +188,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                    "Removing local classloader for type " + type + " of id " + id);
-        }
+        log.debug("Removing local classloader for type {} of id {}", type, id);
         NullCheckingUtil.checkArgsNotNull(id, type);
 
         // Remove the class loader
@@ -207,9 +197,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void destroyLocalClassLoader(final ClassLoaderIdentifier key) throws SClassLoaderException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying local classloader with key: " + key);
-        }
+        log.debug("Destroying local classloader with key: {}", key);
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
         if (localClassLoader != null) {
             if (localClassLoader.hasChildren()) {
@@ -219,13 +207,15 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             localClassLoader.destroy();
             localClassLoaders.remove(key);
             for (ClassLoaderListener globalListener : globalListeners) {
+                log.debug("Notify global classloader listener that classloader {} is destroyed: {}",
+                        localClassLoader.getIdentifier(), globalListener);
                 globalListener.onDestroy(localClassLoader);
             }
         }
     }
 
     private void refreshGlobalClassLoader(Stream<BonitaResource> resources) throws SClassLoaderException {
-        logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Refreshing global classloader");
+        log.info("Refreshing global classloader");
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
         try {
             refreshClassLoader(virtualClassloader, resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(),
@@ -239,7 +229,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private void refreshLocalClassLoader(String type, long id, Stream<BonitaResource> resources)
             throws SClassLoaderException {
         final ClassLoaderIdentifier key = getKey(type, id);
-        logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Refreshing classloader with key: " + key);
         final VirtualClassLoader virtualClassloader = getVirtualClassLoaderWithoutInitializingIt(
                 new ClassLoaderIdentifier(type, id));
         try {
@@ -260,37 +249,34 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private void refreshClassLoader(final VirtualClassLoader virtualClassloader, Stream<BonitaResource> resources,
             final String type, final long id,
             final URI temporaryFolder, final ClassLoader parent) {
+        log.info("Refreshing class loader of type {} with id {}", type, id);
+
         final BonitaClassLoader classLoader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
+        log.debug("Replacing {} with {}", virtualClassloader.getClassLoader(), classLoader);
         virtualClassloader.replaceClassLoader(classLoader);
         for (ClassLoaderListener globalListener : new HashSet<>(globalListeners)) {
+            log.debug("Notify global classloader listener that classloader {} is updated: {}",
+                    virtualClassloader.getIdentifier(), globalListener);
             globalListener.onUpdate(virtualClassloader);
         }
     }
 
     @Override
     public void start() {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                    "Starting classloader service, creating the platform classloader");
-        }
+        log.debug("Starting classloader service, creating the platform classloader");
         shuttingDown = false;
         //we do not create or destroy the global classloader because it does not point to a bonita classloader
     }
 
     @Override
-    public void stop() throws SClassLoaderException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                    "Stopping classloader service, destroying all classloaders");
-        }
+    public void stop() {
+        log.debug("Stopping classloader service, destroying all classloaders");
         shuttingDown = true;
         destroyAllLocalClassLoaders();
     }
 
-    private void destroyAllLocalClassLoaders() throws SClassLoaderException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying all classloaders");
-        }
+    private void destroyAllLocalClassLoaders() {
+        log.debug("Destroying all classloaders");
         //remove elements only that don't have children
         //there is no loop in this so the algorithm finishes
         final Set<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> entries = localClassLoaders.entrySet();
@@ -316,8 +302,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public boolean addListener(String type, long id, ClassLoaderListener classLoaderListener) {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                "Added listener " + classLoaderListener + " on " + type + " " + id);
+        log.debug("Added listener {} on {} {}", classLoaderListener, type, id);
         final VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(
                 new ClassLoaderIdentifier(type, id));
         return localClassLoader.addListener(classLoaderListener);
@@ -325,8 +310,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener) {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                "Removed listener " + classLoaderListener + " on " + type + " " + id);
+        log.debug("Removed listener {} on {} {}", classLoaderListener, type, id);
         VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(
                 new ClassLoaderIdentifier(type, id));
         return localClassLoader.removeListener(classLoaderListener);
@@ -334,13 +318,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public boolean addListener(ClassLoaderListener classLoaderListener) {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Added global listener " + classLoaderListener);
+        log.debug("Added global listener {}", classLoaderListener);
         return globalListeners.add(classLoaderListener);
     }
 
     @Override
     public boolean removeListener(ClassLoaderListener classLoaderListener) {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Removed  global listener " + classLoaderListener);
+        log.debug("Removed global listener {}", classLoaderListener);
         return globalListeners.remove(classLoaderListener);
     }
 
@@ -364,8 +348,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 long tenantId = sessionAccessor.getTenantId();
                 TenantDependencyService tenantDependencyService = dependencyServicesByTenant.get(tenantId);
                 if (tenantDependencyService == null) {
-                    logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                            "No dependency service is initialized on tenant {}. Initializing empty classloader",
+                    log.warn("No dependency service is initialized on tenant {}. Initializing empty classloader",
                             tenantId);
                     return Stream.empty();
                 }

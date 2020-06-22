@@ -16,6 +16,8 @@ dependencies {
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

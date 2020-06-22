@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 
 /**
@@ -30,6 +31,7 @@ import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class VirtualClassLoader extends ClassLoader {
 
     /**
@@ -77,6 +79,7 @@ public class VirtualClassLoader extends ClassLoader {
 
     private void notifyUpdate() {
         for (ClassLoaderListener listener : getListeners()) {
+            log.debug("Notify listener of virtual classloader {} of update: {}", identifier, listener);
             listener.onUpdate(this);
         }
         for (VirtualClassLoader child : children) {
@@ -139,6 +142,7 @@ public class VirtualClassLoader extends ClassLoader {
 
     private void notifyDestroy() {
         for (ClassLoaderListener listener : getListeners()) {
+            log.debug("Notify listener of virtual classloader {} of destroy: {}", identifier, listener);
             listener.onDestroy(this);
         }
         //do not notify children, it should not happen

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -38,6 +39,7 @@ import org.bonitasoft.engine.home.BonitaResource;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     private final String type;
@@ -70,6 +72,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         this.temporaryDirectory = createTemporaryDirectory(temporaryDirectoryUri);
         addResources(resources);
         addURLs(urls.toArray(new URL[urls.size()]));
+        log.debug("Created {}", this);
     }
 
     private File createTemporaryDirectory(URI temporaryDirectoryUri) {
@@ -183,6 +186,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         super.destroy();
         FileUtils.deleteQuietly(temporaryDirectory);
         isActive = false;
+        log.debug("Destroyed {}", this);
     }
 
     public long getId() {
@@ -199,7 +203,8 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     public String toString() {
-        return super.toString() + ", uuid=" + uuid + ", creationTime=" + creationTime + ", type=" + type + ", id=" + id
+        return "[" + this.getClass().getName() + ":" + " uuid=" + uuid + ", name=" + this.getName() + ", creationTime="
+                + creationTime + ", type=" + type + ", id=" + id
                 + ", isActive: " + isActive
                 + ", parent= " + getParent();
     }
