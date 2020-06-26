@@ -40,8 +40,6 @@ import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuil
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -247,7 +245,8 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     boolean containsToken(long processInstanceId, List<SFlowNodeDefinition> elements, Boolean shouldBeTerminal)
             throws SBonitaReadException {
         for (SFlowNodeDefinition element : elements) {
-            List<SFlowNodeInstance> sFlowNodeInstances = getFlowNodes(processInstanceId, element);
+            List<SFlowNodeInstance> sFlowNodeInstances = flowNodeInstanceService
+                    .getFlowNodeInstancesByNameAndParentContainerId(element.getName(), processInstanceId);
             for (SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
                 if (shouldBeTerminal == null || (shouldBeTerminal ^ !sFlowNodeInstance.isTerminal())) {
                     logger.log(TAG, TechnicalLogSeverity.DEBUG,
@@ -257,17 +256,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             }
         }
         return false;
-    }
-
-    private List<SFlowNodeInstance> getFlowNodes(long processInstanceId, SFlowNodeDefinition sourceElement)
-            throws SBonitaReadException {
-        List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(new FilterOption(SFlowNodeInstance.class, "name", sourceElement.getName()));
-        filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", processInstanceId));
-        QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption> emptyList(), filters, null);
-        return flowNodeInstanceService.searchFlowNodeInstances(
-                SFlowNodeInstance.class,
-                searchOptions);
     }
 
     void addBackwardReachableTransitions(SFlowElementContainerDefinition processContainer,

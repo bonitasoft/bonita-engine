@@ -77,6 +77,13 @@
 		ORDER BY id
 	</query>
 
+	<query name="getFlowNodeInstancesByNameAndParentContainerId">
+		SELECT f
+		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
+		WHERE f.name = :name
+		AND f.parentContainerId = :parentContainerId
+	</query>
+
 	<query name="getInclusiveGatewayInstanceOfProcessInstance">
 		SELECT g
 		FROM org.bonitasoft.engine.core.process.instance.model.SGatewayInstance AS g
@@ -1076,7 +1083,7 @@
                 		       WHERE u.managerUserId = :managerUserId)
                       		OR actormember.id IN (
                               	SELECT actormember.id
-                              	FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, 
+                              	FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
                               	     org.bonitasoft.engine.identity.model.SUserMembership as um
                               	WHERE um.userId IN (SELECT u.id 
                               	     				FROM org.bonitasoft.engine.identity.model.SUser AS u
@@ -1118,7 +1125,7 @@
                		       WHERE u.managerUserId = :managerUserId)
                      		OR actormember.id IN (
                              	SELECT actormember.id
-                             	FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, 
+                             	FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
                              	     org.bonitasoft.engine.identity.model.SUserMembership as um
                              	WHERE um.userId IN (SELECT u.id 
                              	     				FROM org.bonitasoft.engine.identity.model.SUser AS u
@@ -1163,7 +1170,7 @@
 					AND ( actormember.userId = :userId
  	  					OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, 
+							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
 							org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId 
 							AND (
