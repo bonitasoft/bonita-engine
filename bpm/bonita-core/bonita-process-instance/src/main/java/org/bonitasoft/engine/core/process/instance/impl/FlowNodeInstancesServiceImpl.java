@@ -517,4 +517,15 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         return getPersistenceService().selectOne(SelectDescriptorBuilder.getNumberOfFlowNode(parentProcessInstanceId))
                 .intValue();
     }
+
+    @Override
+    public List<SFlowNodeInstance> getFlowNodeInstancesByNameAndParentContainerId(String name, Long parentContainerId)
+            throws SBonitaReadException {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", name);
+        parameters.put("parentContainerId", parentContainerId);
+        return getPersistenceService().selectList(
+                new SelectListDescriptor<>("getFlowNodeInstancesByNameAndParentContainerId", parameters,
+                        SFlowNodeInstance.class, QueryOptions.ALL_RESULTS));
+    }
 }
