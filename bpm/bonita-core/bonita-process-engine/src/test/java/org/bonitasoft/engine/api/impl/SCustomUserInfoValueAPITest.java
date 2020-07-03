@@ -27,7 +27,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.impl.SCustomUserInfoValueUpdateBuilderImpl;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,7 +85,8 @@ public class SCustomUserInfoValueAPITest {
     @Test
     public void set_should_delete_CustomUserInfoValue_when_value_is_null() throws Exception {
         final SCustomUserInfoValue value = SCustomUserInfoValue.builder().id(254).build();
-        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
+        given(service.getCustomUserInfoValueOfUserAndDefinitions(2L, Collections.singletonList(1L)))
+                .willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, null);
 
@@ -96,7 +96,8 @@ public class SCustomUserInfoValueAPITest {
     @Test
     public void set_should_delete_SCustomUserInfoValue_when_value_is_empty() throws Exception {
         final SCustomUserInfoValue value = SCustomUserInfoValue.builder().id(254).build();
-        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
+        given(service.getCustomUserInfoValueOfUserAndDefinitions(2L, Collections.singletonList(1L)))
+                .willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, "");
 
@@ -115,7 +116,8 @@ public class SCustomUserInfoValueAPITest {
     @Test
     public void set_should_update_SCustomUserInfoValue_when_value_exist() throws Exception {
         final SCustomUserInfoValue value = SCustomUserInfoValue.builder().id(254).build();
-        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
+        given(service.getCustomUserInfoValueOfUserAndDefinitions(2L, Collections.singletonList(1L)))
+                .willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, "update");
 
@@ -124,8 +126,6 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void set_should_create_SCustomUserInfoValue_when_value_doesnt_exist() throws Exception {
-        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(
-                Collections.<SCustomUserInfoValue> emptyList());
 
         api.set(5L, 3L, "update");
 

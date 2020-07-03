@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 
@@ -80,7 +81,7 @@ public class CustomUserInfoAPIDelegateTest {
                 SCustomUserInfoValue.builder().definitionId(1).value("value 1").build(),
                 SCustomUserInfoValue.builder().definitionId(2).value("value 2").build());
         doReturn(list1).when(service).getCustomUserInfoDefinitions(0, 2);
-        doReturn(list2).when(service).searchCustomUserInfoValue(any());
+        doReturn(list2).when(service).getCustomUserInfoValueOfUserAndDefinitions(eq(1L), any());
 
         List<CustomUserInfo> result = api.list(1L, 0, 2);
 
@@ -92,8 +93,6 @@ public class CustomUserInfoAPIDelegateTest {
     public void list_should_return_a_null_value_for_a_not_found_definition_matching_value() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Collections.singletonList(
                 SCustomUserInfoDefinition.builder().id(1).name("definition").build()));
-        given(service.searchCustomUserInfoValue(any()))
-                .willReturn(Collections.emptyList());
 
         List<CustomUserInfo> result = api.list(2L, 0, 2);
 

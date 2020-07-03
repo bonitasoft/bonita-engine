@@ -370,21 +370,6 @@ public class QueryBuilderTest {
     }
 
     @Test
-    public void should_generate_query_with_in_filter() throws Exception {
-        //given
-        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
-        //when
-        FilterOption age = new FilterOption(TestObject.class, "age");
-        age.setIn(Arrays.asList(25, 26, 27));
-        age.setFilterOperationType(FilterOperationType.IN);
-        queryBuilder.appendFilters(Collections.singletonList(age), null,
-                false);
-        //then
-        assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age in (25,26,27))");
-    }
-
-    @Test
     public void should_generate_query_with_parenthesis_filter() throws Exception {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");

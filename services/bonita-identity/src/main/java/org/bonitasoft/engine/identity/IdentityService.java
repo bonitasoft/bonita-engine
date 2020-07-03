@@ -970,6 +970,12 @@ public interface IdentityService {
     List<SCustomUserInfoValue> searchCustomUserInfoValue(QueryOptions options) throws SBonitaReadException;
 
     /**
+     * Get SCustomUserInfoValues of definitions for a user
+     */
+    List<SCustomUserInfoValue> getCustomUserInfoValueOfUserAndDefinitions(long userId, List<Long> definitionsIds)
+            throws SBonitaReadException;
+
+    /**
      * Get {@link SUserMembership} for a specific interval for a given user
      *
      * @param userId

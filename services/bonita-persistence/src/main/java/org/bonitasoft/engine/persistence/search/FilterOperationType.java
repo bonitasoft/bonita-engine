@@ -18,15 +18,11 @@ package org.bonitasoft.engine.persistence.search;
  */
 public enum FilterOperationType {
 
-    IN, BETWEEN, EQUALS, LIKE, GREATER, LESS, GREATER_OR_EQUALS, LESS_OR_EQUALS, DIFFERENT, L_PARENTHESIS, R_PARENTHESIS, AND, OR;
+    BETWEEN, EQUALS, LIKE, GREATER, LESS, GREATER_OR_EQUALS, LESS_OR_EQUALS, DIFFERENT, L_PARENTHESIS, R_PARENTHESIS, AND, OR;
 
     public static boolean isNormalOperator(final FilterOperationType type) {
-        return type == IN || type == BETWEEN || type == EQUALS || type == LIKE || type == GREATER || type == LESS
+        return type == BETWEEN || type == EQUALS || type == LIKE || type == GREATER || type == LESS
                 || type == GREATER_OR_EQUALS
                 || type == LESS_OR_EQUALS || type == DIFFERENT;
-    }
-
-    public static boolean isLinkOperator(final FilterOperationType type) {
-        return type == L_PARENTHESIS || type == R_PARENTHESIS || type == AND || type == OR;
     }
 }

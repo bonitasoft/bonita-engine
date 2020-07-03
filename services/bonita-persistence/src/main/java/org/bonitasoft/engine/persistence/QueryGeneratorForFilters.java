@@ -54,21 +54,6 @@ class QueryGeneratorForFilters {
         return fieldValue;
     }
 
-    private String getInValues(final FilterOption filterOption) {
-        final StringBuilder stb = new StringBuilder();
-        for (final Object element : filterOption.getIn()) {
-            stb.append(element).append(",");
-        }
-        final String inValues = stb.toString();
-        return inValues.substring(0, inValues.length() - 1);
-    }
-
-    private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
-        return completeField + " in (" +
-                getInValues(filterOption) +
-                ")";
-    }
-
     private StringBuilder appendFilterClause(final StringBuilder clause, final FilterOption filterOption) {
         final FilterOperationType type = filterOption.getFilterOperationType();
         StringBuilder completeField = null;
@@ -101,9 +86,6 @@ class QueryGeneratorForFilters {
                 break;
             case DIFFERENT:
                 clause.append(completeField).append(" != ").append(fieldValue);
-                break;
-            case IN:
-                clause.append(getInClause(completeField, filterOption));
                 break;
             case BETWEEN:
                 // 1) escape ' character by adding another ' character
