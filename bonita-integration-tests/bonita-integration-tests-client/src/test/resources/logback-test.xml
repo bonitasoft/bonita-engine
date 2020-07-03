@@ -9,8 +9,9 @@
 
     <logger name="org.bonitasoft" level="INFO" />
     <logger name="org.hibernate.orm.cache" level="ERROR" />
+    <logger name="org.hibernate.SQL_SLOW" level="INFO"/>
 
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
     <!--   Show events of synchro repository -->

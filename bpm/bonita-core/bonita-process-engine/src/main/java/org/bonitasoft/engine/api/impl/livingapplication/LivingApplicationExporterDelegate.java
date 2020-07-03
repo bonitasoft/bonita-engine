@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.api.impl.livingapplication;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.exporter.ApplicationExporter;
-import org.bonitasoft.engine.business.application.filter.ApplicationsWithIdsFilterBuilder;
 import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -37,12 +37,13 @@ public class LivingApplicationExporterDelegate {
     }
 
     public byte[] exportApplications(long... applicationIds) throws ExportException {
-        ApplicationsWithIdsFilterBuilder filterBuilder = new ApplicationsWithIdsFilterBuilder(
-                ArrayUtils.toObject(applicationIds));
         try {
-            List<SApplication> applications = applicationService.searchApplications(filterBuilder.buildQueryOptions());
+            List<SApplication> applications = new ArrayList<>();
+            for (long applicationId : applicationIds) {
+                applications.add(applicationService.getApplication(applicationId));
+            }
             return exporter.export(applications);
-        } catch (SBonitaReadException e) {
+        } catch (SObjectNotFoundException | SBonitaReadException e) {
             throw new ExportException(e);
         }
     }

@@ -1222,6 +1222,7 @@
     <bean id="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
         <property name="map">
             <map>
+                <entry key="hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS" value="2" />
                 <entry key="hibernate.connection.datasource" value-ref="bonitaDataSource" />
                 <entry key="hibernate.current_session_context_class" value="jta" />
                 <entry key="hibernate.transaction.coordinator_class" value="jta" />

@@ -14,19 +14,14 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.exporter.ApplicationExporter;
-import org.bonitasoft.engine.business.application.filter.ApplicationsWithIdsFilterBuilder;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.exception.ExportException;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,10 +44,8 @@ public class LivingApplicationExporterDelegateTest {
     @Test
     public void exportApplications_should_return_result_of_ApplicationsExporter() throws Exception {
         //given
-        QueryOptions options = new ApplicationsWithIdsFilterBuilder(5L).buildQueryOptions();
-        List<SApplication> applications = Arrays.asList(mock(SApplication.class));
-        given(applicationService.searchApplications(options)).willReturn(applications);
-        given(exporter.export(applications)).willReturn("<applications/>".getBytes());
+        given(applicationService.getApplication(5L)).willReturn(mock(SApplication.class));
+        given(exporter.export(anyList())).willReturn("<applications/>".getBytes());
 
         //when
         byte[] exportApplications = delegate.exportApplications(5);
@@ -65,7 +58,7 @@ public class LivingApplicationExporterDelegateTest {
     public void exportApplications_should_throw_SBonitaExportException_when_applicationService_throwsSBonitaReadException()
             throws Exception {
         //given
-        given(applicationService.searchApplications(any(QueryOptions.class))).willThrow(new SBonitaReadException(""));
+        given(applicationService.getApplication(5L)).willThrow(new SBonitaReadException(""));
 
         //when
         delegate.exportApplications(5);

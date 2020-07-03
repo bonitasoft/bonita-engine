@@ -1642,6 +1642,19 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
+    public List<SCustomUserInfoValue> getCustomUserInfoValueOfUserAndDefinitions(long userId, List<Long> definitionsIds)
+            throws SBonitaReadException {
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("userId", userId);
+        parameters.put("definitionIds", definitionsIds);
+        return persistenceService.selectList(new SelectListDescriptor<>(
+                "getCustomUserInfoValueOfUserAndDefinitions",
+                parameters,
+                SCustomUserInfoValue.class,
+                QueryOptions.ALL_RESULTS));
+    }
+
+    @Override
     public SUser updateUser(long userId, EntityUpdateDescriptor userUpdateDescriptor,
             EntityUpdateDescriptor personalDataUpdateDescriptor,
             EntityUpdateDescriptor professionalDataUpdateDescriptor, EntityUpdateDescriptor iconUpdater)

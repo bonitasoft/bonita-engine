@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.persistence;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -40,8 +38,6 @@ public class FilterOption implements Serializable {
     private Object to;
 
     private Object from;
-
-    private Collection<?> in;
 
     private FilterOperationType operationType;
 
@@ -96,26 +92,8 @@ public class FilterOption implements Serializable {
         this.from = from;
     }
 
-    public Collection<?> getIn() {
-        return in;
-    }
-
-    public void setIn(final Collection<?> in) {
-        this.in = in;
-    }
-
-    public void setFilterOperationType(final FilterOperationType operatorType) {
-        operationType = operatorType;
-    }
-
     public Object getTo() {
         return to;
-    }
-
-    public FilterOption equalsTo(final Object value) {
-        this.value = value;
-        operationType = FilterOperationType.EQUALS;
-        return this;
     }
 
     public FilterOption like(final Object value) {
@@ -131,52 +109,8 @@ public class FilterOption implements Serializable {
         return this;
     }
 
-    public FilterOption greaterThan(final Object value) {
-        from = value;
-        operationType = FilterOperationType.GREATER;
-        return this;
-    }
-
-    public FilterOption lessThan(final Object value) {
-        to = value;
-        operationType = FilterOperationType.LESS;
-        return this;
-    }
-
-    public FilterOption greaterThanOrEquals(final Object value) {
-        from = value;
-        operationType = FilterOperationType.GREATER_OR_EQUALS;
-        return this;
-    }
-
-    public FilterOption lessThanOrEquals(final Object value) {
-        to = value;
-        operationType = FilterOperationType.LESS_OR_EQUALS;
-        return this;
-    }
-
-    public FilterOption in(final Collection<?> values) {
-        in = values;
-        operationType = FilterOperationType.IN;
-        return this;
-    }
-
-    public FilterOption in(final Object... value) {
-        in = Arrays.asList(value);
-        operationType = FilterOperationType.IN;
-        return this;
-    }
-
     public FilterOperationType getFilterOperationType() {
         return operationType;
-    }
-
-    public static FilterOption leftParenthesis() {
-        return new FilterOption(FilterOperationType.L_PARENTHESIS);
-    }
-
-    public static FilterOption rightParenthesis() {
-        return new FilterOption(FilterOperationType.R_PARENTHESIS);
     }
 
     public static FilterOption or() {
@@ -185,10 +119,6 @@ public class FilterOption implements Serializable {
 
     public static FilterOption and() {
         return new FilterOption(FilterOperationType.AND);
-    }
-
-    public Collection<?> getValues() {
-        return in;
     }
 
 }

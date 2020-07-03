@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -24,9 +23,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -96,14 +92,8 @@ public class SCustomUserInfoValueAPI {
     }
 
     private SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaReadException {
-        List<SCustomUserInfoValue> result = service.searchCustomUserInfoValue(new QueryOptions(
-                0,
-                1,
-                Collections.<OrderByOption> emptyList(),
-                Arrays.asList(
-                        new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.DEFINITION_ID, definitionId),
-                        new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID, userId)),
-                null));
+        List<SCustomUserInfoValue> result = service.getCustomUserInfoValueOfUserAndDefinitions(userId,
+                Arrays.asList(definitionId));
         if (result.size() == 0) {
             return null;
         }

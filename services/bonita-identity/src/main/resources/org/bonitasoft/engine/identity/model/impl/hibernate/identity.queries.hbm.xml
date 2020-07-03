@@ -389,6 +389,13 @@
 		FROM org.bonitasoft.engine.identity.model.SCustomUserInfoValue AS custom_usr_inf_val
 	</query>
 
+	<query name="getCustomUserInfoValueOfUserAndDefinitions">
+		SELECT custom_usr_inf_val
+		FROM org.bonitasoft.engine.identity.model.SCustomUserInfoValue AS custom_usr_inf_val
+		WHERE custom_usr_inf_val.userId = :userId
+		AND custom_usr_inf_val.definitionId IN (:definitionIds)
+	</query>
+
 	<query name="searchSRole">
 		SELECT role
   		FROM org.bonitasoft.engine.identity.model.SRole AS role

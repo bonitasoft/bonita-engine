@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,9 +25,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 
@@ -68,15 +64,7 @@ public class CustomUserInfoAPIDelegate {
     private List<SCustomUserInfoValue> searchCorrespondingValues(final long userId,
             final List<SCustomUserInfoDefinition> definitions)
             throws SBonitaReadException {
-        return service.searchCustomUserInfoValue(new QueryOptions(
-                0,
-                definitions.size(),
-                Collections.<OrderByOption> emptyList(),
-                Arrays.asList(
-                        new FilterOption(SCustomUserInfoValue.class, "userId", userId),
-                        new FilterOption(SCustomUserInfoValue.class, "definitionId")
-                                .in(getIds(definitions))),
-                null));
+        return service.getCustomUserInfoValueOfUserAndDefinitions(userId, getIds(definitions));
     }
 
     private List<Long> getIds(final List<SCustomUserInfoDefinition> definitions) {
