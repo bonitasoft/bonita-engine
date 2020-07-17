@@ -63,16 +63,19 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
 
     @Override
     public void afterCompletion(final TransactionState transactionStatus) {
-        if (TransactionState.COMMITTED == transactionStatus) {
-            for (WorkDescriptor work : works) {
-                work.setTenantId(tenantId);
-                workExecutorService.execute(work);
+        try {
+            if (TransactionState.COMMITTED == transactionStatus) {
+                for (WorkDescriptor work : works) {
+                    work.setTenantId(tenantId);
+                    workExecutorService.execute(work);
+                }
+            } else {
+                LOG.debug("Transaction completion with state {} != COMMITTED. Not triggering subsequent works: {}",
+                        transactionStatus, works);
             }
-        } else {
-            LOG.debug("Transaction completion with state {} != COMMITTED. Not triggering subsequent works: {}",
-                    transactionStatus, works);
+        } finally {
+            workService.removeSynchronization();
         }
-        workService.removeSynchronization();
     }
 
 }
