@@ -510,35 +510,51 @@
 		WHERE ap.id IN (:ids)
 	</query>
 
-  	<query name="getNumberOfSAProcessInstanceInvolvingUser">
-		SELECT COUNT(ap.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
-		WHERE (
-				ap.stateId IN (6,7,3,4) AND
-				(
-					 EXISTS (SELECT at.id
-						FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS at
-						WHERE (at.logicalGroup2 = ap.sourceObjectId AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
-					)
-					OR ap.startedBy = :userId
-				)
-			)
-  	</query>
+  	<sql-query name="getNumberOfSAProcessInstanceInvolvingUser">
+		<return-scalar column="count" type="long"/>
+		SELECT count(id) as count from (
+			SELECT ap.*
+				FROM arch_process_instance ap
+				JOIN (
+					select afi.logicalGroup2 from arch_flownode_instance afi
+						WHERE afi.tenantId = :tenantId
+						AND afi.kind in ('user', 'manual')
+						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
+						AND afi.stateId = 2
+				) humanTask ON (humanTask.logicalGroup2 = ap.sourceObjectId)
+			WHERE ap.tenantId = :tenantId
+				AND (ap.stateId in (6 , 7 , 3 , 4))
+			UNION
+			SELECT ap.*
+				FROM arch_process_instance ap
+				WHERE ap.tenantId = :tenantId
+					AND (ap.stateId in (6 , 7 , 3 , 4))
+					AND ap.startedBy = :userId
+		) ap
+	</sql-query>
 
-  	<query name="searchSAProcessInstanceInvolvingUser">
-		SELECT DISTINCT ap
-		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
-		WHERE (
-				ap.stateId IN (6,7,3,4) AND
-				(
-					 EXISTS (SELECT at.id
-						FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS at
-						WHERE (at.logicalGroup2 = ap.sourceObjectId AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
-					)
-					OR ap.startedBy = :userId
-				)
-			)
-  	</query>
+	<sql-query name="searchSAProcessInstanceInvolvingUser">
+		<return alias="ap" class="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" />
+		SELECT * from (
+			SELECT ap.*
+				FROM arch_process_instance ap
+				JOIN (
+					select afi.logicalGroup2 from arch_flownode_instance afi
+						WHERE afi.tenantId = :tenantId
+						AND afi.kind in ('user', 'manual')
+						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
+						AND afi.stateId = 2
+				) humanTask ON (humanTask.logicalGroup2 = ap.sourceObjectId)
+			WHERE ap.tenantId = :tenantId
+				AND (ap.stateId in (6 , 7 , 3 , 4))
+			UNION
+			SELECT ap.*
+				FROM arch_process_instance ap
+				WHERE ap.tenantId = :tenantId
+					AND (ap.stateId in (6 , 7 , 3 , 4))
+					AND ap.startedBy = :userId
+		) ap
+	</sql-query>
 
   	<query name="getNumberOfSAProcessInstanceSupervisedBy">
 		SELECT COUNT(DISTINCT ap)
