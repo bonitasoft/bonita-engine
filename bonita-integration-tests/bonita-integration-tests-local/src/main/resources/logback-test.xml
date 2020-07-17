@@ -34,6 +34,7 @@
     <logger name="org.bonitasoft.engine.tracking.TimeTracker" level="WARN" />
     <!--<logger name="org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl" level="ERROR" />-->
     <!--<logger name="org.hibernate.hql.internal.ast.QueryTranslatorImpl" level="DEBUG" />-->
+    <logger name="org.hibernate.SQL_SLOW" level="INFO" />
     <logger name="org.bonitasoft.engine.TestShades" level="INFO" />
 
 

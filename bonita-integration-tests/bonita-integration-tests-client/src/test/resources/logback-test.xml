@@ -9,6 +9,7 @@
 
     <logger name="org.bonitasoft" level="INFO" />
     <logger name="org.hibernate.cache.ehcache.AbstractEhcacheRegionFactory" level="ERROR" />
+    <logger name="org.hibernate.SQL_SLOW" level="INFO" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />
