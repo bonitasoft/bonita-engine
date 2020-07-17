@@ -10,6 +10,7 @@
     <logger name="org.bonitasoft" level="INFO" />
     <logger name="com.arjuna" level="INFO" />
     <logger name="org.hibernate.orm.cache" level="ERROR" />
+    <logger name="org.hibernate.SQL_SLOW" level="INFO" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

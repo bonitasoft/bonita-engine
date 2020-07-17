@@ -85,18 +85,12 @@ abstract class QueryBuilder<T> {
         }
     }
 
-    /**
-     * check if there is a `where` inside the root query
-     */
     static boolean hasWHEREInRootQuery(String query) {
         // We simply remove all blocks that are in parenthesis in order to remove all subqueries
         // Then we check if there is the `where` word here
         return removeAllParenthesisBlocks(query.toLowerCase()).contains("where");
     }
 
-    /**
-     * remove all blocks that are inside parenthesis
-     */
     private static String removeAllParenthesisBlocks(String q) {
         StringBuilder stringBuilder = new StringBuilder(q.length());
         int depthCounter = 0;
