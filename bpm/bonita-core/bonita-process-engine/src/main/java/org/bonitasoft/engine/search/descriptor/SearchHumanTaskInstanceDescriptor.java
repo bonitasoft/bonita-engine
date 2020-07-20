@@ -102,8 +102,17 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
 
     @Override
     protected Serializable convertFilterValue(final String filterField, final Serializable filterValue) {
-        if (filterValue instanceof TaskPriority) {
-            return STaskPriority.valueOf(((TaskPriority) filterValue).name());
+        if (HumanTaskInstanceSearchDescriptor.PRIORITY.equals(filterField)) {
+            if (filterValue instanceof Integer) {
+                return STaskPriority.fromOrdinal((Integer) filterValue);
+            } else if (filterValue instanceof String) {
+                return STaskPriority.valueOf((String) filterValue);
+            } else if (filterValue instanceof TaskPriority) {
+                return STaskPriority.valueOf(((TaskPriority) filterValue).name());
+            } else {
+                throw new IllegalArgumentException(
+                        "Invalid value '" + filterValue + "' for filter on filed 'priority'");
+            }
         }
         return filterValue;
     }

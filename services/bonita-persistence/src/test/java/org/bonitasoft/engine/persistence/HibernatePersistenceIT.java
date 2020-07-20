@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -51,6 +53,60 @@ public class HibernatePersistenceIT {
     }
 
     @Test
+    public void hibernate_should_escape_special_characters_in_parameters() throws Exception {
+
+        // Setup Hibernate and extract SessionFactory
+        final Configuration configuration = new Configuration().configure();
+        final ServiceRegistry serviceRegistry = new ServiceRegistryBuilder()
+                .applySettings(configuration.getProperties()).buildServiceRegistry();
+        SessionFactory sessionFactory;
+        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+
+        //
+        final List<Class<? extends PersistentObject>> classMapping = Arrays.asList(Book.class);
+        final Map<String, String> classAliasMappings = singletonMap(Book.class.getName(), "book");
+        final PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(
+                sessionFactory, classMapping,
+                classAliasMappings, true, Collections.<String> emptySet(), mock(TechnicalLoggerService.class));
+
+        Session session;
+        session = persistenceService.getSession(true);
+        session.beginTransaction();
+        try {
+            Book book;
+            book = new Book();
+            book.setId(1);
+            book.setTitle("lieues");
+            book.setAuthor("Vingt");
+            persistenceService.insert(book);
+
+            book = new Book();
+            book.setId(2);
+            book.setTitle("Vin%gt mille lieues");
+            book.setAuthor("Nicolas");
+            persistenceService.insert(book);
+
+        } finally {
+            session.getTransaction().commit();
+        }
+
+        QueryOptions queryOptions = new QueryOptions(0, 10, Collections.emptyList(),
+                singletonList(new FilterOption(Book.class, "id", "2")),
+                null);
+
+        session = persistenceService.getSession(true);
+        session.beginTransaction();
+        try {
+            List<Book> allBooks = persistenceService
+                    .selectList(new SelectListDescriptor<>("getAllBooks", null, Book.class, queryOptions));
+            assertThat(allBooks).hasSize(1);
+            assertThat(allBooks.get(0).getId()).isEqualTo(2);
+        } finally {
+            session.getTransaction().commit();
+        }
+    }
+
+    @Test
     public void should_return_single_result_when_wordsearch_not_enabled() throws Exception {
         final boolean enableWordSearch = false;
         final int expectedResults = 1;
@@ -79,7 +135,7 @@ public class HibernatePersistenceIT {
         //
         final List<Class<? extends PersistentObject>> classMapping = Arrays
                 .<Class<? extends PersistentObject>> asList(Book.class);
-        final Map<String, String> classAliasMappings = Collections.singletonMap(Book.class.getName(), "book");
+        final Map<String, String> classAliasMappings = singletonMap(Book.class.getName(), "book");
         final PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(
                 sessionFactory, classMapping,
                 classAliasMappings, enableWordSearch, Collections.<String> emptySet(),

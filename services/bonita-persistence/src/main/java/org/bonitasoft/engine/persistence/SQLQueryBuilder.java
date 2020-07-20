@@ -45,10 +45,14 @@ public class SQLQueryBuilder extends QueryBuilder {
         this.entityType = entityType;
     }
 
+    // FIXME: Manage IN clause if native query requires it
     Query buildQuery(Session session) {
         String builtQuery = stringQueryBuilder.toString();
         builtQuery = replaceHQLAliasesBySQLAliases(builtQuery);
         SQLQuery sqlQuery = session.createSQLQuery(builtQuery);
+        for (Map.Entry<String, Object> parameter : getQueryParameters().entrySet()) {
+            sqlQuery.setParameter(parameter.getKey(), parameter.getValue());
+        }
         addConstantsAsParameters(sqlQuery);
         setReturnType(builtQuery, sqlQuery);
         return sqlQuery;
@@ -92,17 +96,6 @@ public class SQLQueryBuilder extends QueryBuilder {
         if (query.getQueryString().contains(":tenantId")) {
             query.setParameter("tenantId", tenantId);
         }
-    }
-
-    @Override
-    protected Object processValue(Object fieldValue) {
-        Object value = super.processValue(fieldValue);
-        if (value instanceof Boolean) {
-            if (useIntegerForBoolean(vendor)) {
-                value = (Boolean) value ? 1 : 0;
-            }
-        }
-        return value;
     }
 
     private boolean useIntegerForBoolean(Vendor vendor) {
