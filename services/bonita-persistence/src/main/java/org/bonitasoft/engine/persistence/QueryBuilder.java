@@ -15,13 +15,13 @@ package org.bonitasoft.engine.persistence;
 
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.commons.EnumToObjectConvertible;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -36,6 +36,8 @@ abstract class QueryBuilder {
     Map<String, String> classAliasMappings;
     private String likeEscapeCharacter;
     private OrderByBuilder orderByBuilder;
+    Map<String, Object> parameters = new HashMap<>();
+    private int parameterCounter = 1;
 
     QueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings,
             char likeEscapeCharacter) {
@@ -117,45 +119,46 @@ abstract class QueryBuilder {
                             filterOption.getFieldName());
         }
         Object fieldValue = filterOption.getValue();
-        fieldValue = processValue(fieldValue);
         switch (type) {
             case EQUALS:
                 if (fieldValue == null) {
                     clause.append(completeField).append(" IS NULL");
                 } else {
-                    clause.append(completeField).append(" = ").append(fieldValue);
+                    clause.append(completeField).append(" = ").append(createParameter(fieldValue));
                 }
                 break;
             case GREATER:
-                clause.append(completeField).append(" > ").append(fieldValue);
+                clause.append(completeField).append(" > ").append(createParameter(fieldValue));
                 break;
             case GREATER_OR_EQUALS:
-                clause.append(completeField).append(" >= ").append(fieldValue);
+                clause.append(completeField).append(" >= ").append(createParameter(fieldValue));
                 break;
             case LESS:
-                clause.append(completeField).append(" < ").append(fieldValue);
+                clause.append(completeField).append(" < ").append(createParameter(fieldValue));
                 break;
             case LESS_OR_EQUALS:
-                clause.append(completeField).append(" <= ").append(fieldValue);
+                clause.append(completeField).append(" <= ").append(createParameter(fieldValue));
                 break;
             case DIFFERENT:
-                clause.append(completeField).append(" != ").append(fieldValue);
+                if (fieldValue == null) {
+                    clause.append(completeField).append(" IS NOT NULL");
+                } else {
+                    clause.append(completeField).append(" != ").append(createParameter(fieldValue));
+                }
                 break;
             case IN:
-                clause.append(getInClause(completeField, filterOption));
+                clause.append(completeField).append(" IN (").append(createParameter(filterOption.getIn())).append(")");
                 break;
             case BETWEEN:
-                final Object from = filterOption.getFrom() instanceof String
-                        ? "'" + escapeString((String) filterOption.getFrom()) + "'"
-                        : filterOption.getFrom();
-                final Object to = filterOption.getTo() instanceof String
-                        ? "'" + escapeString((String) filterOption.getTo()) + "'" : filterOption.getTo();
-                clause.append("(").append(from).append(" <= ").append(completeField);
-                clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
+                // eg. ('fromValue' <= p.myField AND p.myField <= 'toValue')
+                clause.append("(").append(createParameter(filterOption.getFrom())).append(" <= ").append(completeField);
+                clause.append(" AND ").append(completeField).append(" <= ")
+                        .append(createParameter(filterOption.getTo())).append(")");
                 break;
             case LIKE:
-                clause.append(completeField).append(" LIKE '%").append(escapeTerm((String) filterOption.getValue()))
-                        .append("%'");
+                clause.append(completeField).append(" LIKE ")
+                        .append(createParameter("%" + escapeTerm((String) filterOption.getValue()) + "%"))
+                        .append(" ESCAPE '").append(likeEscapeCharacter).append("'");
                 break;
             case L_PARENTHESIS:
                 clause.append(" (");
@@ -175,13 +178,10 @@ abstract class QueryBuilder {
         return completeField;
     }
 
-    protected Object processValue(Object fieldValue) {
-        if (fieldValue instanceof String) {
-            fieldValue = "'" + escapeString((String) fieldValue) + "'";
-        } else if (fieldValue instanceof EnumToObjectConvertible) {
-            fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
-        }
-        return fieldValue;
+    private String createParameter(Object fieldValue) {
+        final String parameterName = "p" + parameterCounter++;
+        getQueryParameters().put(parameterName, fieldValue);
+        return ":" + parameterName;
     }
 
     private void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter,
@@ -242,61 +242,35 @@ abstract class QueryBuilder {
             final String currentTerm,
             final boolean enableWordSearch) {
         // Search if a sentence starts with the term
-        queryBuilder.append(currentField).append(buildLikeEscapeClause(currentTerm, "", "%"));
+        queryBuilder.append(currentField).append(buildLikeEscapeClause(escapeTerm(currentTerm) + "%"));
 
         if (enableWordSearch) {
             // Search also if a word starts with the term
             // We do not want to search for %currentTerm% to ensure we can use Lucene-like library.
-            queryBuilder.append(" OR ").append(currentField).append(buildLikeEscapeClause(currentTerm, "% ", "%"));
+            queryBuilder.append(" OR ").append(currentField)
+                    .append(buildLikeEscapeClause("% " + escapeTerm(currentTerm) + "%"));
         }
     }
 
     /**
      * Get like clause for given term with escaped sql query wildcards and escape character
      */
-    private String buildLikeEscapeClause(final String term, final String prefixPattern, final String suffixPattern) {
-        return " LIKE '" + (prefixPattern != null ? prefixPattern : "") + escapeTerm(term)
-                + (suffixPattern != null ? suffixPattern : "") + "' ESCAPE '"
-                + likeEscapeCharacter + "'";
+    private String buildLikeEscapeClause(String term) {
+        return " LIKE " + createParameter(term)
+                + " ESCAPE '" + likeEscapeCharacter + "'";
     }
 
     /*
      * escape for like
      */
     private final String escapeTerm(final String term) {
-        // 1) escape ' character by adding another ' character
-        // 2) protect escape character if this character is used in data
-        // 3) escape % character (sql query wildcard) by adding escape character
-        // 4) escape _ character (sql query wildcard) by adding escape character
+        // 1) protect escape character if this character is used in data
+        // 2) escape % character (sql query wildcard) by adding escape character
+        // 3) escape _ character (sql query wildcard) by adding escape character
         return term
-                .replace("'", "''")
                 .replace(likeEscapeCharacter, likeEscapeCharacter + likeEscapeCharacter)
                 .replace("%", likeEscapeCharacter + "%")
                 .replace("_", likeEscapeCharacter + "_");
-    }
-
-    /*
-     * escape for other things than like
-     */
-    String escapeString(final String term) {
-        // 1) escape ' character by adding another ' character
-        return term
-                .replaceAll("'", "''");
-    }
-
-    private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
-        return completeField + " in (" +
-                getInValues(filterOption) +
-                ")";
-    }
-
-    private String getInValues(final FilterOption filterOption) {
-        final StringBuilder stb = new StringBuilder();
-        for (final Object element : filterOption.getIn()) {
-            stb.append(element).append(",");
-        }
-        final String inValues = stb.toString();
-        return inValues.substring(0, inValues.length() - 1);
     }
 
     void appendOrderByClause(List<OrderByOption> orderByOptions, Class<? extends PersistentObject> entityType)
@@ -351,4 +325,8 @@ abstract class QueryBuilder {
     abstract Query buildQuery(Session session);
 
     public abstract void setTenantId(Query query, long tenantId);
+
+    Map<String, Object> getQueryParameters() {
+        return parameters;
+    }
 }

@@ -159,16 +159,50 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
 
     @Test
     public void searchAssignedTasksSupervisedBy() throws Exception {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
         builder.filter("state", "ready");
         builder.filter("name", "step1");
-        builder.filter("priority", TaskPriority.NORMAL);
+        builder.filter("priority", TaskPriority.NORMAL); // Test with Enum value filter on Task Priority
 
-        final SearchResult<HumanTaskInstance> searchResult = getProcessAPI()
+        SearchResult<HumanTaskInstance> searchResult = getProcessAPI()
                 .searchAssignedTasksSupervisedBy(matti.getId(), builder.done());
         assertEquals(2, searchResult.getResult().size());
         UserTaskInstance taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
+        assertEquals("step1", taskInstance.getName());
+        assertEquals(john.getId(), taskInstance.getAssigneeId());
+
+        taskInstance = (UserTaskInstance) searchResult.getResult().get(1);
+        assertEquals("step1", taskInstance.getName());
+        assertEquals(john.getId(), taskInstance.getAssigneeId());
+
+        // Test the same thing with numeric filter on Task Priority:
+        builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
+        builder.filter("state", "ready");
+        builder.filter("name", "step1");
+        builder.filter("priority", TaskPriority.NORMAL.ordinal());
+
+        searchResult = getProcessAPI().searchAssignedTasksSupervisedBy(matti.getId(), builder.done());
+        assertEquals(2, searchResult.getResult().size());
+        taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
+        assertEquals("step1", taskInstance.getName());
+        assertEquals(john.getId(), taskInstance.getAssigneeId());
+
+        taskInstance = (UserTaskInstance) searchResult.getResult().get(1);
+        assertEquals("step1", taskInstance.getName());
+        assertEquals(john.getId(), taskInstance.getAssigneeId());
+
+        // Test the same thing with String filter on Task Priority:
+        builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
+        builder.filter("state", "ready");
+        builder.filter("name", "step1");
+        builder.filter("priority", TaskPriority.NORMAL.name());
+
+        searchResult = getProcessAPI().searchAssignedTasksSupervisedBy(matti.getId(), builder.done());
+        assertEquals(2, searchResult.getResult().size());
+        taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
         assertEquals("step1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
 

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.persistence;
 
 import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -105,7 +106,8 @@ public class SQLQueryBuilderTest {
                 false);
         queryBuilder.buildQuery(session);
         //then
-        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE (testObj.enabled = true)");
+        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE (testObj.enabled = :p1)");
+        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(true);
     }
 
     @Test
@@ -123,6 +125,7 @@ public class SQLQueryBuilderTest {
                 false);
         queryBuilder.buildQuery(session);
         //then
-        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE (testObj.enabled = 1)");
+        verify(session).createSQLQuery("SELECT testObj.* FROM test_object testObj WHERE (testObj.enabled = :p1)");
+        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(true);
     }
 }

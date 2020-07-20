@@ -19,10 +19,21 @@ import org.bonitasoft.engine.commons.EnumToObjectConvertible;
  * @author Emmanuel Duchastenier
  */
 public enum STaskPriority implements EnumToObjectConvertible {
+
     LOWEST, UNDER_NORMAL, NORMAL, ABOVE_NORMAL, HIGHEST;
 
     @Override
-    public Object fromEnum() {
+    public int fromEnum() {
         return ordinal();
     }
+
+    public static STaskPriority fromOrdinal(int n) {
+        for (STaskPriority enumValue : values()) {
+            if (enumValue.ordinal() == n) {
+                return enumValue;
+            }
+        }
+        throw new IllegalArgumentException("Invalid ordinal value for STaskPriority");
+    }
+
 }

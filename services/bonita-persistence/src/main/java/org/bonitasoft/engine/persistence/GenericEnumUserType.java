@@ -78,7 +78,7 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
     }
 
     @Override
-    public Class<?> returnedClass() {
+    public Class<? extends Enum> returnedClass() {
         return enumClass;
     }
 
@@ -114,7 +114,7 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
             }
         } catch (final Exception e) {
             final StringBuilder stb = new StringBuilder("Exception while invoking identifierMethod '");
-            stb.append(valueOfMethod.getName());
+            stb.append(identifierMethod.getName());
             stb.append("' of enumeration class '");
             stb.append(enumClass);
             stb.append('\'');
