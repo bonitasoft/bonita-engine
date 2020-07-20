@@ -13,8 +13,10 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -254,4 +256,7 @@ abstract class QueryBuilder<T> {
                 .replace("_", likeEscapeCharacter + "_");
     }
 
+    Map<String, Serializable> getQueryParameters(){
+        return emptyMap();
+    }
 }
