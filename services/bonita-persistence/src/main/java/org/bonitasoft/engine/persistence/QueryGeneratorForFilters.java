@@ -13,45 +13,31 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.commons.Pair.pair;
+import static org.bonitasoft.engine.persistence.QueryBuilder.escapeTerm;
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PARENTHESIS;
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.commons.EnumToObjectConvertible;
-import org.bonitasoft.engine.commons.Pair;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 
 class QueryGeneratorForFilters {
 
     private Map<String, String> classAliasMappings;
-    private boolean useIntegerForBoolean;
     private String likeEscapeCharacter;
+    private int parameterCounter = 1;
+    private Map<String, Object> parameters = new HashMap<>();
 
-    QueryGeneratorForFilters(Map<String, String> classAliasMappings, boolean useIntegerForBoolean,
-            char likeEscapeCharacter) {
+    QueryGeneratorForFilters(Map<String, String> classAliasMappings, char likeEscapeCharacter) {
         this.classAliasMappings = classAliasMappings;
-        this.useIntegerForBoolean = useIntegerForBoolean;
         this.likeEscapeCharacter = String.valueOf(likeEscapeCharacter);
-    }
-
-    private Object processValue(Object fieldValue) {
-        if (fieldValue instanceof String) {
-            // 1) escape ' character by adding another ' character
-            fieldValue = "'" + QueryBuilder.escapeString((String) fieldValue) + "'";
-        } else if (fieldValue instanceof EnumToObjectConvertible) {
-            fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
-        } else if (fieldValue instanceof Boolean) {
-            if (useIntegerForBoolean) {
-                fieldValue = (Boolean) fieldValue ? 1 : 0;
-            }
-        }
-        return fieldValue;
     }
 
     private StringBuilder appendFilterClause(final StringBuilder clause, final FilterOption filterOption) {
@@ -63,49 +49,44 @@ class QueryGeneratorForFilters {
                             filterOption.getFieldName());
         }
         Object fieldValue = filterOption.getValue();
-        fieldValue = processValue(fieldValue);
         switch (type) {
             case EQUALS:
                 if (fieldValue == null) {
                     clause.append(completeField).append(" IS NULL");
                 } else {
-                    clause.append(completeField).append(" = ").append(fieldValue);
+                    clause.append(completeField).append(" = ").append(createParameter(fieldValue));
                 }
                 break;
             case GREATER:
-                clause.append(completeField).append(" > ").append(fieldValue);
+                clause.append(completeField).append(" > ").append(createParameter(fieldValue));
                 break;
             case GREATER_OR_EQUALS:
-                clause.append(completeField).append(" >= ").append(fieldValue);
+                clause.append(completeField).append(" >= ").append(createParameter(fieldValue));
                 break;
             case LESS:
-                clause.append(completeField).append(" < ").append(fieldValue);
+                clause.append(completeField).append(" < ").append(createParameter(fieldValue));
                 break;
             case LESS_OR_EQUALS:
-                clause.append(completeField).append(" <= ").append(fieldValue);
+                clause.append(completeField).append(" <= ").append(createParameter(fieldValue));
                 break;
             case DIFFERENT:
-                clause.append(completeField).append(" != ").append(fieldValue);
+                if (fieldValue == null) {
+                    clause.append(completeField).append(" IS NOT NULL");
+                } else {
+                    clause.append(completeField).append(" != ").append(createParameter(fieldValue));
+                }
                 break;
             case BETWEEN:
-                // 1) escape ' character by adding another ' character
-                final Object from = filterOption.getFrom() instanceof String
-                        ? "'" + QueryBuilder.escapeString((String) filterOption.getFrom()) + "'"
-                        : filterOption.getFrom();
-                // 1) escape ' character by adding another ' character
-                final Object to = filterOption.getTo() instanceof String
-                        ? "'" + QueryBuilder.escapeString((String) filterOption.getTo()) + "'" : filterOption.getTo();
-                clause.append("(").append(from).append(" <= ").append(completeField);
-                clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
+                // eg. ('fromValue' <= p.myField AND p.myField <= 'toValue')
+                clause.append("(").append(createParameter(filterOption.getFrom())).append(" <= ").append(completeField);
+                clause.append(" AND ").append(completeField).append(" <= ")
+                        .append(createParameter(filterOption.getTo())).append(")");
                 break;
             case LIKE:
-                // 1) escape ' character by adding another ' character
-                // 2) protect escape character if this character is used in data
-                // 3) escape % character (sql query wildcard) by adding escape character
-                // 4) escape _ character (sql query wildcard) by adding escape character
-                clause.append(completeField).append(" LIKE '%")
-                        .append(QueryBuilder.escapeTerm((String) filterOption.getValue(), likeEscapeCharacter))
-                        .append("%'");
+                clause.append(completeField).append(" LIKE ")
+                        .append(createParameter(
+                                "%" + escapeTerm((String) filterOption.getValue(), likeEscapeCharacter) + "%"))
+                        .append(" ESCAPE '").append(likeEscapeCharacter).append("'");
                 break;
             case L_PARENTHESIS:
                 clause.append(" (");
@@ -125,12 +106,18 @@ class QueryGeneratorForFilters {
         return completeField;
     }
 
+    private String createParameter(Object fieldValue) {
+        final String parameterName = "f" + parameterCounter++;
+        parameters.put(parameterName, fieldValue);
+        return ":" + parameterName;
+    }
+
     /**
      * generate a HQL/SQL condition given the filters
      *
      * @return a tuple containing the genereted where clause and the fields it filters on
      */
-    public Pair<String, Set<String>> generate(List<FilterOption> filters) {
+    public QueryGeneratedFilters generate(List<FilterOption> filters) {
         Set<String> specificFilters = new HashSet<>();
         FilterOption previousFilter = null;
         StringBuilder filtersStringBuilder = new StringBuilder();
@@ -150,6 +137,15 @@ class QueryGeneratorForFilters {
             }
             previousFilter = filterOption;
         }
-        return pair(filtersStringBuilder.toString(), specificFilters);
+        return new QueryGeneratedFilters(filtersStringBuilder.toString(), specificFilters, parameters);
+    }
+
+    @Data
+    @AllArgsConstructor
+    static final class QueryGeneratedFilters {
+
+        private String filters;
+        private Set<String> specificFilters;
+        private Map<String, Object> parameters;
     }
 }

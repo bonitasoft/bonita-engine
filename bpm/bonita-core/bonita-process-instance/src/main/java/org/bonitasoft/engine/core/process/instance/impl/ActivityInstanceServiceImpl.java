@@ -181,7 +181,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public void deleteAllPendingMappings() throws SActivityModificationException {
         try {
             final FilterOption filterOption = new FilterOption(SPendingActivityMapping.class,
-                    SPendingActivityMapping.ACTOR_ID, -1);
+                    SPendingActivityMapping.ACTOR_ID, -1L);
             final DeleteAllRecord record = new DeleteAllRecord(SPendingActivityMapping.class,
                     Collections.singletonList(filterOption));
             getRecorder().recordDeleteAll(record);

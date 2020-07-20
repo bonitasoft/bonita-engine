@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -138,8 +137,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.theValue = :p1)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(12);
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.theValue = :f1)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(12);
     }
 
     @Test
@@ -154,9 +153,9 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
-                "SELECT testObj.* FROM test_object testObj WHERE (testObj.age = :p1 AND testObj.lastname = :p2)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(25);
-        assertThat(queryBuilder.getQueryParameters().get("p2")).isEqualTo("John");
+                "SELECT testObj.* FROM test_object testObj WHERE (testObj.age = :f1 AND testObj.lastname = :f2)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(25);
+        assertThat(queryBuilder.getQueryParameters().get("f2")).isEqualTo("John");
     }
 
     @Test
@@ -169,8 +168,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
-                "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true AND (testObj.theValue = :p1)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(12);
+                "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true AND (testObj.theValue = :f1)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(12);
     }
 
     @Test
@@ -186,8 +185,8 @@ public class QueryBuilderTest {
                 TestObject.class);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
-                "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true AND (testObj.theValue = :p1) ORDER BY testObj.theValue ASC,testObj.id ASC");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(12);
+                "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true AND (testObj.theValue = :f1) ORDER BY testObj.theValue ASC,testObj.id ASC");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(12);
     }
 
     @Test
@@ -202,9 +201,9 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery()).matches(
-                "SELECT testObj\\.\\* FROM test_object testObj WHERE \\(testObj.field1 LIKE :p1 ESCAPE '§' OR testObj.field2 LIKE :p2 ESCAPE '§'\\)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("p2")).isEqualTo("toto%");
+                "SELECT testObj\\.\\* FROM test_object testObj WHERE \\(testObj.field1 LIKE :s1 ESCAPE '§' OR testObj.field2 LIKE :s2 ESCAPE '§'\\)");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("toto%");
     }
 
     @Test
@@ -219,14 +218,14 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
-                "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE :p1 ESCAPE '§' " +
-                        "OR testObj.field1 LIKE :p2 ESCAPE '§' " +
-                        "OR testObj.field2 LIKE :p3 ESCAPE '§' " +
-                        "OR testObj.field2 LIKE :p4 ESCAPE '§')");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("p2")).isEqualTo("tata%");
-        assertThat(queryBuilder.getQueryParameters().get("p3")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("p4")).isEqualTo("tata%");
+                "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE :s1 ESCAPE '§' " +
+                        "OR testObj.field1 LIKE :s2 ESCAPE '§' " +
+                        "OR testObj.field2 LIKE :s3 ESCAPE '§' " +
+                        "OR testObj.field2 LIKE :s4 ESCAPE '§')");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("tata%");
+        assertThat(queryBuilder.getQueryParameters().get("s3")).isEqualTo("toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s4")).isEqualTo("tata%");
     }
 
     @Test
@@ -242,12 +241,12 @@ public class QueryBuilderTest {
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
                 "SELECT testObj.* FROM test_object testObj WHERE " +
-                        "(testObj.field1 LIKE :p1 ESCAPE '§' OR testObj.field1 LIKE :p2 ESCAPE '§' " +
-                        "OR testObj.field2 LIKE :p3 ESCAPE '§' OR testObj.field2 LIKE :p4 ESCAPE '§')");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("p2")).isEqualTo("% toto%");
-        assertThat(queryBuilder.getQueryParameters().get("p3")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("p4")).isEqualTo("% toto%");
+                        "(testObj.field1 LIKE :s1 ESCAPE '§' OR testObj.field1 LIKE :s2 ESCAPE '§' " +
+                        "OR testObj.field2 LIKE :s3 ESCAPE '§' OR testObj.field2 LIKE :s4 ESCAPE '§')");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("% toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s3")).isEqualTo("toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s4")).isEqualTo("% toto%");
     }
 
     private Set<String> aSet(String... fields) {
@@ -265,9 +264,9 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
-                "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 = :p1) AND (testObj.field2 LIKE :p2 ESCAPE '§')");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo("tata");
-        assertThat(queryBuilder.getQueryParameters().get("p2")).isEqualTo("toto%");
+                "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 = :f1) AND (testObj.field2 LIKE :s1 ESCAPE '§')");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo("tata");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("toto%");
     }
 
     @Test
@@ -282,8 +281,8 @@ public class QueryBuilderTest {
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo(
-                        "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE :p1 ESCAPE '§')");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo("the'value§%with§_special:§_§§§§%");
+                        "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE :s1 ESCAPE '§')");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("the'value§%with§_special:§_§§§§%");
     }
 
     @Test
@@ -298,8 +297,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age >= :p1)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(25);
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age >= :f1)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(25);
     }
 
     @Test
@@ -313,8 +312,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age > :p1)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(25);
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age > :f1)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(25);
     }
 
     @Test
@@ -328,8 +327,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age < :p1)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(25);
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age < :f1)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(25);
     }
 
     private QueryBuilder createBaseQueryBuilder() {
@@ -348,8 +347,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age <= :p1)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(25);
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age <= :f1)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(25);
     }
 
     @Test
@@ -363,8 +362,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age != :p1)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(25);
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age != :f1)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(25);
     }
 
     @Test
@@ -376,9 +375,9 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
-                "SELECT testObj.* FROM test_object testObj WHERE ((:p1 <= testObj.age AND testObj.age <= :p2))");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(25);
-        assertThat(queryBuilder.getQueryParameters().get("p2")).isEqualTo(27);
+                "SELECT testObj.* FROM test_object testObj WHERE ((:f1 <= testObj.age AND testObj.age <= :f2))");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(25);
+        assertThat(queryBuilder.getQueryParameters().get("f2")).isEqualTo(27);
     }
 
     @Test
@@ -397,10 +396,10 @@ public class QueryBuilderTest {
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo(
-                        "SELECT testObj.* FROM test_object testObj WHERE (testObj.age = :p1 AND  (testObj.lastname = :p2 OR testObj.lastname = :p3 ))");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(12);
-        assertThat(queryBuilder.getQueryParameters().get("p2")).isEqualTo("john");
-        assertThat(queryBuilder.getQueryParameters().get("p3")).isEqualTo("jack");
+                        "SELECT testObj.* FROM test_object testObj WHERE (testObj.age = :f1 AND  (testObj.lastname = :f2 OR testObj.lastname = :f3 ))");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(12);
+        assertThat(queryBuilder.getQueryParameters().get("f2")).isEqualTo("john");
+        assertThat(queryBuilder.getQueryParameters().get("f3")).isEqualTo("jack");
     }
 
     @Test
@@ -415,8 +414,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname LIKE :p1 ESCAPE '§')");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo("%jack%");
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname LIKE :f1 ESCAPE '§')");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo("%jack%");
     }
 
     @Test
@@ -446,8 +445,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname = :p1)");
-        assertThat(queryBuilder.getQueryParameters().get("p1")).isEqualTo(TEST_ENUM.TEST1);
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname = :f1)");
+        assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo(TEST_ENUM.TEST1);
     }
 
     @Test(expected = SBonitaReadException.class)
@@ -526,7 +525,7 @@ public class QueryBuilderTest {
 
     @Test
     public void should_escapeString_escape_quote() {
-        new QueryGeneratorForFilters(emptyMap(), false, '%');
+        new QueryGeneratorForFilters(emptyMap(), '%');
         // 1) escape ' character by adding another ' character
         final String s = QueryBuilder.escapeString("toto'toto");
 
@@ -535,7 +534,7 @@ public class QueryBuilderTest {
 
     @Test
     public void should_escapeString_do_not_escape_like_wildcard() {
-        new QueryGeneratorForFilters(emptyMap(), false, '%');
+        new QueryGeneratorForFilters(emptyMap(), '%');
         // 1) escape ' character by adding another ' character
         final String s = QueryBuilder.escapeString("%to'to%t_oto%");
 

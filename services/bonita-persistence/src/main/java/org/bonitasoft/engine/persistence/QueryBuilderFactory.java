@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.services.Vendor;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
@@ -29,7 +28,6 @@ import org.hibernate.query.Query;
 @Slf4j
 public class QueryBuilderFactory {
 
-    private Vendor vendor;
     private OrderByCheckingMode orderByCheckingMode;
     private OrderByBuilder orderByBuilder = new DefaultOrderByBuilder();
     private Map<String, String> classAliasMappings;
@@ -74,17 +72,13 @@ public class QueryBuilderFactory {
         Query query = session.getNamedQuery(selectDescriptor.getQueryName());
         boolean wordSearchEnabled = isWordSearchEnabled(selectDescriptor.getEntityType());
         if (query instanceof NativeQuery) {
-            return new SQLQueryBuilder<>(session, query, vendor, orderByBuilder, classAliasMappings,
+            return new SQLQueryBuilder<>(session, query, orderByBuilder, classAliasMappings,
                     likeEscapeCharacter,
                     wordSearchEnabled, orderByCheckingMode, selectDescriptor);
         } else {
             return new HQLQueryBuilder<>(session, query, orderByBuilder, classAliasMappings, likeEscapeCharacter,
                     wordSearchEnabled, orderByCheckingMode, selectDescriptor);
         }
-    }
-
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
     }
 
     public void setOrderByBuilder(OrderByBuilder orderByBuilder) {

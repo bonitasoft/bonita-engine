@@ -17,6 +17,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.stream.Stream;
 
@@ -28,28 +29,41 @@ public class QueryGeneratorForSearchTermTest {
     public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_enabled() {
         QueryGeneratorForSearchTerm generator = new QueryGeneratorForSearchTerm('$');
 
-        String query = generator.generate(Stream.of("field1").collect(toSet()), singletonList("termA"), true);
+        QueryGeneratorForSearchTerm.QueryGeneratedSearchTerms query = generator
+                .generate(Stream.of("field1").collect(toSet()), singletonList("termA"), true);
 
-        assertThat(query).isEqualTo("field1 LIKE 'termA%' ESCAPE '$' OR field1 LIKE '% termA%' ESCAPE '$'");
+        assertThat(query.getSearch()).isEqualTo("field1 LIKE :s1 ESCAPE '$' OR field1 LIKE :s2 ESCAPE '$'");
+        assertThat(query.getParameters()).containsOnly(
+                entry("s1", "termA%"),
+                entry("s2", "% termA%"));
     }
 
     @Test
     public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_not_enabled() {
         QueryGeneratorForSearchTerm generator = new QueryGeneratorForSearchTerm('%');
 
-        String query = generator.generate(Stream.of("field1", "field2").collect(toSet()), asList("termA", "termB"),
+        QueryGeneratorForSearchTerm.QueryGeneratedSearchTerms query = generator.generate(
+                Stream.of("field1", "field2").collect(toSet()), asList("termA", "termB"),
                 false);
 
-        assertThat(query).isEqualTo(
-                "field1 LIKE 'termA%' ESCAPE '%' OR field1 LIKE 'termB%' ESCAPE '%' OR field2 LIKE 'termA%' ESCAPE '%' OR field2 LIKE 'termB%' ESCAPE '%'");
+        assertThat(query.getSearch()).isEqualTo(
+                "field1 LIKE :s1 ESCAPE '%' OR field1 LIKE :s2 ESCAPE '%' OR field2 LIKE :s3 ESCAPE '%' OR field2 LIKE :s4 ESCAPE '%'");
+        assertThat(query.getParameters()).containsOnly(
+                entry("s1", "termA%"),
+                entry("s2", "termB%"),
+                entry("s3", "termA%"),
+                entry("s4", "termB%"));
     }
 
     @Test
     public void should_escape_special_chars() {
         QueryGeneratorForSearchTerm generator = new QueryGeneratorForSearchTerm('@');
 
-        String query = generator.generate(Stream.of("field1").collect(toSet()), singletonList("100%"), false);
+        QueryGeneratorForSearchTerm.QueryGeneratedSearchTerms query = generator
+                .generate(Stream.of("field1").collect(toSet()), singletonList("100%"), false);
 
-        assertThat(query).isEqualTo("field1 LIKE '100@%%' ESCAPE '@'");
+        assertThat(query.getSearch()).isEqualTo("field1 LIKE :s1 ESCAPE '@'");
+        assertThat(query.getParameters()).containsOnly(
+                entry("s1", "100@%%"));
     }
 }
