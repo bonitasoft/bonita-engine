@@ -1111,6 +1111,7 @@
                 <entry key="hibernate.validator.autoregister_listeners" value="${bonita.platform.persistence.validator.autoregister_listeners}" />
                 <entry key="hibernate.validator.apply_to_ddl" value="${bonita.platform.persistence.validator.apply_to_ddl}" />
                 <entry key="javax.persistence.validation.mode" value="${bonita.platform.persistence.javax.persistence.validation.mode}" />
+                <entry key="hibernate.query.plan_cache_max_size" value="${bonita.platform.persistence.query.cache.max_size}" />
             </map>
         </property>
     </bean>
