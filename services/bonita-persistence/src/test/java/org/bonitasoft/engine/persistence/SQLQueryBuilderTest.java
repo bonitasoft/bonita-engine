@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.services.Vendor;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.junit.Test;
@@ -40,9 +39,9 @@ public class SQLQueryBuilderTest {
     private static final char LIKE_ESCAPE_CHARACTER = '§';
     private Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
 
-    private SQLQueryBuilder createQueryBuilder(String baseQuery, Vendor vendor) {
+    private SQLQueryBuilder createQueryBuilder(String baseQuery) {
         doReturn(baseQuery).when(query).getQueryString();
-        return new SQLQueryBuilder(null, query, vendor, new DefaultOrderByBuilder(),
+        return new SQLQueryBuilder(null, query, new DefaultOrderByBuilder(),
                 classAliasMappings,
                 LIKE_ESCAPE_CHARACTER, false, OrderByCheckingMode.NONE, null);
     }
@@ -52,34 +51,10 @@ public class SQLQueryBuilderTest {
         //given
         String baseQuery = "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue";
         doReturn(baseQuery).when(mockedQuery).getQueryString();
-        SQLQueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.POSTGRES);
+        SQLQueryBuilder queryBuilder = createQueryBuilder(baseQuery);
         //when
         queryBuilder.addConstantsAsParameters(mockedQuery);
         //then
         verify(mockedQuery).setParameter("trueValue", true);
-    }
-
-    @Test
-    public void should_generate_query_with_boolean_parameter_replaced_by_int_on_oracle() throws Exception {
-        //given
-        String baseQuery = "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue";
-        doReturn(baseQuery).when(mockedQuery).getQueryString();
-        SQLQueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.ORACLE);
-        //when
-        queryBuilder.addConstantsAsParameters(mockedQuery);
-        //then
-        verify(mockedQuery).setParameter("trueValue", 1);
-    }
-
-    @Test
-    public void should_generate_query_with_boolean_parameter_replaced_by_int_on_sqlserver() throws Exception {
-        //given
-        String baseQuery = "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = :trueValue";
-        doReturn(baseQuery).when(mockedQuery).getQueryString();
-        SQLQueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.SQLSERVER);
-        //when
-        queryBuilder.addConstantsAsParameters(mockedQuery);
-        //then
-        verify(mockedQuery).setParameter("trueValue", 1);
     }
 }

@@ -140,8 +140,8 @@ public class ThemeServiceImpl implements ThemeService {
     public void restoreDefaultTheme(final SThemeType type) throws SRestoreThemeException {
         try {
             final FilterOption defaultFilter = new FilterOption(STheme.class, STheme.IS_DEFAULT, false);
-            final FilterOption typeFilter = new FilterOption(STheme.class, STheme.TYPE, type.name());
-            final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
+            final FilterOption typeFilter = new FilterOption(STheme.class, STheme.TYPE, type);
+            final List<FilterOption> filterOptions = new ArrayList<>();
             filterOptions.add(defaultFilter);
             filterOptions.add(typeFilter);
             final DeleteAllRecord record = new DeleteAllRecord(STheme.class, filterOptions);

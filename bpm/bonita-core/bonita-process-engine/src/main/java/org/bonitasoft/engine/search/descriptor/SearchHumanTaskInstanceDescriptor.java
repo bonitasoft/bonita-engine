@@ -102,6 +102,7 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
 
     @Override
     protected Serializable convertFilterValue(final String filterField, final Serializable filterValue) {
+        // Convert value of the filter "priority" to the server STaskPriority, hiberate will handle that as a normal enum
         if (HumanTaskInstanceSearchDescriptor.PRIORITY.equals(filterField)) {
             if (filterValue instanceof Integer) {
                 return STaskPriority.fromOrdinal((Integer) filterValue);
@@ -111,7 +112,7 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
                 return STaskPriority.valueOf(((TaskPriority) filterValue).name());
             } else {
                 throw new IllegalArgumentException(
-                        "Invalid value '" + filterValue + "' for filter on filed 'priority'");
+                        "Invalid value '" + filterValue + "' for filter on field 'priority'");
             }
         }
         return filterValue;
