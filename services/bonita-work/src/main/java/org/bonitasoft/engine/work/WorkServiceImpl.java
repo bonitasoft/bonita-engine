@@ -29,11 +29,7 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  */
 public class WorkServiceImpl implements WorkService {
 
-    private final Object getSynchroLock = new Object();
-
     private final UserTransactionService transactionService;
-
-    private final ThreadLocal<WorkSynchronization> synchronizations = new ThreadLocal<>();
 
     private final TechnicalLogger log;
 
@@ -61,24 +57,19 @@ public class WorkServiceImpl implements WorkService {
         }
         workDescriptor.setRegistrationDate(engineClock.now());
         log.debug("Registering work {}", workDescriptor);
-        getContinuationSynchronization().addWork(workDescriptor);
+        createAndRegisterNewSynchronization(workDescriptor);
         log.debug("Work registered");
     }
 
-    private WorkSynchronization getContinuationSynchronization() throws SWorkRegisterException {
-        synchronized (getSynchroLock) {
-            WorkSynchronization synchro = synchronizations.get();
-            if (synchro == null) {
-                synchro = new WorkSynchronization(workExecutorService, sessionAccessor, this);
-                try {
-                    transactionService.registerBonitaSynchronization(synchro);
-                } catch (final STransactionNotFoundException e) {
-                    throw new SWorkRegisterException(e.getMessage(), e);
-                }
-                synchronizations.set(synchro);
-            }
-            return synchro;
+    private WorkSynchronization createAndRegisterNewSynchronization(WorkDescriptor workDescriptor)
+            throws SWorkRegisterException {
+        WorkSynchronization synchro = new WorkSynchronization(workExecutorService, sessionAccessor, workDescriptor);
+        try {
+            transactionService.registerBonitaSynchronization(synchro);
+        } catch (final STransactionNotFoundException e) {
+            throw new SWorkRegisterException(e.getMessage(), e);
         }
+        return synchro;
     }
 
     @Override
@@ -103,9 +94,5 @@ public class WorkServiceImpl implements WorkService {
     @Override
     public synchronized void resume() {
         start();
-    }
-
-    void removeSynchronization() {
-        synchronizations.remove();
     }
 }
