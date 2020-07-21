@@ -90,12 +90,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             throws Exception {
         super(name, sequenceManager, datasource, logger);
         hbmConfigurationProvider.bootstrap(extraHibernateProperties);
-        Vendor vendor = hbmConfigurationProvider.getVendor();
         sessionFactory = hbmConfigurationProvider.getSessionFactory();
 
         this.queryBuilderFactory = queryBuilderFactory;
-        this.queryBuilderFactory.setVendor(vendor);
-        if (vendor == Vendor.SQLSERVER) {
+        if (hbmConfigurationProvider.getVendor() == Vendor.SQLSERVER) {
             this.queryBuilderFactory.setOrderByBuilder(new SQLServerOrderByBuilder());
         }
         statistics = sessionFactory.getStatistics();

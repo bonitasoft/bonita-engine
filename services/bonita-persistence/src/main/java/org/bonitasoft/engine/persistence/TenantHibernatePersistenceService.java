@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -177,6 +179,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             final String entityClassName = entityClass.getCanonicalName();
 
             boolean hasFilters = filters != null && !filters.isEmpty();
+            Map<String, Object> parameters = new HashMap<>();
             String baseQuery = "DELETE FROM " + entityClassName + " "
                     + (hasFilters ? getClassAliasMappings().get(entityClassName) : "")
                     + " WHERE tenantId= :tenantId";
@@ -185,16 +188,19 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
                 if (filters.stream().anyMatch(f -> f.getFilterOperationType() == FilterOperationType.LIKE)) {
                     throw new IllegalStateException("Delete queries do not support queries with LIKE");
                 }
-                String whereClause = new QueryGeneratorForFilters(getClassAliasMappings(), false, '%'/*
-                                                                                                      * there is no
-                                                                                                      * 'like' in these
-                                                                                                      * delete queries
-                                                                                                      */)
-                        .generate(filters).getKey();
-                baseQuery += " AND ( " + whereClause + " )";
+                QueryGeneratorForFilters.QueryGeneratedFilters whereClause = new QueryGeneratorForFilters(
+                        getClassAliasMappings(), '%'/*
+                                                     * there is no
+                                                     * 'like' in these
+                                                     * delete queries
+                                                     */)
+                                .generate(filters);
+                parameters.putAll(whereClause.getParameters());
+                baseQuery += " AND ( " + whereClause.getFilters() + " )";
             }
             Query query = session.createQuery(baseQuery);
             query.setLong(TENANT_ID, getTenantId());
+            parameters.forEach(query::setParameter);
             query.executeUpdate();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,

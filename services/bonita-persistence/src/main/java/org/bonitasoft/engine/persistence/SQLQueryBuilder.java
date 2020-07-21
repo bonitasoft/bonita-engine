@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.services.Vendor;
 import org.hibernate.Session;
 import org.hibernate.engine.query.spi.sql.NativeSQLQueryReturn;
 import org.hibernate.engine.query.spi.sql.NativeSQLQueryRootReturn;
@@ -37,9 +36,7 @@ public class SQLQueryBuilder<T> extends QueryBuilder<T> {
         hqlToSqlAlias.put("user", "user_");
     }
 
-    private final Vendor vendor;
-
-    SQLQueryBuilder(Session session, Query baseQuery, Vendor vendor,
+    SQLQueryBuilder(Session session, Query baseQuery,
             OrderByBuilder orderByBuilder,
             Map<String, String> classAliasMappings, char likeEscapeCharacter,
             boolean wordSearchEnabled,
@@ -47,17 +44,13 @@ public class SQLQueryBuilder<T> extends QueryBuilder<T> {
             SelectListDescriptor<T> selectDescriptor) {
         super(session, baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter, wordSearchEnabled,
                 orderByCheckingMode,
-                selectDescriptor, useIntegerForBoolean(vendor));
-        this.vendor = vendor;
+                selectDescriptor);
     }
 
     public void addConstantsAsParameters(Query sqlQuery) {
         if (sqlQuery.getQueryString().contains(":" + TRUE_VALUE_PARAMETER)) {
-            if (useIntegerForBoolean(vendor)) {
-                sqlQuery.setParameter(TRUE_VALUE_PARAMETER, 1);
-            } else {
-                sqlQuery.setParameter(TRUE_VALUE_PARAMETER, true);
-            }
+            // there is no need to convert the true value to a integer for Oracle and Sqlserver, hibernate does that already.
+            sqlQuery.setParameter(TRUE_VALUE_PARAMETER, true);
         }
     }
 
@@ -77,15 +70,14 @@ public class SQLQueryBuilder<T> extends QueryBuilder<T> {
         }
     }
 
-    private static boolean useIntegerForBoolean(Vendor vendor) {
-        return Vendor.ORACLE.equals(vendor) || Vendor.SQLSERVER.equals(vendor);
-    }
-
     @Override
     Query rebuildQuery(AbstractSelectDescriptor<T> selectDescriptor, Session session, Query query) {
         String builtQuery = stringQueryBuilder.toString();
         builtQuery = replaceHQLAliasesBySQLAliases(builtQuery);
         NativeQuery generatedSqlQuery = session.createSQLQuery(builtQuery);
+        for (Map.Entry<String, Object> parameter : getQueryParameters().entrySet()) {
+            generatedSqlQuery.setParameter(parameter.getKey(), parameter.getValue());
+        }
         for (NativeSQLQueryReturn queryReturn : (List<NativeSQLQueryReturn>) ((NativeQuery) query)
                 .getQueryReturns()) {
             if (queryReturn instanceof NativeSQLQueryScalarReturn) {

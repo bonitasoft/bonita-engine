@@ -29,5 +29,5 @@ public interface EnumToObjectConvertible {
      * @return The object corresponding to the Enum
      * @since 6.0
      */
-    Object fromEnum();
+    int fromEnum();
 }
