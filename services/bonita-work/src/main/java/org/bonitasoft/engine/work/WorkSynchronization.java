@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
@@ -27,18 +24,14 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkSynchronization.class);
 
-    private final Collection<WorkDescriptor> works;
+    private final WorkDescriptor work;
 
     private final WorkExecutorService workExecutorService;
-    private final WorkServiceImpl workService;
 
     private long tenantId;
 
     WorkSynchronization(final WorkExecutorService workExecutorService, final SessionAccessor sessionAccessor,
-            WorkServiceImpl workService) {
-        super();
-        this.workService = workService;
-        works = new HashSet<>();
+            WorkDescriptor work) {
         try {
             // Instead of doing this which is not so clear using sessionAccessor, we should add the tenantId as a parameter of the class
             tenantId = sessionAccessor.getTenantId();
@@ -46,15 +39,12 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
             // We are not in a tenant
             tenantId = -1L;
         }
+        this.work = work;
         this.workExecutorService = workExecutorService;
     }
 
-    void addWork(final WorkDescriptor work) {
-        works.add(work);
-    }
-
-    Collection<WorkDescriptor> getWorks() {
-        return works;
+    WorkDescriptor getWork() {
+        return work;
     }
 
     @Override
@@ -63,18 +53,12 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
 
     @Override
     public void afterCompletion(final TransactionState transactionStatus) {
-        try {
-            if (TransactionState.COMMITTED == transactionStatus) {
-                for (WorkDescriptor work : works) {
-                    work.setTenantId(tenantId);
-                    workExecutorService.execute(work);
-                }
-            } else {
-                LOG.debug("Transaction completion with state {} != COMMITTED. Not triggering subsequent works: {}",
-                        transactionStatus, works);
-            }
-        } finally {
-            workService.removeSynchronization();
+        if (TransactionState.COMMITTED == transactionStatus) {
+            work.setTenantId(tenantId);
+            workExecutorService.execute(work);
+        } else {
+            LOG.debug("Transaction completion with state {} != COMMITTED. Not triggering the work: {}",
+                    transactionStatus, work);
         }
     }
 
