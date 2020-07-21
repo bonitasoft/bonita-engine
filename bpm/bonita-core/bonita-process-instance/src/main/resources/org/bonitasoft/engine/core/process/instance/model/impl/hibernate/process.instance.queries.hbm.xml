@@ -165,7 +165,7 @@
 		AND a.assigneeId = 0
 		AND EXISTS (
 			SELECT mapping.id 
-			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping 
+			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 			WHERE mapping.activityId=a.id
 			AND mapping.userId = :userId
 		)
@@ -1065,7 +1065,7 @@
 		AND a.terminal = FALSE
 		AND exists (
     		SELECT mapping.activityId
-        		FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping  
+        		FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
         		WHERE mapping.activityId=a.id
         		AND
            		( mapping.userId IN (
@@ -1160,7 +1160,7 @@
 		AND a.assigneeId = 0
 		AND a.expectedEndDate &lt; :currentTime
 		AND EXISTS (SELECT mapping.id 
-			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping 
+			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (SELECT actor.id
@@ -1657,29 +1657,48 @@
 		)
 	</query>
 
-	<query name="getNumberOfSProcessInstanceInvolvingUser">
-		select COUNT(p.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
-		WHERE (EXISTS 
-				(SELECT at.id 
-					FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS at
-					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
-				)
-				OR p.startedBy = :userId
-		)
-	</query>
+	<sql-query name="getNumberOfSProcessInstanceInvolvingUser">
+		<return-scalar column="count" type="long"/>
+		SELECT count(id) as count from (
+			SELECT p.*
+				FROM process_instance p
+				JOIN (
+					select afi.logicalGroup2 from arch_flownode_instance afi
+						WHERE afi.tenantId = :tenantId
+						AND afi.kind in ('user', 'manual')
+						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
+						AND afi.stateId = 2
+				) humanTask ON (humanTask.logicalGroup2 = p.id)
+			WHERE p.tenantId = :tenantId
+			UNION
+			SELECT p.*
+				FROM process_instance p
+				WHERE p.tenantId = :tenantId
+					AND p.startedBy = :userId
+		) p
+	</sql-query>
 
-	<query name="searchSProcessInstanceInvolvingUser">
-		SELECT p
-		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
-		WHERE (EXISTS 
-				(SELECT at.id 
-					FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS at
-					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
-				)
-				OR p.startedBy = :userId
-		)
-	</query>
+
+	<sql-query name="searchSProcessInstanceInvolvingUser">
+		<return alias="p" class="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" />
+		SELECT * from (
+			SELECT p.*
+				FROM process_instance p
+				JOIN (
+					select afi.logicalGroup2 from arch_flownode_instance afi
+						WHERE afi.tenantId = :tenantId
+						AND afi.kind in ('user', 'manual')
+						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
+						AND afi.stateId = 2
+				) humanTask ON (humanTask.logicalGroup2 = p.id)
+			WHERE p.tenantId = :tenantId
+			UNION
+			SELECT p.*
+				FROM process_instance p
+				WHERE p.tenantId = :tenantId
+					AND p.startedBy = :userId
+		) p
+	</sql-query>
 
 	<query name="getNumberOfSProcessInstanceInvolvingUsersManagedBy">
 		SELECT COUNT(DISTINCT p.id)

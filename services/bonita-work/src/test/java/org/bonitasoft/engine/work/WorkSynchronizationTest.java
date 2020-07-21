@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.work;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.bonitasoft.engine.transaction.TransactionState.COMMITTED;
 import static org.bonitasoft.engine.transaction.TransactionState.ROLLEDBACK;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class WorkSynchronizationTest {
     private WorkDescriptor workDescriptor2 = WorkDescriptor.create("myWork2");
 
     @Test
-    public void should_submit_work_on_commit() throws Exception {
+    public void should_submit_work_on_commit() {
         workSynchronization.addWork(workDescriptor1);
 
         workSynchronization.afterCompletion(COMMITTED);
@@ -54,7 +54,7 @@ public class WorkSynchronizationTest {
     }
 
     @Test
-    public void should_submit_all_work_on_commit() throws Exception {
+    public void should_submit_all_work_on_commit() {
         workSynchronization.addWork(workDescriptor1);
         workSynchronization.addWork(workDescriptor2);
 
@@ -65,7 +65,7 @@ public class WorkSynchronizationTest {
     }
 
     @Test
-    public void should_not_submit_work_on_transaction_not_in_committed_state() throws Exception {
+    public void should_not_submit_work_on_transaction_not_in_committed_state() {
         workSynchronization.addWork(workDescriptor1);
 
         workSynchronization.afterCompletion(ROLLEDBACK);
@@ -73,4 +73,24 @@ public class WorkSynchronizationTest {
         verify(workExecutorService, never()).execute(workDescriptor1);
     }
 
+    @Test
+    public void should_remove_work_synchronization_even_if_exception_is_thrown() {
+        workSynchronization.addWork(workDescriptor1);
+        workSynchronization.addWork(workDescriptor2);
+        doThrow(new RuntimeException("Run,Run")).when(workExecutorService).execute(workDescriptor2);
+
+        assertThatThrownBy(() -> workSynchronization.afterCompletion(COMMITTED)).hasMessage("Run,Run");
+
+        verify(workService).removeSynchronization();
+    }
+
+    @Test
+    public void should_remove_work_synchronization() {
+        workSynchronization.addWork(workDescriptor1);
+        workSynchronization.addWork(workDescriptor2);
+
+        workSynchronization.afterCompletion(COMMITTED);
+
+        verify(workService).removeSynchronization();
+    }
 }
