@@ -15,36 +15,41 @@ package org.bonitasoft.engine.persistence;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Set;
 
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.junit.Test;
 
 public class QueryGeneratorForFiltersTest {
 
     @Test
-    public void should_not_replace_parameters_of_type_boolean_on_postgres() throws Exception {
+    public void should_generate_query_with_one_boolean_filter() throws Exception {
         QueryGeneratorForFilters generator = new QueryGeneratorForFilters(
-                singletonMap(TestObject.class.getName(), "testObject"), false, '%');
+                singletonMap(TestObject.class.getName(), "testObject"), '%');
 
-        Pair<String, Set<String>> whereClause = generator.generate(Collections.singletonList(
+        QueryGeneratorForFilters.QueryGeneratedFilters whereClause = generator.generate(Collections.singletonList(
                 new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)));
 
-        assertThat(whereClause.getLeft()).isEqualTo("testObject.enabled = true");
+        assertThat(whereClause.getFilters()).isEqualTo("testObject.enabled = :f1");
+        assertThat(whereClause.getParameters()).containsOnly(entry("f1", true));
+        assertThat(whereClause.getSpecificFilters()).containsOnly("testObject.enabled");
     }
 
     @Test
-    public void should_replace_parameters_of_type_boolean_on_oracle() throws Exception {
+    public void should_generate_query_with_multiple_filters() throws Exception {
         QueryGeneratorForFilters generator = new QueryGeneratorForFilters(
-                singletonMap(TestObject.class.getName(), "testObject"), true, '%');
+                singletonMap(TestObject.class.getName(), "testObject"), '%');
 
-        Pair<String, Set<String>> whereClause = generator.generate(Collections.singletonList(
-                new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)));
+        QueryGeneratorForFilters.QueryGeneratedFilters whereClause = generator.generate(Arrays.asList(
+                new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS),
+                new FilterOption(TestObject.class, "name", "john", FilterOperationType.EQUALS)));
 
-        assertThat(whereClause.getLeft()).isEqualTo("testObject.enabled = 1");
+        assertThat(whereClause.getFilters()).isEqualTo("testObject.enabled = :f1 AND testObject.name = :f2");
+        assertThat(whereClause.getParameters()).containsOnly(entry("f1", true), entry("f2", "john"));
+        assertThat(whereClause.getSpecificFilters()).containsOnly("testObject.enabled", "testObject.name");
     }
 
 }

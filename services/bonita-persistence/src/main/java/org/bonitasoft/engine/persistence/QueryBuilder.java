@@ -16,13 +16,13 @@ package org.bonitasoft.engine.persistence;
 import static java.util.Collections.emptySet;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.commons.Pair;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -44,11 +44,12 @@ abstract class QueryBuilder<T> {
     private Session session;
     private long tenantId;
     private boolean cacheEnabled;
+    private Map<String, Object> parameters = new HashMap<>();
 
     QueryBuilder(Session session, Query baseQuery, OrderByBuilder orderByBuilder,
             Map<String, String> classAliasMappings,
             char likeEscapeCharacter, boolean wordSearchEnabled, OrderByCheckingMode orderByCheckingMode,
-            AbstractSelectDescriptor<T> selectDescriptor, boolean useIntegerForBoolean) {
+            AbstractSelectDescriptor<T> selectDescriptor) {
         this.session = session;
         this.classAliasMappings = classAliasMappings;
         stringQueryBuilder = new StringBuilder(baseQuery.getQueryString());
@@ -56,7 +57,7 @@ abstract class QueryBuilder<T> {
         this.wordSearchEnabled = wordSearchEnabled;
         this.orderByCheckingMode = orderByCheckingMode;
         this.selectDescriptor = selectDescriptor;
-        this.queryGeneratorForFilters = new QueryGeneratorForFilters(classAliasMappings, useIntegerForBoolean,
+        this.queryGeneratorForFilters = new QueryGeneratorForFilters(classAliasMappings,
                 likeEscapeCharacter);
         this.queryGeneratorForSearchTerm = new QueryGeneratorForSearchTerm(likeEscapeCharacter);
         this.queryGeneratorForOrderBy = new QueryGeneratorForOrderBy(classAliasMappings, orderByBuilder);
@@ -75,10 +76,11 @@ abstract class QueryBuilder<T> {
             } else {
                 stringQueryBuilder.append(" AND (");
             }
-            Pair<String, Set<String>> whereClause = queryGeneratorForFilters.generate(filters);
-            specificFilters = whereClause.getRight();
-            stringQueryBuilder.append(whereClause.getLeft());
+            QueryGeneratorForFilters.QueryGeneratedFilters whereClause = queryGeneratorForFilters.generate(filters);
+            specificFilters = whereClause.getSpecificFilters();
+            stringQueryBuilder.append(whereClause.getFilters());
             stringQueryBuilder.append(")");
+            parameters.putAll(whereClause.getParameters());
         }
         if (multipleFilter != null && multipleFilter.getTerms() != null && !multipleFilter.getTerms().isEmpty()) {
             handleMultipleFilters(stringQueryBuilder, multipleFilter, specificFilters, enableWordSearch);
@@ -139,10 +141,12 @@ abstract class QueryBuilder<T> {
         }
         queryBuilder.append("(");
 
-        String result = queryGeneratorForSearchTerm.generate(fields, terms, enableWordSearch);
-        queryBuilder.append(result);
+        QueryGeneratorForSearchTerm.QueryGeneratedSearchTerms result = queryGeneratorForSearchTerm.generate(fields,
+                terms, enableWordSearch);
+        queryBuilder.append(result.getSearch());
 
         queryBuilder.append(")");
+        parameters.putAll(result.getParameters());
     }
 
     void appendOrderByClause(List<OrderByOption> orderByOptions, Class<? extends PersistentObject> entityType)
@@ -243,15 +247,16 @@ abstract class QueryBuilder<T> {
      * escape for like
      */
     static String escapeTerm(final String term, String likeEscapeCharacter) {
-        // 1) escape ' character by adding another ' character
-        // 2) protect escape character if this character is used in data
-        // 3) escape % character (sql query wildcard) by adding escape character
-        // 4) escape _ character (sql query wildcard) by adding escape character
+        // 1) protect escape character if this character is used in data
+        // 2) escape % character (sql query wildcard) by adding escape character
+        // 3) escape _ character (sql query wildcard) by adding escape character
         return term
-                .replace("'", "''")
                 .replace(likeEscapeCharacter, likeEscapeCharacter + likeEscapeCharacter)
                 .replace("%", likeEscapeCharacter + "%")
                 .replace("_", likeEscapeCharacter + "_");
     }
 
+    Map<String, Object> getQueryParameters() {
+        return parameters;
+    }
 }

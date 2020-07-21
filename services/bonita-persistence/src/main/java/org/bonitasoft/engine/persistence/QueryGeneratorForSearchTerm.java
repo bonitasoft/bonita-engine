@@ -13,42 +13,53 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static org.bonitasoft.engine.persistence.QueryBuilder.escapeTerm;
+
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 class QueryGeneratorForSearchTerm {
 
     private String likeEscapeCharacter;
+    private int parameterCounter = 1;
+    private Map<String, Object> parameters = new HashMap<>();
 
     QueryGeneratorForSearchTerm(char likeEscapeCharacter) {
         this.likeEscapeCharacter = String.valueOf(likeEscapeCharacter);
     }
 
-    /**
-     * Get like clause for given term with escaped sql query wildcards and escape character
-     *
-     * @param term
-     * @param prefixPattern
-     * @param suffixPattern
-     */
-    private String buildLikeEscapeClause(final String term, final String prefixPattern, final String suffixPattern) {
-        return " LIKE '" + (prefixPattern != null ? prefixPattern : "")
-                + QueryBuilder.escapeTerm(term, likeEscapeCharacter)
-                + (suffixPattern != null ? suffixPattern : "") + "' ESCAPE '"
-                + likeEscapeCharacter + "'";
+    private String createParameter(Object fieldValue) {
+        final String parameterName = "s" + parameterCounter++;
+        parameters.put(parameterName, fieldValue);
+        return ":" + parameterName;
     }
 
-    private void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField,
+    /**
+     * Get like clause for given term with escaped sql query wildcards and escape character
+     */
+    private String buildLikeEscapeClause(String term) {
+        return " LIKE " + createParameter(term)
+                + " ESCAPE '" + likeEscapeCharacter + "'";
+    }
+
+    void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField,
             final String currentTerm,
             final boolean enableWordSearch) {
         // Search if a sentence starts with the term
-        queryBuilder.append(currentField).append(buildLikeEscapeClause(currentTerm, "", "%"));
+        queryBuilder.append(currentField)
+                .append(buildLikeEscapeClause(escapeTerm(currentTerm, likeEscapeCharacter) + "%"));
 
         if (enableWordSearch) {
             // Search also if a word starts with the term
             // We do not want to search for %currentTerm% to ensure we can use Lucene-like library.
-            queryBuilder.append(" OR ").append(currentField).append(buildLikeEscapeClause(currentTerm, "% ", "%"));
+            queryBuilder.append(" OR ").append(currentField)
+                    .append(buildLikeEscapeClause("% " + escapeTerm(currentTerm, likeEscapeCharacter) + "%"));
         }
     }
 
@@ -67,7 +78,7 @@ class QueryGeneratorForSearchTerm {
         }
     }
 
-    String generate(Set<String> fields, List<String> terms, boolean enableWordSearch) {
+    QueryGeneratedSearchTerms generate(Set<String> fields, List<String> terms, boolean enableWordSearch) {
         StringBuilder stringBuilder = new StringBuilder();
         final Iterator<String> fieldIterator = fields.iterator();
         while (fieldIterator.hasNext()) {
@@ -76,6 +87,14 @@ class QueryGeneratorForSearchTerm {
                 stringBuilder.append(" OR ");
             }
         }
-        return stringBuilder.toString();
+        return new QueryGeneratedSearchTerms(stringBuilder.toString(), parameters);
+    }
+
+    @Data
+    @AllArgsConstructor
+    static final class QueryGeneratedSearchTerms {
+
+        private String search;
+        private Map<String, Object> parameters;
     }
 }
