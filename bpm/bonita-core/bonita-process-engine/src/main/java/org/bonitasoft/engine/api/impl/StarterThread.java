@@ -15,11 +15,9 @@ package org.bonitasoft.engine.api.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -34,23 +32,21 @@ import org.slf4j.LoggerFactory;
  */
 public class StarterThread extends Thread {
 
-    private static Logger logger = LoggerFactory.getLogger(StarterThread.class);
+    private static final Logger logger = LoggerFactory.getLogger(StarterThread.class);
 
     private final List<TenantRestartHandler> tenantRestartHandlers;
-    private Long tenantId;
-    private SessionAccessor sessionAccessor;
-    private SessionService sessionService;
-    private UserTransactionService transactionService;
-    private PlatformService platformService;
+    private final Long tenantId;
+    private final SessionAccessor sessionAccessor;
+    private final UserTransactionService transactionService;
+    private final PlatformService platformService;
 
-    public StarterThread(Long tenantId, SessionAccessor sessionAccessor, SessionService sessionService,
+    public StarterThread(Long tenantId, SessionAccessor sessionAccessor,
             UserTransactionService transactionService, PlatformService platformService,
             List<TenantRestartHandler> tenantRestartHandlers) {
         super("Tenant " + tenantId + " starter Thread");
         this.tenantRestartHandlers = tenantRestartHandlers;
         this.tenantId = tenantId;
         this.sessionAccessor = sessionAccessor;
-        this.sessionService = sessionService;
         this.transactionService = transactionService;
         this.platformService = platformService;
     }
@@ -71,28 +67,19 @@ public class StarterThread extends Thread {
         }
     }
 
-    private void executeHandlers(long tenantId, SessionAccessor sessionAccessor)
-            throws SBonitaException, RestartException {
-        long sessionId = createSessionAndMakeItActive(sessionAccessor, tenantId);
+    private void executeHandlers(long tenantId, SessionAccessor sessionAccessor) throws RestartException {
+        sessionAccessor.setTenantId(tenantId);
         try {
             for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {
                 restartHandler.afterServicesStart();
 
             }
         } finally {
-            sessionService.deleteSession(sessionId);
+            sessionAccessor.deleteTenantId();
         }
     }
 
     STenant getTenant(final long tenantId) throws Exception {
         return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
-    }
-
-    private long createSessionAndMakeItActive(final SessionAccessor sessionAccessor, final long tenantId)
-            throws SBonitaException {
-
-        final long sessionId = sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
-        sessionAccessor.setSessionInfo(sessionId, tenantId);
-        return sessionId;
     }
 }

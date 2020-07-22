@@ -13,23 +13,17 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -58,20 +52,14 @@ public class StarterThreadTest {
     private TenantRestartHandler tenantRestartHandler2;
     @Mock
     private SessionAccessor sessionAccessor;
-    @Mock
-    private SessionService sessionService;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     private StarterThread starterThread;
 
     @Before
     public void before() throws Exception {
         doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService)
                 .executeInTransaction(any());
-        starterThread = spy(new StarterThread(1L, sessionAccessor, sessionService, transactionService,
-                platformService, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)));
-        doReturn(SSession.builder().id(54L).tenantId(1).userName("SYSTEM").userId(12).build()).when(sessionService)
-                .createSession(anyLong(), anyString());
+        starterThread = new StarterThread(1L, sessionAccessor, transactionService,
+                platformService, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
         doReturn(tenant).when(platformService).getTenant(1L);
     }
 
