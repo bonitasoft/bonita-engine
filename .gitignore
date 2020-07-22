@@ -20,6 +20,9 @@ buildNumber.properties
 ### Intellij
 *.iml
 .idea
+*.ipr
+*.iws
+.shelf
 
 ### Eclipse
 .project
