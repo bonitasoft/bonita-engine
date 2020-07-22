@@ -40,15 +40,11 @@ import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefin
 import org.bonitasoft.engine.core.process.definition.model.impl.SUserTaskDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -189,16 +185,11 @@ public class GatewayInstanceServiceImplTest {
     }
 
     private void instanceInDatabase(String name, long processInstanceId, boolean terminal) throws Exception {
-        List<FilterOption> filters = new ArrayList<>();
-        filters.add(new FilterOption(SFlowNodeInstance.class, "name", name));
-        filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", processInstanceId));
-        QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption> emptyList(), filters, null);
         SUserTaskInstance sUserTaskInstance = new SUserTaskInstance();
         sUserTaskInstance.setName(name);
         sUserTaskInstance.setTerminal(terminal);
-        doReturn(Arrays.asList(sUserTaskInstance)).when(flowNodeInstanceService).searchFlowNodeInstances(
-                SFlowNodeInstance.class,
-                searchOptions);
+        doReturn(Arrays.asList(sUserTaskInstance)).when(flowNodeInstanceService)
+                .getFlowNodeInstancesByNameAndParentContainerId(name, processInstanceId);
 
     }
 
