@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.transaction.synchronization;
 
+import javax.transaction.Status;
+
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 public class SimpleSynchronization implements BonitaTransactionSynchronization {
 
@@ -22,7 +23,7 @@ public class SimpleSynchronization implements BonitaTransactionSynchronization {
 
     private boolean afterCompletion = false;
 
-    private TransactionState afterCompletionStatus = TransactionState.NO_TRANSACTION;
+    private int afterCompletionStatus = Status.STATUS_NO_TRANSACTION;
 
     private final boolean failOnBeforeCompletion;
 
@@ -33,13 +34,8 @@ public class SimpleSynchronization implements BonitaTransactionSynchronization {
         this.failOnAfterCompletion = false;
     }
 
-    public SimpleSynchronization(final boolean failOnBeforeCompletion, final boolean failOnAfterCompletion) {
-        this.failOnBeforeCompletion = failOnBeforeCompletion;
-        this.failOnAfterCompletion = failOnAfterCompletion;
-    }
-
     @Override
-    public void beforeCommit() {
+    public void beforeCompletion() {
         if (this.failOnBeforeCompletion) {
             throw new RuntimeException();
         }
@@ -47,7 +43,7 @@ public class SimpleSynchronization implements BonitaTransactionSynchronization {
     }
 
     @Override
-    public void afterCompletion(final TransactionState status) {
+    public void afterCompletion(final int status) {
         if (this.failOnAfterCompletion) {
             throw new RuntimeException();
         }
@@ -63,7 +59,7 @@ public class SimpleSynchronization implements BonitaTransactionSynchronization {
         return this.afterCompletion;
     }
 
-    public TransactionState getAfterCompletionStatus() {
+    public int getAfterCompletionStatus() {
         return this.afterCompletionStatus;
     }
 

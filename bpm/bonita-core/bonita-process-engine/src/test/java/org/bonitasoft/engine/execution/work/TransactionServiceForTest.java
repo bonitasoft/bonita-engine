@@ -15,7 +15,8 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import javax.transaction.Synchronization;
+
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 public class TransactionServiceForTest implements UserTransactionService {
@@ -24,7 +25,7 @@ public class TransactionServiceForTest implements UserTransactionService {
     }
 
     @Override
-    public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) {
+    public void registerBonitaSynchronization(final Synchronization txSync) {
     }
 
     @Override

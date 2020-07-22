@@ -21,13 +21,14 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import javax.transaction.Status;
+
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Baptiste Mesta
@@ -55,13 +56,9 @@ class RefreshClassloaderSynchronization implements BonitaTransactionSynchronizat
     }
 
     @Override
-    public void beforeCommit() {
-    }
-
-    @Override
-    public void afterCompletion(TransactionState txState) {
+    public void afterCompletion(final int txState) {
         classLoaderService.removeRefreshClassLoaderSynchronization();
-        if (txState == TransactionState.COMMITTED) {
+        if (txState == Status.STATUS_COMMITTED) {
             classLoaderUpdater.refreshClassloaders(classLoaderService, tenantId, ids);
             refreshClassLoaderOnOtherNodes();
         }

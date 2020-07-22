@@ -24,6 +24,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
+import javax.transaction.Status;
+
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.classloader.listeners.ClassReflectorClearer;
 import org.bonitasoft.engine.classloader.listeners.JacksonCacheClearer;
@@ -42,8 +44,8 @@ import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
@@ -372,23 +374,26 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void refreshClassLoaderOnOtherNodes(final ScopeType type, final long id) throws SClassLoaderException {
         try {
-            userTransactionService.registerBonitaSynchronization((transactionState) -> {
-                if (transactionState != TransactionState.COMMITTED) {
-                    return;
-                }
-                Map<String, TaskResult<Void>> execute;
-                try {
-                    execute = broadcastService.executeOnOthersAndWait(new RefreshClassLoaderTask(id, type),
-                            getTenantId(type));
-                } catch (TimeoutException | STenantIdNotSetException | ExecutionException | InterruptedException e) {
-                    throw new BonitaRuntimeException(e);
-                }
-                for (Map.Entry<String, TaskResult<Void>> resultEntry : execute.entrySet()) {
-                    if (resultEntry.getValue().isError()) {
-                        throw new IllegalStateException(resultEntry.getValue().getThrowable());
-                    }
-                }
-            });
+            userTransactionService
+                    .registerBonitaSynchronization((BonitaTransactionSynchronization) transactionState -> {
+
+                        if (transactionState != Status.STATUS_COMMITTED) {
+                            return;
+                        }
+                        Map<String, TaskResult<Void>> execute;
+                        try {
+                            execute = broadcastService.executeOnOthersAndWait(new RefreshClassLoaderTask(id, type),
+                                    getTenantId(type));
+                        } catch (TimeoutException | STenantIdNotSetException | ExecutionException
+                                | InterruptedException e) {
+                            throw new BonitaRuntimeException(e);
+                        }
+                        for (Map.Entry<String, TaskResult<Void>> resultEntry : execute.entrySet()) {
+                            if (resultEntry.getValue().isError()) {
+                                throw new IllegalStateException(resultEntry.getValue().getThrowable());
+                            }
+                        }
+                    });
         } catch (STransactionNotFoundException e) {
             throw new SClassLoaderException(e);
         }

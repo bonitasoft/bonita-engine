@@ -128,7 +128,7 @@ public class RecorderIT extends CommonBPMServicesTest {
     public void testNotLogOnInsertRecordWhenBTXRolledBack() throws Exception {
         getTransactionService().begin();
         final SelectOneDescriptor<SUser> selectDescriptor = new SelectOneDescriptor<>("getUserByUserName",
-                (Map<String, Object>) Collections.singletonMap("userName", (Object) "firstName"), SUser.class);
+                Collections.singletonMap("userName", (Object) "firstName"), SUser.class);
         SUser retrievedSUser = getPersistenceService().selectOne(selectDescriptor);
         assertNull("Should not have any SUSER_IMPL in DB before test", retrievedSUser);
 

@@ -15,9 +15,9 @@ package org.bonitasoft.engine.execution;
 
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import javax.transaction.Synchronization;
+
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Baptiste Mesta
@@ -30,11 +30,6 @@ public class TransactionServiceMock implements TransactionService {
 
     @Override
     public void complete() {
-    }
-
-    @Override
-    public TransactionState getState() {
-        return null;
     }
 
     @Deprecated
@@ -66,7 +61,7 @@ public class TransactionServiceMock implements TransactionService {
     }
 
     @Override
-    public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) {
+    public void registerBonitaSynchronization(final Synchronization txSync) {
     }
 
     @Override

@@ -13,10 +13,11 @@
  **/
 package org.bonitasoft.engine.work;
 
+import javax.transaction.Status;
+
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,12 +49,8 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
     }
 
     @Override
-    public void beforeCommit() {
-    }
-
-    @Override
-    public void afterCompletion(final TransactionState transactionStatus) {
-        if (TransactionState.COMMITTED == transactionStatus) {
+    public void afterCompletion(final int transactionStatus) {
+        if (Status.STATUS_COMMITTED == transactionStatus) {
             work.setTenantId(tenantId);
             workExecutorService.execute(work);
         } else {

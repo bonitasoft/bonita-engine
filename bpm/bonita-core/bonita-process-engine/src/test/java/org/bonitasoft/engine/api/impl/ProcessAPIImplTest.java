@@ -54,6 +54,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javax.transaction.Synchronization;
+
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -180,7 +182,6 @@ import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -1588,7 +1589,7 @@ public class ProcessAPIImplTest {
         }
 
         @Override
-        public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync)
+        public void registerBonitaSynchronization(Synchronization txSync)
                 throws STransactionNotFoundException {
 
         }

@@ -21,7 +21,6 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Baptiste Mesta
@@ -41,12 +40,12 @@ class BatchLogSynchronization implements BonitaTransactionSynchronization {
     }
 
     @Override
-    public void afterCompletion(final TransactionState transactionState) {
+    public void afterCompletion(final int transactionState) {
         queriableLogger.clearSynchronization();
     }
 
     @Override
-    public void beforeCommit() {
+    public void beforeCompletion() {
         if (!logs.isEmpty()) {
             try {
                 persistenceService.insertInBatch(logs);

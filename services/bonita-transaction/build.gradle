@@ -1,11 +1,10 @@
 dependencies {
     compile project(':services:bonita-commons')
     compile project(':services:bonita-log-technical')
+    compile "javax.transaction:jta:${Deps.javaxJtaVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.jboss.narayana.jta:narayana-jta:${Deps.naranayaVersion}"
     testCompile "org.jboss.logging:jboss-logging:${Deps.jbossLoggingVersion}"
-    compileOnly "javax.transaction:jta:${Deps.javaxJtaVersion}"
-    testCompile "javax.transaction:jta:${Deps.javaxJtaVersion}"
 }

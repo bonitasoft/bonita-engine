@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.engine.work;
 
-import static org.bonitasoft.engine.transaction.TransactionState.COMMITTED;
-import static org.bonitasoft.engine.transaction.TransactionState.ROLLEDBACK;
-import static org.mockito.Mockito.*;
+import static javax.transaction.Status.STATUS_COMMITTED;
+import static javax.transaction.Status.STATUS_ROLLEDBACK;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class WorkSynchronizationTest {
         WorkSynchronization workSynchronization = new WorkSynchronization(workExecutorService, sessionAccessor,
                 workDescriptor1);
 
-        workSynchronization.afterCompletion(COMMITTED);
+        workSynchronization.afterCompletion(STATUS_COMMITTED);
 
         verify(workExecutorService).execute(workDescriptor1);
     }
@@ -49,7 +50,7 @@ public class WorkSynchronizationTest {
     public void should_not_submit_work_on_transaction_not_in_committed_state() {
         WorkSynchronization workSynchronization = new WorkSynchronization(workExecutorService, sessionAccessor,
                 workDescriptor1);
-        workSynchronization.afterCompletion(ROLLEDBACK);
+        workSynchronization.afterCompletion(STATUS_ROLLEDBACK);
 
         verify(workExecutorService, never()).execute(workDescriptor1);
     }

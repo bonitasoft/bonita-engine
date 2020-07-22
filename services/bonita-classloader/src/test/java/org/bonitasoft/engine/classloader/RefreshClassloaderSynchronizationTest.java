@@ -15,16 +15,14 @@ package org.bonitasoft.engine.classloader;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
+import static javax.transaction.Status.*;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.BroadcastService;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,7 +54,7 @@ public class RefreshClassloaderSynchronizationTest {
     @Test
     public void should_remove_the_synchronization_when_its_executed() {
 
-        refreshClassloaderSynchronization.afterCompletion(TransactionState.NO_TRANSACTION);
+        refreshClassloaderSynchronization.afterCompletion(STATUS_NO_TRANSACTION);
 
         verify(classLoaderService).removeRefreshClassLoaderSynchronization();
     }
@@ -65,7 +63,7 @@ public class RefreshClassloaderSynchronizationTest {
     public void should_refresh_classloader_using_classLoaderUpdater() throws Exception {
         doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any(), anyLong());
 
-        refreshClassloaderSynchronization.afterCompletion(TransactionState.COMMITTED);
+        refreshClassloaderSynchronization.afterCompletion(STATUS_COMMITTED);
 
         verify(classLoaderUpdater).refreshClassloaders(classLoaderService, 1L,
                 singleton(pair(ScopeType.PROCESS, 111L)));
@@ -75,14 +73,14 @@ public class RefreshClassloaderSynchronizationTest {
     public void should_refresh_classloader_on_other_nodes_after_commit() throws Exception {
         doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any(), anyLong());
 
-        refreshClassloaderSynchronization.afterCompletion(TransactionState.COMMITTED);
+        refreshClassloaderSynchronization.afterCompletion(STATUS_COMMITTED);
 
         verify(broadcastService).executeOnOthersAndWait(refreshClassLoaderTask, 1L);
     }
 
     @Test
     public void should_not_refresh_classloader_when_transaction_is_not_committed() {
-        refreshClassloaderSynchronization.afterCompletion(TransactionState.ROLLBACKONLY);
+        refreshClassloaderSynchronization.afterCompletion(STATUS_MARKED_ROLLBACK);
 
         verifyZeroInteractions(broadcastService);
         verifyZeroInteractions(classLoaderUpdater);

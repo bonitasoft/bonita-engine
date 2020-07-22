@@ -16,8 +16,9 @@ package org.bonitasoft.engine.synchro;
 import java.io.Serializable;
 import java.util.Map;
 
+import javax.transaction.Status;
+
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Baptiste Mesta
@@ -38,13 +39,8 @@ public class WaitForEventSynchronization implements BonitaTransactionSynchroniza
     }
 
     @Override
-    public void beforeCommit() {
-        // NOTHING
-    }
-
-    @Override
-    public void afterCompletion(final TransactionState status) {
-        if (status == TransactionState.COMMITTED) {
+    public void afterCompletion(final int status) {
+        if (status == Status.STATUS_COMMITTED) {
             synchroService.fireEvent(event, id);
         }
     }

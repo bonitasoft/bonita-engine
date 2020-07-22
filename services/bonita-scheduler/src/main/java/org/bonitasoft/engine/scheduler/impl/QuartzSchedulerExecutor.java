@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.transaction.Status;
+
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
@@ -35,7 +37,6 @@ import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -114,7 +115,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    private final class NotifyQuartzOfNewTrigger implements BonitaTransactionSynchronization {
+    private static final class NotifyQuartzOfNewTrigger implements BonitaTransactionSynchronization {
 
         private final long time;
 
@@ -127,13 +128,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
 
         @Override
-        public void beforeCommit() {
-            // NOTHING
-        }
-
-        @Override
-        public void afterCompletion(final TransactionState txState) {
-            if (TransactionState.COMMITTED.equals(txState)) {
+        public void afterCompletion(final int txState) {
+            if (Status.STATUS_COMMITTED == txState) {
                 if (quartzScheduler != null) {
                     quartzScheduler.getSchedulerSignaler().signalSchedulingChange(time);
                 }

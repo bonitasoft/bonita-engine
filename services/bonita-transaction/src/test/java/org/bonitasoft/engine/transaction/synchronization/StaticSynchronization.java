@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.transaction.synchronization;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 public class StaticSynchronization implements BonitaTransactionSynchronization {
 
@@ -47,7 +46,7 @@ public class StaticSynchronization implements BonitaTransactionSynchronization {
     }
 
     @Override
-    public void beforeCommit() {
+    public void beforeCompletion() {
         StaticSynchronizationResult.COMMENT += this.beforeCompletionComment;
         if (this.failOnBefore) {
             throw new RuntimeException();
@@ -55,7 +54,7 @@ public class StaticSynchronization implements BonitaTransactionSynchronization {
     }
 
     @Override
-    public void afterCompletion(final TransactionState status) {
+    public void afterCompletion(final int status) {
         StaticSynchronizationResult.COMMENT += this.afterCompletionComment;
         if (this.failOnAfter) {
             throw new RuntimeException();

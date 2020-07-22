@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.transaction.Synchronization;
+
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -41,9 +43,7 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -185,10 +185,6 @@ public class PlatformAPIImplTest {
         public void complete() {
         }
 
-        public TransactionState getState() {
-            return null;
-        }
-
         @Override
         public boolean isTransactionActive() {
             return false;
@@ -214,7 +210,7 @@ public class PlatformAPIImplTest {
         }
 
         @Override
-        public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) {
+        public void registerBonitaSynchronization(Synchronization txSync) {
 
         }
 
