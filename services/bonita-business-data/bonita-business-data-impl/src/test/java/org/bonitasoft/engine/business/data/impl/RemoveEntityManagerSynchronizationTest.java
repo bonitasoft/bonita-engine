@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import static javax.transaction.Status.STATUS_ACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import javax.persistence.EntityManager;
 
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -43,7 +43,7 @@ public class RemoveEntityManagerSynchronizationTest {
                 localManager);
 
         //when
-        removeEntityManagerSynchronization.beforeCommit();
+        removeEntityManagerSynchronization.beforeCompletion();
 
         //then
         verify(entityManager, times(0)).close();
@@ -60,7 +60,7 @@ public class RemoveEntityManagerSynchronizationTest {
                 localManager);
 
         //when
-        removeEntityManagerSynchronization.afterCompletion(TransactionState.ACTIVE);
+        removeEntityManagerSynchronization.afterCompletion(STATUS_ACTIVE);
 
         //then
         verify(entityManager).close();

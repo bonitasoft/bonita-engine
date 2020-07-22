@@ -17,19 +17,27 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.CountDownLatch;
 
+import javax.transaction.TransactionManager;
+
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public abstract class TransactionServiceTest {
+public class TransactionServiceTest {
 
+    private static TransactionManager transactionManager;
     private TransactionService txService;
 
-    protected abstract TransactionService getTxService() throws Exception;
+    @BeforeClass
+    public static void setupTransactionManager() {
+        transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+    }
 
     @Before
-    public void before() throws Exception {
-        txService = getTxService();
+    public void before() {
+        txService = new JTATransactionServiceImpl(new TechnicalLoggerSLF4JImpl(), transactionManager);
     }
 
     @After

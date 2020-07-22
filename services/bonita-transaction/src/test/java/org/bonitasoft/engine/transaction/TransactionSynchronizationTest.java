@@ -15,25 +15,33 @@ package org.bonitasoft.engine.transaction;
 
 import static org.junit.Assert.*;
 
+import javax.transaction.Status;
+import javax.transaction.TransactionManager;
+
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.transaction.synchronization.SimpleSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronizationResult;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public abstract class TransactionSynchronizationTest {
+public class TransactionSynchronizationTest {
 
+    private static TransactionManager transactionManager;
     private TransactionService txService;
 
-    protected abstract TransactionService getTxService() throws Exception;
-
-    @Before
-    public void before() throws Exception {
-        txService = getTxService();
+    @BeforeClass
+    public static void setupTransactionManager() {
+        transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
     }
 
-    @SuppressWarnings("deprecation")
+    @Before
+    public void before() {
+        txService = new JTATransactionServiceImpl(new TechnicalLoggerSLF4JImpl(), transactionManager);
+    }
+
     @After
     public void closeTransactions() throws Exception {
         if (txService.isTransactionActive()) {
@@ -51,11 +59,11 @@ public abstract class TransactionSynchronizationTest {
 
         assertFalse(simpleSynchronization.isBeforeCompletion());
         assertFalse(simpleSynchronization.isAfterCompletion());
-        assertEquals(TransactionState.NO_TRANSACTION, simpleSynchronization.getAfterCompletionStatus());
+        assertEquals(Status.STATUS_NO_TRANSACTION, simpleSynchronization.getAfterCompletionStatus());
 
     }
 
-    private void testSynchronizationStatus(final boolean rollback, final TransactionState expectedStatus)
+    private void testSynchronizationStatus(final boolean rollback, final int expectedStatus)
             throws Exception {
         txService.begin();
 
@@ -69,7 +77,7 @@ public abstract class TransactionSynchronizationTest {
         for (final SimpleSynchronization sync : synchronizations) {
             assertFalse(sync.isBeforeCompletion());
             assertFalse(sync.isAfterCompletion());
-            assertEquals(TransactionState.NO_TRANSACTION, sync.getAfterCompletionStatus());
+            assertEquals(Status.STATUS_NO_TRANSACTION, sync.getAfterCompletionStatus());
         }
 
         if (rollback) {
@@ -86,12 +94,12 @@ public abstract class TransactionSynchronizationTest {
 
     @Test
     public void testSynchronizationStatusOnCommit() throws Exception {
-        testSynchronizationStatus(false, TransactionState.COMMITTED);
+        testSynchronizationStatus(false, Status.STATUS_COMMITTED);
     }
 
     @Test
     public void testSynchronizationStatusOnRollback() throws Exception {
-        testSynchronizationStatus(true, TransactionState.ROLLEDBACK);
+        testSynchronizationStatus(true, Status.STATUS_ROLLEDBACK);
     }
 
     private void testRegisteredSynchronizationsOrder(final boolean rollback,

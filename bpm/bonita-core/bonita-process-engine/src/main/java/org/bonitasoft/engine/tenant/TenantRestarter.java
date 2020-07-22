@@ -15,6 +15,8 @@ package org.bonitasoft.engine.tenant;
 
 import java.util.List;
 
+import javax.transaction.Status;
+
 import org.bonitasoft.engine.api.impl.StarterThread;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -23,7 +25,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -82,18 +83,9 @@ public class TenantRestarter {
 
     private void executeAfterServicesStartAfterCurrentTransaction(
             final List<TenantRestartHandler> tenantRestartHandlers) throws STransactionNotFoundException {
-        transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
-
-            @Override
-            public void beforeCommit() {
-
-            }
-
-            @Override
-            public void afterCompletion(TransactionState txState) {
-                if (txState.equals(TransactionState.COMMITTED)) {
-                    afterServicesStart(tenantRestartHandlers);
-                }
+        transactionService.registerBonitaSynchronization((BonitaTransactionSynchronization) txState -> {
+            if (txState == Status.STATUS_COMMITTED) {
+                afterServicesStart(tenantRestartHandlers);
             }
         });
     }

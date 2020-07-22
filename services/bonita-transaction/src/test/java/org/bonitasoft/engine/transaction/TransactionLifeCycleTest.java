@@ -13,23 +13,34 @@
  **/
 package org.bonitasoft.engine.transaction;
 
+import static javax.transaction.Status.STATUS_COMMITTED;
+import static javax.transaction.Status.STATUS_ROLLEDBACK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import javax.transaction.Status;
+import javax.transaction.TransactionManager;
+
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public abstract class TransactionLifeCycleTest {
+public class TransactionLifeCycleTest {
 
+    private static TransactionManager transactionManager;
     private TransactionService txService;
 
-    protected abstract TransactionService getTxService() throws Exception;
+    @BeforeClass
+    public static void setupTransactionManager() {
+        transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+    }
 
     @Before
-    public void before() throws Exception {
-        txService = getTxService();
+    public void before() {
+        txService = new JTATransactionServiceImpl(new TechnicalLoggerSLF4JImpl(), transactionManager);
     }
 
     @SuppressWarnings("deprecation")
@@ -39,24 +50,23 @@ public abstract class TransactionLifeCycleTest {
         if (txService.isTransactionActive()) {
             txService.complete();
         }
-
     }
 
     @Test
     public void testActiveTransactionState() throws Exception {
         txService.begin();
-        assertEquals(TransactionState.ACTIVE, txService.getState());
+        assertEquals(Status.STATUS_ACTIVE, transactionManager.getStatus());
     }
 
     @Test
-    public void testCommitedTransactionState() throws Exception {
+    public void testCommittedTransactionState() throws Exception {
         TxSync sync = new TxSync();
         txService.begin();
         txService.registerBonitaSynchronization(sync);
         txService.complete();
 
-        assertEquals(TransactionState.COMMITTED, sync.getTxCompletionState());
-        assertEquals(TransactionState.NO_TRANSACTION, txService.getState());
+        assertEquals(STATUS_COMMITTED, sync.getTxCompletionState());
+        assertEquals(Status.STATUS_NO_TRANSACTION, transactionManager.getStatus());
     }
 
     @Test
@@ -64,7 +74,7 @@ public abstract class TransactionLifeCycleTest {
         txService.begin();
         txService.setRollbackOnly();
 
-        assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+        assertEquals(Status.STATUS_MARKED_ROLLBACK, transactionManager.getStatus());
         txService.complete();
     }
 
@@ -76,8 +86,8 @@ public abstract class TransactionLifeCycleTest {
         txService.setRollbackOnly();
         txService.complete();
 
-        assertEquals(TransactionState.ROLLEDBACK, sync.getTxCompletionState());
-        assertEquals(TransactionState.NO_TRANSACTION, txService.getState());
+        assertEquals(STATUS_ROLLEDBACK, sync.getTxCompletionState());
+        assertEquals(Status.STATUS_NO_TRANSACTION, transactionManager.getStatus());
     }
 
     @Test
@@ -85,14 +95,14 @@ public abstract class TransactionLifeCycleTest {
         TxSync sync = new TxSync();
         txService.begin();
         txService.registerBonitaSynchronization(sync);
-        assertEquals(TransactionState.ACTIVE, txService.getState());
+        assertEquals(Status.STATUS_ACTIVE, transactionManager.getStatus());
 
         txService.setRollbackOnly();
-        assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+        assertEquals(Status.STATUS_MARKED_ROLLBACK, transactionManager.getStatus());
 
         txService.complete();
-        assertEquals(TransactionState.ROLLEDBACK, sync.getTxCompletionState());
-        assertEquals(TransactionState.NO_TRANSACTION, txService.getState());
+        assertEquals(STATUS_ROLLEDBACK, sync.getTxCompletionState());
+        assertEquals(Status.STATUS_NO_TRANSACTION, transactionManager.getStatus());
     }
 
     @Test
@@ -100,11 +110,11 @@ public abstract class TransactionLifeCycleTest {
         TxSync sync = new TxSync();
         txService.begin();
         txService.registerBonitaSynchronization(sync);
-        assertEquals(TransactionState.ACTIVE, txService.getState());
+        assertEquals(Status.STATUS_ACTIVE, transactionManager.getStatus());
 
         txService.complete();
-        assertEquals(TransactionState.COMMITTED, sync.getTxCompletionState());
-        assertEquals(TransactionState.NO_TRANSACTION, txService.getState());
+        assertEquals(STATUS_COMMITTED, sync.getTxCompletionState());
+        assertEquals(Status.STATUS_NO_TRANSACTION, transactionManager.getStatus());
     }
 
     @Test
@@ -119,7 +129,7 @@ public abstract class TransactionLifeCycleTest {
     public void testSetRollbackOnlyOnActiveTx() throws Exception {
         txService.begin();
         txService.setRollbackOnly();
-        assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+        assertEquals(Status.STATUS_MARKED_ROLLBACK, transactionManager.getStatus());
         txService.complete();
     }
 
@@ -131,10 +141,10 @@ public abstract class TransactionLifeCycleTest {
         txService.complete();
         try {
             txService.setRollbackOnly();
-            fail("Impossible to call setRollbackOnly on a tx with state " + TransactionState.COMMITTED);
+            fail("Impossible to call setRollbackOnly on a tx with state COMMITTED");
         } catch (final STransactionException e) {
-            assertEquals(TransactionState.COMMITTED, sync.getTxCompletionState());
-            assertEquals(TransactionState.NO_TRANSACTION, txService.getState());
+            assertEquals(STATUS_COMMITTED, sync.getTxCompletionState());
+            assertEquals(Status.STATUS_NO_TRANSACTION, transactionManager.getStatus());
         }
     }
 
@@ -143,22 +153,22 @@ public abstract class TransactionLifeCycleTest {
         txService.begin();
         try {
             txService.begin();
-            fail("Impossible to begin a tx with state " + TransactionState.ACTIVE);
+            fail("Impossible to begin a tx with state ACTIVE");
         } catch (final STransactionCreationException e) {
-            assertEquals(TransactionState.ACTIVE, txService.getState());
+            assertEquals(Status.STATUS_ACTIVE, transactionManager.getStatus());
         }
     }
 
     @Test
-    public void testBeginRollebackOnlyTx() throws Exception {
+    public void testBeginRollbackOnlyTx() throws Exception {
         txService.begin();
         txService.setRollbackOnly();
         try {
             txService.begin();
             System.out.println("++++" + txService.getNumberOfActiveTransactions());
-            fail("Impossible to begin a tx with state " + TransactionState.ROLLBACKONLY);
+            fail("Impossible to begin a tx with state ROLLBACKONLY");
         } catch (final STransactionCreationException e) {
-            assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+            assertEquals(Status.STATUS_MARKED_ROLLBACK, transactionManager.getStatus());
         } finally {
             txService.complete();
         }
@@ -166,24 +176,19 @@ public abstract class TransactionLifeCycleTest {
 
     // This is a dumb implementation of the BonitaTransactionSynchronization interface just to
     // keep a reference to transaction completion's state.
-    private class TxSync implements BonitaTransactionSynchronization {
+    private static class TxSync implements BonitaTransactionSynchronization {
 
-        private TransactionState txCompletionState;
+        private int txCompletionState;
 
         public TxSync() {
         }
 
-        public TransactionState getTxCompletionState() {
+        public int getTxCompletionState() {
             return txCompletionState;
         }
 
         @Override
-        public void beforeCommit() {
-            // Nothig to do
-        }
-
-        @Override
-        public void afterCompletion(final TransactionState txState) {
+        public void afterCompletion(final int txState) {
             this.txCompletionState = txState;
         }
     }

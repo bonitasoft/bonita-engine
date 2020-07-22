@@ -122,7 +122,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
@@ -459,7 +458,7 @@ public class StateBehaviors {
                     userTransactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
 
                         @Override
-                        public void beforeCommit() {
+                        public void beforeCompletion() {
                             //the called process is finished, next step is stable so we trigger execution of this flownode
                             try {
                                 workService.registerWork(
@@ -470,8 +469,7 @@ public class StateBehaviors {
                         }
 
                         @Override
-                        public void afterCompletion(TransactionState txState) {
-
+                        public void afterCompletion(final int txState) {
                         }
                     });
                 }

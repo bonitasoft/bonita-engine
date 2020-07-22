@@ -13,12 +13,15 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-@FunctionalInterface
-public interface BonitaTransactionSynchronization {
+import javax.transaction.Synchronization;
 
-    default void beforeCommit() {
+@FunctionalInterface
+public interface BonitaTransactionSynchronization extends Synchronization {
+
+    @Override
+    default void beforeCompletion() {
     }
 
-    void afterCompletion(TransactionState txState);
-
+    @Override
+    void afterCompletion(int i);
 }

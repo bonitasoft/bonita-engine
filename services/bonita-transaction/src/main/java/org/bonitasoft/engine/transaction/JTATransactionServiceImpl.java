@@ -54,23 +54,6 @@ public class JTATransactionServiceImpl implements TransactionService {
         return logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
     }
 
-    public static TransactionState convert(int status) {
-        switch (status) {
-            case Status.STATUS_ACTIVE:
-                return TransactionState.ACTIVE;
-            case Status.STATUS_COMMITTED:
-                return TransactionState.COMMITTED;
-            case Status.STATUS_MARKED_ROLLBACK:
-                return TransactionState.ROLLBACKONLY;
-            case Status.STATUS_ROLLEDBACK:
-                return TransactionState.ROLLEDBACK;
-            case Status.STATUS_NO_TRANSACTION:
-                return TransactionState.NO_TRANSACTION;
-            default:
-                throw new IllegalStateException("Can't map the JTA status : " + status);
-        }
-    }
-
     @Override
     public void begin() throws STransactionCreationException {
         final TransactionServiceContext txContext = getTransactionServiceContext();
@@ -215,14 +198,6 @@ public class JTATransactionServiceImpl implements TransactionService {
         txContext.stackTraceThatMadeLastBegin = null;
     }
 
-    public TransactionState getState() throws STransactionException {
-        try {
-            return convert(txManager.getStatus());
-        } catch (final SystemException e) {
-            throw new STransactionException(e);
-        }
-    }
-
     @Override
     public boolean isTransactionActive() {
         try {
@@ -253,14 +228,14 @@ public class JTATransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync)
+    public void registerBonitaSynchronization(final Synchronization txSync)
             throws STransactionNotFoundException {
         try {
             final Transaction transaction = txManager.getTransaction();
             if (transaction == null) {
                 throw new STransactionNotFoundException("No active transaction.");
             }
-            transaction.registerSynchronization(new JTATransactionWrapper(logger, txSync));
+            transaction.registerSynchronization(txSync);
         } catch (final IllegalStateException | SystemException | RollbackException e) {
             throw new STransactionNotFoundException(e);
         }

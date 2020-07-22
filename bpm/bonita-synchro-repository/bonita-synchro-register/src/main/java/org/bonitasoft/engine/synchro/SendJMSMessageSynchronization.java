@@ -17,9 +17,9 @@ import java.io.Serializable;
 import java.util.Map;
 
 import javax.jms.JMSException;
+import javax.transaction.Status;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Baptiste Mesta
@@ -40,13 +40,8 @@ public class SendJMSMessageSynchronization implements BonitaTransactionSynchroni
     }
 
     @Override
-    public void beforeCommit() {
-        // NOTHING
-    }
-
-    @Override
-    public void afterCompletion(final TransactionState status) {
-        if (status == TransactionState.COMMITTED) {
+    public void afterCompletion(final int status) {
+        if (status == Status.STATUS_COMMITTED) {
             try {
                 jmsProducer.sendMessage(event, Long.toString(id));
             } catch (JMSException e) {

@@ -47,7 +47,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
@@ -323,11 +322,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
     private class RegisterMessagesMatchingSynchronization implements BonitaTransactionSynchronization {
 
         @Override
-        public void beforeCommit() {
-        }
-
-        @Override
-        public void afterCompletion(TransactionState txState) {
+        public void afterCompletion(final int txState) {
             threadPoolExecutor.submit(new MessagesMatchingTask());
             logger.debug("Messages matching task registered");
         }

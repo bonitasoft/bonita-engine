@@ -15,6 +15,8 @@ package org.bonitasoft.engine.transaction;
 
 import java.util.concurrent.Callable;
 
+import javax.transaction.Synchronization;
+
 public interface UserTransactionService {
 
     /**
@@ -47,7 +49,7 @@ public interface UserTransactionService {
      *            Thrown if the transaction manager
      *            encounters an unexpected error condition.
      */
-    void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException;
+    void registerBonitaSynchronization(Synchronization txSync) throws STransactionNotFoundException;
 
     void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException;
 

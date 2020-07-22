@@ -23,9 +23,10 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionException;
+import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,11 +77,11 @@ public class TestUtil {
         }
     }
 
-    // This method should disappear as well, with the Transaction refactoring.
-    public static void closeTransactionIfOpen(final TransactionService txService) throws STransactionException {
-        final TransactionState txState = txService.getState();
-        if (txState == TransactionState.ROLLBACKONLY || txState == TransactionState.ACTIVE) {
+    public static void closeTransactionIfOpen(final TransactionService txService) {
+        try {
             txService.complete();
+        } catch (STransactionCommitException | STransactionRollbackException e) {
+            LOGGER.debug("Cannot complete the transaction. Probably already completed. Ignoring.");
         }
     }
 

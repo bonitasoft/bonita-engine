@@ -15,7 +15,6 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.events.EventService;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Matthieu Chaffotte
@@ -143,25 +141,16 @@ public class JobWrapper implements StatelessJob {
         transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
 
             @Override
-            public void beforeCommit() {
-
-            }
-
-            @Override
-            public void afterCompletion(TransactionState txState) {
+            public void afterCompletion(final int txState) {
                 Thread thread = new Thread(new Runnable() {
 
                     @Override
                     public void run() {
                         try {
                             sessionAccessor.setTenantId(jobIdentifier.getTenantId());
-                            transactionService.executeInTransaction(new Callable<Object>() {
-
-                                @Override
-                                public Object call() throws Exception {
-                                    jobService.logJobError(jobException, jobIdentifier.getId());
-                                    return null;
-                                }
+                            transactionService.executeInTransaction(() -> {
+                                jobService.logJobError(jobException, jobIdentifier.getId());
+                                return null;
                             });
                         } catch (Exception e) {
                             logger.log(getClass(), TechnicalLogSeverity.ERROR,

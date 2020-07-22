@@ -35,17 +35,6 @@ public interface TransactionService extends UserTransactionService {
     void complete() throws STransactionCommitException, STransactionRollbackException;
 
     /**
-     * Obtain the status of the transaction associated with the current thread.
-     *
-     * @return The transaction status. If no transaction is associated with
-     *         the current thread, this method returns the Status.NoTransaction
-     *         value.
-     * @throws STransactionException Thrown if the transaction manager
-     *         encounters an unexpected error condition.
-     */
-    TransactionState getState() throws STransactionException;
-
-    /**
      * Modify the transaction associated with the current thread such that
      * the only possible outcome of the transaction is to roll back the
      * transaction.

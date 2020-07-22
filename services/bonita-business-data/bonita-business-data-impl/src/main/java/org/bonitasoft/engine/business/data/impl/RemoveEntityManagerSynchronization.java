@@ -16,7 +16,6 @@ package org.bonitasoft.engine.business.data.impl;
 import javax.persistence.EntityManager;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Matthieu Chaffotte
@@ -31,12 +30,7 @@ public class RemoveEntityManagerSynchronization implements BonitaTransactionSync
     }
 
     @Override
-    public void beforeCommit() {
-        // nothing to do
-    }
-
-    @Override
-    public void afterCompletion(final TransactionState txState) {
+    public void afterCompletion(final int txState) {
         localManager.get().close();
         localManager.remove();
     }
