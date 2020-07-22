@@ -77,6 +77,13 @@
 		ORDER BY id
 	</query>
 
+	<query name="getFlowNodeInstancesByNameAndParentContainerId">
+		SELECT f
+		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
+		WHERE f.name = :name
+		AND f.parentContainerId = :parentContainerId
+	</query>
+
 	<query name="getInclusiveGatewayInstanceOfProcessInstance">
 		SELECT g
 		FROM org.bonitasoft.engine.core.process.instance.model.SGatewayInstance AS g

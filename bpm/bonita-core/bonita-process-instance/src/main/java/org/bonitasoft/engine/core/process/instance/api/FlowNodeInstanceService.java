@@ -377,4 +377,7 @@ public interface FlowNodeInstanceService {
             throws SBonitaReadException;
 
     void deleteArchivedFlowNodeInstances(List<Long> sourceObjectIds) throws SBonitaException;
+
+    List<SFlowNodeInstance> getFlowNodeInstancesByNameAndParentContainerId(String name, Long parentContainerId)
+            throws SBonitaReadException;
 }
