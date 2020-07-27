@@ -28,12 +28,17 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.*;
+import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -196,6 +201,23 @@ public class ExecuteFlowNodesTest {
         executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
+    }
+
+    @Test
+    public void should_continue_batch_if_one_flow_node_fails() throws Exception {
+        SGatewayInstance gatewayInstance1 = new SGatewayInstance();
+        gatewayInstance1.setId(333L);
+        SGatewayInstance gatewayInstance2 = new SGatewayInstance();
+        gatewayInstance2.setId(344L);
+        doThrow(SBonitaReadException.class).when(gatewayInstanceService).checkMergingCondition(any(),
+                eq(gatewayInstance1));
+        doReturn(true).when(gatewayInstanceService).checkMergingCondition(any(), eq(gatewayInstance2));
+
+        executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance1, gatewayInstance2));
+
+        verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")
+                && work.getParameter("flowNodeInstanceId").equals(344L)));
+        verifyNoMoreInteractions(workService);
     }
 
     @Test
