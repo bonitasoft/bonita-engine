@@ -100,26 +100,31 @@ public class ExecuteFlowNodes {
         List<Long> unprocessed = new ArrayList<>(flowNodeIds);
         List<SFlowNodeInstance> flowNodeInstances = activityInstanceService.getFlowNodeInstancesByIds(flowNodeIds);
         for (SFlowNodeInstance flowNodeInstance : flowNodeInstances) {
-            unprocessed.remove(flowNodeInstance.getId());
-            if (flowNodeInstance.isTerminal()) {
-                executionMonitor.finishing++;
-                logger.debug("Restarting flow node (Notify finished...) with name = <" + flowNodeInstance.getName()
-                        + ">, and id = <" + flowNodeInstance.getId()
-                        + " in state = <" + flowNodeInstance.getStateName() + ">");
-                workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(flowNodeInstance));
-            } else {
-                if (shouldExecuteFlownode(flowNodeInstance)) {
-                    executionMonitor.executing++;
-                    logger.debug("Restarting flow node (Execute ...) with name = <" + flowNodeInstance.getName()
+            try {
+                unprocessed.remove(flowNodeInstance.getId());
+                if (flowNodeInstance.isTerminal()) {
+                    executionMonitor.finishing++;
+                    logger.debug("Restarting flow node (Notify finished...) with name = <" + flowNodeInstance.getName()
                             + ">, and id = <" + flowNodeInstance.getId()
-                            + "> in state = <" + flowNodeInstance.getStateName() + ">");
-                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
+                            + " in state = <" + flowNodeInstance.getStateName() + ">");
+                    workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(flowNodeInstance));
                 } else {
-                    executionMonitor.notExecutable++;
-                    logger.debug(
-                            "Flownode with name = <{}>, and id = <{}> in state = <{}> does not fulfill the restart conditions.",
-                            flowNodeInstance.getName(), flowNodeInstance.getId(), flowNodeInstance.getStateName());
+                    if (shouldExecuteFlownode(flowNodeInstance)) {
+                        executionMonitor.executing++;
+                        logger.debug("Restarting flow node (Execute ...) with name = <" + flowNodeInstance.getName()
+                                + ">, and id = <" + flowNodeInstance.getId()
+                                + "> in state = <" + flowNodeInstance.getStateName() + ">");
+                        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
+                    } else {
+                        executionMonitor.notExecutable++;
+                        logger.debug(
+                                "Flownode with name = <{}>, and id = <{}> in state = <{}> does not fulfill the restart conditions.",
+                                flowNodeInstance.getName(), flowNodeInstance.getId(), flowNodeInstance.getStateName());
+                    }
                 }
+            } catch (Exception e) {
+                logger.error("Error restarting flow node {}", flowNodeInstance.getId(), e);
+                executionMonitor.inError++;
             }
         }
         executionMonitor.notFound += unprocessed.size();
@@ -166,6 +171,7 @@ public class ExecuteFlowNodes {
         long executing;
         long notExecutable;
         long notFound;
+        long inError;
         private final long startTime;
         private final int numberOfElementsToProcess;
 
@@ -175,7 +181,8 @@ public class ExecuteFlowNodes {
         }
 
         public void printProgress() {
-            logger.info("Restarting elements...Processed " + (finishing + executing + notExecutable + notFound) + " of "
+            logger.info("Restarting elements...Processed "
+                    + (finishing + executing + notExecutable + notFound + inError) + " of "
                     + numberOfElementsToProcess +
                     " flow nodes to be restarted in " + Duration.ofMillis(System.currentTimeMillis() - startTime));
         }
@@ -183,13 +190,16 @@ public class ExecuteFlowNodes {
         public void printSummary() {
             logger.info("Restart of flow nodes completed.");
             logger.info("Processed {} flow nodes to be restarted in {}",
-                    (finishing + executing + notExecutable + notFound),
+                    (finishing + executing + notExecutable + notFound + inError),
                     Duration.ofMillis(System.currentTimeMillis() - startTime));
             logger.info("Found {} flow nodes to be executed", executing);
             logger.info("Found {} flow nodes to be completed", finishing);
             logger.info("Found {} flow nodes that were not executable (e.g. unmerged gateway)", notExecutable);
             if (notFound > 0) {
                 logger.info(notFound + " flow nodes were not found (might have been manually executed)");
+            }
+            if (inError > 0) {
+                logger.info("Found {} flow nodes in error (see stacktrace for reason)", inError);
             }
         }
     }

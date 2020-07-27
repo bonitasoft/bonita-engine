@@ -98,14 +98,14 @@ public class RestartProcessHandler implements TenantRestartHandler {
     @Override
     public void afterServicesStart() {
         // get all process in initializing
-        // call executeConnectors on enter on them (only case they can be in initializing)
+        // call executeConnectors ON_ENTER on them (only case they can be in initializing)
         // get all process in completing
-        // call executeConnectors on finish on them (only case they can be in completing)
+        // call executeConnectors ON_FINISH on them (only case they can be in completing)
+        // also completed, aborted, cancelled
 
         final List<Long> list = processInstancesByTenant.get(tenantId);
         final Iterator<Long> iterator = list.iterator();
-        logInfo(logger,
-                "Attempting to restart " + list.size() + " processes for tenant " + tenantId);
+        logInfo(logger, "Attempting to restart " + list.size() + " processes for tenant " + tenantId);
         final ExecuteProcesses exec = new ExecuteProcesses(workService, logger, activityInstanceService,
                 processDefinitionService,
                 processInstanceService, processExecutor,
@@ -119,8 +119,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                         e);
             }
         } while (iterator.hasNext());
-        logInfo(logger,
-                "All processes to be restarted on tenant " + tenantId + " have been handled");
+        logInfo(logger, "All processes to be restarted on tenant " + tenantId + " have been handled");
     }
 
     protected void handleCompletion(final SProcessInstance processInstance, final TechnicalLoggerService logger,
