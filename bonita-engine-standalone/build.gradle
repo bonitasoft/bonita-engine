@@ -13,7 +13,6 @@ dependencies{
 
     implementation "org.springframework:spring-context:${Deps.springVersion}"
     implementation "org.jboss.narayana.jta:narayana-jta:${Deps.naranayaVersion}"
-    implementation "javax.transaction:jta:${Deps.javaxJtaVersion}"
     implementation "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
     implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     runtime "com.h2database:h2:${Deps.h2Version}"
