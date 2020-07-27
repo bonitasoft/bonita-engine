@@ -479,10 +479,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         return getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
-    protected EventService getEventService() {
-        return eventService;
-    }
-
     protected Recorder getRecorder() {
         return recorder;
     }
@@ -510,6 +506,13 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
                 new SelectListDescriptor<>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class,
                         queryOptions));
         return getUnmodifiableList(selectList);
+    }
+
+    @Override
+    public List<SFlowNodeInstance> getFlowNodeInstancesByIds(List<Long> ids) throws SBonitaReadException {
+        return getUnmodifiableList(getPersistenceService().selectList(
+                new SelectListDescriptor<>("getFlowNodeInstancesByIds", Collections.singletonMap("ids", ids),
+                        SFlowNodeInstance.class, QueryOptions.ALL_RESULTS)));
     }
 
     @Override

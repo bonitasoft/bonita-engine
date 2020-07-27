@@ -15,7 +15,6 @@ package org.bonitasoft.engine.tenant.restart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +72,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
             final ArrayList<Long> flownodesToRestart = new ArrayList<>();
             flownodesToRestartByTenant.put(tenantId, flownodesToRestart);
 
-            // using a to low page size (100) causes too many access to the database and causes timeout exception if there are lot of elements.
+            // using a too low page size (100) causes too many access to the database and causes timeout exception if there are lot of elements.
             // As we retrieve only the id we can use a greater page size
             QueryOptions queryOptions = new QueryOptions(0, 50000);
             List<Long> ids;
@@ -97,22 +96,10 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     }
 
     @Override
-    public void afterServicesStart()
-            throws RestartException {
+    public void afterServicesStart() {
         final List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantId);
-
         logInfo("Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
-        try {
-            final Iterator<Long> iterator = flownodesIds.iterator();
-            do {
-                transactionService.executeInTransaction(() -> {
-                    executeFlowNodes.execute(iterator);
-                    return null;
-                });
-            } while (iterator.hasNext());
-        } catch (final Exception e) {
-            throw new RestartException("Unable to restart elements", e);
-        }
+        executeFlowNodes.executeFlowNodes(flownodesIds);
         logInfo("All flow nodes to be restarted on tenant " + tenantId + " have been handled");
     }
 }
