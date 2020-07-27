@@ -23,8 +23,6 @@ dependencies {
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
     testCompile project(':bpm:bonita-util:bonita-common-util-test')
-    compileOnly "javax.transaction:jta:${Deps.javaxJtaVersion}"
-    testCompile "javax.transaction:jta:${Deps.javaxJtaVersion}"
     testRuntimeOnly "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
     testRuntimeOnly "com.h2database:h2:${Deps.h2Version}"
     testRuntimeOnly "mysql:mysql-connector-java:${Deps.mysqlVersion}"
