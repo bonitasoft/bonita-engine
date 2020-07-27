@@ -32,6 +32,6 @@ public interface TenantRestartHandler {
      *
      * @throws RestartException
      */
-    void afterServicesStart() throws RestartException;
+    void afterServicesStart();
 
 }
