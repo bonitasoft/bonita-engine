@@ -15,11 +15,8 @@ package org.bonitasoft.engine.api.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -34,65 +31,57 @@ import org.slf4j.LoggerFactory;
  */
 public class StarterThread extends Thread {
 
-    private static Logger logger = LoggerFactory.getLogger(StarterThread.class);
+    private static final Logger logger = LoggerFactory.getLogger(StarterThread.class);
 
     private final List<TenantRestartHandler> tenantRestartHandlers;
-    private Long tenantId;
-    private SessionAccessor sessionAccessor;
-    private SessionService sessionService;
-    private UserTransactionService transactionService;
-    private PlatformService platformService;
+    private final Long tenantId;
+    private final SessionAccessor sessionAccessor;
+    private final UserTransactionService transactionService;
+    private final PlatformService platformService;
 
-    public StarterThread(Long tenantId, SessionAccessor sessionAccessor, SessionService sessionService,
+    public StarterThread(Long tenantId, SessionAccessor sessionAccessor,
             UserTransactionService transactionService, PlatformService platformService,
             List<TenantRestartHandler> tenantRestartHandlers) {
         super("Tenant " + tenantId + " starter Thread");
         this.tenantRestartHandlers = tenantRestartHandlers;
         this.tenantId = tenantId;
         this.sessionAccessor = sessionAccessor;
-        this.sessionService = sessionService;
         this.transactionService = transactionService;
         this.platformService = platformService;
     }
 
     @Override
     public void run() {
-        try {
-            STenant tenant = getTenant(tenantId);
-            logger.info("Restarting elements of tenant {} that were not finished at the last shutdown", tenant.getId());
-            if (!tenant.isActivated()) {
-                logger.warn("Unable to restart elements of tenant because tenant is {}", tenant.getStatus());
-                return;
-            }
-            executeHandlers(tenantId, sessionAccessor);
-
-        } catch (Exception e) {
-            logger.error("Error while restarting elements", e);
+        STenant tenant = getTenant();
+        logger.info("Restarting elements of tenant {} that were not finished at the last shutdown", tenant.getId());
+        if (!tenant.isActivated()) {
+            logger.warn("Unable to restart elements of tenant because tenant is {}", tenant.getStatus());
+            return;
         }
+        executeHandlers(sessionAccessor);
     }
 
-    private void executeHandlers(long tenantId, SessionAccessor sessionAccessor)
-            throws SBonitaException, RestartException {
-        long sessionId = createSessionAndMakeItActive(sessionAccessor, tenantId);
+    private void executeHandlers(SessionAccessor sessionAccessor) {
+        sessionAccessor.setTenantId(tenantId);
         try {
             for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {
-                restartHandler.afterServicesStart();
-
+                try {
+                    logger.info("Executing Restart Handler " + restartHandler.getClass().getName());
+                    restartHandler.afterServicesStart();
+                } catch (Exception e) {
+                    logger.error("The Restart Handler " + restartHandler.getClass().getName() + " failed", e);
+                }
             }
         } finally {
-            sessionService.deleteSession(sessionId);
+            sessionAccessor.deleteTenantId();
         }
     }
 
-    STenant getTenant(final long tenantId) throws Exception {
-        return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
-    }
-
-    private long createSessionAndMakeItActive(final SessionAccessor sessionAccessor, final long tenantId)
-            throws SBonitaException {
-
-        final long sessionId = sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
-        sessionAccessor.setSessionInfo(sessionId, tenantId);
-        return sessionId;
+    STenant getTenant() {
+        try {
+            return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
