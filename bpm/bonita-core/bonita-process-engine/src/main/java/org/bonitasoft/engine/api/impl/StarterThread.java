@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -53,33 +52,36 @@ public class StarterThread extends Thread {
 
     @Override
     public void run() {
-        try {
-            STenant tenant = getTenant(tenantId);
-            logger.info("Restarting elements of tenant {} that were not finished at the last shutdown", tenant.getId());
-            if (!tenant.isActivated()) {
-                logger.warn("Unable to restart elements of tenant because tenant is {}", tenant.getStatus());
-                return;
-            }
-            executeHandlers(tenantId, sessionAccessor);
-
-        } catch (Exception e) {
-            logger.error("Error while restarting elements", e);
+        STenant tenant = getTenant();
+        logger.info("Restarting elements of tenant {} that were not finished at the last shutdown", tenant.getId());
+        if (!tenant.isActivated()) {
+            logger.warn("Unable to restart elements of tenant because tenant is {}", tenant.getStatus());
+            return;
         }
+        executeHandlers(sessionAccessor);
     }
 
-    private void executeHandlers(long tenantId, SessionAccessor sessionAccessor) throws RestartException {
+    private void executeHandlers(SessionAccessor sessionAccessor) {
         sessionAccessor.setTenantId(tenantId);
         try {
             for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {
-                restartHandler.afterServicesStart();
-
+                try {
+                    logger.info("Executing Restart Handler " + restartHandler.getClass().getName());
+                    restartHandler.afterServicesStart();
+                } catch (Exception e) {
+                    logger.error("The Restart Handler " + restartHandler.getClass().getName() + " failed", e);
+                }
             }
         } finally {
             sessionAccessor.deleteTenantId();
         }
     }
 
-    STenant getTenant(final long tenantId) throws Exception {
-        return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
+    STenant getTenant() {
+        try {
+            return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

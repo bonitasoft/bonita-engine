@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan({
-        "org.bonitasoft.engine.configuration.tenant",
         "org.bonitasoft.engine.tenant"
 })
 public class EngineTenantConfiguration {

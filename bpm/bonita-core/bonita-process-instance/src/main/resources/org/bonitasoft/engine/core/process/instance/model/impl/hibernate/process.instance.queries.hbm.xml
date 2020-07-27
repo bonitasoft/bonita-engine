@@ -84,6 +84,12 @@
 		AND f.parentContainerId = :parentContainerId
 	</query>
 
+	<query name="getFlowNodeInstancesByIds">
+		SELECT f
+		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
+		WHERE f.id IN (:ids)
+	</query>
+
 	<query name="getInclusiveGatewayInstanceOfProcessInstance">
 		SELECT g
 		FROM org.bonitasoft.engine.core.process.instance.model.SGatewayInstance AS g
