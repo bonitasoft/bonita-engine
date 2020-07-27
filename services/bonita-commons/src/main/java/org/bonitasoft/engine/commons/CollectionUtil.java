@@ -15,10 +15,10 @@ package org.bonitasoft.engine.commons;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CollectionUtil {
 
@@ -28,14 +28,20 @@ public class CollectionUtil {
         return result;
     }
 
-    public static <T> Set<T> buildHashSetFromList(final Class<T> clazz, final List<T> list) {
-        final Set<T> set = new HashSet<T>();
-        set.addAll(list);
-        return set;
-
-    }
-
     public static <T> List<T> emptyOrUnmodifiable(final List<T> list) {
         return list == null ? Collections.<T> emptyList() : Collections.unmodifiableList(list);
+    }
+
+    public static <T> List<List<T>> split(List<T> source, int chunkSize) {
+        if (chunkSize <= 0) {
+            throw new IllegalArgumentException("can't split a list with a chunkSize = " + chunkSize);
+        }
+        int size = source.size();
+        if (size <= 0) {
+            return Collections.emptyList();
+        }
+        return IntStream.range(0, size / chunkSize + (size % chunkSize == 0 ? 0 : 1))
+                .mapToObj(n -> source.subList(n * chunkSize, Math.min(size, (n + 1) * chunkSize)))
+                .collect(Collectors.toList());
     }
 }

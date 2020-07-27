@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.tenant.restart;
 
+import static java.util.Arrays.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
@@ -75,5 +75,16 @@ public class RestartFlowNodesHandlerTest {
 
         //when
         restartFlowNodesHandler.beforeServicesStart();
+    }
+
+    @Test
+    public void should_call_ExecuteFlowNodes_with_ids_to_restart() throws Exception {
+        doReturn(asList(1L, 2L, 3L, 4L)).when(flowNodeInstanceService)
+                .getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
+
+        restartFlowNodesHandler.beforeServicesStart();
+        restartFlowNodesHandler.afterServicesStart();
+
+        verify(executeFlowNodes).executeFlowNodes(asList(1L, 2L, 3L, 4L));
     }
 }

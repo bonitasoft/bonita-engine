@@ -13,11 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.concurrent.Callable;
@@ -28,7 +26,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -38,6 +38,9 @@ import org.mockito.junit.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class StarterThreadTest {
+
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     private final STenant tenant = createTenant();
     @Mock
@@ -102,4 +105,36 @@ public class StarterThreadTest {
         verify(tenantRestartHandler2, never()).afterServicesStart();
     }
 
+    @Test
+    public void should_call_all_restart_handlers_even_when_one_handler_fails() throws Exception {
+        //given
+        tenant.setStatus("ACTIVATED");
+        doThrow(new RuntimeException("test")).when(tenantRestartHandler1).afterServicesStart();
+        //when
+        starterThread.run();
+        //then
+        verify(tenantRestartHandler1).afterServicesStart();
+        verify(tenantRestartHandler2).afterServicesStart();
+
+        assertThat(systemOutRule.getLog())
+                .contains("The Restart Handler " + tenantRestartHandler1.getClass().getName() + " failed");
+        assertThat(systemOutRule.getLog()).contains("java.lang.RuntimeException: test");
+    }
+
+    @Test
+    public void should_call_all_restart_handlers_even_when_one_handler_fails_with_a_runtime_exception()
+            throws Exception {
+        //given
+        tenant.setStatus("ACTIVATED");
+        doThrow(new RuntimeException("test", new Exception())).when(tenantRestartHandler1).afterServicesStart();
+        //when
+        starterThread.run();
+        //then
+        verify(tenantRestartHandler1).afterServicesStart();
+        verify(tenantRestartHandler2).afterServicesStart();
+
+        assertThat(systemOutRule.getLog())
+                .contains("The Restart Handler " + tenantRestartHandler1.getClass().getName() + " failed");
+        assertThat(systemOutRule.getLog()).contains("RuntimeException", "test");
+    }
 }
