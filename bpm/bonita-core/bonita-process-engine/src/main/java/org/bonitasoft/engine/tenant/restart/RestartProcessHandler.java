@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -27,6 +28,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -53,6 +55,144 @@ import org.springframework.stereotype.Component;
 @Component
 public class RestartProcessHandler implements TenantRestartHandler {
 
+    private final Long tenantId;
+    private final WorkService workService;
+    private final ActivityInstanceService activityInstanceService;
+    private final ProcessDefinitionService processDefinitionService;
+    private final ProcessExecutor processExecutor;
+    private final BPMWorkFactory workFactory;
+    private final FlowNodeStateManager flowNodeStateManager;
+    private final UserTransactionService transactionService;
+    private final TechnicalLoggerService logger;
+    private final ProcessInstanceService processInstanceService;
+    //the handler is executed on one tenant only but we keep a map by tenant because this class is a singleton
+    //It should not be a singleton but have a factory to create it
+    private Map<Long, List<Long>> processInstancesByTenant = new HashMap<>();
+
+    public RestartProcessHandler(@Value("${tenantId}") Long tenantId, WorkService workService,
+            ActivityInstanceService activityInstanceService, ProcessDefinitionService processDefinitionService,
+            ProcessExecutor processExecutor, BPMWorkFactory workFactory,
+            FlowNodeStateManager flowNodeStateManager, UserTransactionService transactionService,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            ProcessInstanceService processInstanceService) {
+        this.tenantId = tenantId;
+        this.workService = workService;
+        this.activityInstanceService = activityInstanceService;
+        this.processDefinitionService = processDefinitionService;
+        this.processExecutor = processExecutor;
+        this.workFactory = workFactory;
+        this.flowNodeStateManager = flowNodeStateManager;
+        this.transactionService = transactionService;
+        this.logger = logger;
+        this.processInstanceService = processInstanceService;
+    }
+
+    @Override
+    public void beforeServicesStart() throws RestartException {
+        logInfo(logger, "Start detecting processes to restart on tenant " + tenantId + "...");
+        final List<Long> ids = getAllProcessInstancesToRestart(processInstanceService);
+        logInfo(logger, "Found " + ids.size() + " process to restart on tenant " + tenantId);
+        processInstancesByTenant.put(tenantId, ids);
+    }
+
+    @Override
+    public void afterServicesStart() {
+        // get all process in initializing
+        // call executeConnectors on enter on them (only case they can be in initializing)
+        // get all process in completing
+        // call executeConnectors on finish on them (only case they can be in completing)
+
+        final List<Long> list = processInstancesByTenant.get(tenantId);
+        final Iterator<Long> iterator = list.iterator();
+        logInfo(logger,
+                "Attempting to restart " + list.size() + " processes for tenant " + tenantId);
+        final ExecuteProcesses exec = new ExecuteProcesses(workService, logger, activityInstanceService,
+                processDefinitionService,
+                processInstanceService, processExecutor,
+                flowNodeStateManager, workFactory, iterator);
+        do {
+            try {
+                transactionService.executeInTransaction(exec);
+            } catch (Exception e) {
+                logger.log(getClass(), TechnicalLogSeverity.ERROR,
+                        "Some processes failed to recover, they might seem stuck, a server restart is required to unlock all stuck process instances.",
+                        e);
+            }
+        } while (iterator.hasNext());
+        logInfo(logger,
+                "All processes to be restarted on tenant " + tenantId + " have been handled");
+    }
+
+    protected void handleCompletion(final SProcessInstance processInstance, final TechnicalLoggerService logger,
+            final ActivityInstanceService activityInstanceService, final WorkService workService,
+            FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory)
+            throws SBonitaException {
+        // Only Error events set interruptedByEvent on SProcessInstance:
+        if (!processInstance.hasBeenInterruptedByEvent()) {
+
+            final long callerId = processInstance.getCallerId();
+            // Should always be in a CallActivity:
+            if (callerId > 0) {
+                final SActivityInstance callActivityInstance = activityInstanceService
+                        .getActivityInstance(processInstance.getCallerId());
+                if (callActivityInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
+                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(callActivityInstance));
+                    logInfo(logger,
+                            "Restarting notification of finished process '" + processInstance.getName() + "' with id "
+                                    + processInstance.getId()
+                                    + " in state " + getState(processInstance.getStateId()));
+                }
+            }
+        }
+    }
+
+    public List<Long> getAllProcessInstancesToRestart(ProcessInstanceService processInstanceService)
+            throws RestartException {
+        final List<Long> ids = new ArrayList<Long>();
+        QueryOptions queryOptions = new QueryOptions(0, 1000, SProcessInstance.class, "id", OrderByType.ASC);
+        try {
+            List<SProcessInstance> processInstances;
+            do {
+                processInstances = processInstanceService.getProcessInstancesInStates(queryOptions,
+                        ProcessInstanceState.INITIALIZING,
+                        ProcessInstanceState.COMPLETING, ProcessInstanceState.COMPLETED,
+                        ProcessInstanceState.ABORTED, ProcessInstanceState.CANCELLED);
+                queryOptions = QueryOptions.getNextPage(queryOptions);
+                for (final SProcessInstance sProcessInstance : processInstances) {
+                    ids.add(sProcessInstance.getId());
+                }
+            } while (processInstances.size() == queryOptions.getNumberOfResults());
+        } catch (final SProcessInstanceReadException e) {
+            handleException(e, "Unable to restart process: can't read process instances");
+        }
+        return ids;
+    }
+
+    @VisibleForTesting
+    void setProcessInstancesByTenant(Map<Long, List<Long>> processInstancesByTenant) {
+        this.processInstancesByTenant = processInstancesByTenant;
+    }
+
+    protected void logInfo(final TechnicalLoggerService logger, final String msg) {
+        if (logger.isLoggable(RestartProcessHandler.class, TechnicalLogSeverity.INFO)) {
+            logger.log(RestartProcessHandler.class, TechnicalLogSeverity.INFO, msg);
+        }
+    }
+
+    private void handleException(final Exception e, final String message) throws RestartException {
+        throw new RestartException(message, e);
+    }
+
+    private ProcessInstanceState getState(final int stateId) {
+        return ProcessInstanceState.getFromId(stateId);
+    }
+
+    private void restartConnector(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
+            final ConnectorEvent event,
+            final ProcessExecutor processExecutor) throws SBonitaException {
+        processExecutor.executeConnectors(processDefinition, processInstance, event, null);
+    }
+
     public class ExecuteProcesses implements Callable<Object> {
 
         private final WorkService workService;
@@ -68,7 +208,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
         private final ProcessExecutor processExecutor;
 
         private final FlowNodeStateManager flowNodeStateManager;
-        private BPMWorkFactory workFactory;
+        private final BPMWorkFactory workFactory;
         private final Iterator<Long> iterator;
 
         public ExecuteProcesses(final WorkService workService, final TechnicalLoggerService logger,
@@ -99,13 +239,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                     final ProcessInstanceState state = getState(processInstance.getStateId());
                     switch (state) {
                         case ABORTED:
-                            handleCompletion(processInstance, logger, activityInstanceService, workService,
-                                    flowNodeStateManager, workFactory);
-                            break;
                         case CANCELLED:
-                            handleCompletion(processInstance, logger, activityInstanceService, workService,
-                                    flowNodeStateManager, workFactory);
-                            break;
                         case COMPLETED:
                             handleCompletion(processInstance, logger, activityInstanceService, workService,
                                     flowNodeStateManager, workFactory);
@@ -121,139 +255,15 @@ public class RestartProcessHandler implements TenantRestartHandler {
                         default:
                             break;
                     }
-                } catch (final SBonitaException e) {
-                    throw new RestartException("Unable to restart the process " + processId, e);
+                } catch (final SProcessInstanceNotFoundException e) {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Unable to restart the process instance "
+                            + processId + ", it is not found (already completed).");
+                } catch (final Exception e) {
+                    logger.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to restart the process instance "
+                            + processId + ", a server restart is required to unlock all stuck process instances.", e);
                 }
             }
             return null;
         }
     }
-
-    private Long tenantId;
-    private WorkService workService;
-    private ActivityInstanceService activityInstanceService;
-    private ProcessDefinitionService processDefinitionService;
-    private ProcessExecutor processExecutor;
-    private BPMWorkFactory workFactory;
-
-    private FlowNodeStateManager flowNodeStateManager;
-
-    private UserTransactionService transactionService;
-
-    public RestartProcessHandler(@Value("${tenantId}") Long tenantId, WorkService workService,
-            ActivityInstanceService activityInstanceService, ProcessDefinitionService processDefinitionService,
-            ProcessExecutor processExecutor, BPMWorkFactory workFactory,
-            FlowNodeStateManager flowNodeStateManager, UserTransactionService transactionService,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
-            ProcessInstanceService processInstanceService) {
-        this.tenantId = tenantId;
-        this.workService = workService;
-        this.activityInstanceService = activityInstanceService;
-        this.processDefinitionService = processDefinitionService;
-        this.processExecutor = processExecutor;
-        this.workFactory = workFactory;
-        this.flowNodeStateManager = flowNodeStateManager;
-        this.transactionService = transactionService;
-        this.logger = logger;
-        this.processInstanceService = processInstanceService;
-    }
-
-    private TechnicalLoggerService logger;
-    private ProcessInstanceService processInstanceService;
-
-    //the handler is executed on one tenant only but we keep a map by tenant because this class is a singleton
-    //It should not be a singleton but have a factory to create it
-    private final Map<Long, List<Long>> processInstancesByTenant = new HashMap<>();
-
-    @Override
-    public void beforeServicesStart() throws RestartException {
-        logInfo(logger, "Start detecting processes to restart on tenant " + tenantId + "...");
-        final List<Long> ids = new ArrayList<>();
-        processInstancesByTenant.put(tenantId, ids);
-        QueryOptions queryOptions = new QueryOptions(0, 1000, SProcessInstance.class, "id", OrderByType.ASC);
-        try {
-            List<SProcessInstance> processInstances;
-            do {
-                processInstances = processInstanceService.getProcessInstancesInStates(queryOptions,
-                        ProcessInstanceState.INITIALIZING,
-                        ProcessInstanceState.COMPLETING, ProcessInstanceState.COMPLETED,
-                        ProcessInstanceState.ABORTED, ProcessInstanceState.CANCELLED);
-                queryOptions = QueryOptions.getNextPage(queryOptions);
-                for (final SProcessInstance sProcessInstance : processInstances) {
-                    ids.add(sProcessInstance.getId());
-                }
-            } while (processInstances.size() == queryOptions.getNumberOfResults());
-            logInfo(logger, "Found " + ids.size() + " process to restart on tenant " + tenantId);
-        } catch (final SProcessInstanceReadException e) {
-            throw new RestartException("Unable to detect processes as to be restarted on tenant " + tenantId
-                    + ": can't read process instances", e);
-        }
-    }
-
-    protected void logInfo(final TechnicalLoggerService logger, final String msg) {
-        if (logger.isLoggable(RestartProcessHandler.class, TechnicalLogSeverity.INFO)) {
-            logger.log(RestartProcessHandler.class, TechnicalLogSeverity.INFO, msg);
-        }
-    }
-
-    private ProcessInstanceState getState(final int stateId) {
-        return ProcessInstanceState.getFromId(stateId);
-    }
-
-    @Override
-    public void afterServicesStart()
-            throws RestartException {
-        // get all process in initializing
-        // call executeConnectors on enter on them (only case they can be in initializing)
-        // get all process in completing
-        // call executeConnectors on finish on them (only case they can be in completing)
-
-        final List<Long> list = processInstancesByTenant.get(tenantId);
-        final Iterator<Long> iterator = list.iterator();
-        logInfo(logger,
-                "Restarting " + list.size() + " processes for tenant " + tenantId);
-        ExecuteProcesses exec;
-        try {
-            do {
-                exec = new ExecuteProcesses(workService, logger, activityInstanceService, processDefinitionService,
-                        processInstanceService, processExecutor,
-                        flowNodeStateManager, workFactory, iterator);
-                transactionService.executeInTransaction(exec);
-            } while (iterator.hasNext());
-        } catch (final Exception e) {
-            throw new RestartException("Unable to restart process instance", e);
-        }
-        logInfo(logger,
-                "All processes to be restarted on tenant " + tenantId + " have been handled");
-    }
-
-    protected void handleCompletion(final SProcessInstance processInstance, final TechnicalLoggerService logger,
-            final ActivityInstanceService activityInstanceService, final WorkService workService,
-            FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory)
-            throws SBonitaException {
-        // Only Error events set interruptedByEvent on SProcessInstance:
-        if (!processInstance.hasBeenInterruptedByEvent()) {
-
-            final long callerId = processInstance.getCallerId();
-            // Should always be in a CallActivity:
-            if (callerId > 0) {
-                final SActivityInstance callActivityInstance = activityInstanceService
-                        .getActivityInstance(processInstance.getCallerId());
-                if (callActivityInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
-                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(callActivityInstance));
-                    logInfo(logger,
-                            "Restarting notification of finished process '" + processInstance.getName() + "' with id "
-                                    + processInstance.getId()
-                                    + " in state " + getState(processInstance.getStateId()));
-                }
-            }
-        }
-    }
-
-    private void restartConnector(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
-            final ConnectorEvent event,
-            final ProcessExecutor processExecutor) throws SBonitaException {
-        processExecutor.executeConnectors(processDefinition, processInstance, event, null);
-    }
-
 }
