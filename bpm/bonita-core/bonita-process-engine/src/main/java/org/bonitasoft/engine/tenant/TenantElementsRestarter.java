@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,17 +23,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class TenantElementsRestarter {
 
-    private List<TenantRestartHandler> tenantRestartHandlers;
-    private TenantRestarter tenantRestarter;
-    private TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
-    private long tenantId;
+    private final TenantRestarter tenantRestarter;
+    private final TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
 
-    public TenantElementsRestarter(List<TenantRestartHandler> tenantRestartHandlers, TenantRestarter tenantRestarter,
-            TenantElementsRestartSupervisor tenantElementsRestartSupervisor, @Value("${tenantId}") long tenantId) {
-        this.tenantRestartHandlers = tenantRestartHandlers;
+    public TenantElementsRestarter(TenantRestarter tenantRestarter,
+            TenantElementsRestartSupervisor tenantElementsRestartSupervisor) {
         this.tenantRestarter = tenantRestarter;
         this.tenantElementsRestartSupervisor = tenantElementsRestartSupervisor;
-        this.tenantId = tenantId;
     }
 
     void prepareRestartOfElements() throws Exception {
@@ -48,10 +40,10 @@ public class TenantElementsRestarter {
             // * transitions that are in state created: call execute on them
             // * flow node that are completed and not deleted : call execute to make it create transitions and so on
             // * all element that are in not stable state
-            log.info("Preparing restart of elements of tenant {}", tenantId);
+            log.info("Preparing restart of elements");
             tenantRestarter.executeBeforeServicesStart();
         } else {
-            log.info("Not preparing restart of elements of tenant {}, as another node already did it", tenantId);
+            log.info("Not preparing restart of elements, as another node already did it");
         }
     }
 
@@ -63,10 +55,10 @@ public class TenantElementsRestarter {
     // * all element that are in not stable state
     void restartElements() throws Exception {
         if (tenantElementsRestartSupervisor.willRestartElements()) {
-            log.info("Restarting unfinished elements of tenant {}", tenantId);
-            tenantRestarter.executeAfterServicesStart(tenantRestartHandlers);
+            log.info("Restarting unfinished elements");
+            tenantRestarter.executeAfterServicesStart();
         } else {
-            log.info("Not restarting elements of tenant {}, as another node already did it", tenantId);
+            log.info("Not restarting elements of tenant, as another node already did it");
         }
     }
 }

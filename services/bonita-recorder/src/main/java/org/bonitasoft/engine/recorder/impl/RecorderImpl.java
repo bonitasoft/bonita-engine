@@ -131,8 +131,7 @@ public class RecorderImpl implements Recorder {
         }
     }
 
-    private void logExceptionsFromHandlers(final Exception e)
-            throws SRecorderException {
+    private void logExceptionsFromHandlers(final Exception e) {
         if (!(e instanceof SFireEventException)) {
             return;
         }

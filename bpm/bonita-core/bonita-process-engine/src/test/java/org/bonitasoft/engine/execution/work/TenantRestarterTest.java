@@ -14,15 +14,14 @@
 package org.bonitasoft.engine.execution.work;
 
 import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.TenantRestarter;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
@@ -48,43 +47,32 @@ public class TenantRestarterTest {
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
-    private SessionService sessionService;
-    @Mock
     private PlatformService platformService;
     private TenantRestarter tenantRestarter;
 
     @Before
     public void before() throws Exception {
-        tenantRestarter = new TenantRestarter(1L, transactionService, sessionAccessor, sessionService, platformService,
+        tenantRestarter = new TenantRestarter(1L, transactionService, sessionAccessor, platformService,
                 asList(tenantRestartHandler1, tenantRestartHandler2));
+        when(transactionService.executeInTransaction(any()))
+                .then(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
     }
 
     @Test
-    public void should_execute_beforeServicesStart_on_handler_when_in_transaction() throws Exception {
-        doReturn(true).when(transactionService).isTransactionActive();
+    public void should_execute_beforeServicesStart_on_handlers() throws Exception {
 
         tenantRestarter.executeBeforeServicesStart();
 
         verify(tenantRestartHandler1).beforeServicesStart();
         verify(tenantRestartHandler2).beforeServicesStart();
+        verify(transactionService).executeInTransaction(any());
     }
 
-    @Test
-    public void should_return_handlers_when_beforeServicesStart_is_executed_when_in_transaction() throws Exception {
-        doReturn(true).when(transactionService).isTransactionActive();
-
-        List<TenantRestartHandler> tenantRestartHandlers = tenantRestarter.executeBeforeServicesStart();
-
-        assertThat(tenantRestartHandlers).containsOnly(tenantRestartHandler1, tenantRestartHandler2);
-    }
-
-    @Test
-    public void should_execute_beforeServicesStart_on_handler_when_outside_of_transaction() throws Exception {
-        doReturn(false).when(transactionService).isTransactionActive();
+    @Test(expected = RuntimeException.class)
+    public void should_stop_execution_when_exception_happens_on_tenantRestartHandler() throws Exception {
+        doThrow(new RuntimeException("ohoh...")).when(tenantRestartHandler1).beforeServicesStart();
 
         tenantRestarter.executeBeforeServicesStart();
-
-        verify(transactionService).executeInTransaction(any());
     }
 
 }

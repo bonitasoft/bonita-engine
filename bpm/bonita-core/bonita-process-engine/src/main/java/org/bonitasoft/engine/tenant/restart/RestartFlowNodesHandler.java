@@ -14,22 +14,18 @@
 package org.bonitasoft.engine.tenant.restart;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorOfActivity;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
 import org.bonitasoft.engine.execution.work.RestartException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,63 +39,44 @@ import org.springframework.stereotype.Component;
 @Component
 public class RestartFlowNodesHandler implements TenantRestartHandler {
 
-    //the handler is executed on one tenant only but we keep a map by tenant because this class is a singleton
-    //It should not be a singleton but have a factory to create it
-    final Map<Long, List<Long>> flownodesToRestartByTenant = new HashMap<>();
-    private Long tenantId;
-    private TechnicalLoggerService logger;
-    private FlowNodeInstanceService flowNodeInstanceService;
-    private UserTransactionService transactionService;
-    private ExecuteFlowNodes executeFlowNodes;
+    List<Long> flownodesToRestart = new ArrayList<>();
+    private final TechnicalLogger logger;
+    private final FlowNodeInstanceService flowNodeInstanceService;
+    private final ExecuteFlowNodes executeFlowNodes;
 
-    public RestartFlowNodesHandler(@Value("${tenantId}") Long tenantId,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+    public RestartFlowNodesHandler(@Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
             FlowNodeInstanceService flowNodeInstanceService,
-            UserTransactionService transactionService,
             ExecuteFlowNodes executeFlowNodes) {
-        this.tenantId = tenantId;
-        this.logger = logger;
+        this.logger = logger.asLogger(RestartFlowNodesHandler.class);
         this.flowNodeInstanceService = flowNodeInstanceService;
-        this.transactionService = transactionService;
         this.executeFlowNodes = executeFlowNodes;
     }
 
     @Override
     public void beforeServicesStart()
             throws RestartException {
-        flownodesToRestartByTenant.clear();
         try {
-            final ArrayList<Long> flownodesToRestart = new ArrayList<>();
-            flownodesToRestartByTenant.put(tenantId, flownodesToRestart);
-
+            flownodesToRestart = new ArrayList<>();
             // using a too low page size (100) causes too many access to the database and causes timeout exception if there are lot of elements.
             // As we retrieve only the id we can use a greater page size
             QueryOptions queryOptions = new QueryOptions(0, 50000);
             List<Long> ids;
-            logInfo("Start detecting flow nodes to restart on tenant " + tenantId + "...");
+            logger.info("Start detecting flow nodes to restart...");
             do {
                 ids = flowNodeInstanceService.getFlowNodeInstanceIdsToRestart(queryOptions);
                 flownodesToRestart.addAll(ids);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
-
             } while (ids.size() == queryOptions.getNumberOfResults());
-            logInfo("Found " + flownodesToRestart.size() + " flow nodes to restart on tenant " + tenantId);
+            logger.info("Found {} flow nodes to restart", flownodesToRestart.size());
         } catch (final SBonitaReadException e) {
-            throw new RestartException("Unable to detect flow nodes as to be restarted on tenant " + tenantId, e);
-        }
-    }
-
-    private void logInfo(final String message) {
-        if (logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO)) {
-            logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO, message);
+            throw new RestartException("Unable to detect flow nodes that need to be restarted", e);
         }
     }
 
     @Override
     public void afterServicesStart() {
-        final List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantId);
-        logInfo("Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
-        executeFlowNodes.executeFlowNodes(flownodesIds);
-        logInfo("All flow nodes to be restarted on tenant " + tenantId + " have been handled");
+        logger.info("Restarting {} flow nodes", flownodesToRestart.size());
+        executeFlowNodes.executeFlowNodes(flownodesToRestart);
+        logger.info("All flow nodes to be restarted have been handled");
     }
 }
