@@ -13,12 +13,8 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-
-import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,17 +31,11 @@ public class TenantElementsRestarterTest {
     private TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
     @Mock
     private TenantRestarter tenantRestarter;
-    @Mock
-    private TenantRestartHandler tenantRestartHandler1;
-    @Mock
-    private TenantRestartHandler tenantRestartHandler2;
     private TenantElementsRestarter tenantElementsRestarter;
 
     @Before
     public void before() {
-        tenantElementsRestarter = new TenantElementsRestarter(
-                Arrays.asList(tenantRestartHandler1, tenantRestartHandler2),
-                tenantRestarter, tenantElementsRestartSupervisor, 41L);
+        tenantElementsRestarter = new TenantElementsRestarter(tenantRestarter, tenantElementsRestartSupervisor);
     }
 
     @Test
@@ -72,7 +62,7 @@ public class TenantElementsRestarterTest {
 
         tenantElementsRestarter.restartElements();
 
-        verify(tenantRestarter).executeAfterServicesStart(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
+        verify(tenantRestarter).executeAfterServicesStart();
     }
 
     @Test
@@ -81,7 +71,7 @@ public class TenantElementsRestarterTest {
 
         tenantElementsRestarter.restartElements();
 
-        verify(tenantRestarter, never()).executeAfterServicesStart(anyList());
+        verify(tenantRestarter, never()).executeAfterServicesStart();
     }
 
 }

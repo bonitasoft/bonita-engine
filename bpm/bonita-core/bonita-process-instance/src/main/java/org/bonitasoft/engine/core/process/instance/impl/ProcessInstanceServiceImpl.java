@@ -560,11 +560,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final long now = System.currentTimeMillis();
         switch (state) {
             case COMPLETED:
-                descriptor.addField(SProcessInstance.END_DATE_KEY, now);
-                break;
             case ABORTED:
-                descriptor.addField(SProcessInstance.END_DATE_KEY, now);
-                break;
             case CANCELLED:
                 descriptor.addField(SProcessInstance.END_DATE_KEY, now);
                 break;

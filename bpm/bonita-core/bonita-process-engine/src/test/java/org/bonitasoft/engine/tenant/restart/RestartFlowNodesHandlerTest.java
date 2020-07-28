@@ -13,19 +13,20 @@
  **/
 package org.bonitasoft.engine.tenant.restart;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.execution.work.RestartException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,18 +40,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class RestartFlowNodesHandlerTest {
 
     @Mock
-    private TechnicalLoggerService logger;
-    @Mock
     private FlowNodeInstanceService flowNodeInstanceService;
-    @Mock
-    private UserTransactionService transactionService;
     @Mock
     private ExecuteFlowNodes executeFlowNodes;
     private RestartFlowNodesHandler restartFlowNodesHandler;
 
     @Before
     public void before() {
-        restartFlowNodesHandler = new RestartFlowNodesHandler(123L, logger, flowNodeInstanceService, transactionService,
+        restartFlowNodesHandler = new RestartFlowNodesHandler(new TechnicalLoggerSLF4JImpl(), flowNodeInstanceService,
                 executeFlowNodes);
     }
 
@@ -64,7 +61,7 @@ public class RestartFlowNodesHandlerTest {
         restartFlowNodesHandler.beforeServicesStart();
 
         //then
-        assertThat(restartFlowNodesHandler.flownodesToRestartByTenant.get(123l)).isEmpty();
+        assertThat(restartFlowNodesHandler.flownodesToRestart).isEmpty();
     }
 
     @Test(expected = RestartException.class)

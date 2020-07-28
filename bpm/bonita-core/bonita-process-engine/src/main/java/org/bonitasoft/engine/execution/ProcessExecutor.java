@@ -51,7 +51,7 @@ public interface ProcessExecutor extends ContainerExecutor {
             Map<String, Serializable> processInputs)
             throws SProcessInstanceCreationException, SContractViolationException;
 
-    boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance,
+    boolean registerConnectorsToExecute(SProcessDefinition processDefinition, SProcessInstance sInstance,
             ConnectorEvent activationEvent,
             FlowNodeSelector selector) throws SBonitaException;
 

@@ -234,7 +234,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public boolean executeConnectors(final SProcessDefinition processDefinition,
+    public boolean registerConnectorsToExecute(final SProcessDefinition processDefinition,
             final SProcessInstance sProcessInstance, final ConnectorEvent activationEvent,
             final FlowNodeSelector selectorForConnectorOnEnter) throws SBonitaException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
@@ -244,6 +244,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             SConnectorInstance nextConnectorInstance;
             nextConnectorInstance = getNextConnectorInstance(sProcessInstance, activationEvent);
             if (nextConnectorInstance != null) {
+                // TODO: extract this search algorithm in a dedicated method:
                 for (final SConnectorDefinition sConnectorDefinition : connectors) {
                     if (sConnectorDefinition.getName().equals(nextConnectorInstance.getName())) {
                         workService.registerWork(workFactory.createExecuteConnectorOfProcessDescriptor(
@@ -440,7 +441,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(),
                 SConnectorInstance.PROCESS_TYPE);
 
-        return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER,
+        return registerConnectorsToExecute(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER,
                 selectorForConnectorOnEnter);
     }
 
@@ -744,7 +745,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 if (ProcessInstanceState.COMPLETING.getId() == sProcessInstance.getStateId()) {
                     processInstanceState = ProcessInstanceState.COMPLETED;
                 } else {
-                    if (executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_FINISH, null)) {
+                    if (registerConnectorsToExecute(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_FINISH,
+                            null)) {
                         // some connectors were trigger
                         processInstanceState = ProcessInstanceState.COMPLETING;
                     } else {

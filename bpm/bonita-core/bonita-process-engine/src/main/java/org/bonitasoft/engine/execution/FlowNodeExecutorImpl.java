@@ -301,10 +301,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public void childReachedState(final SProcessInstance childProcInst, final ProcessInstanceState childState,
-            final boolean hasActionsToExecute)
-            throws SBonitaException {
-        final long callerId = childProcInst.getCallerId();
-        if (isTerminalState(childState) && callerId > 0) {
+            final boolean hasActionsToExecute) throws SBonitaException {
+        if (isTerminalState(childState) && childProcInst.getCallerId() > 0) {
             final SActivityInstance callActivityInstance = activityInstanceService
                     .getActivityInstance(childProcInst.getCallerId());
             decrementToken(callActivityInstance);

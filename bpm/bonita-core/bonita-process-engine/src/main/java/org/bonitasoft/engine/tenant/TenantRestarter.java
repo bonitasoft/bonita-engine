@@ -15,16 +15,10 @@ package org.bonitasoft.engine.tenant;
 
 import java.util.List;
 
-import javax.transaction.Status;
-
 import org.bonitasoft.engine.api.impl.StarterThread;
-import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,58 +29,34 @@ import org.springframework.stereotype.Component;
 @Component
 public class TenantRestarter {
 
-    private UserTransactionService transactionService;
-    private List<TenantRestartHandler> tenantRestartHandlers;
-    private Long tenantId;
-    private SessionAccessor sessionAccessor;
-    private SessionService sessionService;
-    private PlatformService platformService;
+    private final UserTransactionService transactionService;
+    private final List<TenantRestartHandler> tenantRestartHandlers;
+    private final Long tenantId;
+    private final SessionAccessor sessionAccessor;
+    private final PlatformService platformService;
 
     public TenantRestarter(@Value("${tenantId}") Long tenantId, UserTransactionService transactionService,
-            SessionAccessor sessionAccessor, SessionService sessionService,
-            PlatformService platformService, List<TenantRestartHandler> tenantRestartHandlers) {
+            SessionAccessor sessionAccessor, PlatformService platformService,
+            List<TenantRestartHandler> tenantRestartHandlers) {
         this.tenantId = tenantId;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
-        this.sessionService = sessionService;
         this.platformService = platformService;
         this.tenantRestartHandlers = tenantRestartHandlers;
     }
 
-    public List<TenantRestartHandler> executeBeforeServicesStart() throws Exception {
-        if (transactionService.isTransactionActive()) {
-            return beforeServicesStart();
-        }
-        return transactionService.executeInTransaction(this::beforeServicesStart);
+    public void executeBeforeServicesStart() throws Exception {
+        transactionService.executeInTransaction(() -> {
+            for (TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
+                tenantRestartHandler.beforeServicesStart();
+            }
+            return null;
+        });
     }
 
-    private List<TenantRestartHandler> beforeServicesStart() throws RestartException {
-        for (TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
-            tenantRestartHandler.beforeServicesStart();
-        }
-        return tenantRestartHandlers;
-    }
-
-    public void executeAfterServicesStart(List<TenantRestartHandler> tenantRestartHandlers)
-            throws STransactionNotFoundException {
-        if (transactionService.isTransactionActive()) {
-            executeAfterServicesStartAfterCurrentTransaction(tenantRestartHandlers);
-        } else {
-            afterServicesStart(tenantRestartHandlers);
-        }
-    }
-
-    private void afterServicesStart(List<TenantRestartHandler> tenantRestartHandlers) {
+    public void executeAfterServicesStart() {
         new StarterThread(tenantId, sessionAccessor, transactionService, platformService,
                 tenantRestartHandlers).start();
     }
 
-    private void executeAfterServicesStartAfterCurrentTransaction(
-            final List<TenantRestartHandler> tenantRestartHandlers) throws STransactionNotFoundException {
-        transactionService.registerBonitaSynchronization((BonitaTransactionSynchronization) txState -> {
-            if (txState == Status.STATUS_COMMITTED) {
-                afterServicesStart(tenantRestartHandlers);
-            }
-        });
-    }
 }
