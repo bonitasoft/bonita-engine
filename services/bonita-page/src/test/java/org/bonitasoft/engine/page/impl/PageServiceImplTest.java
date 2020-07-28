@@ -21,10 +21,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -1129,6 +1129,20 @@ public class PageServiceImplTest {
         final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
                 getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION, "apiExtensions=myApi",
                         "myApi.classFileName=Index.groovy"));
+
+        //when
+        final SPage insertedPage = pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
+
+        //then
+        SPageAssert.assertThat(insertedPage).hasContentType(SContentType.API_EXTENSION);
+    }
+
+    @Test
+    public void should_read_rest_api_extension_in_compile_mode() throws Exception {
+        //given
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION, "apiExtensions=myApi",
+                        "myApi.className=com.company.Index"));
 
         //when
         final SPage insertedPage = pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);

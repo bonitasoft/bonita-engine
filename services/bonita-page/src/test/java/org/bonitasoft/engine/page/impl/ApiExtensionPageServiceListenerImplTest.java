@@ -80,7 +80,32 @@ public class ApiExtensionPageServiceListenerImplTest {
     }
 
     @Test
-    public void pageInserted_should_add_api_resources() throws Exception {
+    public void pageInserted_should_add_api_resources_in_compiled_mode() throws Exception {
+        final long pageId = 1983L;
+        final SPage page = buildPage(pageId);
+        final byte[] content = new byte[] { 1, 0, 0 };
+        final Properties properties = new Properties();
+        properties.setProperty("apiExtensions", "employee, address");
+        properties.setProperty("employee.method", "GET");
+        properties.setProperty("employee.pathTemplate", "employees");
+        properties.setProperty("employee.className", "com.company.Index");
+        properties.setProperty("employee.permissions", "myPermission");
+        properties.setProperty("address.method", "GET");
+        properties.setProperty("address.pathTemplate", "employees/{employeeId}/address");
+        properties.setProperty("address.className", "com.company.Index1");
+        properties.setProperty("address.permissions", "myPermission");
+        when(helper.loadPageProperties(content)).thenReturn(properties);
+
+        listener.pageInserted(page, content);
+
+        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String> emptyList());
+        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId,
+                Collections.<String> emptyList());
+        verifyNoMoreInteractions(pageMappingService);
+    }
+
+    @Test
+    public void pageInserted_should_add_api_resources_in_legacy_mode() throws Exception {
         final long pageId = 1983L;
         final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
@@ -341,7 +366,7 @@ public class ApiExtensionPageServiceListenerImplTest {
         when(helper.loadPageProperties(content)).thenReturn(properties);
         final SPageMapping pageMapping1 = buildPageMapping("apiExtension|POST|employees");
         final SPageMapping pageMapping2 = buildPageMapping("apiExtension|GET|employees");
-        final List<SPageMapping> mappings = new ArrayList<SPageMapping>();
+        final List<SPageMapping> mappings = new ArrayList<>();
         mappings.add(pageMapping1);
         mappings.add(pageMapping2);
         when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings);
