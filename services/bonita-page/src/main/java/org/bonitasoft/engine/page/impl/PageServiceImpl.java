@@ -106,7 +106,11 @@ public class PageServiceImpl implements PageService {
 
     private static final String API_EXTENSIONS = "apiExtensions";
 
-    private static final String CLASS_FILENAME = "classFileName";
+    // Refers to a compiled class inside a jar, used by REST API extensions in compiled mode
+    private static final String COMPILED_CLASS_NAME = "className";
+
+    // Refers to a Groovy source file, used by REST API extensions in legacy mode (compilation is performed at runtime)
+    private static final String GROOVY_CLASS_FILENAME = "classFileName";
 
     private static final String THEME_CSS = "resources/theme.css";
 
@@ -231,6 +235,16 @@ public class PageServiceImpl implements PageService {
         return pageProperties;
     }
 
+    /**
+     * For each declared API, the following verifications are performed:
+     * - If a property 'className' is defined, then we assume that the required jar file is present in the lib folder
+     * and no
+     * further verification is performed.
+     * - If the property 'className' isn't defined, then we look for the property 'classFileName' (legacy mode). The
+     * property
+     * points to a Groovy source file, which will be compiled at runtime. We verify that this Groovy file exists in the
+     * archive.
+     */
     private void checkApiControllerExists(Map<String, byte[]> zipContent, Properties pageProperties)
             throws SInvalidPageZipInconsistentException, SInvalidPageZipMissingAPropertyException {
         final Set<String> entrySet = zipContent.keySet();
@@ -240,13 +254,16 @@ public class PageServiceImpl implements PageService {
         }
         final String[] apis = declaredApis.split(",");
         for (final String api : apis) {
-            final String classFileName = pageProperties.getProperty(api.trim() + "." + CLASS_FILENAME);
-            if (classFileName == null || classFileName.isEmpty()) {
-                throw new SInvalidPageZipMissingAPropertyException(api.trim() + "." + CLASS_FILENAME);
-            }
-            if (!entrySet.contains(classFileName.trim())) {
-                throw new SInvalidPageZipInconsistentException(
-                        String.format("RestAPIController %s has not been found in archive.", classFileName.trim()));
+            String className = pageProperties.getProperty(api.trim() + "." + COMPILED_CLASS_NAME);
+            if (className == null) {
+                final String classFileName = pageProperties.getProperty(api.trim() + "." + GROOVY_CLASS_FILENAME);
+                if (classFileName == null || classFileName.isEmpty()) {
+                    throw new SInvalidPageZipMissingAPropertyException(api.trim() + "." + GROOVY_CLASS_FILENAME);
+                }
+                if (!entrySet.contains(classFileName.trim())) {
+                    throw new SInvalidPageZipInconsistentException(
+                            String.format("RestAPIController %s has not been found in archive.", classFileName.trim()));
+                }
             }
         }
     }

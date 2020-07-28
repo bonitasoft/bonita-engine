@@ -140,7 +140,11 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
             final String resourceName = resource.trim();
             final String method = getRequiredProperty(apiProperties, resourceName + ".method");
             final String pathTemplate = getRequiredProperty(apiProperties, resourceName + ".pathTemplate");
-            getRequiredProperty(apiProperties, resourceName + ".classFileName");
+            try {
+                getRequiredProperty(apiProperties, resourceName + ".className");
+            } catch (SObjectCreationException e) { // if the property 'className' isn't present, then the rest api might be used in legacy mode (!= compiled mode) -> we look for the property 'classFileName'
+                getRequiredProperty(apiProperties, resourceName + ".classFileName");
+            }
             getRequiredProperty(apiProperties, resourceName + ".permissions");
             keys.add(getMappingKey(method, pathTemplate));
         }
