@@ -1,0 +1,22 @@
+plugins {
+    id "me.champeau.gradle.jmh" version "0.5.0"
+}
+
+dependencies {
+    compile "junit:junit:${Deps.junit4Version}"
+    compile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    compile project(':bonita-integration-tests:bonita-integration-tests-client')
+    compile project(':bpm:bonita-server')
+    runtime "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    runtime "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+    runtime "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}
+
+jmh {
+    duplicateClassesStrategy = 'warn'
+    iterations = 2
+    threads = 1
+    fork = 1
+}
