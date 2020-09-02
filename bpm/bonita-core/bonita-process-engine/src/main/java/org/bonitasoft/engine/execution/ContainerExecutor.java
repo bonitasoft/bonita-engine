@@ -32,10 +32,10 @@ public interface ContainerExecutor {
      *        The identifier of the process definition
      * @param parentId
      *        The identifier of the parent of the flow node
-     * @param flowNodeInstance
+     * @param childFlowNode
      * @throws SBonitaException
      */
-    void childFinished(long processDefinitionId, long parentId, SFlowNodeInstance flowNodeInstance)
+    void childFinished(long processDefinitionId, long parentId, SFlowNodeInstance childFlowNode)
             throws SBonitaException;
 
     /**

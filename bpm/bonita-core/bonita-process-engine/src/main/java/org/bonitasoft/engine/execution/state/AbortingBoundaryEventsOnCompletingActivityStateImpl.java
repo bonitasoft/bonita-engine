@@ -20,9 +20,9 @@ import org.bonitasoft.engine.execution.StateBehaviors;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class CompletingActivityWithBoundaryStateImpl extends EndingActivityWithBoundaryStateImpl {
+public class AbortingBoundaryEventsOnCompletingActivityStateImpl extends EndingActivityWithBoundaryStateImpl {
 
-    public CompletingActivityWithBoundaryStateImpl(final StateBehaviors stateBehaviors) {
+    public AbortingBoundaryEventsOnCompletingActivityStateImpl(final StateBehaviors stateBehaviors) {
         super(stateBehaviors);
     }
 
@@ -43,6 +43,7 @@ public class CompletingActivityWithBoundaryStateImpl extends EndingActivityWithB
 
     @Override
     public String getName() {
+        // TODO: should be changed but has impacts client-side, as it is exposed client-side.
         return "completing activity with boundary";
     }
 

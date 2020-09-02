@@ -157,13 +157,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
             final SProcessDefinition processDefinition = processDefinitionService
                     .getProcessDefinition(processDefinitionId);
-            final FlowNodeState state = updateState(flowNodeInstance, processDefinition);
-            if (!flowNodeInstance.isStateExecuting() && state != null) {
-                registerWork(state, flowNodeInstance);
-            } else {
-                LOG.debug("stepForward: no work to register on state {} for flowNode {}", state, flowNodeInstance);
-            }
-            return state;
+            final FlowNodeState nextState = updateState(flowNodeInstance, processDefinition);
+            registerWorkIfUnstableOrTerminal(nextState, flowNodeInstance);
+            return nextState;
         } catch (final SFlowNodeExecutionException e) {
             throw e;
         } catch (final SBonitaException e) {
@@ -173,25 +169,35 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         }
     }
 
+    /**
+     * Executes the current state, and returns the next step, if applicable.
+     * In a normal case, the normal next state is returned.
+     * If execution of the current state returns StateCode.EXECUTING (meaning the execution of the state is not
+     * finished)
+     * then null is returned (meaning we stay on the same state, some background work will trigger the next state
+     * later).
+     */
     private FlowNodeState updateState(final SFlowNodeInstance sFlowNodeInstance,
             final SProcessDefinition processDefinition)
             throws SActivityStateExecutionException, SActivityExecutionException, SFlowNodeModificationException {
         final StateCode stateCode = executeState(processDefinition, sFlowNodeInstance,
                 flowNodeStateManager.getState(sFlowNodeInstance.getStateId()));
-        if (StateCode.DONE.equals(stateCode)) {
-            return getNextNormalState(sFlowNodeInstance, processDefinition);
-        } else if (StateCode.EXECUTING.equals(stateCode)) {
-            // the state is still executing set the executing flag
-            activityInstanceService.setExecuting(sFlowNodeInstance);
+        switch (stateCode) {
+            case DONE:
+                return getNextNormalState(sFlowNodeInstance, processDefinition);
+            case EXECUTING:
+            default:
+                // the state is still executing set the executing flag
+                activityInstanceService.setExecuting(sFlowNodeInstance);
+                return null;
         }
-        return null;
     }
 
     private FlowNodeState getNextNormalState(final SFlowNodeInstance sFlowNodeInstance,
             final SProcessDefinition processDefinition)
             throws SActivityExecutionException,
             SFlowNodeModificationException {
-        final FlowNodeState state = flowNodeStateManager.getNextNormalState(processDefinition, sFlowNodeInstance,
+        final FlowNodeState state = flowNodeStateManager.getNextState(processDefinition, sFlowNodeInstance,
                 sFlowNodeInstance.getStateId());
         if (sFlowNodeInstance.getStateId() != state.getId()) {
             // this also unset the executing flag
@@ -200,15 +206,29 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         return state;
     }
 
-    private void registerWork(FlowNodeState state, SFlowNodeInstance sFlowNodeInstance) throws SWorkRegisterException {
-        if (!state.isStable() && !state.isInterrupting()) {
-            registerExecuteFlowNodeWork(sFlowNodeInstance);
-        } else if (state.isTerminal()) {
-            registerNotifyFinishWork(sFlowNodeInstance);
-        } else {
-            LOG.debug("registerWork: nothing to register on state {} for flownode {}", state,
-                    sFlowNodeInstance.toString());
+    private void registerWorkIfUnstableOrTerminal(FlowNodeState nextState, SFlowNodeInstance flowNodeInstance)
+            throws SWorkRegisterException {
+        if (flowNodeInstance.isStateExecuting() || nextState == null) {
+            LOG.debug("No work to register on state {} for flowNode {}", nextState, flowNodeInstance);
+            return;
         }
+        if (nextState.isInterrupting()) {
+            LOG.debug("No work to register on state {} for flowNode {}, should never be there!!!!", nextState,
+                    flowNodeInstance);
+            return;
+            // Only used by InterruptedFlowNodeState that is never used
+            //TODO remove me
+        }
+        if (!nextState.isStable()) {
+            registerExecuteFlowNodeWork(flowNodeInstance);
+            return;
+        }
+        if (nextState.isTerminal()) {
+            registerNotifyFinishWork(flowNodeInstance);
+            return;
+        }
+        // State is stable, nothing to do.
+        LOG.debug("No work to register on state {} for flowNode {}", nextState, flowNodeInstance);
     }
 
     private void registerExecuteFlowNodeWork(SFlowNodeInstance sFlowNodeInstance) throws SWorkRegisterException {
@@ -267,30 +287,30 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void childFinished(final long processDefinitionId, final long parentId, SFlowNodeInstance flowNodeInstance)
+    public void childFinished(final long processDefinitionId, final long parentId, SFlowNodeInstance childFlowNode)
             throws SFlowNodeNotFoundException,
             SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException, SArchivingException,
             SFlowNodeModificationException,
             SFlowNodeExecutionException, SWorkRegisterException {
-        // TODO check deletion here
-        archiveFlowNodeInstance(flowNodeInstance, true, processDefinitionId);
+        archiveFlowNodeInstance(childFlowNode, true, processDefinitionId);
 
         final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService
                 .getFlowNodeInstance(parentId);
         decrementToken(activityInstanceParent);
         final SProcessDefinition sProcessDefinition = processDefinitionService
                 .getProcessDefinition(processDefinitionId);
-        final boolean hit = flowNodeStateManager.getState(activityInstanceParent.getStateId()).hit(sProcessDefinition,
-                activityInstanceParent,
-                flowNodeInstance);
-        if (hit) {// we continue parent if hit of the parent return true
+        final FlowNodeState state = flowNodeStateManager.getState(activityInstanceParent.getStateId());
+        final boolean shouldContinueParent = state.hit(sProcessDefinition, activityInstanceParent, childFlowNode);
+        if (shouldContinueParent) {
+            // it should never happen, because the terminal state never waits children to finish
             if (activityInstanceParent.isTerminal()) {
                 registerNotifyFinishWork(activityInstanceParent);
             } else {
                 stepForward(activityInstanceParent, null, null);
             }
         } else {
-            LOG.debug("childFinished: no work to register when hit() => false for child flownode {}", flowNodeInstance);
+            LOG.debug("the child flownode {} of parent flownode {} finished, but there are other children remaining",
+                    childFlowNode, activityInstanceParent);
         }
     }
 

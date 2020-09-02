@@ -28,11 +28,11 @@ import org.bonitasoft.engine.execution.StateBehaviors;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  */
-public class CompletingSubTaskStateImpl implements FlowNodeState {
+public class AbortingSubTaskStateImpl implements FlowNodeState {
 
     private final StateBehaviors stateBehaviors;
 
-    public CompletingSubTaskStateImpl(final StateBehaviors stateBehaviors) {
+    public AbortingSubTaskStateImpl(final StateBehaviors stateBehaviors) {
         super();
         this.stateBehaviors = stateBehaviors;
     }
@@ -64,6 +64,8 @@ public class CompletingSubTaskStateImpl implements FlowNodeState {
 
     @Override
     public String getName() {
+        // TODO: should be changed but has impacts client-side, as it is exposed in
+        // org.bonitasoft.engine.bpm.flownode.ActivityStates.CANCELLING_SUBTASKS_STATE
         return "cancelling subtasks";
     }
 

@@ -652,23 +652,23 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public void childFinished(long processDefinitionId, long parentId, SFlowNodeInstance sFlowNodeInstanceChild)
+    public void childFinished(long processDefinitionId, long parentId, SFlowNodeInstance childFlowNode)
             throws SBonitaException {
         final SProcessDefinition sProcessDefinition = processDefinitionService
                 .getProcessDefinition(processDefinitionId);
         final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory
                 .get(SUserTaskInstanceBuilderFactory.class);
-        final long processInstanceId = sFlowNodeInstanceChild
+        final long processInstanceId = childFlowNode
                 .getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
 
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
 
         //this also delete the event (unless its the event that interrupted the process)
-        final boolean isEnd = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild,
+        final boolean isEnd = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, childFlowNode,
                 sProcessInstance);
         logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
-                "The flow node <" + sFlowNodeInstanceChild.getName() + "> with id<"
-                        + sFlowNodeInstanceChild.getId() + "> of process instance <" + processInstanceId
+                "The flow node <" + childFlowNode.getName() + "> with id<"
+                        + childFlowNode.getId() + "> of process instance <" + processInstanceId
                         + "> finished");
         if (isEnd) {
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
@@ -709,7 +709,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             //
             if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
                 hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance,
-                        sFlowNodeInstanceChild);
+                        childFlowNode);
                 // the process instance has maybe changed
                 logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "has action to execute");
                 if (hasActionsToExecute) {

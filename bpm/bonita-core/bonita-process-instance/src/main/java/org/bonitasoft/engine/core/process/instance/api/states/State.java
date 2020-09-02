@@ -29,10 +29,13 @@ public interface State<T> {
     StateCode execute(SProcessDefinition processDefinition, T instance) throws SActivityStateExecutionException;
 
     /**
-     * Called when a children of the flow node parentInstance finish
+     * Called when a child of the flow node parentInstance finishes.
+     * Triggers what's next, if applicable.
+     * returns if all children activity is finished / triggered.
      *
      * @return
-     *         true if the state is finished (the execution will continue automatically)
+     *         true if the state is finished (the flow node will continue its flow),
+     *         false if there are still some children to be triggered / to wait for.
      */
     boolean hit(SProcessDefinition processDefinition, T parentInstance, T childInstance)
             throws SActivityStateExecutionException;
