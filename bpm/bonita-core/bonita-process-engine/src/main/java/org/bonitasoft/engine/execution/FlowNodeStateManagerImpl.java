@@ -40,10 +40,12 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryStateImpl;
 import org.bonitasoft.engine.execution.state.AbortingBoundaryAndIntermediateCatchEventStateImpl;
+import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityStateImpl;
 import org.bonitasoft.engine.execution.state.AbortingCallActivityStateImpl;
 import org.bonitasoft.engine.execution.state.AbortingFlowNodeContainerStateImpl;
 import org.bonitasoft.engine.execution.state.AbortingFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.state.AbortingReceiveTaskStateImpl;
+import org.bonitasoft.engine.execution.state.AbortingSubTaskStateImpl;
 import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryStateImpl;
 import org.bonitasoft.engine.execution.state.CancellingBoundaryAndIntermediateCatchEventStateImpl;
@@ -52,9 +54,7 @@ import org.bonitasoft.engine.execution.state.CancellingFlowNodeContainerChildren
 import org.bonitasoft.engine.execution.state.CancellingFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.state.CancellingReceiveTaskStateImpl;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.CompletingActivityWithBoundaryStateImpl;
 import org.bonitasoft.engine.execution.state.CompletingCallActivityStateImpl;
-import org.bonitasoft.engine.execution.state.CompletingSubTaskStateImpl;
 import org.bonitasoft.engine.execution.state.ExecutingAutomaticActivityStateImpl;
 import org.bonitasoft.engine.execution.state.ExecutingBoundaryEventStateImpl;
 import org.bonitasoft.engine.execution.state.ExecutingCallActivityStateImpl;
@@ -87,6 +87,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
+    protected static final int FIRST_STATE_KEY = -1;
+
     protected final Map<Integer, FlowNodeState> states = new HashMap<>();
 
     protected final Map<SFlowNodeType, Map<Integer, FlowNodeState>> normalTransitions = new HashMap<>();
@@ -117,7 +119,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     protected CompletingCallActivityStateImpl completingCallActivity;
 
-    protected CompletingActivityWithBoundaryStateImpl completingActivityWithBoundary;
+    protected AbortingBoundaryEventsOnCompletingActivityStateImpl abortingBoundaryEventsOnCompletingActivityState;
 
     protected ExecutingCallActivityStateImpl executingCallActivity;
 
@@ -171,7 +173,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private WaitingEventsInterrupter waitingEventsInterrupter;
 
-    protected CompletingSubTaskStateImpl completingSubTaskState;
+    protected AbortingSubTaskStateImpl abortingSubTaskState;
 
     protected AbortingReceiveTaskStateImpl abortingReceiveTask;
 
@@ -271,8 +273,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private void defineTransitionsForUserTask() {
         defineNormalTransitionForFlowNode(SFlowNodeType.USER_TASK, initializingActivityWithBoundary, ready,
-                completingActivityWithBoundary,
-                completingSubTaskState, completed);
+                abortingBoundaryEventsOnCompletingActivityState,
+                abortingSubTaskState, completed);
         defineAbortTransitionForFlowNode(SFlowNodeType.USER_TASK, abortingActivityWithBoundary, abortingContainer,
                 aborted);
         defineCancelTransitionForFlowNode(SFlowNodeType.USER_TASK, cancellingActivityWithBoundary, cancellingContainer,
@@ -280,7 +282,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     private void defineTransitionsForManualTask() {
-        defineNormalTransitionForFlowNode(SFlowNodeType.MANUAL_TASK, initializing, ready, completingSubTaskState,
+        defineNormalTransitionForFlowNode(SFlowNodeType.MANUAL_TASK, initializing, ready, abortingSubTaskState,
                 completed);
         defineAbortTransitionForFlowNode(SFlowNodeType.MANUAL_TASK, abortingContainer, aborted);
         defineCancelTransitionForFlowNode(SFlowNodeType.MANUAL_TASK, cancellingContainer, cancelled);
@@ -288,7 +290,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private void defineTransitionsForCallActivity() {
         defineNormalTransitionForFlowNode(SFlowNodeType.CALL_ACTIVITY, initializingActivityWithBoundary,
-                executingCallActivity, completingActivityWithBoundary,
+                executingCallActivity, abortingBoundaryEventsOnCompletingActivityState,
                 completingCallActivity, completed);
         defineAbortTransitionForFlowNode(SFlowNodeType.CALL_ACTIVITY, abortingActivityWithBoundary,
                 abortingCallActivity, aborted);
@@ -304,7 +306,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private void defineTransitionsForAutomaticTask() {
         defineNormalTransitionForFlowNode(SFlowNodeType.AUTOMATIC_TASK, executingAutomaticActivity,
-                completingActivityWithBoundary, completed);
+                abortingBoundaryEventsOnCompletingActivityState, completed);
         defineAbortTransitionForFlowNode(SFlowNodeType.AUTOMATIC_TASK, abortingActivityWithBoundary, abortingContainer,
                 aborted);
         defineCancelTransitionForFlowNode(SFlowNodeType.AUTOMATIC_TASK, cancellingActivityWithBoundary,
@@ -313,7 +315,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private void defineTransitionsForReceiveTask() {
         defineNormalTransitionForFlowNode(SFlowNodeType.RECEIVE_TASK, initializingActivityWithBoundary, waiting,
-                executing, completingActivityWithBoundary,
+                executing, abortingBoundaryEventsOnCompletingActivityState,
                 completed);
         defineAbortTransitionForFlowNode(SFlowNodeType.RECEIVE_TASK, abortingActivityWithBoundary, abortingReceiveTask,
                 aborted);
@@ -323,7 +325,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private void defineTransitionsForSendTask() {
         defineNormalTransitionForFlowNode(SFlowNodeType.SEND_TASK, executingAutomaticActivity,
-                completingActivityWithBoundary, completed);
+                abortingBoundaryEventsOnCompletingActivityState, completed);
         defineAbortTransitionForFlowNode(SFlowNodeType.SEND_TASK, abortingActivityWithBoundary, abortingReceiveTask,
                 aborted);
         defineCancelTransitionForFlowNode(SFlowNodeType.SEND_TASK, cancellingActivityWithBoundary,
@@ -332,7 +334,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private void defineTransitionsForLoopActivity() {
         defineNormalTransitionForFlowNode(SFlowNodeType.LOOP_ACTIVITY, initializingLoop, executingLoop,
-                completingActivityWithBoundary, completed);
+                abortingBoundaryEventsOnCompletingActivityState, completed);
         defineAbortTransitionForFlowNode(SFlowNodeType.LOOP_ACTIVITY, abortingActivityWithBoundary, abortingContainer,
                 aborted);
         defineCancelTransitionForFlowNode(SFlowNodeType.LOOP_ACTIVITY, cancellingActivityWithBoundary,
@@ -342,7 +344,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     private void defineTransitionsForMultiInstanceActivity() {
         defineNormalTransitionForFlowNode(SFlowNodeType.MULTI_INSTANCE_ACTIVITY, initializingMultiInstance,
                 executingMultiInstance,
-                completingActivityWithBoundary, completed);
+                abortingBoundaryEventsOnCompletingActivityState, completed);
         defineAbortTransitionForFlowNode(SFlowNodeType.MULTI_INSTANCE_ACTIVITY, abortingActivityWithBoundary,
                 abortingContainer, aborted);
         defineCancelTransitionForFlowNode(SFlowNodeType.MULTI_INSTANCE_ACTIVITY, cancellingActivityWithBoundary,
@@ -377,7 +379,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
                 processInstanceService, documentService, logger,
                 archiveService, commentService, processDefinitionService, connectorInstanceService, classLoaderService,
                 refBusinessDataService);
-        completingActivityWithBoundary = new CompletingActivityWithBoundaryStateImpl(stateBehaviors);
+        abortingBoundaryEventsOnCompletingActivityState = new AbortingBoundaryEventsOnCompletingActivityStateImpl(
+                stateBehaviors);
         executingCallActivity = new ExecutingCallActivityStateImpl(stateBehaviors);
         completed = new CompletedActivityStateImpl();
         waiting = new WaitingFlowNodeStateImpl();
@@ -409,7 +412,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         abortingReceiveTask = new AbortingReceiveTaskStateImpl(stateBehaviors, waitingEventsInterrupter);
         aborted = new AbortedFlowNodeStateImpl();
         interruptedFlowNodeState = new InterruptedFlowNodeState();
-        completingSubTaskState = new CompletingSubTaskStateImpl(stateBehaviors);
+        abortingSubTaskState = new AbortingSubTaskStateImpl(stateBehaviors);
 
         final Set<Integer> unstableStatesModifiable = new HashSet<>();
         final Set<Integer> stableStatesModifiable = new HashSet<>();
@@ -449,8 +452,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         addToMap(interruptedFlowNodeState);
         addToMap(executingAutomaticActivity);
         addToMap(initializingAndExecuting);
-        addToMap(completingSubTaskState);
-        addToMap(completingActivityWithBoundary);
+        addToMap(abortingSubTaskState);
+        addToMap(abortingBoundaryEventsOnCompletingActivityState);
 
         allStates = Collections.unmodifiableSet(states.keySet());
 
@@ -491,7 +494,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final FlowNodeState... states) {
         final Map<Integer, FlowNodeState> taskTransitions = new HashMap<>();
         int stateIndex = 0;
-        taskTransitions.put(-1, states[0]);
+        taskTransitions.put(FIRST_STATE_KEY, states[0]);
         while (stateIndex < states.length - 1) {
             taskTransitions.put(states[stateIndex].getId(), states[stateIndex + 1]);
             stateIndex++;
@@ -500,7 +503,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     @Override
-    public FlowNodeState getNextNormalState(final SProcessDefinition processDefinition,
+    public FlowNodeState getNextState(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance, final int currentStateId)
             throws SActivityExecutionException {
         FlowNodeState currentState = getCurrentNonInterruptingState(flowNodeInstance, currentStateId);
@@ -576,7 +579,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     public FlowNodeState getFirstState(SFlowNodeType nodeType) {
-        return normalTransitions.get(nodeType).get(-1);
+        return normalTransitions.get(nodeType).get(FIRST_STATE_KEY);
     }
 
 }

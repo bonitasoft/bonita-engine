@@ -75,14 +75,17 @@ public class ActivityStates {
     public static final String ABORTED_STATE = "aborted";
 
     /**
-     * The state when the subtaks of a activity are cancelling.
+     * The state when the subtask of a activity are cancelling.
+     *
+     * @deprecated this should not be used anymore client-side.
      */
+    @Deprecated
     public static final String CANCELLING_SUBTASKS_STATE = "cancelling subtasks";
 
     /**
      * The set of the states
      */
-    public static final Set<String> STATES = new HashSet<String>();
+    public static final Set<String> STATES = new HashSet<>();
 
     static {
         STATES.add(FAILED_STATE);

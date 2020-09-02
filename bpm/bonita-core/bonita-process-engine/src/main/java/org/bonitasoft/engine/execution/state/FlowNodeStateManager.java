@@ -33,7 +33,7 @@ import org.bonitasoft.engine.execution.StateBehaviors;
  */
 public interface FlowNodeStateManager {
 
-    FlowNodeState getNextNormalState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance,
+    FlowNodeState getNextState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance,
             int currentStateId)
             throws SActivityExecutionException;
 

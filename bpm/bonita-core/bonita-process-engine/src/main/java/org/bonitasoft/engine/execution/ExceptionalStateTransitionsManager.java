@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import static org.bonitasoft.engine.execution.FlowNodeStateManagerImpl.FIRST_STATE_KEY;
+
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -33,7 +35,7 @@ public class ExceptionalStateTransitionsManager extends NormalStateTransitionsMa
     protected FlowNodeState getNextStateFromMap(FlowNodeState currentState) {
         if (SStateCategory.NORMAL.equals(currentState.getStateCategory()) && !currentState.isTerminal()) {
             // is the first state in the category aborting or canceling
-            return stateTransitions.get(-1);
+            return stateTransitions.get(FIRST_STATE_KEY);
         }
         return stateTransitions.get(currentState.getId());
     }
