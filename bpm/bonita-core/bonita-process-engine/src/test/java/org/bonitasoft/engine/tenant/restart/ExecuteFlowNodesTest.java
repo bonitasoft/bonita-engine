@@ -35,6 +35,7 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
+import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
@@ -68,15 +69,18 @@ public class ExecuteFlowNodesTest {
     private BPMInstancesCreator bpmInstancesCreator;
     @Mock
     private UserTransactionService userTransactionService;
+    @Mock
+    private BPMArchiverService bpmArchiverService;
+
     private BPMWorkFactory workFactory = new BPMWorkFactory();
     private ExecuteFlowNodes executeFlowNodes;
     private List<SFlowNodeInstance> allFlowNodes = new ArrayList<>();
 
     @Before
     public void before() throws Exception {
-        flownodeStateManager = new FlowNodeStateManagerImpl(null, null, null, null, null, null, bpmInstancesCreator,
+        flownodeStateManager = new FlowNodeStateManagerImpl(null, null, null, null, bpmInstancesCreator,
                 null, null,
-                null, null, null, null, null, null, null, null);
+                null, null, null, bpmArchiverService);
         executeFlowNodes = new ExecuteFlowNodes(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
                 gatewayInstanceService,
                 processDefinitionService, flownodeStateManager, workFactory, userTransactionService,

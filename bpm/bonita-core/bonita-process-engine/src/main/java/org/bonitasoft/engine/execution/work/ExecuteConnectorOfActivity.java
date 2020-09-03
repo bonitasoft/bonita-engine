@@ -148,7 +148,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
                 throwEventInstance,
                 errorEventTriggerDefinition, sFlowNodeInstance);
-        tenantAccessor.getFlowNodeExecutor().archiveFlowNodeInstance(throwEventInstance, true,
+        tenantAccessor.getBPMArchiverService().archiveAndDeleteFlowNodeInstance(throwEventInstance,
                 sProcessDefinition.getId());
     }
 

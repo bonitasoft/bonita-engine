@@ -15,22 +15,13 @@ package org.bonitasoft.engine.execution.handler;
 
 import java.util.UUID;
 
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
-import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.execution.archive.ProcessArchiver;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
@@ -60,24 +51,7 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
     public void execute(final SUpdateEvent event) throws SHandlerExecutionException {
         final SProcessInstance processInstance = (SProcessInstance) event.getObject();
         try {
-            TenantServiceAccessor tenantServiceAccessor;
-            tenantServiceAccessor = getTenantServiceAccessor();
-            final ArchiveService archiveService = tenantServiceAccessor.getArchiveService();
-            final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
-            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-            final DocumentService documentService = tenantServiceAccessor.getDocumentService();
-            final SCommentService commentService = tenantServiceAccessor.getCommentService();
-            final ProcessDefinitionService processDefinitionService = tenantServiceAccessor
-                    .getProcessDefinitionService();
-            final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor
-                    .getConnectorInstanceService();
-            ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
-            RefBusinessDataService refBusinessDataService = tenantServiceAccessor.getRefBusinessDataService();
-
-            new ProcessArchiver().archiveProcessInstance(processInstance, archiveService, processInstanceService,
-                    documentService,
-                    logger, commentService, processDefinitionService, connectorInstanceService, classLoaderService,
-                    refBusinessDataService);
+            getTenantServiceAccessor().getBPMArchiverService().archiveAndDeleteProcessInstance(processInstance);
         } catch (SBonitaException e) {
             throw new SHandlerExecutionException(e);
         }

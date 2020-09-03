@@ -164,7 +164,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
                 sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, throwEventInstance);
 
-        tenantAccessor.getFlowNodeExecutor().archiveFlowNodeInstance(throwEventInstance, true,
+        tenantAccessor.getBPMArchiverService().archiveAndDeleteFlowNodeInstance(throwEventInstance,
                 sProcessDefinition.getId());
         if (!hasActionToExecute) {
             setConnectorAndContainerToFailed(context, exception);

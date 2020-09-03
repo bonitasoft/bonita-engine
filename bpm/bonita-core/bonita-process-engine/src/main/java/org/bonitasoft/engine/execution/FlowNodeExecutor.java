@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -60,22 +59,6 @@ public interface FlowNodeExecutor extends ContainerExecutor {
      */
     void childReachedState(SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionsToExecute)
             throws SBonitaException;
-
-    /**
-     * Archive the flow node instance given as parameter. Also archive all related object that needs to be archived as
-     * well.
-     *
-     * @param flowNodeInstance
-     *        The flow node instance to be archived.
-     * @param deleteAfterArchive
-     * @param processDefinitionId
-     *        the identifier of process definition
-     * @throws SActivityExecutionException
-     *         in case an error occurs
-     * @since 6.1
-     */
-    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive,
-            long processDefinitionId) throws SArchivingException;
 
     /**
      * @param processDefinition

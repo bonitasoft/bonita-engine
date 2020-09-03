@@ -143,6 +143,7 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.Expression;
@@ -273,6 +274,8 @@ public class ProcessAPIImplTest {
     @Mock
     private UserFilterService userFilterService;
     @Mock
+    private BPMArchiverService bpmArchiverService;
+    @Mock
     private ProcessResourcesService processResourcesService;
     private SProcessDefinitionImpl processDefinition;
     private SUserTaskDefinitionImpl userTaskDefinition;
@@ -316,6 +319,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getBPMWorkFactory()).thenReturn(workFactory);
         when(tenantAccessor.getUserFilterService()).thenReturn(userFilterService);
         when(tenantAccessor.getProcessResourcesService()).thenReturn(processResourcesService);
+        when(tenantAccessor.getBPMArchiverService()).thenReturn(bpmArchiverService);
         userTransactionService = new TestUserTransactionService();
         when(tenantAccessor.getUserTransactionService()).thenReturn(userTransactionService);
 

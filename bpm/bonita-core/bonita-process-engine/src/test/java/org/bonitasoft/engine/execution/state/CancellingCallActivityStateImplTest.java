@@ -15,28 +15,22 @@ package org.bonitasoft.engine.execution.state;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
@@ -55,8 +49,7 @@ public class CancellingCallActivityStateImplTest {
     private static final long CALL_ACTIVITY_ID = 665437L;
     private static final long PROCESS_DEFINITION_ID = 4538938902L;
     private static final long PROCESS_INSTANCE_ID = 3240213094L;
-    @InjectMocks
-    private CancellingCallActivityStateImpl cancellingCallActivityState;
+
     private SProcessDefinition processDefinition = new SProcessDefinitionImpl("myProcess", "1.0");
     private SProcessInstance processInstance = new SProcessInstance("myProcess", PROCESS_DEFINITION_ID);
     private SCallActivityInstance callActivity = new SCallActivityInstance("callACtivity", 5342985348L, 4323264L,
@@ -70,24 +63,16 @@ public class CancellingCallActivityStateImplTest {
     @Mock
     private ProcessDefinitionService processDefinitionService;
     @Mock
-    private SCommentService commentService;
+    ProcessInstanceInterruptor processInstanceInterruptor;
     @Mock
-    private DocumentService documentService;
-    @Mock
-    private RefBusinessDataService refBusinessDataService;
-    @Mock
-    private ArchiveService archiveService;
-    @Mock
-    private ActivityInstanceService flowNodeInstanceService;
-    @Mock
-    private ProcessInstanceInterruptor processInstanceInterruptor;
+    BPMArchiverService bpmArchiverService;
+
+    @InjectMocks
+    private CancellingCallActivityStateImpl cancellingCallActivityState;
 
     @Before
     public void before() throws Exception {
-        doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
-                .getLocalClassLoader(anyString(), anyLong());
         callActivity.setId(CALL_ACTIVITY_ID);
-        doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(PROCESS_DEFINITION_ID);
         processInstance.setId(PROCESS_INSTANCE_ID);
     }
 
@@ -127,14 +112,14 @@ public class CancellingCallActivityStateImplTest {
     }
 
     @Test
-    public void shouldExecuteState_should_delete_called_process_if_finished() throws Exception {
+    public void should_archive_process_if_finished() throws Exception {
         //given
         callActivity.setTokenCount(0);
         doReturn(processInstance).when(processInstanceService).getChildOfActivity(CALL_ACTIVITY_ID);
         //when
         cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
         //then
-        verify(processInstanceService).deleteProcessInstance(PROCESS_INSTANCE_ID);
+        verify(bpmArchiverService).archiveAndDeleteProcessInstance(processInstance);
     }
 
 }
