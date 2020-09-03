@@ -34,6 +34,9 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -78,20 +81,52 @@ import org.bonitasoft.engine.recorder.SRecorderException;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class ProcessArchiver {
+public class BPMArchiverService {
+
+    private final ArchiveService archiveService;
+    private final ProcessInstanceService processInstanceService;
+    private final DocumentService documentService;
+    private final TechnicalLoggerService logger;
+    private final SCommentService commentService;
+    private final ProcessDefinitionService processDefinitionService;
+    private final ConnectorInstanceService connectorInstanceService;
+    private final ClassLoaderService classLoaderService;
+    private final RefBusinessDataService refBusinessDataService;
+    private final ContractDataService contractDataService;
+    private final DataInstanceService dataInstanceService;
+    private final ActivityInstanceService activityInstanceService;
 
     private final int BATCH_SIZE = 100;
 
-    public void archiveProcessInstance(final SProcessInstance processInstance, final ArchiveService archiveService,
-            final ProcessInstanceService processInstanceService, final DocumentService documentService,
-            final TechnicalLoggerService logger,
-            final SCommentService commentService, final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService,
-            RefBusinessDataService refBusinessDataService)
-            throws SArchivingException {
+    public BPMArchiverService(ArchiveService archiveService,
+            ProcessInstanceService processInstanceService,
+            DocumentService documentService,
+            TechnicalLoggerService logger,
+            SCommentService commentService,
+            ProcessDefinitionService processDefinitionService,
+            ConnectorInstanceService connectorInstanceService,
+            ClassLoaderService classLoaderService,
+            RefBusinessDataService refBusinessDataService,
+            ContractDataService contractDataService,
+            DataInstanceService dataInstanceService,
+            ActivityInstanceService activityInstanceService) {
+        this.archiveService = archiveService;
+        this.processInstanceService = processInstanceService;
+        this.documentService = documentService;
+        this.logger = logger;
+        this.commentService = commentService;
+        this.processDefinitionService = processDefinitionService;
+        this.connectorInstanceService = connectorInstanceService;
+        this.classLoaderService = classLoaderService;
+        this.refBusinessDataService = refBusinessDataService;
+        this.contractDataService = contractDataService;
+        this.dataInstanceService = dataInstanceService;
+        this.activityInstanceService = activityInstanceService;
+    }
+
+    public void archiveAndDeleteProcessInstance(final SProcessInstance processInstance) throws SArchivingException {
 
         //set the classloader to this process because we need it e.g. to archive data instance
-
         ClassLoader processClassLoader;
         try {
             processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
@@ -118,18 +153,17 @@ public class ProcessArchiver {
 
             // The archive of data instance is not done because it is done on creation + when updating.
             // Archive SComment
-            archiveComments(processDefinition, processInstance, commentService, archiveDate);
+            archiveComments(processDefinition, processInstance, archiveDate);
 
             // archive document mappings
-            archiveDocumentMappings(processDefinition, processInstance, documentService, archiveDate);
+            archiveDocumentMappings(processDefinition, processInstance, archiveDate);
 
-            archiveConnectorInstancesIfAny(processInstance, connectorInstanceService, processDefinition, archiveDate);
+            archiveConnectorInstancesIfAny(processInstance, processDefinition, archiveDate);
 
-            archiveRefBusinessDataInstances(refBusinessDataService, processInstance.getId());
+            archiveRefBusinessDataInstances(processInstance.getId());
 
             // Archive
-            archiveProcessInstance(processDefinition, processInstance, saProcessInstance, archiveDate, archiveService,
-                    processInstanceService, logger);
+            archiveAndDeleteProcessInstanceObject(processDefinition, processInstance, saProcessInstance, archiveDate);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
@@ -137,11 +171,9 @@ public class ProcessArchiver {
     }
 
     protected void archiveConnectorInstancesIfAny(SProcessInstance processInstance,
-            ConnectorInstanceService connectorInstanceService,
             SProcessDefinition processDefinition, long archiveDate) throws SArchivingException {
         if (!processDefinition.getProcessContainer().getConnectors().isEmpty()) {
-            archiveConnectors(connectorInstanceService, archiveDate, processInstance.getId(),
-                    SConnectorInstance.PROCESS_TYPE);
+            archiveConnectors(archiveDate, processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
         }
     }
 
@@ -149,8 +181,7 @@ public class ProcessArchiver {
         return BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
     }
 
-    private void archiveRefBusinessDataInstances(final RefBusinessDataService refBusinessDataService,
-            long processInstanceId) throws SArchivingException {
+    private void archiveRefBusinessDataInstances(long processInstanceId) throws SArchivingException {
         try {
             List<SRefBusinessDataInstance> refBusinessDataInstances;
             int i = 0;
@@ -167,7 +198,7 @@ public class ProcessArchiver {
         }
     }
 
-    private void archiveConnectors(final ConnectorInstanceService connectorInstanceService, final long archiveDate,
+    private void archiveConnectors(final long archiveDate,
             final long containerId,
             final String containerType) throws SArchivingException {
         try {
@@ -186,18 +217,16 @@ public class ProcessArchiver {
         }
     }
 
-    private void archiveProcessInstance(final SProcessDefinition processDefinition,
+    private void archiveAndDeleteProcessInstanceObject(final SProcessDefinition processDefinition,
             final SProcessInstance processInstance,
-            final SAProcessInstance saProcessInstance, final long archiveDate,
-            final ArchiveService archiveService, final ProcessInstanceService processInstanceService,
-            final TechnicalLoggerService logger)
+            final SAProcessInstance saProcessInstance, final long archiveDate)
             throws SArchivingException {
         try {
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saProcessInstance);
             archiveService.recordInsert(archiveDate, insertRecord);
 
-            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.DEBUG)) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.DEBUG,
+            if (logger.isLoggable(BPMArchiverService.class, TechnicalLogSeverity.DEBUG)) {
+                logger.log(BPMArchiverService.class, TechnicalLogSeverity.DEBUG,
                         "Archiving process instance with id = <" + processInstance.getId() + ">" +
                                 " and state " + processInstance.getStateId());
             }
@@ -214,7 +243,7 @@ public class ProcessArchiver {
 
     private void archiveDocumentMappings(final SProcessDefinition processDefinition,
             final SProcessInstance processInstance,
-            final DocumentService documentService, final long archiveDate) throws SArchivingException {
+            final long archiveDate) throws SArchivingException {
         try {
             List<SMappedDocument> mappedDocuments;
             int startIndex = 0;
@@ -233,7 +262,7 @@ public class ProcessArchiver {
     }
 
     private void archiveComments(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
-            final SCommentService commentService, final long archiveDate) throws SArchivingException {
+            final long archiveDate) throws SArchivingException {
         try {
             List<SComment> sComments;
             int startIndex = 0;
@@ -252,6 +281,59 @@ public class ProcessArchiver {
         }
     }
 
+    public void archiveAndDeleteFlowNodeInstance(final SFlowNodeInstance flowNodeInstance,
+            final long processDefinitionId) throws SArchivingException {
+        try {
+            final SProcessDefinition processDefinition = processDefinitionService
+                    .getProcessDefinition(processDefinitionId);
+            // Remove data instance + data visibility mapping
+            archiveAndDeleteFlownodeInstance(flowNodeInstance, processDefinition, System.currentTimeMillis());
+        } catch (final SArchivingException e) {
+            throw e;
+        } catch (final SBonitaException e) {
+            throw new SArchivingException(e);
+        }
+
+    }
+
+    public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance) throws SArchivingException {
+        archiveFlowNodeInstance(flowNodeInstance, System.currentTimeMillis());
+    }
+
+    private void archiveAndDeleteFlownodeInstance(SFlowNodeInstance flowNodeInstance,
+            SProcessDefinition processDefinition, long archiveDate) throws SDataInstanceException, SArchivingException,
+            SFlowNodeNotFoundException, SFlowNodeReadException, SProcessInstanceModificationException {
+        if (flowNodeInstance instanceof SActivityInstance) {
+            final SActivityDefinition activityDef = (SActivityDefinition) processDefinition
+                    .getProcessContainer().getFlowNode(
+                            flowNodeInstance.getFlowNodeDefinitionId());
+            // only do search for data instances with there are data definitions. Can be null if it's a manual data add at runtime
+            if (activityDef != null && !activityDef.getSDataDefinitions().isEmpty()) {
+                /*
+                 * Delete data instances defined at activity level:
+                 * We do not archive because it's done after update not before update
+                 */
+                deleteLocalDataInstancesFromActivityInstance(flowNodeInstance);
+            }
+
+            if (activityDef != null && !activityDef.getConnectors().isEmpty()) {
+                archiveConnectors(archiveDate, flowNodeInstance.getId(),
+                        SConnectorInstance.FLOWNODE_TYPE);
+            }
+        }
+        if (flowNodeInstance instanceof SUserTaskInstance) {
+            archiveContractData(archiveDate, flowNodeInstance.getId());
+        }
+
+        // then archive the flow node instance:
+        archiveFlowNodeInstance(flowNodeInstance, archiveDate);
+
+        // Reconnect the persisted object before deleting it:
+        final SFlowNodeInstance flowNodeInstance2 = activityInstanceService
+                .getFlowNodeInstance(flowNodeInstance.getId());
+        processInstanceService.deleteFlowNodeInstance(flowNodeInstance2, processDefinition);
+    }
+
     private void setExceptionContext(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
             final SBonitaException e) {
         e.setProcessInstanceIdOnContext(processInstance.getId());
@@ -261,7 +343,7 @@ public class ProcessArchiver {
         e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
     }
 
-    private void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final ArchiveService archiveService,
+    private void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance,
             final long archiveDate)
             throws SArchivingException {
         try {
@@ -344,8 +426,7 @@ public class ProcessArchiver {
         return saFlowNodeInstance;
     }
 
-    private void deleteLocalDataInstancesFromActivityInstance(final SFlowNodeInstance flowNodeInstance,
-            final DataInstanceService dataInstanceService)
+    private void deleteLocalDataInstancesFromActivityInstance(final SFlowNodeInstance flowNodeInstance)
             throws SDataInstanceException {
         List<SDataInstance> dataInstances;
         do {
@@ -357,60 +438,7 @@ public class ProcessArchiver {
         } while (dataInstances.size() > 0);
     }
 
-    public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive,
-            final long processDefinitionId,
-            final ProcessInstanceService processInstanceService,
-            final ProcessDefinitionService processDefinitionService, final ArchiveService archiveService,
-            final DataInstanceService dataInstanceService, final ActivityInstanceService activityInstanceService,
-            final ConnectorInstanceService connectorInstanceService, final ContractDataService contractDataService)
-            throws SArchivingException {
-        try {
-            final SProcessDefinition processDefinition = processDefinitionService
-                    .getProcessDefinition(processDefinitionId);
-            final long archiveDate = System.currentTimeMillis();
-            // Remove data instance + data visibility mapping
-            if (deleteAfterArchive) {
-                if (flowNodeInstance instanceof SActivityInstance) {
-                    final SActivityDefinition activityDef = (SActivityDefinition) processDefinition
-                            .getProcessContainer().getFlowNode(
-                                    flowNodeInstance.getFlowNodeDefinitionId());
-                    // only do search for data instances with there are data definitions. Can be null if it's a manual data add at runtime
-                    if (activityDef != null && !activityDef.getSDataDefinitions().isEmpty()) {
-                        /*
-                         * Delete data instances defined at activity level:
-                         * We do not archive because it's done after update not before update
-                         */
-                        deleteLocalDataInstancesFromActivityInstance(flowNodeInstance, dataInstanceService);
-                    }
-
-                    if (activityDef != null && !activityDef.getConnectors().isEmpty()) {
-                        archiveConnectors(connectorInstanceService, archiveDate, flowNodeInstance.getId(),
-                                SConnectorInstance.FLOWNODE_TYPE);
-                    }
-                }
-                if (flowNodeInstance instanceof SUserTaskInstance) {
-                    archiveContractData(contractDataService, archiveDate, flowNodeInstance.getId());
-                }
-
-                // then archive the flow node instance:
-                archiveFlowNodeInstance(flowNodeInstance, archiveService, archiveDate);
-
-                // Reconnect the persisted object before deleting it:
-                final SFlowNodeInstance flowNodeInstance2 = activityInstanceService
-                        .getFlowNodeInstance(flowNodeInstance.getId());
-                processInstanceService.deleteFlowNodeInstance(flowNodeInstance2, processDefinition);
-            } else {
-                archiveFlowNodeInstance(flowNodeInstance, archiveService, archiveDate);
-            }
-        } catch (final SArchivingException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SArchivingException(e);
-        }
-
-    }
-
-    private void archiveContractData(final ContractDataService contractDataService, final long archiveDate,
+    private void archiveContractData(final long archiveDate,
             final long userTaskId)
             throws SArchivingException {
         try {

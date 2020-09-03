@@ -105,6 +105,7 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.flowmerger.FlowNodeTransitionsWrapper;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
@@ -160,6 +161,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final RefBusinessDataService refBusinessDataService;
     private final DocumentHelper documentHelper;
     private final BPMWorkFactory workFactory;
+    private final BPMArchiverService bpmArchiverService;
 
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService,
@@ -176,7 +178,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
             final BusinessDataRepository businessDataRepository,
             final RefBusinessDataService refBusinessDataService, final TransitionEvaluator transitionEvaluator,
-            final ContractDataService contractDataService, BPMWorkFactory workFactory) {
+            final ContractDataService contractDataService, BPMWorkFactory workFactory,
+            BPMArchiverService bpmArchiverService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -199,6 +202,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.refBusinessDataService = refBusinessDataService;
         this.contractDataService = contractDataService;
         this.workFactory = workFactory;
+        this.bpmArchiverService = bpmArchiverService;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
         // dependency injection because of circular references...
         flowNodeStateManager.setProcessExecutor(this);
@@ -772,7 +776,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                             endEventInstance.getFlowNodeDefinitionId());
             hasActionsToExecute = eventsHandler.handlePostThrowEvent(sProcessDefinition, endEventDefinition,
                     (SThrowEventInstance) endEventInstance, child);
-            flowNodeExecutor.archiveFlowNodeInstance(endEventInstance, true, sProcessDefinition.getId());
+            bpmArchiverService.archiveAndDeleteFlowNodeInstance(endEventInstance, sProcessDefinition.getId());
         }
         return hasActionsToExecute;
     }
@@ -879,7 +883,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (child.getId() != sProcessInstance.getInterruptingEventId()
                 || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
-            flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
+            bpmArchiverService.archiveAndDeleteFlowNodeInstance(child, sProcessDefinition.getId());
         }
     }
 

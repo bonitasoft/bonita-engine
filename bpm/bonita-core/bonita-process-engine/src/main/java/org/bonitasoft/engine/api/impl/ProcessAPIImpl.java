@@ -6403,8 +6403,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
             // TODO: the following 4 instructions seem to be redundant with stepForward:
             // Cannot we factorize this?
-            flowNodeExecutor.archiveFlowNodeInstance(flowNodeInstance, false,
-                    flowNodeInstance.getProcessDefinitionId());
+            tenantAccessor.getBPMArchiverService().archiveFlowNodeInstance(flowNodeInstance);
             // flag as executing
             activityInstanceService.setExecuting(flowNodeInstance);
             activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId);

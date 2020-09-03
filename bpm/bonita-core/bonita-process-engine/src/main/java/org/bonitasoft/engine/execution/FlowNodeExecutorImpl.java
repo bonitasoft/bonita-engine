@@ -16,13 +16,10 @@ package org.bonitasoft.engine.execution;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
 
 import org.bonitasoft.engine.SArchivingException;
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
-import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
@@ -30,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
@@ -44,9 +40,8 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.execution.archive.ProcessArchiver;
+import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -69,36 +64,26 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private final FlowNodeStateManager flowNodeStateManager;
     private final ActivityInstanceService activityInstanceService;
-    private final ArchiveService archiveService;
-    private final DataInstanceService dataInstanceService;
     private final ContainerRegistry containerRegistry;
     private final ProcessDefinitionService processDefinitionService;
     private final SCommentService commentService;
-    private final ProcessInstanceService processInstanceService;
-    private final ConnectorInstanceService connectorInstanceService;
     private final ClassLoaderService classLoaderService;
     private final WorkService workService;
     private final BPMWorkFactory workFactory;
-    private final ContractDataService contractDataService;
     private final ProcessInstanceInterruptor processInstanceInterruptor;
+    private final BPMArchiverService bpmArchiverService;
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager,
             final ActivityInstanceService activityInstanceManager,
-            final ArchiveService archiveService,
-            final DataInstanceService dataInstanceService,
-            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
+            final ContainerRegistry containerRegistry,
+            final ProcessDefinitionService processDefinitionService,
             final SCommentService commentService,
-            final ProcessInstanceService processInstanceService,
-            final ConnectorInstanceService connectorInstanceService,
             final ClassLoaderService classLoaderService, final WorkService workService, BPMWorkFactory workFactory,
-            final ContractDataService contractDataService, ProcessInstanceInterruptor processInstanceInterruptor) {
+            ProcessInstanceInterruptor processInstanceInterruptor,
+            final BPMArchiverService bpmArchiverService) {
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
-        this.archiveService = archiveService;
-        this.dataInstanceService = dataInstanceService;
         this.containerRegistry = containerRegistry;
-        this.processInstanceService = processInstanceService;
-        this.connectorInstanceService = connectorInstanceService;
         this.classLoaderService = classLoaderService;
         this.workService = workService;
         this.workFactory = workFactory;
@@ -106,7 +91,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         containerRegistry.addContainerExecutor(this);
         this.processDefinitionService = processDefinitionService;
         this.commentService = commentService;
-        this.contractDataService = contractDataService;
+        this.bpmArchiverService = bpmArchiverService;
 
     }
 
@@ -150,7 +135,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             Thread.currentThread().setContextClassLoader(localClassLoader);
 
             if (!flowNodeInstance.isStateExecuting()) {
-                archiveFlowNodeInstance(flowNodeInstance, false, processDefinitionId);
+                bpmArchiverService.archiveFlowNodeInstance(flowNodeInstance);
                 setExecutedBy(executerId, flowNodeInstance);
                 setExecutedBySubstitute(executerSubstituteId, flowNodeInstance);
             }
@@ -258,7 +243,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         final FlowNodeState state = flowNodeStateManager.getState(stateId);
         try {
             final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-            archiveFlowNodeInstance(sFlowNodeInstance, false, sFlowNodeInstance.getProcessDefinitionId());
+            bpmArchiverService.archiveFlowNodeInstance(sFlowNodeInstance);
             activityInstanceService.setState(sFlowNodeInstance, state);
             if (state.isTerminal()) {
                 if (hasChildren(sFlowNodeInstance)) {
@@ -292,8 +277,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException, SArchivingException,
             SFlowNodeModificationException,
             SFlowNodeExecutionException, SWorkRegisterException {
-        archiveFlowNodeInstance(childFlowNode, true, processDefinitionId);
-
+        bpmArchiverService.archiveAndDeleteFlowNodeInstance(childFlowNode, processDefinitionId);
         final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService
                 .getFlowNodeInstance(parentId);
         decrementToken(activityInstanceParent);
@@ -354,15 +338,4 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             throws SFlowNodeExecutionException {
         return stepForward(flowNodeInstance, executerId, executerSubstituteId);
     }
-
-    @Override
-    public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive,
-            final long processDefinitionId)
-            throws SArchivingException {
-        new ProcessArchiver().archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId,
-                processInstanceService,
-                processDefinitionService, archiveService, dataInstanceService, activityInstanceService,
-                connectorInstanceService, contractDataService);
-    }
-
 }

@@ -14,16 +14,9 @@
 package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.SArchivingException;
-import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
-import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -33,7 +26,7 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
-import org.bonitasoft.engine.execution.archive.ProcessArchiver;
+import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -44,40 +37,18 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeState {
 
     private final ProcessInstanceService processInstanceService;
-
-    private final ArchiveService archiveService;
-
-    private final SCommentService commentService;
-
-    private final DocumentService documentService;
-
     private final TechnicalLoggerService logger;
-
-    private final ProcessDefinitionService processDefinitionService;
-
-    private final ConnectorInstanceService connectorInstanceService;
-
-    private ClassLoaderService classLoaderService;
-    private RefBusinessDataService refBusinessDataService;
-    private ProcessInstanceInterruptor processInstanceInterruptor;
+    private final ProcessInstanceInterruptor processInstanceInterruptor;
+    private final BPMArchiverService bpmArchiverService;
 
     public EndingCallActivityExceptionStateImpl(ProcessInstanceService processInstanceService,
-            ArchiveService archiveService, final SCommentService commentService,
-            final DocumentService documentService, final TechnicalLoggerService logger,
-            final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService,
-            RefBusinessDataService refBusinessDataService, ProcessInstanceInterruptor processInstanceInterruptor) {
-        super();
+            TechnicalLoggerService logger,
+            ProcessInstanceInterruptor processInstanceInterruptor,
+            BPMArchiverService bpmArchiverService) {
         this.processInstanceService = processInstanceService;
-        this.archiveService = archiveService;
-        this.commentService = commentService;
-        this.documentService = documentService;
         this.logger = logger;
-        this.processDefinitionService = processDefinitionService;
-        this.connectorInstanceService = connectorInstanceService;
-        this.classLoaderService = classLoaderService;
-        this.refBusinessDataService = refBusinessDataService;
         this.processInstanceInterruptor = processInstanceInterruptor;
+        this.bpmArchiverService = bpmArchiverService;
     }
 
     @Override
@@ -113,14 +84,10 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     }
 
     private void archiveChildProcessInstance(final SFlowNodeInstance instance)
-            throws SProcessInstanceNotFoundException, SArchivingException,
-            SBonitaReadException {
+            throws SArchivingException, SBonitaReadException {
         try {
             final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
-            new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService,
-                    documentService, logger,
-                    commentService, processDefinitionService, connectorInstanceService, classLoaderService,
-                    refBusinessDataService);
+            bpmArchiverService.archiveAndDeleteProcessInstance(childProcInst);
         } catch (SProcessInstanceNotFoundException ignored) {
             logger.log(getClass(), TechnicalLogSeverity.WARNING,
                     "No target process instance found when archiving the call activity " + instance.getId()

@@ -23,6 +23,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
@@ -60,6 +61,8 @@ public class FlowNodeExecutorImplTest {
     private ArchiveService archiveService;
     @Mock
     private StateBehaviors stateBehaviors;
+    @Mock
+    BPMArchiverService bpmArchiverService;
     @Captor
     private ArgumentCaptor<WorkDescriptor> workDescriptorArgumentCaptor;
     private FlowNodeExecutorImpl flowNodeExecutor;
@@ -67,9 +70,9 @@ public class FlowNodeExecutorImplTest {
 
     @Before
     public void before() throws Exception {
-        flowNodeExecutor = new FlowNodeExecutorImpl(flowNodeStateManager, activityInstanceService, archiveService,
-                null, containerRegistry, processDefinitionService, null, null, null, null, workService, workFactory,
-                null, processInstanceInterruptor);
+        flowNodeExecutor = new FlowNodeExecutorImpl(flowNodeStateManager, activityInstanceService,
+                containerRegistry, processDefinitionService, null, null, workService, workFactory,
+                processInstanceInterruptor, bpmArchiverService);
         skippedFlowNodeState = new SkippedFlowNodeStateImpl();
         doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeStateImpl.ID);
         doReturn(stateBehaviors).when(flowNodeStateManager).getStateBehaviors();

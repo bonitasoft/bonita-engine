@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.archive;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -54,7 +53,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * author Emmanuel Duchastenier
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ProcessArchiverTest {
+public class BPMArchiverServiceTest {
 
     @Mock
     private ArchiveService archiveService;
@@ -75,14 +74,14 @@ public class ProcessArchiverTest {
     @Mock
     private RefBusinessDataService refBusinessDataService;
     @Mock
-    DataInstanceService dataInstanceService;
+    private ContractDataService contractDataService;
+    @Mock
+    private DataInstanceService dataInstanceService;
     @Mock
     private ActivityInstanceService activityInstanceService;
-    @Mock
-    private ContractDataService contractDataInstanceService;
     @Spy
     @InjectMocks
-    private ProcessArchiver processArchiver;
+    private BPMArchiverService bpmArchiverService;
 
     @Test
     public void archiveProcessInstance_should_archive_SRefBusinessDataInstances() throws Exception {
@@ -95,9 +94,9 @@ public class ProcessArchiverTest {
         SProcessInstance processInstance = new SProcessInstance();
         processInstance.setId(451L);
 
-        doReturn(mock(SAProcessInstance.class)).when(processArchiver).buildArchiveProcessInstance(processInstance);
-        doNothing().when(processArchiver).archiveConnectorInstancesIfAny(eq(processInstance),
-                eq(connectorInstanceService), nullable(SProcessDefinition.class),
+        doReturn(mock(SAProcessInstance.class)).when(bpmArchiverService).buildArchiveProcessInstance(processInstance);
+        doNothing().when(bpmArchiverService).archiveConnectorInstancesIfAny(eq(processInstance),
+                nullable(SProcessDefinition.class),
                 anyLong());
 
         doReturn(sRefBusinessDataInstances).when(refBusinessDataService)
@@ -105,9 +104,7 @@ public class ProcessArchiverTest {
         doNothing().when(refBusinessDataService)
                 .archiveRefBusinessDataInstance(nullable(SRefBusinessDataInstance.class));
 
-        processArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, documentService,
-                logger, commentService,
-                processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+        bpmArchiverService.archiveAndDeleteProcessInstance(processInstance);
 
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref1);
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref2);
