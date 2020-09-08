@@ -18,9 +18,11 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -33,6 +35,8 @@ import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.junit.Rule;
@@ -73,7 +77,15 @@ public abstract class CommonAPIIT extends APITestUtil {
         cleanGroups();
         cleanRoles();
         cleanSupervisors();
+        checkThereAreNoWaitingEventsLeft();
         logoutOnTenant();
+    }
+
+    private void checkThereAreNoWaitingEventsLeft() throws BonitaException {
+        SearchResult<?> searchResult = (SearchResult<?>) getCommandAPI()
+                .execute("searchWaitingEventsCommand",
+                        Collections.singletonMap("searchOptions", new SearchOptionsBuilder(0, 100).done()));
+        Assertions.assertThat(searchResult.getResult()).hasSize(0);
     }
 
     public BarResource getResource(final String path, final String name) throws IOException {

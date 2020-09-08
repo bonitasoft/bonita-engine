@@ -202,8 +202,8 @@ public class ProcessExecutorImplTest {
     public void should_not_start_disabled_process() throws Exception {
         final long starterId = 1L;
         final long starterSubstituteId = 9L;
-        final List<SOperation> operations = new ArrayList<SOperation>();
-        final Map<String, Object> context = new HashMap<String, Object>();
+        final List<SOperation> operations = new ArrayList<>();
+        final Map<String, Object> context = new HashMap<>();
 
         final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class,
                 withSettings().spiedInstance(processExecutorImpl));
@@ -250,9 +250,9 @@ public class ProcessExecutorImplTest {
     public void startProcessWithOperationsAndContext() throws Exception {
         final long starterId = 1L;
         final long starterSubstituteId = 9L;
-        final List<SOperation> operations = new ArrayList<SOperation>(1);
+        final List<SOperation> operations = new ArrayList<>(1);
         operations.add(mock(SOperation.class));
-        final Map<String, Object> context = new HashMap<String, Object>(1);
+        final Map<String, Object> context = new HashMap<>(1);
         context.put("input", "value");
 
         final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class,
@@ -284,12 +284,12 @@ public class ProcessExecutorImplTest {
             throws Exception {
         final long starterId = 1L;
         final long starterSubstituteId = 9L;
-        final List<SOperation> operations = new ArrayList<SOperation>(1);
+        final List<SOperation> operations = new ArrayList<>(1);
         operations.add(mock(SOperation.class));
-        final Map<String, Object> context = new HashMap<String, Object>(1);
+        final Map<String, Object> context = new HashMap<>(1);
         context.put("input", "value");
         final SExpressionContext expressionContext = mock(SExpressionContext.class);
-        final List<ConnectorDefinitionWithInputValues> connectors = new ArrayList<ConnectorDefinitionWithInputValues>();
+        final List<ConnectorDefinitionWithInputValues> connectors = new ArrayList<>();
         connectors.add(mock(ConnectorDefinitionWithInputValues.class));
         final long callerId = 1L;
         final long subProcessDefinitionId = 1L;
@@ -334,12 +334,12 @@ public class ProcessExecutorImplTest {
     public void startProcessWithOperationsAndContextAndExpressionContextAndConnectors() throws Exception {
         final long starterId = 1L;
         final long starterSubstituteId = 9L;
-        final List<SOperation> operations = new ArrayList<SOperation>(1);
+        final List<SOperation> operations = new ArrayList<>(1);
         operations.add(mock(SOperation.class));
-        final Map<String, Object> context = new HashMap<String, Object>(1);
+        final Map<String, Object> context = new HashMap<>(1);
         context.put("input", "value");
         final SExpressionContext expressionContext = mock(SExpressionContext.class);
-        final List<ConnectorDefinitionWithInputValues> connectors = new ArrayList<ConnectorDefinitionWithInputValues>();
+        final List<ConnectorDefinitionWithInputValues> connectors = new ArrayList<>();
         connectors.add(mock(ConnectorDefinitionWithInputValues.class));
         final long callerId = 1L;
         final long subProcessDefinitionId = 1L;
@@ -497,14 +497,14 @@ public class ProcessExecutorImplTest {
     public void validateContractInputsShouldDoNothingIfcontractDefinitionIsNull() throws Exception {
         final SProcessDefinition mock = mock(SProcessDefinition.class);
         doReturn(null).when(mock).getContract();
-        processExecutorImpl.validateContractInputs(new HashMap<String, Serializable>(), mock);
+        processExecutorImpl.validateContractInputs(new HashMap<>(), mock);
     }
 
     @Test
     public void validateContractInputsShouldValidateContractWithDefinition() throws Exception {
         final SProcessDefinition processDef = mock(SProcessDefinition.class);
         doReturn(mock(SContractDefinition.class)).when(processDef).getContract();
-        processExecutorImpl.validateContractInputs(new HashMap<String, Serializable>(), processDef);
+        processExecutorImpl.validateContractInputs(new HashMap<>(), processDef);
 
         // then, we call the validator:
         verify(processDef).getId();

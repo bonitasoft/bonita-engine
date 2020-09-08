@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -49,7 +50,7 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
         assertEquals(errorMessage, expectedNbOfWaitingEvents, searchResult.getCount());
     }
 
-    protected void checkNumberOfWaitingEvents(final String flowNodeName, final long expectedNbOfWaitingEvents)
+    protected void checkNumberOfWaitingEvents(final String flowNodeName, final int expectedNbOfWaitingEvents)
             throws BonitaException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, flowNodeName);
@@ -60,7 +61,7 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
         @SuppressWarnings("unchecked")
         final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
                 .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
-        assertEquals(expectedNbOfWaitingEvents, searchResult.getCount());
+        Assertions.assertThat(searchResult.getResult()).hasSize(expectedNbOfWaitingEvents);
     }
 
     protected void checkNumberOfWaitingEventsInProcess(final String processName, final long expectedNbOfWaitingEvents)
