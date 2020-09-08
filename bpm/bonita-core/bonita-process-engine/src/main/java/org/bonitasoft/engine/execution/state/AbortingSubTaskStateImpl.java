@@ -70,7 +70,8 @@ public class AbortingSubTaskStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+    public boolean notifyChildFlowNodeHasFinished(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance parentInstance,
             final SFlowNodeInstance childInstance) {
         final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) parentInstance;
         return sHumanTaskInstance.getTokenCount() == 0;

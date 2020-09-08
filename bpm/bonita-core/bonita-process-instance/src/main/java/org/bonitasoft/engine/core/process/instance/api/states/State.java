@@ -37,7 +37,7 @@ public interface State<T> {
      *         true if the state is finished (the flow node will continue its flow),
      *         false if there are still some children to be triggered / to wait for.
      */
-    boolean hit(SProcessDefinition processDefinition, T parentInstance, T childInstance)
+    boolean notifyChildFlowNodeHasFinished(SProcessDefinition processDefinition, T parentInstance, T childInstance)
             throws SActivityStateExecutionException;
 
     int getId();

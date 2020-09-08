@@ -90,66 +90,68 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+    public boolean notifyChildFlowNodeHasFinished(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance parentInstance,
             final SFlowNodeInstance childInstance)
             throws SActivityStateExecutionException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SActivityDefinition activityDefinition = (SActivityDefinition) processContainer
-                .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+                .getFlowNode(parentInstance.getFlowNodeDefinitionId());
         final SMultiInstanceLoopCharacteristics loopCharacteristics = (SMultiInstanceLoopCharacteristics) activityDefinition
                 .getLoopCharacteristics();
 
         try {
-            final SMultiInstanceActivityInstance miActivity = (SMultiInstanceActivityInstance) flowNodeInstance;
-            if (miActivity.getStateCategory() != SStateCategory.NORMAL) {
-                // if is not a normal state (aborting / canceling), return true to change state from executing to aborting / cancelling (ChildReadstate),
+            if (parentInstance.getStateCategory() != SStateCategory.NORMAL) {
+                // if is not a normal state (aborting / canceling), return true to change state from executing to aborting / cancelling (ChildReachstate),
                 // without create a new child task
                 return true;
             }
 
+            final SMultiInstanceActivityInstance parentMultiInstance = (SMultiInstanceActivityInstance) parentInstance;
             if (childInstance.isAborting() || childInstance.isCanceling()) {
                 // TODO add synchronization
-                activityInstanceService.addMultiInstanceNumberOfTerminatedActivities(miActivity, 1);
+                activityInstanceService.addMultiInstanceNumberOfTerminatedActivities(parentMultiInstance, 1);
             } else {
                 // TODO add synchronization
-                activityInstanceService.addMultiInstanceNumberOfCompletedActivities(miActivity, 1);
+                activityInstanceService.addMultiInstanceNumberOfCompletedActivities(parentMultiInstance, 1);
                 // check the completionCondition
                 final SExpression completionCondition = loopCharacteristics.getCompletionCondition();
                 final Map<String, Object> input = new HashMap<>(1);
                 input.put(ExpressionConstants.NUMBER_OF_ACTIVE_INSTANCES.getEngineConstantName(),
-                        miActivity.getNumberOfActiveInstances());
+                        parentMultiInstance.getNumberOfActiveInstances());
                 input.put(ExpressionConstants.NUMBER_OF_TERMINATED_INSTANCES.getEngineConstantName(),
-                        miActivity.getNumberOfTerminatedInstances());
+                        parentMultiInstance.getNumberOfTerminatedInstances());
                 input.put(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName(),
-                        miActivity.getNumberOfCompletedInstances());
-                final int numberOfInstances = miActivity.getNumberOfInstances();
+                        parentMultiInstance.getNumberOfCompletedInstances());
+                final int numberOfInstances = parentMultiInstance.getNumberOfInstances();
                 input.put(ExpressionConstants.NUMBER_OF_INSTANCES.getEngineConstantName(), numberOfInstances);
-                final SExpressionContext sExpressionContext = new SExpressionContext(miActivity.getId(),
+                final SExpressionContext sExpressionContext = new SExpressionContext(parentMultiInstance.getId(),
                         DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                         processDefinition.getId(), input);
-                sExpressionContext.setProcessDefinitionId(miActivity.getProcessDefinitionId());
+                sExpressionContext.setProcessDefinitionId(parentMultiInstance.getProcessDefinitionId());
                 if (completionCondition != null) {
                     final boolean complete = (Boolean) expressionResolverService.evaluate(completionCondition,
                             sExpressionContext);
                     if (complete) {
-                        stateBehaviors.interruptSubActivities(miActivity, ABORTING);
-                        if (miActivity.isSequential()) {
+                        stateBehaviors.interruptSubActivities(parentMultiInstance, ABORTING);
+                        if (parentMultiInstance.isSequential()) {
                             return true;
                         }
                     }
                 }
             }
 
-            final int numberOfActiveInstances = miActivity.getNumberOfActiveInstances();
-            final int numberOfCompletedInstances = miActivity.getNumberOfCompletedInstances();
-            final int numberOfTerminatedInstances = miActivity.getNumberOfTerminatedInstances();
-            final int numberOfInstances = miActivity.getNumberOfInstances();
-            if (miActivity.isSequential()) {
+            final int numberOfActiveInstances = parentMultiInstance.getNumberOfActiveInstances();
+            final int numberOfCompletedInstances = parentMultiInstance.getNumberOfCompletedInstances();
+            final int numberOfTerminatedInstances = parentMultiInstance.getNumberOfTerminatedInstances();
+            final int numberOfInstances = parentMultiInstance.getNumberOfInstances();
+            if (parentMultiInstance.isSequential()) {
                 // only instantiate when we are in sequence
                 List<SFlowNodeInstance> createInnerInstances = null;
-                if (stateBehaviors.shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
+                if (stateBehaviors.shouldCreateANewInstance(loopCharacteristics, numberOfInstances,
+                        parentMultiInstance)) {
                     createInnerInstances = stateBehaviors.createInnerInstances(processDefinition.getId(),
-                            activityDefinition, miActivity, 1);
+                            activityDefinition, parentMultiInstance, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
                         containerRegistry.executeFlowNode(sFlowNodeInstance);
                     }

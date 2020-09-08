@@ -96,12 +96,13 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+    public boolean notifyChildFlowNodeHasFinished(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance parentInstance,
             final SFlowNodeInstance childInstance)
             throws SActivityStateExecutionException {
         try {
             final SLoopActivityInstance loopActivity = (SLoopActivityInstance) activityInstanceService
-                    .getFlowNodeInstance(flowNodeInstance.getId());// get it
+                    .getFlowNodeInstance(parentInstance.getId());// get it
             if (loopActivity.getStateCategory() != SStateCategory.NORMAL) {
                 // if is not a normal state (aborting / canceling), return true to change state from executing to aborting / cancelling (ChildReadstate),
                 // without create a new child task
@@ -109,7 +110,7 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
             }
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SActivityDefinition activity = (SActivityDefinition) processContainer
-                    .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+                    .getFlowNode(parentInstance.getFlowNodeDefinitionId());
             final SStandardLoopCharacteristics loopCharacteristics = (SStandardLoopCharacteristics) activity
                     .getLoopCharacteristics();
             boolean loop = false;
@@ -128,13 +129,13 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
             if (loop) {
                 final SLoopActivityInstanceBuilderFactory keyProvider = BuilderFactory
                         .get(SLoopActivityInstanceBuilderFactory.class);
-                final long rootProcessInstanceId = flowNodeInstance
+                final long rootProcessInstanceId = parentInstance
                         .getLogicalGroup(keyProvider.getRootProcessInstanceIndex());
-                final long parentProcessInstanceId = flowNodeInstance
+                final long parentProcessInstanceId = parentInstance
                         .getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
                 final SFlowNodeInstance child = bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
-                        flowNodeInstance.getRootContainerId(),
-                        flowNodeInstance.getId(), SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId,
+                        parentInstance.getRootContainerId(),
+                        parentInstance.getId(), SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId,
                         parentProcessInstanceId, true,
                         loopCounter + 1, SStateCategory.NORMAL, -1);
                 activityInstanceService.incrementLoopCounter(loopActivity);
