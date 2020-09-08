@@ -78,8 +78,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final ContainerRegistry containerRegistry,
             final ProcessDefinitionService processDefinitionService,
             final SCommentService commentService,
-            final ClassLoaderService classLoaderService, final WorkService workService, BPMWorkFactory workFactory,
-            ProcessInstanceInterruptor processInstanceInterruptor,
+            final ClassLoaderService classLoaderService,
+            final WorkService workService, BPMWorkFactory workFactory,
+            final ProcessInstanceInterruptor processInstanceInterruptor,
             final BPMArchiverService bpmArchiverService) {
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -273,10 +274,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public void childFinished(final long processDefinitionId, final long parentId, SFlowNodeInstance childFlowNode)
-            throws SFlowNodeNotFoundException,
-            SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException, SArchivingException,
-            SFlowNodeModificationException,
-            SFlowNodeExecutionException, SWorkRegisterException {
+            throws SFlowNodeNotFoundException, SFlowNodeReadException, SProcessDefinitionNotFoundException,
+            SBonitaReadException, SArchivingException, SFlowNodeModificationException, SFlowNodeExecutionException,
+            SWorkRegisterException {
         bpmArchiverService.archiveAndDeleteFlowNodeInstance(childFlowNode, processDefinitionId);
         final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService
                 .getFlowNodeInstance(parentId);

@@ -90,7 +90,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
@@ -649,24 +648,22 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             throws SBonitaException {
         final SProcessDefinition sProcessDefinition = processDefinitionService
                 .getProcessDefinition(processDefinitionId);
-        final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory
-                .get(SUserTaskInstanceBuilderFactory.class);
-        final long processInstanceId = childFlowNode
-                .getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
+        final long processInstanceId = childFlowNode.getParentProcessInstanceId();
 
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
 
-        //this also delete the event (unless its the event that interrupted the process)
-        final boolean isEnd = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, childFlowNode,
+        // this also deletes the event (unless the process was interrupted by event)
+        final boolean wasTheLastFlowNodeToExecute = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition,
+                childFlowNode,
                 sProcessInstance);
         logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
                 "The flow node <" + childFlowNode.getName() + "> with id<"
                         + childFlowNode.getId() + "> of process instance <" + processInstanceId
                         + "> finished");
-        if (isEnd) {
+        if (wasTheLastFlowNodeToExecute) {
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
             if (sProcessInstance.getInterruptingEventId() > 0) {
-                //it it's interrupted by an event (error event), the flow node is kept to be executed last and deleted in executePostThrowEventHandlers
+                //if it's interrupted by an event (error event), the flow node is kept to be executed last and deleted in triggerErrorEvents()
                 numberOfFlowNode -= 1;
             }
             if (numberOfFlowNode > 0) {
@@ -686,7 +683,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
                     "The process instance <" + processInstanceId + "> from definition <"
                             + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> finished");
-            boolean hasActionsToExecute = false;
+            boolean hasTriggeredErrorEvents = false;
             // in case of interruption by error event:
             // * the first time the last element (except the error event itself)  goes here, it put the process in aborting
             // * the error event in thrown
@@ -698,24 +695,24 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             //     * ABORTING: if the process was in state category ABORTING (I don't know why...)
             //         I'm not sure this case really happens because this would require that a last flow node trigger this method again and it's never the case
             //     * COMPLETED: in 'normal' case
-            //         In that case if the process is called by a call activity, the calling activity have its token count decremented but is not executed (hasActionsToExecute==true)
+            //         In that case if the process is called by a call activity, the calling activity have its token count decremented but is not executed (hasTriggeredErrorEvents==true)
             //
             if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
                 if (sProcessInstance.getStateCategory() != SStateCategory.CANCELLING
                         && sProcessInstance.hasBeenInterruptedByEvent()) {
                     // trigger error events only if process instance has been aborted by an event
                     // and no-one cancelled the process instance in the meantime:
-                    hasActionsToExecute = triggerErrorEventsIfAny(sProcessDefinition, sProcessInstance,
+                    hasTriggeredErrorEvents = triggerErrorEvents(sProcessDefinition, sProcessInstance,
                             childFlowNode);
                 }
                 // the process instance has maybe changed
                 logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "has action to execute");
-                if (hasActionsToExecute) {
+                if (hasTriggeredErrorEvents) {
                     sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
                 }
                 eventsHandler.unregisterEventSubProcess(sProcessDefinition, sProcessInstance);
             }
-            handleProcessCompletion(sProcessDefinition, sProcessInstance, hasActionsToExecute);
+            handleProcessCompletion(sProcessDefinition, sProcessInstance, hasTriggeredErrorEvents);
         }
     }
 
@@ -758,7 +755,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     }
 
-    private boolean triggerErrorEventsIfAny(final SProcessDefinition sProcessDefinition,
+    private boolean triggerErrorEvents(final SProcessDefinition sProcessDefinition,
             final SProcessInstance sProcessInstance,
             final SFlowNodeInstance child) throws SBonitaException {
         final SFlowNodeInstance endEventInstance = activityInstanceService
@@ -766,11 +763,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SEndEventDefinition endEventDefinition = (SEndEventDefinition) sProcessDefinition
                 .getProcessContainer().getFlowNode(
                         endEventInstance.getFlowNodeDefinitionId());
-        boolean hasActionsToExecute = eventsHandler.handlePostThrowEvent(sProcessDefinition, endEventDefinition,
+        boolean hasTriggeredErrorEvents = eventsHandler.handlePostThrowEvent(sProcessDefinition, endEventDefinition,
                 (SThrowEventInstance) endEventInstance, child);
         bpmArchiverService.archiveAndDeleteFlowNodeInstance(endEventInstance, sProcessDefinition.getId());
-
-        return hasActionsToExecute;
+        return hasTriggeredErrorEvents;
     }
 
     /**
@@ -780,8 +776,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * @return number of token of the process
      */
     private boolean executeValidOutgoingTransitionsAndUpdateTokens(final SProcessDefinition processDefinition,
-            final SFlowNodeInstance child,
-            final SProcessInstance sProcessInstance) throws SBonitaException {
+            final SFlowNodeInstance child, final SProcessInstance sProcessInstance) throws SBonitaException {
         // token we merged
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer()
                 .getFlowNode(child.getFlowNodeDefinitionId());
@@ -791,8 +786,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<>(transitionsDescriptor
                 .getValidOutgoingTransitionDefinitions().size());
         final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<>(
-                transitionsDescriptor.getValidOutgoingTransitionDefinitions()
-                        .size());
+                transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
         for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor
                 .getValidOutgoingTransitionDefinitions()) {
             final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(processDefinition,
