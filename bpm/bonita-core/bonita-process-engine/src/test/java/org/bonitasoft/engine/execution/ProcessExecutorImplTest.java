@@ -304,8 +304,6 @@ public class ProcessExecutorImplTest {
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null, subProcessDefinitionId);
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(ActivationState.ENABLED.name()).when(sProcessDefinitionDeployInfo).getActivationState();
-        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
         when(mockedProcessExecutorImpl.startElements(sProcessInstance, selector)).thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId,
                 subProcessDefinitionId)).thenReturn(

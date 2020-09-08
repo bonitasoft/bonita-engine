@@ -114,13 +114,14 @@ public interface EventInstanceRepository {
             throws SEventTriggerInstanceReadException;
 
     /**
+     * search start waiting events related to a process definition (not its event sub processes)
+     *
      * @param processDefinitionId
-     * @param queryOptions
      * @return
      * @throws SBonitaReadException
      * @since 6.3
      */
-    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions)
+    List<SWaitingEvent> getStartWaitingEventsOfProcessDefinition(long processDefinitionId)
             throws SBonitaReadException;
 
     List<SMessageEventCouple> getMessageEventCouples(int fromIndex, int maxResults)
@@ -226,4 +227,11 @@ public interface EventInstanceRepository {
 
     List<SWaitingEvent> getWaitingEventsForFlowNodeId(long flowNodeInstanceId)
             throws SEventTriggerInstanceReadException;
+
+    /**
+     * Return waiting events related to the process instance passed as parameter, including
+     * the ones at flow node level.
+     */
+    List<SWaitingEvent> getAllWaitingEventsForProcessInstance(long processInstanceId, final int fromIndex,
+            final int maxResults) throws SEventTriggerInstanceReadException;
 }
