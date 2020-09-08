@@ -31,6 +31,10 @@ public class FlowNodeSelector implements Serializable {
     private final SProcessDefinition definition;
     private long subProcessDefinitionId = -1;
 
+    public boolean isEventSubProcess() {
+        return subProcessDefinitionId > 0;
+    }
+
     public FlowNodeSelector(SProcessDefinition definition, Filter<SFlowNodeDefinition> filter) {
         this.definition = definition;
         this.selector = filter;
