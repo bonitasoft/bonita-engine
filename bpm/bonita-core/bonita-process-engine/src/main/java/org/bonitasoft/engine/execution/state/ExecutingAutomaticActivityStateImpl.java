@@ -84,7 +84,8 @@ public class ExecutingAutomaticActivityStateImpl extends OnEnterAndFinishConnect
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+    public boolean notifyChildFlowNodeHasFinished(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance parentInstance,
             final SFlowNodeInstance childInstance) {
         return false;
     }

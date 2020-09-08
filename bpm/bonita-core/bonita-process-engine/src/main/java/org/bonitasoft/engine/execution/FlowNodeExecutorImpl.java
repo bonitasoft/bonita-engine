@@ -284,7 +284,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         final SProcessDefinition sProcessDefinition = processDefinitionService
                 .getProcessDefinition(processDefinitionId);
         final FlowNodeState state = flowNodeStateManager.getState(activityInstanceParent.getStateId());
-        final boolean shouldContinueParent = state.hit(sProcessDefinition, activityInstanceParent, childFlowNode);
+        final boolean shouldContinueParent = state.notifyChildFlowNodeHasFinished(sProcessDefinition,
+                activityInstanceParent, childFlowNode);
         if (shouldContinueParent) {
             // it should never happen, because the terminal state never waits children to finish
             if (activityInstanceParent.isTerminal()) {

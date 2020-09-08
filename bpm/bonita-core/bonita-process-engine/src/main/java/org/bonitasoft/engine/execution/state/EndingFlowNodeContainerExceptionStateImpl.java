@@ -56,7 +56,8 @@ public abstract class EndingFlowNodeContainerExceptionStateImpl implements FlowN
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+    public boolean notifyChildFlowNodeHasFinished(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance parentInstance,
             final SFlowNodeInstance childInstance) {
         return parentInstance.getTokenCount() == 0;
     }
