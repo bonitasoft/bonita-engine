@@ -130,7 +130,7 @@ public class EventInstanceServiceIT extends CommonBPMServicesTest {
                         orderByType));
     }
 
-    private List<SBoundaryEventInstance> getActiviyBoundaryEventInstances(final long activityId, final int fromIndex,
+    private List<SBoundaryEventInstance> getActivityBoundaryEventInstances(final long activityId, final int fromIndex,
             final int maxResults) throws Exception {
         return userTransactionService.executeInTransaction(
                 () -> eventInstanceService.getActivityBoundaryEventInstances(activityId, fromIndex, maxResults));
@@ -139,6 +139,13 @@ public class EventInstanceServiceIT extends CommonBPMServicesTest {
     private void createWaitingEvent(final SWaitingEvent waitingEvent) throws Exception {
         userTransactionService.executeInTransaction((Callable<Void>) () -> {
             eventInstanceService.createWaitingEvent(waitingEvent);
+            return null;
+        });
+    }
+
+    protected void deleteWaitingEvents(final SProcessInstance processInstance) throws Exception {
+        userTransactionService.executeInTransaction((Callable<Void>) () -> {
+            eventInstanceService.deleteWaitingEvents(processInstance);
             return null;
         });
     }
@@ -249,7 +256,7 @@ public class EventInstanceServiceIT extends CommonBPMServicesTest {
                 processInstance.getId());
         final long activityInstanceId = automaticTaskInstance.getId();
 
-        List<SBoundaryEventInstance> boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId, 0,
+        List<SBoundaryEventInstance> boundaryEventInstances = getActivityBoundaryEventInstances(activityInstanceId, 0,
                 1);
         assertTrue(boundaryEventInstances.isEmpty());
 
@@ -258,14 +265,14 @@ public class EventInstanceServiceIT extends CommonBPMServicesTest {
         final SEventInstance eventInstance2 = createBoundaryEventInstance("BoundaryEvent2", 3, processInstance.getId(),
                 processDefinitionId, processInstance.getId(), activityInstanceId, true);
 
-        boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId, 0, 3);
+        boundaryEventInstances = getActivityBoundaryEventInstances(activityInstanceId, 0, 3);
         assertEquals(2, boundaryEventInstances.size());
         checkBoundaryEventInstance(eventInstance1, boundaryEventInstances.get(0));
         checkBoundaryEventInstance(eventInstance2, boundaryEventInstances.get(1));
 
         deleteSProcessInstance(processInstance);
 
-        boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId, 0, 1);
+        boundaryEventInstances = getActivityBoundaryEventInstances(activityInstanceId, 0, 1);
         assertTrue(boundaryEventInstances.isEmpty());
     }
 
@@ -349,7 +356,7 @@ public class EventInstanceServiceIT extends CommonBPMServicesTest {
         final SWaitingErrorEventBuilderFactory waitingErrorEventBuilder = BuilderFactory
                 .get(SWaitingErrorEventBuilderFactory.class);
 
-        final SEventInstance eventInstance = createSIntermediateCatchEventInstance("itermediate", 1,
+        final SEventInstance eventInstance = createSIntermediateCatchEventInstance("intermediate", 1,
                 processInstance.getId(), 5, processInstance.getId());
 
         final Class<SWaitingEvent> waitingEventClass = SWaitingEvent.class;
@@ -381,9 +388,10 @@ public class EventInstanceServiceIT extends CommonBPMServicesTest {
         checkWaitingEvents(1, SWaitingSignalEvent.class, processDefinitionIdKey, flowNodeInstanceIdKey,
                 eventInstanceId);
 
+        deleteWaitingEvents(processInstance);
         deleteSProcessInstance(processInstance);
 
-        // checkWaitingEvents(0, waitingEventClass, processDefinitionIdKey, flowNodeInstanceIdKey, eventInstanceId);
+        checkWaitingEvents(0, waitingEventClass, processDefinitionIdKey, flowNodeInstanceIdKey, eventInstanceId);
     }
 
     private void checkWaitingEvents(final int expectedNbOfWaitingEvents, final Class<? extends SWaitingEvent> clazz,

@@ -295,6 +295,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         String catchingErrorCode = errorCode;
         boolean canHandleError = hasEventSubProcessCatchingError(container, catchingErrorCode);
         if (!canHandleError) {
+            // if there is no event sub-process catching that particular error,  we search for an event sub process that catch all kind of error
             catchingErrorCode = null;
             canHandleError = hasEventSubProcessCatchingError(container, catchingErrorCode);
         }

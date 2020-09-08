@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
@@ -192,38 +193,22 @@ public class EventInstanceRepositoryImplForWaitingTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#searchStartWaitingEvents(long, org.bonitasoft.engine.persistence.QueryOptions)}
+     * {@link EventInstanceRepository#getStartWaitingEventsOfProcessDefinition(long)}
      * .
      */
     @Test
     public final void searchStartWaitingEvents_should_return_the_list() throws Exception {
         // Given
-        final long processDefinitionId = 9L;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
         final List<SWaitingSignalEvent> sWaitingSignalEvents = Arrays.asList(new SWaitingSignalEvent());
-        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder
-                .getStartWaitingEvents(processDefinitionId, queryOptions);
-        doReturn(sWaitingSignalEvents).when(persistenceService).selectList(descriptor);
+        // event sub-processes are not returned:
+        doReturn(sWaitingSignalEvents).when(persistenceService).selectList(any());
 
         // When
-        final List<SWaitingEvent> result = eventInstanceRepository.searchStartWaitingEvents(processDefinitionId,
-                queryOptions);
+        final List<SWaitingEvent> result = eventInstanceRepository
+                .getStartWaitingEventsOfProcessDefinition(9L);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", sWaitingSignalEvents, result);
-    }
-
-    @Test(expected = SBonitaReadException.class)
-    public final void searchStartWaitingEvents_should_throw_exception_when_there_is_error() throws Exception {
-        // Given
-        final long processDefinitionId = 9L;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
-        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder
-                .getStartWaitingEvents(processDefinitionId, queryOptions);
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(descriptor);
-
-        // When
-        eventInstanceRepository.searchStartWaitingEvents(processDefinitionId, queryOptions);
     }
 
     /**

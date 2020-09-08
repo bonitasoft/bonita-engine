@@ -27,8 +27,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -102,14 +100,10 @@ public final class DisableProcess implements TransactionContent {
     }
 
     private void deleteWaitingEvents() throws SWaitingEventModificationException, SBonitaReadException {
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
-        List<SWaitingEvent> waitingEvents = eventInstanceService.searchStartWaitingEvents(processDefinitionId,
-                queryOptions);
-        while (!waitingEvents.isEmpty()) {
-            for (final SWaitingEvent startEvent : waitingEvents) {
-                eventInstanceService.deleteWaitingEvent(startEvent);
-            }
-            waitingEvents = eventInstanceService.searchStartWaitingEvents(processDefinitionId, queryOptions);
+        List<SWaitingEvent> waitingEvents = eventInstanceService
+                .getStartWaitingEventsOfProcessDefinition(processDefinitionId);
+        for (final SWaitingEvent startEvent : waitingEvents) {
+            eventInstanceService.deleteWaitingEvent(startEvent);
         }
     }
 
