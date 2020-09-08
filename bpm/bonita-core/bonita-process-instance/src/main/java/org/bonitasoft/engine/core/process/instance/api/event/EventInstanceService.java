@@ -30,6 +30,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
@@ -72,6 +73,9 @@ public interface EventInstanceService {
             OrderByType orderByType)
             throws SEventInstanceReadException;
 
+    void deleteWaitingEvents(SProcessInstance processInstance)
+            throws SWaitingEventModificationException, SEventTriggerInstanceReadException;
+
     /**
      * @param activityInstanceId
      * @param fromIndex
@@ -110,12 +114,11 @@ public interface EventInstanceService {
 
     /**
      * @param processDefinitionId
-     * @param searchOptions
      * @return
      * @throws SBonitaReadException
      * @since 6.3
      */
-    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions)
+    List<SWaitingEvent> getStartWaitingEventsOfProcessDefinition(long processDefinitionId)
             throws SBonitaReadException;
 
     List<SMessageEventCouple> getMessageEventCouples(int fromIndex, int maxResults)

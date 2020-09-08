@@ -34,6 +34,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
@@ -130,6 +131,21 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     }
 
     @Override
+    public void deleteWaitingEvents(SProcessInstance processInstance)
+            throws SWaitingEventModificationException, SEventTriggerInstanceReadException {
+        List<SWaitingEvent> waitingEvents;
+        final int pageCount = 100;
+        do {
+            waitingEvents = this.eventInstanceRepository.getAllWaitingEventsForProcessInstance(processInstance.getId(),
+                    0, pageCount);
+            for (final SWaitingEvent sWaitingEvent : waitingEvents) {
+                deleteWaitingEvent(sWaitingEvent);
+            }
+        } while (waitingEvents.size() == pageCount);
+
+    }
+
+    @Override
     public List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long id, int fromIndex,
             int maxResults) throws SEventInstanceReadException {
         return this.eventInstanceRepository.getActivityBoundaryEventInstances(id, fromIndex, maxResults);
@@ -182,9 +198,9 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     }
 
     @Override
-    public List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions)
+    public List<SWaitingEvent> getStartWaitingEventsOfProcessDefinition(long processDefinitionId)
             throws SBonitaReadException {
-        return this.eventInstanceRepository.searchStartWaitingEvents(processDefinitionId, queryOptions);
+        return this.eventInstanceRepository.getStartWaitingEventsOfProcessDefinition(processDefinitionId);
     }
 
     @Override
