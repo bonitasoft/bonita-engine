@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.BPMEventType;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 
@@ -20,6 +21,7 @@ import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@ToString
 public abstract class WaitingEventImpl implements WaitingEvent {
 
     private static final long serialVersionUID = -4479053804299166959L;

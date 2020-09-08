@@ -58,7 +58,7 @@ public class SelectDescriptorBuilder {
     public static SelectListDescriptor<SAFlowNodeInstance> getArchivedFlowNodesFromProcessInstance(
             final long rootContainerId, final int fromIndex,
             final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", rootContainerId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<>("getArchivedFlowNodesFromProcessInstance", parameters,
                 SAFlowNodeInstance.class, queryOptions);
@@ -67,7 +67,7 @@ public class SelectDescriptorBuilder {
     public static SelectListDescriptor<SAActivityInstance> getArchivedActivitiesFromProcessInstance(
             final long rootContainerId,
             final QueryOptions queryOptions) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", rootContainerId);
         return new SelectListDescriptor<>("getAActivitiesFromProcessInstance", parameters, SAActivityInstance.class,
                 queryOptions);
     }
@@ -76,7 +76,7 @@ public class SelectDescriptorBuilder {
             final long processDefinitionId,
             final QueryOptions queryOptions) {
         final Map<String, Object> parameters = Collections.singletonMap("processDefinitionId",
-                (Object) processDefinitionId);
+                processDefinitionId);
         return new SelectListDescriptor<>("getSourceProcessInstanceIdsByProcessDefinitionId", parameters,
                 SAProcessInstance.class, queryOptions);
     }
@@ -90,7 +90,7 @@ public class SelectDescriptorBuilder {
     public static SelectListDescriptor<SHumanTaskInstance> getAssignedUserTasks(final long userId, final int fromIndex,
             final int maxResults,
             final String sortFieldName, final OrderByType order) {
-        final Map<String, Object> parameters = Collections.singletonMap("assigneeId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("assigneeId", userId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SActivityInstance.class,
                 sortFieldName, order);
         return new SelectListDescriptor<>("getAssignedUserTasks", parameters, SHumanTaskInstance.class, queryOptions);
@@ -130,12 +130,12 @@ public class SelectDescriptorBuilder {
     }
 
     public static SelectOneDescriptor<Long> getNumberOfOpenActivities(final long rootContainerId) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", rootContainerId);
         return new SelectOneDescriptor<>("getNumberOfOpenActivities", parameters, SActivityInstance.class, Long.class);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfAssignedHumanTaskInstances(final long userId) {
-        final Map<String, Object> parameters = Collections.singletonMap("assigneeId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("assigneeId", userId);
         return new SelectOneDescriptor<>("getNumberOfAssignedUserTaskInstances", parameters, SHumanTaskInstance.class,
                 Long.class);
     }
@@ -151,28 +151,28 @@ public class SelectDescriptorBuilder {
     public static SelectListDescriptor<SActivityInstance> getActivitiesFromProcessInstance(final long rootContainerId,
             final int fromIndex,
             final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", rootContainerId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<>("getActivitiesFromProcessInstance", parameters, SActivityInstance.class,
                 queryOptions);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfActivitiesFromProcessInstance(final long rootContainerId) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", rootContainerId);
         return new SelectOneDescriptor<>("getNumberOfActivitiesFromProcessInstance", parameters,
                 SFlowNodeInstance.class, Long.class);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfFlowNode(final long parentProcessInstanceId) {
         final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId",
-                (Object) parentProcessInstanceId);
+                parentProcessInstanceId);
         return new SelectOneDescriptor<>("getNumberOfFlowNode", parameters, SFlowNodeInstance.class, Long.class);
     }
 
     public static SelectListDescriptor<SEventInstance> getEventsFromRootContainer(final long rootContainerId,
             final int fromIndex, final int maxResults,
             final String field, final OrderByType orderByType) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", rootContainerId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SEventInstance.class, field,
                 orderByType);
         return new SelectListDescriptor<>("getEventInstancesFromRootContainer", parameters, SEventInstance.class,
@@ -183,7 +183,7 @@ public class SelectDescriptorBuilder {
             final int fromIndex,
             final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("activityInstanceId",
-                (Object) activityInstanceId);
+                activityInstanceId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<>("getActivityBoundaryEventInstances", parameters, SBoundaryEventInstance.class,
                 queryOptions);
@@ -191,7 +191,7 @@ public class SelectDescriptorBuilder {
 
     public static SelectListDescriptor<STimerEventTriggerInstance> getEventTriggers(final long eventInstanceId,
             final QueryOptions queryOptions) {
-        final Map<String, Object> parameters = Collections.singletonMap("eventInstanceId", (Object) eventInstanceId);
+        final Map<String, Object> parameters = Collections.singletonMap("eventInstanceId", eventInstanceId);
         return new SelectListDescriptor<>("getEventTriggerInstances", parameters, STimerEventTriggerInstance.class,
                 queryOptions);
     }
@@ -199,13 +199,13 @@ public class SelectDescriptorBuilder {
     public static SelectListDescriptor<Long> getChildInstanceIdsOfProcessInstance(final Class<SProcessInstance> class1,
             final long processInstanceId,
             final QueryOptions queryOptions) {
-        final Map<String, Object> map = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
+        final Map<String, Object> map = Collections.singletonMap("processInstanceId", processInstanceId);
         return new SelectListDescriptor<>("getChildInstanceIdsOfProcessInstance", map, class1, queryOptions);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfChildInstancesOfProcessInstance(final long processInstanceId) {
         final Map<String, Object> parameters = Collections.singletonMap("processInstanceId",
-                (Object) processInstanceId);
+                processInstanceId);
         return new SelectOneDescriptor<>("getNumberOfChildInstancesOfProcessInstance", parameters,
                 SProcessInstance.class, Long.class);
     }
@@ -231,7 +231,7 @@ public class SelectDescriptorBuilder {
 
     public static SelectListDescriptor<SWaitingSignalEvent> getListeningSignals(final String signalName,
             final int fromIndex, final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("signalName", (Object) signalName);
+        final Map<String, Object> parameters = Collections.singletonMap("signalName", signalName);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<>("getListeningSignals", parameters, SWaitingSignalEvent.class, queryOptions);
     }
@@ -263,7 +263,7 @@ public class SelectDescriptorBuilder {
 
     public static SelectListDescriptor<SHumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId,
             final int fromIndex, final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<>("searchAssignedTasksSupervisedBy", parameters, SHumanTaskInstance.class,
                 queryOptions);
@@ -271,7 +271,7 @@ public class SelectDescriptorBuilder {
 
     public static SelectListDescriptor<Map<String, Long>> getNumbersOfAssignedOpenTasks(final List<Long> userIds) {
         final QueryOptions queryOptions = new QueryOptions(0, userIds.size());
-        final Map<String, Object> parameters = Collections.singletonMap("assigneeIds", (Object) userIds);
+        final Map<String, Object> parameters = Collections.singletonMap("assigneeIds", userIds);
         return new SelectListDescriptor<>("getNumbersOfOpenTasksForUsers", parameters, SHumanTaskInstance.class,
                 queryOptions);
     }

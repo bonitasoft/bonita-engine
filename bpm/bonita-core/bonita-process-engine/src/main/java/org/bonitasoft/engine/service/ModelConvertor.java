@@ -129,6 +129,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.SubProcessActivityInstan
 import org.bonitasoft.engine.bpm.flownode.impl.internal.TimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingErrorEventImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingEventImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingMessageEventImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingSignalEventImpl;
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -1315,7 +1316,7 @@ public class ModelConvertor {
     }
 
     public static WaitingEvent toWaitingEvent(final SWaitingEvent sWaitingEvent) {
-        WaitingEvent waitingEvent;
+        WaitingEventImpl waitingEvent;
         final BPMEventType bpmEventType = BPMEventType.valueOf(sWaitingEvent.getEventType().name());
         final long processDefinitionId = sWaitingEvent.getProcessDefinitionId();
         final String processName = sWaitingEvent.getProcessName();
@@ -1342,6 +1343,8 @@ public class ModelConvertor {
             default:
                 throw new UnknownElementType(sWaitingEvent.getClass().getName());
         }
+        waitingEvent.setRootProcessInstanceId(sWaitingEvent.getRootProcessInstanceId());
+        waitingEvent.setParentProcessInstanceId(sWaitingEvent.getParentProcessInstanceId());
         return waitingEvent;
     }
 
