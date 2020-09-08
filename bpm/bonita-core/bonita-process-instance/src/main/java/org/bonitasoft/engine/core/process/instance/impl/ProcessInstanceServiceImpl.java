@@ -42,6 +42,7 @@ import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -54,6 +55,8 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -378,6 +381,20 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         documentService.deleteDocumentsFromProcessInstance(processInstance.getId());
         deleteConnectorInstancesIfNecessary(processInstance, processDefinition);
         commentService.deleteComments(processInstance.getId());
+        deleteEventSubprocessWaitingEvents(processInstance, processDefinition);
+    }
+
+    private void deleteEventSubprocessWaitingEvents(SProcessInstance processInstance,
+            SProcessDefinition processDefinition)
+            throws SWaitingEventModificationException, SEventTriggerInstanceReadException {
+        if (processDefinition != null) {
+            boolean containsEventSubProcess = processDefinition.getProcessContainer().getActivities().stream()
+                    .anyMatch(a -> a.getType().equals(SFlowNodeType.SUB_PROCESS)
+                            && ((SSubProcessDefinition) a).isTriggeredByEvent());
+            if (containsEventSubProcess) {
+                bpmEventInstanceService.deleteWaitingEvents(processInstance);
+            }
+        }
     }
 
     private void deleteConnectorInstancesIfNecessary(final SProcessInstance processInstance,

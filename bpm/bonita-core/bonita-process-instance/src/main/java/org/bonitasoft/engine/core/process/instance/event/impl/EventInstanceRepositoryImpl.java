@@ -340,11 +340,12 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
     }
 
     @Override
-    public List<SWaitingEvent> searchStartWaitingEvents(final long processDefinitionId, final QueryOptions queryOptions)
+    public List<SWaitingEvent> getStartWaitingEventsOfProcessDefinition(final long processDefinitionId)
             throws SBonitaReadException {
-        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder
-                .getStartWaitingEvents(processDefinitionId, queryOptions);
-        return persistenceService.selectList(descriptor);
+        // event sub-processes are not returned:
+        return persistenceService.selectList(new SelectListDescriptor<>("getStartWaitingEvents",
+                singletonMap("processDefinitionId", processDefinitionId), SWaitingEvent.class,
+                QueryOptions.ALL_RESULTS));
     }
 
     @Override
@@ -371,9 +372,22 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
     public List<SWaitingEvent> getWaitingEventsForFlowNodeId(long flowNodeInstanceId)
             throws SEventTriggerInstanceReadException {
         try {
-            return persistenceService.selectList(new SelectListDescriptor<SWaitingEvent>("getWaitingEventsOfFlowNode",
-                    Collections.<String, Object> singletonMap("flowNodeInstanceId", flowNodeInstanceId),
+            return persistenceService.selectList(new SelectListDescriptor<>("getWaitingEventsOfFlowNode",
+                    Collections.singletonMap("flowNodeInstanceId", flowNodeInstanceId),
                     SWaitingEvent.class, new QueryOptions(0, 100)));
+        } catch (final SBonitaReadException e) {
+            throw new SEventTriggerInstanceReadException(e);
+        }
+    }
+
+    @Override
+    public List<SWaitingEvent> getAllWaitingEventsForProcessInstance(long processInstanceId, final int fromIndex,
+            final int maxResults) throws SEventTriggerInstanceReadException {
+        try {
+            return persistenceService
+                    .selectList(new SelectListDescriptor<>("getWaitingEventsForProcessInstance",
+                            Collections.singletonMap("processInstanceId", processInstanceId),
+                            SWaitingEvent.class, new QueryOptions(fromIndex, maxResults)));
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }

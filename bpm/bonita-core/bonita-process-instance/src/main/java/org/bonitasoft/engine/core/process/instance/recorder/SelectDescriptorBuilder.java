@@ -32,7 +32,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -235,13 +234,6 @@ public class SelectDescriptorBuilder {
         final Map<String, Object> parameters = Collections.singletonMap("signalName", (Object) signalName);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<>("getListeningSignals", parameters, SWaitingSignalEvent.class, queryOptions);
-    }
-
-    public static SelectListDescriptor<SWaitingEvent> getStartWaitingEvents(final long processDefinitionId,
-            final QueryOptions queryOptions) {
-        final Map<String, Object> parameters = Collections.singletonMap("processDefinitionId",
-                (Object) processDefinitionId);
-        return new SelectListDescriptor<>("getStartWaitingEvents", parameters, SWaitingEvent.class, queryOptions);
     }
 
     public static SelectListDescriptor<SMessageEventCouple> getMessageEventCouples(final int fromIndex,

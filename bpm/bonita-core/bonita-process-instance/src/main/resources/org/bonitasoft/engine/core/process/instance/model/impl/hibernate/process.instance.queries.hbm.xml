@@ -522,11 +522,17 @@
 	</query>
 
 	<query name="getStartWaitingEvents">
-		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent AS s
-		WHERE s.processDefinitionId = :processDefinitionId
-		AND (s.eventType = 'START_EVENT' OR s.eventType = 'EVENT_SUB_PROCESS')
+        SELECT s
+        FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent AS s
+        WHERE s.processDefinitionId = :processDefinitionId
+        AND (s.eventType = 'START_EVENT')
 	</query>
+
+    <query name="getWaitingEventsForProcessInstance">
+        SELECT s
+        FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent AS s
+        WHERE s.parentProcessInstanceId = :processInstanceId
+    </query>
 
 	<query name="getWaitingEventsOfFlowNode">
 		SELECT s
