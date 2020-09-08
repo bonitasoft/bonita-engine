@@ -707,8 +707,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             //         In that case if the process is called by a call activity, the calling activity have its token count decremented but is not executed (hasActionsToExecute==true)
             //
             if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
-                hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance,
-                        sFlowNodeInstanceChild);
+                if (sProcessInstance.getStateCategory() != SStateCategory.CANCELLING
+                        && sProcessInstance.hasBeenInterruptedByEvent()) {
+                    // trigger error events only if process instance has been aborted by an event
+                    // and no-one cancelled the process instance in the meantime:
+                    hasActionsToExecute = triggerErrorEventsIfAny(sProcessDefinition, sProcessInstance,
+                            sFlowNodeInstanceChild);
+                }
                 // the process instance has maybe changed
                 logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "has action to execute");
                 if (hasActionsToExecute) {
@@ -758,20 +763,17 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     }
 
-    private boolean executePostThrowEventHandlers(final SProcessDefinition sProcessDefinition,
+    private boolean triggerErrorEventsIfAny(final SProcessDefinition sProcessDefinition,
             final SProcessInstance sProcessInstance,
             final SFlowNodeInstance child) throws SBonitaException {
-        boolean hasActionsToExecute = false;
-        if (sProcessInstance.hasBeenInterruptedByEvent()) {
-            final SFlowNodeInstance endEventInstance = activityInstanceService
-                    .getFlowNodeInstance(sProcessInstance.getInterruptingEventId());
-            final SEndEventDefinition endEventDefinition = (SEndEventDefinition) sProcessDefinition
-                    .getProcessContainer().getFlowNode(
-                            endEventInstance.getFlowNodeDefinitionId());
-            hasActionsToExecute = eventsHandler.handlePostThrowEvent(sProcessDefinition, endEventDefinition,
-                    (SThrowEventInstance) endEventInstance, child);
-            flowNodeExecutor.archiveFlowNodeInstance(endEventInstance, true, sProcessDefinition.getId());
-        }
+        final SFlowNodeInstance endEventInstance = activityInstanceService
+                .getFlowNodeInstance(sProcessInstance.getInterruptingEventId());
+        final SEndEventDefinition endEventDefinition = (SEndEventDefinition) sProcessDefinition
+                .getProcessContainer().getFlowNode(
+                        endEventInstance.getFlowNodeDefinitionId());
+        boolean hasActionsToExecute = eventsHandler.handlePostThrowEvent(sProcessDefinition, endEventDefinition,
+                (SThrowEventInstance) endEventInstance, child);
+        flowNodeExecutor.archiveFlowNodeInstance(endEventInstance, true, sProcessDefinition.getId());
         return hasActionsToExecute;
     }
 
@@ -951,7 +953,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ensureProcessIsEnabled(sProcessDefinition);
+            // so that event sub-process can trigger even if containing process definition is disabled:
+            if (selector.getSubProcessDefinitionId() <= 0) {
+                ensureProcessIsEnabled(sProcessDefinition);
+            }
             setProcessClassloader(sProcessDefinition);
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId,
                     starterSubstituteId, callerId);
