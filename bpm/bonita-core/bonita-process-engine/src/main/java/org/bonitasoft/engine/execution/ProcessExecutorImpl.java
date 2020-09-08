@@ -943,14 +943,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
 
         // Validate start process contract inputs:
-        if (selector.getSubProcessDefinitionId() <= 0) {
+        if (!selector.isEventSubProcess()) {
             validateContractInputs(processInputs, sProcessDefinition);
         }
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             // so that event sub-process can trigger even if containing process definition is disabled:
-            if (selector.getSubProcessDefinitionId() <= 0) {
+            if (!selector.isEventSubProcess()) {
                 ensureProcessIsEnabled(sProcessDefinition);
             }
             setProcessClassloader(sProcessDefinition);
