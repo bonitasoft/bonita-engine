@@ -951,7 +951,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ensureProcessIsEnabled(sProcessDefinition);
+            // so that event sub-process can trigger even if containing process definition is disabled:
+            if (selector.getSubProcessDefinitionId() <= 0) {
+                ensureProcessIsEnabled(sProcessDefinition);
+            }
             setProcessClassloader(sProcessDefinition);
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId,
                     starterSubstituteId, callerId);
