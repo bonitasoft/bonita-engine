@@ -1,6 +1,7 @@
 # Bonita Engine
 
 ![Travis CI](https://img.shields.io/travis/bonitasoft/bonita-engine/master?label=Travis%20build&logo=travis)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fbonitasoft%2Fbonita-engine.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fbonitasoft%2Fbonita-engine?ref=badge_shield)
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.bonitasoft.engine/bonita-server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.bonitasoft.engine/bonita-server)
 
@@ -76,3 +77,7 @@ To report an issue use the official [bugtracker][bugtracker].
 [guide]: https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD
 [wrapper]: https://docs.gradle.org/current/userguide/gradle_wrapper.html
 [bugtracker]: https://bonita.atlassian.net/projects/BBPMC/issues
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fbonitasoft%2Fbonita-engine.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fbonitasoft%2Fbonita-engine?ref=badge_large)
