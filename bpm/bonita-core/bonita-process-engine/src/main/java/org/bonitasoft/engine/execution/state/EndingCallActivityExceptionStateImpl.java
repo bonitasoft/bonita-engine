@@ -29,7 +29,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
-import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
@@ -39,7 +38,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
- * @author Elias Ricken de Medeiros
+ * State that is used to cancel or abort Call activities and Subprocess activities (event sub process)
  */
 public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeState {
 
@@ -84,8 +83,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     public boolean shouldExecuteState(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         try {
-            final SCallActivityInstance callActivity = (SCallActivityInstance) flowNodeInstance;
-            final boolean hasActiveChild = callActivity.getTokenCount() > 0;
+            final boolean hasActiveChild = flowNodeInstance.getTokenCount() > 0;
             if (hasActiveChild) {
                 final SProcessInstance targetProcessInstance = processInstanceService
                         .getChildOfActivity(flowNodeInstance.getId());
