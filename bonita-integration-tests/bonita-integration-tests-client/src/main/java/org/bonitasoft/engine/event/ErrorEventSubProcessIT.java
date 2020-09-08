@@ -189,7 +189,7 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
     }
 
     @Test
-    public void eventSubProcesWithDataAndRootProcessWithNoData() throws Exception {
+    public void eventSubProcessWithDataAndRootProcessWithNoData() throws Exception {
         final String rootUserTaskName = "step1";
         final String subProcUserTaskName = "subStep";
         final String dataName = "content";
@@ -299,7 +299,7 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
     }
 
     @Test
-    public void should_catch_error_in_event_subprocess_when_process_is_disabled() throws Exception {
+    public void should_catch_error_in_event_subprocess_when_process_is_disabled_and_then_cancel_it() throws Exception {
         //given: a process with error event subprocess catching an error
         ProcessDefinition parent = deployAndEnableProcessWithActor(new ProcessDefinitionBuilder()
                 .createNewInstance("Parent process with error event subprocess", "1.0")
@@ -337,12 +337,14 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         getProcessAPI().assignAndExecuteUserTask(user.getId(), task, Collections.emptyMap());
 
         //then: the error event sub process should be triggered
-        long eventSubProcessTask = waitForUserTask("eventSubProcessTask");
-        getProcessAPI().assignAndExecuteUserTask(user.getId(), eventSubProcessTask, Collections.emptyMap());
-        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
+        waitForUserTask("eventSubProcessTask");
+
+        // then: we should be able to cancel that instance
+        getProcessAPI().cancelProcessInstance(processInstance.getId());
+
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
 
         // to allow proper clean-up:
         getProcessAPI().enableProcess(parent.getId());
     }
-
 }
