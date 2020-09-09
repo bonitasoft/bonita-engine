@@ -16,26 +16,35 @@ package org.bonitasoft.engine.tenant.restart;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
-import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
-import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
@@ -52,11 +61,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ExecuteFlowNodesTest {
 
     private static final int ABORTING_STATE_ID = 1111;
-    private static final int NORMAL_STATE_ID = 61;
     private static final int CANCELLING_STATE_ID = 33333;
     public static final int BATCH_RESTART_SIZE = 10;
-    private FlowNodeStateManager flownodeStateManager;
 
+    @Mock
+    private FlowNodeStateManager flownodeStateManager;
     @Mock
     private ActivityInstanceService activityInstanceService;
     @Mock
@@ -66,21 +75,20 @@ public class ExecuteFlowNodesTest {
     @Mock
     private ProcessDefinitionService processDefinitionService;
     @Mock
-    private BPMInstancesCreator bpmInstancesCreator;
-    @Mock
     private UserTransactionService userTransactionService;
-    @Mock
-    private BPMArchiverService bpmArchiverService;
 
-    private BPMWorkFactory workFactory = new BPMWorkFactory();
+    private final BPMWorkFactory workFactory = new BPMWorkFactory();
     private ExecuteFlowNodes executeFlowNodes;
-    private List<SFlowNodeInstance> allFlowNodes = new ArrayList<>();
+    private final List<SFlowNodeInstance> allFlowNodes = new ArrayList<>();
+
+    private final FlowNodeState waitingState = new TestFlowNodeState(1, SStateCategory.NORMAL, true, false);
+    private final FlowNodeState abortingState = new TestFlowNodeState(2, SStateCategory.ABORTING, true, false);
+    private final FlowNodeState cancellingState = new TestFlowNodeState(3, SStateCategory.CANCELLING, true, false);
+    private final FlowNodeState normalStableState = new TestFlowNodeState(4, SStateCategory.NORMAL, true, false);
 
     @Before
     public void before() throws Exception {
-        flownodeStateManager = new FlowNodeStateManagerImpl(null, null, null, null, bpmInstancesCreator,
-                null, null,
-                null, null, null, bpmArchiverService);
+        ;
         executeFlowNodes = new ExecuteFlowNodes(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
                 gatewayInstanceService,
                 processDefinitionService, flownodeStateManager, workFactory, userTransactionService,
@@ -91,27 +99,33 @@ public class ExecuteFlowNodesTest {
             List<Long> ids = invocationOnMock.getArgument(0);
             return allFlowNodes.stream().filter(f -> ids.contains(f.getId())).collect(Collectors.toList());
         });
+        doReturn(waitingState).when(flownodeStateManager).getState(waitingState.getId());
+        doReturn(abortingState).when(flownodeStateManager).getState(abortingState.getId());
+        doReturn(cancellingState).when(flownodeStateManager).getState(cancellingState.getId());
+        doReturn(normalStableState).when(flownodeStateManager).getState(normalStableState.getId());
     }
 
     @Test
-    public final void execute_with_terminal_flow_node_should_register_notify_work() throws Exception {
+    public final void should_register_FINISH_FLOWNODE_when_flownode_is_in_terminal_state() throws Exception {
+        SAutomaticTaskInstance task = createTask(123L, true /* terminal */);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(createTask(123l, true)));
+        executeFlowNodes.executeFlowNodes(flowNodeIds(task));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")));
 
     }
 
     @Test
-    public final void execute_with_non_terminal_flow_node_should_register_execute_work() throws Exception {
+    public void should_register_EXECUTE_FLOWNODE_when_flownode_is_not_in_terminal_state() throws Exception {
+        SAutomaticTaskInstance task = createTask(123L, false /* not terminal */);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(createTask(123L, false)));
+        executeFlowNodes.executeFlowNodes(flowNodeIds(task));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
 
     @Test
-    public void should_create_work_for_all_works() throws Exception {
+    public void should_register_work_for_each_flow_nodes_executed() throws Exception {
         List<SFlowNodeInstance> list = new ArrayList<>();
         for (int i = 1; i <= 21; i++) {
             list.add(createTask(123L + i, false));
@@ -144,10 +158,8 @@ public class ExecuteFlowNodesTest {
     public void should_execute_flownode_that_is_aborting_non_terminal_and_stable_when_the_FlowNodeState_is_not_in_the_same_state_category()
             throws Exception {
         SAutomaticTaskInstance autoTask = createTask(123L, false);
+        setState(autoTask, normalStableState);
         autoTask.setStateCategory(SStateCategory.ABORTING);
-        autoTask.setTerminal(false);
-        autoTask.setStable(true);
-        autoTask.setStateId(NORMAL_STATE_ID);
 
         executeFlowNodes.executeFlowNodes(flowNodeIds(autoTask));
 
@@ -158,10 +170,8 @@ public class ExecuteFlowNodesTest {
     public final void should_execute_flownode_that_is_cancelling_non_terminal_and_stable_when_the_FlowNodeState_is_not_in_the_same_state_category()
             throws Exception {
         SAutomaticTaskInstance autoTask = createTask(123L, false);
+        setState(autoTask, normalStableState);
         autoTask.setStateCategory(SStateCategory.CANCELLING);
-        autoTask.setTerminal(false);
-        autoTask.setStable(true);
-        autoTask.setStateId(NORMAL_STATE_ID);
 
         executeFlowNodes.executeFlowNodes(flowNodeIds(autoTask));
 
@@ -248,7 +258,7 @@ public class ExecuteFlowNodesTest {
             throws Exception {
         SBoundaryEventInstance boundaryEventInstance = new SBoundaryEventInstance();
         boundaryEventInstance.setStateCategory(SStateCategory.CANCELLING);
-        setState(boundaryEventInstance, flownodeStateManager.getState(10)/* waiting state */);
+        setState(boundaryEventInstance, waitingState);
 
         assertThat(executeFlowNodes.shouldExecuteFlownode(boundaryEventInstance)).isTrue();
     }
@@ -258,7 +268,7 @@ public class ExecuteFlowNodesTest {
             throws Exception {
         SCallActivityInstance boundaryEventInstance = new SCallActivityInstance();
         boundaryEventInstance.setStateCategory(SStateCategory.CANCELLING);
-        setState(boundaryEventInstance, flownodeStateManager.getState(19)/* cancelling call activity */);
+        setState(boundaryEventInstance, cancellingState);
 
         assertThat(executeFlowNodes.shouldExecuteFlownode(boundaryEventInstance)).isFalse();
     }
@@ -268,7 +278,7 @@ public class ExecuteFlowNodesTest {
             throws Exception {
         SBoundaryEventInstance boundaryEventInstance = new SBoundaryEventInstance();
         boundaryEventInstance.setStateCategory(SStateCategory.ABORTING);
-        setState(boundaryEventInstance, flownodeStateManager.getState(10)/* waiting state */);
+        setState(boundaryEventInstance, waitingState);
 
         assertThat(executeFlowNodes.shouldExecuteFlownode(boundaryEventInstance)).isTrue();
     }
@@ -278,7 +288,7 @@ public class ExecuteFlowNodesTest {
             throws Exception {
         SBoundaryEventInstance boundaryEventInstance = new SBoundaryEventInstance();
         boundaryEventInstance.setStateCategory(SStateCategory.ABORTING);
-        setState(boundaryEventInstance, flownodeStateManager.getState(20)/* aborting call activity */);
+        setState(boundaryEventInstance, abortingState);
 
         assertThat(executeFlowNodes.shouldExecuteFlownode(boundaryEventInstance)).isFalse();
     }
@@ -305,10 +315,10 @@ public class ExecuteFlowNodesTest {
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
 
-    private void setState(SFlowNodeInstance boundaryEventInstance, FlowNodeState state) {
-        boundaryEventInstance.setStateId(state.getId());
-        boundaryEventInstance.setStable(state.isStable());
-        boundaryEventInstance.setTerminal(state.isTerminal());
+    private void setState(SFlowNodeInstance flowNodeInstance, FlowNodeState state) {
+        flowNodeInstance.setStateId(state.getId());
+        flowNodeInstance.setStable(state.isStable());
+        flowNodeInstance.setTerminal(state.isTerminal());
     }
 
     private List<Long> flowNodeIds(final SFlowNodeInstance... flowNodes) {
@@ -326,5 +336,79 @@ public class ExecuteFlowNodesTest {
         sAutomaticTaskInstance.setTerminal(terminal);
         sAutomaticTaskInstance.setLogicalGroup(3, 456L);
         return sAutomaticTaskInstance;
+    }
+
+    private static class TestFlowNodeState implements FlowNodeState {
+
+        private final SStateCategory stateCategory;
+        private final boolean stable;
+        private final boolean terminal;
+        private final int id;
+
+        private TestFlowNodeState(int id, SStateCategory stateCategory, boolean stable, boolean terminal) {
+            this.id = id;
+            this.stateCategory = stateCategory;
+            this.stable = stable;
+            this.terminal = terminal;
+        }
+
+        @Override
+        public boolean shouldExecuteState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance)
+                throws SActivityExecutionException {
+            return false;
+        }
+
+        @Override
+        public boolean mustAddSystemComment(SFlowNodeInstance flowNodeInstance) {
+            return false;
+        }
+
+        @Override
+        public String getSystemComment(SFlowNodeInstance flowNodeInstance) {
+            return null;
+        }
+
+        @Override
+        public StateCode execute(SProcessDefinition processDefinition, SFlowNodeInstance instance)
+                throws SActivityStateExecutionException {
+            return null;
+        }
+
+        @Override
+        public boolean notifyChildFlowNodeHasFinished(SProcessDefinition processDefinition,
+                SFlowNodeInstance parentInstance, SFlowNodeInstance childInstance)
+                throws SActivityStateExecutionException {
+            return false;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public boolean isInterrupting() {
+            return false;
+        }
+
+        @Override
+        public boolean isStable() {
+            return stable;
+        }
+
+        @Override
+        public boolean isTerminal() {
+            return terminal;
+        }
+
+        @Override
+        public SStateCategory getStateCategory() {
+            return stateCategory;
+        }
     }
 }
