@@ -62,15 +62,14 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
-import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -85,27 +84,24 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
-    private final ContainerRegistry containerRegistry;
-
     private final ProcessDefinitionService processDefinitionService;
 
     private final EventsHandler eventsHandler;
 
-    private final TechnicalLoggerService logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorEventHandlerStrategy.class);
+
     private ProcessInstanceInterruptor processInstanceInterruptor;
 
     public ErrorEventHandlerStrategy(final EventInstanceService eventInstanceService,
             final ProcessInstanceService processInstanceService,
-            final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry,
+            final FlowNodeInstanceService flowNodeInstanceService,
             final ProcessDefinitionService processDefinitionService, final EventsHandler eventsHandler,
-            final TechnicalLoggerService logger, ProcessInstanceInterruptor processInstanceInterruptor) {
+            ProcessInstanceInterruptor processInstanceInterruptor) {
         super(eventInstanceService);
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
-        this.containerRegistry = containerRegistry;
         this.processDefinitionService = processDefinitionService;
         this.eventsHandler = eventsHandler;
-        this.logger = logger;
         this.processInstanceInterruptor = processInstanceInterruptor;
     }
 
@@ -113,17 +109,15 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
             final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Error event is thrown, error code = "
-                    + ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode() + " process instance = "
-                    + eventInstance.getRootContainerId());
-        }
-        updateInterruptorErrorEvent(eventInstance);
+        LOGGER.debug("Error event is thrown, error code = {} process instance = {}",
+                ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode(),
+                eventInstance.getRootContainerId());
+        setInterruptorEventIdOnProcessInstance(eventInstance);
         processInstanceInterruptor.interruptChildrenOfProcessInstance(eventInstance.getParentContainerId(),
                 SStateCategory.ABORTING, eventInstance.getId());
     }
 
-    private void updateInterruptorErrorEvent(final SThrowEventInstance eventInstance)
+    private void setInterruptorEventIdOnProcessInstance(final SThrowEventInstance eventInstance)
             throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
             SProcessInstanceModificationException {
         final SIntermediateThrowEventInstanceBuilderFactory throwEventKeyProvider = BuilderFactory
@@ -135,11 +129,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         updateBuilder.updateInterruptingEventId(eventInstance.getId());
         final SProcessInstance processInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
         processInstanceService.updateProcess(processInstance, updateBuilder.done());
-    }
-
-    @Override
-    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) {
-        // NOT supported. Must to be implemented with errors can be sent via the API
     }
 
     @Override
@@ -161,21 +150,11 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         if (waitingErrorEvent != null) {
             eventsHandler.triggerCatchEvent(waitingErrorEvent, sThrowEventInstance.getId());
             hasActionToExecute = true;
-        } else if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            final StringBuilder logBuilder = new StringBuilder();
-            logBuilder.append("No catch error event was defined to handle the error code '");
-            logBuilder.append(errorTrigger.getErrorCode());
-            logBuilder.append("' defined in the process [name: ");
-            logBuilder.append(processDefinition.getName());
-            logBuilder.append(", version: ");
-            logBuilder.append(processDefinition.getVersion());
-            logBuilder.append("]");
-            if (sEventDefinition != null) {
-                logBuilder.append(", throw event: ");
-                logBuilder.append(sEventDefinition.getName());
-            }
-            logBuilder.append(". This throw error event will act as a Terminate Event.");
-            logger.log(this.getClass(), TechnicalLogSeverity.WARNING, logBuilder.toString());
+        } else {
+            LOGGER.warn(
+                    "No catch error event was defined to handle the error code {} defined in the process [name: {}, version: {}], throw event: {}. This throw error event will act as a Terminate Event.",
+                    errorTrigger.getErrorCode(), processDefinition.getName(), processDefinition.getVersion(),
+                    sEventDefinition == null ? null : sEventDefinition.getName());
         }
         return hasActionToExecute;
     }

@@ -51,10 +51,10 @@ public abstract class CoupleEventHandlerStrategy extends EventHandlerStrategy {
     @Override
     public void unregisterCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
             final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId,
-            final SProcessInstance parentProcessIsnstance)
+            final SProcessInstance parentProcessInstance)
             throws SBonitaException {
         if (!eventDefinition.getEventTriggers().isEmpty()) {
-            unregisterWaitingEvents(SWaitingEvent.class, subProcessId, parentProcessIsnstance);
+            unregisterWaitingEvents(SWaitingEvent.class, subProcessId, parentProcessInstance);
         }
     }
 

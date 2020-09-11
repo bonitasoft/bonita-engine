@@ -43,14 +43,6 @@ public abstract class EventHandlerStrategy {
             SThrowEventInstance eventInstance,
             SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException;
 
-    public abstract boolean handlePostThrowEvent(SProcessDefinition processDefinition,
-            SEndEventDefinition sEventDefinition,
-            SThrowEventInstance sThrowEventInstance, SEventTriggerDefinition sEventTriggerDefinition,
-            SFlowNodeInstance sFlowNodeInstance)
-            throws SBonitaException;
-
-    public abstract void handleThrowEvent(SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException;
-
     public abstract void handleCatchEvent(SProcessDefinition processDefinition, SEventDefinition eventDefinition,
             SCatchEventInstance eventInstance,
             SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException;
@@ -63,6 +55,20 @@ public abstract class EventHandlerStrategy {
             SEventTriggerDefinition sEventTriggerDefinition, long subProcessId, SProcessInstance parentProcessIsnstance)
             throws SBonitaException;
 
+    public abstract OperationsWithContext getOperations(SWaitingEvent waitingEvent, Long triggeringElementID)
+            throws SBonitaException;
+
+    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+    }
+
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition,
+            final SEndEventDefinition sEventDefinition,
+            final SThrowEventInstance sThrowEventInstance,
+            final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance)
+            throws SBonitaException {
+        return false;
+    }
+
     protected DataInstanceContainer getParentContainerType(final SFlowNodeInstance flowNodeInstance) {
         DataInstanceContainer parentContainerType;
         if (SFlowElementsContainerType.PROCESS.equals(flowNodeInstance.getParentContainerType())) {
@@ -72,8 +78,5 @@ public abstract class EventHandlerStrategy {
         }
         return parentContainerType;
     }
-
-    public abstract OperationsWithContext getOperations(SWaitingEvent waitingEvent, Long triggeringElementID)
-            throws SBonitaException;
 
 }

@@ -76,7 +76,7 @@ public class ErrorEventHandlerStrategyTest {
     public void setUp() {
         spyStrategy = spy(new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService,
                 flowNodeInstanceService,
-                containerRegistry, processDefinitionService, eventsHandler, logger, processInstanceInterruptor));
+                processDefinitionService, eventsHandler, processInstanceInterruptor));
     }
 
     @Test

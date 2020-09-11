@@ -115,21 +115,21 @@ public class ProcessInstanceInterruptor {
     }
 
     /**
-     * Interrupt children of given process instance excluding interruptorChildId
+     * Interrupt children of given process instance excluding notToInterruptFlownodeId
      *
      * @param processInstanceId the process instance
      * @param stateCategory the state category in which children must be set
-     * @param interruptorChildId the element to exclude
+     * @param notToInterruptFlownodeId the element to exclude
      */
     public void interruptChildrenOfProcessInstance(final long processInstanceId, final SStateCategory stateCategory,
-            final long interruptorChildId)
+            final long notToInterruptFlownodeId)
             throws SBonitaException {
         List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService
                 .getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
-        flowNodeInstances = excludeFlowNode(interruptorChildId, flowNodeInstances);
+        flowNodeInstances = excludeFlowNode(notToInterruptFlownodeId, flowNodeInstances);
         interruptFlowNodeInstances(flowNodeInstances, stateCategory);
         logger.info("Process instance {} and its children were {} by flownode {}", processInstanceId,
-                getInterruptionType(stateCategory), interruptorChildId);
+                getInterruptionType(stateCategory), notToInterruptFlownodeId);
     }
 
     /**

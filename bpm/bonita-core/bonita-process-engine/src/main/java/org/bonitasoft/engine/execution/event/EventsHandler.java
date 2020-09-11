@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -33,13 +32,11 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -49,7 +46,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecu
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -73,7 +69,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -106,8 +101,6 @@ public class EventsHandler {
 
     private final ProcessInstanceService processInstanceService;
 
-    private final TechnicalLoggerService logger;
-
     private final OperationService operationService;
 
     private ProcessExecutor processExecutor;
@@ -129,7 +122,6 @@ public class EventsHandler {
         this.containerRegistry = containerRegistry;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.processInstanceService = processInstanceService;
-        this.logger = logger;
         this.operationService = operationService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processInstanceInterruptor = processInstanceInterruptor;
@@ -144,8 +136,7 @@ public class EventsHandler {
         handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceInterruptor));
         handlers.put(SEventTriggerType.ERROR,
                 new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, flowNodeInstanceService,
-                        containerRegistry,
-                        processDefinitionService, this, logger, processInstanceInterruptor));
+                        processDefinitionService, this, processInstanceInterruptor));
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -277,8 +268,8 @@ public class EventsHandler {
     public void handleThrowMessage(final SProcessDefinition processDefinition,
             final SSendTaskDefinition sendTaskDefinition,
             final SSendTaskInstance sendTaskInstance)
-            throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException, SDataInstanceException,
-            SExpressionException, SWorkRegisterException, STransactionNotFoundException {
+            throws SMessageInstanceCreationException, SDataInstanceException,
+            SExpressionException, STransactionNotFoundException {
         final SThrowMessageEventTriggerDefinition eventTrigger = sendTaskDefinition.getMessageTrigger();
         final MessageEventHandlerStrategy messageEventHandlerStrategy = (MessageEventHandlerStrategy) handlers
                 .get(SEventTriggerType.MESSAGE);
@@ -286,35 +277,17 @@ public class EventsHandler {
     }
 
     public boolean handlePostThrowEvent(final SProcessDefinition sProcessDefinition,
-            final SEndEventDefinition sEndEventDefinition,
-            final SThrowEventInstance sThrowEventInstance, final SFlowNodeInstance sFlowNodeInstance)
-            throws SBonitaException {
+            final SEndEventDefinition sEndEventDefinition, final SThrowEventInstance sThrowEventInstance,
+            final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
         boolean hasActionsToExecute = false;
-        if (sEndEventDefinition == null) {
-            /*
-             * If the eventDefinition is not set that mean that the event was
-             * triggered by a connector and that it's an error event
-             * ...yep that's a lot of assumptions
-             */
-            final String errorCode = sThrowEventInstance.getName();
-
-            final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory
-                    .get(SThrowErrorEventTriggerDefinitionBuilderFactory.class)
-                    .createNewInstance(errorCode).done();
-            hasActionsToExecute = handlers.get(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, null,
-                    sThrowEventInstance,
-                    errorEventTriggerDefinition, sFlowNodeInstance);
-        } else {
-            final List<SEventTriggerDefinition> eventTriggers = sEndEventDefinition.getEventTriggers();
-            for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
-                final EventHandlerStrategy eventHandlerStrategy = handlers
-                        .get(sEventTriggerDefinition.getEventTriggerType());
-                if (eventHandlerStrategy != null) {
-                    hasActionsToExecute = hasActionsToExecute
-                            || eventHandlerStrategy.handlePostThrowEvent(sProcessDefinition, sEndEventDefinition,
-                                    sThrowEventInstance, sEventTriggerDefinition,
-                                    sFlowNodeInstance);
-                }
+        final List<SEventTriggerDefinition> eventTriggers = sEndEventDefinition.getEventTriggers();
+        for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
+            final EventHandlerStrategy eventHandlerStrategy = handlers
+                    .get(sEventTriggerDefinition.getEventTriggerType());
+            if (eventHandlerStrategy != null) {
+                hasActionsToExecute = hasActionsToExecute
+                        || eventHandlerStrategy.handlePostThrowEvent(sProcessDefinition, sEndEventDefinition,
+                                sThrowEventInstance, sEventTriggerDefinition, sFlowNodeInstance);
             }
         }
         return hasActionsToExecute;

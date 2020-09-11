@@ -29,7 +29,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCorrelationDefinition;
@@ -39,7 +38,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowM
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
@@ -320,14 +318,4 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         getEventInstanceService().createWaitingEvent(builder.done());
         messagesHandlingService.triggerMatchingOfMessages();
     }
-
-    @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition,
-            final SEndEventDefinition sEventDefinition,
-            final SThrowEventInstance sThrowEventInstance,
-            final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
-        // nothing to do
-        return false;
-    }
-
 }
