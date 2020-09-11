@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
@@ -31,7 +30,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerE
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
@@ -164,10 +162,6 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) {
-    }
-
-    @Override
     public void handleEventSubProcess(final SProcessDefinition processDefinition,
             final SEventDefinition eventDefinition,
             final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId,
@@ -278,14 +272,4 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         }
 
     }
-
-    @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition,
-            final SEndEventDefinition sEventDefinition,
-            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition,
-            final SFlowNodeInstance sFlowNodeInstance) {
-        // nothing to do
-        return false;
-    }
-
 }

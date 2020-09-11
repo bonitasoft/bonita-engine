@@ -18,14 +18,12 @@ import java.util.List;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilderFactory;
@@ -147,12 +145,4 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
         getEventInstanceService().createWaitingEvent(signalEvent);
     }
 
-    @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition,
-            final SEndEventDefinition sEventDefinition,
-            final SThrowEventInstance sThrowEventInstance,
-            final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
-        // nothing to do
-        return false;
-    }
 }

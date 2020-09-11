@@ -15,10 +15,8 @@ package org.bonitasoft.engine.execution.event;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
@@ -64,11 +62,6 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) {
-
-    }
-
-    @Override
     public void handleEventSubProcess(final SProcessDefinition processDefinition,
             final SEventDefinition eventDefinition,
             final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId,
@@ -83,15 +76,6 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
             final SProcessInstance parentProcessIsnstance) {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition,
-            final SEndEventDefinition sEventDefinition,
-            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition,
-            final SFlowNodeInstance sFlowNodeInstance) {
-        // nothing to do
-        return false;
     }
 
 }

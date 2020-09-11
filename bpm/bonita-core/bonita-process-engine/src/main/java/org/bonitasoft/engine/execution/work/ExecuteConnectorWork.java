@@ -326,32 +326,4 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             return null;
         }
     }
-
-    /**
-     * @author Emmanuel Duchastenier
-     */
-    final class EvaluateConnectorOutputsTxContent implements Callable<Void> {
-
-        private final ConnectorResult result;
-
-        private final SConnectorDefinition sConnectorDefinition;
-
-        private final Map<String, Object> context;
-
-        private EvaluateConnectorOutputsTxContent(final ConnectorResult result,
-                final SConnectorDefinition sConnectorDefinition,
-                final Map<String, Object> context) {
-            this.result = result;
-            this.sConnectorDefinition = sConnectorDefinition;
-            this.context = context;
-        }
-
-        @Override
-        public Void call() throws Exception {
-            evaluateOutput(context, result, sConnectorDefinition);
-            continueFlow(context);
-            return null;
-        }
-    }
-
 }
