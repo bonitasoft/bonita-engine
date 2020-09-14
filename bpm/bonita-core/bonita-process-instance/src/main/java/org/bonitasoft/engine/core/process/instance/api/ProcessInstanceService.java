@@ -153,6 +153,13 @@ public interface ProcessInstanceService {
             SProcessInstanceModificationException;
 
     /**
+     * Set which event interrupted the process instance
+     */
+    void setInterruptingEventId(long parentProcessInstanceId, long eventInstanceId)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
+            SProcessInstanceModificationException;
+
+    /**
      * Delete specified archived process instance
      *
      * @param archivedProcessInstance
@@ -568,5 +575,4 @@ public interface ProcessInstanceService {
     List<SProcessInstance> searchFailedProcessInstances(QueryOptions queryOptions) throws SBonitaReadException;
 
     long getNumberOfProcessInstances(long processDefinitionId) throws SBonitaReadException;
-
 }
