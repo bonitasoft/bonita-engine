@@ -24,6 +24,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.states.State;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -138,7 +139,7 @@ public class ExecuteProcesses {
             if (callerId > 0) {
                 final SActivityInstance callActivityInstance = activityInstanceService
                         .getActivityInstance(processInstance.getCallerId());
-                if (callActivityInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
+                if (callActivityInstance.getStateId() != State.ID_ACTIVITY_FAILED) {
                     workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(callActivityInstance));
                     logger.info("Restarting notification of finished process '{}' with id {} in state {}",
                             processInstance.getName(), processInstance.getId(),
