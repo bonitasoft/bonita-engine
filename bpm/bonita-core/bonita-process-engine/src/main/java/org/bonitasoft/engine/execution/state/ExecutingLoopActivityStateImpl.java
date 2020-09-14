@@ -40,12 +40,9 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SLoopActivityIn
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.expression.ExpressionConstants;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
+@Component
 public class ExecutingLoopActivityStateImpl implements FlowNodeState {
 
     private final ExpressionResolverService expressionResolverService;

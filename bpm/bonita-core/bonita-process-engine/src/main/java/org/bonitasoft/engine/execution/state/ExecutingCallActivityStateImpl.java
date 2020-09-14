@@ -20,10 +20,9 @@ import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.StateBehaviors;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Elias Ricken de Medeiros
- */
+@Component
 public class ExecutingCallActivityStateImpl implements FlowNodeState {
 
     private final StateBehaviors stateBehaviors;

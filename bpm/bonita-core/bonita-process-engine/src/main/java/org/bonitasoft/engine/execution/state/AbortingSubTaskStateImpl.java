@@ -22,12 +22,9 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.StateBehaviors;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Frederic Bouquet
- * @author Baptiste Mesta
- * @author Elias Ricken de Medeiros
- */
+@Component
 public class AbortingSubTaskStateImpl implements FlowNodeState {
 
     private final StateBehaviors stateBehaviors;

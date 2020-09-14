@@ -19,7 +19,9 @@ package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.execution.StateBehaviors;
+import org.springframework.stereotype.Component;
 
+@Component
 public abstract class OnFinishConnectorState extends OnEnterOrOnFinishConnectorState {
 
     public OnFinishConnectorState(StateBehaviors stateBehaviors) {

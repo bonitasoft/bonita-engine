@@ -29,10 +29,10 @@ import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-/**
- * State that is used to cancel or abort Call activities and Subprocess activities (event sub process)
- */
+@Component
 public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeState {
 
     private final ProcessInstanceService processInstanceService;
@@ -41,7 +41,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     private final BPMArchiverService bpmArchiverService;
 
     public EndingCallActivityExceptionStateImpl(ProcessInstanceService processInstanceService,
-            TechnicalLoggerService logger,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
             ProcessInstanceInterruptor processInstanceInterruptor,
             BPMArchiverService bpmArchiverService) {
         this.processInstanceService = processInstanceService;

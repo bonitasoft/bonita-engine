@@ -44,11 +44,9 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Matthieu Chaffotte
- * @author Baptiste Mesta
- */
+@Component
 public class InitializingLoopActivityStateImpl implements FlowNodeState {
 
     private final ExpressionResolverService expressionResolverService;
