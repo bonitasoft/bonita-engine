@@ -15,13 +15,21 @@ package org.bonitasoft.engine.core.process.instance.api.states;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface FlowNodeState extends State<SFlowNodeInstance> {
+public interface FlowNodeState {
+
+    int ID_ACTIVITY_EXECUTING = 1;
+    int ID_ACTIVITY_READY = 4;
+    int ID_ACTIVITY_FAILED = 3;
+
+    int getId();
 
     /**
      * @param processDefinition
@@ -51,4 +59,48 @@ public interface FlowNodeState extends State<SFlowNodeInstance> {
      */
     String getSystemComment(SFlowNodeInstance flowNodeInstance);
 
+    StateCode execute(SProcessDefinition processDefinition, SFlowNodeInstance instance)
+            throws SActivityStateExecutionException;
+
+    /**
+     * Called when a child of the flow node parentInstance finishes.
+     * Triggers what's next, if applicable.
+     * returns if all children activity is finished / triggered.
+     *
+     * @return true if the state is finished (the flow node will continue its flow),
+     *         false if there are still some children to be triggered / to wait for.
+     */
+    default boolean notifyChildFlowNodeHasFinished(SProcessDefinition processDefinition,
+            SFlowNodeInstance parentInstance, SFlowNodeInstance childInstance)
+            throws SActivityStateExecutionException {
+
+        return false;
+    }
+
+    String getName();
+
+    /**
+     * @return true if the state is an interrupting state
+     */
+    boolean isInterrupting();
+
+    /**
+     * @return true if the state is stable
+     *         a final state is stable
+     */
+    boolean isStable();
+
+    /**
+     * Checks whether the state is a terminal one.
+     *
+     * @return true is the state is a terminal one; false otherwise
+     */
+    boolean isTerminal();
+
+    /**
+     * Get the state's category
+     *
+     * @return the state's category
+     */
+    SStateCategory getStateCategory();
 }

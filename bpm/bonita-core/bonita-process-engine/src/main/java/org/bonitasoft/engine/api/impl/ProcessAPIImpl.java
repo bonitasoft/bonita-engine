@@ -271,7 +271,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
-import org.bonitasoft.engine.core.process.instance.api.states.State;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -6307,7 +6307,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (Exception e1) {
             throw new FlowNodeExecutionException(e);
         }
-        if (flowNodeInstance.getStateId() != State.ID_ACTIVITY_READY || flowNodeInstance.isStateExecuting()) {
+        if (flowNodeInstance.getStateId() != FlowNodeState.ID_ACTIVITY_READY || flowNodeInstance.isStateExecuting()) {
             //this in a not found because that task was not visible anymore
             throw new UserTaskNotFoundException(
                     String.format(
@@ -6327,7 +6327,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SFlowNodeExecutionException(
                     "Unable to execute flownode " + flowNodeInstance.getId() + " because is not a user task");
         }
-        if (flowNodeInstance.getStateId() != State.ID_ACTIVITY_READY || flowNodeInstance.isStateExecuting()) {
+        if (flowNodeInstance.getStateId() != FlowNodeState.ID_ACTIVITY_READY || flowNodeInstance.isStateExecuting()) {
             throw new SFlowNodeExecutionException(
                     "Unable to execute flow node " + flowNodeInstance.getId()
                             + " because it is in an incompatible state ("

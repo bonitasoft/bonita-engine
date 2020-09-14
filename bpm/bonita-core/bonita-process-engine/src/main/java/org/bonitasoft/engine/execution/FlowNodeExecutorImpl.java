@@ -145,7 +145,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
             final SProcessDefinition processDefinition = processDefinitionService
                     .getProcessDefinition(processDefinitionId);
-            final FlowNodeState nextState = updateState(flowNodeInstance, processDefinition);
+            final FlowNodeState nextState = executeStateAndReturnNextState(flowNodeInstance, processDefinition);
             registerWorkIfUnstableOrTerminal(nextState, flowNodeInstance);
             return nextState;
         } catch (final SFlowNodeExecutionException e) {
@@ -165,7 +165,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
      * then null is returned (meaning we stay on the same state, some background work will trigger the next state
      * later).
      */
-    private FlowNodeState updateState(final SFlowNodeInstance sFlowNodeInstance,
+    private FlowNodeState executeStateAndReturnNextState(final SFlowNodeInstance sFlowNodeInstance,
             final SProcessDefinition processDefinition)
             throws SActivityStateExecutionException, SActivityExecutionException, SFlowNodeModificationException {
         final StateCode stateCode = executeState(processDefinition, sFlowNodeInstance,

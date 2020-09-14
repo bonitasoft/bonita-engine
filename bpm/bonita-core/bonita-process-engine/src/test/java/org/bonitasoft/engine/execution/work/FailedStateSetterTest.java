@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import static org.bonitasoft.engine.core.process.instance.api.states.State.ID_ACTIVITY_FAILED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -68,7 +67,7 @@ public class FailedStateSetterTest {
 
     @Before
     public void setUp() throws Exception {
-        given(flowNodeStateManager.getState(ID_ACTIVITY_FAILED)).willReturn(failedState);
+        given(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).willReturn(failedState);
         given(flowNodeInstance.getStateId()).willReturn(STATE_ID);
         given(loggerService.isLoggable(ArgumentMatchers.<Class<?>> any(), any(TechnicalLogSeverity.class)))
                 .willReturn(true);
@@ -107,7 +106,7 @@ public class FailedStateSetterTest {
     public void setAsFailed_should_do_nothing_when_flow_node_is_already_in_failed_state() throws Exception {
         //given
         given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
-        given(flowNodeInstance.getStateId()).willReturn(ID_ACTIVITY_FAILED);
+        given(flowNodeInstance.getStateId()).willReturn(FlowNodeState.ID_ACTIVITY_FAILED);
 
         //when
         failedStateSetter.setAsFailed(FLOW_NODE_INSTANCE_ID);

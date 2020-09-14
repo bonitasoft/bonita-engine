@@ -16,7 +16,7 @@ package org.bonitasoft.engine.execution.work;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.states.State;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -51,9 +51,9 @@ public class FailedStateSetter {
             flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
 
             //nothing to do if the flownode is already in failed state
-            if (flowNodeInstance.getStateId() != State.ID_ACTIVITY_FAILED) {
+            if (flowNodeInstance.getStateId() != FlowNodeState.ID_ACTIVITY_FAILED) {
                 activityInstanceService.setState(flowNodeInstance,
-                        flowNodeStateManager.getState(State.ID_ACTIVITY_FAILED));
+                        flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED));
                 waitingEventsInterrupter.interruptWaitingEvents(flowNodeInstance);
             }
         } catch (SFlowNodeNotFoundException e) {
