@@ -113,7 +113,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
-import org.bonitasoft.engine.core.process.instance.api.states.State;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
@@ -1380,7 +1380,7 @@ public class ProcessAPIImplTest {
         Map<String, Serializable> inputValues = new HashMap<>();
         inputValues.put("input1", 456);
         inputValues.put("input2", "value");
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setAssigneeId(543L);
         WorkDescriptor workDescriptor = WorkDescriptor.create("flownode");
         doReturn(workDescriptor).when(workFactory).createExecuteFlowNodeWorkDescriptor(sUserTaskInstance);
@@ -1394,7 +1394,7 @@ public class ProcessAPIImplTest {
     @Test
     public void executeUserTask_should_throw_exception_if_user_task_not_in_ready() throws Exception {
         //given
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_EXECUTING);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_EXECUTING);
         sUserTaskInstance.setStateName("executing");
         sUserTaskInstance.setAssigneeId(543L);
         //when
@@ -1409,7 +1409,7 @@ public class ProcessAPIImplTest {
     public void should_verify_if_the_task_was_in_fact_in_a_wrong_state_when_executing_it() throws Exception {
         //with some concurrency, we might have some commit exceptions when executing a task.
         // in that case if there is a commit exception we then open an other transaction to verify if the state of the task was ok
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateName("ready");
         sUserTaskInstance.setStateExecuting(true);
         sUserTaskInstance.setAssigneeId(543L);
@@ -1424,7 +1424,7 @@ public class ProcessAPIImplTest {
     @Test
     public void executeUserTask_should_throw_exception_if_user_task_is_ready_but_executing() throws Exception {
         //given
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateName("ready");
         sUserTaskInstance.setStateExecuting(true);
         sUserTaskInstance.setAssigneeId(543L);
@@ -1439,7 +1439,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_not_be_able_to_update_mapping_when_task_is_not_ready() throws Exception {
         //given)
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_FAILED);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_FAILED);
         //when
         expectedEx.expect(UpdateException.class);
         expectedEx.expectMessage("Unable to update actors of the task 1674 because it is not in ready state");
@@ -1449,7 +1449,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_not_be_able_to_update_mapping_when_task_is_ready_but_with_executing_flag() throws Exception {
         //given
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(true);
         //when
         expectedEx.expect(UpdateException.class);
@@ -1460,7 +1460,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_update_mapping_when_task_is_ready() throws Exception {
         //given
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(false);
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(
                 new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
@@ -1483,7 +1483,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_update_mapping_auto_assign_if_flag_is_set() throws Exception {
         //given
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(false);
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(
                 new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
@@ -1502,7 +1502,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_update_mapping_not_auto_assign_if_flag_is_not_set() throws Exception {
         //given
-        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateId(FlowNodeState.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(false);
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(
                 new UserFilterDefinitionImpl("myUserFilter", "def", "version"));

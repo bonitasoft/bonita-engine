@@ -33,7 +33,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInsta
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.api.states.State;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -100,9 +100,9 @@ public class ExecuteProcessesTest {
 
     @Test
     public void should_not_execute_a_process_called_by_a_failed_call_activity() throws Exception {
-        havingCallActivity(State.ID_ACTIVITY_FAILED, CALLER_ID);
+        havingCallActivity(FlowNodeState.ID_ACTIVITY_FAILED, CALLER_ID);
         havingProcessInstance(COMPLETED, CALLER_ID);
-        when(flowNodeStateManager.getState(State.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityStateImpl());
+        when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityStateImpl());
 
         executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
 
@@ -112,9 +112,9 @@ public class ExecuteProcessesTest {
 
     @Test
     public void should_execute_process_called_by_a_call_activity() throws Exception {
-        havingCallActivity(State.ID_ACTIVITY_EXECUTING, CALLER_ID);
+        havingCallActivity(FlowNodeState.ID_ACTIVITY_EXECUTING, CALLER_ID);
         havingProcessInstance(COMPLETED, CALLER_ID);
-        when(flowNodeStateManager.getState(State.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityStateImpl());
+        when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityStateImpl());
 
         executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
 

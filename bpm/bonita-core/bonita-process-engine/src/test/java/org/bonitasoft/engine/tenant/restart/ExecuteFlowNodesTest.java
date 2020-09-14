@@ -375,13 +375,6 @@ public class ExecuteFlowNodesTest {
         }
 
         @Override
-        public boolean notifyChildFlowNodeHasFinished(SProcessDefinition processDefinition,
-                SFlowNodeInstance parentInstance, SFlowNodeInstance childInstance)
-                throws SActivityStateExecutionException {
-            return false;
-        }
-
-        @Override
         public int getId() {
             return id;
         }

@@ -50,13 +50,6 @@ public class ExecutingCallActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean notifyChildFlowNodeHasFinished(final SProcessDefinition processDefinition,
-            final SFlowNodeInstance parentInstance,
-            final SFlowNodeInstance childInstance) {
-        return false;
-    }
-
-    @Override
     public boolean isTerminal() {
         return false;
     }
