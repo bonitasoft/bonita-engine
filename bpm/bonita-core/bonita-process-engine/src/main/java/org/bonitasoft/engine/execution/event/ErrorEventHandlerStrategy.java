@@ -37,9 +37,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -48,8 +45,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateCatchEventInstanceBuilderFactory;
@@ -112,23 +107,10 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         LOGGER.debug("Error event is thrown, error code = {} process instance = {}",
                 ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode(),
                 eventInstance.getRootContainerId());
-        setInterruptorEventIdOnProcessInstance(eventInstance);
+        processInstanceService.setInterruptingEventId(eventInstance.getParentProcessInstanceId(),
+                eventInstance.getId());
         processInstanceInterruptor.interruptChildrenOfProcessInstance(eventInstance.getParentContainerId(),
                 SStateCategory.ABORTING, eventInstance.getId());
-    }
-
-    private void setInterruptorEventIdOnProcessInstance(final SThrowEventInstance eventInstance)
-            throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
-            SProcessInstanceModificationException {
-        final SIntermediateThrowEventInstanceBuilderFactory throwEventKeyProvider = BuilderFactory
-                .get(SIntermediateThrowEventInstanceBuilderFactory.class);
-        final SProcessInstanceUpdateBuilder updateBuilder = BuilderFactory
-                .get(SProcessInstanceUpdateBuilderFactory.class).createNewInstance();
-        final long parentProcessInstanceId = eventInstance
-                .getLogicalGroup(throwEventKeyProvider.getParentProcessInstanceIndex());
-        updateBuilder.updateInterruptingEventId(eventInstance.getId());
-        final SProcessInstance processInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
-        processInstanceService.updateProcess(processInstance, updateBuilder.done());
     }
 
     @Override
