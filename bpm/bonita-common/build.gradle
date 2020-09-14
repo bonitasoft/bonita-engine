@@ -19,10 +19,13 @@ dependencies {
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile 'org.jmockit:jmockit:1.44'
     testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly project(':bpm:bonita-sap-jco-connector-api')
+    testCompile project(':bpm:bonita-sap-jco-connector-api')
 }
 
 def generateInfoProperties = task("generateInfoProperties") {
@@ -122,3 +125,5 @@ tasks.processResources.dependsOn tasks.jaxbSchemaGenApplication
 tasks.processResources.dependsOn tasks.jaxbSchemaGenBom
 tasks.processResources.dependsOn tasks.jaxbSchemaGenProfile
 tasks.processResources.dependsOn tasks.jaxbSchemaGenForms
+
+test { jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}" }
