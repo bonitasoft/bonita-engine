@@ -26,10 +26,12 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  */
+@Component
 public abstract class OnEnterOrOnFinishConnectorState implements FlowNodeState {
 
     protected final StateBehaviors stateBehaviors;

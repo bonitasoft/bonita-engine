@@ -21,10 +21,9 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Julien Molinaro
- */
+@Component
 public class AbortingReceiveTaskStateImpl extends AbortingFlowNodeContainerStateImpl {
 
     private final WaitingEventsInterrupter waitingEventsInterrupter;

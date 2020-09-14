@@ -24,11 +24,9 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Elias Ricken de Medeiros
- * @author Celine Souchet
- */
+@Component
 public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
 
     private final ActivityInstanceService activityInstanceService;

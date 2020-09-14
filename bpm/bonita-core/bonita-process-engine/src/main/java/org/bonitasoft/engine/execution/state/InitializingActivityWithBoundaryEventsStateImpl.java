@@ -19,10 +19,9 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.StateBehaviors;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Elias Ricken de Medeiros
- */
+@Component
 public class InitializingActivityWithBoundaryEventsStateImpl extends OnEnterConnectorState {
 
     private final StateBehaviors stateBehaviors;

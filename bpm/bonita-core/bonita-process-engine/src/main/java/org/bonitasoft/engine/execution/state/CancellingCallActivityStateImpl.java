@@ -19,14 +19,14 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Elias Ricken de Medeiros
- */
+@Component
 public class CancellingCallActivityStateImpl extends EndingCallActivityExceptionStateImpl {
 
     public CancellingCallActivityStateImpl(ProcessInstanceService processInstanceService,
-            TechnicalLoggerService logger,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
             ProcessInstanceInterruptor processInstanceInterruptor,
             BPMArchiverService bpmArchiverService) {
         super(processInstanceService, logger, processInstanceInterruptor, bpmArchiverService);

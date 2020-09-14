@@ -20,11 +20,9 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.StateBehaviors;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- */
+@Component
 public class ReadyActivityStateImpl extends OnEnterAndFinishConnectorState {
 
     private final StateBehaviors stateBehaviors;

@@ -19,10 +19,9 @@ import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Zhang Bole
- */
+@Component
 public class SkippedFlowNodeStateImpl implements FlowNodeState {
 
     public static final int ID = 12;

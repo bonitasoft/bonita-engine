@@ -37,18 +37,6 @@
     <bean id="searchEntitiesDescriptor" class="org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
     </bean>
 
-    <bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
-        <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
-        <constructor-arg name="activityInstanceManager" ref="activityInstanceService" />
-        <constructor-arg name="containerRegistry" ref="containerRegistry" />
-        <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
-        <constructor-arg name="commentService" ref="commentService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
-        <constructor-arg name="workService" ref="workService" />
-        <constructor-arg name="workFactory" ref="workFactory" />
-        <constructor-arg name="bpmArchiverService" ref="bpmArchiverService" />
-    </bean>
-
     <bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="workFactory" ref="workFactory" />
@@ -101,22 +89,6 @@
         <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
-    </bean>
-
-
-    <bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
-        <constructor-arg name="processInstanceService" ref="processInstanceService" />
-        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
-        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
-        <constructor-arg name="operationService" ref="operationService" />
-        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-        <constructor-arg name="containerRegistry" ref="containerRegistry" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="stateBehaviors" ref="stateBehaviors" />
-        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
-        <constructor-arg name="processInstanceInterruptor" ref="processInstanceInterruptor" />
-        <constructor-arg name="bpmArchiverService" ref="bpmArchiverService" />
-
     </bean>
 
     <bean id="processInstanceInterruptor" class="org.bonitasoft.engine.execution.ProcessInstanceInterruptor">

@@ -23,9 +23,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 
-/**
- * @author Elias Ricken de Medeiros
- */
 public abstract class EndingIntermediateCatchEventExceptionStateImpl implements FlowNodeState {
 
     private final WaitingEventsInterrupter waitingEventsInterrupter;

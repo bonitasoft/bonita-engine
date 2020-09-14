@@ -19,18 +19,18 @@ ACTIVITY (some constants are defined in the State interface)
 3 FailedActivityStateImpl
 4 ReadyActivityStateImpl
 9 CompletingActivityStateImpl
-10 WaitingEventStateImpl
+10 WaitingFlowNodeStateImpl
 12 SkippedFlowNodeStateImpl
-13 CompletingHumanTaskStateImpl
+13 AbortingSubTaskStateImpl
 14 CancelledFlowNodeStateImpl
 15 AbortingFlowNodeContainerStateImpl
 16 AbortedFlowNodeStateImpl
-17 CancelingFlowNodeContainerStateImpl
+17 CancellingFlowNodeContainerChildrenStateImpl
 18 CancellingFlowNodeStateImpl
 19 CancellingCallActivityStateImpl
 20 AbortingCallActivityStateImpl
 21 AbortingFlowNodeStateImpl
-22 CancelingIntermediateCatchEventStateImpl
+22 CancellingBoundaryAndIntermediateCatchEventStateImpl
 23 InitializingLoopActivityStateImpl
 24 ExecutingLoopActivityStateImpl
 25 ExecutingActivityStateImpl
@@ -41,7 +41,7 @@ ACTIVITY (some constants are defined in the State interface)
 31 ExecutingCallActivityStateImpl
 32 InitializingActivityWithBoundaryEventsStateImpl
 33 InitializingBoundaryEventStateImpl
-34 CompletingActivityWithBoundaryStateImpl
+34 AbortingBoundaryEventsOnCompletingActivityStateImpl
 35 AbortingActivityWithBoundaryStateImpl
 36 CancellingActivityWithBoundaryStateImpl
 37 ExecutingAutomaticActivityStateImpl
@@ -51,7 +51,8 @@ ACTIVITY (some constants are defined in the State interface)
 
 45 InterruptedFlowNodeState
 
-
-60 AbortingIntermediateCatchEventStateImpl
-61 InitializinAndExecutingFlowNodeStateImpl
+60 AbortingBoundaryAndIntermediateCatchEventStateImpl
+61 InitializingAndExecutingFlowNodeStateImpl
 65 ExecutingBoundaryEventStateImpl
+
+// up-to-date on 2020-09-11

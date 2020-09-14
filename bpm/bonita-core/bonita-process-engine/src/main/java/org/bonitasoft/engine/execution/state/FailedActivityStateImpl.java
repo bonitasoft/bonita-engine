@@ -19,14 +19,9 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.springframework.stereotype.Component;
 
-/**
- * Failed state is not terminal because activity can be retried, so it must be visible, so not archived immediately.
- *
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
+@Component
 public class FailedActivityStateImpl implements FlowNodeState {
 
     @Override

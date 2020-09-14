@@ -27,12 +27,9 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Elias Ricken de Medeiros
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
+@Component
 public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl {
 
     private final OperationService operationService;

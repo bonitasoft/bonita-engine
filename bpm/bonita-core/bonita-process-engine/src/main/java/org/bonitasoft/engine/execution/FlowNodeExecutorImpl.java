@@ -49,6 +49,7 @@ import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
@@ -58,6 +59,7 @@ import org.slf4j.LoggerFactory;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
+@Component("flowNodeExecutor")
 public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlowNodeExecutorImpl.class);

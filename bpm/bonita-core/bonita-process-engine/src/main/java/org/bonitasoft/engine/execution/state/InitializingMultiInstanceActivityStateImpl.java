@@ -31,12 +31,9 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Matthieu Chaffotte
- * @author Baptiste Mesta
- * @author Celine Souchet
- */
+@Component
 public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState {
 
     private final ExpressionResolverService expressionResolverService;
