@@ -37,8 +37,6 @@ public interface FlowNodeStateManager {
             int currentStateId)
             throws SActivityExecutionException;
 
-    FlowNodeState getFailedState();// TODO get the old state?
-
     FlowNodeState getState(int stateId);
 
     Set<String> getSupportedState(FlowNodeType nodeType);

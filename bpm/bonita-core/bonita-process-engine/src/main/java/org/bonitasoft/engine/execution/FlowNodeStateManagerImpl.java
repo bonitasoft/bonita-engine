@@ -26,14 +26,8 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.execution.state.AbortingSubTaskStateImpl;
-import org.bonitasoft.engine.execution.state.FailedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.transition.FlowNodeStatesAndTransitions;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,40 +44,39 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     protected static final int FIRST_STATE_KEY = -1;
 
-    private final SkippedFlowNodeStateImpl skipped;
-
-    private final FailedActivityStateImpl failed;
-
     protected final Map<Integer, FlowNodeState> allStates = new HashMap<>();
-
     protected final Map<SFlowNodeType, Map<Integer, FlowNodeState>> normalFlowNodeStatesAndTransitions = new HashMap<>();
-
     protected final Map<SFlowNodeType, Map<Integer, FlowNodeState>> abortFlowNodeStatesAndTransitions = new HashMap<>();
-
     protected final Map<SFlowNodeType, Map<Integer, FlowNodeState>> cancelFlowNodeStatesAndTransitions = new HashMap<>();
 
     protected StateBehaviors stateBehaviors;
     private final List<FlowNodeStatesAndTransitions> flowNodeStatesAndTransitions;
 
-    protected AbortingSubTaskStateImpl abortingSubTaskState;
-
     protected final Set<Integer> unstableStates = new HashSet<>();
     protected final Set<Integer> stableStates = new HashSet<>();
 
-    @Autowired
     public FlowNodeStateManagerImpl(
             BPMInstancesCreator bpmInstancesCreator,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
             StateBehaviors stateBehaviors,
-            List<FlowNodeStatesAndTransitions> flowNodeStatesAndTransitions) {
+            List<FlowNodeStatesAndTransitions> flowNodeStatesAndTransitions,
+            List<FlowNodeState> allStates) {
         this.stateBehaviors = stateBehaviors;
         this.flowNodeStatesAndTransitions = flowNodeStatesAndTransitions;
-        this.failed = new FailedActivityStateImpl();
-        allStates.put(failed.getId(), failed);
-        this.skipped = new SkippedFlowNodeStateImpl();
-        allStates.put(skipped.getId(), skipped);
         bpmInstancesCreator.setStateManager(this);
+        storeAllStates(allStates);
         defineTransitionsForAllNodesType();
+    }
+
+    private void storeAllStates(List<FlowNodeState> states) {
+        for (FlowNodeState state : states) {
+            final int stateId = state.getId();
+            if (state.isStable()) {
+                stableStates.add(stateId);
+            } else {
+                unstableStates.add(stateId);
+            }
+            allStates.put(stateId, state);
+        }
     }
 
     @Override
@@ -126,17 +119,6 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             currentStateIdToNextState.put(states[stateIndex].getId(), states[stateIndex + 1]);
             stateIndex++;
         }
-
-        for (FlowNodeState state : states) {
-            final int stateId = state.getId();
-            if (state.isStable()) {
-                stableStates.add(stateId);
-            } else {
-                unstableStates.add(stateId);
-            }
-            allStates.put(stateId, state);
-        }
-
         transitions.put(flowNodeType, currentStateIdToNextState);
     }
 
@@ -192,11 +174,6 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
                             + " activity id=" + flowNodeInstance.getId());
         }
         return nextStateToHandle;
-    }
-
-    @Override
-    public FlowNodeState getFailedState() {
-        return failed;
     }
 
     @Override

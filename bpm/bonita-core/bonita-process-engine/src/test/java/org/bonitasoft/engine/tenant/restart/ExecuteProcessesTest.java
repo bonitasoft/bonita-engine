@@ -102,7 +102,7 @@ public class ExecuteProcessesTest {
     public void should_not_execute_a_process_called_by_a_failed_call_activity() throws Exception {
         havingCallActivity(State.ID_ACTIVITY_FAILED, CALLER_ID);
         havingProcessInstance(COMPLETED, CALLER_ID);
-        when(flowNodeStateManager.getFailedState()).thenReturn(new FailedActivityStateImpl());
+        when(flowNodeStateManager.getState(State.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityStateImpl());
 
         executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
 
@@ -114,7 +114,7 @@ public class ExecuteProcessesTest {
     public void should_execute_process_called_by_a_call_activity() throws Exception {
         havingCallActivity(State.ID_ACTIVITY_EXECUTING, CALLER_ID);
         havingProcessInstance(COMPLETED, CALLER_ID);
-        when(flowNodeStateManager.getFailedState()).thenReturn(new FailedActivityStateImpl());
+        when(flowNodeStateManager.getState(State.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityStateImpl());
 
         executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
 

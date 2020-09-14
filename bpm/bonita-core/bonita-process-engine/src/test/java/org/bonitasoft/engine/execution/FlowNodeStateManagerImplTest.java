@@ -13,10 +13,9 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -35,6 +34,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeStateManagerImplTest {
 
+    private static final ExecutingAutomaticActivityStateImpl executingAutomaticActivityState = new ExecutingAutomaticActivityStateImpl(
+            null);
+    private static final AbortingActivityWithBoundaryStateImpl abortingActivityWithBoundaryState = new AbortingActivityWithBoundaryStateImpl(
+            null);
+    private static final CancellingActivityWithBoundaryStateImpl cancellingActivityWithBoundaryState = new CancellingActivityWithBoundaryStateImpl(
+            null);
+    private static final AbortedFlowNodeStateImpl abortedFlowNodeState = new AbortedFlowNodeStateImpl();;
     private FlowNodeStateManagerImpl stateManager;
 
     @Mock
@@ -42,9 +48,10 @@ public class FlowNodeStateManagerImplTest {
 
     @Before
     public void before() {
-        List<FlowNodeStatesAndTransitions> flowNodeStatesAndTransitions = new ArrayList<>();
-        flowNodeStatesAndTransitions.add(new TestState());
-        stateManager = new FlowNodeStateManagerImpl(bpmInstancesCreator, null, null, flowNodeStatesAndTransitions);
+        stateManager = new FlowNodeStateManagerImpl(bpmInstancesCreator, null,
+                singletonList(new TestState()),
+                asList(executingAutomaticActivityState, abortingActivityWithBoundaryState,
+                        cancellingActivityWithBoundaryState, abortedFlowNodeState));
     }
 
     @Test
@@ -63,10 +70,9 @@ public class FlowNodeStateManagerImplTest {
         }
 
         TestState() {
-            defineNormalTransitionForFlowNode(new ExecutingAutomaticActivityStateImpl(null),
-                    new AbortedFlowNodeStateImpl());
-            defineAbortTransitionForFlowNode(new AbortingActivityWithBoundaryStateImpl(null));
-            defineCancelTransitionForFlowNode(new CancellingActivityWithBoundaryStateImpl(null));
+            defineNormalTransitionForFlowNode(executingAutomaticActivityState, abortedFlowNodeState);
+            defineAbortTransitionForFlowNode(abortingActivityWithBoundaryState);
+            defineCancelTransitionForFlowNode(cancellingActivityWithBoundaryState);
         }
     }
 }
