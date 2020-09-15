@@ -23,7 +23,7 @@ import org.bonitasoft.engine.execution.state.WaitingFlowNodeState;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BoundaryEventStates extends FlowNodeStatesAndTransitions {
+public class BoundaryEventStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.BOUNDARY_EVENT;
@@ -36,9 +36,9 @@ public class BoundaryEventStates extends FlowNodeStatesAndTransitions {
             InitializingBoundaryEventState initializingBoundaryEvent,
             ExecutingBoundaryEventState executingBoundaryEvent) {
 
-        defineNormalTransitionForFlowNode(initializingBoundaryEvent, waiting, executingBoundaryEvent, completed);
-        defineAbortTransitionForFlowNode(aborted);
-        defineCancelTransitionForFlowNode(cancelled);
+        defineNormalSequence(initializingBoundaryEvent, waiting, executingBoundaryEvent, completed);
+        defineAbortSequence(aborted);
+        defineCancelSequence(cancelled);
     }
 
 }

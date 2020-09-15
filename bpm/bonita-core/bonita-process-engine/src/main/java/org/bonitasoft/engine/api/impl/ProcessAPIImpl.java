@@ -241,6 +241,7 @@ import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -2831,7 +2832,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Set<String> getSupportedStates(final FlowNodeType nodeType) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        return flowNodeStateManager.getSupportedState(nodeType);
+        return flowNodeStateManager.getSupportedState(SFlowNodeType.valueOf(nodeType.toString()));
     }
 
     @Override

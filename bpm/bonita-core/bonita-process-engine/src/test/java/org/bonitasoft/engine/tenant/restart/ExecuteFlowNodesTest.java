@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.tenant.restart;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.execution.TestFlowNodeState.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.argThat;
@@ -32,13 +33,9 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -81,10 +78,10 @@ public class ExecuteFlowNodesTest {
     private ExecuteFlowNodes executeFlowNodes;
     private final List<SFlowNodeInstance> allFlowNodes = new ArrayList<>();
 
-    private final FlowNodeState waitingState = new TestFlowNodeState(1, SStateCategory.NORMAL, true, false);
-    private final FlowNodeState abortingState = new TestFlowNodeState(2, SStateCategory.ABORTING, true, false);
-    private final FlowNodeState cancellingState = new TestFlowNodeState(3, SStateCategory.CANCELLING, true, false);
-    private final FlowNodeState normalStableState = new TestFlowNodeState(4, SStateCategory.NORMAL, true, false);
+    private final FlowNodeState waitingState = stableState(1, SStateCategory.NORMAL);
+    private final FlowNodeState abortingState = stableState(2, SStateCategory.ABORTING);
+    private final FlowNodeState cancellingState = stableState(3, SStateCategory.CANCELLING);
+    private final FlowNodeState normalStableState = stableState(4, SStateCategory.NORMAL);
 
     @Before
     public void before() throws Exception {
@@ -336,67 +333,5 @@ public class ExecuteFlowNodesTest {
         sAutomaticTaskInstance.setTerminal(terminal);
         sAutomaticTaskInstance.setLogicalGroup(3, 456L);
         return sAutomaticTaskInstance;
-    }
-
-    private static class TestFlowNodeState implements FlowNodeState {
-
-        private final SStateCategory stateCategory;
-        private final boolean stable;
-        private final boolean terminal;
-        private final int id;
-
-        private TestFlowNodeState(int id, SStateCategory stateCategory, boolean stable, boolean terminal) {
-            this.id = id;
-            this.stateCategory = stateCategory;
-            this.stable = stable;
-            this.terminal = terminal;
-        }
-
-        @Override
-        public boolean shouldExecuteState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance)
-                throws SActivityExecutionException {
-            return false;
-        }
-
-        @Override
-        public boolean mustAddSystemComment(SFlowNodeInstance flowNodeInstance) {
-            return false;
-        }
-
-        @Override
-        public String getSystemComment(SFlowNodeInstance flowNodeInstance) {
-            return null;
-        }
-
-        @Override
-        public StateCode execute(SProcessDefinition processDefinition, SFlowNodeInstance instance)
-                throws SActivityStateExecutionException {
-            return null;
-        }
-
-        @Override
-        public int getId() {
-            return id;
-        }
-
-        @Override
-        public String getName() {
-            return null;
-        }
-
-        @Override
-        public boolean isStable() {
-            return stable;
-        }
-
-        @Override
-        public boolean isTerminal() {
-            return terminal;
-        }
-
-        @Override
-        public SStateCategory getStateCategory() {
-            return stateCategory;
-        }
     }
 }

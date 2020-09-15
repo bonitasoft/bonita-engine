@@ -23,7 +23,7 @@ import org.bonitasoft.engine.execution.state.ExecutingThrowEventState;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IntermediateThrowEventStates extends FlowNodeStatesAndTransitions {
+public class IntermediateThrowEventStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.INTERMEDIATE_THROW_EVENT;
@@ -37,8 +37,8 @@ public class IntermediateThrowEventStates extends FlowNodeStatesAndTransitions {
             CancellingFlowNodeState cancellingFlowNode,
             ExecutingThrowEventState executingThrowEvent) {
 
-        defineNormalTransitionForFlowNode(executingThrowEvent, completed);
-        defineAbortTransitionForFlowNode(abortingFlowNode, aborted);
-        defineCancelTransitionForFlowNode(cancellingFlowNode, cancelled);
+        defineNormalSequence(executingThrowEvent, completed);
+        defineAbortSequence(abortingFlowNode, aborted);
+        defineCancelSequence(cancellingFlowNode, cancelled);
     }
 }

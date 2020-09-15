@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserTaskStates extends FlowNodeStatesAndTransitions {
+public class UserTaskStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.USER_TASK;
@@ -47,9 +47,9 @@ public class UserTaskStates extends FlowNodeStatesAndTransitions {
             CancellingFlowNodeContainerChildrenState cancellingContainer,
             CancelledFlowNodeState cancelled) {
 
-        defineNormalTransitionForFlowNode(initializingActivityWithBoundary, ready,
+        defineNormalSequence(initializingActivityWithBoundary, ready,
                 abortingBoundaryEventsOnCompletingActivityState, abortingSubTaskState, completed);
-        defineAbortTransitionForFlowNode(abortingActivityWithBoundary, abortingContainer, aborted);
-        defineCancelTransitionForFlowNode(cancellingActivityWithBoundary, cancellingContainer, cancelled);
+        defineAbortSequence(abortingActivityWithBoundary, abortingContainer, aborted);
+        defineCancelSequence(cancellingActivityWithBoundary, cancellingContainer, cancelled);
     }
 }

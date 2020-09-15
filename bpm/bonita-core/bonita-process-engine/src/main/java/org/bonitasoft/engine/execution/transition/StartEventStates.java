@@ -23,7 +23,7 @@ import org.bonitasoft.engine.execution.state.InitializingAndExecutingFlowNodeSta
 import org.springframework.stereotype.Component;
 
 @Component
-public class StartEventStates extends FlowNodeStatesAndTransitions {
+public class StartEventStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.START_EVENT;
@@ -36,9 +36,9 @@ public class StartEventStates extends FlowNodeStatesAndTransitions {
             CancellingFlowNodeState cancellingFlowNode,
             InitializingAndExecutingFlowNodeState initializingAndExecuting) {
 
-        defineNormalTransitionForFlowNode(initializingAndExecuting, completed);
-        defineAbortTransitionForFlowNode(abortingFlowNode, aborted);
-        defineCancelTransitionForFlowNode(cancellingFlowNode, cancelled);
+        defineNormalSequence(initializingAndExecuting, completed);
+        defineAbortSequence(abortingFlowNode, aborted);
+        defineCancelSequence(cancellingFlowNode, cancelled);
     }
 
 }

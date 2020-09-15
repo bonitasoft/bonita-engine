@@ -23,7 +23,7 @@ import org.bonitasoft.engine.execution.state.ExecutingCallActivityState;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SubProcessActivityTaskStates extends FlowNodeStatesAndTransitions {
+public class SubProcessActivityTaskStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.SUB_PROCESS;
@@ -36,8 +36,8 @@ public class SubProcessActivityTaskStates extends FlowNodeStatesAndTransitions {
             AbortingCallActivityState abortingCallActivity,
             CancellingCallActivityState cancellingCallActivity) {
 
-        defineNormalTransitionForFlowNode(executingCallActivity, completed);
-        defineAbortTransitionForFlowNode(abortingCallActivity, aborted);
-        defineCancelTransitionForFlowNode(cancellingCallActivity, cancelled);
+        defineNormalSequence(executingCallActivity, completed);
+        defineAbortSequence(abortingCallActivity, aborted);
+        defineCancelSequence(cancellingCallActivity, cancelled);
     }
 }

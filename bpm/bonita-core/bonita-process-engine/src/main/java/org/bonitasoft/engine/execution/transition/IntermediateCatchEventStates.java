@@ -25,7 +25,7 @@ import org.bonitasoft.engine.execution.state.WaitingFlowNodeState;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IntermediateCatchEventStates extends FlowNodeStatesAndTransitions {
+public class IntermediateCatchEventStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.INTERMEDIATE_CATCH_EVENT;
@@ -38,8 +38,8 @@ public class IntermediateCatchEventStates extends FlowNodeStatesAndTransitions {
             WaitingFlowNodeState waiting,
             AbortingBoundaryAndIntermediateCatchEventState abortingBoundaryAndIntermediateCatchEvent) {
 
-        defineNormalTransitionForFlowNode(initializing, waiting, executing, completed);
-        defineAbortTransitionForFlowNode(abortingBoundaryAndIntermediateCatchEvent, aborted);
-        defineCancelTransitionForFlowNode(cancelingBoundaryAndIntermediateCatchEvent, cancelled);
+        defineNormalSequence(initializing, waiting, executing, completed);
+        defineAbortSequence(abortingBoundaryAndIntermediateCatchEvent, aborted);
+        defineCancelSequence(cancelingBoundaryAndIntermediateCatchEvent, cancelled);
     }
 }
