@@ -62,11 +62,6 @@ public class ExecutingAutomaticActivityStateImpl extends OnEnterAndFinishConnect
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return false;
     }

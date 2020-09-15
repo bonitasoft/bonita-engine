@@ -62,11 +62,6 @@ public abstract class EndingIntermediateCatchEventExceptionStateImpl implements 
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return false;
     }

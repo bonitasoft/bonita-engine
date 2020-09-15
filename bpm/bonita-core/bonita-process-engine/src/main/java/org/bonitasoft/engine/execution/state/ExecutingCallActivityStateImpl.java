@@ -80,9 +80,4 @@ public class ExecutingCallActivityStateImpl implements FlowNodeState {
         return "";
     }
 
-    @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
 }

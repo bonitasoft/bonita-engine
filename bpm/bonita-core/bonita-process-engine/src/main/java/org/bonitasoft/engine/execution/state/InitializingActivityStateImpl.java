@@ -36,11 +36,6 @@ public class InitializingActivityStateImpl extends OnEnterConnectorState {
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return false;
     }

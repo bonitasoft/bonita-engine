@@ -37,11 +37,6 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends OnEnterConn
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return false;
     }

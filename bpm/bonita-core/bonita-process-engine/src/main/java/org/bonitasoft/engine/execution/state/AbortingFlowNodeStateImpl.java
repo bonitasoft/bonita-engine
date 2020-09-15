@@ -52,11 +52,6 @@ public class AbortingFlowNodeStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return true;
     }

@@ -59,11 +59,6 @@ public abstract class EndingFlowNodeContainerExceptionStateImpl implements FlowN
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return true;
     }
