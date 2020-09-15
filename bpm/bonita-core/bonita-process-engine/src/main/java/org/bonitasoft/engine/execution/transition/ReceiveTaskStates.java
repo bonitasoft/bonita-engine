@@ -14,17 +14,17 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingReceiveTaskStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingReceiveTaskStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ExecutingFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.InitializingActivityWithBoundaryEventsStateImpl;
-import org.bonitasoft.engine.execution.state.WaitingFlowNodeStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityState;
+import org.bonitasoft.engine.execution.state.AbortingReceiveTaskState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.CancellingReceiveTaskState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.ExecutingFlowNodeState;
+import org.bonitasoft.engine.execution.state.InitializingActivityWithBoundaryEventsState;
+import org.bonitasoft.engine.execution.state.WaitingFlowNodeState;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -35,17 +35,17 @@ public class ReceiveTaskStates extends FlowNodeStatesAndTransitions {
         return SFlowNodeType.RECEIVE_TASK;
     }
 
-    public ReceiveTaskStates(InitializingActivityWithBoundaryEventsStateImpl initializingActivityWithBoundary,
-            AbortingBoundaryEventsOnCompletingActivityStateImpl abortingBoundaryEventsOnCompletingActivityState,
-            CompletedActivityStateImpl completed,
-            AbortingActivityWithBoundaryStateImpl abortingActivityWithBoundary,
-            AbortedFlowNodeStateImpl aborted,
-            @Qualifier("cancellingActivityWithBoundaryStateImpl") CancellingActivityWithBoundaryStateImpl cancellingActivityWithBoundary,
-            ExecutingFlowNodeStateImpl executing,
-            AbortingReceiveTaskStateImpl abortingReceiveTask,
-            @Qualifier("cancellingReceiveTaskStateImpl") CancellingReceiveTaskStateImpl cancellingReceiveTask,
-            CancelledFlowNodeStateImpl cancelled,
-            WaitingFlowNodeStateImpl waiting) {
+    public ReceiveTaskStates(InitializingActivityWithBoundaryEventsState initializingActivityWithBoundary,
+            AbortingBoundaryEventsOnCompletingActivityState abortingBoundaryEventsOnCompletingActivityState,
+            CompletedActivityState completed,
+            AbortingActivityWithBoundaryState abortingActivityWithBoundary,
+            AbortedFlowNodeState aborted,
+            @Qualifier("cancellingActivityWithBoundaryState") CancellingActivityWithBoundaryState cancellingActivityWithBoundary,
+            ExecutingFlowNodeState executing,
+            AbortingReceiveTaskState abortingReceiveTask,
+            @Qualifier("cancellingReceiveTaskState") CancellingReceiveTaskState cancellingReceiveTask,
+            CancelledFlowNodeState cancelled,
+            WaitingFlowNodeState waiting) {
 
         defineNormalTransitionForFlowNode(initializingActivityWithBoundary, waiting, executing,
                 abortingBoundaryEventsOnCompletingActivityState, completed);

@@ -14,12 +14,12 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ExecutingBoundaryEventStateImpl;
-import org.bonitasoft.engine.execution.state.InitializingBoundaryEventStateImpl;
-import org.bonitasoft.engine.execution.state.WaitingFlowNodeStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.ExecutingBoundaryEventState;
+import org.bonitasoft.engine.execution.state.InitializingBoundaryEventState;
+import org.bonitasoft.engine.execution.state.WaitingFlowNodeState;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,12 +29,12 @@ public class BoundaryEventStates extends FlowNodeStatesAndTransitions {
         return SFlowNodeType.BOUNDARY_EVENT;
     }
 
-    public BoundaryEventStates(CompletedActivityStateImpl completed,
-            AbortedFlowNodeStateImpl aborted,
-            CancelledFlowNodeStateImpl cancelled,
-            WaitingFlowNodeStateImpl waiting,
-            InitializingBoundaryEventStateImpl initializingBoundaryEvent,
-            ExecutingBoundaryEventStateImpl executingBoundaryEvent) {
+    public BoundaryEventStates(CompletedActivityState completed,
+            AbortedFlowNodeState aborted,
+            CancelledFlowNodeState cancelled,
+            WaitingFlowNodeState waiting,
+            InitializingBoundaryEventState initializingBoundaryEvent,
+            ExecutingBoundaryEventState executingBoundaryEvent) {
 
         defineNormalTransitionForFlowNode(initializingBoundaryEvent, waiting, executingBoundaryEvent, completed);
         defineAbortTransitionForFlowNode(aborted);

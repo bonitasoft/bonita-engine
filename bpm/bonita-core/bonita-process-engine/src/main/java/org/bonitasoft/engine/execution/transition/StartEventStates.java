@@ -14,12 +14,12 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.InitializingAndExecutingFlowNodeStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingFlowNodeState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.InitializingAndExecutingFlowNodeState;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,12 +29,12 @@ public class StartEventStates extends FlowNodeStatesAndTransitions {
         return SFlowNodeType.START_EVENT;
     }
 
-    public StartEventStates(CompletedActivityStateImpl completed,
-            AbortedFlowNodeStateImpl aborted,
-            CancelledFlowNodeStateImpl cancelled,
-            AbortingFlowNodeStateImpl abortingFlowNode,
-            CancellingFlowNodeStateImpl cancellingFlowNode,
-            InitializingAndExecutingFlowNodeStateImpl initializingAndExecuting) {
+    public StartEventStates(CompletedActivityState completed,
+            AbortedFlowNodeState aborted,
+            CancelledFlowNodeState cancelled,
+            AbortingFlowNodeState abortingFlowNode,
+            CancellingFlowNodeState cancellingFlowNode,
+            InitializingAndExecutingFlowNodeState initializingAndExecuting) {
 
         defineNormalTransitionForFlowNode(initializingAndExecuting, completed);
         defineAbortTransitionForFlowNode(abortingFlowNode, aborted);

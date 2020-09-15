@@ -1,56 +1,55 @@
 WARNING: If some states change, it requires migration
 
 PROCESS
-0 InitializingProcessInstanceStateImpl
-1 StartedProcessInstanceStateImpl
-2 SuspendedProcessInstanceStateImpl
-3 CancelledProcessInstanceStateImpl
-4 AbortedProcessInstanceStateImpl
-5 CompletingProcessInstanceStateImpl
-6 CompletedProcessInstanceStateImpl
-7 FailedProcessInstanceStateImpl
-11 AbortingProcessInstanceStateImpl
-12 ToMigrateProcessInstanceStateImpl
+0 Initializing
+1 Started
+2 Suspended
+3 Cancelled
+4 Aborted
+5 Completing
+6 Completed
+7 Failed / Error
+11 Aborting
 
 ACTIVITY (some constants are defined in the State interface)
-0 InitializingActivityStateImpl
-1 ExecutingFlowNodeStateImpl
-2 CompletedActivityStateImpl
-3 FailedActivityStateImpl
-4 ReadyActivityStateImpl
-9 CompletingActivityStateImpl
-10 WaitingFlowNodeStateImpl
-12 SkippedFlowNodeStateImpl
-13 AbortingSubTaskStateImpl
-14 CancelledFlowNodeStateImpl
-15 AbortingFlowNodeContainerStateImpl
-16 AbortedFlowNodeStateImpl
-17 CancellingFlowNodeContainerChildrenStateImpl
-18 CancellingFlowNodeStateImpl
-19 CancellingCallActivityStateImpl
-20 AbortingCallActivityStateImpl
-21 AbortingFlowNodeStateImpl
-22 CancellingBoundaryAndIntermediateCatchEventStateImpl
-23 InitializingLoopActivityStateImpl
-24 ExecutingLoopActivityStateImpl
-25 ExecutingActivityStateImpl
-26 ExecutingThrowEventStateImpl
-27 InitializingMultiInstanceActivityStateImpl
-28 ExecutingMultiInstanceActivityStateImpl
-30 CompletingCallActivityStateImpl
-31 ExecutingCallActivityStateImpl
-32 InitializingActivityWithBoundaryEventsStateImpl
-33 InitializingBoundaryEventStateImpl
-34 AbortingBoundaryEventsOnCompletingActivityStateImpl
-35 AbortingActivityWithBoundaryStateImpl
-36 CancellingActivityWithBoundaryStateImpl
-37 ExecutingAutomaticActivityStateImpl
+0 InitializingActivityState
+1 ExecutingFlowNodeState
+2 CompletedActivityState
+3 FailedActivityState
+4 ReadyActivityState
+9 CompletingActivityState
+10 WaitingFlowNodeState
+12 SkippedFlowNodeState
+13 AbortingSubTaskState
+14 CancelledFlowNodeState
+15 AbortingFlowNodeContainerState
+16 AbortedFlowNodeState
+17 CancellingFlowNodeContainerChildrenState
+18 CancellingFlowNodeState
+19 CancellingCallActivityState
+20 AbortingCallActivityState
+21 AbortingFlowNodeState
+22 CancellingBoundaryAndIntermediateCatchEventState
+23 InitializingLoopActivityState
+24 ExecutingLoopActivityState
+25 ExecutingActivityState
+26 ExecutingThrowEventState
+27 InitializingMultiInstanceActivityState
+28 ExecutingMultiInstanceActivityState
+30 CompletingCallActivityState
+31 ExecutingCallActivityState
+32 InitializingActivityWithBoundaryEventsState
+33 InitializingBoundaryEventState
+34 AbortingBoundaryEventsOnCompletingActivityState
+35 AbortingActivityWithBoundaryState
+36 CancellingActivityWithBoundaryState
+37 ExecutingAutomaticActivityState
 
-38 AbortingReceiveTaskStateImpl
-39 CancellingReceiveTaskStateImpl
+38 AbortingReceiveTaskState
+39 CancellingReceiveTaskState
 
-60 AbortingBoundaryAndIntermediateCatchEventStateImpl
-61 InitializingAndExecutingFlowNodeStateImpl
-65 ExecutingBoundaryEventStateImpl
+60 AbortingBoundaryAndIntermediateCatchEventState
+61 InitializingAndExecutingFlowNodeState
+65 ExecutingBoundaryEventState
 
-// up-to-date on 2020-09-11
+// up-to-date on 2020-09-15

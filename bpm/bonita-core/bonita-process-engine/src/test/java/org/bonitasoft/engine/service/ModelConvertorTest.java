@@ -72,7 +72,7 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessM
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingType;
@@ -172,7 +172,7 @@ public class ModelConvertorTest {
         sInstance.setClaimedDate(claimedDate);
         sInstance.setPriority(STaskPriority.NORMAL);
 
-        when(manager.getState(5)).thenReturn(new CompletedActivityStateImpl());
+        when(manager.getState(5)).thenReturn(new CompletedActivityState());
 
         final ArchivedUserTaskInstance archivedUserTaskInstance = ModelConvertor.toArchivedUserTaskInstance(sInstance,
                 manager);

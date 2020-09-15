@@ -14,17 +14,17 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingFlowNodeContainerStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingSubTaskStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingFlowNodeContainerChildrenStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.InitializingActivityWithBoundaryEventsStateImpl;
-import org.bonitasoft.engine.execution.state.ReadyActivityStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityState;
+import org.bonitasoft.engine.execution.state.AbortingFlowNodeContainerState;
+import org.bonitasoft.engine.execution.state.AbortingSubTaskState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.CancellingFlowNodeContainerChildrenState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.InitializingActivityWithBoundaryEventsState;
+import org.bonitasoft.engine.execution.state.ReadyActivityState;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -35,17 +35,17 @@ public class UserTaskStates extends FlowNodeStatesAndTransitions {
         return SFlowNodeType.USER_TASK;
     }
 
-    public UserTaskStates(InitializingActivityWithBoundaryEventsStateImpl initializingActivityWithBoundary,
-            ReadyActivityStateImpl ready,
-            AbortingBoundaryEventsOnCompletingActivityStateImpl abortingBoundaryEventsOnCompletingActivityState,
-            AbortingSubTaskStateImpl abortingSubTaskState,
-            CompletedActivityStateImpl completed,
-            AbortingActivityWithBoundaryStateImpl abortingActivityWithBoundary,
-            @Qualifier("abortingFlowNodeContainerStateImpl") AbortingFlowNodeContainerStateImpl abortingContainer,
-            AbortedFlowNodeStateImpl aborted,
-            @Qualifier("cancellingActivityWithBoundaryStateImpl") CancellingActivityWithBoundaryStateImpl cancellingActivityWithBoundary,
-            CancellingFlowNodeContainerChildrenStateImpl cancellingContainer,
-            CancelledFlowNodeStateImpl cancelled) {
+    public UserTaskStates(InitializingActivityWithBoundaryEventsState initializingActivityWithBoundary,
+            ReadyActivityState ready,
+            AbortingBoundaryEventsOnCompletingActivityState abortingBoundaryEventsOnCompletingActivityState,
+            AbortingSubTaskState abortingSubTaskState,
+            CompletedActivityState completed,
+            AbortingActivityWithBoundaryState abortingActivityWithBoundary,
+            @Qualifier("abortingFlowNodeContainerState") AbortingFlowNodeContainerState abortingContainer,
+            AbortedFlowNodeState aborted,
+            @Qualifier("cancellingActivityWithBoundaryState") CancellingActivityWithBoundaryState cancellingActivityWithBoundary,
+            CancellingFlowNodeContainerChildrenState cancellingContainer,
+            CancelledFlowNodeState cancelled) {
 
         defineNormalTransitionForFlowNode(initializingActivityWithBoundary, ready,
                 abortingBoundaryEventsOnCompletingActivityState, abortingSubTaskState, completed);

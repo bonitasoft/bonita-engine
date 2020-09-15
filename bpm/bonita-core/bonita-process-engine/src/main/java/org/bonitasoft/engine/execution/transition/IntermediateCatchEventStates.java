@@ -14,14 +14,14 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingBoundaryAndIntermediateCatchEventStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingBoundaryAndIntermediateCatchEventStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ExecutingFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.InitializingActivityStateImpl;
-import org.bonitasoft.engine.execution.state.WaitingFlowNodeStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingBoundaryAndIntermediateCatchEventState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingBoundaryAndIntermediateCatchEventState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.ExecutingFlowNodeState;
+import org.bonitasoft.engine.execution.state.InitializingActivityState;
+import org.bonitasoft.engine.execution.state.WaitingFlowNodeState;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,12 +31,12 @@ public class IntermediateCatchEventStates extends FlowNodeStatesAndTransitions {
         return SFlowNodeType.INTERMEDIATE_CATCH_EVENT;
     }
 
-    public IntermediateCatchEventStates(CompletedActivityStateImpl completed, AbortedFlowNodeStateImpl aborted,
-            CancelledFlowNodeStateImpl cancelled,
-            CancellingBoundaryAndIntermediateCatchEventStateImpl cancelingBoundaryAndIntermediateCatchEvent,
-            ExecutingFlowNodeStateImpl executing, InitializingActivityStateImpl initializing,
-            WaitingFlowNodeStateImpl waiting,
-            AbortingBoundaryAndIntermediateCatchEventStateImpl abortingBoundaryAndIntermediateCatchEvent) {
+    public IntermediateCatchEventStates(CompletedActivityState completed, AbortedFlowNodeState aborted,
+            CancelledFlowNodeState cancelled,
+            CancellingBoundaryAndIntermediateCatchEventState cancelingBoundaryAndIntermediateCatchEvent,
+            ExecutingFlowNodeState executing, InitializingActivityState initializing,
+            WaitingFlowNodeState waiting,
+            AbortingBoundaryAndIntermediateCatchEventState abortingBoundaryAndIntermediateCatchEvent) {
 
         defineNormalTransitionForFlowNode(initializing, waiting, executing, completed);
         defineAbortTransitionForFlowNode(abortingBoundaryAndIntermediateCatchEvent, aborted);
