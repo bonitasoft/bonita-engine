@@ -200,13 +200,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             LOG.debug("No work to register on state {} for flowNode {}", nextState, flowNodeInstance);
             return;
         }
-        if (nextState.isInterrupting()) {
-            LOG.debug("No work to register on state {} for flowNode {}, should never be there!!!!", nextState,
-                    flowNodeInstance);
-            return;
-            // Only used by InterruptedFlowNodeState that is never used
-            //TODO remove me
-        }
         if (!nextState.isStable()) {
             registerExecuteFlowNodeWork(flowNodeInstance);
             return;

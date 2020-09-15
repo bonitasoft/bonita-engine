@@ -64,11 +64,6 @@ public abstract class EndingActivityWithBoundaryStateImpl implements FlowNodeSta
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return false;
     }

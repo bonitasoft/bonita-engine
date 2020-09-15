@@ -60,11 +60,6 @@ public class ReadyActivityStateImpl extends OnEnterAndFinishConnectorState {
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return true;
     }

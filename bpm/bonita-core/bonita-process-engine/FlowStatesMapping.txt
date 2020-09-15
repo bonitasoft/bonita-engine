@@ -49,8 +49,6 @@ ACTIVITY (some constants are defined in the State interface)
 38 AbortingReceiveTaskStateImpl
 39 CancellingReceiveTaskStateImpl
 
-45 InterruptedFlowNodeState
-
 60 AbortingBoundaryAndIntermediateCatchEventStateImpl
 61 InitializingAndExecutingFlowNodeStateImpl
 65 ExecutingBoundaryEventStateImpl

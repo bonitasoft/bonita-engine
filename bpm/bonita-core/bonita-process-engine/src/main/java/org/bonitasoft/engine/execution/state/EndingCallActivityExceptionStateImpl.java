@@ -101,11 +101,6 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return true;
     }

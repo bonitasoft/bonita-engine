@@ -126,20 +126,10 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     public FlowNodeState getNextState(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance, final int currentStateId)
             throws SActivityExecutionException {
-        FlowNodeState currentState = getCurrentNonInterruptingState(flowNodeInstance, currentStateId);
+        FlowNodeState currentState = getState(currentStateId);
         do {
             currentState = getNextStateToHandle(flowNodeInstance, currentState);
         } while (!currentState.shouldExecuteState(processDefinition, flowNodeInstance));
-        return currentState;
-    }
-
-    private FlowNodeState getCurrentNonInterruptingState(final SFlowNodeInstance flowNodeInstance,
-            final int currentStateId) {
-        final FlowNodeState currentState = getState(currentStateId);
-        if (currentState.isInterrupting()) {
-            final int previousStateId = flowNodeInstance.getPreviousStateId();
-            return allStates.get(previousStateId);
-        }
         return currentState;
     }
 

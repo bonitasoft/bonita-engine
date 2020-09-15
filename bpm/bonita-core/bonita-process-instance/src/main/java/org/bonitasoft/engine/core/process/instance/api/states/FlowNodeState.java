@@ -80,11 +80,6 @@ public interface FlowNodeState {
     String getName();
 
     /**
-     * @return true if the state is an interrupting state
-     */
-    boolean isInterrupting();
-
-    /**
      * @return true if the state is stable
      *         a final state is stable
      */

@@ -41,11 +41,6 @@ public class CompletingActivityStateImpl extends OnFinishConnectorState {
     }
 
     @Override
-    public boolean isInterrupting() {
-        return false;
-    }
-
-    @Override
     public boolean isStable() {
         return false;
     }
