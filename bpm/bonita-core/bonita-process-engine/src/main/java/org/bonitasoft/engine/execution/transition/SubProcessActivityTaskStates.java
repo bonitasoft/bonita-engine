@@ -14,12 +14,12 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingCallActivityStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingCallActivityStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ExecutingCallActivityStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingCallActivityState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingCallActivityState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.ExecutingCallActivityState;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,12 +29,12 @@ public class SubProcessActivityTaskStates extends FlowNodeStatesAndTransitions {
         return SFlowNodeType.SUB_PROCESS;
     }
 
-    public SubProcessActivityTaskStates(CompletedActivityStateImpl completed,
-            AbortedFlowNodeStateImpl aborted,
-            CancelledFlowNodeStateImpl cancelled,
-            ExecutingCallActivityStateImpl executingCallActivity,
-            AbortingCallActivityStateImpl abortingCallActivity,
-            CancellingCallActivityStateImpl cancellingCallActivity) {
+    public SubProcessActivityTaskStates(CompletedActivityState completed,
+            AbortedFlowNodeState aborted,
+            CancelledFlowNodeState cancelled,
+            ExecutingCallActivityState executingCallActivity,
+            AbortingCallActivityState abortingCallActivity,
+            CancellingCallActivityState cancellingCallActivity) {
 
         defineNormalTransitionForFlowNode(executingCallActivity, completed);
         defineAbortTransitionForFlowNode(abortingCallActivity, aborted);

@@ -48,7 +48,7 @@ import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.state.InitializingActivityStateImpl;
+import org.bonitasoft.engine.execution.state.InitializingActivityState;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.junit.Before;
@@ -143,7 +143,7 @@ public class BPMInstancesCreatorTest {
     @Test
     public void createManualTaskInstanceShouldSetReachedStateDateAndLastUpdateDate() throws Exception {
         doReturn(mock(SManualTaskInstance.class)).when(activityInstanceService).getFlowNodeInstance(anyLong());
-        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager)
+        doReturn(new InitializingActivityState(null)).when(flowNodeStateManager)
                 .getFirstState(SFlowNodeType.MANUAL_TASK);
 
         final SManualTaskInstance manualTaskInstance = bpmInstancesCreator.createManualTaskInstance(2345L, "task",
@@ -156,7 +156,7 @@ public class BPMInstancesCreatorTest {
 
     @Test
     public void createFlownodeInstanceShouldSetReachedStateDateAndLastUpdateDate() throws Exception {
-        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager)
+        doReturn(new InitializingActivityState(null)).when(flowNodeStateManager)
                 .getFirstState(SFlowNodeType.GATEWAY);
 
         final SGatewayInstance gatewayInstance = (SGatewayInstance) bpmInstancesCreator.createFlowNodeInstance(2345L,
@@ -172,7 +172,7 @@ public class BPMInstancesCreatorTest {
     @Test
     public void create_user_task_should_not_evaluate_setExpectedEndDate_expression() throws Exception {
         //given
-        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager)
+        doReturn(new InitializingActivityState(null)).when(flowNodeStateManager)
                 .getFirstState(SFlowNodeType.USER_TASK);
         doReturn(USER_TASK).when(sHumanTaskDefinition).getType();
         doReturn("actor").when(sHumanTaskDefinition).getActorName();

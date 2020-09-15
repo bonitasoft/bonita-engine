@@ -29,11 +29,11 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.StateBehaviors;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.FailedActivityStateImpl;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.FailedActivityState;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.state.InitializingActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ReadyActivityStateImpl;
+import org.bonitasoft.engine.execution.state.InitializingActivityState;
+import org.bonitasoft.engine.execution.state.ReadyActivityState;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,9 +87,9 @@ public class FlowNodeRetrierTest {
         //given
         given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
 
-        given(flowNodeStateManager.getState(STATE_ID)).willReturn(new FailedActivityStateImpl());
+        given(flowNodeStateManager.getState(STATE_ID)).willReturn(new FailedActivityState());
         given(flowNodeStateManager.getState(PREVIOUS_STATE_ID))
-                .willReturn(new InitializingActivityStateImpl(mock(StateBehaviors.class)));
+                .willReturn(new InitializingActivityState(mock(StateBehaviors.class)));
 
         //when
         retrier.retry(FLOW_NODE_INSTANCE_ID);
@@ -105,8 +105,8 @@ public class FlowNodeRetrierTest {
         //given
         given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
 
-        given(flowNodeStateManager.getState(STATE_ID)).willReturn(new FailedActivityStateImpl());
-        given(flowNodeStateManager.getState(PREVIOUS_STATE_ID)).willReturn(new CompletedActivityStateImpl());
+        given(flowNodeStateManager.getState(STATE_ID)).willReturn(new FailedActivityState());
+        given(flowNodeStateManager.getState(PREVIOUS_STATE_ID)).willReturn(new CompletedActivityState());
 
         //when
         retrier.retry(FLOW_NODE_INSTANCE_ID);
@@ -147,7 +147,7 @@ public class FlowNodeRetrierTest {
         //given
         given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
         given(flowNodeStateManager.getState(STATE_ID))
-                .willReturn(new ReadyActivityStateImpl(mock(StateBehaviors.class)));
+                .willReturn(new ReadyActivityState(mock(StateBehaviors.class)));
 
         try {
             //when

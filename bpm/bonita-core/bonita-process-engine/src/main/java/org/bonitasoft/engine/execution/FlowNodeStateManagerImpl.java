@@ -112,9 +112,9 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         while (stateIndex < states.length - 1) {
             // key = current state id , value = nextState (Full Object). Eg. for a human task:
             // [
-            //   0 (Initializing id) -> ReadyActivityStateImpl
-            //   4 (Ready id) -> ExecutingFlowNodeStateImpl
-            //   1 (Executing id) -> CompletedActivityStateImpl (terminal state)
+            //   0 (Initializing id) -> ReadyActivityState
+            //   4 (Ready id) -> ExecutingFlowNodeState
+            //   1 (Executing id) -> CompletedActivityState (terminal state)
             // ]
             currentStateIdToNextState.put(states[stateIndex].getId(), states[stateIndex + 1]);
             stateIndex++;

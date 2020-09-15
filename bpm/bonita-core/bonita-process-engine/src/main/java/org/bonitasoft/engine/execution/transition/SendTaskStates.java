@@ -14,15 +14,15 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingReceiveTaskStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingReceiveTaskStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ExecutingAutomaticActivityStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityState;
+import org.bonitasoft.engine.execution.state.AbortingReceiveTaskState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.CancellingReceiveTaskState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.ExecutingAutomaticActivityState;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -34,15 +34,15 @@ public class SendTaskStates extends FlowNodeStatesAndTransitions {
     }
 
     public SendTaskStates(
-            AbortingBoundaryEventsOnCompletingActivityStateImpl abortingBoundaryEventsOnCompletingActivityState,
-            CompletedActivityStateImpl completed,
-            AbortingActivityWithBoundaryStateImpl abortingActivityWithBoundary,
-            AbortedFlowNodeStateImpl aborted,
-            @Qualifier("cancellingActivityWithBoundaryStateImpl") CancellingActivityWithBoundaryStateImpl cancellingActivityWithBoundary,
-            CancelledFlowNodeStateImpl cancelled,
-            ExecutingAutomaticActivityStateImpl executingAutomaticActivity,
-            @Qualifier("cancellingReceiveTaskStateImpl") CancellingReceiveTaskStateImpl cancellingReceiveTask,
-            AbortingReceiveTaskStateImpl abortingReceiveTask) {
+            AbortingBoundaryEventsOnCompletingActivityState abortingBoundaryEventsOnCompletingActivityState,
+            CompletedActivityState completed,
+            AbortingActivityWithBoundaryState abortingActivityWithBoundary,
+            AbortedFlowNodeState aborted,
+            @Qualifier("cancellingActivityWithBoundaryState") CancellingActivityWithBoundaryState cancellingActivityWithBoundary,
+            CancelledFlowNodeState cancelled,
+            ExecutingAutomaticActivityState executingAutomaticActivity,
+            @Qualifier("cancellingReceiveTaskState") CancellingReceiveTaskState cancellingReceiveTask,
+            AbortingReceiveTaskState abortingReceiveTask) {
 
         defineNormalTransitionForFlowNode(executingAutomaticActivity, abortingBoundaryEventsOnCompletingActivityState,
                 completed);

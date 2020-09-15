@@ -37,7 +37,7 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.state.FailedActivityStateImpl;
+import org.bonitasoft.engine.execution.state.FailedActivityState;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
@@ -102,7 +102,7 @@ public class ExecuteProcessesTest {
     public void should_not_execute_a_process_called_by_a_failed_call_activity() throws Exception {
         havingCallActivity(FlowNodeState.ID_ACTIVITY_FAILED, CALLER_ID);
         havingProcessInstance(COMPLETED, CALLER_ID);
-        when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityStateImpl());
+        when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityState());
 
         executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
 
@@ -114,7 +114,7 @@ public class ExecuteProcessesTest {
     public void should_execute_process_called_by_a_call_activity() throws Exception {
         havingCallActivity(FlowNodeState.ID_ACTIVITY_EXECUTING, CALLER_ID);
         havingProcessInstance(COMPLETED, CALLER_ID);
-        when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityStateImpl());
+        when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityState());
 
         executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
 

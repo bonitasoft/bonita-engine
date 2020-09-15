@@ -20,10 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.ExecutingAutomaticActivityStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.ExecutingAutomaticActivityState;
 import org.bonitasoft.engine.execution.transition.FlowNodeStatesAndTransitions;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,13 +34,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeStateManagerImplTest {
 
-    private static final ExecutingAutomaticActivityStateImpl executingAutomaticActivityState = new ExecutingAutomaticActivityStateImpl(
+    private static final ExecutingAutomaticActivityState executingAutomaticActivityState = new ExecutingAutomaticActivityState(
             null);
-    private static final AbortingActivityWithBoundaryStateImpl abortingActivityWithBoundaryState = new AbortingActivityWithBoundaryStateImpl(
+    private static final AbortingActivityWithBoundaryState abortingActivityWithBoundaryState = new AbortingActivityWithBoundaryState(
             null);
-    private static final CancellingActivityWithBoundaryStateImpl cancellingActivityWithBoundaryState = new CancellingActivityWithBoundaryStateImpl(
+    private static final CancellingActivityWithBoundaryState cancellingActivityWithBoundaryState = new CancellingActivityWithBoundaryState(
             null);
-    private static final AbortedFlowNodeStateImpl abortedFlowNodeState = new AbortedFlowNodeStateImpl();;
+    private static final AbortedFlowNodeState abortedFlowNodeState = new AbortedFlowNodeState();;
     private FlowNodeStateManagerImpl stateManager;
 
     @Mock
@@ -55,11 +55,11 @@ public class FlowNodeStateManagerImplTest {
     }
 
     @Test
-    public void getFirstState_for_sub_process_should_return_ExecutingAutomaticActivityStateImpl() throws Exception {
+    public void getFirstState_for_sub_process_should_return_ExecutingAutomaticActivityState() throws Exception {
         //when
         FlowNodeState firstState = stateManager.getFirstState(SFlowNodeType.AUTOMATIC_TASK);
         //then
-        assertThat(firstState).isInstanceOf(ExecutingAutomaticActivityStateImpl.class);
+        assertThat(firstState).isInstanceOf(ExecutingAutomaticActivityState.class);
     }
 
     static class TestState extends FlowNodeStatesAndTransitions {

@@ -25,7 +25,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
+import org.bonitasoft.engine.execution.state.SkippedFlowNodeState;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
@@ -66,15 +66,15 @@ public class FlowNodeExecutorImplTest {
     @Captor
     private ArgumentCaptor<WorkDescriptor> workDescriptorArgumentCaptor;
     private FlowNodeExecutorImpl flowNodeExecutor;
-    private SkippedFlowNodeStateImpl skippedFlowNodeState;
+    private SkippedFlowNodeState skippedFlowNodeState;
 
     @Before
     public void before() throws Exception {
         flowNodeExecutor = new FlowNodeExecutorImpl(flowNodeStateManager, activityInstanceService,
                 containerRegistry, processDefinitionService, null, null, workService, workFactory,
                 processInstanceInterruptor, bpmArchiverService);
-        skippedFlowNodeState = new SkippedFlowNodeStateImpl();
-        doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeStateImpl.ID);
+        skippedFlowNodeState = new SkippedFlowNodeState();
+        doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeState.ID);
         doReturn(stateBehaviors).when(flowNodeStateManager).getStateBehaviors();
     }
 
@@ -83,7 +83,7 @@ public class FlowNodeExecutorImplTest {
         SUserTaskInstance flowNodeInstance = aTask(1L, true);
         flowNodeInstance.setTokenCount(2);
 
-        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
+        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeState.ID);
 
         verify(processInstanceInterruptor).interruptChildrenOfFlowNodeInstance(flowNodeInstance, ABORTING);
     }
@@ -92,7 +92,7 @@ public class FlowNodeExecutorImplTest {
     public void should_interrupt_boundary_when_setting_activity_to_a_terminal_state() throws Exception {
         SUserTaskInstance sUserTaskInstance = aTask(1L, true);
 
-        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
+        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeState.ID);
 
         verify(stateBehaviors).interruptAttachedBoundaryEvent(any(), eq(sUserTaskInstance), eq(ABORTING));
     }
@@ -102,7 +102,7 @@ public class FlowNodeExecutorImplTest {
             throws Exception {
         aTask(1L, true);
 
-        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
+        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeState.ID);
 
         verify(workService).registerWork(workDescriptorArgumentCaptor.capture());
         assertThat(workDescriptorArgumentCaptor.getValue().getType())
@@ -113,7 +113,7 @@ public class FlowNodeExecutorImplTest {
     public void should_set_the_state_on_the_activity() throws Exception {
         SUserTaskInstance aTask = aTask(1L, true);
 
-        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
+        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeState.ID);
 
         verify(activityInstanceService).setState(aTask, skippedFlowNodeState);
     }

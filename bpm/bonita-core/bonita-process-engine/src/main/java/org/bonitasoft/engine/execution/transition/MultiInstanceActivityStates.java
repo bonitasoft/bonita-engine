@@ -14,16 +14,16 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingFlowNodeContainerStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingFlowNodeContainerChildrenStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ExecutingMultiInstanceActivityStateImpl;
-import org.bonitasoft.engine.execution.state.InitializingMultiInstanceActivityStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityState;
+import org.bonitasoft.engine.execution.state.AbortingFlowNodeContainerState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.CancellingFlowNodeContainerChildrenState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.ExecutingMultiInstanceActivityState;
+import org.bonitasoft.engine.execution.state.InitializingMultiInstanceActivityState;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -35,16 +35,16 @@ public class MultiInstanceActivityStates extends FlowNodeStatesAndTransitions {
     }
 
     public MultiInstanceActivityStates(
-            AbortingBoundaryEventsOnCompletingActivityStateImpl abortingBoundaryEventsOnCompletingActivityState,
-            CompletedActivityStateImpl completed,
-            AbortingActivityWithBoundaryStateImpl abortingActivityWithBoundary,
-            AbortedFlowNodeStateImpl aborted,
-            @Qualifier("cancellingActivityWithBoundaryStateImpl") CancellingActivityWithBoundaryStateImpl cancellingActivityWithBoundary,
-            CancelledFlowNodeStateImpl cancelled,
-            CancellingFlowNodeContainerChildrenStateImpl cancellingContainer,
-            @Qualifier("abortingFlowNodeContainerStateImpl") AbortingFlowNodeContainerStateImpl abortingContainer,
-            InitializingMultiInstanceActivityStateImpl initializingMultiInstance,
-            ExecutingMultiInstanceActivityStateImpl executingMultiInstance) {
+            AbortingBoundaryEventsOnCompletingActivityState abortingBoundaryEventsOnCompletingActivityState,
+            CompletedActivityState completed,
+            AbortingActivityWithBoundaryState abortingActivityWithBoundary,
+            AbortedFlowNodeState aborted,
+            @Qualifier("cancellingActivityWithBoundaryState") CancellingActivityWithBoundaryState cancellingActivityWithBoundary,
+            CancelledFlowNodeState cancelled,
+            CancellingFlowNodeContainerChildrenState cancellingContainer,
+            @Qualifier("abortingFlowNodeContainerState") AbortingFlowNodeContainerState abortingContainer,
+            InitializingMultiInstanceActivityState initializingMultiInstance,
+            ExecutingMultiInstanceActivityState executingMultiInstance) {
 
         defineNormalTransitionForFlowNode(initializingMultiInstance, executingMultiInstance,
                 abortingBoundaryEventsOnCompletingActivityState, completed);

@@ -14,14 +14,14 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingFlowNodeContainerStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingSubTaskStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingFlowNodeContainerChildrenStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.InitializingActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ReadyActivityStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingFlowNodeContainerState;
+import org.bonitasoft.engine.execution.state.AbortingSubTaskState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingFlowNodeContainerChildrenState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.InitializingActivityState;
+import org.bonitasoft.engine.execution.state.ReadyActivityState;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -32,14 +32,14 @@ public class ManualTaskStates extends FlowNodeStatesAndTransitions {
         return SFlowNodeType.MANUAL_TASK;
     }
 
-    public ManualTaskStates(InitializingActivityStateImpl initializing,
-            ReadyActivityStateImpl ready,
-            AbortingSubTaskStateImpl abortingSubTaskState,
-            CompletedActivityStateImpl completed,
-            @Qualifier("abortingFlowNodeContainerStateImpl") AbortingFlowNodeContainerStateImpl abortingContainer,
-            AbortedFlowNodeStateImpl aborted,
-            CancellingFlowNodeContainerChildrenStateImpl cancellingContainer,
-            CancelledFlowNodeStateImpl cancelled) {
+    public ManualTaskStates(InitializingActivityState initializing,
+            ReadyActivityState ready,
+            AbortingSubTaskState abortingSubTaskState,
+            CompletedActivityState completed,
+            @Qualifier("abortingFlowNodeContainerState") AbortingFlowNodeContainerState abortingContainer,
+            AbortedFlowNodeState aborted,
+            CancellingFlowNodeContainerChildrenState cancellingContainer,
+            CancelledFlowNodeState cancelled) {
 
         defineNormalTransitionForFlowNode(initializing, ready, abortingSubTaskState, completed);
         defineAbortTransitionForFlowNode(abortingContainer, aborted);

@@ -14,17 +14,17 @@
 package org.bonitasoft.engine.execution.transition;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.execution.state.AbortedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityStateImpl;
-import org.bonitasoft.engine.execution.state.AbortingCallActivityStateImpl;
-import org.bonitasoft.engine.execution.state.CancelledFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryStateImpl;
-import org.bonitasoft.engine.execution.state.CancellingCallActivityStateImpl;
-import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
-import org.bonitasoft.engine.execution.state.CompletingCallActivityStateImpl;
-import org.bonitasoft.engine.execution.state.ExecutingCallActivityStateImpl;
-import org.bonitasoft.engine.execution.state.InitializingActivityWithBoundaryEventsStateImpl;
+import org.bonitasoft.engine.execution.state.AbortedFlowNodeState;
+import org.bonitasoft.engine.execution.state.AbortingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.AbortingBoundaryEventsOnCompletingActivityState;
+import org.bonitasoft.engine.execution.state.AbortingCallActivityState;
+import org.bonitasoft.engine.execution.state.CancelledFlowNodeState;
+import org.bonitasoft.engine.execution.state.CancellingActivityWithBoundaryState;
+import org.bonitasoft.engine.execution.state.CancellingCallActivityState;
+import org.bonitasoft.engine.execution.state.CompletedActivityState;
+import org.bonitasoft.engine.execution.state.CompletingCallActivityState;
+import org.bonitasoft.engine.execution.state.ExecutingCallActivityState;
+import org.bonitasoft.engine.execution.state.InitializingActivityWithBoundaryEventsState;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -35,17 +35,17 @@ public class CallActivityTaskStates extends FlowNodeStatesAndTransitions {
         return SFlowNodeType.CALL_ACTIVITY;
     }
 
-    public CallActivityTaskStates(InitializingActivityWithBoundaryEventsStateImpl initializingActivityWithBoundary,
-            AbortingBoundaryEventsOnCompletingActivityStateImpl abortingBoundaryEventsOnCompletingActivityState,
-            CompletedActivityStateImpl completed,
-            AbortingActivityWithBoundaryStateImpl abortingActivityWithBoundary,
-            AbortedFlowNodeStateImpl aborted,
-            @Qualifier("cancellingActivityWithBoundaryStateImpl") CancellingActivityWithBoundaryStateImpl cancellingActivityWithBoundary,
-            CancelledFlowNodeStateImpl cancelled,
-            ExecutingCallActivityStateImpl executingCallActivity,
-            CompletingCallActivityStateImpl completingCallActivity,
-            AbortingCallActivityStateImpl abortingCallActivity,
-            CancellingCallActivityStateImpl cancellingCallActivity) {
+    public CallActivityTaskStates(InitializingActivityWithBoundaryEventsState initializingActivityWithBoundary,
+            AbortingBoundaryEventsOnCompletingActivityState abortingBoundaryEventsOnCompletingActivityState,
+            CompletedActivityState completed,
+            AbortingActivityWithBoundaryState abortingActivityWithBoundary,
+            AbortedFlowNodeState aborted,
+            @Qualifier("cancellingActivityWithBoundaryState") CancellingActivityWithBoundaryState cancellingActivityWithBoundary,
+            CancelledFlowNodeState cancelled,
+            ExecutingCallActivityState executingCallActivity,
+            CompletingCallActivityState completingCallActivity,
+            AbortingCallActivityState abortingCallActivity,
+            CancellingCallActivityState cancellingCallActivity) {
 
         defineNormalTransitionForFlowNode(initializingActivityWithBoundary, executingCallActivity,
                 abortingBoundaryEventsOnCompletingActivityState, completingCallActivity, completed);
