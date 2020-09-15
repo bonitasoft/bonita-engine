@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoopActivityStates extends FlowNodeStatesAndTransitions {
+public class LoopActivityStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.LOOP_ACTIVITY;
@@ -46,9 +46,9 @@ public class LoopActivityStates extends FlowNodeStatesAndTransitions {
             InitializingLoopActivityState initializingLoop,
             ExecutingLoopActivityState executingLoop) {
 
-        defineNormalTransitionForFlowNode(initializingLoop, executingLoop,
+        defineNormalSequence(initializingLoop, executingLoop,
                 abortingBoundaryEventsOnCompletingActivityState, completed);
-        defineAbortTransitionForFlowNode(abortingActivityWithBoundary, abortingContainer, aborted);
-        defineCancelTransitionForFlowNode(cancellingActivityWithBoundary, cancellingContainer, cancelled);
+        defineAbortSequence(abortingActivityWithBoundary, abortingContainer, aborted);
+        defineCancelSequence(cancellingActivityWithBoundary, cancellingContainer, cancelled);
     }
 }

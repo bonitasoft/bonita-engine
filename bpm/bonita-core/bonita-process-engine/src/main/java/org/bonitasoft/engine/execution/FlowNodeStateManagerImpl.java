@@ -13,21 +13,22 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.NORMAL;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.transition.FlowNodeStatesAndTransitions;
+import org.bonitasoft.engine.execution.transition.FlowNodeStateSequences;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,41 +43,20 @@ import org.springframework.stereotype.Component;
 @Component("flowNodeStateManager")
 public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
-    protected static final int FIRST_STATE_KEY = -1;
-
-    protected final Map<Integer, FlowNodeState> allStates = new HashMap<>();
-    protected final Map<SFlowNodeType, Map<Integer, FlowNodeState>> normalFlowNodeStatesAndTransitions = new HashMap<>();
-    protected final Map<SFlowNodeType, Map<Integer, FlowNodeState>> abortFlowNodeStatesAndTransitions = new HashMap<>();
-    protected final Map<SFlowNodeType, Map<Integer, FlowNodeState>> cancelFlowNodeStatesAndTransitions = new HashMap<>();
-
+    protected final Map<Integer, FlowNodeState> allStates;
     protected StateBehaviors stateBehaviors;
-    private final List<FlowNodeStatesAndTransitions> flowNodeStatesAndTransitions;
-
-    protected final Set<Integer> unstableStates = new HashSet<>();
-    protected final Set<Integer> stableStates = new HashSet<>();
+    private final Map<SFlowNodeType, FlowNodeStateSequences> flowNodeStateSequences;
 
     public FlowNodeStateManagerImpl(
             BPMInstancesCreator bpmInstancesCreator,
             StateBehaviors stateBehaviors,
-            List<FlowNodeStatesAndTransitions> flowNodeStatesAndTransitions,
+            List<FlowNodeStateSequences> flowNodeStateSequences,
             List<FlowNodeState> allStates) {
         this.stateBehaviors = stateBehaviors;
-        this.flowNodeStatesAndTransitions = flowNodeStatesAndTransitions;
+        this.flowNodeStateSequences = flowNodeStateSequences.stream()
+                .collect(Collectors.toMap(FlowNodeStateSequences::getFlowNodeType, e -> e));
+        this.allStates = allStates.stream().collect(Collectors.toMap(FlowNodeState::getId, s -> s));
         bpmInstancesCreator.setStateManager(this);
-        storeAllStates(allStates);
-        defineTransitionsForAllNodesType();
-    }
-
-    private void storeAllStates(List<FlowNodeState> states) {
-        for (FlowNodeState state : states) {
-            final int stateId = state.getId();
-            if (state.isStable()) {
-                stableStates.add(stateId);
-            } else {
-                unstableStates.add(stateId);
-            }
-            allStates.put(stateId, state);
-        }
     }
 
     @Override
@@ -87,39 +67,6 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     @Override
     public StateBehaviors getStateBehaviors() {
         return stateBehaviors;
-    }
-
-    private void defineTransitionsForAllNodesType() {
-        for (FlowNodeStatesAndTransitions flowNodeStatesAndTransition : flowNodeStatesAndTransitions) {
-            defineTransitionsForFlowNode(flowNodeStatesAndTransition.getFlowNodeType(),
-                    normalFlowNodeStatesAndTransitions,
-                    flowNodeStatesAndTransition.getNormalTransition());
-            defineTransitionsForFlowNode(flowNodeStatesAndTransition.getFlowNodeType(),
-                    cancelFlowNodeStatesAndTransitions,
-                    flowNodeStatesAndTransition.getCancelTransitionForFlowNode());
-            defineTransitionsForFlowNode(flowNodeStatesAndTransition.getFlowNodeType(),
-                    abortFlowNodeStatesAndTransitions,
-                    flowNodeStatesAndTransition.getAbortTransitionForFlowNode());
-        }
-    }
-
-    private void defineTransitionsForFlowNode(final SFlowNodeType flowNodeType,
-            final Map<SFlowNodeType, Map<Integer, FlowNodeState>> transitions,
-            final FlowNodeState... states) {
-        final Map<Integer, FlowNodeState> currentStateIdToNextState = new HashMap<>();
-        int stateIndex = 0;
-        currentStateIdToNextState.put(FIRST_STATE_KEY, states[0]);
-        while (stateIndex < states.length - 1) {
-            // key = current state id , value = nextState (Full Object). Eg. for a human task:
-            // [
-            //   0 (Initializing id) -> ReadyActivityState
-            //   4 (Ready id) -> ExecutingFlowNodeState
-            //   1 (Executing id) -> CompletedActivityState (terminal state)
-            // ]
-            currentStateIdToNextState.put(states[stateIndex].getId(), states[stateIndex + 1]);
-            stateIndex++;
-        }
-        transitions.put(flowNodeType, currentStateIdToNextState);
     }
 
     @Override
@@ -134,36 +81,23 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     private FlowNodeState getNextStateToHandle(final SFlowNodeInstance flowNodeInstance,
-            final FlowNodeState flowNodeStateToExecute) throws SActivityExecutionException {
-        FlowNodeState nextStateToHandle;
-        switch (flowNodeInstance.getStateCategory()) {
-            case ABORTING:
-                final ExceptionalStateTransitionsManager abortStateTransitionsManager = new ExceptionalStateTransitionsManager(
-                        abortFlowNodeStatesAndTransitions.get(flowNodeInstance.getType()), flowNodeInstance);
-                nextStateToHandle = abortStateTransitionsManager.getNextState(flowNodeStateToExecute);
-                break;
-
-            case CANCELLING:
-                final ExceptionalStateTransitionsManager cancelStateTransitionsManager = new ExceptionalStateTransitionsManager(
-                        cancelFlowNodeStatesAndTransitions.get(flowNodeInstance.getType()), flowNodeInstance);
-                nextStateToHandle = cancelStateTransitionsManager.getNextState(flowNodeStateToExecute);
-                break;
-
-            default:
-                final NormalStateTransitionsManager normalStateTransitionsManager = new NormalStateTransitionsManager(
-                        normalFlowNodeStatesAndTransitions.get(flowNodeInstance
-                                .getType()),
-                        flowNodeInstance);
-                nextStateToHandle = normalStateTransitionsManager.getNextState(flowNodeStateToExecute);
-                break;
+            final FlowNodeState currentState) throws SActivityExecutionException {
+        FlowNodeStateSequences stateSequence = this.flowNodeStateSequences.get(flowNodeInstance.getType());
+        SStateCategory stateCategory = flowNodeInstance.getStateCategory();
+        if (currentState.getStateCategory() != stateCategory) {
+            // the state category changed (flow node was aborted or cancelled), get the first state of the corresponding state category
+            return stateSequence.getFirstState(stateCategory);
+        } else {
+            FlowNodeState nextState = stateSequence.getStateAfter(stateCategory, currentState.getId());
+            if (nextState == null) {
+                throw new SActivityExecutionException(
+                        "no state found after " + allStates.get(currentState.getId()).getClass() + " for "
+                                + flowNodeInstance.getClass() + " in state category "
+                                + flowNodeInstance.getStateCategory()
+                                + " activity id=" + flowNodeInstance.getId());
+            }
+            return nextState;
         }
-        if (nextStateToHandle == null) {
-            throw new SActivityExecutionException(
-                    "no state found after " + allStates.get(flowNodeStateToExecute.getId()).getClass() + " for "
-                            + flowNodeInstance.getClass() + " in state category " + flowNodeInstance.getStateCategory()
-                            + " activity id=" + flowNodeInstance.getId());
-        }
-        return nextStateToHandle;
     }
 
     @Override
@@ -172,18 +106,12 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     @Override
-    public Set<String> getSupportedState(final FlowNodeType nodeType) {
-        final SFlowNodeType type = SFlowNodeType.valueOf(nodeType.toString());
-        final Map<Integer, FlowNodeState> states = normalFlowNodeStatesAndTransitions.get(type);
-        final Set<String> stateNames = new HashSet<>();
-        for (final FlowNodeState state : states.values()) {
-            stateNames.add(state.getName());
-        }
-        return stateNames;
+    public Set<String> getSupportedState(final SFlowNodeType nodeType) {
+        return flowNodeStateSequences.get(nodeType).getSupportedStates();
     }
 
     public FlowNodeState getFirstState(SFlowNodeType nodeType) {
-        return normalFlowNodeStatesAndTransitions.get(nodeType).get(FIRST_STATE_KEY);
+        return flowNodeStateSequences.get(nodeType).getFirstState(NORMAL);
     }
 
 }

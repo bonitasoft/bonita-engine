@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EndEventStates extends FlowNodeStatesAndTransitions {
+public class EndEventStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.END_EVENT;
@@ -38,8 +38,8 @@ public class EndEventStates extends FlowNodeStatesAndTransitions {
             CancellingFlowNodeState cancellingFlowNode,
             ExecutingThrowEventState executingThrowEvent) {
 
-        defineNormalTransitionForFlowNode(executingThrowEvent, completed);
-        defineAbortTransitionForFlowNode(abortingFlowNode, aborted);
-        defineCancelTransitionForFlowNode(cancellingFlowNode, cancelled);
+        defineNormalSequence(executingThrowEvent, completed);
+        defineAbortSequence(abortingFlowNode, aborted);
+        defineCancelSequence(cancellingFlowNode, cancelled);
     }
 }

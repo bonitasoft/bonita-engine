@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AutomaticTaskStates extends FlowNodeStatesAndTransitions {
+public class AutomaticTaskStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.AUTOMATIC_TASK;
@@ -44,10 +44,10 @@ public class AutomaticTaskStates extends FlowNodeStatesAndTransitions {
             CancellingFlowNodeContainerChildrenState cancellingContainer,
             @Qualifier("abortingFlowNodeContainerState") AbortingFlowNodeContainerState abortingContainer) {
 
-        defineNormalTransitionForFlowNode(executingAutomaticActivity, abortingBoundaryEventsOnCompletingActivityState,
+        defineNormalSequence(executingAutomaticActivity, abortingBoundaryEventsOnCompletingActivityState,
                 completed);
-        defineAbortTransitionForFlowNode(abortingActivityWithBoundary, abortingContainer, aborted);
-        defineCancelTransitionForFlowNode(cancellingActivityWithBoundary, cancellingContainer, cancelled);
+        defineAbortSequence(abortingActivityWithBoundary, abortingContainer, aborted);
+        defineCancelSequence(cancellingActivityWithBoundary, cancellingContainer, cancelled);
     }
 
 }

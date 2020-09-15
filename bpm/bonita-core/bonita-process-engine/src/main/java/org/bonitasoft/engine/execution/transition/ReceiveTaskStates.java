@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReceiveTaskStates extends FlowNodeStatesAndTransitions {
+public class ReceiveTaskStates extends FlowNodeStateSequences {
 
     public SFlowNodeType getFlowNodeType() {
         return SFlowNodeType.RECEIVE_TASK;
@@ -47,9 +47,9 @@ public class ReceiveTaskStates extends FlowNodeStatesAndTransitions {
             CancelledFlowNodeState cancelled,
             WaitingFlowNodeState waiting) {
 
-        defineNormalTransitionForFlowNode(initializingActivityWithBoundary, waiting, executing,
+        defineNormalSequence(initializingActivityWithBoundary, waiting, executing,
                 abortingBoundaryEventsOnCompletingActivityState, completed);
-        defineAbortTransitionForFlowNode(abortingActivityWithBoundary, abortingReceiveTask, aborted);
-        defineCancelTransitionForFlowNode(cancellingActivityWithBoundary, cancellingReceiveTask, cancelled);
+        defineAbortSequence(abortingActivityWithBoundary, abortingReceiveTask, aborted);
+        defineCancelSequence(cancellingActivityWithBoundary, cancellingReceiveTask, cancelled);
     }
 }
