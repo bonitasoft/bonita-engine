@@ -79,7 +79,6 @@ public class EntityCodeGeneratorTest {
         final JDefinedClass definedClass = codeGenerator.getModel()._getClass(employeeBO.getQualifiedName());
         assertThat(definedClass).isNotNull();
         assertThat(definedClass._package().name()).isEqualTo("org.bonitasoft.hr");
-        assertThat(definedClass._implements()).hasSize(1);
         final Iterator<JClass> it = definedClass._implements();
         final JClass jClass = it.next();
         assertThat(jClass.fullName()).isEqualTo(org.bonitasoft.engine.bdm.Entity.class.getName());

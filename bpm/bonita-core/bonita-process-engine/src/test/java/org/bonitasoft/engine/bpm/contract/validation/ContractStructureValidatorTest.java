@@ -19,7 +19,9 @@ import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.c
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.aComplexInput;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
-import static org.bonitasoft.engine.core.process.definition.model.SType.*;
+import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
+import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
+import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

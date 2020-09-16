@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -200,8 +201,9 @@ public class CodeGeneratorTest {
     public void shoulAddInterface_AddInterface_ToADefinedClass() throws Exception {
         JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
         definedClass = codeGenerator.addInterface(definedClass, Serializable.class.getName());
-        assertThat(definedClass._implements()).isNotEmpty()
-                .contains(codeGenerator.getModel().ref(Serializable.class.getName()));
+        List<JClass> elements = new ArrayList<>();
+        definedClass._implements().forEachRemaining(elements::add);
+        assertThat(elements).contains(codeGenerator.getModel().ref(Serializable.class.getName()));
     }
 
     @Test
