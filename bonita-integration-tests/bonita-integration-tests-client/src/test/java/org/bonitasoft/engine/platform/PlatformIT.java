@@ -16,7 +16,8 @@ package org.bonitasoft.engine.platform;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.*;
 
-import org.awaitility.Duration;
+import java.time.Duration;
+
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.api.APIClient;
@@ -167,7 +168,7 @@ public class PlatformIT extends CommonAPIIT {
         Thread.sleep(800);
         stopNodeAndStartNode();
         apiClient.login("install", "install");
-        await().atMost(Duration.TWO_MINUTES).until(() -> apiClient.getProcessAPI().getNumberOfProcessInstances(),
+        await().atMost(Duration.ofMinutes(2)).until(() -> apiClient.getProcessAPI().getNumberOfProcessInstances(),
                 (FunctionalMatcher<Long>) it -> it == 0);
     }
 }

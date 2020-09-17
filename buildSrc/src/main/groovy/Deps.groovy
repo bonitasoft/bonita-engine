@@ -45,7 +45,7 @@ class Deps {
 
     public static String junit4Version = "4.12"
     public static String junit5Version = "5.6.2"
-    public static String awaitilityVersion = "2.0.0"
+    public static String awaitilityVersion = "4.0.3"
     public static String assertjVersion = "3.17.2"
     public static String xmlunitVersion = "1.6"
     public static String mockitoVersion = "3.5.10"
