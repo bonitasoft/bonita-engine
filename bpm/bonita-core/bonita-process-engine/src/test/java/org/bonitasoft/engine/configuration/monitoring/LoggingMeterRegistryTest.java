@@ -53,7 +53,7 @@ public class LoggingMeterRegistryTest {
             counter.increment(3);
             Thread.sleep(10);
         }
-        await().until(() -> assertThat(systemOutRule.getLog())
+        await().untilAsserted(() -> assertThat(systemOutRule.getLog())
                 .contains("my.counter {tenant=12}")
                 .contains("my.gauge value=")
                 .contains("my.gauge2 {t1=1, t2=2} value=")
