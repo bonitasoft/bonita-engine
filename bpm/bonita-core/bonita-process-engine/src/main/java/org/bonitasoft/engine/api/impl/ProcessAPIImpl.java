@@ -3351,10 +3351,10 @@ public class ProcessAPIImpl implements ProcessAPI {
                             (Serializable) expressionContext.getInputValues().get(leftOperand.getName()));
                 }
             }
-            // we finally disconnect the connector
-            connectorService.disconnect(connectorResult);
             return externalDataValue;
         } finally {
+            // we finally disconnect the connector
+            connectorService.disconnect(connectorResult);
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }

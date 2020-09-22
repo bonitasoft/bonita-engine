@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.tuple;
@@ -83,6 +84,7 @@ import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
+import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
@@ -94,6 +96,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.filter.impl.FilterResultImpl;
 import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
@@ -1686,5 +1689,21 @@ public class ProcessAPIImplTest {
         expectedException.expect(ExecutionException.class);
 
         processAPI.deleteMessageByCreationDate(1000L, new SearchOptionsImpl(0, 1000));
+    }
+
+    @Test
+    public void should_disconnect_connector_execution_when_output_operation_throw_an_exception() throws Exception {
+        // Given
+        doThrow(SOperationExecutionException.class).when(operationService).execute(anyList(), anyLong(),
+                nullable(String.class), any(SExpressionContext.class));
+        ConnectorResult connectorResult = new ConnectorResult(null, new HashMap<>(), 0);
+
+        // When
+        assertThatThrownBy(() -> processAPI.executeOperations(connectorResult, new ArrayList<>(),
+                new HashMap<>(), new SExpressionContext(), ProcessAPIImplTest.class.getClassLoader(), tenantAccessor))
+                        .isInstanceOf(SOperationExecutionException.class);
+
+        // Then
+        verify(connectorService).disconnect(connectorResult);
     }
 }
