@@ -19,7 +19,7 @@ class Deps {
     public static String jacksonDataBindingVersion = "2.10.1"
     public static String javaxJtaVersion = "1.1"
     public static String javaxServletVersion = "3.0.1"
-    public static String groovyAllVersion = "2.4.16"
+    public static String groovyAllVersion = "2.4.20"
     public static String javassistVersion = "3.18.1-GA"
     public static String httpComponentsVersion = "4.5.2"
     public static String xstreamVersion = "1.4.11.1"
