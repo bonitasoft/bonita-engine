@@ -19,7 +19,7 @@ dependencies {
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "org.jboss.narayana.jta:narayana-jta:${Deps.naranayaVersion}"
+    testCompile "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
     testCompile project(':bpm:bonita-util:bonita-common-util-test')
