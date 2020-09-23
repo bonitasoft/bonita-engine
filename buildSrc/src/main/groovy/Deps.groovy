@@ -27,7 +27,7 @@ class Deps {
     public static String jbcryptVersion = "0.3m"
     public static String activationVersion = "1.2.1"
     public static String quartzVersion = "2.3.2"
-    public static String micrometerVersion = "1.3.2"
+    public static String micrometerVersion = "1.5.4"
 
     public static String mysqlVersion = "8.0.14"
     public static String mssqlVersion = "7.2.1.jre8"

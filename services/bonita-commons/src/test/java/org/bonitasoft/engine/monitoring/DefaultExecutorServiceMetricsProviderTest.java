@@ -34,7 +34,7 @@ public class DefaultExecutorServiceMetricsProviderTest {
     public void should_register_metrics_when_binding_the_threadpool() {
         defaultExecutorServiceMetricsProvider.bind(meterRegistry, executorService, "my-executor", 14L);
 
-        assertThat(meterRegistry.getMeters()).hasSize(7);
+        assertThat(meterRegistry.getMeters()).hasSize(9);
     }
 
     @Test

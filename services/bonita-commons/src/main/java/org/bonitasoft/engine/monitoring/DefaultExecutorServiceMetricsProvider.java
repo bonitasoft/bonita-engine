@@ -48,6 +48,10 @@ public class DefaultExecutorServiceMetricsProvider implements ExecutorServiceMet
         Optional.ofNullable(meterRegistry.find("executor.active").tags(tags).gauge()).ifPresent(meterRegistry::remove);
         Optional.ofNullable(meterRegistry.find("executor.pool.size").tags(tags).gauge())
                 .ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.pool.max").tags(tags).gauge())
+                .ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.pool.core").tags(tags).gauge())
+                .ifPresent(meterRegistry::remove);
         Optional.ofNullable(meterRegistry.find("executor.queue.remaining").tags(tags).gauge())
                 .ifPresent(meterRegistry::remove);
         Optional.ofNullable(meterRegistry.find("executor.queued").tags(tags).gauge()).ifPresent(meterRegistry::remove);
