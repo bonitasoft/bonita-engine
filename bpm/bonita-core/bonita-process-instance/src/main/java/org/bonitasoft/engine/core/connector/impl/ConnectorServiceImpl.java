@@ -207,7 +207,6 @@ public class ConnectorServiceImpl implements ConnectorService {
             expressionContext.putAllInputValues(result.getResult());
             operationService.execute(outputs, expressionContext.getContainerId(), expressionContext.getContainerType(),
                     expressionContext);// data is in
-            disconnect(result);
         } catch (final SOperationExecutionException e) {
             throw new SConnectorException(e);
         } finally {
@@ -216,6 +215,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                 String desc = "ConnectorResult: " + result;
                 timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS, desc, endTime - startTime);
             }
+            disconnect(result);
         }
     }
 
