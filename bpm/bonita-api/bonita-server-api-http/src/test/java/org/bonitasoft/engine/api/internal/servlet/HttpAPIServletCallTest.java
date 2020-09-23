@@ -41,7 +41,7 @@ public class HttpAPIServletCallTest {
     public void should_manage_login_request() throws Exception {
         //given:
         MockHttpServletRequest request = MockMvcRequestBuilders
-                .post("serverAPI/com.bonitasoft.engine.api.LoginAPI/login")
+                .post("http://localhost/serverAPI/com.bonitasoft.engine.api.LoginAPI/login")
                 .param("options", "<object-stream>" +
                         "  <map/>" +
                         "</object-stream>")

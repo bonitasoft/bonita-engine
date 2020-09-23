@@ -17,12 +17,15 @@ import org.bonitasoft.engine.BonitaEngine;
 import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.spring.autoconfigure.properties.BonitaEngineProperties;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 
 @Configuration
 @AutoConfigureBefore(BonitaEngineCommonAutoConfiguration.class)
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 public class BonitaEngineServerAutoConfiguration {
 
     @Bean
