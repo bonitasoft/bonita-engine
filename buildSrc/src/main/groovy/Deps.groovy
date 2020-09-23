@@ -35,7 +35,7 @@ class Deps {
     public static String postgresqlVersion = "42.2.5"
     public static String lombokVersion = "1.18.4"
 
-    public static String naranayaVersion = "5.9.3.Final"
+    public static String narayanaVersion = "5.10.6.Final"
     public static String jbossLoggingVersion = "3.1.3.GA"
     public static String jaxbVersion = "2.3.1"
     public static String logbackVersion = "1.2.3"
