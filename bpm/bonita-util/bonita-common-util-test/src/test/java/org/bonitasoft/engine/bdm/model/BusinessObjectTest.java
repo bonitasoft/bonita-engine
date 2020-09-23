@@ -172,8 +172,7 @@ public class BusinessObjectTest {
         //when then
         assertThat(businessObject.toString())
                 .as("should return simple name")
-                .isEqualTo(
-                        "BusinessObject[description=description,fields=[SimpleField[name=field1,nullable=true,collection=false,length=<null>,type=BOOLEAN], SimpleField[name=field2,nullable=true,collection=false,length=<null>,type=BOOLEAN]],indexes=[],qualifiedName=com.company.model.Employee,queries=[Query [name=queryName, content=select * from Employee, returnType=java.lang.String, queryParameters=[]]],uniqueConstraints=[UniqueConstraint[name=const,description=desc,fieldNames=[field1]]]]");
+                .contains("field1", "field2", "queryName");
     }
 
     @Test
