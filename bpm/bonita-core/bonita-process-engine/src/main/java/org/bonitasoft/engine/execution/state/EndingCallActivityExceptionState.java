@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -26,26 +27,21 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public abstract class EndingCallActivityExceptionState implements FlowNodeState {
 
     private final ProcessInstanceService processInstanceService;
-    private final TechnicalLoggerService logger;
     private final ProcessInstanceInterruptor processInstanceInterruptor;
     private final BPMArchiverService bpmArchiverService;
 
     public EndingCallActivityExceptionState(ProcessInstanceService processInstanceService,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
             ProcessInstanceInterruptor processInstanceInterruptor,
             BPMArchiverService bpmArchiverService) {
         this.processInstanceService = processInstanceService;
-        this.logger = logger;
         this.processInstanceInterruptor = processInstanceInterruptor;
         this.bpmArchiverService = bpmArchiverService;
     }
@@ -54,15 +50,21 @@ public abstract class EndingCallActivityExceptionState implements FlowNodeState 
     public boolean shouldExecuteState(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         try {
-            final boolean hasActiveChild = flowNodeInstance.getTokenCount() > 0;
-            if (hasActiveChild) {
-                final SProcessInstance targetProcessInstance = processInstanceService
-                        .getChildOfActivity(flowNodeInstance.getId());
-                processInstanceInterruptor.interruptProcessInstance(targetProcessInstance.getId(), getStateCategory());
-            } else {
+            final SProcessInstance targetProcessInstance = processInstanceService
+                    .getChildOfActivity(flowNodeInstance.getId());
+
+            final boolean hasActiveChild = processInstanceInterruptor
+                    .interruptProcessInstance(targetProcessInstance.getId(), getStateCategory());
+            log.debug("{} activity id {}, name {}   with active process : {} ", getStateCategory(),
+                    flowNodeInstance.getId(),
+                    flowNodeInstance.getName(),
+                    hasActiveChild);
+            if (!hasActiveChild) {
                 archiveChildProcessInstance(flowNodeInstance);
             }
             return hasActiveChild;
+        } catch (SProcessInstanceNotFoundException e) {
+            return false;
         } catch (final SBonitaException e) {
             throw new SActivityExecutionException(e);
         }
@@ -87,9 +89,8 @@ public abstract class EndingCallActivityExceptionState implements FlowNodeState 
             final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
             bpmArchiverService.archiveAndDeleteProcessInstance(childProcInst);
         } catch (SProcessInstanceNotFoundException ignored) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "No target process instance found when archiving the call activity " + instance.getId()
-                            + " in state " + getName());
+            log.warn("No target process instance found when archiving the call activity {}, in state {}",
+                    instance.getId(), getName());
         }
     }
 

@@ -32,14 +32,14 @@ import org.bonitasoft.engine.work.SWorkRegisterException;
  */
 public class ProcessInstanceInterruptor {
 
-    private ProcessInstanceService processInstanceService;
-    private FlowNodeInstanceService flowNodeInstanceService;
-    private ContainerRegistry containerRegistry;
+    private final ProcessInstanceService processInstanceService;
+    private final FlowNodeInstanceService flowNodeInstanceService;
+    private final ContainerRegistry containerRegistry;
     private final TechnicalLogger logger;
 
     public ProcessInstanceInterruptor(ProcessInstanceService processInstanceService,
             FlowNodeInstanceService flowNodeInstanceService,
-            ContainerRegistry containerRegistry, final TechnicalLoggerService technicalLoggerService) {
+            ContainerRegistry containerRegistry, TechnicalLoggerService technicalLoggerService) {
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.containerRegistry = containerRegistry;
@@ -47,40 +47,39 @@ public class ProcessInstanceInterruptor {
     }
 
     /**
-     * Interrupt the given process instant AND its children
+     * Interrupt the given process instance AND its children
      *
      * @param processInstanceId the process instance
      * @param stateCategory the state category
+     * @return true if some children were interrupted
      */
-    public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory)
+    public boolean interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory)
             throws SBonitaException {
         processInstanceService.setStateCategory(processInstanceService.getProcessInstance(processInstanceId),
                 stateCategory);
         List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService
                 .getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
+        if (flowNodeInstances.isEmpty()) {
+            logger.info("Process instance {} with no children was {}", processInstanceId,
+                    getInterruptionType(stateCategory));
+            return false;
+        }
         interruptFlowNodeInstances(flowNodeInstances, stateCategory);
+
         logger.info("Process instance {} and its children were {}", processInstanceId,
                 getInterruptionType(stateCategory));
+        return true;
+
     }
 
     private String getInterruptionType(SStateCategory stateCategory) {
         return stateCategory.equals(SStateCategory.ABORTING) ? "aborted" : "cancelled";
     }
 
-    private void executeChildren(SStateCategory stateCategory, List<SFlowNodeInstance> stableChildrenIds)
-            throws SWorkRegisterException {
-        for (final SFlowNodeInstance child : stableChildrenIds) {
-            logger.debug("Resume child in stateCategory {}: {}, {}, {}", stateCategory, child.getId(),
-                    child.getStateName(), child.getStateCategory());
-            executeFlowNode(child);
-        }
-    }
-
     private void executeFlowNode(SFlowNodeInstance child) throws SWorkRegisterException {
         if (child.isTerminal()) {
             containerRegistry.notifyChildFinished(child);
         } else {
-
             //should not try to execute these because its the children that should be aborted
             if (child.getType() != SFlowNodeType.MULTI_INSTANCE_ACTIVITY
                     || child.getType() != SFlowNodeType.LOOP_ACTIVITY) {
@@ -101,17 +100,7 @@ public class ProcessInstanceInterruptor {
             throws SBonitaException {
         processInstanceService.setStateCategory(processInstanceService.getProcessInstance(processInstanceId),
                 stateCategory);
-        List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService
-                .getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
-        flowNodeInstances = excludeFlowNode(exceptionChildId, flowNodeInstances);
-        interruptFlowNodeInstances(flowNodeInstances, stateCategory);
-    }
-
-    private List<SFlowNodeInstance> excludeFlowNode(long exceptionChildId, List<SFlowNodeInstance> flowNodeInstances) {
-        return flowNodeInstances
-                .stream()
-                .filter(f -> f.getId() != exceptionChildId)
-                .collect(Collectors.toList());
+        interruptChildrenOfProcessInstance(processInstanceId, stateCategory, exceptionChildId);
     }
 
     /**
@@ -125,11 +114,18 @@ public class ProcessInstanceInterruptor {
             final long notToInterruptFlownodeId)
             throws SBonitaException {
         List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService
-                .getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
-        flowNodeInstances = excludeFlowNode(notToInterruptFlownodeId, flowNodeInstances);
+                .getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE).stream()
+                .filter(f -> f.getId() != notToInterruptFlownodeId)
+                .collect(Collectors.toList());
+        if (flowNodeInstances.isEmpty()) {
+            logger.warn("Process instance {} with no children was {} by flownode {}", processInstanceId,
+                    getInterruptionType(stateCategory), notToInterruptFlownodeId);
+            return;
+        }
         interruptFlowNodeInstances(flowNodeInstances, stateCategory);
         logger.info("Process instance {} and its children were {} by flownode {}", processInstanceId,
                 getInterruptionType(stateCategory), notToInterruptFlownodeId);
+
     }
 
     /**
@@ -140,11 +136,14 @@ public class ProcessInstanceInterruptor {
      */
     public void interruptChildrenOfFlowNodeInstance(SFlowNodeInstance flowNodeInstance, SStateCategory stateCategory)
             throws SBonitaException {
-        if (flowNodeInstance.getTokenCount() == 0) {
-            return;
-        }
         List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService
                 .getFlowNodeInstancesOfActivity(flowNodeInstance.getId(), 0, Integer.MAX_VALUE);
+        if (flowNodeInstances.isEmpty()) {
+            logger.warn("No children of flownode {} to {} found", flowNodeInstance.getId(),
+                    getInterruptionType(stateCategory));
+            return;
+        }
+
         interruptFlowNodeInstances(flowNodeInstances, stateCategory);
     }
 
@@ -154,8 +153,10 @@ public class ProcessInstanceInterruptor {
             logger.debug("Put element in {}, element:  {}, {}, {}", stateCategory, child.getId(), child.getStateName(),
                     child.getType());
             flowNodeInstanceService.setStateCategory(child, stateCategory);
+            logger.debug("Resume child in stateCategory {}: {}, {}, {}", stateCategory, child.getId(),
+                    child.getStateName(), child.getStateCategory());
+            executeFlowNode(child);
         }
-        executeChildren(stateCategory, children);
     }
 
 }

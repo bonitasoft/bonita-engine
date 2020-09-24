@@ -18,18 +18,15 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CancellingCallActivityState extends EndingCallActivityExceptionState {
 
     public CancellingCallActivityState(ProcessInstanceService processInstanceService,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
             ProcessInstanceInterruptor processInstanceInterruptor,
             BPMArchiverService bpmArchiverService) {
-        super(processInstanceService, logger, processInstanceInterruptor, bpmArchiverService);
+        super(processInstanceService, processInstanceInterruptor, bpmArchiverService);
     }
 
     @Override
