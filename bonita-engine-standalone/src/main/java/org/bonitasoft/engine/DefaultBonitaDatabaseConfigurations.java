@@ -19,7 +19,7 @@ public class DefaultBonitaDatabaseConfigurations {
         return BonitaDatabaseConfiguration.builder()
                 .dbVendor("h2")
                 .url("jdbc:h2:file:" + System.getProperty("org.bonitasoft.h2.database.dir", "./h2databasedir")
-                        + "/" + schemaName + ";MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE")
+                        + "/" + schemaName + ";DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE")
                 .user("bonita")
                 .password("bpm").build();
     }
