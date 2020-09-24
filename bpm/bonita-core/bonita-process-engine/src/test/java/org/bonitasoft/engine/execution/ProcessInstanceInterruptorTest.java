@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.CANCELLING;
 import static org.mockito.Mockito.*;
@@ -111,6 +112,31 @@ public class ProcessInstanceInterruptorTest {
     }
 
     @Test
+    public void should_return_true_were_children_were_interrupted() throws Exception {
+        //given
+        doReturn(Arrays.asList(flownode1_stable, flownode2_unstable)).when(flowNodeInstanceService)
+                .getFlowNodeInstancesOfProcess(PROCESS_INSTANCE_ID, 0, Integer.MAX_VALUE);
+        //when
+        boolean actual = processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
+        //then
+        verify(containerRegistry).executeFlowNode(flownode1_stable);
+        verify(containerRegistry).executeFlowNode(flownode2_unstable);
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    public void should_return_false_were_no_children() throws Exception {
+        //given
+        doReturn(Arrays.asList()).when(flowNodeInstanceService)
+                .getFlowNodeInstancesOfProcess(PROCESS_INSTANCE_ID, 0, Integer.MAX_VALUE);
+        //when
+        boolean actual = processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
+        //then
+        verify(containerRegistry, never()).executeFlowNode(any());
+        assertThat(actual).isFalse();
+    }
+
+    @Test
     public void should_call_execute_on_all_elements_only() throws Exception {
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
@@ -186,18 +212,6 @@ public class ProcessInstanceInterruptorTest {
         verify(flowNodeInstanceService).setStateCategory(flownode2_unstable, ABORTING);
         verify(containerRegistry).executeFlowNode(flownode1_stable);
         verify(containerRegistry).executeFlowNode(flownode2_unstable);
-    }
-
-    @Test
-    public void should_not_search_for_children_when_flow_node_does_not_have_children() throws Exception {
-        SUserTaskInstance sUserTaskInstance = new SUserTaskInstance();
-        sUserTaskInstance.setId(42L);
-        sUserTaskInstance.setTokenCount(0);
-
-        processInstanceInterruptor.interruptChildrenOfFlowNodeInstance(sUserTaskInstance, ABORTING);
-
-        verifyZeroInteractions(flowNodeInstanceService);
-        verifyZeroInteractions(containerRegistry);
     }
 
 }

@@ -14,25 +14,18 @@
 package org.bonitasoft.engine.execution.state;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.BPMArchiverService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,12 +50,6 @@ public class CancellingCallActivityStateTest {
     @Mock
     private ProcessInstanceService processInstanceService;
     @Mock
-    private ClassLoaderService classLoaderService;
-    @Mock
-    private TechnicalLoggerService loggerService;
-    @Mock
-    private ProcessDefinitionService processDefinitionService;
-    @Mock
     ProcessInstanceInterruptor processInstanceInterruptor;
     @Mock
     BPMArchiverService bpmArchiverService;
@@ -77,49 +64,36 @@ public class CancellingCallActivityStateTest {
     }
 
     @Test
-    public void should_warn_when_completing_call_activity_with_no_called_process() throws Exception {
-        //given
-        callActivity.setTokenCount(0);
+    public void should_not_execute_state_when_target_process_is_not_found() throws Exception {
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService)
                 .getChildOfActivity(CALL_ACTIVITY_ID);
         //when
-        cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
-        //then
-        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
-                contains("No target process instance found when archiving the call activity"));
+        boolean actual = cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
+
+        assertThat(actual).isFalse();
     }
 
     @Test
-    public void shouldExecuteState_should_return_false_when_called_process_is_finished() throws Exception {
-        //given
-        callActivity.setTokenCount(0);
+    public void should_not_execute_state_when_process_interruptor_did_not_execute_anything() throws Exception {
         doReturn(processInstance).when(processInstanceService).getChildOfActivity(CALL_ACTIVITY_ID);
+        doReturn(false).when(processInstanceInterruptor).interruptProcessInstance(PROCESS_INSTANCE_ID,
+                SStateCategory.CANCELLING);
         //when
-        boolean shouldExecuteState = cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
-        //then
-        assertThat(shouldExecuteState).isFalse();
-    }
+        boolean actual = cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
 
-    @Test
-    public void shouldExecuteState_should_return_true_when_called_process_is_not_finished() throws Exception {
-        //given
-        callActivity.setTokenCount(1);
-        doReturn(processInstance).when(processInstanceService).getChildOfActivity(CALL_ACTIVITY_ID);
-        //when
-        boolean shouldExecuteState = cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
-        //then
-        assertThat(shouldExecuteState).isTrue();
-    }
-
-    @Test
-    public void should_archive_process_if_finished() throws Exception {
-        //given
-        callActivity.setTokenCount(0);
-        doReturn(processInstance).when(processInstanceService).getChildOfActivity(CALL_ACTIVITY_ID);
-        //when
-        cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
-        //then
+        assertThat(actual).isFalse();
         verify(bpmArchiverService).archiveAndDeleteProcessInstance(processInstance);
     }
 
+    @Test
+    public void should_execute_state_when_process_interruptor_aborted_child_of_target_process() throws Exception {
+        doReturn(processInstance).when(processInstanceService).getChildOfActivity(CALL_ACTIVITY_ID);
+        doReturn(true).when(processInstanceInterruptor).interruptProcessInstance(PROCESS_INSTANCE_ID,
+                SStateCategory.CANCELLING);
+        //when
+        boolean actual = cancellingCallActivityState.shouldExecuteState(processDefinition, callActivity);
+
+        assertThat(actual).isTrue();
+        verify(bpmArchiverService, never()).archiveAndDeleteProcessInstance(processInstance);
+    }
 }
