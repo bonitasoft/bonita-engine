@@ -13,14 +13,14 @@
  **/
 package com.sap.conn.jco.ext;
 
-public interface Environment {
+public abstract class Environment {
 
-    static void registerDestinationDataProvider(DestinationDataProvider destinationDataProvider) {
+    public static void registerDestinationDataProvider(DestinationDataProvider destinationDataProvider) {
         // Mock implementation to remove sap jco connector compile dependency
         // Concrete implementation should be provided at runtime
     }
 
-    static void unregisterDestinationDataProvider(DestinationDataProvider destinationDataProvider) {
+    public static void unregisterDestinationDataProvider(DestinationDataProvider destinationDataProvider) {
         // Mock implementation to remove sap jco connector compile dependency
         // Concrete implementation should be provided at runtime
     }
