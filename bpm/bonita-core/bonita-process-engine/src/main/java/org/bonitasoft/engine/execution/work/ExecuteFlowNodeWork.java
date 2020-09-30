@@ -35,10 +35,6 @@ import org.bonitasoft.engine.work.SWorkPreconditionException;
  */
 public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
-    public enum Type {
-        PROCESS, FLOWNODE
-    }
-
     private final long flowNodeInstanceId;
     private final Integer stateId;
     private final Boolean executing;

@@ -83,7 +83,6 @@ public class InitializingActivityState extends OnEnterConnectorState {
             throws SActivityStateExecutionException {
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
         stateBehaviors.updateExpectedDuration(processDefinition, flowNodeInstance);
-        stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
         stateBehaviors.registerWaitingEvent(processDefinition, flowNodeInstance);
     }
 }

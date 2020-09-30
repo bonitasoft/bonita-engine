@@ -84,7 +84,6 @@ public class InitializingAndExecutingFlowNodeState extends OnEnterAndFinishConne
             final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
-        stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
     }
 
     @Override

@@ -58,7 +58,7 @@ public class InitializingAndExecutingFlowNodeStateTest {
 
         // then
         verify(stateBehaviors).updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
-        verify(stateBehaviors).handleCallActivity(processDefinition, flowNodeInstance);
+
     }
 
     @Test

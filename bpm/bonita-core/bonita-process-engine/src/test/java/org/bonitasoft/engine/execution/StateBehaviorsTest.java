@@ -21,13 +21,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -35,7 +31,6 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
-import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -47,9 +42,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -246,54 +238,6 @@ public class StateBehaviorsTest {
                 return false;
             }
         };
-    }
-
-    @Test
-    public void getEvaluatedInputExpressionsShouldEvaluateExpressionForDeclaredCallActivityInputs() throws Exception {
-        final HashMap<String, SExpression> contractInputs = new HashMap<>(1);
-        final String input = "someContractInput";
-        final SExpressionImpl expression = new SExpressionImpl();
-        contractInputs.put(input, expression);
-
-        final ArrayList<SExpression> sExpressions = new ArrayList<>();
-        sExpressions.add(expression);
-
-        final SExpressionContext context = mock(SExpressionContext.class);
-        final StateBehaviors behave = spy(stateBehaviors);
-        doReturn(mock(Serializable.class)).when(behave)
-                .getExpressionResultWithDiscriminant(eq(expression.getDiscriminant()), eq(sExpressions), anyList());
-
-        behave.getEvaluatedInputExpressions(contractInputs, context);
-
-        verify(expressionResolverService).evaluate(sExpressions, context);
-    }
-
-    @Test
-    public void instantiateProcessShouldCallStartWithInputs() throws Exception {
-
-        final SFlowNodeInstance callActivityInstance = mock(SFlowNodeInstance.class);
-        final long callerId = 444L;
-        doReturn(callerId).when(callActivityInstance).getId();
-        final SProcessDefinition callerProcessDefinition = mock(SProcessDefinition.class);
-        final long callerProcessDefinitionId = 555L;
-        doReturn(callerProcessDefinitionId).when(callerProcessDefinition).getId();
-        final StateBehaviors spy = spy(stateBehaviors);
-        final SExpressionContext context = new SExpressionContext(callerId,
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
-
-        final SCallActivityDefinition callActivityDefinition = mock(SCallActivityDefinition.class);
-        final List operations = mock(List.class);
-        doReturn(operations).when(callActivityDefinition).getDataInputOperations();
-
-        final Map evaluatedExpressions = mock(Map.class);
-        doReturn(evaluatedExpressions).when(spy).getEvaluatedInputExpressions(anyMap(), eq(context));
-
-        final ProcessExecutor processExecutor = mock(ProcessExecutor.class);
-        spy.setProcessExecutor(processExecutor);
-
-        spy.instantiateProcess(callerProcessDefinition, callActivityDefinition, callActivityInstance, 147L);
-
-        verify(processExecutor).start(147L, -1, 0, 0, context, operations, callerId, -1, evaluatedExpressions);
     }
 
     @Test

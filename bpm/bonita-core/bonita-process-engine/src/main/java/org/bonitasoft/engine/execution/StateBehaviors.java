@@ -16,9 +16,7 @@ package org.bonitasoft.engine.execution;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeSet;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -27,7 +25,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -46,11 +43,8 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -73,21 +67,17 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreat
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -106,14 +96,8 @@ import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.exception.SExpressionException;
-import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
@@ -121,16 +105,16 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Component
 public class StateBehaviors {
 
     private static final int BATCH_SIZE = 20;
@@ -142,7 +126,6 @@ public class StateBehaviors {
     private final ClassLoaderService classLoaderService;
     private final ActorMappingService actorMappingService;
     private final ExpressionResolverService expressionResolverService;
-    private final ProcessDefinitionService processDefinitionService;
     private final DataInstanceService dataInstanceService;
     private final OperationService operationService;
     private final WorkService workService;
@@ -154,17 +137,14 @@ public class StateBehaviors {
     private final IdentityService identityService;
     private final WaitingEventsInterrupter waitingEventsInterrupter;
     private final RefBusinessDataService refBusinessDataService;
-    private ProcessExecutor processExecutor;
     private final BPMWorkFactory workFactory;
     private ProcessInstanceInterruptor processInstanceInterruptor;
-    private final UserTransactionService userTransactionService;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService,
             final ClassLoaderService classLoaderService,
             final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
-            final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService,
             final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService,
@@ -172,7 +152,7 @@ public class StateBehaviors {
             final IdentityService identityService, final ParentContainerResolver parentContainerResolver,
             final WaitingEventsInterrupter waitingEventsInterrupter,
             final RefBusinessDataService refBusinessDataService, BPMWorkFactory workFactory,
-            UserTransactionService userTransactionService, ProcessInstanceInterruptor processInstanceInterruptor) {
+            ProcessInstanceInterruptor processInstanceInterruptor) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -182,7 +162,6 @@ public class StateBehaviors {
         this.actorMappingService = actorMappingService;
         this.connectorInstanceService = connectorInstanceService;
         this.expressionResolverService = expressionResolverService;
-        this.processDefinitionService = processDefinitionService;
         this.dataInstanceService = dataInstanceService;
         this.operationService = operationService;
         this.workService = workService;
@@ -195,11 +174,6 @@ public class StateBehaviors {
         this.waitingEventsInterrupter = waitingEventsInterrupter;
         this.workFactory = workFactory;
         this.processInstanceInterruptor = processInstanceInterruptor;
-        this.userTransactionService = userTransactionService;
-    }
-
-    public void setProcessExecutor(final ProcessExecutor processExecutor) {
-        this.processExecutor = processExecutor;
     }
 
     public DataInstanceContainer getParentContainerType(final SFlowNodeInstance flowNodeInstance) {
@@ -414,130 +388,6 @@ public class StateBehaviors {
         if (flowNodeInstance instanceof SActivityInstance) {
             bpmInstancesCreator.createDataInstances(processDefinition, flowNodeInstance);
         }
-    }
-
-    public void handleCallActivity(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
-            throws SActivityStateExecutionException {
-        if (isCallActivity(flowNodeInstance)) {
-            final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-            try {
-                final SCallActivityDefinition callActivity = (SCallActivityDefinition) processContainer
-                        .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-                if (callActivity == null) {
-                    final StringBuilder stb = new StringBuilder("unable to find call activity definition with name '");
-                    stb.append(flowNodeInstance.getName());
-                    stb.append("' in process definition '");
-                    stb.append(processDefinition.getId());
-                    stb.append("'");
-                    throw new SActivityStateExecutionException(stb.toString());
-                }
-
-                final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(),
-                        DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                        processDefinition.getId());
-                final String callableElement = (String) expressionResolverService
-                        .evaluate(callActivity.getCallableElement(), expressionContext);
-                String callableElementVersion = null;
-                if (callActivity.getCallableElementVersion() != null) {
-                    callableElementVersion = (String) expressionResolverService
-                            .evaluate(callActivity.getCallableElementVersion(), expressionContext);
-                }
-
-                final long targetProcessDefinitionId = getTargetProcessDefinitionId(callableElement,
-                        callableElementVersion);
-                SProcessInstance sProcessInstance = instantiateProcess(processDefinition, callActivity,
-                        flowNodeInstance, targetProcessDefinitionId);
-                final SCallActivityInstance callActivityInstance = (SCallActivityInstance) flowNodeInstance;
-                // update token count
-                if (sProcessInstance.getStateId() != ProcessInstanceState.COMPLETED.getId()) {
-                    activityInstanceService.setTokenCount(callActivityInstance,
-                            callActivityInstance.getTokenCount() + 1);
-                } else {
-                    // This need to be done "later" we register a work to execute this call activity because it is in fact finish
-                    // we can't do it right now because its state is not yet changed and the work would fail.
-                    userTransactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
-
-                        @Override
-                        public void beforeCompletion() {
-                            //the called process is finished, next step is stable so we trigger execution of this flownode
-                            try {
-                                workService.registerWork(
-                                        workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
-                            } catch (SWorkRegisterException e) {
-                                throw new BonitaRuntimeException(e);
-                            }
-                        }
-
-                        @Override
-                        public void afterCompletion(final int txState) {
-                        }
-                    });
-                }
-            } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException(e);
-            }
-        }
-    }
-
-    private long getTargetProcessDefinitionId(final String callableElement, final String callableElementVersion)
-            throws SBonitaReadException,
-            SProcessDefinitionNotFoundException {
-        if (callableElementVersion != null) {
-            return processDefinitionService.getProcessDefinitionId(callableElement, callableElementVersion);
-        }
-        return processDefinitionService.getLatestProcessDefinitionId(callableElement);
-    }
-
-    private boolean isCallActivity(final SFlowNodeInstance flowNodeInstance) {
-        return SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType());
-    }
-
-    protected SProcessInstance instantiateProcess(final SProcessDefinition callerProcessDefinition,
-            final SCallActivityDefinition callActivityDefinition,
-            final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId)
-            throws SProcessInstanceCreationException,
-            SContractViolationException, SExpressionException {
-        final long callerProcessDefinitionId = callerProcessDefinition.getId();
-        final long callerId = callActivityInstance.getId();
-        final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
-        final SExpressionContext context = new SExpressionContext(callerId,
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
-
-        final Map<String, Serializable> processInputs = getEvaluatedInputExpressions(
-                callActivityDefinition.getProcessStartContractInputs(), context);
-
-        return processExecutor
-                .start(targetProcessDefinitionId, -1, 0, 0, context, operationList, callerId, -1, processInputs);
-    }
-
-    protected Map<String, Serializable> getEvaluatedInputExpressions(Map<String, SExpression> contractInputs,
-            SExpressionContext context)
-            throws SExpressionTypeUnknownException, SExpressionDependencyMissingException,
-            SExpressionEvaluationException, SInvalidExpressionException {
-        List<SExpression> expressions = new ArrayList<>(contractInputs.size());
-        expressions.addAll(contractInputs.values());
-        final List<Object> exprResults = expressionResolverService.evaluate(expressions, context);
-
-        final Map<String, Serializable> inputExpressionsMap = new HashMap<>(contractInputs.size());
-        for (Map.Entry<String, SExpression> entry : contractInputs.entrySet()) {
-            inputExpressionsMap.put(entry.getKey(),
-                    getExpressionResultWithDiscriminant(entry.getValue().getDiscriminant(), expressions, exprResults));
-        }
-
-        return inputExpressionsMap;
-    }
-
-    /**
-     * Both lists have the same order.
-     */
-    protected Serializable getExpressionResultWithDiscriminant(int discriminant, List<SExpression> expressions,
-            List<Object> exprResults) {
-        for (int i = 0; i < expressions.size(); i++) {
-            if (expressions.get(i).getDiscriminant() == discriminant) {
-                return (Serializable) exprResults.get(i);
-            }
-        }
-        return null;
     }
 
     public void updateDisplayNameAndDescription(final SProcessDefinition processDefinition,
