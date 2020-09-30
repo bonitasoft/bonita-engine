@@ -44,7 +44,6 @@ public class ExecutingAutomaticActivityState extends OnEnterAndFinishConnectorSt
             throws SActivityStateExecutionException {
         final SActivityInstance activityInstance = (SActivityInstance) flowNodeInstance;
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
-        stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
         stateBehaviors.executeOperations(processDefinition, activityInstance);
         stateBehaviors.handleThrowEvent(processDefinition, flowNodeInstance);
     }

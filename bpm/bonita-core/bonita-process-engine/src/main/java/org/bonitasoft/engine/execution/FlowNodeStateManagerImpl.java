@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
  * @author Zhang Bole
  * @author Celine Souchet
  */
+
 @Component("flowNodeStateManager")
 public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
@@ -57,11 +58,6 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
                 .collect(Collectors.toMap(FlowNodeStateSequences::getFlowNodeType, e -> e));
         this.allStates = allStates.stream().collect(Collectors.toMap(FlowNodeState::getId, s -> s));
         bpmInstancesCreator.setStateManager(this);
-    }
-
-    @Override
-    public void setProcessExecutor(final ProcessExecutor processExecutor) {
-        stateBehaviors.setProcessExecutor(processExecutor);
     }
 
     @Override

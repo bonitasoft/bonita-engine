@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StateBehaviors;
 
 /**
@@ -39,8 +38,6 @@ public interface FlowNodeStateManager {
     FlowNodeState getState(int stateId);
 
     Set<String> getSupportedState(SFlowNodeType nodeType);
-
-    void setProcessExecutor(ProcessExecutor processExecutor);
 
     StateBehaviors getStateBehaviors();
 

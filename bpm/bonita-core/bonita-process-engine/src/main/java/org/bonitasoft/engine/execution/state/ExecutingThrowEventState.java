@@ -85,7 +85,6 @@ public class ExecutingThrowEventState extends OnEnterAndFinishConnectorState {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
         stateBehaviors.mapActors(flowNodeInstance, processContainer);
-        stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
         stateBehaviors.handleThrowEvent(processDefinition, flowNodeInstance);
     }
 

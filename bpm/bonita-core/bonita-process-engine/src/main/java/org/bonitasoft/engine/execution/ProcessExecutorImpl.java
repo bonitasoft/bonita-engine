@@ -197,8 +197,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.workFactory = workFactory;
         this.bpmArchiverService = bpmArchiverService;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
-        // dependency injection because of circular references...
-        flowNodeStateManager.setProcessExecutor(this);
+        //FIXME There is responsibility issue the circular dependencies must be fixed next time.
         eventsHandler.setProcessExecutor(this);
         for (final Entry<String, SProcessInstanceHandler<SEvent>> handler : handlers.entrySet()) {
             try {
@@ -1072,6 +1071,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final int size = flowNodeInstances.size();
         if (size == 0) {
             state = ProcessInstanceState.COMPLETED;
+
         } else {
             state = ProcessInstanceState.STARTED;
         }
