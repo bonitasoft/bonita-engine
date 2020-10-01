@@ -31,6 +31,7 @@ import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.xml.DocumentManager;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,6 +45,7 @@ import org.xml.sax.SAXException;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
+@Component
 public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecutorStrategy {
 
     public static final String TYPE_XPATH_UPDATE_QUERY = "XPATH_UPDATE_QUERY";

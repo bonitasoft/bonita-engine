@@ -27,11 +27,13 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Component
 public class DataLeftOperandHandler implements LeftOperandHandler {
 
     private static final String DATA_INSTANCE = "%DATA_INSTANCE%_";

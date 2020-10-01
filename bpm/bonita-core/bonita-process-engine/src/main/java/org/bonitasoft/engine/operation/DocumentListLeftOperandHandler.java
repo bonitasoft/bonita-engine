@@ -18,15 +18,13 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.springframework.stereotype.Component;
 
 /**
  * Handles document lists
@@ -34,28 +32,17 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  *
  * @author Baptiste Mesta
  */
+@Component
 public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandHandler {
 
     public final DocumentHelper documentHelper;
-    private final DocumentService documentService;
-
-    public DocumentListLeftOperandHandler(final DocumentService documentService,
-            final ActivityInstanceService activityInstanceService,
-            final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final ProcessDefinitionService processDefinitionService,
-            final ProcessInstanceService processInstanceService) {
-        this(activityInstanceService, sessionAccessor, sessionService, documentService,
-                new DocumentHelper(documentService, processDefinitionService,
-                        processInstanceService));
-    }
 
     public DocumentListLeftOperandHandler(final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor,
-            final SessionService sessionService, final DocumentService documentService,
+            final SessionService sessionService,
             final DocumentHelper documentHelper) {
         super(activityInstanceService, sessionAccessor, sessionService);
         this.documentHelper = documentHelper;
-        this.documentService = documentService;
     }
 
     @Override

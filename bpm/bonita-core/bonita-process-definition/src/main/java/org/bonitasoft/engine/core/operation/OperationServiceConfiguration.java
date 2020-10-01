@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2020 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,23 +13,10 @@
  **/
 package org.bonitasoft.engine.core.operation;
 
-import java.util.List;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * Utility Bean to be able to provide easily {@link LeftOperandHandler} via spring
- *
- * @author Baptiste Mesta
- */
-public class LeftOperandHandlerProvider {
-
-    private List<LeftOperandHandler> leftOperandHandlers;
-
-    public List<LeftOperandHandler> getLeftOperandHandlers() {
-        return leftOperandHandlers;
-    }
-
-    public void setLeftOperandHandlers(final List<LeftOperandHandler> leftOperandHandlers) {
-        this.leftOperandHandlers = leftOperandHandlers;
-    }
-
+@Configuration
+@ComponentScan
+public class OperationServiceConfiguration {
 }

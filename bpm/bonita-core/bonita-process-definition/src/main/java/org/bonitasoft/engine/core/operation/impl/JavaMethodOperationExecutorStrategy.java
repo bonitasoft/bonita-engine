@@ -20,11 +20,10 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SOperation;
 
 /**
- * @author Zhang Bole
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
+ * This stategy is not used directly,
+ * BusinessDataJavaMethodOperationExecutorStrategy is first executed and then delegate to that one.
  */
-public class JavaMethodOperationExecutorStrategy implements OperationExecutorStrategy {
+public abstract class JavaMethodOperationExecutorStrategy implements OperationExecutorStrategy {
 
     public static final String TYPE_JAVA_METHOD = "JAVA_METHOD";
 

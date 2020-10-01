@@ -27,11 +27,14 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Component
 public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
     private static final String TRANSIENT_DATA = "%TRANSIENT_DATA%_";
@@ -39,8 +42,8 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     private final TransientDataService transientDataService;
     private final TechnicalLoggerService logger;
 
-    public TransientDataLeftOperandHandler(final TransientDataService transientDataService,
-            final TechnicalLoggerService logger) {
+    public TransientDataLeftOperandHandler(TransientDataService transientDataService,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger) {
         this.transientDataService = transientDataService;
         this.logger = logger;
     }

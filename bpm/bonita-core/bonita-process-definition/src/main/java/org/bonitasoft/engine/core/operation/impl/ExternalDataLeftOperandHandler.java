@@ -21,11 +21,13 @@ import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Component
 public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
 
     @Override

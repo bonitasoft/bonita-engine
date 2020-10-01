@@ -43,7 +43,9 @@ public class JavaMethodOperationExecutorStrategyTest {
 
     @Before
     public void setUp() throws Exception {
-        strategy = new JavaMethodOperationExecutorStrategy();
+        strategy = new JavaMethodOperationExecutorStrategy() {
+
+        };
     }
 
     @Test(expected = SOperationExecutionException.class)

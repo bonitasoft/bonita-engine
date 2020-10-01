@@ -24,6 +24,7 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.springframework.stereotype.Component;
 
 /**
  * Updates of creates a document of the process.
@@ -35,6 +36,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Component
 public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandler {
 
     private final DocumentHelper documentHelper;

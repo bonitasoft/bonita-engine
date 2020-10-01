@@ -24,7 +24,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
-import org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -36,6 +35,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Zhang Bole
@@ -44,28 +45,25 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  * @author Colin Puy
  * @author Matthieu Chaffotte
  */
+@Service("operationService")
 public class OperationServiceImpl implements OperationService {
 
     private final Map<String, LeftOperandHandler> leftOperandHandlersMap;
-
     private final ExpressionResolverService expressionResolverService;
-
     private final PersistRightOperandResolver persistRightOperandResolver;
     private final TechnicalLoggerService logger;
-
     private final OperationExecutorStrategyProvider operationExecutorStrategyProvider;
 
-    public OperationServiceImpl(final OperationExecutorStrategyProvider operationExecutorStrategyProvider,
-            final LeftOperandHandlerProvider leftOperandHandlerProvider,
-            final ExpressionResolverService expressionResolverService,
-            final PersistRightOperandResolver persistRightOperandResolver,
-            final TechnicalLoggerService logger) {
+    public OperationServiceImpl(OperationExecutorStrategyProvider operationExecutorStrategyProvider,
+            List<LeftOperandHandler> leftOperandHandlers,
+            ExpressionResolverService expressionResolverService,
+            PersistRightOperandResolver persistRightOperandResolver,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger) {
         super();
         this.operationExecutorStrategyProvider = operationExecutorStrategyProvider;
         this.expressionResolverService = expressionResolverService;
         this.persistRightOperandResolver = persistRightOperandResolver;
         this.logger = logger;
-        final List<LeftOperandHandler> leftOperandHandlers = leftOperandHandlerProvider.getLeftOperandHandlers();
         leftOperandHandlersMap = new HashMap<>(leftOperandHandlers.size());
         for (final LeftOperandHandler leftOperandHandler : leftOperandHandlers) {
             leftOperandHandlersMap.put(leftOperandHandler.getType(), leftOperandHandler);

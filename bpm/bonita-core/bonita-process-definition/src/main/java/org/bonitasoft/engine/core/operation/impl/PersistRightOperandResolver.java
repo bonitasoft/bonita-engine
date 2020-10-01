@@ -17,10 +17,12 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Component
 public class PersistRightOperandResolver {
 
     private OperationsAnalyzer operationsAnalyzer;

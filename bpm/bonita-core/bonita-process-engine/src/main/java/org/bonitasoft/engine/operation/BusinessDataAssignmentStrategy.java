@@ -19,10 +19,12 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Component
 public class BusinessDataAssignmentStrategy implements OperationExecutorStrategy {
 
     private final EntitiesActionsExecutor actionsExecutor;
