@@ -13,16 +13,18 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.execution.StateBehaviors;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CancellingActivityWithBoundaryState extends EndingActivityWithBoundaryState {
+public class CancellingActivityWithBoundaryState implements FlowNodeState {
 
-    public CancellingActivityWithBoundaryState(final StateBehaviors stateBehaviors) {
-        super(stateBehaviors);
+    public CancellingActivityWithBoundaryState() {
     }
 
     @Override
@@ -50,9 +52,36 @@ public class CancellingActivityWithBoundaryState extends EndingActivityWithBound
         return SStateCategory.CANCELLING;
     }
 
-    @Override
     public SStateCategory getBoundaryCategoryState() {
         return SStateCategory.CANCELLING;
+    }
+
+    @Override
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
+        return false;
+    }
+
+    @Override
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
+        return StateCode.DONE;
+    }
+
+    @Override
+    public boolean notifyChildFlowNodeHasFinished(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+        return true;
+    }
+
+    @Override
+    public boolean isStable() {
+        return false;
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return false;
     }
 
 }

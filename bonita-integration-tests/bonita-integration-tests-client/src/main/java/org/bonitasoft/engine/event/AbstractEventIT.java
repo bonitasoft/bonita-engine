@@ -685,12 +685,15 @@ public abstract class AbstractEventIT extends TestWithUser {
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1",
                 ACTOR_NAME);
         userTaskDefinitionBuilder.addBoundaryEvent(BOUNDARY_NAME, true).addMessageEventTrigger(message);
+        final String otherBoundaryNotTriggered = "otherBoundaryNotTriggered";
+        userTaskDefinitionBuilder.addBoundaryEvent(otherBoundaryNotTriggered, true).addSignalEventTrigger("bat signal");
         userTaskDefinitionBuilder.addUserTask(EXCEPTION_STEP, ACTOR_NAME);
         userTaskDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", "step1");
         processDefinitionBuilder.addTransition("step1", "step2");
         processDefinitionBuilder.addTransition(BOUNDARY_NAME, EXCEPTION_STEP);
+        processDefinitionBuilder.addTransition(otherBoundaryNotTriggered, "end");
 
         return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
     }

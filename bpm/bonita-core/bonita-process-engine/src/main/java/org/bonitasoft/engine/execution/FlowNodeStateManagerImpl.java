@@ -87,10 +87,9 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             FlowNodeState nextState = stateSequence.getStateAfter(stateCategory, currentState.getId());
             if (nextState == null) {
                 throw new SActivityExecutionException(
-                        "no state found after " + allStates.get(currentState.getId()).getClass() + " for "
-                                + flowNodeInstance.getClass() + " in state category "
-                                + flowNodeInstance.getStateCategory()
-                                + " activity id=" + flowNodeInstance.getId());
+                        "no state found after " + allStates.get(currentState.getId()).getClass().getSimpleName()
+                                + " for " + flowNodeInstance.getClass().getSimpleName() + " in state category "
+                                + flowNodeInstance.getStateCategory() + " activity id=" + flowNodeInstance.getId());
             }
             return nextState;
         }

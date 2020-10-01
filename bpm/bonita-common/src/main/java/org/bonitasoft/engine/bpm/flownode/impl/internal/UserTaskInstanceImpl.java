@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 
@@ -20,6 +21,7 @@ import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@ToString(callSuper = true)
 public class UserTaskInstanceImpl extends HumanTaskInstanceImpl implements UserTaskInstance {
 
     private static final long serialVersionUID = -1791657324743303807L;

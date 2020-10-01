@@ -405,21 +405,10 @@ public class BPMArchiverService {
                         .done();
                 break;
             case END_EVENT:
-                // To uncomment if need to fix BS-11970
-                //                saFlowNodeInstance = BuilderFactory.get(SAEndEventInstanceBuilderFactory.class)
-                //                        .createNewArchivedEndEventInstance((SEndEventInstance) flowNodeInstance).done();
-                break;
             case START_EVENT:
-                // To uncomment if need to fix BS-11970
-                //                saFlowNodeInstance = BuilderFactory.get(SAStartEventInstanceBuilderFactory.class)
-                //                        .createNewArchivedStartEventInstance((SStartEventInstance) flowNodeInstance).done();
-                break;
             case BOUNDARY_EVENT:
-                break;
             case INTERMEDIATE_CATCH_EVENT:
-                break;
             case INTERMEDIATE_THROW_EVENT:
-                break;
             default:
                 break;
         }

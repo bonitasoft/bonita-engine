@@ -13,16 +13,19 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.junit.Test;
 
@@ -35,6 +38,13 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance.getId(), "step1");
 
+        // Check that boundary event has been created:
+        long otherBoundaries = getProcessAPI()
+                .searchFlowNodeInstances(new SearchOptionsBuilder(0, 10)
+                        .filter(FlowNodeInstanceSearchDescriptor.NAME, "otherBoundaryNotTriggered").done())
+                .getCount();
+        assertThat(otherBoundaries).isEqualTo(1);
+
         getProcessAPI().sendMessage("MyMessage",
                 new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
@@ -45,6 +55,14 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         waitForArchivedActivity(step1Id, TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
+
+        // Boundary events are not archived, so there is no way to check if the second boundary has been properly aborted (otherBoundaryNotTriggered).
+        // For that matter, only check that boundary is deleted:
+        otherBoundaries = getProcessAPI()
+                .searchFlowNodeInstances(new SearchOptionsBuilder(0, 10)
+                        .filter(FlowNodeInstanceSearchDescriptor.NAME, "otherBoundaryNotTriggered").done())
+                .getCount();
+        assertThat(otherBoundaries).isEqualTo(0);
 
         disableAndDeleteProcess(processDefinition);
     }
