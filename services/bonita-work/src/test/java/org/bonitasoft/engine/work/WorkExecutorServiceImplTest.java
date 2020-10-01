@@ -261,13 +261,14 @@ public class WorkExecutorServiceImplTest {
     }
 
     @Test
-    public void should_log_when_work_is_ignored_because_of_precondition() {
+    public void should_ignored_work_because_of_precondition_not_verified() {
         workExecutorService.onFailure(workDescriptor, bonitaWork, Collections.emptyMap(),
                 new SWorkPreconditionException("My precondition"));
 
-        verifyZeroInteractions(bonitaExecutorService);
-        verifyZeroInteractions(bonitaWork);
-        verify(logger).warn(contains("Work was not executed because preconditions were not met,"), any(), any());
+        verifyNoMoreInteractions(bonitaExecutorService);
+        verifyNoMoreInteractions(bonitaWork);
+        verify(logger).warn(contains("Work was not executed because preconditions were not met,"), (Object) any(),
+                (Object) any());
     }
 
 }

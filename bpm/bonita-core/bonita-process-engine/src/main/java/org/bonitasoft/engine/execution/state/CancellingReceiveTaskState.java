@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
-import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.springframework.stereotype.Component;
 
@@ -28,9 +27,7 @@ public class CancellingReceiveTaskState extends CancellingActivityWithBoundarySt
 
     private final WaitingEventsInterrupter waitingEventsInterrupter;
 
-    public CancellingReceiveTaskState(final StateBehaviors stateBehaviors,
-            WaitingEventsInterrupter waitingEventsInterrupter) {
-        super(stateBehaviors);
+    public CancellingReceiveTaskState(WaitingEventsInterrupter waitingEventsInterrupter) {
         this.waitingEventsInterrupter = waitingEventsInterrupter;
     }
 

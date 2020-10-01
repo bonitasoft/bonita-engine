@@ -16,6 +16,8 @@ package org.bonitasoft.engine.execution.state;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
@@ -24,6 +26,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
+import org.bonitasoft.engine.execution.StateBehaviors;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,10 +36,14 @@ public class ExecutingBoundaryEventState implements FlowNodeState {
 
     private final ContainerRegistry containerRegistry;
 
-    public ExecutingBoundaryEventState(final ActivityInstanceService activityInstanceService,
-            final ContainerRegistry containerRegistry) {
+    private final StateBehaviors stateBehaviors;
+
+    public ExecutingBoundaryEventState(ActivityInstanceService activityInstanceService,
+            ContainerRegistry containerRegistry,
+            StateBehaviors stateBehaviors) {
         this.activityInstanceService = activityInstanceService;
         this.containerRegistry = containerRegistry;
+        this.stateBehaviors = stateBehaviors;
     }
 
     @Override
@@ -56,11 +63,19 @@ public class ExecutingBoundaryEventState implements FlowNodeState {
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance boundary)
             throws SActivityStateExecutionException {
-        final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) instance;
+        final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) boundary;
         if (boundaryEventInstance.isInterrupting()) {
             abortRelatedActivity(boundaryEventInstance);
+            // Also abort the other boundary events on the same flow node instance:
+            try {
+                stateBehaviors.interruptAttachedBoundaryEvent(processDefinition,
+                        activityInstanceService.getActivityInstance(boundaryEventInstance.getActivityInstanceId()),
+                        SStateCategory.ABORTING);
+            } catch (SActivityInstanceNotFoundException | SActivityReadException e) {
+                throw new SActivityStateExecutionException(e);
+            }
         }
 
         return StateCode.DONE;

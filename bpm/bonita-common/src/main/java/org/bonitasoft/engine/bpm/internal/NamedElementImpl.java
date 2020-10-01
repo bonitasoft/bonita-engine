@@ -15,13 +15,14 @@ package org.bonitasoft.engine.bpm.internal;
 
 import java.util.Objects;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * author Emmanuel Duchastenier
  * author Baptiste Mesta
  */
+@ToString(callSuper = true)
 public class NamedElementImpl extends BaseElementImpl implements NamedElement {
 
     private String name;
@@ -61,11 +62,6 @@ public class NamedElementImpl extends BaseElementImpl implements NamedElement {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), name);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this).append("name", name).toString();
     }
 
 }

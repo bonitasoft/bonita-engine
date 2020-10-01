@@ -13,16 +13,24 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
+import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AbortingBoundaryEventsOnCompletingActivityState extends EndingActivityWithBoundaryState {
+public class AbortingBoundaryEventsOnCompletingActivityState implements FlowNodeState {
+
+    private final StateBehaviors stateBehaviors;
 
     public AbortingBoundaryEventsOnCompletingActivityState(final StateBehaviors stateBehaviors) {
-        super(stateBehaviors);
+        this.stateBehaviors = stateBehaviors;
     }
 
     @Override
@@ -52,8 +60,40 @@ public class AbortingBoundaryEventsOnCompletingActivityState extends EndingActiv
     }
 
     @Override
-    public SStateCategory getBoundaryCategoryState() {
-        return SStateCategory.ABORTING;
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
+        final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer()
+                .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+        return !activityDef.getBoundaryEventDefinitions().isEmpty();
     }
 
+    @Override
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
+        final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer()
+                .getFlowNode(instance.getFlowNodeDefinitionId());
+        if (!activityDef.getBoundaryEventDefinitions().isEmpty()) {
+            final SActivityInstance activityInstance = (SActivityInstance) instance;
+            stateBehaviors.interruptAttachedBoundaryEvent(processDefinition, activityInstance,
+                    SStateCategory.ABORTING);
+        }
+        return StateCode.DONE;
+    }
+
+    @Override
+    public boolean notifyChildFlowNodeHasFinished(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
+        return true;
+    }
+
+    @Override
+    public boolean isStable() {
+        return false;
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return false;
+    }
 }

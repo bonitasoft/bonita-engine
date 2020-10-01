@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.process.impl.internal;
 
 import java.util.Date;
 
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 
@@ -23,6 +24,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@ToString(callSuper = true)
 public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInstance {
 
     private static final long serialVersionUID = 7745012384930764581L;

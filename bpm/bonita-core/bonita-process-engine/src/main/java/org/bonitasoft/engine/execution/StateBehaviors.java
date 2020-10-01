@@ -668,7 +668,7 @@ public class StateBehaviors {
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(
-                    "Unable cancel boundary events attached to activity " + activityInstance.getName(), e);
+                    "Unable to cancel boundary events attached to activity " + activityInstance.getName(), e);
         }
     }
 

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.Date;
 import java.util.Objects;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.StateCategory;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@ToString(callSuper = true)
 public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements FlowNodeInstance {
 
     private static final long serialVersionUID = -6573747806944970703L;
@@ -233,23 +234,4 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
                 Objects.equals(lastUpdateDate, that.lastUpdateDate);
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("parentContainerId", parentContainerId)
-                .append("state", state)
-                .append("stateCategory", stateCategory)
-                .append("rootContainerId", rootContainerId)
-                .append("processDefinitionId", processDefinitionId)
-                .append("parentProcessInstanceId", parentProcessInstanceId)
-                .append("displayDescription", displayDescription)
-                .append("displayName", displayName)
-                .append("description", description)
-                .append("executedBy", executedBy)
-                .append("executedBySubstitute", executedBySubstitute)
-                .append("flownodeDefinitionId", flownodeDefinitionId)
-                .append("reachedStateDate", reachedStateDate)
-                .append("lastUpdateDate", lastUpdateDate)
-                .toString();
-    }
 }

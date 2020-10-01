@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.work;
 
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
@@ -22,7 +24,6 @@ import java.util.UUID;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * @author Baptiste Mesta.
@@ -137,7 +138,7 @@ public class WorkDescriptor implements Serializable {
     }
 
     public String getDescription() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
                 .append(type)
                 .append("parameters", parameters).toString();
     }
@@ -179,7 +180,7 @@ public class WorkDescriptor implements Serializable {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
+        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
                 .append("uuid", uuid)
                 .append("type", type)
                 .append("tenantId", tenantId)

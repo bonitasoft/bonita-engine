@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import java.util.Date;
 
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 
@@ -22,6 +23,7 @@ import org.bonitasoft.engine.bpm.flownode.TaskPriority;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@ToString(callSuper = true)
 public abstract class HumanTaskInstanceImpl extends TaskInstanceImpl implements HumanTaskInstance {
 
     private static final long serialVersionUID = 5988594900787242204L;

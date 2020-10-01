@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.process.instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -27,6 +29,7 @@ import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -208,7 +211,7 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
     }
 
     @Test
-    @Ignore("not working")
+    @Ignore("not working need the retry mechanism, the fix BR454 is needed  ")
     public void should_abort_call_activities_from_calledProcess_with_event_subprocess() throws Exception {
         ProcessDefinition calledProcess = getProcessAPI()
                 .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "4.0")
@@ -255,7 +258,7 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
     }
 
     @Test
-    @Ignore("not working")
+    @Ignore("not working need the retry mechanism, the fix BR454 is needed  ")
     public void should_abort_elements_from_calledProcess_with_event_subprocess() throws Exception {
 
         ProcessDefinition endErrorProcess = getProcessAPI()
@@ -296,7 +299,7 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
     }
 
     @Test
-    @Ignore("not working")
+    @Ignore("not working need the retry mechanism, the fix BR454 is needed  ")
     public void should_abort_call_activities_from_parent_processes() throws Exception {
         ProcessDefinition calledProcess = getProcessAPI()
                 .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "1.0")
@@ -333,17 +336,67 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         disableAndDeleteProcess(calledProcess);
     }
 
+    @Test
+    public void should_abort_or_cancel_all_flow_nodes_including_boundary_events_when_process_is_aborted_or_cancelled()
+            throws Exception {
+        // given:
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(new ProcessDefinitionBuilder()
+                .createNewInstance("process to be aborted with boundary", "2.a")
+                .addActor("actor", true)
+                .addStartEvent("start")
+                .addUserTask("toBeAborted", "actor").addBoundaryEvent("boundary").addSignalEventTrigger("theSignal")
+                .addUserTask("terminateTask", "actor")
+                .addEndEvent("end").addTerminateEventTrigger()
+                .addTransition("start", "toBeAborted")
+                .addTransition("start", "terminateTask")
+                .addTransition("boundary", "end")
+                .addTransition("terminateTask", "end").getProcess(), "actor", user);
+
+        // when:
+        getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("toBeAborted");
+        waitForUserTaskAndExecuteIt("terminateTask", user);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask(processInstance, "toBeAborted");
+        getProcessAPI().cancelProcessInstance(processInstance.getId());
+
+        // then:
+        await().until(
+                () -> getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.LAST_UPDATE_ASC),
+                hasSize(0));
+        assertThat(getProcessAPI().searchFlowNodeInstances(new SearchOptionsBuilder(0, 100).done()).getResult())
+                .hasSize(0);
+        await().until(
+                () -> getProcessAPI()
+                        .searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 100)
+                                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "toBeAborted")
+                                .filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "aborted")
+                                .done())
+                        .getResult(),
+                hasSize(1));
+        await().until(
+                () -> getProcessAPI()
+                        .searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 100)
+                                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "toBeAborted")
+                                .filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "cancelled")
+                                .done())
+                        .getResult(),
+                hasSize(1));
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
     private void executeAndVerifyCompleted(Callable<DesignProcessDefinition> callable) throws Exception {
         ProcessDefinition processDefinition = getProcessAPI().deployAndEnableProcess(callable.call());
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         try {
-
             waitForProcessToFinish(processInstance);
         } catch (Exception e) {
             logger.error("error while waiting for process to finish");
             ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI()
                     .getFinalArchivedProcessInstance(processInstance.getId());
-            logger.error("final archive: {}, {}", finalArchivedProcessInstance.getState(),
+            logger.error("final archive: state={}, endDate={}", finalArchivedProcessInstance.getState(),
                     finalArchivedProcessInstance.getEndDate());
             getProcessAPI().searchProcessInstances(new SearchOptionsBuilder(0, 100).done()).getResult()
                     .forEach(a -> logger.error("process found at the end: {}", a));
@@ -357,13 +410,12 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         ProcessDefinition processDefinition = getProcessAPI().deployAndEnableProcess(callable.call());
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         try {
-
             waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
         } catch (Exception e) {
-            logger.error("error while waiting for process to finish");
+            logger.error("error while waiting for process to be aborted");
             ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI()
                     .getFinalArchivedProcessInstance(processInstance.getId());
-            logger.error("final archive: {}, {}", finalArchivedProcessInstance.getState(),
+            logger.error("final archive: state={}, endDate={}", finalArchivedProcessInstance.getState(),
                     finalArchivedProcessInstance.getEndDate());
             getProcessAPI().searchProcessInstances(new SearchOptionsBuilder(0, 100).done()).getResult()
                     .forEach(a -> logger.error("process found at the end: {}", a));

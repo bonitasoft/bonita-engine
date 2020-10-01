@@ -15,12 +15,14 @@ package org.bonitasoft.engine.bpm.internal;
 
 import java.util.Objects;
 
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
  * @author Baptiste Mesta
  */
 
+@ToString
 public abstract class BaseElementImpl implements BaseElement {
 
     private static final long serialVersionUID = -5094021692278906536L;
@@ -51,11 +53,6 @@ public abstract class BaseElementImpl implements BaseElement {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "id: " + id + "\n";
     }
 
 }
