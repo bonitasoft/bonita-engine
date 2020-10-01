@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
@@ -59,9 +58,6 @@ public class DocumentListLeftOperandHandlerTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @Mock
-    private DocumentService documentService;
-
-    @Mock
     private ActivityInstanceService activityInstanceService;
 
     @Mock
@@ -87,7 +83,7 @@ public class DocumentListLeftOperandHandlerTest {
     @Before
     public void setUp() throws SFlowNodeReadException, SFlowNodeNotFoundException {
         handler = new DocumentListLeftOperandHandler(activityInstanceService, sessionAccessor, sessionService,
-                documentService, documentHelper);
+                documentHelper);
         doReturn(LOGGED_USER_ID).when(sessionService).getLoggedUserFromSession(sessionAccessor);
 
         SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);

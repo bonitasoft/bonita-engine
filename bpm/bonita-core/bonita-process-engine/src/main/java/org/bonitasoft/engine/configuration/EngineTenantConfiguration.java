@@ -13,13 +13,18 @@
  **/
 package org.bonitasoft.engine.configuration;
 
+import org.bonitasoft.engine.core.operation.OperationServiceConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan({
-        "org.bonitasoft.engine.tenant", "org.bonitasoft.engine.execution"
+        "org.bonitasoft.engine.tenant",
+        "org.bonitasoft.engine.execution",
+        "org.bonitasoft.engine.operation"
 })
+@Import(OperationServiceConfiguration.class)
 public class EngineTenantConfiguration {
 
     //Add here tenant beans instead of adding it in xml file

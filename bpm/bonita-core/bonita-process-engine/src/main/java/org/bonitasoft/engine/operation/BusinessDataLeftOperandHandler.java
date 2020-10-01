@@ -32,11 +32,13 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessM
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Component
 public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
 
     protected final RefBusinessDataService refBusinessDataService;

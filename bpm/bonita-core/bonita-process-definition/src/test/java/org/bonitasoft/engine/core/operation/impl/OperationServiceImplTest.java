@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.operation.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.core.operation.model.SOperatorType.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,7 +27,6 @@ import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anyString;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +35,6 @@ import java.util.Map;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
-import org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -65,9 +64,6 @@ public class OperationServiceImplTest {
 
     @Mock
     private ExpressionResolverService expressionResolverService;
-
-    @Mock
-    private LeftOperandHandlerProvider leftOperandHandlerProvider;
 
     @Mock
     private LeftOperandHandler leftOperandHandler1;
@@ -141,14 +137,12 @@ public class OperationServiceImplTest {
         doReturn(javaMethodOperationExecutorStrategy).when(operationExecutorStrategyProvider)
                 .getOperationExecutorStrategy(
                         argThat(operation -> JAVA_METHOD.equals(operation.getType())));
-        doReturn(Arrays.asList(leftOperandHandler1, leftOperandHandler2, leftOperandHandler3, leftOperandHandler4))
-                .when(leftOperandHandlerProvider)
-                .getLeftOperandHandlers();
 
         given(assignmentOperationExecutorStrategy.shouldPersistOnNullValue()).willReturn(true);
         given(xPathOperationExecutorStrategy.shouldPersistOnNullValue()).willReturn(true);
         given(javaMethodOperationExecutorStrategy.shouldPersistOnNullValue()).willReturn(true);
-        operationServiceImpl = new OperationServiceImpl(operationExecutorStrategyProvider, leftOperandHandlerProvider,
+        operationServiceImpl = new OperationServiceImpl(operationExecutorStrategyProvider,
+                asList(leftOperandHandler1, leftOperandHandler2, leftOperandHandler3, leftOperandHandler4),
                 expressionResolverService,
                 persistRightOperandResolver, logger);
     }
@@ -185,7 +179,7 @@ public class OperationServiceImplTest {
         final Map<String, Object> inputValues = new HashMap<>();
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, inputValues);
 
-        final List<SOperation> operations = Arrays.asList(op1, op2, op3);
+        final List<SOperation> operations = asList(op1, op2, op3);
         given(persistRightOperandResolver.shouldPersistByPosition(0, operations)).willReturn(true);
         given(persistRightOperandResolver.shouldPersistByPosition(1, operations)).willReturn(false);
         given(persistRightOperandResolver.shouldPersistByPosition(2, operations)).willReturn(true);
@@ -216,11 +210,11 @@ public class OperationServiceImplTest {
                         "originalValue"));
 
         // when
-        operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(Arrays.asList(op1), 123,
+        operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(asList(op1), 123,
                 "containerType", expressionContext);
 
         // then
-        verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(eq(Arrays.asList(op1.getLeftOperand())),
+        verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(eq(asList(op1.getLeftOperand())),
                 anyLong(), anyString(),
                 any(SExpressionContext.class));
         assertThat(expressionContext.getInputValues().get("data1")).isEqualTo("originalValue");
@@ -231,7 +225,7 @@ public class OperationServiceImplTest {
         // given
         final SOperation operation1 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
         final SOperation operation2 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
-        final List<SOperation> operations = Arrays.asList(operation1, operation2);
+        final List<SOperation> operations = asList(operation1, operation2);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L,
                 Collections.<String, Object> singletonMap("data1",
                         "givenValue"));

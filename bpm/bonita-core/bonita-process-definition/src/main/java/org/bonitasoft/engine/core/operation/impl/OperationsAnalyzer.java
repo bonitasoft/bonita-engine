@@ -20,10 +20,12 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Component
 public class OperationsAnalyzer {
 
     /**

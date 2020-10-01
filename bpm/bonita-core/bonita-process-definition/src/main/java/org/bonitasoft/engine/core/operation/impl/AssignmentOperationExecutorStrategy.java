@@ -19,6 +19,7 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
+import org.springframework.stereotype.Component;
 
 /**
  * AssignmentOperationExecutorStrategy is the default Bonita strategy to execute data assignment operations
@@ -28,6 +29,7 @@ import org.bonitasoft.engine.core.operation.model.SOperatorType;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Component
 public class AssignmentOperationExecutorStrategy implements OperationExecutorStrategy {
 
     /**

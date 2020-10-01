@@ -20,11 +20,13 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Laurent Leseigneur
  * @author Matthieu Chaffotte
  */
+@Component
 public class BusinessDataJavaMethodOperationExecutorStrategy extends JavaMethodOperationExecutorStrategy {
 
     private final BusinessDataService businessDataService;

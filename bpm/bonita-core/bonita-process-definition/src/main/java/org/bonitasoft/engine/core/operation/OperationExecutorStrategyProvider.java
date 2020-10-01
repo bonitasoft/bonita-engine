@@ -21,10 +21,9 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Zhang Bole
- */
+@Component
 public class OperationExecutorStrategyProvider {
 
     private final Map<String, OperationExecutorStrategy> operationStrategies;
