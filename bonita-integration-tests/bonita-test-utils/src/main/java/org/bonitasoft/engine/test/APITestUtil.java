@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -153,6 +154,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public static final int DEFAULT_REPEAT_EACH = 500;
 
+    // Use 'sysprop.bonita.test.timeout.millis' to overwrite:
     public static final int DEFAULT_TIMEOUT;
 
     public static final String ACTOR_NAME = BuildTestUtil.ACTOR_NAME;
@@ -194,11 +196,12 @@ public class APITestUtil extends PlatformTestUtil {
     private final APIClient apiClient = new APIClient();
 
     static {
-        final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
+        final String strTimeout = System.getProperty("sysprop.bonita.test.timeout.millis");
         if (strTimeout != null) {
-            DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
+            LOGGER.info("Using overridden test timeout value {} ms", strTimeout);
+            DEFAULT_TIMEOUT = Integer.parseInt(strTimeout);
         } else {
-            DEFAULT_TIMEOUT = 2 * 60 * 1000;
+            DEFAULT_TIMEOUT = (int) Duration.ofSeconds(30).toMillis();
         }
     }
 
@@ -1272,7 +1275,7 @@ public class APITestUtil extends PlatformTestUtil {
                 processInstancedId, 0, 200,
                 ActivityInstanceCriterion.DEFAULT);
         for (final ArchivedActivityInstance archivedActivityInstance : archivedActivityInstances) {
-            assertFalse(flowNodeName.equals(archivedActivityInstance.getName()));
+            assertNotEquals(flowNodeName, archivedActivityInstance.getName());
         }
     }
 
@@ -1284,7 +1287,7 @@ public class APITestUtil extends PlatformTestUtil {
         searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, flowNodeName);
         final SearchResult<ArchivedFlowNodeInstance> searchArchivedActivities = getProcessAPI()
                 .searchArchivedFlowNodeInstances(searchOptionsBuilder.done());
-        assertTrue(searchArchivedActivities.getCount() == 0);
+        assertEquals(0, searchArchivedActivities.getCount());
     }
 
     public void skipTask(final long activityId) throws UpdateException {
