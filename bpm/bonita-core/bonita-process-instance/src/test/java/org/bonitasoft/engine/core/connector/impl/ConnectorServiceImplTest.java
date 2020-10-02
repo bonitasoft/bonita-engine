@@ -14,10 +14,22 @@
 package org.bonitasoft.engine.core.connector.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.notNull;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,16 +45,20 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.connector.AbstractConnector;
+import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorExecutionResult;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.connector.SConnector;
+import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
+import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -621,5 +637,23 @@ public class ConnectorServiceImplTest {
                 "Executing connector  [name: <myConnectorInstance>, version: <connectorVersion>, connector id: <connectorId>, "
                         +
                         "connector instance id: <0>, container type: <containerType>, container id: <123>, activation event: <ON_ENTER>");
+    }
+
+    @Test
+    public void should_disconnect_connector_when_executeOutputOperation_throw_a_SOperationExecutionException()
+            throws Exception {
+        // Given
+        doThrow(SOperationExecutionException.class).when(operationService).execute(anyList(), anyLong(),
+                nullable(String.class), nullable(SExpressionContext.class));
+
+        //When
+        ConnectorResult connectorResult = new ConnectorResult(mock(Connector.class), new HashMap<>(), 1);
+        assertThatThrownBy(
+                () -> connectorService.executeOutputOperation(new ArrayList<>(), new SExpressionContext(1L, "", 1L),
+                        connectorResult))
+                                .isInstanceOf(SConnectorException.class);
+
+        // Then
+        verify(connectorExecutor).disconnect(any(SConnectorAdapter.class));
     }
 }
