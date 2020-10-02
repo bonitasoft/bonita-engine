@@ -22,12 +22,10 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.springframework.core.annotation.Order;
 
-/**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- * @author Hongwen Zang
- */
+// Must be started before the work service so it has a "higher" priority
+@Order(10)
 public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
 
     private final long tenantId;

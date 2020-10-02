@@ -70,8 +70,6 @@ public class PlatformAPIImplTest {
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
     @Mock
-    private TenantConfiguration tenantConfiguration;
-    @Mock
     private BonitaHomeServer bonitaHomeServer;
     @Mock
     private PlatformService platformService;

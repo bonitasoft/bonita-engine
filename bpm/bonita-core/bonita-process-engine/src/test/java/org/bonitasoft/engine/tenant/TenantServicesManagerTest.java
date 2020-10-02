@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SLifecycleException;
@@ -52,8 +51,6 @@ public class TenantServicesManagerTest {
     @Mock
     private TransactionService transactionService;
     @Mock
-    private TenantConfiguration tenantConfiguration;
-    @Mock
     private TenantLifecycleService tenantService1;
     @Mock
     private TenantLifecycleService tenantService2;
@@ -71,13 +68,11 @@ public class TenantServicesManagerTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(asList(tenantService1, tenantService2, tenantService3)).when(tenantConfiguration)
-                .getLifecycleServices();
         when(transactionService.executeInTransaction(any()))
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         tenantServicesManager = new TenantServicesManager(sessionAccessor, sessionService, transactionService,
                 classLoaderService,
-                tenantConfiguration, TENANT_ID, tenantElementsRestarter);
+                asList(tenantService1, tenantService2, tenantService3), TENANT_ID, tenantElementsRestarter);
         doReturn(true).when(sessionAccessor).isTenantSession();
     }
 
@@ -123,14 +118,15 @@ public class TenantServicesManagerTest {
     }
 
     @Test
-    public void stop_should_stop_services() throws Exception {
+    public void stop_should_stop_services_in_reverse_order() throws Exception {
         tenantServicesManager.start();
 
         tenantServicesManager.stop();
 
-        InOrder inOrder = inOrder(tenantService1, tenantService2);
-        inOrder.verify(tenantService1).stop();
+        InOrder inOrder = inOrder(tenantService1, tenantService2, tenantService3);
+        inOrder.verify(tenantService3).stop();
         inOrder.verify(tenantService2).stop();
+        inOrder.verify(tenantService1).stop();
     }
 
     @Test
@@ -139,9 +135,10 @@ public class TenantServicesManagerTest {
 
         tenantServicesManager.pause();
 
-        InOrder inOrder = inOrder(tenantService1, tenantService2);
-        inOrder.verify(tenantService1).pause();
+        InOrder inOrder = inOrder(tenantService1, tenantService2, tenantService3);
+        inOrder.verify(tenantService3).pause();
         inOrder.verify(tenantService2).pause();
+        inOrder.verify(tenantService1).pause();
     }
 
     @Test

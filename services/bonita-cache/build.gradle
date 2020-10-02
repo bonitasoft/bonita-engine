@@ -5,6 +5,7 @@ dependencies {
     compile project(':services:bonita-commons')
     compile project(':services:bonita-session')
     compile project(':services:bonita-log-technical')
+    compile "org.springframework:spring-context:${Deps.springVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }

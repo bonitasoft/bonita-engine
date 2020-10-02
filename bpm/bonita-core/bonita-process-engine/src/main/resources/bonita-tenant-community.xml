@@ -1050,9 +1050,6 @@
 
     <task:scheduler id="internalTasksScheduler"/>
 
-    <bean id="tenantConfiguration" class="org.bonitasoft.engine.api.impl.TenantConfiguration" autowire="byType">
-    </bean>
-
 
     <bean id="supervisorMappingService"
           class="org.bonitasoft.engine.supervisor.mapping.impl.SupervisorMappingServiceImpl">
