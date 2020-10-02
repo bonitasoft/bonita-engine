@@ -16,49 +16,23 @@ package org.bonitasoft.engine.recorder.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.EqualsAndHashCode;
+
 /**
  * @author Baptiste Mesta
  */
+@EqualsAndHashCode
 public class EntityUpdateDescriptor {
 
-    Map<String, Object> fields = new HashMap<String, Object>();
+    Map<String, Object> fields = new HashMap<>();
 
     public Map<String, Object> getFields() {
         return fields;
     }
 
-    public void addField(final String name, final Object value) {
+    public EntityUpdateDescriptor addField(final String name, final Object value) {
         fields.put(name, value);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (fields == null ? 0 : fields.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final EntityUpdateDescriptor other = (EntityUpdateDescriptor) obj;
-        if (fields == null) {
-            if (other.fields != null) {
-                return false;
-            }
-        } else if (!fields.equals(other.fields)) {
-            return false;
-        }
-        return true;
+        return this;
     }
 
     @Override
