@@ -64,8 +64,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -835,7 +833,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void updateProcess(final SProcessInstance processInstance, final EntityUpdateDescriptor descriptor)
             throws SProcessInstanceModificationException {
         try {
-            recorder.recordUpdate(UpdateRecord.buildSetFields(processInstance, descriptor), PROCESSINSTANCE);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(processInstance,
+                    descriptor.addField(SProcessInstance.LAST_UPDATE_KEY, System.currentTimeMillis())),
+                    PROCESSINSTANCE);
         } catch (final SRecorderException e) {
             throw new SProcessInstanceModificationException(e);
         }
@@ -958,10 +958,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void setInterruptingEventId(long parentProcessInstanceId, long eventInstanceId)
             throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
             SProcessInstanceModificationException {
-        final SProcessInstanceUpdateBuilder updateBuilder = BuilderFactory
-                .get(SProcessInstanceUpdateBuilderFactory.class).createNewInstance();
-        updateBuilder.updateInterruptingEventId(eventInstanceId);
-        final SProcessInstance processInstance = getProcessInstance(parentProcessInstanceId);
-        updateProcess(processInstance, updateBuilder.done());
+        updateProcess(getProcessInstance(parentProcessInstanceId),
+                new EntityUpdateDescriptor().addField(SProcessInstance.INTERRUPTING_EVENT_ID_KEY, eventInstanceId));
     }
 }

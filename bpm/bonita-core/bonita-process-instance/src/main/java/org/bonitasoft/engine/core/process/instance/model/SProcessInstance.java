@@ -45,6 +45,7 @@ import org.hibernate.annotations.Filter;
 public class SProcessInstance implements PersistentObject {
 
     private static final long DEFAULT_INTERRUPTING_EVENT_ID = -1L;
+    public static final String STRING_INDEX_KEY = "stringIndex";
     public static final String STRING_INDEX_1_KEY = "stringIndex1";
     public static final String STRING_INDEX_2_KEY = "stringIndex2";
     public static final String STRING_INDEX_3_KEY = "stringIndex3";
