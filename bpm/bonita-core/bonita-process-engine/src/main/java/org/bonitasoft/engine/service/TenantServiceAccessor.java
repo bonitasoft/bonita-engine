@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.service;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
@@ -215,8 +214,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     JobService getJobService();
 
     ThemeService getThemeService();
-
-    TenantConfiguration getTenantConfiguration();
 
     <T> T lookup(String serviceName) throws NotFoundException;
 

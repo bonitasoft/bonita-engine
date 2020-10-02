@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.service.impl;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
@@ -406,11 +405,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public void destroy() {
         beanAccessor.destroy();
-    }
-
-    @Override
-    public TenantConfiguration getTenantConfiguration() {
-        return beanAccessor.getService(TenantConfiguration.class);
     }
 
     @Override

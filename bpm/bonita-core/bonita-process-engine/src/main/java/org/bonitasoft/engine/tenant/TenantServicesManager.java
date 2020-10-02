@@ -16,11 +16,13 @@ package org.bonitasoft.engine.tenant;
 import static java.text.MessageFormat.format;
 import static org.bonitasoft.engine.tenant.TenantServicesManager.ServiceAction.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -56,20 +58,20 @@ public class TenantServicesManager {
     private final SessionService sessionService;
     private final TransactionService transactionService;
     private final ClassLoaderService classLoaderService;
-    private final TenantConfiguration tenantConfiguration;
+    private List<TenantLifecycleService> services;
     private final Long tenantId;
     private final TenantElementsRestarter tenantElementsRestarter;
     private TenantServiceState tenantServiceState = TenantServiceState.STOPPED;
 
     public TenantServicesManager(SessionAccessor sessionAccessor, SessionService sessionService,
             TransactionService transactionService, ClassLoaderService classLoaderService,
-            TenantConfiguration tenantConfiguration, @Value("${tenantId}") Long tenantId,
+            List<TenantLifecycleService> services, @Value("${tenantId}") Long tenantId,
             TenantElementsRestarter tenantElementsRestarter) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.transactionService = transactionService;
         this.classLoaderService = classLoaderService;
-        this.tenantConfiguration = tenantConfiguration;
+        this.services = services;
         this.tenantId = tenantId;
         this.tenantElementsRestarter = tenantElementsRestarter;
     }
@@ -111,9 +113,7 @@ public class TenantServicesManager {
             inTenantSession(() -> {
                 tenantElementsRestarter.prepareRestartOfElements();
                 transactionService.executeInTransaction((Callable<Void>) () -> {
-                    executeInClassloader(() -> {
-                        startServices(startAction);
-                    });
+                    executeInClassloader(() -> startServices(startAction));
                     return null;
                 });
             });
@@ -130,7 +130,7 @@ public class TenantServicesManager {
 
     private void startServices(ServiceAction startAction) throws SLifecycleException {
 
-        for (TenantLifecycleService tenantService : tenantConfiguration.getLifecycleServices()) {
+        for (TenantLifecycleService tenantService : services) {
             try {
                 LOGGER.info("{} tenant-level service {} on tenant with ID {}", startAction,
                         tenantService.getClass().getName(), tenantId);
@@ -171,26 +171,29 @@ public class TenantServicesManager {
             return;
         }
         updateState(TenantServiceState.STOPPING);
+        List<TenantLifecycleService> list = new ArrayList<>(services);
+        Collections.reverse(list);
         Optional<Exception> firstIssue = transactionService
                 .executeInTransaction(
-                        () -> tenantConfiguration.getLifecycleServices().stream().<Exception> map(tenantService -> {
-                            LOGGER.info("{} tenant-level service {} on tenant with ID {}", stopAction,
-                                    tenantService.getClass().getName(), tenantId);
-                            try {
-                                if (stopAction == PAUSE) {
-                                    tenantService.pause();
-                                } else {
-                                    tenantService.stop();
-                                }
-                            } catch (final Exception e) {
-                                LOGGER.error("Error executing the {} of the service {} because: {} {}",
-                                        stopAction, tenantService.getClass().getName(), e.getClass().getName(),
-                                        e.getMessage());
-                                LOGGER.debug("Cause", e);
-                                return e;
-                            }
-                            return null;
-                        }).filter(Objects::nonNull).findFirst());
+                        () -> list.stream()
+                                .map(tenantService -> {
+                                    LOGGER.info("{} tenant-level service {} on tenant with ID {}", stopAction,
+                                            tenantService.getClass().getName(), tenantId);
+                                    try {
+                                        if (stopAction == PAUSE) {
+                                            tenantService.pause();
+                                        } else {
+                                            tenantService.stop();
+                                        }
+                                    } catch (final Exception e) {
+                                        LOGGER.error("Error executing the {} of the service {} because: {} {}",
+                                                stopAction, tenantService.getClass().getName(), e.getClass().getName(),
+                                                e.getMessage());
+                                        LOGGER.debug("Cause", e);
+                                        return e;
+                                    }
+                                    return null;
+                                }).filter(Objects::nonNull).findFirst());
         updateState(TenantServiceState.STOPPED);
         LOGGER.debug("Services of tenant {} are stopped.", tenantId);
         if (firstIssue.isPresent()) {
