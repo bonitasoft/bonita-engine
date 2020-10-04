@@ -1,6 +1,6 @@
 # Bonita Engine
 
-![Travis CI](https://img.shields.io/travis/bonitasoft/bonita-engine/master?label=Travis%20build&logo=travis)
+[![Travis CI](https://img.shields.io/travis/bonitasoft/bonita-engine/master?label=Travis%20build&logo=travis)](https://travis-ci.org/bonitasoft/bonita-engine)
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.bonitasoft.engine/bonita-server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.bonitasoft.engine/bonita-server)
 
