@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.operation;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -53,26 +53,113 @@ public class OperationIT extends TestWithUser {
 
     @Test
     public void executeStringOperationOnData() throws Exception {
-        createAndExecuteProcessWithOperations("executeStringOperationOnData", Collections.singletonList("myData1"),
-                Collections.singletonList(String.class.getName()),
-                Collections.singletonList(new LeftOperandBuilder().createNewInstance().setName("myData1").done()),
-                Collections.singletonList(OperatorType.ASSIGNMENT), Collections.singletonList("="),
-                Collections.singletonList(new ExpressionBuilder().createConstantStringExpression("val1")),
-                Collections.singletonList(new ExpressionBuilder().createConstantStringExpression("val2")),
-                Collections.singletonList((Object) "val1"),
-                Collections.singletonList((Object) "val2"));
+        createAndExecuteProcessWithOperations("executeStringOperationOnData", singletonList("myData1"),
+                singletonList(String.class.getName()),
+                singletonList(new LeftOperandBuilder().createNewInstance().setName("myData1").done()),
+                singletonList(OperatorType.ASSIGNMENT), singletonList("="),
+                singletonList(new ExpressionBuilder().createConstantStringExpression("val1")),
+                singletonList(new ExpressionBuilder().createConstantStringExpression("val2")),
+                singletonList("val1"),
+                singletonList("val2"));
     }
 
     @Test
     public void executeBooleanOperationOnData() throws Exception {
-        createAndExecuteProcessWithOperations("executeBooleanOperationOnData", Collections.singletonList("myData1"),
-                Collections.singletonList(Boolean.class.getName()),
-                Collections.singletonList(new LeftOperandBuilder().createNewInstance().setName("myData1").done()),
-                Collections.singletonList(OperatorType.ASSIGNMENT), Collections.singletonList("="),
-                Collections.singletonList(new ExpressionBuilder().createConstantBooleanExpression(true)),
-                Collections.singletonList(new ExpressionBuilder().createConstantBooleanExpression(false)),
-                Collections.singletonList((Object) true),
-                Collections.singletonList((Object) false));
+        createAndExecuteProcessWithOperations("executeBooleanOperationOnData", singletonList("myData1"),
+                singletonList(Boolean.class.getName()),
+                singletonList(new LeftOperandBuilder().createNewInstance().setName("myData1").done()),
+                singletonList(OperatorType.ASSIGNMENT), singletonList("="),
+                singletonList(new ExpressionBuilder().createConstantBooleanExpression(true)),
+                singletonList(new ExpressionBuilder().createConstantBooleanExpression(false)),
+                singletonList(true),
+                singletonList(false));
+    }
+
+    @Test
+    public void executeStringIndexOperation() throws Exception {
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("procWithStringIndexes", "1.0");
+        final String actorName = "doctor";
+        designProcessDefinition.addActor(actorName).addDescription("The doc'");
+        designProcessDefinition.addUserTask("step1", actorName);
+        designProcessDefinition.addUserTask("step3", actorName);
+        final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1,
+                new ExpressionBuilder().createConstantStringExpression("newValue1")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(2,
+                new ExpressionBuilder().createConstantStringExpression("newValue2")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(3,
+                new ExpressionBuilder().createConstantStringExpression("newValue3")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(4,
+                new ExpressionBuilder().createConstantStringExpression("newValue4")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(5,
+                new ExpressionBuilder().createConstantStringExpression("newValue5")));
+        designProcessDefinition.addTransition("step1", "step2");
+        designProcessDefinition.addTransition("step2", "step3");
+        designProcessDefinition.setStringIndex(1, "label1",
+                new ExpressionBuilder().createConstantStringExpression("value1"));
+        designProcessDefinition.setStringIndex(2, "label2",
+                new ExpressionBuilder().createConstantStringExpression("value2"));
+        designProcessDefinition.setStringIndex(3, "label3",
+                new ExpressionBuilder().createConstantStringExpression("value3"));
+        designProcessDefinition.setStringIndex(4, "label4",
+                new ExpressionBuilder().createConstantStringExpression("value4"));
+        designProcessDefinition.setStringIndex(5, "label5",
+                new ExpressionBuilder().createConstantStringExpression("value5"));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                actorName, user);
+
+        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
+        final long step1Id = waitForUserTask(startProcess, "step1");
+        ProcessInstance processInstance = getProcessAPI().getProcessInstance(startProcess.getId());
+        assertEquals("value1", processInstance.getStringIndex1());
+        assertEquals("value2", processInstance.getStringIndex2());
+        assertEquals("value3", processInstance.getStringIndex3());
+        assertEquals("value4", processInstance.getStringIndex4());
+        assertEquals("value5", processInstance.getStringIndex5());
+        assignAndExecuteStep(step1Id, user);
+        waitForUserTask(startProcess, "step3");
+        processInstance = getProcessAPI().getProcessInstance(startProcess.getId());
+        assertEquals("newValue1", processInstance.getStringIndex1());
+        assertEquals("newValue2", processInstance.getStringIndex2());
+        assertEquals("newValue3", processInstance.getStringIndex3());
+        assertEquals("newValue4", processInstance.getStringIndex4());
+        assertEquals("newValue5", processInstance.getStringIndex5());
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void executeStringIndexOperationUsingData() throws Exception {
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("procWithStringIndexes", "1.0");
+        final String actorName = "doctor";
+        designProcessDefinition.addData("baseData", String.class.getName(),
+                new ExpressionBuilder().createConstantStringExpression("baseValue"));
+        designProcessDefinition.addActor(actorName).addDescription("The doc'");
+        designProcessDefinition.addUserTask("step1", actorName);
+        designProcessDefinition.addUserTask("step3", actorName);
+        final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
+        addAutomaticTask.addOperation(new LeftOperandBuilder().createDataLeftOperand("baseData"),
+                OperatorType.ASSIGNMENT, null, null,
+                new ExpressionBuilder().createConstantStringExpression("changedData"));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1,
+                new ExpressionBuilder().createDataExpression("baseData", String.class.getName())));
+        designProcessDefinition.addTransition("step1", "step2");
+        designProcessDefinition.addTransition("step2", "step3");
+        designProcessDefinition.setStringIndex(1, "label1",
+                new ExpressionBuilder().createDataExpression("baseData", String.class.getName()));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                actorName, user);
+
+        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
+        final long step1Id = waitForUserTask(startProcess, "step1");
+        ProcessInstance processInstance = getProcessAPI().getProcessInstance(startProcess.getId());
+        assertEquals("baseValue", processInstance.getStringIndex1());
+        assignAndExecuteStep(step1Id, user);
+        waitForUserTask(startProcess, "step3");
+        processInstance = getProcessAPI().getProcessInstance(startProcess.getId());
+        assertEquals("changedData", processInstance.getStringIndex1());
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
@@ -92,26 +179,26 @@ public class OperationIT extends TestWithUser {
 
     @Test
     public void executeIntegerOperationOnData() throws Exception {
-        createAndExecuteProcessWithOperations("executeIntegerOperationOnData", Collections.singletonList("myData12"),
-                Collections.singletonList(Integer.class.getName()),
-                Collections.singletonList(new LeftOperandBuilder().createNewInstance().setName("myData12").done()),
-                Collections.singletonList(OperatorType.ASSIGNMENT), Collections.singletonList("="),
-                Collections.singletonList(new ExpressionBuilder().createConstantIntegerExpression(1)),
-                Collections.singletonList(new ExpressionBuilder().createConstantIntegerExpression(2)),
-                Collections.singletonList((Object) 1),
-                Collections.singletonList((Object) 2));
+        createAndExecuteProcessWithOperations("executeIntegerOperationOnData", singletonList("myData12"),
+                singletonList(Integer.class.getName()),
+                singletonList(new LeftOperandBuilder().createNewInstance().setName("myData12").done()),
+                singletonList(OperatorType.ASSIGNMENT), singletonList("="),
+                singletonList(new ExpressionBuilder().createConstantIntegerExpression(1)),
+                singletonList(new ExpressionBuilder().createConstantIntegerExpression(2)),
+                singletonList(1),
+                singletonList(2));
     }
 
     @Test
     public void executeLongOperationOnData() throws Exception {
-        createAndExecuteProcessWithOperations("executeLongOperationOnData", Collections.singletonList("myData12"),
-                Collections.singletonList(Long.class.getName()),
-                Collections.singletonList(new LeftOperandBuilder().createNewInstance().setName("myData12").done()),
-                Collections.singletonList(OperatorType.ASSIGNMENT), Collections.singletonList("="),
-                Collections.singletonList(new ExpressionBuilder().createConstantLongExpression(1234567891234567891L)),
-                Collections.singletonList(new ExpressionBuilder().createConstantLongExpression(1234567891234567892L)),
-                Collections.singletonList((Object) 1234567891234567891L),
-                Collections.singletonList((Object) 1234567891234567892L));
+        createAndExecuteProcessWithOperations("executeLongOperationOnData", singletonList("myData12"),
+                singletonList(Long.class.getName()),
+                singletonList(new LeftOperandBuilder().createNewInstance().setName("myData12").done()),
+                singletonList(OperatorType.ASSIGNMENT), singletonList("="),
+                singletonList(new ExpressionBuilder().createConstantLongExpression(1234567891234567891L)),
+                singletonList(new ExpressionBuilder().createConstantLongExpression(1234567891234567892L)),
+                singletonList(1234567891234567891L),
+                singletonList(1234567891234567892L));
     }
 
     @Test
@@ -132,9 +219,9 @@ public class OperationIT extends TestWithUser {
                 Arrays.asList(new ExpressionBuilder().createConstantStringExpression("test2"),
                         new ExpressionBuilder().createConstantBooleanExpression(true),
                         new ExpressionBuilder().createConstantLongExpression(1234567891234567892L)),
-                Arrays.asList((Object) "test1", (Object) false,
-                        (Object) 1234567891234567891L),
-                Arrays.asList((Object) "test2", (Object) true, (Object) 1234567891234567892L));
+                Arrays.asList("test1", false,
+                        1234567891234567891L),
+                Arrays.asList("test2", true, 1234567891234567892L));
     }
 
     @Test
@@ -162,10 +249,10 @@ public class OperationIT extends TestWithUser {
                         new ExpressionBuilder().createConstantBooleanExpression(true),
                         new ExpressionBuilder().createConstantLongExpression(1234567891234567892L),
                         new ExpressionBuilder().createConstantStringExpression("test3")),
-                Arrays.asList((Object) "test1", (Object) false,
-                        (Object) 1234567891234567891L, (Object) "test1"),
-                Arrays.asList((Object) "test3", (Object) true, (Object) 1234567891234567892L,
-                        (Object) "test3"));
+                Arrays.asList("test1", false,
+                        1234567891234567891L, "test1"),
+                Arrays.asList("test3", true, 1234567891234567892L,
+                        "test3"));
     }
 
     @Test
@@ -275,6 +362,16 @@ public class OperationIT extends TestWithUser {
         designProcessDefinition.addUserTask("step2", delivery);
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
+        designProcessDefinition.setStringIndex(1, "label1",
+                new ExpressionBuilder().createConstantStringExpression("value1"));
+        designProcessDefinition.setStringIndex(2, "label2",
+                new ExpressionBuilder().createConstantStringExpression("value2"));
+        designProcessDefinition.setStringIndex(3, "label3",
+                new ExpressionBuilder().createConstantStringExpression("value3"));
+        designProcessDefinition.setStringIndex(4, "label4",
+                new ExpressionBuilder().createConstantStringExpression("value4"));
+        designProcessDefinition.setStringIndex(5, "label5",
+                new ExpressionBuilder().createConstantStringExpression("value5"));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
                 delivery, user);
@@ -344,9 +441,15 @@ public class OperationIT extends TestWithUser {
         final String updatedValue = "<node><after/></node>";
         final String xPathExpression = "/node/before";
         final String updatedContent = "after";
-        executeProcessAndUpdateDataUsingAGroovyScript("removeAndCreateANewNodeOfAnXMLNodeOfADataUsingXPath",
-                defaultValue, xPathExpression, updatedContent,
-                updatedValue);
+        final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
+        final Expression rightOperand = expressionBuilder.createGroovyScriptExpression(
+                "removeAndCreateANewNodeOfAnXMLNodeOfADataUsingXPath",
+                "import javax.xml.parsers.DocumentBuilder;"
+                        + "import javax.xml.parsers.DocumentBuilderFactory;import org.w3c.dom.Node;"
+                        + "DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); return builder.newDocument().createElement(\""
+                        + updatedContent + "\");",
+                Node.class.getName());
+        executeProcessAndUpdateData(defaultValue, xPathExpression, rightOperand, updatedValue);
     }
 
     @Test
@@ -379,19 +482,6 @@ public class OperationIT extends TestWithUser {
     public void updateTheContentOfAnXMLNodeOfADataWithDoubleValueUsingXPath() throws Exception {
         updateAttributeAndContentWithNumericValueUsingXPath(
                 new ExpressionBuilder().createConstantDoubleExpression(123.123), "123.123");
-    }
-
-    private void executeProcessAndUpdateDataUsingAGroovyScript(final String name, final String defaultValue,
-            final String xPathExpression,
-            final String updatedContent, final String updatedValue) throws Exception {
-        final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
-        final Expression rightOperand = expressionBuilder.createGroovyScriptExpression(name,
-                "import javax.xml.parsers.DocumentBuilder;"
-                        + "import javax.xml.parsers.DocumentBuilderFactory;import org.w3c.dom.Node;"
-                        + "DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); return builder.newDocument().createElement(\""
-                        + updatedContent + "\");",
-                Node.class.getName());
-        executeProcessAndUpdateData(defaultValue, xPathExpression, rightOperand, updatedValue);
     }
 
     private void executeProcessAndUpdateData(final String defaultValue, final String xPathExpression,
@@ -458,10 +548,9 @@ public class OperationIT extends TestWithUser {
     }
 
     private void executeProcessAndUpdateData(final String defaultValue, final String xPathExpression,
-            final Expression rightOperand, final String updatedValue)
-            throws Exception {
-        executeProcessAndUpdateData(Arrays.asList(defaultValue), Arrays.asList(xPathExpression),
-                Arrays.asList(rightOperand), Arrays.asList(updatedValue));
+            final Expression rightOperand, final String updatedValue) throws Exception {
+        executeProcessAndUpdateData(singletonList(defaultValue), singletonList(xPathExpression),
+                singletonList(rightOperand), singletonList(updatedValue));
     }
 
     @Test

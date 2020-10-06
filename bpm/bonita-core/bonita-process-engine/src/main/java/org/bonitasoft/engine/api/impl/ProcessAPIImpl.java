@@ -176,6 +176,7 @@ import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.Index;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
@@ -194,6 +195,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.V6FormDeployException;
+import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -6717,6 +6719,51 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         return processConfigurationAPI.getFormMapping(formMappingId);
+    }
+
+    @Override
+    public ProcessInstance updateProcessInstance(final long processInstanceId, final ProcessInstanceUpdater updater)
+            throws ProcessInstanceNotFoundException, UpdateException {
+        if (updater == null || updater.getFields().isEmpty()) {
+            throw new UpdateException("The update descriptor does not contain field updates");
+        }
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        try {
+            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+            EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            final Map<org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater.ProcessInstanceField, Serializable> fields = updater
+                    .getFields();
+            for (final Entry<org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater.ProcessInstanceField, Serializable> field : fields
+                    .entrySet()) {
+                entityUpdateDescriptor.addField(SProcessInstance.STRING_INDEX_KEY + (field.getKey().ordinal() + 1),
+                        field.getValue());
+            }
+            processInstanceService.updateProcess(processInstance, entityUpdateDescriptor);
+            return getProcessInstance(processInstanceId);
+        } catch (final SProcessInstanceNotFoundException spinfe) {
+            throw new ProcessInstanceNotFoundException(spinfe);
+        } catch (final SBonitaException | RetrieveException sbe) {
+            throw new UpdateException(sbe);
+        }
+    }
+
+    @Override
+    public ProcessInstance updateProcessInstanceIndex(final long processInstanceId, final Index index,
+            final String value) throws ProcessInstanceNotFoundException, UpdateException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        try {
+            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+            EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            entityUpdateDescriptor.addField(SProcessInstance.STRING_INDEX_KEY + (index.ordinal() + 1), value);
+            processInstanceService.updateProcess(processInstance, entityUpdateDescriptor);
+            return getProcessInstance(processInstanceId);
+        } catch (final SProcessInstanceNotFoundException notFound) {
+            throw new ProcessInstanceNotFoundException(notFound);
+        } catch (final SBonitaException | RetrieveException sbe) {
+            throw new UpdateException(sbe);
+        }
     }
 
 }

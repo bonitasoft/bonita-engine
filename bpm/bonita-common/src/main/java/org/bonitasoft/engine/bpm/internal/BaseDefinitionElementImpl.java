@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
- * @author mazourd
+ * @author Danila Mazour
  */
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)

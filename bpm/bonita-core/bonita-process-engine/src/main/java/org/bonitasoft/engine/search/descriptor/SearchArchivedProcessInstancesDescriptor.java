@@ -80,9 +80,25 @@ public class SearchArchivedProcessInstancesDescriptor extends SearchEntityDescri
         searchEntityKeys.put(ASSIGNEE_ID,
                 new FieldDescriptor(SUserTaskInstance.class, sUserTaskInstanceBuilder.getAssigneeIdKey()));
 
+        searchEntityKeys.put(STRING_INDEX_1,
+                new FieldDescriptor(SAProcessInstance.class, STRING_INDEX_1));
+        searchEntityKeys.put(STRING_INDEX_2,
+                new FieldDescriptor(SAProcessInstance.class, STRING_INDEX_2));
+        searchEntityKeys.put(STRING_INDEX_3,
+                new FieldDescriptor(SAProcessInstance.class, STRING_INDEX_3));
+        searchEntityKeys.put(STRING_INDEX_4,
+                new FieldDescriptor(SAProcessInstance.class, STRING_INDEX_4));
+        searchEntityKeys.put(STRING_INDEX_5,
+                new FieldDescriptor(SAProcessInstance.class, STRING_INDEX_5));
+
         archivedProcessInstanceAllFields = new HashMap<>();
         processInstanceFields = new HashSet<>();
         processInstanceFields.add(instanceBuilder.getNameKey());
+        processInstanceFields.add(STRING_INDEX_1);
+        processInstanceFields.add(STRING_INDEX_2);
+        processInstanceFields.add(STRING_INDEX_3);
+        processInstanceFields.add(STRING_INDEX_4);
+        processInstanceFields.add(STRING_INDEX_5);
         archivedProcessInstanceAllFields.put(SAProcessInstance.class, processInstanceFields);
     }
 
