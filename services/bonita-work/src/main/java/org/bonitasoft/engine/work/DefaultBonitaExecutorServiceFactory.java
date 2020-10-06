@@ -26,6 +26,9 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Use ThreadPoolExecutor as ExecutorService
@@ -39,24 +42,33 @@ import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
  *
  * @author Baptiste Mesta
  */
+@Component("bonitaExecutorServiceFactory")
 public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
 
     private final int corePoolSize;
     private final int queueCapacity;
     private final int maximumPoolSize;
     private final long keepAliveTimeSeconds;
-    private EngineClock engineClock;
+    private final EngineClock engineClock;
     private final TechnicalLoggerService logger;
-    private WorkFactory workFactory;
+    private final WorkFactory workFactory;
     private final long tenantId;
     private final WorkExecutionAuditor workExecutionAuditor;
-    private MeterRegistry meterRegistry;
-    private ExecutorServiceMetricsProvider executorServiceMetricsProvider;
+    private final MeterRegistry meterRegistry;
+    private final ExecutorServiceMetricsProvider executorServiceMetricsProvider;
 
-    public DefaultBonitaExecutorServiceFactory(final TechnicalLoggerService logger, WorkFactory workFactory,
-            final long tenantId, final int corePoolSize, final int queueCapacity, final int maximumPoolSize,
-            final long keepAliveTimeSeconds, EngineClock engineClock, WorkExecutionAuditor workExecutionAuditor,
-            MeterRegistry meterRegistry, ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
+    public DefaultBonitaExecutorServiceFactory(
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            WorkFactory workFactory,
+            @Value("${tenantId}") long tenantId,
+            @Value("${bonita.tenant.work.corePoolSize}") int corePoolSize,
+            @Value("${bonita.tenant.work.queueCapacity}") int queueCapacity,
+            @Value("${bonita.tenant.work.maximumPoolSize}") int maximumPoolSize,
+            @Value("${bonita.tenant.work.keepAliveTimeSeconds}") long keepAliveTimeSeconds,
+            EngineClock engineClock,
+            WorkExecutionAuditor workExecutionAuditor,
+            MeterRegistry meterRegistry,
+            ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
         this.logger = logger;
         this.workFactory = workFactory;
         this.tenantId = tenantId;

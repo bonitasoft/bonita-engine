@@ -16,10 +16,12 @@ package org.bonitasoft.engine.work.audit;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Default implementation backed to a slf4j logger.
  */
+@Component
 public class AuditListener {
 
     private static final Logger WORK_AUDIT = LoggerFactory.getLogger("BONITA_WORK_AUDIT.EXECUTION");

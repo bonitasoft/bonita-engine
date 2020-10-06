@@ -38,9 +38,8 @@ public class WorkExecutionAuditorTest {
     @Test
     public void should_execution_status_be_ok_when_no_threshold_is_reached() {
         // given:
-        WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()),
-                new RegistrationDurationElapsedCheckConfig(3, DAYS),
-                new ExecutionCountCheckConfig(50, 3, DAYS));
+        WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()), new AuditListener(),
+                new RegistrationDurationElapsedCheckConfig(3, DAYS), new ExecutionCountCheckConfig(50, 3, DAYS));
 
         // when:
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(now(), 10));
@@ -52,9 +51,8 @@ public class WorkExecutionAuditorTest {
     @Test
     public void should_execution_status_be_ko_when_a_large_number_of_executions_have_been_performed() {
         // given:
-        WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()),
-                new RegistrationDurationElapsedCheckConfig(3, DAYS),
-                new ExecutionCountCheckConfig(50, 3, MILLIS));
+        WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()), new AuditListener(),
+                new RegistrationDurationElapsedCheckConfig(3, DAYS), new ExecutionCountCheckConfig(50, 3, MILLIS));
 
         // when:
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(now().minus(12, MINUTES), 200));
@@ -66,9 +64,8 @@ public class WorkExecutionAuditorTest {
     @Test
     public void should_execution_status_be_ok_when_a_large_number_of_executions_have_been_performed_but_execution_count_duration_threshold_is_not_elapsed() {
         // given:
-        WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()),
-                new RegistrationDurationElapsedCheckConfig(3, DAYS),
-                new ExecutionCountCheckConfig(50, 3, HOURS));
+        WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()), new AuditListener(),
+                new RegistrationDurationElapsedCheckConfig(3, DAYS), new ExecutionCountCheckConfig(50, 3, HOURS));
 
         // when:
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(now().minus(12, MINUTES), 200));
@@ -81,9 +78,8 @@ public class WorkExecutionAuditorTest {
     public void should_execution_status_be_ko_when_too_much_time_elapsed_since_work_registration() {
         // given:
         final Instant registrationDate = now().minus(12, MINUTES);
-        WorkExecutionAuditor auditor = new WorkExecutionAuditor(
-                new FixedEngineClock(registrationDate.plusSeconds(250)),
-                new RegistrationDurationElapsedCheckConfig(30, MILLIS),
+        WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(registrationDate.plusSeconds(250)),
+                new AuditListener(), new RegistrationDurationElapsedCheckConfig(30, MILLIS),
                 new ExecutionCountCheckConfig(50, 3, DAYS));
         // when:
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(registrationDate, 1));

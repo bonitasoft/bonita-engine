@@ -22,7 +22,10 @@ import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class WorkExecutionAuditor {
 
     private static final Logger log = LoggerFactory.getLogger(WorkExecutionAuditor.class);
@@ -30,19 +33,13 @@ public class WorkExecutionAuditor {
     private final EngineClock engineClock;
     private final AuditListener auditListener;
 
-    private boolean activated = true; // TODO make this configurable
-
-    private int executionCountThreshold;
-    private Duration executionCountDurationThreshold;
-    private Duration registrationDurationElapsedThreshold;
+    private boolean activated = true;
+    private final int executionCountThreshold;
+    private final Duration executionCountDurationThreshold;
+    private final Duration registrationDurationElapsedThreshold;
 
     public WorkExecutionAuditor(EngineClock engineClock,
-            RegistrationDurationElapsedCheckConfig registrationDurationElapsedCheckConfig,
-            ExecutionCountCheckConfig executionCountCheckConfig) {
-        this(engineClock, new AuditListener(), registrationDurationElapsedCheckConfig, executionCountCheckConfig);
-    }
-
-    public WorkExecutionAuditor(EngineClock engineClock, AuditListener auditListener,
+            AuditListener auditListener,
             RegistrationDurationElapsedCheckConfig registrationDurationElapsedCheckConfig,
             ExecutionCountCheckConfig executionCountCheckConfig) {
         this.engineClock = engineClock;
@@ -52,6 +49,7 @@ public class WorkExecutionAuditor {
         this.executionCountDurationThreshold = executionCountCheckConfig.executionDurationThreshold;
     }
 
+    @Value("${bonita.tenant.work.audit.activated:true}")
     public void setActivated(boolean activated) {
         this.activated = activated;
     }
@@ -108,23 +106,29 @@ public class WorkExecutionAuditor {
         return OK;
     }
 
+    @Component
     public static class RegistrationDurationElapsedCheckConfig {
 
         private final Duration duration;
 
-        public RegistrationDurationElapsedCheckConfig(int amount, ChronoUnit unit) {
+        public RegistrationDurationElapsedCheckConfig(
+                @Value("${bonita.tenant.work.audit.abnormal.execution.threshold.elapsed_duration_since_registration_amount:30}") int amount,
+                @Value("${bonita.tenant.work.audit.abnormal.execution.threshold.elapsed_duration_since_registration_unit:MINUTES}") ChronoUnit unit) {
             this.duration = Duration.of(amount, unit);
         }
 
     }
 
+    @Component
     public static class ExecutionCountCheckConfig {
 
         private final int executionCountThreshold;
         private final Duration executionDurationThreshold;
 
-        public ExecutionCountCheckConfig(int executionCountThreshold, int durationThresholdAmount,
-                ChronoUnit durationThresholdUnit) {
+        public ExecutionCountCheckConfig(
+                @Value("${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count:10}") int executionCountThreshold,
+                @Value("${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count_duration_amount:10}") int durationThresholdAmount,
+                @Value("${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count_duration_unit:MINUTES}") ChronoUnit durationThresholdUnit) {
             this.executionCountThreshold = executionCountThreshold;
             this.executionDurationThreshold = Duration.of(durationThresholdAmount, durationThresholdUnit);
         }
