@@ -31,6 +31,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: 'bonita-tests'
+    apply plugin: 'com.adarshr.test-logger'
 
     repositories {
         mavenLocal()
@@ -55,5 +56,12 @@ subprojects {
             configurations = [project.configurations.runtimeClasspath]
         }
 
+    }
+
+    testlogger {
+        showFullStackTraces false
+        showCauses true
+        showPassed false
+        showSkipped true
     }
 }
