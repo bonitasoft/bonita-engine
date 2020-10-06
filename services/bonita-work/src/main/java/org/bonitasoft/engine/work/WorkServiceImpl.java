@@ -19,6 +19,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 /**
  * Directly calls the WorkExecutorService
@@ -27,21 +29,20 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@Service("workService")
 public class WorkServiceImpl implements WorkService {
 
     private final UserTransactionService transactionService;
-
     private final TechnicalLogger log;
-
     private final SessionAccessor sessionAccessor;
-
     private final WorkExecutorService workExecutorService;
-
     private final EngineClock engineClock;
 
-    public WorkServiceImpl(final UserTransactionService transactionService,
-            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
-            WorkExecutorService workExecutorService, final EngineClock engineClock) {
+    public WorkServiceImpl(UserTransactionService transactionService,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService loggerService,
+            SessionAccessor sessionAccessor,
+            WorkExecutorService workExecutorService,
+            EngineClock engineClock) {
         this.transactionService = transactionService;
         this.log = loggerService.asLogger(WorkServiceImpl.class);
         this.sessionAccessor = sessionAccessor;

@@ -872,19 +872,41 @@
 
     <bean id="workFactory" class="org.bonitasoft.engine.execution.work.BPMWorkFactory" />
 
-    <bean id="workService" class="org.bonitasoft.engine.work.WorkServiceImpl">
-        <constructor-arg name="transactionService" ref="transactionService" />
-        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="workExecutorService" ref="workExecutorService" />
-        <constructor-arg name="engineClock" ref="engineClock" />
-    </bean>
 
-    <bean id="workExecutorService" class="org.bonitasoft.engine.work.WorkExecutorServiceImpl">
-        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
-        <constructor-arg name="workTerminationTimeout" value="${bonita.tenant.work.terminationTimeout}" />
-        <constructor-arg name="workExecutionAuditor" ref="workExecutionAuditor" />
+
+    <bean id="exceptionRetryabilityEvaluator" class="org.bonitasoft.engine.work.DefaultExceptionRetryabilityEvaluator">
+        <constructor-arg name="exceptionClassesToRetry">
+            <list>
+                <value>org.bonitasoft.engine.commons.exceptions.SRetryableException</value>
+
+                <!-- Related to concurrent updates -->
+                <value>org.hibernate.StaleStateException</value>
+                <value>org.hibernate.exception.LockAcquisitionException</value>
+                <value>javax.persistence.LockTimeoutException</value>
+                <value>javax.persistence.PessimisticLockException</value>
+                <value>javax.persistence.OptimisticLockException</value>
+                <value>org.hibernate.dialect.lock.LockingStrategyException</value>
+                <value>java.sql.SQLRecoverableException</value>
+                <value>java.sql.SQLTransientException</value>
+                <value>org.springframework.dao.TransientDataAccessException</value>
+                <value>org.springframework.dao.RecoverableDataAccessException</value>
+                <value>org.hibernate.exception.JDBCConnectionException</value>
+
+                <!-- Exceptions below might be useful on Microsoft Sql Server when data are not available directly after write -->
+                <!--<value>org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException</value>-->
+                <!--<value>org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException</value>-->
+                <!--<value>org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException</value>-->
+                <!--<value>org.bonitasoft.engine.business.data.SBusinessDataNotFoundException</value>-->
+                <!--<value>org.bonitasoft.engine.core.connector.exception.SConnectorInstanceNotFoundException</value>-->
+            </list>
+        </constructor-arg>
+        <constructor-arg name="exceptionClassesToNotRetry">
+            <list>
+                <!-- Will not retry issues coming from extensions like connectors -->
+                <value>org.bonitasoft.engine.connector.exception.SConnectorException</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
 
@@ -918,41 +940,8 @@
         <constructor-arg name="identityService" ref="identityService" />
     </bean>
 
-    <bean id="bonitaExecutorServiceFactory" class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="workFactory" ref="workFactory" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
-        <constructor-arg name="corePoolSize" value="${bonita.tenant.work.corePoolSize}" />
-        <constructor-arg name="maximumPoolSize" value="${bonita.tenant.work.maximumPoolSize}" />
-        <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.work.keepAliveTimeSeconds}" />
-        <constructor-arg name="queueCapacity" value="${bonita.tenant.work.queueCapacity}" />
-        <constructor-arg name="engineClock" ref="engineClock" />
-        <constructor-arg name="workExecutionAuditor" ref="workExecutionAuditor" />
-        <constructor-arg name="meterRegistry" ref="meterRegistry" />
-    </bean>
 
-    <bean id="workExecutionAuditor" class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor">
-        <property name="activated" value="${bonita.tenant.work.audit.activated:true}" />
-        <constructor-arg name="engineClock" ref="engineClock"/>
-        <constructor-arg name="executionCountCheckConfig">
-            <bean class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor$ExecutionCountCheckConfig">
-                <constructor-arg name="executionCountThreshold"
-                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count:10}"/>
-                <constructor-arg name="durationThresholdAmount"
-                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count_duration_amount:10}"/>
-                <constructor-arg name="durationThresholdUnit"
-                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count_duration_unit:MINUTES}"/>
-            </bean>
-        </constructor-arg>
-        <constructor-arg name="registrationDurationElapsedCheckConfig">
-            <bean class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor$RegistrationDurationElapsedCheckConfig">
-                <constructor-arg name="amount"
-                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.elapsed_duration_since_registration_amount:30}"/>
-                <constructor-arg name="unit"
-                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.elapsed_duration_since_registration_unit:MINUTES}"/>
-            </bean>
-        </constructor-arg>
-    </bean>
+
 
     <bean id="userFilterService" class="org.bonitasoft.engine.userfilter.UserFilterServiceDecorator">
         <constructor-arg name="userFilterService" ref="userFilterServiceSub" />
