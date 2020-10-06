@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -75,6 +76,23 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
         processFields = new HashSet<>();
         processFields.add(SProcessInstance.NAME_KEY);
         processInstanceAllFields.put(SProcessInstance.class, processFields);
+
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.STRING_INDEX_1,
+                new FieldDescriptor(SProcessInstance.class, SProcessInstance.STRING_INDEX_1_KEY));
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.STRING_INDEX_2,
+                new FieldDescriptor(SProcessInstance.class, SProcessInstance.STRING_INDEX_2_KEY));
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.STRING_INDEX_3,
+                new FieldDescriptor(SProcessInstance.class, SProcessInstance.STRING_INDEX_3_KEY));
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.STRING_INDEX_4,
+                new FieldDescriptor(SProcessInstance.class, SProcessInstance.STRING_INDEX_4_KEY));
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.STRING_INDEX_5,
+                new FieldDescriptor(SProcessInstance.class, SProcessInstance.STRING_INDEX_5_KEY));
+
+        processFields.add(SProcessInstance.STRING_INDEX_1_KEY);
+        processFields.add(SProcessInstance.STRING_INDEX_2_KEY);
+        processFields.add(SProcessInstance.STRING_INDEX_3_KEY);
+        processFields.add(SProcessInstance.STRING_INDEX_4_KEY);
+        processFields.add(SProcessInstance.STRING_INDEX_5_KEY);
     }
 
     @Override

@@ -370,8 +370,7 @@ public class BuildTestUtil {
     }
 
     public static List<DesignProcessDefinition> buildNbProcessDefinitionWithHumanAndAutomatic(final int nbProcess,
-            final List<String> stepNames,
-            final List<Boolean> isHuman) throws InvalidProcessDefinitionException {
+            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException {
         final List<DesignProcessDefinition> processDefinitions = new ArrayList<>();
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;

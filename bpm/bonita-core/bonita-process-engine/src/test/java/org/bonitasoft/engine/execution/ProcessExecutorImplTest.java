@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -59,6 +57,8 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SBusinessDataDef
 import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SSubProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
@@ -84,6 +84,7 @@ import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.work.WorkService;
@@ -608,4 +609,37 @@ public class ProcessExecutorImplTest {
         assertThat(transitionList).contains(transition4);
         assertThat(transitionList).contains(transition5);
     }
+
+    @Test
+    public void should_initializeStringIndex_should_update_process_if_string_index_defined() throws Exception {
+        //given
+        SProcessInstance processInstance = new SProcessInstance("p1", 15234632L);
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("p1", "1.0");
+        processDefinition.setStringIndex(1, "stringIndex1", new SExpressionImpl());
+        SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
+        processDefinition.setProcessContainer(processContainer);
+        //when
+        processExecutorImpl.initializeStringIndexes(processInstance, processDefinition, processContainer);
+        //then
+        verify(processInstanceService).updateProcess(eq(processInstance), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void should_initializeStringIndex_do_not_set_indexes_for_sub_processes() throws Exception {
+        //given
+        SProcessInstance processInstance = new SProcessInstance("p1", 15234632L);
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("p1", "1.0");
+        processDefinition.setStringIndex(1, "stringIndex1", new SExpressionImpl());
+        SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
+        SSubProcessDefinitionImpl subProcess = new SSubProcessDefinitionImpl(489372L, "subProcess", true);
+        SFlowElementContainerDefinitionImpl subProcessContainer = new SFlowElementContainerDefinitionImpl();
+        subProcess.setSubProcessContainer(subProcessContainer);
+        processContainer.addSubProcess(subProcess);
+        processDefinition.setProcessContainer(processContainer);
+        //when
+        processExecutorImpl.initializeStringIndexes(processInstance, processDefinition, subProcessContainer);
+        //then
+        verify(processInstanceService, never()).updateProcess(eq(processInstance), any(EntityUpdateDescriptor.class));
+    }
+
 }

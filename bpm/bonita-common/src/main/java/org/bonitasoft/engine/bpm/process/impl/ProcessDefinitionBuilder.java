@@ -971,4 +971,17 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         return new ContractDefinitionBuilder(this, process);
     }
 
+    /**
+     * Set the process string index at the given position.
+     *
+     * @param index
+     *        The position to be set. Valid values are between 1 and 5 (inclusive)
+     * @param label
+     *        The label to be displayed for this position
+     * @param initialValue
+     *        The expression representing the initial index value
+     */
+    public void setStringIndex(final int index, final String label, final Expression initialValue) {
+        process.setStringIndex(index, label, initialValue);
+    }
 }

@@ -82,6 +82,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadE
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -116,6 +117,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -420,7 +422,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 expressionContextToEvaluateOperations);
 
         initializeBusinessData(processContainer, sProcessInstance, expressionContext);
-        initializeData(processContainer, sProcessDefinition, sProcessInstance);
+        initializeStringIndexes(sProcessInstance, sProcessDefinition, processContainer);
 
         createDocuments(sProcessDefinition, processContainer, sProcessInstance, userId, expressionContext, context);
         createDocumentLists(processContainer, sProcessInstance, userId, expressionContext, context);
@@ -453,12 +455,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final Map<String, Serializable> processInputs)
             throws SContractDataCreationException {
         contractDataService.addProcessData(processInstanceId, processInputs);
-    }
-
-    protected void initializeData(final SFlowElementContainerDefinition processContainer,
-            SProcessDefinition sProcessDefinition, final SProcessInstance sInstance)
-            throws SProcessInstanceCreationException {
-        // nothing to do
     }
 
     protected void initializeBusinessData(SFlowElementContainerDefinition processContainer, SProcessInstance sInstance,
@@ -923,6 +919,33 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             return new StartFlowNodeFilter();
         }
         return new FlowNodeIdFilter(targetSFlowNodeDefinitionId);
+    }
+
+    protected void initializeStringIndexes(final SProcessInstance sInstance, SProcessDefinition sProcessDefinition,
+            final SFlowElementContainerDefinition processContainer) throws SExpressionTypeUnknownException,
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
+            SProcessInstanceModificationException {
+        if (!sProcessDefinition.getProcessContainer().equals(processContainer)) {
+            //we are not instantiating the process, we are starting an event subprocess
+            return;
+        }
+        final SExpressionContext contextDependency = new SExpressionContext(sInstance.getId(),
+                DataInstanceContainer.PROCESS_INSTANCE.name(),
+                sProcessDefinition.getId());
+
+        boolean update = false;
+        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        for (int i = 1; i <= 5; i++) {
+            final SExpression value = sProcessDefinition.getStringIndexValue(i);
+            if (value != null) {
+                update = true;
+                entityUpdateDescriptor.addField(SProcessInstance.STRING_INDEX_KEY + i,
+                        String.valueOf(expressionResolverService.evaluate(value, contextDependency)));
+            }
+        }
+        if (update) {
+            processInstanceService.updateProcess(sInstance, entityUpdateDescriptor);
+        }
     }
 
     protected SProcessInstance start(final long starterId, final long starterSubstituteId,

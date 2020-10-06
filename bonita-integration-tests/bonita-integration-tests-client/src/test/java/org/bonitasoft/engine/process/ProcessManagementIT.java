@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -64,6 +65,8 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -1924,6 +1927,123 @@ public class ProcessManagementIT extends TestWithUser {
         getProcessAPI().purgeClassLoader(processDefinition.getId());
 
         deleteProcess(processDefinition);
+    }
+
+    @Test
+    public void getProcessInstancesWithLabelOnStringIndex() throws Exception {
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        processBuilder.setStringIndex(1, "Label1", null);
+        processBuilder.setStringIndex(2, "Label2", null);
+        processBuilder.setStringIndex(3, "Label3", null);
+        processBuilder.setStringIndex(4, "Label4", null);
+        processBuilder.setStringIndex(5, "Label5", null);
+        final ProcessDefinition process1 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        processBuilder = new ProcessDefinitionBuilder().createNewInstance("2" + PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        processBuilder.setStringIndex(1, "LabelBis1", null);
+        processBuilder.setStringIndex(2, "LabelBis2", null);
+        processBuilder.setStringIndex(3, "LabelBis3", null);
+        processBuilder.setStringIndex(4, "LabelBis4", null);
+        processBuilder.setStringIndex(5, "LabelBis5", null);
+        final ProcessDefinition process2 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        startProcessAndWaitForTask(process1.getId(), "step1");
+        startProcessAndWaitForTask(process2.getId(), "step1");
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.NAME_ASC);
+        assertEquals(2, processInstances.size());
+        ProcessInstance processInstance = processInstances.get(0);
+        assertEquals("1" + PROCESS_NAME, processInstance.getName());
+        assertEquals("Label1", processInstance.getStringIndexLabel(1));
+        assertEquals("Label2", processInstance.getStringIndexLabel(2));
+        assertEquals("Label3", processInstance.getStringIndexLabel(3));
+        assertEquals("Label4", processInstance.getStringIndexLabel(4));
+        assertEquals("Label5", processInstance.getStringIndexLabel(5));
+        processInstance = processInstances.get(1);
+        assertEquals("2" + PROCESS_NAME, processInstance.getName());
+        assertEquals("LabelBis1", processInstance.getStringIndexLabel(1));
+        assertEquals("LabelBis2", processInstance.getStringIndexLabel(2));
+        assertEquals("LabelBis3", processInstance.getStringIndexLabel(3));
+        assertEquals("LabelBis4", processInstance.getStringIndexLabel(4));
+        assertEquals("LabelBis5", processInstance.getStringIndexLabel(5));
+        disableAndDeleteProcess(process1);
+        disableAndDeleteProcess(process2);
+    }
+
+    @Test
+    public void should_event_sub_process_do_not_have_search_index_of_parent() throws Exception {
+        //given
+        /*
+         * We test here that an event sub process instantiation do nothing on the parent process
+         * see bug BS-15123 and BS-15275
+         */
+        //given
+        ProcessDefinitionBuilder parentProcessBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ParentProcessWithSignalEventSubProcess", "1.0");
+        parentProcessBuilder.addActor(ACTOR_NAME);
+        parentProcessBuilder.addUserTask("userTask", ACTOR_NAME);
+        parentProcessBuilder.setStringIndex(1, "index1",
+                new ExpressionBuilder().createConstantStringExpression("index1Value"));
+        parentProcessBuilder.addShortTextData("textData",
+                new ExpressionBuilder().createConstantStringExpression("parentVar"));
+        //construct sub process
+        SubProcessDefinitionBuilder subProcessBuilder = parentProcessBuilder
+                .addSubProcess("interruptWithSignalProcess", true).getSubProcessBuilder();
+        StartEventDefinitionBuilder startEventDefinitionBuilder = subProcessBuilder.addStartEvent("signalStart");
+        startEventDefinitionBuilder.addSignalEventTrigger("theSignal");
+        subProcessBuilder.addUserTask("userTaskInSubProcess", ACTOR_NAME);
+        subProcessBuilder.addEndEvent("endSubProcess");
+        subProcessBuilder.addTransition("signalStart", "userTaskInSubProcess");
+        subProcessBuilder.addTransition("userTaskInSubProcess", "endSubProcess");
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(parentProcessBuilder.done(), ACTOR_NAME,
+                user);
+        getProcessAPI().startProcess(processDefinition.getId());
+        //when
+        waitForUserTask("userTask");
+        getProcessAPI().sendSignal("theSignal");
+        //then
+        ActivityInstance eventSubProcessActivity = getProcessAPI()
+                .getActivityInstance(waitForUserTask("userTaskInSubProcess"));
+        Assertions
+                .assertThat(getProcessAPI().getProcessInstance(eventSubProcessActivity.getRootContainerId())
+                        .getStringIndex1())
+                .isEqualTo("index1Value");
+        Assertions
+                .assertThat(getProcessAPI().getProcessInstance(eventSubProcessActivity.getParentProcessInstanceId())
+                        .getStringIndex1())
+                .isNull();
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void getProcessInstancesWithStringIndex() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
+        processBuilder.setStringIndex(1, "Label1", expressionBuilder.createConstantStringExpression("Value1"));
+        processBuilder.setStringIndex(2, "Label2", expressionBuilder.createGroovyScriptExpression("script",
+                "return \"a\"+\"b\";", String.class.getName()));
+        processBuilder.setStringIndex(3, "Label3", null);
+        final ProcessDefinition process1 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = startProcessAndWaitForTask(process1.getId(), "step1")
+                .getProcessInstance();
+        assertEquals("Label1", processInstance.getStringIndexLabel(1));
+        assertEquals("Label2", processInstance.getStringIndexLabel(2));
+        assertEquals("Label3", processInstance.getStringIndexLabel(3));
+        assertNull(processInstance.getStringIndexLabel(4));
+        assertNull(processInstance.getStringIndexLabel(5));
+        assertEquals("Value1", processInstance.getStringIndex1());
+        assertEquals("ab", processInstance.getStringIndex2());
+        assertNull(processInstance.getStringIndex3());
+        assertNull(processInstance.getStringIndex4());
+        assertNull(processInstance.getStringIndex5());
+
+        disableAndDeleteProcess(process1);
     }
 
 }

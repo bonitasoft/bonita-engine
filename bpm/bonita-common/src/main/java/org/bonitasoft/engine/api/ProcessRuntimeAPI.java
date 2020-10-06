@@ -51,6 +51,7 @@ import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundExcep
 import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.Index;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -3034,4 +3035,44 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long archivedProcessInstanceId)
             throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
+
+    /**
+     * Update an instance of process with the given processInstanceId.
+     *
+     * @param processInstanceId
+     *        Identifier of the process instance
+     * @param updater
+     *        including new value of all attributes adaptable
+     * @return the updated process instance
+     * @throws ProcessInstanceNotFoundException if no process instance can be found with id processInstanceId.
+     * @throws UpdateException
+     *         if an error is thrown while updating the process instance.
+     * @throws InvalidSessionException
+     *         if the session is invalid, e.g. the session has expired.
+     * @since 6.0
+     */
+    ProcessInstance updateProcessInstance(long processInstanceId,
+            org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater updater)
+            throws ProcessInstanceNotFoundException, UpdateException;
+
+    /**
+     * Update a string index of a process instance.
+     *
+     * @param processInstanceId
+     *        identifier of the process instance
+     * @param index the string {@link Index} to update
+     * @param value
+     *        the new value for the string index
+     * @return the updated process instance
+     * @throws ProcessInstanceNotFoundException
+     *         Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
+     * @throws UpdateException
+     *         if an error is thrown while updating the process instance.
+     * @throws InvalidSessionException
+     *         if the session is invalid, e.g. the session has expired.
+     * @since 7.12.0
+     */
+    ProcessInstance updateProcessInstanceIndex(long processInstanceId, Index index, String value)
+            throws ProcessInstanceNotFoundException, UpdateException;
+
 }

@@ -109,4 +109,10 @@ public class ArchivedProcessInstancesSearchDescriptor {
      */
     public static final String CALLER_ID = "callerId";
 
+    public static final String STRING_INDEX_1 = "stringIndex1";
+    public static final String STRING_INDEX_2 = "stringIndex2";
+    public static final String STRING_INDEX_3 = "stringIndex3";
+    public static final String STRING_INDEX_4 = "stringIndex4";
+    public static final String STRING_INDEX_5 = "stringIndex5";
+
 }
