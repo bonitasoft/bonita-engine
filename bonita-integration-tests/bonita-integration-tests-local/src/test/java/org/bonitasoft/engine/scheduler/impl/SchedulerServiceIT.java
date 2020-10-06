@@ -76,8 +76,12 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
     }
 
     @After
-    public void after() {
+    public void after() throws Exception {
         storage.clear();
+        userTransactionService.executeInTransaction(() -> {
+            schedulerService.deleteJobs();
+            return null;
+        });
     }
 
     @Test
@@ -163,6 +167,12 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
         ReleaseWaitersJob.waitForJobToExecuteOnce();
+
+        //cleanup
+        after();
+        changeTenant(tenantForJobTest1);
+        after();
+        changeTenant(getDefaultTenantId());
     }
 
     @Test
