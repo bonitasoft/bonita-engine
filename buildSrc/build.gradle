@@ -6,10 +6,12 @@ plugins {
 repositories {
     mavenLocal()
     jcenter()
+    gradlePluginPortal()
 }
 
 dependencies {
     compile "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+    compile "com.adarshr:gradle-test-logger-plugin:2.1.0"
 
     // for databases:
     compile "com.bmuschko:gradle-docker-plugin:5.2.0"
