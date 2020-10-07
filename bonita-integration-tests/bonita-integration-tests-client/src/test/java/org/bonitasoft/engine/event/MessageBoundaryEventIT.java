@@ -14,22 +14,35 @@
 package org.bonitasoft.engine.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.bonitasoft.engine.util.AssertionsUtils.assertNoErrorAfterXAttemps;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageBoundaryEventIT extends AbstractEventIT {
+
+    private static final Logger logger = LoggerFactory.getLogger(MessageBoundaryEventIT.class);
 
     @Test
     public void messageBoundaryEventTriggered() throws Exception {
@@ -290,6 +303,82 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         checkWasntExecuted(processInstance, "exceptionStep");
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void process_with_call_activity_aborted_by_boundary_event_should_complete_along_with_its_target_process()
+            throws Exception {
+        // given:
+        final DesignProcessDefinition subProcess = new ProcessDefinitionBuilder()
+                .createNewInstance("SubProcessWith2AutomaticTasks", "2.7")
+                .addAutomaticTask("sub1").addAutomaticTask("sub2")
+                .addTransition("sub1", "sub2")
+                .getProcess();
+        final DesignProcessDefinition parentProcess = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithCallActivityAborted", "7.3")
+                .addCallActivity("call",
+                        new ExpressionBuilder().createConstantStringExpression(subProcess.getName()),
+                        new ExpressionBuilder().createConstantStringExpression(subProcess.getVersion()))
+                .addBoundaryEvent("boundary", true).addMessageEventTrigger("abortCallActivity")
+                .addEndEvent("end")
+                .addTransition("boundary", "end")
+                .getProcess();
+        getProcessAPI().deployAndEnableProcess(subProcess);
+        ProcessDefinition parentProcessDefinition = getProcessAPI().deployAndEnableProcess(parentProcess);
+        assertNoErrorAfterXAttemps(5, () -> {
+            getProcessAPI().startProcess(parentProcessDefinition.getId());
+            getProcessAPI().sendMessage("abortCallActivity",
+                    new ExpressionBuilder().createConstantStringExpression("ProcessWithCallActivityAborted"),
+                    new ExpressionBuilder().createConstantStringExpression("boundary"), Collections.emptyMap());
+            await().until(
+                    () -> getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.LAST_UPDATE_ASC),
+                    hasSize(0));
+        }, e -> logAllProcesses());
+    }
+
+    @Test
+    public void process_with_call_activity_aborted_by_terminate_end_event_should_complete_along_with_its_target_process()
+            throws Exception {
+        // given:
+        final DesignProcessDefinition subProcess = new ProcessDefinitionBuilder()
+                .createNewInstance("SubProcessWith2AutomaticTasks", "2.7")
+                .addAutomaticTask("sub1").addAutomaticTask("sub2")
+                .addTransition("sub1", "sub2")
+                .getProcess();
+        final DesignProcessDefinition parentProcess = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithCallActivityAborted", "7.3")
+                .addStartEvent("start").addCallActivity("call",
+                        new ExpressionBuilder().createConstantStringExpression(subProcess.getName()),
+                        new ExpressionBuilder().createConstantStringExpression(subProcess.getVersion()))
+                // will loop forever until the terminate and event aborts it:
+                .addLoop(false, new ExpressionBuilder().createConstantBooleanExpression(true)).addAutomaticTask("auto1")
+                .addAutomaticTask("auto2").addEndEvent("end").addTerminateEventTrigger()
+                .addTransition("start", "call")
+                .addTransition("start", "auto1")
+                .addTransition("auto1", "auto2")
+                .addTransition("auto2", "end").getProcess();
+        getProcessAPI().deployAndEnableProcess(subProcess);
+        ProcessDefinition parentProcessDefinition = getProcessAPI().deployAndEnableProcess(parentProcess);
+
+        assertNoErrorAfterXAttemps(5, () -> {
+            getProcessAPI().startProcess(parentProcessDefinition.getId());
+            await().until(
+                    () -> getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.LAST_UPDATE_ASC),
+                    hasSize(0));
+        }, e -> logAllProcesses());
+    }
+
+    protected void logAllProcesses() throws SearchException {
+        logger.error("Found processes instances");
+        for (ProcessInstance p : getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.LAST_UPDATE_ASC)) {
+            logger.error("  * " + p);
+        }
+        logger.error("Found flow nodes");
+        for (FlowNodeInstance p : getProcessAPI()
+                .searchFlowNodeInstances(new SearchOptionsBuilder(0, 100).done()).getResult()) {
+            logger.error("  * " + p);
+        }
     }
 
 }
