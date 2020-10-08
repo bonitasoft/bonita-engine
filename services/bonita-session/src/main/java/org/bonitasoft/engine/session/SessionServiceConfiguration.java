@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2020 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,28 +11,12 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.configuration;
+package org.bonitasoft.engine.session;
 
-import org.bonitasoft.engine.core.operation.OperationServiceConfiguration;
-import org.bonitasoft.engine.session.SessionServiceConfiguration;
-import org.bonitasoft.engine.work.WorkServiceConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 @Configuration
-@ComponentScan({
-        "org.bonitasoft.engine.tenant",
-        "org.bonitasoft.engine.execution",
-        "org.bonitasoft.engine.operation"
-})
-@Import({
-        WorkServiceConfiguration.class,
-        OperationServiceConfiguration.class,
-        SessionServiceConfiguration.class
-})
-public class EngineTenantConfiguration {
-
-    //Add here tenant beans instead of adding it in xml file
-
+@ComponentScan
+public class SessionServiceConfiguration {
 }
