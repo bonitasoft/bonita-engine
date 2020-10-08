@@ -21,9 +21,9 @@ import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
+import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;

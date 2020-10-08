@@ -36,6 +36,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.StartNodeException;
+import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;

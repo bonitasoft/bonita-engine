@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.configuration.datasource;
+package org.bonitasoft.engine.platform.configuration.datasource;
 
 import javax.sql.DataSource;
 

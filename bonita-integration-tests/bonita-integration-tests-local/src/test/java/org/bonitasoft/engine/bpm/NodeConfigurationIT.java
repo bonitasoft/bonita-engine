@@ -19,10 +19,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.api.impl.NodeConfigurationImpl;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
+import org.bonitasoft.engine.platform.configuration.NodeConfigurationImpl;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.junit.BeforeClass;
