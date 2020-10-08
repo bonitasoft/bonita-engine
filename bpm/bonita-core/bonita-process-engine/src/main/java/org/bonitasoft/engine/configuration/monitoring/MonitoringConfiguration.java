@@ -27,11 +27,11 @@ import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.jmx.JmxConfig;
 import io.micrometer.jmx.JmxMeterRegistry;
-import org.bonitasoft.engine.configuration.ConditionalOnProperty;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +47,7 @@ public class MonitoringConfiguration {
     public final static String METRICS = "metrics.";
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + PUBLISHER + "jmx.enable", enableIfMissing = true)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + PUBLISHER + "jmx.enable", matchIfMissing = true)
     public JmxMeterRegistry jmxMeterRegistry(JmxConfig jmxConfig) {
         JmxMeterRegistry jmxMeterRegistry = new JmxMeterRegistry(jmxConfig, SYSTEM);
         jmxMeterRegistry.config()
@@ -58,7 +58,7 @@ public class MonitoringConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + PUBLISHER + "logging.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + PUBLISHER + "logging.enable")
     public LoggingMeterRegistry loggingMeterRegistry(LoggingRegistryConfig loggingRegistryConfig) {
         LoggingMeterRegistry registry = new LoggingMeterRegistry(loggingRegistryConfig, SYSTEM);
         //deny all meters that are not bonita related
@@ -77,25 +77,25 @@ public class MonitoringConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.memory.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.memory.enable")
     public JvmMemoryMetrics jvmMemoryMetrics() {
         return new JvmMemoryMetrics();
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.threads.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.threads.enable")
     public JvmThreadMetrics jvmThreadMetrics() {
         return new JvmThreadMetrics();
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.gc.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.gc.enable")
     public JvmGcMetrics jvmGcMetrics() {
         return new JvmGcMetrics();
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "tomcat.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "tomcat.enable")
     public TomcatMetrics tomcatMetrics() {
         return new TomcatMetrics();
     }
@@ -109,27 +109,26 @@ public class MonitoringConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX
-            + METRICS + "executors.enable" /* , havingValue=true */, enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "executors.enable")
     public ExecutorServiceMetricsProvider meterBinder() {
         return new DefaultExecutorServiceMetricsProvider();
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX
-            + METRICS + "executors.enable", havingValue = false, enableIfMissing = true)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS
+            + "executors.enable", havingValue = "false", matchIfMissing = true)
     public ExecutorServiceMetricsProvider emptyMeterBinder() {
         return new NoOpExecutorServiceMetricsProvider();
     }
 
     @Bean
-    @ConditionalOnProperty(value = "bonita.platform.persistence.generate_statistics", enableIfMissing = false)
+    @ConditionalOnProperty(value = "bonita.platform.persistence.generate_statistics")
     public HibernateMetricsBinder activatedHibernateMetrics(MeterRegistry meterRegistry) {
         return ((sessionFactory) -> new HibernateMetrics(sessionFactory, "persistence", null).bindTo(meterRegistry));
     }
 
     @Bean
-    @ConditionalOnProperty(value = "bonita.platform.persistence.generate_statistics", havingValue = false, enableIfMissing = true)
+    @ConditionalOnProperty(value = "bonita.platform.persistence.generate_statistics", havingValue = "false", matchIfMissing = true)
     public HibernateMetricsBinder deactivatedHibernateMetrics() {
         return ((sessionFactory) -> {
         });
