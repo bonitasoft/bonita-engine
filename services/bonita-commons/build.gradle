@@ -6,6 +6,7 @@ dependencies {
     compile(group: 'com.thoughtworks.xstream', name: 'xstream', version: Deps.xstreamVersion)
     compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     compile "org.springframework:spring-context:${Deps.springVersion}"
+    compile  "org.springframework.boot:spring-boot-autoconfigure:${Deps.springBootVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
