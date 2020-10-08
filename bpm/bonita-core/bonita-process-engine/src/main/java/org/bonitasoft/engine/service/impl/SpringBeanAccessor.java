@@ -70,8 +70,12 @@ public abstract class SpringBeanAccessor {
     }
 
     private void configureContext(BonitaSpringContext context) throws IOException {
-        for (String classPathResource : getSpringFileFromClassPath(isCluster())) {
+        boolean isCluster = isCluster();
+        for (String classPathResource : getSpringFileFromClassPath(isCluster)) {
             context.addClassPathResource(classPathResource);
+        }
+        if (isCluster) {
+            context.getEnvironment().setActiveProfiles("cluster");
         }
         for (BonitaConfiguration bonitaConfiguration : getConfigurationFromDatabase()) {
             context.addByteArrayResource(bonitaConfiguration);
