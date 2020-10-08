@@ -26,9 +26,9 @@
                 <prop key="org.quartz.jobStore.dataSource">managedDS</prop>
                 <prop key="org.quartz.jobStore.useProperties">true</prop>
                 <prop key="org.quartz.jobStore.nonManagedTXDataSource">notManagedDS</prop>
-                <prop key="org.quartz.dataSource.managedDS.connectionProvider.class">org.bonitasoft.engine.configuration.datasource.QuartzConnectionProvider</prop>
+                <prop key="org.quartz.dataSource.managedDS.connectionProvider.class">org.bonitasoft.engine.platform.configuration.datasource.QuartzConnectionProvider</prop>
                 <prop key="org.quartz.dataSource.managedDS.xaDataSource">true</prop>
-                <prop key="org.quartz.dataSource.notManagedDS.connectionProvider.class">org.bonitasoft.engine.configuration.datasource.QuartzConnectionProvider</prop>
+                <prop key="org.quartz.dataSource.notManagedDS.connectionProvider.class">org.bonitasoft.engine.platform.configuration.datasource.QuartzConnectionProvider</prop>
                 <prop key="org.quartz.dataSource.notManagedDS.xaDataSource">false</prop>
                 <prop key="org.quartz.jobStore.dontSetAutoCommitFalse">true</prop>
                 <prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
@@ -134,15 +134,6 @@
     </bean>
 
     <bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />
-
-    <bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
-        <property name="shouldRestartElements" value="true" />
-        <property name="platformRestartHandlers">
-            <list>
-                <ref bean="schedulerServiceRestartHandler" />
-            </list>
-        </property>
-    </bean>
 
     <bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
         <constructor-arg name="jobService" ref="jobService" />
@@ -1257,6 +1248,6 @@
 
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
-    <bean class="org.bonitasoft.engine.configuration.EnginePlatformConfiguration" />
+    <bean class="org.bonitasoft.engine.platform.configuration.EnginePlatformConfiguration" />
 
 </beans>

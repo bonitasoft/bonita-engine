@@ -11,12 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl;
+package org.bonitasoft.engine.platform.configuration;
 
 import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
@@ -24,6 +26,8 @@ import org.bonitasoft.engine.commons.PlatformRestartHandler;
  * @author Laurent Vaills
  * @author Celine Souchet
  */
+@Component
+@ConditionalOnSingleCandidate(NodeConfiguration.class)
 public class NodeConfigurationImpl implements NodeConfiguration {
 
     private boolean shouldRestartElements = true;

@@ -16,11 +16,11 @@ package org.bonitasoft.engine.platform;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
 import org.bonitasoft.engine.platform.model.STenant;

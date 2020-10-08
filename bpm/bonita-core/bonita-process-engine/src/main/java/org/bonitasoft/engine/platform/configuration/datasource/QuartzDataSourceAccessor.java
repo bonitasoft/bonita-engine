@@ -11,25 +11,29 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.configuration;
+package org.bonitasoft.engine.platform.configuration.datasource;
 
-import org.bonitasoft.engine.configuration.datasource.DataSourceConfiguration;
-import org.bonitasoft.engine.configuration.monitoring.MonitoringConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import javax.sql.DataSource;
 
 /**
- * Bonita Engine Spring configuration at platform-level
- *
- * @author Danila Mazour
- * @author Baptiste Mesta
- * @author Emmanuel Duchastenier
+ * This is a hack to let Quartz access datasource beans from SprigContext
+ * Quartz support custom connection providers but not non primitive parameters for them
  */
-@Configuration
-@Import({ DataSourceConfiguration.class,
-        MonitoringConfiguration.class })
-@ComponentScan("org.bonitasoft.engine.platform")
-public class EnginePlatformConfiguration {
+public class QuartzDataSourceAccessor {
 
+    private DataSource bonitaDataSource;
+    private DataSource bonitaNonXaDataSource;
+
+    public QuartzDataSourceAccessor(DataSource bonitaDataSource, DataSource bonitaNonXaDataSource) {
+        this.bonitaDataSource = bonitaDataSource;
+        this.bonitaNonXaDataSource = bonitaNonXaDataSource;
+    }
+
+    public DataSource getBonitaDataSource() {
+        return bonitaDataSource;
+    }
+
+    public DataSource getBonitaNonXaDataSource() {
+        return bonitaNonXaDataSource;
+    }
 }
