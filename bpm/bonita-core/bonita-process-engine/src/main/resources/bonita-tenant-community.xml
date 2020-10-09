@@ -12,7 +12,7 @@
 
     <context:annotation-config />
 
-    <context:property-placeholder/>
+    <context:property-placeholder />
 
     <bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
         <constructor-arg name="applicationName" value="BPM" />
@@ -742,7 +742,7 @@
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
         <constructor-arg name="meterRegistry" ref="meterRegistry" />
-        <constructor-arg name="tenantId" value="${tenantId}"/>
+        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
@@ -793,7 +793,7 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
-    
+
     <bean id="groovyScriptConditionExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptConditionExpressionExecutorStrategy">
         <constructor-arg name="cacheService" ref="cacheService" />
@@ -864,13 +864,12 @@
     <bean id="parameterService" class="org.bonitasoft.engine.parameter.ParameterServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService"/>
+        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
 
     <bean id="workFactory" class="org.bonitasoft.engine.execution.work.BPMWorkFactory" />
-
 
 
     <bean id="exceptionRetryabilityEvaluator" class="org.bonitasoft.engine.work.DefaultExceptionRetryabilityEvaluator">
@@ -921,14 +920,12 @@
     </bean>
 
 
-
     <bean id="mergeEntityAction" class="org.bonitasoft.engine.operation.MergeEntityAction">
         <constructor-arg name="repository" ref="businessDataRepository" />
 
     </bean>
 
     <bean id="entitiesActionsExecutor" class="org.bonitasoft.engine.operation.EntitiesActionsExecutor" />
-
 
 
     <bean id="actorMappingService" class="org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl">
@@ -938,8 +935,6 @@
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="identityService" ref="identityService" />
     </bean>
-
-
 
 
     <bean id="userFilterService" class="org.bonitasoft.engine.userfilter.UserFilterServiceDecorator">
@@ -1033,10 +1028,10 @@
     </bean>
 
     <task:scheduled-tasks scheduler="internalTasksScheduler">
-        <task:scheduled ref="sessionService" method="cleanInvalidSessions" cron="${org.bonitasoft.engine.clean.invalid.sessions.cron:0 0 */2 * * ?}"/>
+        <task:scheduled ref="sessionService" method="cleanInvalidSessions" cron="${org.bonitasoft.engine.clean.invalid.sessions.cron:0 0 */2 * * ?}" />
     </task:scheduled-tasks>
 
-    <task:scheduler id="internalTasksScheduler"/>
+    <task:scheduler id="internalTasksScheduler" />
 
 
     <bean id="supervisorMappingService"
@@ -1172,7 +1167,7 @@
         <constructor-arg name="pageMappingService" ref="pageMappingService" />
     </bean>
 
-    <bean id="pageService" class="org.bonitasoft.engine.page.impl.PageServiceImpl" autowire="byType">
+    <bean id="pageService" class="org.bonitasoft.engine.page.impl.PageServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
@@ -1183,83 +1178,114 @@
                 <ref bean="apiExtensionPageServiceListener" />
             </list>
         </property>
-        <property name="providedPages" ref="providedPages" />
     </bean>
 
-    <bean id="providedPages" class="org.springframework.beans.factory.config.ListFactoryBean">
-        <property name="sourceList">
-            <list>
-                <!-- required pages -->
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="bonita-home-page.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="bonita-default-layout.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="bonita-bootstrap-default-theme.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="bonita-theme.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="task-autogenerated-form.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="process-autogenerated-form.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="case-autogenerated-overview.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
+    <!-- required pages -->
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="bonita-home-page.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="bonita-default-layout.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="bonita-bootstrap-default-theme.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="bonita-theme.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="task-autogenerated-form.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="process-autogenerated-form.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="case-autogenerated-overview.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
 
-                <!-- this examples can be removed in production -->
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="bonita-html-page-example.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="bonita-groovy-page-example.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="api-extension-example.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="api-extension-viewer.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="bonita-task-list-page.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-
-                <!-- New web-pages -->
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="page-process-list.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="page-tenant-status.zip" />
-                    <constructor-arg name="hidden" value="true" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="page-install-export-organization.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-                    <constructor-arg name="zipName" value="layout-bonita.zip" />
-                    <constructor-arg name="hidden" value="false" />
-                </bean>
-            </list>
-        </property>
+    <!-- this examples can be removed in production -->
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="bonita-html-page-example.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="bonita-groovy-page-example.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="api-extension-example.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="api-extension-viewer.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="bonita-task-list-page.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-process-list.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-tenant-status.zip" />
+        <constructor-arg name="hidden" value="true" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-install-export-organization.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="layout-bonita.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-application-details.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-applications.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-bdm.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-case-list.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-case-visu.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-license.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-monitoring.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-process-details.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-admin-process-visu.zip" />
+        <constructor-arg name="hidden" value="false" />
+    </bean>
+    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+        <constructor-arg name="zipName" value="page-user-details.zip" />
+        <constructor-arg name="hidden" value="false" />
     </bean>
 
     <bean id="technicalUser" class="org.bonitasoft.engine.core.login.TechnicalUser">
@@ -1308,7 +1334,7 @@
     </bean>
 
     <bean id="expressionResolverService"
-          class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl" >
+          class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl">
         <constructor-arg name="expressionService" ref="expressionService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
@@ -1323,9 +1349,9 @@
     </bean>
 
     <bean id="documentHelper" class="org.bonitasoft.engine.core.document.api.impl.DocumentHelper">
-        <constructor-arg name="documentService" ref="documentService"/>
-        <constructor-arg name="processDefinitionService" ref="processDefinitionService"/>
-        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
     </bean>
 
     <bean name="documentURLProvider"
@@ -1388,7 +1414,7 @@
     </bean>
 
     <bean id="connectorTimeExecutionLogger" class="org.bonitasoft.engine.core.connector.impl.ConnectorExecutionTimeLogger">
-        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService"/>
+        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="warnWhenLongerThanMillis" value="${bonita.tenant.connector.warnWhenLongerThanMillis}" />
     </bean>
 
@@ -1528,7 +1554,6 @@
         <property name="copyOnWrite" value="${bonita.tenant.cache.transientdata.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.tenant.cache.transientdata.readIntensive}" />
     </bean>
-
 
 
     <bean id="bdmDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">
@@ -1685,7 +1710,7 @@
         <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="platformService" ref="platformService" />
-        <constructor-arg name="transactionService" ref="transactionService"/>
+        <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
 
     <bean id="pageMappingService" class="org.bonitasoft.engine.page.impl.PageMappingServiceImpl">
