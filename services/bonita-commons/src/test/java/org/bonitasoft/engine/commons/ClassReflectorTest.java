@@ -219,7 +219,7 @@ class ClassReflectorTest {
     @Test
     void testGetCompatibleMethod_with_wrong_null_parameters() {
         assertThrows(SReflectException.class,
-                () -> ClassReflector.getCompatibleMethod(pojo.getClass(), "setChoice", null));
+                () -> ClassReflector.getCompatibleMethod(pojo.getClass(), "setChoice", (Class<?>[]) null));
     }
 
     @Test
