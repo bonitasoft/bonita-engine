@@ -42,7 +42,7 @@ public class PageAPILocalIT extends CommonAPIIT {
     }
 
     /*
-     * when the tenant is created the provided page "bonita-groovy-page-example.zip" should be imported from classpath
+     * when the tenant is created the provided page "bonita-home-page.zip" should be imported from classpath
      */
     @Test
     public void should_provided_page_be_imported() throws BonitaException {
@@ -50,17 +50,9 @@ public class PageAPILocalIT extends CommonAPIIT {
         // engine started
 
         // when
-        final Page pageGroovy = getPageAPI().getPageByName("custompage_groovyexample");
-        final Page pageHtml = getPageAPI().getPageByName("custompage_htmlexample");
         final Page homePage = getPageAPI().getPageByName("custompage_home");
 
         // then
-        assertThat(pageGroovy).isNotNull();
-        assertThat(pageGroovy.isProvided()).isTrue();
-
-        assertThat(pageHtml).isNotNull();
-        assertThat(pageHtml.isProvided()).isTrue();
-
         assertThat(homePage).isNotNull();
         assertThat(homePage.isProvided()).isTrue();
     }

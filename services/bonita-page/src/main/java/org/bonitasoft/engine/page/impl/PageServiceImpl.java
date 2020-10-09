@@ -77,6 +77,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Baptiste Mesta
@@ -128,7 +129,7 @@ public class PageServiceImpl implements PageService {
 
     private final SPageContentHelper helper;
 
-    private List<ImportPageDescriptor> providedPages;
+    private List<ImportPageDescriptor> providedPages = Collections.EMPTY_LIST;
 
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
@@ -139,7 +140,6 @@ public class PageServiceImpl implements PageService {
         this.queriableLoggerService = queriableLoggerService;
         this.profileService = profileService;
         helper = new SPageContentHelper();
-        this.providedPages = Collections.EMPTY_LIST;
     }
 
     @Override
@@ -718,6 +718,7 @@ public class PageServiceImpl implements PageService {
         return providedPages;
     }
 
+    @Autowired
     public void setProvidedPages(List<ImportPageDescriptor> providedPages) {
         this.providedPages = providedPages;
     }
