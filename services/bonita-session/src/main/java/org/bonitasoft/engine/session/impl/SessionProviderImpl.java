@@ -16,20 +16,16 @@ package org.bonitasoft.engine.session.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.model.SSession;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnSingleCandidate(SessionProvider.class)
-@Slf4j
 public final class SessionProviderImpl extends AbstractSessionProvider {
 
-    static Map<Long, SSession> sessions = new HashMap<Long, SSession>();
-    private ApplicationContext applicationContext;
+    private static final Map<Long, SSession> sessions = new HashMap<>();
 
     @Override
     protected Map<Long, SSession> getSessions() {
