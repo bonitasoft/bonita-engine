@@ -789,14 +789,12 @@
 
     <bean id="groovyScriptExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy">
-        <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="groovyScriptConditionExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptConditionExpressionExecutorStrategy">
-        <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
@@ -943,7 +941,6 @@
 
     <bean id="userFilterServiceSub" class="org.bonitasoft.engine.core.filter.impl.UserFilterServiceImpl">
         <constructor-arg name="connectorExecutor" ref="connectorExecutor" />
-        <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="processResourcesService" ref="processResourcesService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
@@ -1136,7 +1133,6 @@
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-        <constructor-arg name="cacheService" ref="cacheService" />
     </bean>
 
 
@@ -1372,7 +1368,6 @@
     </bean>
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">
-        <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
@@ -1398,7 +1393,6 @@
     </bean>
 
     <bean id="connectorServiceSub" class="org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl">
-        <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="connectorExecutor" ref="connectorExecutor" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="operationService" ref="operationService" />
@@ -1432,14 +1426,6 @@
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-    </bean>
-
-    <bean id="cacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
-        <constructor-arg name="defaultCacheConfiguration" ref="defaultTenantCacheConfiguration" />
-        <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.${tenantId}.cache" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="defaultTenantCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
