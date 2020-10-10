@@ -1236,7 +1236,7 @@
         <constructor-arg name="hidden" value="true" />
     </bean>
     <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-        <constructor-arg name="zipName" value="page-install-export-organization.zip" />
+        <constructor-arg name="zipName" value="page-admin-install-export-organization.zip" />
         <constructor-arg name="hidden" value="false" />
     </bean>
     <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
@@ -1248,7 +1248,7 @@
         <constructor-arg name="hidden" value="false" />
     </bean>
     <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-        <constructor-arg name="zipName" value="page-admin-applications.zip" />
+        <constructor-arg name="zipName" value="page-admin-application-list.zip" />
         <constructor-arg name="hidden" value="false" />
     </bean>
     <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
@@ -1280,7 +1280,7 @@
         <constructor-arg name="hidden" value="false" />
     </bean>
     <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-        <constructor-arg name="zipName" value="page-user-details.zip" />
+        <constructor-arg name="zipName" value="page-admin-user-details.zip" />
         <constructor-arg name="hidden" value="false" />
     </bean>
 
