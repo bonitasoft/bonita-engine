@@ -349,7 +349,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public CacheService getCacheService() {
-        return beanAccessor.getService("cacheService", CacheService.class);
+        return beanAccessor.getService(CacheService.class);
     }
 
     @Override

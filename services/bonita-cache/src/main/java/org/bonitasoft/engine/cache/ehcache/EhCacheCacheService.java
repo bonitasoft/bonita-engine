@@ -22,16 +22,25 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 // Must be started before the work service so it has a "higher" priority
 @Order(10)
+@Component
+@ConditionalOnSingleCandidate(CacheService.class)
 public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
 
     private final long tenantId;
 
-    public EhCacheCacheService(final TechnicalLoggerService logger, final List<CacheConfiguration> cacheConfigurations,
-            final CacheConfiguration defaultCacheConfiguration, final String diskStorePath, long tenantId) {
+    public EhCacheCacheService(@Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            List<CacheConfiguration> cacheConfigurations,
+            @Qualifier("defaultTenantCacheConfiguration") CacheConfiguration defaultCacheConfiguration,
+            @Value("java.io.tmpdir/tenant.${tenantId}.cache") String diskStorePath,
+            @Value("${tenantId}") long tenantId) {
         super(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
         this.tenantId = tenantId;
     }
