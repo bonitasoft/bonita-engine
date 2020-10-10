@@ -15,9 +15,11 @@ package org.bonitasoft.engine.tenant;
 
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnSingleCandidate(TenantElementsRestartSupervisor.class)
 public class TenantElementsRestartSupervisorLocal implements TenantLifecycleService, TenantElementsRestartSupervisor {
 
     private boolean areTenantsElementsAlreadyRestarted;
