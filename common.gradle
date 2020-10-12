@@ -63,5 +63,6 @@ subprojects {
         showCauses true
         showPassed false
         showSkipped true
+        showSummary false
     }
 }
