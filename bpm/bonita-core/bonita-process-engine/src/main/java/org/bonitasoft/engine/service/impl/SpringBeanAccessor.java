@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
+import static org.bonitasoft.engine.Profiles.CLUSTER;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
@@ -75,7 +77,7 @@ public abstract class SpringBeanAccessor {
             context.addClassPathResource(classPathResource);
         }
         if (isCluster) {
-            context.getEnvironment().setActiveProfiles("cluster");
+            context.getEnvironment().setActiveProfiles(CLUSTER);
         }
         for (BonitaConfiguration bonitaConfiguration : getConfigurationFromDatabase()) {
             context.addByteArrayResource(bonitaConfiguration);
