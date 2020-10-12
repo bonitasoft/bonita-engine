@@ -28,12 +28,14 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta.
  */
-@Component("workExecutorService")
+@Component
+@ConditionalOnSingleCandidate(WorkExecutorService.class)
 public class RetryingWorkExecutorService implements WorkExecutorService, WorkExecutionCallback {
 
     public static final String NUMBER_OF_WORKS_RETRIED = "bonita.bpmengine.work.retried";
