@@ -13,8 +13,11 @@
  **/
 package org.bonitasoft.engine.work;
 
+import static java.lang.String.format;
+
 import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.micrometer.core.instrument.Gauge;
@@ -22,7 +25,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.work.ExceptionRetryabilityEvaluator.Retryability;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,18 +34,21 @@ import org.springframework.stereotype.Component;
  * @author Baptiste Mesta.
  */
 @Component("workExecutorService")
-public class RetryingWorkExecutorService extends WorkExecutorServiceImpl {
+public class RetryingWorkExecutorService implements WorkExecutorService, WorkExecutionCallback {
 
     public static final String NUMBER_OF_WORKS_RETRIED = "bonita.bpmengine.work.retried";
 
-    private final TechnicalLogger log;
+    private final TechnicalLogger logger;
     private final EngineClock engineClock;
     private final int maxRetry;
+    private final WorkExecutionAuditor workExecutionAuditor;
     private int delay;
     private final double delayFactor;
     private final ExceptionRetryabilityEvaluator exceptionRetryabilityEvaluator;
-
     private final AtomicLong retriedWorks = new AtomicLong();
+    private final BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
+    private final long workTerminationTimeout;
+    private BonitaExecutorService executor;
 
     public RetryingWorkExecutorService(BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
             @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService loggerService,
@@ -56,68 +61,87 @@ public class RetryingWorkExecutorService extends WorkExecutorServiceImpl {
             WorkExecutionAuditor workExecutionAuditor,
             MeterRegistry meterRegistry,
             @Value("${tenantId}") long tenantId) {
-        super(bonitaExecutorServiceFactory, loggerService, workTerminationTimeout, workExecutionAuditor);
-        this.log = loggerService.asLogger(RetryingWorkExecutorService.class);
+        this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
+        this.logger = loggerService.asLogger(RetryingWorkExecutorService.class);
         this.engineClock = engineClock;
+        this.workTerminationTimeout = workTerminationTimeout;
         this.maxRetry = maxRetry;
         this.delay = delay;
         this.delayFactor = delayFactor;
         this.exceptionRetryabilityEvaluator = exceptionRetryabilityEvaluator;
+        this.workExecutionAuditor = workExecutionAuditor;
         Gauge.builder(NUMBER_OF_WORKS_RETRIED, retriedWorks, AtomicLong::get)
                 .tag("tenant", String.valueOf(tenantId)).baseUnit("works")
-                .description("Works that have been retried at least once")
+                .description("Works currently waiting for execution that have been retried at least once")
                 .register(meterRegistry);
     }
 
     @Override
     public void onSuccess(WorkDescriptor work) {
         if (work.getRetryCount() > 0) {
-            log.info("Work {} was successfully retried after {} tries.", work, work.getRetryCount());
+            logger.info("Work {} was successfully retried after {} tries.", work, work.getRetryCount());
             retriedWorks.decrementAndGet();
         }
-        super.onSuccess(work);
+        logger.debug("Completed work {}", work);
+        workExecutionAuditor.notifySuccess(work);
     }
 
     @Override
     public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context, Throwable thrown) {
-        Retryability retryability = exceptionRetryabilityEvaluator.evaluateRetryability(thrown);
-        if (isNonRetryablePreconditionIssue(thrown, retryability) || isResourceLockingIssue(thrown)) {
-            super.onFailure(work, bonitaWork, context, thrown);// handled by the community work executor itself
+        if (thrown instanceof LockException) {
+            if (thrown instanceof LockTimeoutException) {
+                //Can happen frequently, only log in debug
+                logger.debug("Tried to execute the work, but it was unable to acquire a lock {}", work);
+            } else {
+                //Caused
+                logger.warn("Tried to execute the work, but it was unable to acquire a lock " + work, thrown);
+            }
+            execute(work);
             return;
         }
-        switch (retryability) {
+        switch (exceptionRetryabilityEvaluator.evaluateRetryability(thrown)) {
             case NOT_RETRYABLE:
-                decrementRetryCounterIfNeeded(work);
-                super.onFailure(work, bonitaWork, context, thrown);
+                if (thrown instanceof SWorkPreconditionException) {
+                    logger.warn("Work was not executed because preconditions were not met, {} : {}", work,
+                            thrown.getMessage());
+                    decrementRetryCounterIfNeeded(work);
+                } else {
+                    handleFailure(work, bonitaWork, context, thrown);
+                }
                 break;
             case UNCERTAIN_COMPLETION_OF_COMMIT:
                 // Do the same as retryable but add a warning log
-                log.warn("Work {} will be retried but the issue happened during the commit. We are uncertain that the "
-                        +
-                        "commit was really completed. If the retry fails with a SWorkPreconditionException it might indicate that "
-                        +
-                        "the work was already completed and you will need to restart your platform to trigger potential subsequent works.");
+                logger.warn(
+                        "Work {} will be retried but the issue happened during the commit. We are uncertain that the "
+                                +
+                                "commit was really completed. If the retry fails with a SWorkPreconditionException it might indicate that "
+                                +
+                                "the work was already completed and you will need to restart your platform to trigger potential subsequent works.");
             case RETRYABLE:
                 if (work.getRetryCount() < maxRetry) {
                     incrementRetryCounterIfNeeded(work);
                     retry(work, thrown);
                 } else {
-                    log.warn("Work {} has encountered an {} and has already been retried {} times. " +
+                    logger.warn("Work {} has encountered an {} and has already been retried {} times. " +
                             "No more retries will be attempted, see what is the failure in subsequent logs.",
                             work, thrown.getClass().getCanonicalName(), maxRetry);
-                    decrementRetryCounterIfNeeded(work);
-                    super.onFailure(work, bonitaWork, context, thrown);
+                    handleFailure(work, bonitaWork, context, thrown);
                 }
                 break;
+            default:
+                throw new IllegalStateException(
+                        "Unexpected value: " + exceptionRetryabilityEvaluator.evaluateRetryability(thrown));
         }
     }
 
-    private boolean isResourceLockingIssue(Throwable thrown) {
-        return thrown instanceof LockException;
-    }
-
-    private boolean isNonRetryablePreconditionIssue(Throwable thrown, Retryability retryability) {
-        return thrown instanceof SWorkPreconditionException && retryability != Retryability.RETRYABLE;
+    public void handleFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
+            Throwable thrown) {
+        decrementRetryCounterIfNeeded(work);
+        try {
+            bonitaWork.handleFailure(thrown, context);
+        } catch (Exception e) {
+            logger.warn("Work failed with error {}", work, e);
+        }
     }
 
     private void incrementRetryCounterIfNeeded(WorkDescriptor work) {
@@ -137,10 +161,10 @@ public class RetryingWorkExecutorService extends WorkExecutorServiceImpl {
         Instant mustBeExecutedAfter = engineClock.now().plusMillis(delayInMillis);
         work.incrementRetryCount();
         work.mustBeExecutedAfter(mustBeExecutedAfter);
-        log.warn("Work {} encountered an {} but it can be retried. Will retry. Attempt {} on {} " +
+        logger.warn("Work {} encountered an {} but it can be retried. Will retry. Attempt {} on {} " +
                 "with a delay of {} ms", work.getDescription(), thrown.getClass().getCanonicalName(),
                 work.getRetryCount(), maxRetry, delayInMillis);
-        log.debug("Exception encountered during retry", thrown);
+        logger.debug("Exception encountered during retry", thrown);
         execute(work);
     }
 
@@ -162,5 +186,83 @@ public class RetryingWorkExecutorService extends WorkExecutorServiceImpl {
     //For testing purpose
     void setDelay(int delay) {
         this.delay = delay;
+    }
+
+    @Override
+    public void execute(WorkDescriptor work) {
+        if (!isStopped()) {
+            logger.debug("Submitted work {}", work);
+            executor.submit(work);
+        } else {
+            logger.debug("Ignored work submission (service stopped) {}", work);
+        }
+    }
+
+    @Override
+    public synchronized void stop() {
+        // we don't throw exception just stop it and log if something happens
+        try {
+            if (isStopped()) {
+                return;
+            }
+            bonitaExecutorServiceFactory.unbind();
+            shutdownExecutor();
+            awaitTermination();
+        } catch (final SWorkException e) {
+            if (e.getCause() != null) {
+                logger.warn(e.getMessage(), e.getCause());
+            } else {
+                logger.warn(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public synchronized void start() {
+        if (isStopped()) {
+            executor = bonitaExecutorServiceFactory.createExecutorService(this);
+        }
+    }
+
+    @Override
+    public synchronized void pause() throws SWorkException {
+        if (isStopped()) {
+            return;
+        }
+        bonitaExecutorServiceFactory.unbind();
+        shutdownExecutor();
+        // completely clear the queue because it's a global pause
+        executor.clearAllQueues();
+        awaitTermination();
+    }
+
+    @Override
+    public synchronized void resume() {
+        start();
+    }
+
+    private void awaitTermination() throws SWorkException {
+        try {
+            if (!executor.awaitTermination(workTerminationTimeout, TimeUnit.SECONDS)) {
+                throw new SWorkException(format("Waited termination of all work %ds but all tasks were not finished",
+                        workTerminationTimeout));
+            }
+        } catch (final InterruptedException e) {
+            throw new SWorkException("Interrupted while stopping the work service", e);
+        }
+        executor = null;
+    }
+
+    private void shutdownExecutor() {
+        executor.shutdownAndEmptyQueue();
+        logger.info("Stopped executor service");
+    }
+
+    public boolean isStopped() {
+        return executor == null;
+    }
+
+    @Override
+    public void notifyNodeStopped(String nodeName) {
     }
 }
