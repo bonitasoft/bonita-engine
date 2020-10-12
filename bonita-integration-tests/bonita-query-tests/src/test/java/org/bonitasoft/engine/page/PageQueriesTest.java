@@ -65,7 +65,7 @@ public class PageQueriesTest {
     }
 
     @Test
-    public void should_getPageByName_return_the_page_without_processDefinitionId() throws Exception {
+    public void should_getPageByName_return_the_page_without_processDefinitionId() {
         //given
         repository.add(aPage().withName("aPage").withContent("content of the global page".getBytes()).build());
         repository.add(aPage().withName("aPage").withContent("content of the process page 1".getBytes())
@@ -109,8 +109,8 @@ public class PageQueriesTest {
                 .withProcessDefinitionId(1L)
                 .withContentType(ContentType.FORM)
                 .build());
-        final AbstractSPage myPage2 = repository.add(aPage()
-                .withName("MyPage2")
+        repository.add(aPage()
+                .withName("AnotherPage")
                 .withProcessDefinitionId(2L)
                 .withContentType(ContentType.FORM)
                 .build());
@@ -122,8 +122,11 @@ public class PageQueriesTest {
 
         // //then
         assertThat(results).as("should retrieve the page").hasSize(1);
-        assertThat(results.get(0)).as("should retrieve the page").isEqualToComparingOnlyGivenFields(myPage1, "name",
-                "processDefinitionId", "contentType");
+        assertThat(results.get(0).getName()).as("should retrieve the right page").isEqualTo(myPage1.getName());
+        assertThat(results.get(0).getProcessDefinitionId()).as("should retrieve the right page")
+                .isEqualTo(myPage1.getProcessDefinitionId());
+        assertThat(results.get(0).getContentType()).as("should retrieve the right page")
+                .isEqualTo(myPage1.getContentType());
     }
 
     @Test
