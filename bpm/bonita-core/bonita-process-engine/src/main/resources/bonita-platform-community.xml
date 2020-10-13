@@ -148,11 +148,6 @@
 
     <bean id="platformTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" />
 
-    <bean id="lockService" class="org.bonitasoft.engine.lock.impl.MemoryLockService">
-        <constructor-arg name="loggerService" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="lockTimeoutSeconds" value="${bonita.platform.lock.memory.timeout}" />
-    </bean>
-
     <bean id="incidentService" class="org.bonitasoft.engine.incident.IncidentServiceImpl">
         <constructor-arg name="handlers">
             <list>
@@ -738,7 +733,6 @@
     </bean>
 
     <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
-        <constructor-arg name="lockService" ref="lockService" />
         <constructor-arg name="sequenceMappingProvider" ref="sequenceMappingProvider" />
         <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="retries" value="${bonita.platform.sequence.retries}" />

@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.lock.impl;
+package org.bonitasoft.engine.lock;
 
 import static java.util.Collections.synchronizedMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -21,21 +21,24 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.bonitasoft.engine.lock.BonitaLock;
-import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.SLockException;
-import org.bonitasoft.engine.lock.SLockTimeoutException;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
+@Component
+@ConditionalOnSingleCandidate(LockService.class)
 public class MemoryLockService implements LockService {
 
     private final TechnicalLogger logger;
     // need to have a synchronized map to synchronize the get with map modifications
-    private Map<String, ReentrantLock> locks = synchronizedMap(new HashMap<>());
-    private int lockTimeoutSeconds;
+    private final Map<String, ReentrantLock> locks = synchronizedMap(new HashMap<>());
+    private final int lockTimeoutSeconds;
 
-    public MemoryLockService(TechnicalLoggerService loggerService, int lockTimeoutSeconds) {
+    public MemoryLockService(@Qualifier("platformTechnicalLoggerService") TechnicalLoggerService loggerService,
+            @Value("${bonita.platform.lock.memory.timeout}") int lockTimeoutSeconds) {
         this.lockTimeoutSeconds = lockTimeoutSeconds;
         logger = loggerService.asLogger(MemoryLockService.class);
     }

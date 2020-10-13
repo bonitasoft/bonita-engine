@@ -96,7 +96,6 @@
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="lockService" ref="lockService" />
         <constructor-arg name="tenantId" value="${tenantId}" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
