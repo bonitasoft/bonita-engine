@@ -49,7 +49,6 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.StartEventDefinitionImpl
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
-import org.bonitasoft.engine.digest.DigestUtils;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.xml.sax.SAXException;
@@ -61,8 +60,6 @@ import org.xml.sax.SAXException;
 public class ProcessDefinitionBARContribution implements BusinessArchiveContribution {
 
     public static final String PROCESS_DEFINITION_XML = "process-design.xml";
-
-    public static final String PROCESS_INFOS_FILE = "process-infos.txt";
 
     private final JAXBContext jaxbContext;
 
@@ -88,22 +85,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         }
         final DesignProcessDefinition processDefinition = deserializeProcessDefinition(file);
         businessArchive.setProcessDefinition(processDefinition);
-        checkProcessInfos(barFolder, processDefinition);
         return true;
-    }
-
-    protected void checkProcessInfos(final File barFolder, final DesignProcessDefinition processDefinition)
-            throws InvalidBusinessArchiveFormatException {
-        final String processInfos = getProcessInfos(generateInfosFromDefinition(processDefinition));
-        String fileContent;
-        try {
-            fileContent = IOUtil.read(new File(barFolder, PROCESS_INFOS_FILE));
-            if (!processInfos.equals(fileContent.trim())) {
-                throw new InvalidBusinessArchiveFormatException("Invalid Business Archive format");
-            }
-        } catch (final IOException e) {
-            throw new InvalidBusinessArchiveFormatException("Invalid Business Archive format");
-        }
     }
 
     public DesignProcessDefinition deserializeProcessDefinition(final File file)
@@ -142,8 +124,6 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         try {
             IOUtil.writeContentToFile(convertProcessToXml(processDefinition),
                     new File(barFolder, PROCESS_DEFINITION_XML));
-            final String infos = generateInfosFromDefinition(processDefinition);
-            IOUtil.writeContentToFile(getProcessInfos(infos), new File(barFolder, PROCESS_INFOS_FILE));
         } catch (final FileNotFoundException e) {
             throw new IOException(e);
         }
@@ -284,17 +264,6 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
                 catchEventImpl.addEventTrigger(timerEventTrigger);
             }
         }
-    }
-
-    protected String generateInfosFromDefinition(final DesignProcessDefinition processDefinition) {
-        final FlowElementContainerDefinition processContainer = processDefinition.getFlowElementContainer();
-        return new StringBuilder("key1:").append(processDefinition.getActorsList().size()).append(",key2:")
-                .append(processContainer.getTransitions().size())
-                .append(",key3:").append(processContainer.getActivities().size()).toString();
-    }
-
-    protected String getProcessInfos(final String infos) {
-        return DigestUtils.encodeBase64AsUtf8String(DigestUtils.md5(infos)).trim();
     }
 
     @Override

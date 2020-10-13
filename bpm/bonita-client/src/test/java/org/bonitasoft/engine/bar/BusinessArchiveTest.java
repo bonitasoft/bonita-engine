@@ -109,34 +109,20 @@ public class BusinessArchiveTest {
         barFile.delete();
     }
 
-    @Test(expected = InvalidBusinessArchiveFormatException.class)
-    public void invalidBOSHashIsRejected() throws Exception {
+    @Test
+    public void should_be_able_to_read_BusinessArchive_with_any_hash() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("MyBOSProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(process).done();
         BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
-        final File infoFile = getFile(ProcessDefinitionBARContribution.PROCESS_INFOS_FILE);
-        IOUtil.writeContentToFile("bad process infos", infoFile);
+        IOUtil.writeContentToFile("random process infos", getFile("process-infos.txt"));
         BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
     private File getFile(final String fileName) {
         return new File(tempFolder, fileName);
-    }
-
-    @Test(expected = InvalidBusinessArchiveFormatException.class)
-    public void barWithNoHashIsRejected() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
-                .createNewInstance("MyBOSProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
-                .setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
-        final File infoFile = getFile(ProcessDefinitionBARContribution.PROCESS_INFOS_FILE);
-        infoFile.delete();
-        BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
     @Test

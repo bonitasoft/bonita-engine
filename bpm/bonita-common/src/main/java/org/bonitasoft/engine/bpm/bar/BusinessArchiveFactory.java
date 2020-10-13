@@ -62,7 +62,6 @@ public class BusinessArchiveFactory {
      */
     public static BusinessArchive readBusinessArchive(final InputStream inputStream)
             throws IOException, InvalidBusinessArchiveFormatException {
-        File barFolder = null;
         return INSTANCE.readBusinessArchive(inputStream, contributions);
     }
 
