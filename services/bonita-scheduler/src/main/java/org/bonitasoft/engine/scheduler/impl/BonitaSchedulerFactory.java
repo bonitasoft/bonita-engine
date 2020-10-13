@@ -18,15 +18,20 @@ import java.util.Properties;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  */
+@Component
+@ConditionalOnSingleCandidate(BonitaSchedulerFactory.class)
 public class BonitaSchedulerFactory extends StdSchedulerFactory {
 
     private SchedulerServiceImpl schedulerService;
 
-    public BonitaSchedulerFactory(final Properties props) throws SchedulerException {
+    public BonitaSchedulerFactory(@Qualifier("quartzProperties") Properties props) throws SchedulerException {
         super(props);
     }
 
