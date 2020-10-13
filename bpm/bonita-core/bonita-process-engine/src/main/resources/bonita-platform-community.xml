@@ -46,7 +46,6 @@
     </bean>
 
     <bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor" autowire="byType">
-        <constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="transactionService" ref="transactionService" />
@@ -76,10 +75,6 @@
     </bean>
 
     <bean id="servicesLookup" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
-
-    <bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory">
-        <constructor-arg name="props" ref="quartzProperties" />
-    </bean>
 
     <bean id="platformSessionProvider" class="org.bonitasoft.engine.platform.session.impl.PlatformSessionProviderImpl">
     </bean>
