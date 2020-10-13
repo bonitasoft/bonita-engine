@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.configuration;
 
+import org.bonitasoft.engine.authentication.AuthenticationConfiguration;
 import org.bonitasoft.engine.cache.CacheServiceConfiguration;
 import org.bonitasoft.engine.core.operation.OperationServiceConfiguration;
 import org.bonitasoft.engine.session.SessionServiceConfiguration;
@@ -30,6 +31,8 @@ import org.springframework.context.annotation.Import;
 @Import({
         WorkServiceConfiguration.class,
         OperationServiceConfiguration.class,
+        SessionServiceConfiguration.class,
+        AuthenticationConfiguration.class,
         SessionServiceConfiguration.class,
         CacheServiceConfiguration.class
 })
