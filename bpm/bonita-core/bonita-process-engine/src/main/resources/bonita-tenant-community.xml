@@ -1259,23 +1259,7 @@
         <constructor-arg name="hidden" value="false" />
     </bean>
     <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-        <constructor-arg name="zipName" value="page-admin-case-visu.zip" />
-        <constructor-arg name="hidden" value="false" />
-    </bean>
-    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-        <constructor-arg name="zipName" value="page-admin-license.zip" />
-        <constructor-arg name="hidden" value="false" />
-    </bean>
-    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-        <constructor-arg name="zipName" value="page-admin-monitoring.zip" />
-        <constructor-arg name="hidden" value="false" />
-    </bean>
-    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
         <constructor-arg name="zipName" value="page-admin-process-details.zip" />
-        <constructor-arg name="hidden" value="false" />
-    </bean>
-    <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
-        <constructor-arg name="zipName" value="page-admin-process-visu.zip" />
         <constructor-arg name="hidden" value="false" />
     </bean>
     <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
