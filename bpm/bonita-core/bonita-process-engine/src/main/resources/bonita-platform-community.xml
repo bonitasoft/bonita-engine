@@ -173,7 +173,6 @@
         <constructor-arg name="eventService" ref="platformEventService" />
         <constructor-arg name="platformDependencyService" ref="platformDependencyService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="broadcastService" ref="broadcastService" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
         <constructor-arg name="classLoaderUpdater" ref="classLoaderUpdater" />
     </bean>
@@ -244,9 +243,6 @@
         <property name="copyOnRead" value="${bonita.platform.cache.platform.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.platform.cache.platform.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.platform.cache.platform.readIntensive}" />
-    </bean>
-
-    <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal">
     </bean>
 
     <bean id="bonitaTaskExecutor" class="org.bonitasoft.engine.service.BonitaTaskExecutor" />

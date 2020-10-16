@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.service.impl;
+package org.bonitasoft.engine.platform;
 
 import java.util.Collections;
 import java.util.Map;
@@ -21,6 +21,8 @@ import java.util.concurrent.Future;
 
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
 /**
  * This implementation does nothing, to be used in a single node environment.
@@ -28,6 +30,8 @@ import org.bonitasoft.engine.service.TaskResult;
  *
  * @author Baptiste Mesta
  */
+@Component
+@ConditionalOnSingleCandidate(BroadcastService.class)
 public class BroadcastServiceLocal implements BroadcastService {
 
     @Override
