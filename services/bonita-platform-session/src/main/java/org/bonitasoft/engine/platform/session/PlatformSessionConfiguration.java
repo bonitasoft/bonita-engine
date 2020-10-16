@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2020 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,31 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.platform.configuration;
+package org.bonitasoft.engine.platform.session;
 
-import org.bonitasoft.engine.lock.LockServiceConfiguration;
-import org.bonitasoft.engine.platform.configuration.monitoring.MonitoringConfiguration;
-import org.bonitasoft.engine.platform.session.PlatformSessionConfiguration;
-import org.bonitasoft.engine.scheduler.SchedulerConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
-/**
- * Bonita Engine Spring configuration at platform-level
- *
- * @author Danila Mazour
- * @author Baptiste Mesta
- * @author Emmanuel Duchastenier
- */
 @Configuration
-@Import({
-        MonitoringConfiguration.class,
-        SchedulerConfiguration.class,
-        LockServiceConfiguration.class,
-        PlatformSessionConfiguration.class
-})
-@ComponentScan("org.bonitasoft.engine.platform")
-public class EnginePlatformConfiguration {
+@ComponentScan
+public class PlatformSessionConfiguration {
 
 }
