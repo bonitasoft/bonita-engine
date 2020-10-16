@@ -27,11 +27,14 @@ import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.platform.session.model.builder.SPlatformSessionBuilderFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Component
 public class PlatformSessionServiceImpl implements PlatformSessionService {
 
     private static final long DEFAULT_SESSION_DURATION = 3600000;
@@ -42,8 +45,9 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
 
     private long sessionDuration = DEFAULT_SESSION_DURATION;
 
-    public PlatformSessionServiceImpl(final PlatformSessionProvider platformSessionProvider,
-            final TechnicalLoggerService logger) {
+    public PlatformSessionServiceImpl(
+            PlatformSessionProvider platformSessionProvider,
+            @Qualifier("platformTechnicalLoggerService") TechnicalLoggerService logger) {
         this.platformSessionProvider = platformSessionProvider;
         this.logger = logger;
     }

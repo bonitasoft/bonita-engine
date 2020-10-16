@@ -20,17 +20,21 @@ import org.bonitasoft.engine.platform.session.PlatformSessionProvider;
 import org.bonitasoft.engine.platform.session.SSessionAlreadyExistsException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Component
+@ConditionalOnSingleCandidate(PlatformSessionProvider.class)
 public final class PlatformSessionProviderImpl implements PlatformSessionProvider {
 
-    private static Map<Long, SPlatformSession> platformSessions;
+    private static final Map<Long, SPlatformSession> platformSessions;
 
     static {
-        platformSessions = new HashMap<Long, SPlatformSession>();
+        platformSessions = new HashMap<>();
     }
 
     public PlatformSessionProviderImpl() {

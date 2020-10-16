@@ -76,17 +76,8 @@
 
     <bean id="servicesLookup" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
 
-    <bean id="platformSessionProvider" class="org.bonitasoft.engine.platform.session.impl.PlatformSessionProviderImpl">
-    </bean>
-
-    <bean id="platformSessionService" class="org.bonitasoft.engine.platform.session.impl.PlatformSessionServiceImpl">
-        <constructor-arg name="platformSessionProvider" ref="platformSessionProvider" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-    </bean>
-
     <bean id="platformLoginService" class="org.bonitasoft.engine.core.platform.login.impl.PlatformLoginServiceImpl">
         <constructor-arg name="platformAuthenticationService" ref="platformAuthenticationService" />
-        <constructor-arg name="platformSessionService" ref="platformSessionService" />
     </bean>
 
     <bean id="platformCommandService" class="org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl">
