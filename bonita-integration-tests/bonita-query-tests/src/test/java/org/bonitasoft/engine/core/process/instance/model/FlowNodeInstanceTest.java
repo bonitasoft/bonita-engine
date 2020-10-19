@@ -121,6 +121,10 @@ public class FlowNodeInstanceTest {
         final SFlowNodeInstance terminal = repository
                 .add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
                         .build());
+        final SFlowNodeInstance failed = repository
+                .add(aUserTask().withName("failedTask").withStateExecuting(true).withStable(true).withTerminal(true)
+                        .withStateId(3)
+                        .build());
         repository
                 .add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
                         .build());
