@@ -73,10 +73,10 @@
 	<query name="getFlowNodeInstanceIdsToRestart">
 		SELECT f.id
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
-		WHERE (f.stateExecuting = TRUE OR f.stable = FALSE OR f.terminal = TRUE OR f.stateCategory = 'ABORTING' OR f.stateCategory = 'CANCELLING')
+		WHERE f.stateId != 3
+		AND (f.stateExecuting = TRUE OR f.stable = FALSE OR f.terminal = TRUE OR f.stateCategory = 'ABORTING' OR f.stateCategory = 'CANCELLING')
 		ORDER BY id
 	</query>
-
 	<query name="getFlowNodeInstancesByNameAndParentContainerId">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
