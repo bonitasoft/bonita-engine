@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.process;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.bonitasoft.engine.data.instance.api.DataInstanceContainer.ACTIVITY_INSTANCE;
 import static org.bonitasoft.engine.data.instance.api.DataInstanceContainer.PROCESS_INSTANCE;
 import static org.junit.Assert.fail;
@@ -23,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.assertj.core.api.SoftAssertions;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.actorMapping.Actor;
@@ -33,6 +33,7 @@ import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
@@ -55,45 +56,9 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
     public void should_delete_complete_archived_process_instances() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         User user = createUser("deleteProcessInstanceIT", "bpm");
-        ProcessDefinitionBuilder mainProcessBuilder = new ProcessDefinitionBuilder()
-                .createNewInstance("mainProcess", "1.0");
-        mainProcessBuilder.addContract().addInput("simpleInput1", Type.TEXT, "a simple input");
-        mainProcessBuilder.addActor("actor");
-        mainProcessBuilder.addUserTask("userTask1", "actor").addContract().addInput("simpleInputTask", Type.TEXT,
-                "a simple task input");
-        ActorMapping actorMapping = new ActorMapping();
-        Actor actor = new Actor("actor");
-        actorMapping.addActor(actor);
-        actor.addUser("deleteProcessInstanceIT");
-        ProcessDefinition mainProcess = deployAndEnableProcess(barWithConnector(mainProcessBuilder
-                .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
-                .addStartEvent("start1")
-                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithConnector")
-                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue"))
-                .addCallActivity("call1", s("subProcess"), s("1.0"))
-                .addCallActivity("call2", s("subProcess"), s("2.0"))
-                .getProcess()).setActorMapping(actorMapping).done());
-        ProcessDefinition sub1 = getProcessAPI().deployAndEnableProcess(barWithConnector(new ProcessDefinitionBuilder()
-                .createNewInstance("subProcess", "1.0")
-                .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
-                .addStartEvent("start1")
-                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithConnector")
-                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue"))
-                .addCallActivity("sub2", s("subProcess"), s("2.0")).getProcess()).done());
-
-        ProcessDefinition sub2 = getProcessAPI().deployAndEnableProcess(barWithConnector(new ProcessDefinitionBuilder()
-                .createNewInstance("subProcess", "2.0")
-                .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
-                .addStartEvent("start1")
-                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithConnector")
-                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue")).getProcess())
-                        .done());
+        ProcessDefinition mainProcess = createMainProcessDefinition();
+        ProcessDefinition sub1 = createSubProcessDefinition1();
+        ProcessDefinition sub2 = createSubProcessDefinition2();
 
         List<Long> processInstances = new ArrayList<>();
         List<Long> userTaskInstances = new ArrayList<>();
@@ -108,10 +73,10 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
             waitForProcessToFinish(id);
             processInstances.add(id);
         }
-        final List<SAFlowNodeInstance> allArchFlowNodesBeforeDelete = getTenantAccessor().getUserTransactionService()
-                .executeInTransaction(this::searchAllArchFlowNodes);
-        final List<SAProcessInstance> allArchProcessInstancesBeforeDelete = getTenantAccessor()
-                .getUserTransactionService().executeInTransaction(this::searchAllArchProcessInstances);
+
+        List<SFlowNodeInstance> allFlowNodesBeforeDelete = getAllFlowNodes();
+        List<SAFlowNodeInstance> allArchFlowNodesBeforeDelete = getAllArchFlowNodes();
+        List<SAProcessInstance> allArchProcessInstancesBeforeDelete = getAllProcessInstances();
 
         getProcessAPI().deleteArchivedProcessInstancesInAllStates(processInstances);
 
@@ -119,7 +84,7 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
             for (Long userTaskInstance : userTaskInstances) {
                 try {
                     getTenantAccessor().getContractDataService().getArchivedUserTaskDataValue(userTaskInstance,
-                            "simpleInputTask");
+                            inputName());
                     fail("should have deleted archived contract data on activity instance");
                 } catch (SContractDataNotFoundException e) {
                     //ok
@@ -134,8 +99,9 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
                     //ok
                 }
             }
-            SoftAssertions.assertSoftly((soft) -> {
+            assertSoftly((soft) -> {
                 try {
+                    soft.assertThat(allFlowNodesBeforeDelete).isEmpty();
                     soft.assertThat(searchAllArchProcessInstances()).isEmpty();
                     soft.assertThat(searchAllArchFlowNodes()).isEmpty();
                     soft.assertThat(
@@ -164,6 +130,115 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
         disableAndDeleteProcess(asList(mainProcess, sub1, sub2));
     }
 
+    @Test
+    public void should_delete_process_instance_currently_executing() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        User user = createUser("deleteProcessInstanceIT", "bpm");
+        ProcessDefinition mainProcess = createMainProcessDefinition();
+        ProcessDefinition sub1 = createSubProcessDefinition1();
+        ProcessDefinition sub2 = createSubProcessDefinitionWithUserTask(user);
+
+        long id = getProcessAPI().startProcessWithInputs(mainProcess.getId(),
+                Collections.singletonMap("simpleInput1", "singleInputValue")).getId();
+        waitForUserTask(id, "userTask1");
+        waitForUserTask("taskOfSubProcess");
+        waitForUserTask("taskOfSubProcess");
+
+        getProcessAPI().deleteProcessInstance(id);
+
+        assertSoftly((soft) -> {
+            try {
+                soft.assertThat(getAllFlowNodes()).isEmpty();
+                soft.assertThat(getAllArchFlowNodes()).isEmpty();
+                soft.assertThat(getAllProcessInstances()).isEmpty();
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        disableAndDeleteProcess(asList(mainProcess, sub1, sub2));
+    }
+
+    protected String inputName() {
+        return "simpleInputTask";
+    }
+
+    protected List<SAProcessInstance> getAllProcessInstances() throws Exception {
+        return getTenantAccessor()
+                .getUserTransactionService().executeInTransaction(this::searchAllArchProcessInstances);
+    }
+
+    protected List<SAFlowNodeInstance> getAllArchFlowNodes() throws Exception {
+        return getTenantAccessor().getUserTransactionService()
+                .executeInTransaction(this::searchAllArchFlowNodes);
+    }
+
+    protected List<SFlowNodeInstance> getAllFlowNodes() throws Exception {
+        return getTenantAccessor().getUserTransactionService()
+                .executeInTransaction(this::searchAllFlowNodes);
+    }
+
+    protected ProcessDefinition createMainProcessDefinition() throws Exception {
+        ProcessDefinitionBuilder mainProcessBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("mainProcess", "1.0");
+        mainProcessBuilder.addContract().addInput("simpleInput1", Type.TEXT, "a simple input");
+        mainProcessBuilder.addActor("actor");
+        mainProcessBuilder.addUserTask("userTask1", "actor").addContract().addInput("simpleInputTask", Type.TEXT,
+                "a simple task input");
+        ActorMapping actorMapping = new ActorMapping();
+        Actor actor = new Actor("actor");
+        actorMapping.addActor(actor);
+        actor.addUser("deleteProcessInstanceIT");
+        mainProcessBuilder
+                .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
+                .addStartEvent("start1")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithConnector")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue"))
+                .addCallActivity("call1", s("subProcess"), s("1.0"));
+        mainProcessBuilder.addCallActivity("call2", s("subProcess"), s("2.0"))
+                .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(2));
+        return deployAndEnableProcess(barWithConnector(mainProcessBuilder
+                .getProcess()).setActorMapping(actorMapping).done());
+    }
+
+    protected ProcessDefinition createSubProcessDefinition1() throws Exception {
+        return getProcessAPI().deployAndEnableProcess(barWithConnector(new ProcessDefinitionBuilder()
+                .createNewInstance("subProcess", "1.0")
+                .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
+                .addStartEvent("start1")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithConnector")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue"))
+                .addCallActivity("sub2", s("subProcess"), s("2.0")).getProcess()).done());
+    }
+
+    protected ProcessDefinition createSubProcessDefinition2() throws Exception {
+        return getProcessAPI().deployAndEnableProcess(barWithConnector(new ProcessDefinitionBuilder()
+                .createNewInstance("subProcess", "2.0")
+                .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
+                .addStartEvent("start1")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithConnector")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue")).getProcess())
+                        .done());
+    }
+
+    protected ProcessDefinition createSubProcessDefinitionWithUserTask(User user) throws Exception {
+        return deployAndEnableProcessWithActor(new ProcessDefinitionBuilder()
+                .createNewInstance("subProcess", "2.0")
+                .addActor("actor")
+                .addStartEvent("start1")
+                .addUserTask("taskOfSubProcess", "actor")
+                .addTransition("start1", "taskOfSubProcess").getProcess(),
+                "actor",
+                user);
+    }
+
     private List<SAProcessInstance> searchAllArchProcessInstances() throws SBonitaReadException {
         return getTenantAccessor().getProcessInstanceService()
                 .searchArchivedProcessInstances(new QueryOptions(0, 1000));
@@ -173,6 +248,12 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
             throws org.bonitasoft.engine.persistence.SBonitaReadException {
         return getTenantAccessor().getActivityInstanceService()
                 .searchArchivedFlowNodeInstances(SAFlowNodeInstance.class, new QueryOptions(0, 1000));
+    }
+
+    private List<SFlowNodeInstance> searchAllFlowNodes()
+            throws org.bonitasoft.engine.persistence.SBonitaReadException {
+        return getTenantAccessor().getActivityInstanceService()
+                .searchFlowNodeInstances(SFlowNodeInstance.class, new QueryOptions(0, 1000));
     }
 
     private Expression docValueExpr() throws InvalidExpressionException {

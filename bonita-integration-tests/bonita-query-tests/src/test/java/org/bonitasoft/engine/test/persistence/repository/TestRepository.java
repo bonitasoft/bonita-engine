@@ -92,18 +92,27 @@ public class TestRepository {
 
     public Long selectCount(String queryName, Pair... parameters) {
         Query namedQuery = getSessionWithTenantFilter(DEFAULT_TENANT_ID).getNamedQuery(queryName);
-        for (Pair parameter : parameters) {
-            namedQuery.setParameter(((String) parameter.getKey()), parameter.getValue());
-        }
+        setParameters(namedQuery, parameters);
         return ((Long) namedQuery.uniqueResult());
     }
 
     public PersistentObject selectOne(long tenantId, String queryName, Pair... parameters) {
         Query namedQuery = getSessionWithTenantFilter(tenantId).getNamedQuery(queryName);
+        setParameters(namedQuery, parameters);
+        return ((PersistentObject) namedQuery.uniqueResult());
+    }
+
+    public <T> List<T> selectList(String name, Pair... parameters) {
+        getSessionWithTenantFilter();
+        Query<T> namedQuery = getNamedQuery(name);
+        setParameters(namedQuery, parameters);
+        return namedQuery.list();
+    }
+
+    protected <T> void setParameters(Query<T> namedQuery, Pair[] parameters) {
         for (Pair parameter : parameters) {
             namedQuery.setParameter(((String) parameter.getKey()), parameter.getValue());
         }
-        return ((PersistentObject) namedQuery.uniqueResult());
     }
 
     /**
