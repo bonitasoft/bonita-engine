@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.TestWithTechnicalUser;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BarResource;
@@ -57,6 +57,8 @@ import org.bonitasoft.engine.bpm.flownode.MultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
@@ -82,7 +84,7 @@ import org.junit.Test;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class MultiInstanceIT extends TestWithTechnicalUser {
+public class MultiInstanceIT extends TestWithUser {
 
     private static final String JACK = "jack";
 
@@ -1260,6 +1262,41 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         assertThat(archivedActivityInstance.getResult()).hasSize(2);
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_cancel_multi_instance_with_call_activity_and_boundary() throws Exception {
+        ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(new ProcessDefinitionBuilder()
+                .createNewInstance("subProcess", "1.0")
+                .addActor("actor")
+                .addAutomaticTask("task1")
+                .addUserTask("task2", "actor")
+                .addTransition("task1", "task2").getProcess(), "actor", user);
+
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("multi+call+boundary", "1.0");
+        CallActivityBuilder callActivityBuilder = processDefinitionBuilder
+                .addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("subProcess"),
+                        new ExpressionBuilder().createConstantStringExpression("1.0"));
+        callActivityBuilder.addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(10));
+        callActivityBuilder.addBoundaryEvent("boundary").addSignalEventTrigger("signal");
+        processDefinitionBuilder.addAutomaticTask("auto1");
+        processDefinitionBuilder.addTransition("boundary", "auto1");
+
+        ProcessDefinition processDefinition = deployAndEnableProcess(processDefinitionBuilder.getProcess());
+
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForUserTaskAndExecuteIt("task2", user);
+        waitForUserTask("task2");
+
+        getProcessAPI().cancelProcessInstance(processInstance.getId());
+
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
+        await().until(() -> getProcessAPI().searchProcessInstances(new SearchOptionsBuilder(0, 100).done())
+                .getResult().isEmpty());
+
+        deleteProcessInstanceAndArchived(subProcessDefinition, processDefinition);
     }
 
 }

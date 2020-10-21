@@ -505,6 +505,42 @@ public class FlowNodeInstanceTest {
     }
 
     @Test
+    public void should_getDirectChildrenOfProcessInstance() {
+        // Given
+        //is directly contained in the process "5"
+        repository.add(aUserTask().withLogicalGroup3(0).withLogicalGroup4(5).withName("multiInstance")
+                .withStateExecuting(true).build());
+
+        //is directly contained in the activity "6" that is in the process "5"
+        repository.add(aUserTask().withLogicalGroup3(6).withLogicalGroup4(5).withName("callActivity")
+                .withStateExecuting(true).build());
+        repository.flush();
+
+        List<SFlowNodeInstance> flowNodes = repository.selectList("getDirectChildrenOfProcessInstance",
+                pair("parentProcessInstanceId", 5L));
+        assertThat(flowNodes).hasSize(1).anyMatch(f -> f.getName().equals("multiInstance"));
+    }
+
+    @Test
+    public void should_getAllChildrenOfProcessInstance() {
+        // Given
+        //is directly contained in the process "5"
+        repository.add(aUserTask().withLogicalGroup3(0).withLogicalGroup4(5).withName("multiInstance")
+                .withStateExecuting(true).build());
+
+        //is directly contained in the activity "6" that is in the process "5"
+        repository.add(aUserTask().withLogicalGroup3(6).withLogicalGroup4(5).withName("callActivity")
+                .withStateExecuting(true).build());
+        repository.flush();
+
+        List<SFlowNodeInstance> flowNodes = repository.selectList("getAllChildrenOfProcessInstance",
+                pair("parentProcessInstanceId", 5L));
+        assertThat(flowNodes).hasSize(2)
+                .anyMatch(f -> f.getName().equals("multiInstance"))
+                .anyMatch(f -> f.getName().equals("callActivity"));
+    }
+
+    @Test
     public void should_have_loopCounter_on_loop_Activity() {
         // Given
         final SLoopActivityInstance sLoopActivityInstance = (SLoopActivityInstance) repository

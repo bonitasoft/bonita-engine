@@ -438,7 +438,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             throws SProcessInstanceModificationException, SFlowNodeReadException, SBonitaReadException {
         List<SFlowNodeInstance> activityInstances;
         do {
-            activityInstances = activityService.getFlowNodeInstancesOfProcess(processInstanceId, 0, BATCH_SIZE);
+            activityInstances = activityService.getAllChildrenOfProcessInstance(processInstanceId, 0, BATCH_SIZE);
             for (final SFlowNodeInstance activityInstance : activityInstances) {
                 deleteFlowNodeInstance(activityInstance, processDefinition);
             }

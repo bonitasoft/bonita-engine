@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import static java.util.Collections.singletonMap;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -245,26 +247,33 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<SFlowNodeInstance> getFlowNodeInstancesOfProcess(final long parentProcessInstanceId,
+    public List<SFlowNodeInstance> getAllChildrenOfProcessInstance(final long parentProcessInstanceId,
             final int fromIndex, final int maxResults) throws SBonitaReadException {
-        List<SFlowNodeInstance> selectList;
-        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId",
-                parentProcessInstanceId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
-        selectList = getPersistenceService().selectList(new SelectListDescriptor<>("getFlowNodeInstancesOfProcess",
-                parameters, SFlowNodeInstance.class, queryOptions));
-        return getUnmodifiableList(selectList);
+        return getUnmodifiableList(
+                getPersistenceService().selectList(new SelectListDescriptor<>("getAllChildrenOfProcessInstance",
+                        singletonMap("parentProcessInstanceId", parentProcessInstanceId),
+                        SFlowNodeInstance.class, new QueryOptions(fromIndex, maxResults))));
     }
 
     @Override
-    public List<SFlowNodeInstance> getFlowNodeInstancesOfActivity(long parentActivityInstanceId, int fromIndex,
+    public List<SFlowNodeInstance> getDirectChildrenOfProcessInstance(final long parentProcessInstanceId,
+            final int fromIndex, final int maxResults) throws SBonitaReadException {
+        return getUnmodifiableList(getPersistenceService().selectList(new SelectListDescriptor<>(
+                "getDirectChildrenOfProcessInstance",
+                singletonMap("parentProcessInstanceId", parentProcessInstanceId),
+                SFlowNodeInstance.class, new QueryOptions(fromIndex, maxResults))));
+    }
+
+    @Override
+    public List<SFlowNodeInstance> getDirectChildrenOfActivityInstance(long parentActivityInstanceId, int fromIndex,
             int maxResults) throws SBonitaReadException {
         List<SFlowNodeInstance> selectList;
-        final Map<String, Object> parameters = Collections.singletonMap("parentActivityInstanceId",
+        final Map<String, Object> parameters = singletonMap("parentActivityInstanceId",
                 parentActivityInstanceId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
-        selectList = getPersistenceService().selectList(new SelectListDescriptor<>("getFlowNodeInstancesOfActivity",
-                parameters, SFlowNodeInstance.class, queryOptions));
+        selectList = getPersistenceService()
+                .selectList(new SelectListDescriptor<>("getDirectChildrenOfActivityInstance",
+                        parameters, SFlowNodeInstance.class, queryOptions));
         return getUnmodifiableList(selectList);
     }
 
@@ -288,14 +297,14 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             throws SBonitaReadException {
         return new HashSet<>(getPersistenceService()
                 .selectList(new SelectListDescriptor<>("getSourceObjectIdsOfArchivedFlowNodeInstances",
-                        Collections.singletonMap("sourceProcessInstanceIds", sourceProcessInstanceIds),
+                        singletonMap("sourceProcessInstanceIds", sourceProcessInstanceIds),
                         SAFlowNodeInstance.class, QueryOptions.countQueryOptions())));
     }
 
     @Override
     public void deleteArchivedFlowNodeInstances(List<Long> sourceObjectIds) throws SBonitaException {
         archiveService.deleteFromQuery("deleteArchivedFlowNodeInstances",
-                Collections.singletonMap("sourceObjectIds", sourceObjectIds));
+                singletonMap("sourceObjectIds", sourceObjectIds));
     }
 
     @Override
@@ -409,7 +418,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public long getNumberOfFlowNodeInstancesSupervisedBy(final Long supervisorId,
             final Class<? extends SFlowNodeInstance> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -417,7 +426,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public <T extends SFlowNodeInstance> List<T> searchFlowNodeInstancesSupervisedBy(final Long supervisorId,
             final Class<T> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -467,7 +476,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public long getNumberOfArchivedFlowNodeInstancesSupervisedBy(final long supervisorId,
             final Class<? extends SAFlowNodeInstance> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -475,7 +484,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstancesSupervisedBy(final long supervisorId,
             final Class<T> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -511,7 +520,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     @Override
     public List<SFlowNodeInstance> getFlowNodeInstancesByIds(List<Long> ids) throws SBonitaReadException {
         return getUnmodifiableList(getPersistenceService().selectList(
-                new SelectListDescriptor<>("getFlowNodeInstancesByIds", Collections.singletonMap("ids", ids),
+                new SelectListDescriptor<>("getFlowNodeInstancesByIds", singletonMap("ids", ids),
                         SFlowNodeInstance.class, QueryOptions.ALL_RESULTS)));
     }
 

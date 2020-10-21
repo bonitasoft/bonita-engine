@@ -671,7 +671,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                                     + numberOfFlowNode + "> to execute");
                     logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
                             activityInstanceService
-                                    .getFlowNodeInstancesOfProcess(processInstanceId, 0, numberOfFlowNode).toString());
+                                    .getDirectChildrenOfProcessInstance(processInstanceId, 0, numberOfFlowNode)
+                                    .toString());
                 }
                 return;
             }
