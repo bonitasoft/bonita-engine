@@ -64,10 +64,13 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 
+    testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
     testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
     testCompile project(':services:bonita-business-application:bonita-business-application-impl')
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
@@ -90,3 +93,9 @@ processResources { from "$buildDir/generated/jaxb/schemas" }
 
 tasks.jaxbSchemaGenOrganization.outputs.cacheIf { true }
 tasks.processResources.dependsOn tasks.jaxbSchemaGenOrganization
+
+
+
+test {
+    useJUnitPlatform()
+}
