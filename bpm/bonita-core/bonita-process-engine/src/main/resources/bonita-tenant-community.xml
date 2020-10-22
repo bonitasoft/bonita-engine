@@ -1026,6 +1026,7 @@
     <task:scheduled-tasks scheduler="internalTasksScheduler">
         <task:scheduled ref="sessionService" method="cleanInvalidSessions" cron="${org.bonitasoft.engine.clean.invalid.sessions.cron:0 0 */2 * * ?}" />
     </task:scheduled-tasks>
+    <task:annotation-driven />
 
     <task:scheduler id="internalTasksScheduler" />
 

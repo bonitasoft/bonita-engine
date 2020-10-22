@@ -1,0 +1,111 @@
+/**
+ * Copyright (C) 2020 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.tenant.restart;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.FLOWNODE;
+import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.PROCESS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+
+import java.util.List;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class ProcessInstanceRecoveryServiceTest {
+
+    @Mock
+    private FlowNodeInstanceService flowNodeInstanceService;
+    @Mock
+    private ProcessInstanceService processInstanceService;
+    @Mock
+    private ExecuteFlowNodes executeFlowNodes;
+    @Mock
+    private ExecuteProcesses executeProcesses;
+
+    @InjectMocks
+    private ProcessInstanceRecoveryService processInstanceRecoveryService;
+
+    @BeforeEach
+    public void before() {
+        processInstanceRecoveryService.setReadBatchSize(2);
+    }
+
+    @Test
+    void should_return_list_of_elements_to_recover() throws Exception {
+        doReturn(asList(1L, 2L)).doReturn(emptyList()).when(flowNodeInstanceService)
+                .getFlowNodeInstanceIdsToRestart(any());
+        doReturn(asList(processInstance(1L), processInstance(2L))).doReturn(emptyList())
+                .when(processInstanceService).getProcessInstancesInStates(any(), any());
+
+        List<ElementToRecover> allElementsToRecover = processInstanceRecoveryService.getAllElementsToRecover();
+
+        assertThat(allElementsToRecover).containsExactlyInAnyOrder(
+                elementToRecover(1L, PROCESS), elementToRecover(2L, PROCESS),
+                elementToRecover(1L, FLOWNODE), elementToRecover(2L, FLOWNODE));
+    }
+
+    @Test
+    void should_return_all_elements_even_if_over_page_size() throws SBonitaException {
+        doReturn(asList(processInstance(1L), processInstance(2L)))
+                .doReturn(singletonList(processInstance(4L)))
+                .when(processInstanceService).getProcessInstancesInStates(any(), any());
+        doReturn(asList(7L, 9L))
+                .doReturn(singletonList(13L))
+                .when(flowNodeInstanceService).getFlowNodeInstanceIdsToRestart(any());
+
+        List<ElementToRecover> allElementsToRecover = processInstanceRecoveryService.getAllElementsToRecover();
+
+        assertThat(allElementsToRecover).containsExactlyInAnyOrder(
+                elementToRecover(1L, PROCESS), elementToRecover(2L, PROCESS), elementToRecover(4L, PROCESS),
+                elementToRecover(7L, FLOWNODE), elementToRecover(9L, FLOWNODE), elementToRecover(13L, FLOWNODE));
+    }
+
+    @Test
+    void should_recover_all_elements() {
+        processInstanceRecoveryService.recover(asList(
+                elementToRecover(1L, PROCESS),
+                elementToRecover(2L, PROCESS),
+                elementToRecover(4L, PROCESS),
+                elementToRecover(7L, FLOWNODE),
+                elementToRecover(9L, FLOWNODE),
+                elementToRecover(13L, FLOWNODE)));
+
+        verify(executeFlowNodes).executeFlowNodes(asList(7L, 9L, 13L));
+        verify(executeProcesses).execute(asList(1L, 2L, 4L));
+    }
+
+    private ElementToRecover elementToRecover(long l, ElementToRecover.Type process) {
+        return ElementToRecover.builder().id(l).type(process).build();
+    }
+
+    private SProcessInstance processInstance(long id) {
+        return SProcessInstance.builder().id(id).build();
+    }
+
+}
