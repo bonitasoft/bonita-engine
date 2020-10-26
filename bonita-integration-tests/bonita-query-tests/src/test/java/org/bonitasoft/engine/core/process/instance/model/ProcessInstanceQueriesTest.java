@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import static java.time.Instant.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.bonitasoft.engine.bpm.process.ProcessInstanceState.STARTED;
+import static org.bonitasoft.engine.bpm.process.ProcessInstanceState.*;
 import static org.bonitasoft.engine.commons.Pair.mapOf;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.core.process.definition.model.SFlowNodeType.RECEIVE_TASK;
@@ -967,5 +968,53 @@ public class ProcessInstanceQueriesTest {
                 entry("DATA_ID", 43L),
                 entry("PROC_INST_ID", null),
                 entry("FN_INST_ID", FLOW_NODE_INSTANCE_ID));
+    }
+
+    @Test
+    public void should_return_process_instance_ids_to_restart_that_older_than_max_last_update_date() {
+        long now = System.currentTimeMillis();
+
+        SProcessInstance oldProcess1 = SProcessInstance.builder().name("oldProcess1").stateId(INITIALIZING.getId())
+                .tenantId(DEFAULT_TENANT_ID).lastUpdate(now().minusSeconds(60).toEpochMilli()).build();
+        SProcessInstance oldProcess2 = SProcessInstance.builder().name("oldProcess2").stateId(INITIALIZING.getId())
+                .tenantId(DEFAULT_TENANT_ID).lastUpdate(now().minusSeconds(70).toEpochMilli()).build();
+        SProcessInstance recentProcess1 = SProcessInstance.builder().name("recentProcess1")
+                .stateId(INITIALIZING.getId()).tenantId(DEFAULT_TENANT_ID)
+                .lastUpdate(now().minusSeconds(10).toEpochMilli()).build();
+        SProcessInstance recentProcess2 = SProcessInstance.builder().name("recentProcess2")
+                .stateId(INITIALIZING.getId()).tenantId(DEFAULT_TENANT_ID).lastUpdate(now).build();
+
+        repository.add(oldProcess1, oldProcess2, recentProcess1, recentProcess2);
+        List<Long> processInstanceIdsToRestart = repository
+                .getProcessInstanceIdsToRecover(now().minusSeconds(30).toEpochMilli());
+
+        assertThat(processInstanceIdsToRestart).containsOnly(oldProcess1.getId(), oldProcess2.getId());
+    }
+
+    @Test
+    public void should_return_process_instance_ids_to_restart_are_in_the_expected_states() {
+
+        SProcessInstance process1 = SProcessInstance.builder().id(1).name("process1").stateId(INITIALIZING.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
+        SProcessInstance process2 = SProcessInstance.builder().id(2).name("process2").stateId(COMPLETING.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
+        SProcessInstance process3 = SProcessInstance.builder().id(3).name("process3").stateId(COMPLETED.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
+        SProcessInstance process4 = SProcessInstance.builder().id(4).name("process4").stateId(CANCELLED.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
+        SProcessInstance process5 = SProcessInstance.builder().id(5).name("process5").stateId(ABORTED.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
+        SProcessInstance process6 = SProcessInstance.builder().id(6).name("process6").stateId(STARTED.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
+        SProcessInstance process7 = SProcessInstance.builder().id(7).name("process7").stateId(ERROR.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
+        SProcessInstance process8 = SProcessInstance.builder().id(8).name("process8").stateId(ABORTING.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
+
+        repository.add(process1, process2, process3, process4, process5, process6, process7, process8);
+
+        List<Long> processInstanceIdsToRestart = repository.getProcessInstanceIdsToRecover(System.currentTimeMillis());
+
+        assertThat(processInstanceIdsToRestart).containsOnly(1L, 2L, 3L, 4L, 5L);
     }
 }

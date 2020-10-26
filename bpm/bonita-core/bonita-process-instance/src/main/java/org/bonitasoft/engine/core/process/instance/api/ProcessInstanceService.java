@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -524,21 +525,6 @@ public interface ProcessInstanceService {
             throws SProcessInstanceReadException;
 
     /**
-     * Returns the list of <code>SProcessInstance</code>s in a given list of states.
-     *
-     * @param queryOptions
-     *        the search criteria containing a map of specific parameters of a query
-     * @param states
-     *        the list of valid states to retrieve.
-     * @return the list of matching <code>SProcessInstance</code>s
-     * @throws SProcessInstanceReadException
-     *         if a read error occurs
-     */
-    List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions,
-            final ProcessInstanceState... states)
-            throws SProcessInstanceReadException;
-
-    /**
      * @param sourceObjectProcessInstanceId
      *        The source identifier of the process instance
      * @return The last archived process instance
@@ -575,4 +561,15 @@ public interface ProcessInstanceService {
     List<SProcessInstance> searchFailedProcessInstances(QueryOptions queryOptions) throws SBonitaReadException;
 
     long getNumberOfProcessInstances(long processDefinitionId) throws SBonitaReadException;
+
+    /**
+     * Retrieve ids of process instances nodes that needs to be recovered.
+     * This is used by recover mechanism ProcessInstanceRecoveryService
+     *
+     * @param considerElementsOlderThan consider elements older than that duration
+     * @param queryOptions used for pagination
+     */
+    List<Long> getProcessInstanceIdsToRecover(Duration considerElementsOlderThan, QueryOptions queryOptions)
+            throws SBonitaReadException;
+
 }

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import static java.time.Instant.now;
+import static java.time.temporal.ChronoUnit.DAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.core.process.definition.model.SGatewayType.PARALLEL;
@@ -28,6 +30,7 @@ import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuild
 import static org.bonitasoft.engine.test.persistence.builder.UserTaskInstanceBuilder.aUserTask;
 import static org.bonitasoft.engine.test.persistence.builder.archive.ArchivedUserTaskInstanceBuilder.anArchivedUserTask;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -107,7 +110,7 @@ public class FlowNodeInstanceTest {
     }
 
     @Test
-    public void getFlowNodeInstanceIdsToRestart_should_return_ids_of_flow_nodes_that_need_to_be_restarted() {
+    public void getFlowNodeInstanceIdsToRecover_should_return_ids_of_flow_nodes_that_needs_to_be_recovered() {
         // given
         repository
                 .add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
@@ -146,11 +149,35 @@ public class FlowNodeInstanceTest {
 
         // when
         final QueryOptions options = new QueryOptions(0, 10);
-        final List<Long> nodeToRestart = repository.getFlowNodeInstanceIdsToRestart(options);
+        final List<Long> nodeToRestart = repository.getFlowNodeInstanceIdsToRecover(Duration.ZERO, options);
 
         // then
         assertThat(nodeToRestart).containsOnly(executing.getId(), notStable.getId(), terminal.getId(),
                 abortingBoundary.getId(), cancellingBoundary.getId());
+    }
+
+    @Test
+    public void getFlowNodeInstanceIdsToRecover_should_return_only_element_older_than_given_duration() {
+        // given
+        long now = System.currentTimeMillis();
+
+        SFlowNodeInstance oldTask1 = repository
+                .add(aUserTask().withName("oldTask1").withTerminal(true)
+                        .withLastUpdateDate(now().minus(2, DAYS).toEpochMilli()).build());
+        SFlowNodeInstance oldTask2 = repository
+                .add(aUserTask().withName("oldTask2").withTerminal(true)
+                        .withLastUpdateDate(now().minusSeconds(600).toEpochMilli()).build());
+
+        repository
+                .add(aUserTask().withName("recentTask1").withTerminal(true)
+                        .withLastUpdateDate(now().minusSeconds(400).toEpochMilli()).build());
+        repository.add(aUserTask().withName("recentTask2").withTerminal(true).withLastUpdateDate(now).build());
+        // when
+        List<Long> nodeToRestart = repository.getFlowNodeInstanceIdsToRecover(Duration.ofSeconds(500),
+                new QueryOptions(0, 10));
+
+        // then
+        assertThat(nodeToRestart).containsOnly(oldTask1.getId(), oldTask2.getId());
     }
 
     // For

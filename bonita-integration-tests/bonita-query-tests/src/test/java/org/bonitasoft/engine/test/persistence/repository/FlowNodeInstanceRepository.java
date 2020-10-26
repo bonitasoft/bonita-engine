@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -41,11 +42,13 @@ public class FlowNodeInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) {
+    public List<Long> getFlowNodeInstanceIdsToRecover(Duration considerElementsOlderThan,
+            final QueryOptions queryOptions) {
         getSessionWithTenantFilter();
-        final Query namedQuery = getNamedQuery("getFlowNodeInstanceIdsToRestart");
+        final Query namedQuery = getNamedQuery("getFlowNodeInstanceIdsToRecover");
         namedQuery.setMaxResults(queryOptions.getNumberOfResults());
         namedQuery.setFirstResult(queryOptions.getFromIndex());
+        namedQuery.setParameter("maxLastUpdate", System.currentTimeMillis() - considerElementsOlderThan.toMillis());
         return (List<Long>) namedQuery.list();
     }
 

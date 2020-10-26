@@ -177,4 +177,11 @@ public class ProcessInstanceRepository extends TestRepository {
         return namedQuery.list();
     }
 
+    public List<Long> getProcessInstanceIdsToRecover(final long maxLastUpdate) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query<Long> namedQuery = getNamedQuery("getProcessInstanceIdsToRecover");
+        namedQuery.setParameter("maxLastUpdate", maxLastUpdate);
+        return namedQuery.list();
+    }
+
 }

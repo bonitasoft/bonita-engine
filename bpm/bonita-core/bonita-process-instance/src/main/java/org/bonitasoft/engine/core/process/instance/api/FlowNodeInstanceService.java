@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -346,15 +347,14 @@ public interface FlowNodeInstanceService {
             throws SFlowNodeReadException, SFlowNodeDeletionException;
 
     /**
-     * retrieve ids of elements that need to be restarted
-     * Called on start node to set the flag to tell the engine to restart these flow nodes
-     * Should not be called when the engine is started!
+     * Retrieve ids of flow nodes that need to be recovered.
+     * This is used by recover mechanism ProcessInstanceRecoveryService
      *
-     * @param queryOptions
-     * @return
-     * @throws SBonitaReadException
+     * @param considerElementsOlderThan consider elements older than that duration
+     * @param queryOptions used for pagination
      */
-    List<Long> getFlowNodeInstanceIdsToRestart(QueryOptions queryOptions) throws SBonitaReadException;
+    List<Long> getFlowNodeInstanceIdsToRecover(Duration considerElementsOlderThan, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     List<SFlowNodeInstance> getFlowNodeInstancesByIds(List<Long> ids) throws SBonitaReadException;
 

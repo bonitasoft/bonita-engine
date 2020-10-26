@@ -16,17 +16,16 @@ package org.bonitasoft.engine.tenant.restart;
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.FLOWNODE;
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.PROCESS;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,6 +39,7 @@ public class ProcessInstanceRecoveryService {
     private final ExecuteFlowNodes executeFlowNodes;
     private final ExecuteProcesses executeProcesses;
     private int readBatchSize;
+    private Duration considerElementsOlderThan;
 
     public ProcessInstanceRecoveryService(FlowNodeInstanceService flowNodeInstanceService,
             ProcessInstanceService processInstanceService,
@@ -55,17 +55,39 @@ public class ProcessInstanceRecoveryService {
         this.readBatchSize = readBatchSize;
     }
 
-    public List<ElementToRecover> getAllElementsToRecover() {
+    @Value("${bonita.tenant.recover.consider_elements_older_than:PT1H}")
+    public void setConsiderElementsOlderThan(String considerElementsOlderThan) {
+        setConsiderElementsOlderThan(Duration.parse(considerElementsOlderThan));
+    }
+
+    @VisibleForTesting
+    void setConsiderElementsOlderThan(Duration considerElementsOlderThan) {
+        this.considerElementsOlderThan = considerElementsOlderThan;
+    }
+
+    /**
+     * Retrieve elements ( ProcessInstance and Flow Nodes ) that needs to be recovered and that are older than the given
+     * duration.
+     *
+     * @param considerElementsOlderThan consider elements older than that duration
+     * @return elements to be recovered
+     */
+    public List<ElementToRecover> getAllElementsToRecover(Duration considerElementsOlderThan) {
         List<ElementToRecover> elementsToRecover;
         try {
-            elementsToRecover = getAllProcessInstancesToRestart(processInstanceService);
-            elementsToRecover.addAll(getAllFlowNodeInstancesToRestart());
+            elementsToRecover = getAllProcessInstancesToRecover(considerElementsOlderThan);
+            elementsToRecover.addAll(getAllFlowNodeInstancesToRecover(considerElementsOlderThan));
             return elementsToRecover;
         } catch (SBonitaException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Trigger works to execute elements ( ProcessInstance and Flow Nodes ) that needs to be recovered
+     *
+     * @param elementsToRecover elements needs to be recovered
+     */
     public void recover(List<ElementToRecover> elementsToRecover) {
         executeFlowNodes.executeFlowNodes(elementsToRecover.stream()
                 .filter(e -> e.getType() == FLOWNODE)
@@ -77,7 +99,17 @@ public class ProcessInstanceRecoveryService {
                 .collect(Collectors.toList()));
     }
 
-    private List<ElementToRecover> getAllFlowNodeInstancesToRestart() throws SBonitaException {
+    /**
+     * Recover all elements considered as "stuck".
+     * Only recover elements older than a duration configured with {@link #setConsiderElementsOlderThan(String)}.
+     */
+    public void recoverAllElements() {
+        List<ElementToRecover> allElementsToRecover = getAllElementsToRecover(considerElementsOlderThan);
+        recover(allElementsToRecover);
+    }
+
+    private List<ElementToRecover> getAllFlowNodeInstancesToRecover(Duration considerElementsOlderThan)
+            throws SBonitaException {
         List<Long> flownodesToRestart = new ArrayList<>();
         // using a too low page size (100) causes too many access to the database and causes timeout exception if there are lot of elements.
         // As we retrieve only the id we can use a greater page size
@@ -85,7 +117,7 @@ public class ProcessInstanceRecoveryService {
         List<Long> ids;
         log.info("Start detecting flow nodes to restart...");
         do {
-            ids = flowNodeInstanceService.getFlowNodeInstanceIdsToRestart(queryOptions);
+            ids = flowNodeInstanceService.getFlowNodeInstanceIdsToRecover(considerElementsOlderThan, queryOptions);
             flownodesToRestart.addAll(ids);
             queryOptions = QueryOptions.getNextPage(queryOptions);
         } while (ids.size() == queryOptions.getNumberOfResults());
@@ -96,21 +128,17 @@ public class ProcessInstanceRecoveryService {
                 .collect(Collectors.toList());
     }
 
-    private List<ElementToRecover> getAllProcessInstancesToRestart(ProcessInstanceService processInstanceService)
+    private List<ElementToRecover> getAllProcessInstancesToRecover(Duration considerElementsOlderThan)
             throws SBonitaException {
         final List<Long> ids = new ArrayList<>();
-        QueryOptions queryOptions = new QueryOptions(0, readBatchSize, SProcessInstance.class, "id", OrderByType.ASC);
-        List<SProcessInstance> processInstances;
+        QueryOptions queryOptions = new QueryOptions(0, readBatchSize);
+        List<Long> processInstancesIds;
         do {
-            processInstances = processInstanceService.getProcessInstancesInStates(queryOptions,
-                    ProcessInstanceState.INITIALIZING,
-                    ProcessInstanceState.COMPLETING, ProcessInstanceState.COMPLETED,
-                    ProcessInstanceState.ABORTED, ProcessInstanceState.CANCELLED);
+            processInstancesIds = processInstanceService.getProcessInstanceIdsToRecover(considerElementsOlderThan,
+                    queryOptions);
             queryOptions = QueryOptions.getNextPage(queryOptions);
-            for (final SProcessInstance sProcessInstance : processInstances) {
-                ids.add(sProcessInstance.getId());
-            }
-        } while (processInstances.size() == queryOptions.getNumberOfResults());
+            ids.addAll(processInstancesIds);
+        } while (processInstancesIds.size() == queryOptions.getNumberOfResults());
         return ids
                 .stream().map(id -> ElementToRecover.builder().id(id).type(PROCESS).build())
                 .collect(Collectors.toList());

@@ -20,6 +20,7 @@ import static org.bonitasoft.engine.tenant.restart.ElementToRecover.builder;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class ProcessInstanceRecoveryHandlerTest {
         final List<ElementToRecover> elementToRecovers = asList(
                 builder().id(17L).type(PROCESS).build(),
                 builder().id(44L).type(FLOWNODE).build());
-        doReturn(elementToRecovers).when(processInstanceRecoveryService).getAllElementsToRecover();
+        doReturn(elementToRecovers).when(processInstanceRecoveryService).getAllElementsToRecover(Duration.ZERO);
 
         processInstanceRecoveryHandler.beforeServicesStart();
         processInstanceRecoveryHandler.afterServicesStart();

@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import static java.util.Collections.singletonMap;
+
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -870,23 +873,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    @Override
-    public List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions,
-            final ProcessInstanceState... states)
-            throws SProcessInstanceReadException {
-        final Set<Integer> stateIds = getStateIdsFromStates(states);
-        final Map<String, Object> inputParameters = new HashMap<>(1);
-        inputParameters.put("stateIds", stateIds);
-        final SelectListDescriptor<SProcessInstance> selectProcessInstancesInStates = new SelectListDescriptor<>(
-                "getProcessInstancesInStates",
-                inputParameters, SProcessInstance.class, queryOptions);
-        try {
-            return persistenceRead.selectList(selectProcessInstancesInStates);
-        } catch (final SBonitaReadException e) {
-            throw new SProcessInstanceReadException(e);
-        }
-    }
-
     protected Set<Integer> getStateIdsFromStates(final ProcessInstanceState... states) {
         if (states.length < 1) {
             throw new IllegalArgumentException(
@@ -952,6 +938,16 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 "countProcessInstancesOfProcessDefinition", inputParameters,
                 SProcessInstance.class);
         return persistenceRead.selectOne(countDescriptor);
+    }
+
+    @Override
+    public List<Long> getProcessInstanceIdsToRecover(Duration considerElementsOlderThan, QueryOptions queryOptions)
+            throws SBonitaReadException {
+        return persistenceRead.selectList(new SelectListDescriptor<>(
+                "getProcessInstanceIdsToRecover",
+                singletonMap("maxLastUpdate",
+                        System.currentTimeMillis() - considerElementsOlderThan.toMillis()),
+                SProcessInstance.class, queryOptions));
     }
 
     @Override

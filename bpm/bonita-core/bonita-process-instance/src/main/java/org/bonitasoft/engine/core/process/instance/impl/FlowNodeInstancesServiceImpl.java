@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.impl;
 import static java.util.Collections.singletonMap;
 
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -510,9 +511,13 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) throws SBonitaReadException {
+    public List<Long> getFlowNodeInstanceIdsToRecover(Duration considerElementsOlderThan, QueryOptions queryOptions)
+            throws SBonitaReadException {
         final List<Long> selectList = getPersistenceService().selectList(
-                new SelectListDescriptor<>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class,
+                new SelectListDescriptor<>("getFlowNodeInstanceIdsToRecover",
+                        singletonMap("maxLastUpdate",
+                                System.currentTimeMillis() - considerElementsOlderThan.toMillis()),
+                        SFlowNodeInstance.class,
                         queryOptions));
         return getUnmodifiableList(selectList);
     }

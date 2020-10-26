@@ -20,9 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.FLOWNODE;
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.PROCESS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -54,16 +56,18 @@ class ProcessInstanceRecoveryServiceTest {
     @BeforeEach
     public void before() {
         processInstanceRecoveryService.setReadBatchSize(2);
+        processInstanceRecoveryService.setConsiderElementsOlderThan(Duration.ofMillis(1000));
     }
 
     @Test
     void should_return_list_of_elements_to_recover() throws Exception {
         doReturn(asList(1L, 2L)).doReturn(emptyList()).when(flowNodeInstanceService)
-                .getFlowNodeInstanceIdsToRestart(any());
-        doReturn(asList(processInstance(1L), processInstance(2L))).doReturn(emptyList())
-                .when(processInstanceService).getProcessInstancesInStates(any(), any());
+                .getFlowNodeInstanceIdsToRecover(eq(Duration.ZERO), any());
+        doReturn(asList(1L, 2L)).doReturn(emptyList())
+                .when(processInstanceService).getProcessInstanceIdsToRecover(eq(Duration.ZERO), any());
 
-        List<ElementToRecover> allElementsToRecover = processInstanceRecoveryService.getAllElementsToRecover();
+        List<ElementToRecover> allElementsToRecover = processInstanceRecoveryService
+                .getAllElementsToRecover(Duration.ZERO);
 
         assertThat(allElementsToRecover).containsExactlyInAnyOrder(
                 elementToRecover(1L, PROCESS), elementToRecover(2L, PROCESS),
@@ -72,14 +76,15 @@ class ProcessInstanceRecoveryServiceTest {
 
     @Test
     void should_return_all_elements_even_if_over_page_size() throws SBonitaException {
-        doReturn(asList(processInstance(1L), processInstance(2L)))
-                .doReturn(singletonList(processInstance(4L)))
-                .when(processInstanceService).getProcessInstancesInStates(any(), any());
+        doReturn(asList(1L, 2L))
+                .doReturn(singletonList(4L))
+                .when(processInstanceService).getProcessInstanceIdsToRecover(eq(Duration.ZERO), any());
         doReturn(asList(7L, 9L))
                 .doReturn(singletonList(13L))
-                .when(flowNodeInstanceService).getFlowNodeInstanceIdsToRestart(any());
+                .when(flowNodeInstanceService).getFlowNodeInstanceIdsToRecover(eq(Duration.ZERO), any());
 
-        List<ElementToRecover> allElementsToRecover = processInstanceRecoveryService.getAllElementsToRecover();
+        List<ElementToRecover> allElementsToRecover = processInstanceRecoveryService
+                .getAllElementsToRecover(Duration.ZERO);
 
         assertThat(allElementsToRecover).containsExactlyInAnyOrder(
                 elementToRecover(1L, PROCESS), elementToRecover(2L, PROCESS), elementToRecover(4L, PROCESS),
@@ -87,7 +92,7 @@ class ProcessInstanceRecoveryServiceTest {
     }
 
     @Test
-    void should_recover_all_elements() {
+    void should_recover_elements_provided() {
         processInstanceRecoveryService.recover(asList(
                 elementToRecover(1L, PROCESS),
                 elementToRecover(2L, PROCESS),
@@ -95,6 +100,24 @@ class ProcessInstanceRecoveryServiceTest {
                 elementToRecover(7L, FLOWNODE),
                 elementToRecover(9L, FLOWNODE),
                 elementToRecover(13L, FLOWNODE)));
+
+        verify(executeFlowNodes).executeFlowNodes(asList(7L, 9L, 13L));
+        verify(executeProcesses).execute(asList(1L, 2L, 4L));
+    }
+
+    @Test
+    void should_recover_all_elements_older_than() throws Exception {
+        Duration considerElementsOlderThan = Duration.ofSeconds(10);
+        processInstanceRecoveryService.setConsiderElementsOlderThan(considerElementsOlderThan);
+
+        doReturn(asList(1L, 2L))
+                .doReturn(singletonList(4L))
+                .when(processInstanceService).getProcessInstanceIdsToRecover(eq(considerElementsOlderThan), any());
+        doReturn(asList(7L, 9L))
+                .doReturn(singletonList(13L))
+                .when(flowNodeInstanceService).getFlowNodeInstanceIdsToRecover(eq(considerElementsOlderThan), any());
+
+        processInstanceRecoveryService.recoverAllElements();
 
         verify(executeFlowNodes).executeFlowNodes(asList(7L, 9L, 13L));
         verify(executeProcesses).execute(asList(1L, 2L, 4L));
