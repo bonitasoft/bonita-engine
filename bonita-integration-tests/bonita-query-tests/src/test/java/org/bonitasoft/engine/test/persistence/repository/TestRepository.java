@@ -140,4 +140,9 @@ public class TestRepository {
         getSession().update(application);
     }
 
+    public <T extends PersistentObject> void add(T... entities) {
+        for (T entity : entities) {
+            add(entity);
+        }
+    }
 }

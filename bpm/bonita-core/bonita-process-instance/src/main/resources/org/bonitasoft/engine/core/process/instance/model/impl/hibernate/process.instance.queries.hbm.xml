@@ -78,13 +78,19 @@
 		AND a.terminal = FALSE
 	</query>
 
-	<query name="getFlowNodeInstanceIdsToRestart">
+	<query name="getFlowNodeInstanceIdsToRecover">
 		SELECT f.id
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
 		WHERE f.stateId != 3
-		AND (f.stateExecuting = TRUE OR f.stable = FALSE OR f.terminal = TRUE OR f.stateCategory = 'ABORTING' OR f.stateCategory = 'CANCELLING')
+		AND (f.stateExecuting = TRUE
+			OR f.stable = FALSE
+			OR f.terminal = TRUE
+			OR f.stateCategory = 'ABORTING'
+			OR f.stateCategory = 'CANCELLING')
+		AND f.lastUpdateDate &lt; :maxLastUpdate
 		ORDER BY id
 	</query>
+
 	<query name="getFlowNodeInstancesByNameAndParentContainerId">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
@@ -1547,10 +1553,12 @@
         )
 	</query>
 	
-	<query name="getProcessInstancesInStates">
-		SELECT p
+	<query name="getProcessInstanceIdsToRecover">
+		SELECT p.id
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
-		WHERE p.stateId IN (:stateIds)
+		WHERE p.lastUpdate &lt; :maxLastUpdate
+		AND p.stateId IN ( 0, 3, 4, 5, 6)
+		ORDER BY id
 	</query>
 
 	<query name="getNumberOfChildInstancesOfProcessInstance">

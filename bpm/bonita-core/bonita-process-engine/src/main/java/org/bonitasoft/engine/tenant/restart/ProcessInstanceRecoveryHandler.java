@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.tenant.restart;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -29,7 +30,7 @@ public class ProcessInstanceRecoveryHandler implements TenantRestartHandler {
 
     @Override
     public void beforeServicesStart() {
-        allElementsToRecover = processInstanceRecoveryService.getAllElementsToRecover();
+        allElementsToRecover = processInstanceRecoveryService.getAllElementsToRecover(Duration.ZERO);
     }
 
     @Override
