@@ -21,16 +21,17 @@ import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.FLOWNOD
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.PROCESS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +47,8 @@ class ProcessInstanceRecoveryServiceTest {
     @Mock
     private ProcessInstanceService processInstanceService;
     @Mock
+    private UserTransactionService userTransactionService;
+    @Mock
     private ExecuteFlowNodes executeFlowNodes;
     @Mock
     private ExecuteProcesses executeProcesses;
@@ -54,7 +57,7 @@ class ProcessInstanceRecoveryServiceTest {
     private ProcessInstanceRecoveryService processInstanceRecoveryService;
 
     @BeforeEach
-    public void before() {
+    public void before() throws Exception {
         processInstanceRecoveryService.setReadBatchSize(2);
         processInstanceRecoveryService.setConsiderElementsOlderThan(Duration.ofMillis(1000));
     }
@@ -110,6 +113,8 @@ class ProcessInstanceRecoveryServiceTest {
         Duration considerElementsOlderThan = Duration.ofSeconds(10);
         processInstanceRecoveryService.setConsiderElementsOlderThan(considerElementsOlderThan);
 
+        when(userTransactionService.executeInTransaction(any()))
+                .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         doReturn(asList(1L, 2L))
                 .doReturn(singletonList(4L))
                 .when(processInstanceService).getProcessInstanceIdsToRecover(eq(considerElementsOlderThan), any());

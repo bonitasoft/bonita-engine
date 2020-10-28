@@ -28,13 +28,6 @@ import org.bonitasoft.engine.commons.PlatformRestartHandler;
 public interface NodeConfiguration {
 
     /**
-     * specify if we should resume unfinished elements when the node is started
-     *
-     * @return
-     */
-    boolean shouldResumeElements();
-
-    /**
      * Handlers called on restart of the platform
      */
     List<PlatformRestartHandler> getPlatformRestartHandlers();
@@ -44,5 +37,4 @@ public interface NodeConfiguration {
      *         true if the sessions should be cleaned when the node is stopped
      */
     boolean shouldClearSessions();
-
 }
