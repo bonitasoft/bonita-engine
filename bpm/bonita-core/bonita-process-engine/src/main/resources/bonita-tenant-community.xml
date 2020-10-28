@@ -853,7 +853,7 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
-    
+
     <bean id="groovyScriptConditionExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptConditionExpressionExecutorStrategy">
         <constructor-arg name="cacheService" ref="cacheService" />
@@ -1705,6 +1705,9 @@
         <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
         <constructor-arg name="configuration">
             <map>
+                <!-- to prevent Hibernate 5 from changing its way of managing ID generation: -->
+                <entry key="hibernate.id.new_generator_mappings" value="false" />
+
                 <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
                 <entry key="hibernate.connection.datasource" value-ref="bdmDatasource" />
                 <entry key="hibernate.show_sql" value="${bonita.tenant.bdm.repository.show_sql}" />
@@ -1738,6 +1741,9 @@
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="configuration">
             <map>
+                <!-- to prevent Hibernate 5 from changing its way of managing ID generation: -->
+                <entry key="hibernate.id.new_generator_mappings" value="false" />
+
                 <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
                 <entry key="hibernate.connection.datasource" value-ref="bdmNonXaDatasource" />
                 <entry key="hibernate.show_sql" value="${bonita.tenant.bdm.schemamanager.show_sql}" />
