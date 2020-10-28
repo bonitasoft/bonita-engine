@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 
@@ -30,26 +31,16 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(NodeConfiguration.class)
 public class NodeConfigurationImpl implements NodeConfiguration {
 
-    private boolean shouldRestartElements = true;
-
     private List<PlatformRestartHandler> platformRestartHandlers;
-
-    @Override
-    public boolean shouldResumeElements() {
-        return shouldRestartElements;
-    }
 
     @Override
     public List<PlatformRestartHandler> getPlatformRestartHandlers() {
         return CollectionUtil.emptyOrUnmodifiable(platformRestartHandlers);
     }
 
+    @Autowired(required = false)
     public void setPlatformRestartHandlers(final List<PlatformRestartHandler> platformRestartHandlers) {
         this.platformRestartHandlers = platformRestartHandlers;
-    }
-
-    public void setShouldRestartElements(final boolean shouldRestartElements) {
-        this.shouldRestartElements = shouldRestartElements;
     }
 
     @Override

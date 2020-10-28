@@ -57,4 +57,8 @@ public class TenantElementsRestartSupervisorLocal implements TenantLifecycleServ
         }
     }
 
+    @Override
+    public boolean isResponsibleForRecovery() {
+        return true;
+    }
 }

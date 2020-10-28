@@ -13,16 +13,14 @@
  **/
 package org.bonitasoft.engine.bpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.handler.SchedulerServiceRestartHandler;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
-import org.bonitasoft.engine.platform.configuration.NodeConfigurationImpl;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.junit.BeforeClass;
@@ -44,19 +42,14 @@ public class NodeConfigurationIT {
     }
 
     @Test
-    public void setRestartHandlers() {
-        List<PlatformRestartHandler> lPlatformRestartHandlers = new ArrayList<>();
-        PlatformRestartHandler rh = () -> {
-
-        };
-        lPlatformRestartHandlers.add(rh);
-        ((NodeConfigurationImpl) nodeConfiguration).setPlatformRestartHandlers(lPlatformRestartHandlers);
-        assertEquals(1, nodeConfiguration.getPlatformRestartHandlers().size());
+    public void should_have_at_least_one_restart_handler() {
+        List<PlatformRestartHandler> platformRestartHandlers = nodeConfiguration.getPlatformRestartHandlers();
+        assertThat(platformRestartHandlers).hasSize(1);
+        assertThat(platformRestartHandlers.get(0)).isInstanceOf(SchedulerServiceRestartHandler.class);
     }
 
     @Test
-    public void getShouldRestartElements() {
-        assertTrue(nodeConfiguration.shouldResumeElements());
+    public void should_clear_sessions() {
+        assertThat(nodeConfiguration.shouldClearSessions()).isTrue();
     }
-
 }

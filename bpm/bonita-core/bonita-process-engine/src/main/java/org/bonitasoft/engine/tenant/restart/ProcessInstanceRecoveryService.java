@@ -27,6 +27,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,7 @@ public class ProcessInstanceRecoveryService {
 
     private final FlowNodeInstanceService flowNodeInstanceService;
     private final ProcessInstanceService processInstanceService;
+    private final UserTransactionService userTransactionService;
     private final ExecuteFlowNodes executeFlowNodes;
     private final ExecuteProcesses executeProcesses;
     private int readBatchSize;
@@ -43,9 +45,12 @@ public class ProcessInstanceRecoveryService {
 
     public ProcessInstanceRecoveryService(FlowNodeInstanceService flowNodeInstanceService,
             ProcessInstanceService processInstanceService,
-            ExecuteFlowNodes executeFlowNodes, ExecuteProcesses executeProcesses) {
+            UserTransactionService userTransactionService,
+            ExecuteFlowNodes executeFlowNodes,
+            ExecuteProcesses executeProcesses) {
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processInstanceService = processInstanceService;
+        this.userTransactionService = userTransactionService;
         this.executeFlowNodes = executeFlowNodes;
         this.executeProcesses = executeProcesses;
     }
@@ -104,8 +109,15 @@ public class ProcessInstanceRecoveryService {
      * Only recover elements older than a duration configured with {@link #setConsiderElementsOlderThan(String)}.
      */
     public void recoverAllElements() {
-        List<ElementToRecover> allElementsToRecover = getAllElementsToRecover(considerElementsOlderThan);
-        recover(allElementsToRecover);
+        try {
+            List<ElementToRecover> allElementsToRecover = userTransactionService.executeInTransaction(
+                    () -> ProcessInstanceRecoveryService.this.getAllElementsToRecover(considerElementsOlderThan));
+            log.info("Found {} that can potentially be recovered", allElementsToRecover.size());
+            recover(allElementsToRecover);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private List<ElementToRecover> getAllFlowNodeInstancesToRecover(Duration considerElementsOlderThan)
