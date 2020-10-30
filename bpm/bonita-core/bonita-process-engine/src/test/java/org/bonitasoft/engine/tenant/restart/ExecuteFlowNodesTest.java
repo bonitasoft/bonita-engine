@@ -14,27 +14,16 @@
 package org.bonitasoft.engine.tenant.restart;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.execution.TestFlowNodeState.*;
+import static org.bonitasoft.engine.execution.TestFlowNodeState.stableState;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -45,8 +34,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventIns
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,10 +57,6 @@ public class ExecuteFlowNodesTest {
     @Mock
     private WorkService workService;
     @Mock
-    private GatewayInstanceService gatewayInstanceService;
-    @Mock
-    private ProcessDefinitionService processDefinitionService;
-    @Mock
     private UserTransactionService userTransactionService;
 
     private final BPMWorkFactory workFactory = new BPMWorkFactory();
@@ -87,8 +72,7 @@ public class ExecuteFlowNodesTest {
     public void before() throws Exception {
         ;
         executeFlowNodes = new ExecuteFlowNodes(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
-                gatewayInstanceService,
-                processDefinitionService, flownodeStateManager, workFactory, userTransactionService,
+                flownodeStateManager, workFactory, userTransactionService,
                 BATCH_RESTART_SIZE);
         doAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call()).when(userTransactionService)
                 .executeInTransaction(any());
@@ -204,10 +188,10 @@ public class ExecuteFlowNodesTest {
     }
 
     @Test
-    public void should_execute_gateway_when_merging_condition_is_true() throws Exception {
+    public void should_execute_gateway_when_gateway_is_flagged_as_finished() throws Exception {
         SGatewayInstance gatewayInstance = new SGatewayInstance();
         gatewayInstance.setId(333L);
-        doReturn(true).when(gatewayInstanceService).checkMergingCondition(any(), eq(gatewayInstance));
+        gatewayInstance.setHitBys("FINISH:2");
 
         executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance));
 
@@ -215,20 +199,34 @@ public class ExecuteFlowNodesTest {
     }
 
     @Test
+    public void should_not_execute_gateway_when_gateway_has_still_an_active_branch() throws Exception {
+        SGatewayInstance gatewayInstance = new SGatewayInstance();
+        gatewayInstance.setId(333L);
+        gatewayInstance.setHitBys("1,2");
+
+        executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance));
+
+        verify(workService, never()).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
+    }
+
+    @Test
     public void should_continue_batch_if_one_flow_node_fails() throws Exception {
-        SGatewayInstance gatewayInstance1 = new SGatewayInstance();
-        gatewayInstance1.setId(333L);
-        SGatewayInstance gatewayInstance2 = new SGatewayInstance();
-        gatewayInstance2.setId(344L);
-        doThrow(SBonitaReadException.class).when(gatewayInstanceService).checkMergingCondition(any(),
-                eq(gatewayInstance1));
-        doReturn(true).when(gatewayInstanceService).checkMergingCondition(any(), eq(gatewayInstance2));
+        SAutomaticTaskInstance automaticTaskInstance1 = new SAutomaticTaskInstance();
+        automaticTaskInstance1.setId(333L);
+        automaticTaskInstance1.setTerminal(true);
+        SAutomaticTaskInstance automaticTaskInstance2 = new SAutomaticTaskInstance();
+        automaticTaskInstance2.setId(344L);
+        automaticTaskInstance2.setTerminal(true);
+        doThrow(SWorkRegisterException.class).when(workService)
+                .registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")
+                        && work.getParameter("flowNodeInstanceId").equals(333L)));
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance1, gatewayInstance2));
+        executeFlowNodes.executeFlowNodes(flowNodeIds(automaticTaskInstance1, automaticTaskInstance2));
 
-        verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")
+        verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")
                 && work.getParameter("flowNodeInstanceId").equals(344L)));
-        verifyNoMoreInteractions(workService);
+        verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")
+                && work.getParameter("flowNodeInstanceId").equals(333L)));
     }
 
     @Test

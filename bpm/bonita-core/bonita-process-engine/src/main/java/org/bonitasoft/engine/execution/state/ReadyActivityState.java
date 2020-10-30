@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReadyActivityState extends OnEnterAndFinishConnectorState {
 
+    public static final int ID = 4;
     private final StateBehaviors stateBehaviors;
 
     public ReadyActivityState(final StateBehaviors stateBehaviors) {
@@ -56,7 +57,7 @@ public class ReadyActivityState extends OnEnterAndFinishConnectorState {
 
     @Override
     public int getId() {
-        return ID_ACTIVITY_READY;
+        return ID;
     }
 
     @Override

@@ -20,11 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
@@ -54,16 +51,13 @@ public class ExecuteFlowNodes {
     private final BPMWorkFactory workFactory;
     private final TechnicalLogger logger;
     private final ActivityInstanceService activityInstanceService;
-    private final GatewayInstanceService gatewayInstanceService;
-    private final ProcessDefinitionService processDefinitionService;
     private final FlowNodeStateManager flowNodeStateManager;
     private final UserTransactionService userTransactionService;
     private final int batchRestartSize;
 
     public ExecuteFlowNodes(WorkService workService,
             @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
-            ActivityInstanceService activityInstanceService, GatewayInstanceService gatewayInstanceService,
-            ProcessDefinitionService processDefinitionService,
+            ActivityInstanceService activityInstanceService,
             FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory,
             UserTransactionService userTransactionService,
             @Value("${bonita.tenant.work.batch_restart_size:1000}") int batchRestartSize) {
@@ -71,8 +65,6 @@ public class ExecuteFlowNodes {
         this.workFactory = workFactory;
         this.logger = logger.asLogger(ExecuteFlowNodes.class);
         this.activityInstanceService = activityInstanceService;
-        this.gatewayInstanceService = gatewayInstanceService;
-        this.processDefinitionService = processDefinitionService;
         this.flowNodeStateManager = flowNodeStateManager;
         this.userTransactionService = userTransactionService;
         this.batchRestartSize = batchRestartSize;
@@ -156,11 +148,8 @@ public class ExecuteFlowNodes {
             return !state.getStateCategory().equals(sFlowNodeInstance.getStateCategory());
         }
         if (SFlowNodeType.GATEWAY.equals(sFlowNodeInstance.getType())) {
-            SProcessDefinition processDefinition = processDefinitionService
-                    .getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId());
-            return sFlowNodeInstance.isAborting() || sFlowNodeInstance.isCanceling() ||
-                    gatewayInstanceService.checkMergingCondition(processDefinition,
-                            (SGatewayInstance) sFlowNodeInstance);
+            return sFlowNodeInstance.isAborting() || sFlowNodeInstance.isCanceling()
+                    || ((SGatewayInstance) sFlowNodeInstance).isFinished();
         }
         return true;
     }
