@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CompletedActivityState implements FlowNodeState {
 
+    public static final int ID = 2;
+
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance activityInstance) {
         return StateCode.DONE;
@@ -32,7 +34,7 @@ public class CompletedActivityState implements FlowNodeState {
 
     @Override
     public int getId() {
-        return 2;
+        return ID;
     }
 
     @Override

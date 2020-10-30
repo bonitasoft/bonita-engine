@@ -72,6 +72,8 @@ public class ContainerRegistry {
         workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
     }
 
+    // FIXME, we should never execute a flow node directly, all call to this method should be replaced by a work
+    @Deprecated
     public void executeFlowNodeInSameThread(final SFlowNodeInstance flowNodeInstance,
             final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InitializingAndExecutingFlowNodeState extends OnEnterAndFinishConnectorState {
 
+    public static final int ID = 61;
     private final StateBehaviors stateBehaviors;
 
     public InitializingAndExecutingFlowNodeState(final StateBehaviors stateBehaviors) {
@@ -32,7 +33,7 @@ public class InitializingAndExecutingFlowNodeState extends OnEnterAndFinishConne
 
     @Override
     public int getId() {
-        return 61;
+        return ID;
     }
 
     @Override
