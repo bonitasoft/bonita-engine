@@ -345,7 +345,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         .setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                executeFlowNode(gatewayToExecute, null, null);
+                registerExecuteFlowNodeWork(gatewayToExecute);
             }
         } catch (final SBonitaException e) {
             setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
@@ -812,24 +812,27 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         if (processDefinition.getProcessContainer().containsInclusiveGateway()
                 && needToReevaluateInclusiveGateways(transitionsDescriptor)) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                    "some branches died, will check again all inclusive gateways");
-            final List<SGatewayInstance> inclusiveGatewaysOfProcessInstance = gatewayInstanceService
-                    .getInclusiveGatewaysOfProcessInstanceThatShouldFire(
-                            processDefinition, processInstanceId);
-            List<SGatewayInstance> gatewaysToExecute = new ArrayList<>(inclusiveGatewaysOfProcessInstance);
-            for (final SGatewayInstance gatewayInstance : inclusiveGatewaysOfProcessInstance) {
-                gatewaysToExecute
-                        .addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(processDefinition,
-                                gatewayInstance));
-            }
-            for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                //FIXME should be done in a work?
-                executeFlowNode(gatewayToExecute, null, null);
-            }
-
+            reevaluateGateways(processDefinition, processInstanceId);
         }
         return transitionsDescriptor.isLastFlowNode();
+    }
+
+    private void reevaluateGateways(SProcessDefinition processDefinition, long processInstanceId)
+            throws SBonitaException {
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                "some branches died, will check again all inclusive gateways");
+        final List<SGatewayInstance> inclusiveGatewaysOfProcessInstance = gatewayInstanceService
+                .getInclusiveGatewaysOfProcessInstanceThatShouldFire(
+                        processDefinition, processInstanceId);
+        List<SGatewayInstance> gatewaysToExecute = new ArrayList<>(inclusiveGatewaysOfProcessInstance);
+        for (final SGatewayInstance gatewayInstance : inclusiveGatewaysOfProcessInstance) {
+            gatewaysToExecute
+                    .addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(processDefinition,
+                            gatewayInstance));
+        }
+        for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
+            registerExecuteFlowNodeWork(gatewayToExecute);
+        }
     }
 
     protected void removeDuplicatedInclusiveGatewayTransitions(SProcessDefinition processDefinition,
@@ -1106,7 +1109,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         for (final SFlowNodeInstance sFlowNodeInstance : flowNodeInstances) {
             try {
-                workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
+                registerExecuteFlowNodeWork(sFlowNodeInstance);
             } catch (final SWorkRegisterException e) {
                 setExceptionContext(sProcessInstance, sFlowNodeInstance, e);
                 throw new SFlowNodeExecutionException("Unable to trigger execution of the flow node.", e);
@@ -1137,9 +1140,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
-            workService
-                    .registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
+            registerExecuteFlowNodeWork(sFlowNodeInstance);
         }
+    }
+
+    private void registerExecuteFlowNodeWork(SFlowNodeInstance sFlowNodeInstance) throws SWorkRegisterException {
+        workService
+                .registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
     }
 
     private void setExceptionContext(final SProcessDefinition sProcessDefinition,

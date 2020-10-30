@@ -46,12 +46,11 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 
 /**
- * @author Ruiheng Fan
- * @author Baptiste Mesta
- * @author Elias Ricken de Medeiros
- * @author Matthieu Chaffotte
- * @author Celine Souchet
+ * This command was used by Forms v6, this should be removed
+ *
+ * @deprecated since 7.12
  */
+@Deprecated
 public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
 
     public static final String ACTIVITY_INSTANCE_ID_KEY = "ACTIVITY_INSTANCE_ID_KEY";
