@@ -143,6 +143,7 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
         waitForUserTask(id, "userTask1");
         waitForUserTask("taskOfSubProcess");
         waitForUserTask("taskOfSubProcess");
+        Thread.sleep(200);
 
         getProcessAPI().deleteProcessInstance(id);
 
