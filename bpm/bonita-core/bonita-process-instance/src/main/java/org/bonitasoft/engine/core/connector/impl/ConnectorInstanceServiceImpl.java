@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -101,12 +100,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(SConnectorInstanceWithFailureInfo.EXCEPTION_MESSAGE,
                 getExceptionMessage(throwable));
-        try {
-            entityUpdateDescriptor.addField(SConnectorInstanceWithFailureInfo.STACK_TRACE,
-                    getStringStackTrace(throwable));
-        } catch (final IOException e) {
-            throw new SConnectorInstanceModificationException(e);
-        }
+        entityUpdateDescriptor.addField(SConnectorInstanceWithFailureInfo.STACK_TRACE,
+                getStringStackTrace(throwable));
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(connectorInstanceWithFailure, entityUpdateDescriptor),
                     CONNECTOR_INSTANCE);
@@ -130,21 +125,28 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         return message;
     }
 
-    private static String getStringStackTrace(final Throwable throwable) throws IOException {
+    private static String getStringStackTrace(final Throwable throwable) {
         if (throwable == null) {
             return null;
         }
-        final StringWriter writer = new StringWriter();
-        PrintWriter printer = null;
-        try {
-            printer = new PrintWriter(writer);
+        try (StringWriter writer = new StringWriter(); PrintWriter printer = new PrintWriter(writer)) {
             throwable.printStackTrace(printer);
             return writer.toString();
-        } finally {
-            if (printer != null) {
-                printer.close();
+        } catch (Throwable e) {
+            //Unable to print exception to the Writer, simply retrieve all exceptions as stacktrace
+            try {
+                Throwable current = throwable;
+                StringBuilder stacktrace = new StringBuilder();
+                stacktrace.append("Unable to retrieve stacktrace, exceptions were:\n");
+                do {
+                    stacktrace.append(" * ").append(current.getClass().getName()).append(": ")
+                            .append(current.getMessage()).append("\n");
+                    current = current.getCause();
+                } while (current != null);
+                return stacktrace.toString();
+            } catch (Throwable e1) {
+                return "Unable to retrieve exception stacktrace";
             }
-            writer.close();
         }
     }
 
