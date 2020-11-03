@@ -71,21 +71,38 @@ public class ConnectorInstanceServiceImplTest {
     private ConnectorInstanceServiceImpl connectorInstanceServiceImpl;
 
     @Test
-    public void setConnectorInstanceFailureException() throws Exception {
-        final Exception exception = new Exception(message);
+    public void should_persist_stack_trace_on_failure() throws Exception {
+        SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = new SConnectorInstanceWithFailureInfo();
 
-        //call method
-        connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
+        connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailure,
+                new Exception("Root cause"));
 
-        //verify
-        final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(String.class));
-        final UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
+        verify(recorder).recordUpdate(argThat(r -> r.getFields().get("exceptionMessage").equals("Root cause") &&
+                ((String) r.getFields().get("stackTrace")).startsWith("java.lang.Exception: Root cause\n" +
+                        "\tat org.bonitasoft.engine.core.connector.impl.ConnectorInstanceServiceImplTest.should_persist_stack_trace_on_failure(ConnectorInstanceServiceImplTest.java:")),
+                any());
+    }
 
-        assertEquals(message, updateRecord.getFields().get(EXCEPTION_MESSAGE));
-        assertTrue(stackTrace.startsWith(Exception.class.getName() + ": " + message));
-        assertTrue(stackTrace.contains(getClass().getName() + ".setConnectorInstanceFailureException"));
+    @Test
+    public void should_not_fail_when_persisting_stack_trace_on_failure() throws Exception {
+        SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = new SConnectorInstanceWithFailureInfo();
+
+        Exception mockedException = mock(Exception.class);
+        when(mockedException.getMessage()).thenReturn("the message of the exception");
+        when(mockedException.toString()).thenThrow(new AbstractMethodError());
+        connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailure,
+                new Exception("wrapping exception", mockedException));
+
+        String stacktraceStart = "Unable to retrieve stacktrace, exceptions were:\n" +
+                " * java.lang.Exception: wrapping exception\n" +
+                " * ";
+        String stacktraceEnd = ": the message of the exception\n";
+
+        verify(recorder).recordUpdate(
+                argThat(r -> r.getFields().get("exceptionMessage").equals("the message of the exception") &&
+                        ((String) r.getFields().get("stackTrace")).startsWith(stacktraceStart) &&
+                        ((String) r.getFields().get("stackTrace")).endsWith(stacktraceEnd)),
+                any());
     }
 
     @Test
@@ -198,4 +215,5 @@ public class ConnectorInstanceServiceImplTest {
         //then
         assertThat(retrievedConnectors).isEqualTo(connectors);
     }
+
 }

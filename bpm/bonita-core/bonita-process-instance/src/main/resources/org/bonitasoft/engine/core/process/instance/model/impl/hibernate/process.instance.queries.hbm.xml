@@ -90,7 +90,6 @@
 		AND f.lastUpdateDate &lt; :maxLastUpdate
 		ORDER BY id
 	</query>
-
 	<query name="getFlowNodeInstancesByNameAndParentContainerId">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
