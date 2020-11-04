@@ -420,7 +420,6 @@ public class PlatformSetup {
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
                     "resources-permissions-mapping-internal.properties");
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "security-config.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "autologin-v6.json");
 
             configurationService.storeTenantTemplatePortalConf(portalTenantTemplate);
 

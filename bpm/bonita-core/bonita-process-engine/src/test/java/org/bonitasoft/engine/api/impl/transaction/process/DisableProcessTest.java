@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.process;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -25,14 +23,9 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -55,30 +48,18 @@ public class DisableProcessTest {
     private SProcessDefinition processDefinition;
     @Mock
     private SFlowElementContainerDefinition flowElementCOntainerDefintion;
-    @Mock
-    private PlatformServiceAccessor platformServiceAccessor;
-    @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
-
-    @Mock
-    private ConfigurationService configurationService;
-
-    @Mock
-    private BonitaConfiguration bonitaConfiguration;
 
     @Test
     public void execute_should_not_clean_the_classLoader_due_to_its_use_for_running_instances()
             throws SBonitaException {
         final long processDefinitionId = 1;
-        when(configurationService.getTenantPortalConfiguration(anyLong(), anyString())).thenReturn(bonitaConfiguration);
-        when(bonitaConfiguration.getResourceContent()).thenReturn("[]".getBytes());
         when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(processDefinition);
         when(processDefinition.getProcessContainer()).thenReturn(flowElementCOntainerDefintion);
-        when(flowElementCOntainerDefintion.getStartEvents()).thenReturn(new ArrayList<SStartEventDefinition>());
+        when(flowElementCOntainerDefintion.getStartEvents()).thenReturn(new ArrayList<>());
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processDefinitionId,
-                eventInstanceService, configurationService,
+                eventInstanceService,
                 scheduler,
-                logger, "matti", 1L);
+                logger, "matti");
 
         disableProcess.execute();
 

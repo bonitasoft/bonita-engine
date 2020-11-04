@@ -91,7 +91,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
-    public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
+    public void disableProcess(final long processId) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -100,9 +100,9 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
 
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId,
-                eventInstanceService, getConfigurationService(),
+                eventInstanceService,
                 schedulerService,
-                logger, SessionInfos.getUserNameFromSession(), SessionInfos.getSession().getTenantId());
+                logger, SessionInfos.getUserNameFromSession());
         disableProcess.execute();
     }
 
