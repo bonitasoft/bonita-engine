@@ -147,10 +147,9 @@ public class PlatformSetupIT {
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '"
                         + ConfigurationType.TENANT_TEMPLATE_PORTAL + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(14);
+        assertThat(rows).hasSize(13);
         int rowId = 0;
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("authenticationManager-config.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("autologin-v6.json");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping-custom.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME"))
                 .isEqualTo("compound-permissions-mapping-internal.properties");
@@ -259,8 +258,7 @@ public class PlatformSetupIT {
                 "resources-permissions-mapping.properties",
                 "resources-permissions-mapping-custom.properties",
                 "resources-permissions-mapping-internal.properties",
-                "SamplePermissionRule.groovy.sample",
-                "autologin-v6.json");
+                "SamplePermissionRule.groovy.sample");
     }
 
     @Test

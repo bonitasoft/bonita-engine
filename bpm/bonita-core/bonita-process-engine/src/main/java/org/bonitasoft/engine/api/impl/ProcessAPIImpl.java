@@ -660,10 +660,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessResourcesService processResourcesService = tenantAccessor.getProcessResourcesService();
         try {
             final ConfigurationService configurationService = PlatformSetupAccessor.getConfigurationService();
-            final EnableProcess enableProcess = new EnableProcess(processDefinitionService, configurationService,
-                    processResourcesService, processDefinitionId,
+            final EnableProcess enableProcess = new EnableProcess(processDefinitionService,
+                    processDefinitionId,
                     eventsHandler,
-                    tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession(), getSession().getTenantId());
+                    tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession());
             enableProcess.execute();
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
