@@ -31,6 +31,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,8 @@ class ProcessInstanceRecoveryServiceTest {
     private ExecuteFlowNodes executeFlowNodes;
     @Mock
     private ExecuteProcesses executeProcesses;
+    @Mock
+    private SessionAccessor sessionAccessor;
 
     @InjectMocks
     private ProcessInstanceRecoveryService processInstanceRecoveryService;

@@ -27,6 +27,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,6 +41,8 @@ public class ProcessInstanceRecoveryService {
     private final UserTransactionService userTransactionService;
     private final ExecuteFlowNodes executeFlowNodes;
     private final ExecuteProcesses executeProcesses;
+    private long tenantId;
+    private final SessionAccessor sessionAccessor;
     private int readBatchSize;
     private Duration considerElementsOlderThan;
 
@@ -47,12 +50,14 @@ public class ProcessInstanceRecoveryService {
             ProcessInstanceService processInstanceService,
             UserTransactionService userTransactionService,
             ExecuteFlowNodes executeFlowNodes,
-            ExecuteProcesses executeProcesses) {
+            ExecuteProcesses executeProcesses,
+            SessionAccessor sessionAccessor) {
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processInstanceService = processInstanceService;
         this.userTransactionService = userTransactionService;
         this.executeFlowNodes = executeFlowNodes;
         this.executeProcesses = executeProcesses;
+        this.sessionAccessor = sessionAccessor;
     }
 
     @Value("${bonita.tenant.recover.read_batch_size:5000}")
@@ -63,6 +68,11 @@ public class ProcessInstanceRecoveryService {
     @Value("${bonita.tenant.recover.consider_elements_older_than:PT1H}")
     public void setConsiderElementsOlderThan(String considerElementsOlderThan) {
         setConsiderElementsOlderThan(Duration.parse(considerElementsOlderThan));
+    }
+
+    @Value("${tenantId}")
+    public void setTenantId(long tenantId) {
+        this.tenantId = tenantId;
     }
 
     @VisibleForTesting
@@ -110,6 +120,7 @@ public class ProcessInstanceRecoveryService {
      */
     public void recoverAllElements() {
         try {
+            sessionAccessor.setTenantId(tenantId);
             List<ElementToRecover> allElementsToRecover = userTransactionService.executeInTransaction(
                     () -> ProcessInstanceRecoveryService.this.getAllElementsToRecover(considerElementsOlderThan));
             log.info("Found {} that can potentially be recovered", allElementsToRecover.size());

@@ -31,7 +31,7 @@ public class ProcessInstanceRecoveryScheduler {
         this.processInstanceRecoveryService = processInstanceRecoveryService;
     }
 
-    @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT30M}", initialDelayString = "${bonita.tenant.recover.delay_before_first_reco:PT2H}")
+    @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT30M}", initialDelayString = "${bonita.tenant.recover.delay_before_first_recovery:PT2H}")
     public void triggerRecoveryAllElements() {
         try {
             if (tenantElementsRestartSupervisor.isResponsibleForRecovery()) {
