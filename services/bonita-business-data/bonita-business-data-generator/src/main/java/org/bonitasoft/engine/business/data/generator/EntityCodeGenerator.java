@@ -18,21 +18,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
@@ -51,6 +37,8 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Colin PUY,
@@ -63,6 +51,8 @@ public class EntityCodeGenerator {
     private final RelationFieldAnnotator relationFieldAnnotator;
 
     private final BusinessObjectModel bom;
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(EntityCodeGenerator.class);
 
     public EntityCodeGenerator(final CodeGenerator codeGenerator, final BusinessObjectModel bom) {
         this.codeGenerator = codeGenerator;
@@ -85,15 +75,16 @@ public class EntityCodeGenerator {
         addUniqueConstraintAnnotations(bo, entityClass);
         addQueriesAnnotation(bo, entityClass);
 
-        addFieldsAndMethods(bo, entityClass);
+        String dbVendor = determineDbVendor();
+        addFieldsAndMethods(bo, entityClass, dbVendor);
 
         codeGenerator.addDefaultConstructor(entityClass);
 
         return entityClass;
     }
 
-    private void addFieldsAndMethods(final BusinessObject bo, final JDefinedClass entityClass) {
-        addPersistenceIdFieldAndAccessors(entityClass);
+    private void addFieldsAndMethods(final BusinessObject bo, final JDefinedClass entityClass, String dbVendor) {
+        addPersistenceIdFieldAndAccessors(entityClass, dbVendor);
         addPersistenceVersionFieldAndAccessors(entityClass);
 
         for (final Field field : bo.getFields()) {
@@ -215,11 +206,22 @@ public class EntityCodeGenerator {
         }
     }
 
-    public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) {
+    public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass, String dbVendor) {
         final JFieldVar idFieldVar = codeGenerator.addField(entityClass, Field.PERSISTENCE_ID,
                 codeGenerator.toJavaClass(FieldType.LONG));
         codeGenerator.addAnnotation(idFieldVar, Id.class);
-        codeGenerator.addAnnotation(idFieldVar, GeneratedValue.class);
+        JAnnotationUse generateValue = codeGenerator.addAnnotation(idFieldVar, GeneratedValue.class);
+        switch (dbVendor) {
+            case "h2":
+            case "postgres":
+            case "oracle":
+                generateValue.param("strategy", GenerationType.SEQUENCE);
+                break;
+            case "mysql":
+            case "sqlserver":
+                generateValue.param("strategy", GenerationType.IDENTITY);
+                break;
+        }
         addAccessors(entityClass, idFieldVar);
     }
 
@@ -316,6 +318,19 @@ public class EntityCodeGenerator {
         }
         final Boolean collection = field.isCollection();
         return collection != null && collection;
+    }
+
+    private String determineDbVendor() {
+        String dbVendor = System.getProperty("sysprop.bonita.bdm.db.vendor");
+        if (dbVendor != null) {
+            return dbVendor;
+        } else {
+            // The situation is not normally possible at runtime.
+            // here to allow testing without too much code change
+            LOGGER.error(
+                    "sysprop.bonita.bdm.db.vendor is not set. This should not happen at runtime. Defaulting to h2.");
+            return "h2";
+        }
     }
 
 }
