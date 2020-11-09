@@ -23,7 +23,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.tenant.restart.ProcessInstanceRecoveryService;
+import org.bonitasoft.engine.tenant.restart.RecoveryService;
 import org.bonitasoft.engine.test.CommonAPILocalIT;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,11 +53,11 @@ public class RecoveryMechanismIT extends CommonAPILocalIT {
         assertThat(getProcessAPI().getProcessInstance(processInstance.getId()).getState())
                 .isEqualToIgnoringCase(ProcessInstanceState.STARTED.name());
 
-        ProcessInstanceRecoveryService processInstanceRecoveryService = getTenantAccessor()
-                .lookup("processInstanceRecoveryService");
-        processInstanceRecoveryService.setConsiderElementsOlderThan("PT0S");
-        processInstanceRecoveryService.recoverAllElements();
-        processInstanceRecoveryService.setConsiderElementsOlderThan("PT1H");
+        RecoveryService recoveryService = getTenantAccessor()
+                .lookup("recoveryService");
+        recoveryService.setConsiderElementsOlderThan("PT0S");
+        recoveryService.recoverAllElements();
+        recoveryService.setConsiderElementsOlderThan("PT1H");
 
         waitForProcessToFinish(processInstance);
     }

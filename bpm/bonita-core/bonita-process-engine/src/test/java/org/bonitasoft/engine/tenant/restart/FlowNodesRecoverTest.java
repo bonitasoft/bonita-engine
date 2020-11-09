@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventIns
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -44,11 +42,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExecuteFlowNodesTest {
+public class FlowNodesRecoverTest {
 
     private static final int ABORTING_STATE_ID = 1111;
     private static final int CANCELLING_STATE_ID = 33333;
-    public static final int BATCH_RESTART_SIZE = 10;
 
     @Mock
     private FlowNodeStateManager flownodeStateManager;
@@ -57,10 +54,10 @@ public class ExecuteFlowNodesTest {
     @Mock
     private WorkService workService;
     @Mock
-    private UserTransactionService userTransactionService;
+    private ExecutionMonitor executionMonitor;
 
     private final BPMWorkFactory workFactory = new BPMWorkFactory();
-    private ExecuteFlowNodes executeFlowNodes;
+    private FlowNodesRecover flowNodesRecover;
     private final List<SFlowNodeInstance> allFlowNodes = new ArrayList<>();
 
     private final FlowNodeState waitingState = stableState(1, SStateCategory.NORMAL);
@@ -71,11 +68,8 @@ public class ExecuteFlowNodesTest {
     @Before
     public void before() throws Exception {
         ;
-        executeFlowNodes = new ExecuteFlowNodes(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
-                flownodeStateManager, workFactory, userTransactionService,
-                BATCH_RESTART_SIZE);
-        doAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call()).when(userTransactionService)
-                .executeInTransaction(any());
+        flowNodesRecover = new FlowNodesRecover(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
+                flownodeStateManager, workFactory);
         when(activityInstanceService.getFlowNodeInstancesByIds(any())).thenAnswer(invocationOnMock -> {
             List<Long> ids = invocationOnMock.getArgument(0);
             return allFlowNodes.stream().filter(f -> ids.contains(f.getId())).collect(Collectors.toList());
@@ -90,7 +84,7 @@ public class ExecuteFlowNodesTest {
     public final void should_register_FINISH_FLOWNODE_when_flownode_is_in_terminal_state() throws Exception {
         SAutomaticTaskInstance task = createTask(123L, true /* terminal */);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(task));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(task));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")));
 
@@ -100,7 +94,7 @@ public class ExecuteFlowNodesTest {
     public void should_register_EXECUTE_FLOWNODE_when_flownode_is_not_in_terminal_state() throws Exception {
         SAutomaticTaskInstance task = createTask(123L, false /* not terminal */);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(task));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(task));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -112,27 +106,10 @@ public class ExecuteFlowNodesTest {
             list.add(createTask(123L + i, false));
         }
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(list.toArray(new SFlowNodeInstance[] {})));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(list.toArray(new SFlowNodeInstance[] {})));
 
         assertThat(list.size()).isEqualTo(21);
         verify(workService, times(21)).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
-        verify(userTransactionService, times(3)).executeInTransaction(any());
-    }
-
-    @Test
-    public void should_continue_to_restart_flow_node_event_if_one_batch_failed() throws Exception {
-        doThrow(new UnsupportedOperationException("current batch failed, sorry ¯\\_(ツ)_/¯"))
-                .doAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call())
-                .when(userTransactionService).executeInTransaction(any());
-        List<SFlowNodeInstance> list = new ArrayList<>();
-        for (int i = 1; i <= 21; i++) {
-            list.add(createTask(123L + i, false));
-        }
-
-        executeFlowNodes.executeFlowNodes(flowNodeIds(list.toArray(new SFlowNodeInstance[] {})));
-
-        verify(workService, times(11)).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
-        verify(userTransactionService, times(3)).executeInTransaction(any());
     }
 
     @Test
@@ -142,7 +119,7 @@ public class ExecuteFlowNodesTest {
         setState(autoTask, normalStableState);
         autoTask.setStateCategory(SStateCategory.ABORTING);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(autoTask));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(autoTask));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -154,7 +131,7 @@ public class ExecuteFlowNodesTest {
         setState(autoTask, normalStableState);
         autoTask.setStateCategory(SStateCategory.CANCELLING);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(autoTask));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(autoTask));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -168,7 +145,7 @@ public class ExecuteFlowNodesTest {
         autoTask.setStable(true);
         autoTask.setStateId(ABORTING_STATE_ID);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(autoTask));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(autoTask));
 
         verify(workService, never()).registerWork(any());
     }
@@ -182,7 +159,7 @@ public class ExecuteFlowNodesTest {
         autoTask.setStable(true);
         autoTask.setStateId(CANCELLING_STATE_ID);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(autoTask));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(autoTask));
 
         verify(workService, never()).registerWork(any());
     }
@@ -193,7 +170,7 @@ public class ExecuteFlowNodesTest {
         gatewayInstance.setId(333L);
         gatewayInstance.setHitBys("FINISH:2");
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -204,7 +181,7 @@ public class ExecuteFlowNodesTest {
         gatewayInstance.setId(333L);
         gatewayInstance.setHitBys("1,2");
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService, never()).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -221,7 +198,8 @@ public class ExecuteFlowNodesTest {
                 .registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")
                         && work.getParameter("flowNodeInstanceId").equals(333L)));
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(automaticTaskInstance1, automaticTaskInstance2));
+        flowNodesRecover.execute(executionMonitor,
+                flowNodeIds(automaticTaskInstance1, automaticTaskInstance2));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")
                 && work.getParameter("flowNodeInstanceId").equals(344L)));
@@ -234,7 +212,7 @@ public class ExecuteFlowNodesTest {
         SGatewayInstance gatewayInstance = new SGatewayInstance();
         gatewayInstance.setId(333L);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService, never()).registerWork(any());
     }
@@ -243,7 +221,7 @@ public class ExecuteFlowNodesTest {
     public void should_not_execute_gateway_that_is_not_finished() throws Exception {
         SGatewayInstance gatewayInstance = new SGatewayInstance();
 
-        boolean shouldExecuteFlownode = executeFlowNodes.shouldExecuteFlownode(gatewayInstance);
+        boolean shouldExecuteFlownode = flowNodesRecover.shouldBeRecovered(gatewayInstance);
 
         assertThat(shouldExecuteFlownode).isFalse();
     }
@@ -255,7 +233,7 @@ public class ExecuteFlowNodesTest {
         boundaryEventInstance.setStateCategory(SStateCategory.CANCELLING);
         setState(boundaryEventInstance, waitingState);
 
-        assertThat(executeFlowNodes.shouldExecuteFlownode(boundaryEventInstance)).isTrue();
+        assertThat(flowNodesRecover.shouldBeRecovered(boundaryEventInstance)).isTrue();
     }
 
     @Test
@@ -265,7 +243,7 @@ public class ExecuteFlowNodesTest {
         boundaryEventInstance.setStateCategory(SStateCategory.CANCELLING);
         setState(boundaryEventInstance, cancellingState);
 
-        assertThat(executeFlowNodes.shouldExecuteFlownode(boundaryEventInstance)).isFalse();
+        assertThat(flowNodesRecover.shouldBeRecovered(boundaryEventInstance)).isFalse();
     }
 
     @Test
@@ -275,7 +253,7 @@ public class ExecuteFlowNodesTest {
         boundaryEventInstance.setStateCategory(SStateCategory.ABORTING);
         setState(boundaryEventInstance, waitingState);
 
-        assertThat(executeFlowNodes.shouldExecuteFlownode(boundaryEventInstance)).isTrue();
+        assertThat(flowNodesRecover.shouldBeRecovered(boundaryEventInstance)).isTrue();
     }
 
     @Test
@@ -285,7 +263,7 @@ public class ExecuteFlowNodesTest {
         boundaryEventInstance.setStateCategory(SStateCategory.ABORTING);
         setState(boundaryEventInstance, abortingState);
 
-        assertThat(executeFlowNodes.shouldExecuteFlownode(boundaryEventInstance)).isFalse();
+        assertThat(flowNodesRecover.shouldBeRecovered(boundaryEventInstance)).isFalse();
     }
 
     @Test
@@ -294,7 +272,7 @@ public class ExecuteFlowNodesTest {
         gatewayInstance.setId(333L);
         gatewayInstance.setStateCategory(SStateCategory.ABORTING);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -305,7 +283,7 @@ public class ExecuteFlowNodesTest {
         gatewayInstance.setId(333L);
         gatewayInstance.setStateCategory(SStateCategory.CANCELLING);
 
-        executeFlowNodes.executeFlowNodes(flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
