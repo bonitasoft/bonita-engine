@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -28,24 +27,21 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * This class handles the continuation of unfinished process instances
- * passed as parameter in {@link #execute(List)} method.
+ * passed as parameter in {@link #execute(ExecutionMonitor, List)} method.
  * The logic ensure that if an instance fails to continue its execution,
  * the error is logged and other instances are continued anyways.
  */
 @Component
-public class ExecuteProcesses {
+public class ProcessesRecover {
 
     private final WorkService workService;
     private final TechnicalLogger logger;
@@ -53,47 +49,25 @@ public class ExecuteProcesses {
     private final ProcessDefinitionService processDefinitionService;
     private final ProcessInstanceService processInstanceService;
     private final ProcessExecutor processExecutor;
-    private final FlowNodeStateManager flowNodeStateManager;
     private final BPMWorkFactory workFactory;
-    private final UserTransactionService userTransactionService;
-    private final int batchRestartSize;
 
-    public ExecuteProcesses(WorkService workService,
+    public ProcessesRecover(WorkService workService,
             @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
             ActivityInstanceService activityInstanceService,
             ProcessDefinitionService processDefinitionService,
             ProcessInstanceService processInstanceService,
             ProcessExecutor processExecutor,
-            FlowNodeStateManager flowNodeStateManager,
-            BPMWorkFactory workFactory,
-            UserTransactionService userTransactionService,
-            @Value("${bonita.tenant.work.batch_restart_size:1000}") int batchRestartSize) {
+            BPMWorkFactory workFactory) {
         this.workService = workService;
-        this.logger = logger.asLogger(ExecuteProcesses.class);
+        this.logger = logger.asLogger(ProcessesRecover.class);
         this.activityInstanceService = activityInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.processInstanceService = processInstanceService;
         this.processExecutor = processExecutor;
-        this.flowNodeStateManager = flowNodeStateManager;
         this.workFactory = workFactory;
-        this.userTransactionService = userTransactionService;
-        this.batchRestartSize = batchRestartSize;
     }
 
-    public void execute(List<Long> processInstanceIdsToRestart) {
-
-        for (List<Long> ids : CollectionUtil.split(processInstanceIdsToRestart, batchRestartSize)) {
-            try {
-                userTransactionService.executeInTransaction(() -> restartBatch(ids));
-            } catch (Exception e) {
-                logger.error(
-                        "Some processes failed to recover, they might seem stuck, a server restart is required to unlock all stuck process instances.",
-                        e);
-            }
-        }
-    }
-
-    public Object restartBatch(List<Long> ids) {
+    void execute(ExecutionMonitor executionMonitor, List<Long> ids) {
         for (Long processId : ids) {
             try {
                 final SProcessInstance processInstance = processInstanceService.getProcessInstance(processId);
@@ -103,33 +77,38 @@ public class ExecuteProcesses {
                     case ABORTED:
                     case CANCELLED:
                     case COMPLETED:
+                        executionMonitor.finishing++;
                         handleCompletion(processInstance);
                         break;
                     case COMPLETING:
+                        executionMonitor.finishing++;
                         processExecutor.registerConnectorsToExecute(processDefinition, processInstance,
                                 ConnectorEvent.ON_FINISH,
                                 null);
                         break;
                     case INITIALIZING:
+                        executionMonitor.executing++;
                         processExecutor.registerConnectorsToExecute(processDefinition, processInstance,
                                 ConnectorEvent.ON_ENTER,
                                 null);
                         break;
                     default:
+                        executionMonitor.notExecutable++;
                         break;
                 }
             } catch (final SProcessInstanceNotFoundException e) {
-                logger.debug("Unable to restart the process instance "
-                        + processId + ", it is not found (already completed).");
+                executionMonitor.notFound++;
+                logger.debug("Unable to recover the process instance "
+                        + processId + ", it is not found (probably already completed).");
             } catch (final Exception e) {
-                logger.error("Unable to restart the process instance "
-                        + processId + ", a server restart is required to unlock all stuck process instances.", e);
+                executionMonitor.inError++;
+                logger.error("Unable to recover the process instance "
+                        + processId + ", it will be retry in next recovery.", e);
             }
         }
-        return null;
     }
 
-    protected void handleCompletion(final SProcessInstance processInstance)
+    private void handleCompletion(final SProcessInstance processInstance)
             throws SBonitaException {
         // Only Error events set interruptedByEvent on SProcessInstance:
         if (!processInstance.hasBeenInterruptedByEvent()) {

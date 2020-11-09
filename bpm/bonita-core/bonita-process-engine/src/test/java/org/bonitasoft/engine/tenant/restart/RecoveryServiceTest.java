@@ -30,7 +30,6 @@ import java.util.concurrent.Callable;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,28 +40,32 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessInstanceRecoveryServiceTest {
+class RecoveryServiceTest {
 
     @Mock
     private FlowNodeInstanceService flowNodeInstanceService;
     @Mock
     private ProcessInstanceService processInstanceService;
-    @Mock
+    @Mock(lenient = true)
     private UserTransactionService userTransactionService;
     @Mock
-    private ExecuteFlowNodes executeFlowNodes;
+    private FlowNodesRecover flowNodesRecover;
     @Mock
-    private ExecuteProcesses executeProcesses;
+    private ProcessesRecover processesRecover;
     @Mock
     private SessionAccessor sessionAccessor;
 
     @InjectMocks
-    private ProcessInstanceRecoveryService processInstanceRecoveryService;
+    private RecoveryService recoveryService;
 
     @BeforeEach
     public void before() throws Exception {
-        processInstanceRecoveryService.setReadBatchSize(2);
-        processInstanceRecoveryService.setConsiderElementsOlderThan(Duration.ofMillis(1000));
+        recoveryService.setReadBatchSize(2);
+        recoveryService.setBatchRestartSize(1000);
+        recoveryService.setConsiderElementsOlderThan(Duration.ofMillis(1000));
+        when(userTransactionService.executeInTransaction(any()))
+                .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
+
     }
 
     @Test
@@ -72,7 +75,7 @@ class ProcessInstanceRecoveryServiceTest {
         doReturn(asList(1L, 2L)).doReturn(emptyList())
                 .when(processInstanceService).getProcessInstanceIdsToRecover(eq(Duration.ZERO), any());
 
-        List<ElementToRecover> allElementsToRecover = processInstanceRecoveryService
+        List<ElementToRecover> allElementsToRecover = recoveryService
                 .getAllElementsToRecover(Duration.ZERO);
 
         assertThat(allElementsToRecover).containsExactlyInAnyOrder(
@@ -89,7 +92,7 @@ class ProcessInstanceRecoveryServiceTest {
                 .doReturn(singletonList(13L))
                 .when(flowNodeInstanceService).getFlowNodeInstanceIdsToRecover(eq(Duration.ZERO), any());
 
-        List<ElementToRecover> allElementsToRecover = processInstanceRecoveryService
+        List<ElementToRecover> allElementsToRecover = recoveryService
                 .getAllElementsToRecover(Duration.ZERO);
 
         assertThat(allElementsToRecover).containsExactlyInAnyOrder(
@@ -98,8 +101,8 @@ class ProcessInstanceRecoveryServiceTest {
     }
 
     @Test
-    void should_recover_elements_provided() {
-        processInstanceRecoveryService.recover(asList(
+    void should_recover_elements_provided() throws Exception {
+        recoveryService.recover(asList(
                 elementToRecover(1L, PROCESS),
                 elementToRecover(2L, PROCESS),
                 elementToRecover(4L, PROCESS),
@@ -107,17 +110,15 @@ class ProcessInstanceRecoveryServiceTest {
                 elementToRecover(9L, FLOWNODE),
                 elementToRecover(13L, FLOWNODE)));
 
-        verify(executeFlowNodes).executeFlowNodes(asList(7L, 9L, 13L));
-        verify(executeProcesses).execute(asList(1L, 2L, 4L));
+        verify(flowNodesRecover).execute(any(), eq(asList(7L, 9L, 13L)));
+        verify(processesRecover).execute(any(), eq(asList(1L, 2L, 4L)));
     }
 
     @Test
     void should_recover_all_elements_older_than() throws Exception {
         Duration considerElementsOlderThan = Duration.ofSeconds(10);
-        processInstanceRecoveryService.setConsiderElementsOlderThan(considerElementsOlderThan);
+        recoveryService.setConsiderElementsOlderThan(considerElementsOlderThan);
 
-        when(userTransactionService.executeInTransaction(any()))
-                .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         doReturn(asList(1L, 2L))
                 .doReturn(singletonList(4L))
                 .when(processInstanceService).getProcessInstanceIdsToRecover(eq(considerElementsOlderThan), any());
@@ -125,18 +126,87 @@ class ProcessInstanceRecoveryServiceTest {
                 .doReturn(singletonList(13L))
                 .when(flowNodeInstanceService).getFlowNodeInstanceIdsToRecover(eq(considerElementsOlderThan), any());
 
-        processInstanceRecoveryService.recoverAllElements();
+        recoveryService.recoverAllElements();
 
-        verify(executeFlowNodes).executeFlowNodes(asList(7L, 9L, 13L));
-        verify(executeProcesses).execute(asList(1L, 2L, 4L));
+        verify(flowNodesRecover).execute(any(), eq(asList(7L, 9L, 13L)));
+        verify(processesRecover).execute(any(), eq(asList(1L, 2L, 4L)));
     }
 
     private ElementToRecover elementToRecover(long l, ElementToRecover.Type process) {
         return ElementToRecover.builder().id(l).type(process).build();
     }
 
-    private SProcessInstance processInstance(long id) {
-        return SProcessInstance.builder().id(id).build();
+    @Test
+    void should_restart_flownodes_in_batch() throws Exception {
+        recoveryService.setBatchRestartSize(2);
+
+        recoveryService.recover(asList(
+                elementToRecover(1L, FLOWNODE),
+                elementToRecover(2L, FLOWNODE),
+                elementToRecover(3L, FLOWNODE),
+                elementToRecover(4L, FLOWNODE),
+                elementToRecover(5L, FLOWNODE)));
+
+        verify(flowNodesRecover).execute(any(), eq(asList(1L, 2L)));
+        verify(flowNodesRecover).execute(any(), eq(asList(3L, 4L)));
+        verify(flowNodesRecover).execute(any(), eq(singletonList(5L)));
+        verify(userTransactionService, times(3)).executeInTransaction(any());
     }
 
+    @Test
+    void should_restart_processes_in_batch() throws Exception {
+        recoveryService.setBatchRestartSize(2);
+
+        recoveryService.recover(asList(
+                elementToRecover(1L, PROCESS),
+                elementToRecover(2L, PROCESS),
+                elementToRecover(3L, PROCESS),
+                elementToRecover(4L, PROCESS),
+                elementToRecover(5L, PROCESS)));
+
+        verify(processesRecover).execute(any(), eq(asList(1L, 2L)));
+        verify(processesRecover).execute(any(), eq(asList(3L, 4L)));
+        verify(processesRecover).execute(any(), eq(singletonList(5L)));
+        verify(userTransactionService, times(3)).executeInTransaction(any());
+    }
+
+    @Test
+    void should_continue_to_restart_process_even_if_one_batch_failed() throws Exception {
+        doThrow(new UnsupportedOperationException("current batch failed, sorry ¯\\_(ツ)_/¯"))
+                .doAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call())
+                .when(userTransactionService).executeInTransaction(any());
+        recoveryService.setBatchRestartSize(2);
+
+        recoveryService.recover(asList(
+                elementToRecover(1L, PROCESS),
+                elementToRecover(2L, PROCESS),
+                elementToRecover(3L, PROCESS),
+                elementToRecover(4L, PROCESS),
+                elementToRecover(5L, PROCESS)));
+
+        verify(processesRecover, never()).execute(any(), eq(asList(1L, 2L)));// transaction fail there
+        verify(processesRecover).execute(any(), eq(asList(3L, 4L)));
+        verify(processesRecover).execute(any(), eq(singletonList(5L)));
+        verify(userTransactionService, times(3)).executeInTransaction(any());
+    }
+
+    @Test
+    void should_continue_to_restart_flow_node_even_if_one_batch_failed() throws Exception {
+        doThrow(new UnsupportedOperationException("current batch failed, sorry ¯\\_(ツ)_/¯"))
+                .doAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call())
+                .when(userTransactionService).executeInTransaction(any());
+        recoveryService.setBatchRestartSize(2);
+
+        recoveryService.recover(asList(
+                elementToRecover(1L, FLOWNODE),
+                elementToRecover(2L, FLOWNODE),
+                elementToRecover(3L, FLOWNODE),
+                elementToRecover(4L, FLOWNODE),
+                elementToRecover(5L, FLOWNODE)));
+
+        verify(flowNodesRecover, never()).execute(any(), eq(asList(1L, 2L)));// transaction fail there
+        verify(flowNodesRecover).execute(any(), eq(asList(3L, 4L)));
+        verify(flowNodesRecover).execute(any(), eq(singletonList(5L)));
+        verify(userTransactionService, times(3)).executeInTransaction(any());
+    }
 }

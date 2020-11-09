@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.tenant.restart;
 
+import static org.bonitasoft.engine.commons.CollectionUtil.split;
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.FLOWNODE;
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.PROCESS;
 
@@ -34,29 +35,30 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ProcessInstanceRecoveryService {
+public class RecoveryService {
 
     private final FlowNodeInstanceService flowNodeInstanceService;
     private final ProcessInstanceService processInstanceService;
     private final UserTransactionService userTransactionService;
-    private final ExecuteFlowNodes executeFlowNodes;
-    private final ExecuteProcesses executeProcesses;
+    private final FlowNodesRecover flowNodesRecover;
+    private final ProcessesRecover processesRecover;
     private long tenantId;
     private final SessionAccessor sessionAccessor;
     private int readBatchSize;
+    private int batchRestartSize;
     private Duration considerElementsOlderThan;
 
-    public ProcessInstanceRecoveryService(FlowNodeInstanceService flowNodeInstanceService,
+    public RecoveryService(FlowNodeInstanceService flowNodeInstanceService,
             ProcessInstanceService processInstanceService,
             UserTransactionService userTransactionService,
-            ExecuteFlowNodes executeFlowNodes,
-            ExecuteProcesses executeProcesses,
+            FlowNodesRecover flowNodesRecover,
+            ProcessesRecover processesRecover,
             SessionAccessor sessionAccessor) {
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processInstanceService = processInstanceService;
         this.userTransactionService = userTransactionService;
-        this.executeFlowNodes = executeFlowNodes;
-        this.executeProcesses = executeProcesses;
+        this.flowNodesRecover = flowNodesRecover;
+        this.processesRecover = processesRecover;
         this.sessionAccessor = sessionAccessor;
     }
 
@@ -68,6 +70,11 @@ public class ProcessInstanceRecoveryService {
     @Value("${bonita.tenant.recover.consider_elements_older_than:PT1H}")
     public void setConsiderElementsOlderThan(String considerElementsOlderThan) {
         setConsiderElementsOlderThan(Duration.parse(considerElementsOlderThan));
+    }
+
+    @Value("${bonita.tenant.work.batch_restart_size:1000}")
+    public void setBatchRestartSize(int batchRestartSize) {
+        this.batchRestartSize = batchRestartSize;
     }
 
     @Value("${tenantId}")
@@ -104,14 +111,33 @@ public class ProcessInstanceRecoveryService {
      * @param elementsToRecover elements needs to be recovered
      */
     public void recover(List<ElementToRecover> elementsToRecover) {
-        executeFlowNodes.executeFlowNodes(elementsToRecover.stream()
-                .filter(e -> e.getType() == FLOWNODE)
+        ExecutionMonitor executionMonitor = new ExecutionMonitor(elementsToRecover.size());
+        executeInBatch(executionMonitor, elementsToRecover.stream()
+                .filter(e1 -> e1.getType() == FLOWNODE)
                 .map(ElementToRecover::getId)
-                .collect(Collectors.toList()));
-        executeProcesses.execute(elementsToRecover.stream()
+                .collect(Collectors.toList()), ids -> flowNodesRecover.execute(executionMonitor, ids));
+        executeInBatch(executionMonitor, elementsToRecover.stream()
                 .filter(e -> e.getType() == PROCESS)
                 .map(ElementToRecover::getId)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()), ids -> processesRecover.execute(executionMonitor, ids));
+
+        executionMonitor.printSummary();
+    }
+
+    protected void executeInBatch(ExecutionMonitor executionMonitor, List<Long> flowNodeIds, BatchExecution execution) {
+        for (List<Long> batchedFlowNodeIds : split(flowNodeIds, batchRestartSize)) {
+            try {
+                userTransactionService.executeInTransaction(() -> {
+                    execution.execute(batchedFlowNodeIds);
+                    return null;
+                });
+            } catch (Exception e1) {
+                log.error(
+                        "Error processing batch of flow nodes to restart, the following flow nodes might need to be restarted manually: {}",
+                        batchedFlowNodeIds, e1);
+            }
+            executionMonitor.printProgress();
+        }
     }
 
     /**
@@ -122,7 +148,7 @@ public class ProcessInstanceRecoveryService {
         try {
             sessionAccessor.setTenantId(tenantId);
             List<ElementToRecover> allElementsToRecover = userTransactionService.executeInTransaction(
-                    () -> ProcessInstanceRecoveryService.this.getAllElementsToRecover(considerElementsOlderThan));
+                    () -> RecoveryService.this.getAllElementsToRecover(considerElementsOlderThan));
             log.info("Found {} that can potentially be recovered", allElementsToRecover.size());
             recover(allElementsToRecover);
         } catch (Exception e) {
@@ -165,6 +191,11 @@ public class ProcessInstanceRecoveryService {
         return ids
                 .stream().map(id -> ElementToRecover.builder().id(id).type(PROCESS).build())
                 .collect(Collectors.toList());
+    }
+
+    private interface BatchExecution {
+
+        void execute(List<Long> ids) throws Exception;
     }
 
 }

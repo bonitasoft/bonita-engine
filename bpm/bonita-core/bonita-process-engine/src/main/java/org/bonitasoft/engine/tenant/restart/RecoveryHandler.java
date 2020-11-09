@@ -19,22 +19,22 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProcessInstanceRecoveryHandler implements TenantRestartHandler {
+public class RecoveryHandler implements TenantRestartHandler {
 
-    private final ProcessInstanceRecoveryService processInstanceRecoveryService;
+    private final RecoveryService recoveryService;
     private List<ElementToRecover> allElementsToRecover;
 
-    public ProcessInstanceRecoveryHandler(ProcessInstanceRecoveryService processInstanceRecoveryService) {
-        this.processInstanceRecoveryService = processInstanceRecoveryService;
+    public RecoveryHandler(RecoveryService recoveryService) {
+        this.recoveryService = recoveryService;
     }
 
     @Override
     public void beforeServicesStart() {
-        allElementsToRecover = processInstanceRecoveryService.getAllElementsToRecover(Duration.ZERO);
+        allElementsToRecover = recoveryService.getAllElementsToRecover(Duration.ZERO);
     }
 
     @Override
     public void afterServicesStart() {
-        processInstanceRecoveryService.recover(allElementsToRecover);
+        recoveryService.recover(allElementsToRecover);
     }
 }

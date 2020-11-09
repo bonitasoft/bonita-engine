@@ -20,15 +20,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ProcessInstanceRecoveryScheduler {
+public class RecoveryScheduler {
 
     private final TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
-    private final ProcessInstanceRecoveryService processInstanceRecoveryService;
+    private final RecoveryService recoveryService;
 
-    ProcessInstanceRecoveryScheduler(TenantElementsRestartSupervisor tenantElementsRestartSupervisor,
-            ProcessInstanceRecoveryService processInstanceRecoveryService) {
+    RecoveryScheduler(TenantElementsRestartSupervisor tenantElementsRestartSupervisor,
+            RecoveryService recoveryService) {
         this.tenantElementsRestartSupervisor = tenantElementsRestartSupervisor;
-        this.processInstanceRecoveryService = processInstanceRecoveryService;
+        this.recoveryService = recoveryService;
     }
 
     @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT30M}", initialDelayString = "${bonita.tenant.recover.delay_before_first_recovery:PT2H}")
@@ -36,7 +36,7 @@ public class ProcessInstanceRecoveryScheduler {
         try {
             if (tenantElementsRestartSupervisor.isResponsibleForRecovery()) {
                 log.info("Starting periodic recovery of elements...");
-                processInstanceRecoveryService.recoverAllElements();
+                recoveryService.recoverAllElements();
                 log.info("Completed periodic recovery of elements.");
             } else {
                 log.info("Periodic recovery of elements not executed, an other node is responsible for it.");

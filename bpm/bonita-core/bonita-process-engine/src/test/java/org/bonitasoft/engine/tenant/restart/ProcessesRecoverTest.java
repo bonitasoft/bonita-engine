@@ -14,14 +14,11 @@
 package org.bonitasoft.engine.tenant.restart;
 
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.LongStream.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.process.ProcessInstanceState.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -51,9 +48,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-public class ExecuteProcessesTest {
+public class ProcessesRecoverTest {
 
-    public static final int BATCH_RESTART_SIZE = 2;
     public static final long CALLER_ID = 55L;
     public static final long PROCESS_INSTANCE_ID = 42L;
     @Rule
@@ -72,17 +68,17 @@ public class ExecuteProcessesTest {
     private ProcessExecutor processExecutor;
     @Mock
     private UserTransactionService userTransactionService;
-    private ExecuteProcesses executeProcesses;
+    private ProcessesRecover processesRecover;
 
+    private ExecutionMonitor executionMonitor;
     @Rule
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     @Before
     public void setUp() throws Exception {
-        executeProcesses = new ExecuteProcesses(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
-                processDefinitionService, processInstanceService, processExecutor, flowNodeStateManager,
-                new BPMWorkFactory(), userTransactionService,
-                BATCH_RESTART_SIZE);
+        executionMonitor = new ExecutionMonitor(100);
+        processesRecover = new ProcessesRecover(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
+                processDefinitionService, processInstanceService, processExecutor, new BPMWorkFactory());
         doAnswer(args -> ((Callable) args.getArgument(0)).call()).when(userTransactionService)
                 .executeInTransaction(any());
     }
@@ -91,7 +87,7 @@ public class ExecuteProcessesTest {
     public void should_not_execute_process_with_no_caller_id() throws Exception {
         havingProcessInstance(COMPLETED, -1);
 
-        executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         // as it can never happen, because when a process instance goes into COMPLETED state, it is archived
         // in the same transaction
@@ -104,7 +100,7 @@ public class ExecuteProcessesTest {
         havingProcessInstance(COMPLETED, CALLER_ID);
         when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityState());
 
-        executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         verifyNoMoreInteractions(workService);
         assertThat(systemOutRule.getLog().toLowerCase()).doesNotContain("error");
@@ -116,7 +112,7 @@ public class ExecuteProcessesTest {
         havingProcessInstance(COMPLETED, CALLER_ID);
         when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityState());
 
-        executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         verify(workService)
                 .registerWork(argThat(workDescriptor -> workDescriptor.getType().equals("EXECUTE_FLOWNODE") &&
@@ -127,7 +123,7 @@ public class ExecuteProcessesTest {
     public void should_execute_on_enter_connector_of_process_instance() throws Exception {
         SProcessInstance processInstance = havingProcessInstance(INITIALIZING, -1);
 
-        executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         verify(processExecutor).registerConnectorsToExecute(any(), eq(processInstance), eq(ConnectorEvent.ON_ENTER),
                 any());
@@ -137,31 +133,10 @@ public class ExecuteProcessesTest {
     public void should_execute_on_finish_connector_of_process_instance() throws Exception {
         SProcessInstance processInstance = havingProcessInstance(COMPLETING, -1);
 
-        executeProcesses.execute(singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         verify(processExecutor).registerConnectorsToExecute(any(), eq(processInstance), eq(ConnectorEvent.ON_FINISH),
                 any());
-    }
-
-    @Test
-    public void should_a_batch_fail_to_commit_continue_with_subsequent_batches() throws Exception {
-        SProcessInstance processInstance = havingProcessInstance(COMPLETING, -1);
-        // given: a transaction commit fails but subsequent commits are ok
-        doThrow(new Exception("Error during commit"))
-                .doAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call())
-                .when(userTransactionService).executeInTransaction(any());
-        // we have more than 2*BATCH_RESTART_SIZE ids
-        List<Long> ids = range(0, BATCH_RESTART_SIZE * 2 + 1).map((t) -> processInstance.getId()).boxed()
-                .collect(toList());
-
-        // when
-        executeProcesses.execute(ids);
-
-        // then
-        verify(userTransactionService, times(3)).executeInTransaction(any());
-        assertThat(systemOutRule.getLog())
-                .containsOnlyOnce("Exception")
-                .containsOnlyOnce("Some processes failed to recover");
     }
 
     protected void havingCallActivity(int stateId, long id)
