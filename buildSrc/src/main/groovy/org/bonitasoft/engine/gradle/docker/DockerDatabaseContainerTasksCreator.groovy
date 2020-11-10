@@ -70,6 +70,9 @@ class DockerDatabaseContainerTasksCreator {
 
     def static createTasks(Project project, DatabasePluginExtension extension) {
         // required to have the environment correctly setup: see https://github.com/bmuschko/gradle-docker-plugin/issues/575#issuecomment-383704012
+        if (!project.rootProject.plugins.hasPlugin('com.bmuschko.docker-remote-api')) {
+            project.rootProject.plugins.apply('com.bmuschko.docker-remote-api')
+        }
         project.plugins.apply('com.bmuschko.docker-remote-api')
         vendors.each { vendor ->
             def uniqueName = "${vendor.name.capitalize()}"
@@ -79,7 +82,7 @@ class DockerDatabaseContainerTasksCreator {
             Task inspectContainer
             Task removeContainer
 
-            def pullImage = project.tasks.create("pull${uniqueName}Image", DockerPullImage) {
+            def pullImage = createTaskInRootProject(project, "pull${uniqueName}Image", DockerPullImage) {
                 description "Pull docker image for $uniqueName db vendor"
                 group null // do not show task when running `gradle tasks`
 
@@ -87,11 +90,10 @@ class DockerDatabaseContainerTasksCreator {
                 tag = vendor.tag
             }
 
-            def createContainer = project.tasks.create("create${uniqueName}Container", DockerCreateContainer) {
+            def createContainer = createTaskInRootProject(project, "create${uniqueName}Container", DockerCreateContainer) {
                 description "Create a docker container for $uniqueName db vendor"
                 group null // do not show task when running `gradle tasks`
 
-                dependsOn pullImage
                 if (project.hasProperty("docker-container-alias")) {
                     containerName = project.getProperty("docker-container-alias")
                 }
@@ -103,19 +105,17 @@ class DockerDatabaseContainerTasksCreator {
                 }
             }
 
-            def startContainer = project.tasks.create("start${uniqueName}Container", DockerStartContainer) {
+            def startContainer = createTaskInRootProject(project, "start${uniqueName}Container", DockerStartContainer) {
                 description "Start a docker container for $uniqueName db vendor"
                 group "docker"
 
-                dependsOn createContainer
                 targetContainerId createContainer.getContainerId()
             }
 
-            def waitForContainerStartup = project.tasks.create("waitFor${uniqueName}ContainerStartup", DockerWaitHealthyContainer) {
+            def waitForContainerStartup = createTaskInRootProject(project, "waitFor${uniqueName}ContainerStartup", DockerWaitHealthyContainer) {
                 description "Wait for a started docker container for $vendor.name db vendor to be healthy"
                 group null // do not show task when running `gradle tasks`
 
-                dependsOn startContainer
                 targetContainerId startContainer.getContainerId()
                 awaitStatusTimeout = 360
             }
@@ -124,7 +124,6 @@ class DockerDatabaseContainerTasksCreator {
                 description "Get url of a docker container for $uniqueName db vendor"
                 group null // do not show task when running `gradle tasks`
 
-                dependsOn waitForContainerStartup
                 targetContainerId startContainer.getContainerId()
 
                 onNext {
@@ -144,7 +143,7 @@ class DockerDatabaseContainerTasksCreator {
                 }
             }
 
-            removeContainer = project.tasks.create("remove${uniqueName}Container", DockerRemoveContainer) {
+            removeContainer = createTaskInRootProject(project, "remove${uniqueName}Container", DockerRemoveContainer) {
                 description "Remove a docker container for $uniqueName db vendor"
                 group "docker"
 
@@ -193,18 +192,28 @@ class DockerDatabaseContainerTasksCreator {
                 destinationDirectory = databaseTestTask.reports.html.destination.parentFile
                 from databaseTestTask.reports.html.destination
             }
-            databaseTestTask.finalizedBy zipReport
             project.afterEvaluate {
                 databaseTestTask.includes = extension.includes
             }
-            if (inspectContainer) {
-                databaseTestTask.dependsOn(inspectContainer)
-            }
-            if (removeContainer) {
-                //container should be removed even when there is a failure
-                databaseTestTask.finalizedBy(removeContainer)
-            }
 
+
+            createContainer.dependsOn pullImage
+            startContainer.dependsOn createContainer
+            waitForContainerStartup.dependsOn startContainer
+            inspectContainer.dependsOn waitForContainerStartup
+            databaseTestTask.dependsOn inspectContainer
+
+            startContainer.finalizedBy removeContainer
+            databaseTestTask.finalizedBy zipReport
+            removeContainer.mustRunAfter databaseTestTask
         }
+    }
+
+    static Task createTaskInRootProject(Project project, String taskName, Class<? extends Task> taskType, Closure configuration) {
+        def task = project.rootProject.tasks.findByPath(taskName)
+        if (!task) {
+            task = project.rootProject.tasks.create(taskName, taskType, configuration)
+        }
+        return task
     }
 }
