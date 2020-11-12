@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -84,6 +85,8 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
                         expressionName);
             }
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             final DocumentBuilder builder = factory.newDocumentBuilder();
             // Check has already been done above:
             final SExpression dep = expression.getDependencies().get(0);
@@ -97,15 +100,8 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
             final XPath xpath = xpFactory.newXPath();
             final XPathExpression exp = xpath.compile(expression.getContent());
             return transType(exp.evaluate(document, qname), returnType);
-        } catch (final XPathExpressionException e) {
-            throw new SExpressionEvaluationException(messageForException, e, expressionName);
-        } catch (final ParserConfigurationException e) {
-            throw new SExpressionEvaluationException(messageForException, e, expressionName);
-        } catch (final SAXException e) {
-            throw new SExpressionEvaluationException(messageForException, e, expressionName);
-        } catch (final IOException e) {
-            throw new SExpressionEvaluationException(messageForException, e, expressionName);
-        } catch (final SBonitaRuntimeException e) {
+        } catch (final XPathExpressionException | SBonitaRuntimeException | IOException | SAXException
+                | ParserConfigurationException e) {
             throw new SExpressionEvaluationException(messageForException, e, expressionName);
         }
     }
@@ -175,7 +171,7 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
             final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        final List<Object> list = new ArrayList<Object>(expressions.size());
+        final List<Object> list = new ArrayList<>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }

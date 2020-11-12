@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.operation.impl;
 import java.io.IOException;
 import java.io.StringReader;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -81,47 +82,48 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
             final String dataInstanceName = operation.getLeftOperand().getName();
             // should be a String because the data is an xml expression
             final String dataValue = (String) expressionContext.getInputValues().get(dataInstanceName);
-            final Object variableValue = value;
 
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             final DocumentBuilder builder = factory.newDocumentBuilder();
             final Document document = builder.parse(new InputSource(new StringReader(dataValue)));
             final XPath xpath = XPathFactory.newInstance().newXPath();
             final String xpathExpression = operation.getOperator();
             final Node node = (Node) xpath.compile(xpathExpression).evaluate(document, XPathConstants.NODE);
-            if (isSetAttribute(xpathExpression, variableValue)) {
+            if (isSetAttribute(xpathExpression, value)) {
                 if (node == null) { // Create the attribute
                     final String parentPath = xpathExpression.substring(0, xpathExpression.lastIndexOf('/'));
                     final String attributeName = xpathExpression.substring(xpathExpression.lastIndexOf('/') + 2); // +1 for @
                     final Node parentNode = (Node) xpath.compile(parentPath).evaluate(document, XPathConstants.NODE);
                     if (parentNode instanceof Element) {
                         final Element element = (Element) parentNode;
-                        if (variableValue instanceof String) {
-                            element.setAttribute(attributeName, getStringValue(variableValue));
-                        } else if (variableValue instanceof Attr) {
-                            element.setAttribute(((Attr) variableValue).getName(),
-                                    ((Attr) variableValue).getTextContent());
+                        if (value instanceof String) {
+                            element.setAttribute(attributeName, getStringValue(value));
+                        } else if (value instanceof Attr) {
+                            element.setAttribute(((Attr) value).getName(),
+                                    ((Attr) value).getTextContent());
                         }
                     }
                 } else if (node instanceof Attr) { // Set an existing attribute
-                    if (variableValue instanceof Attr) {
-                        node.setTextContent(((Attr) variableValue).getTextContent());
+                    if (value instanceof Attr) {
+                        node.setTextContent(((Attr) value).getTextContent());
                     } else {
-                        node.setTextContent(getStringValue(variableValue));
+                        node.setTextContent(getStringValue(value));
                     }
                 } else if (node instanceof Element) { // add attribute to an element
-                    final Attr attr = (Attr) variableValue;
+                    final Attr attr = (Attr) value;
                     ((Element) node).setAttribute(attr.getName(), attr.getValue());
                 }
             } else if (node instanceof Text) {
-                node.setTextContent(getStringValue(variableValue));
+                node.setTextContent(getStringValue(value));
             } else if (node instanceof Element) {
                 Node newNode = null;
-                if (variableValue instanceof Node) {
-                    newNode = document.importNode((Node) variableValue, true);
-                } else if (variableValue instanceof String) {
+                if (value instanceof Node) {
+                    newNode = document.importNode((Node) value, true);
+                } else if (value instanceof String) {
                     newNode = document.importNode(
-                            DocumentManager.generateDocument(getStringValue(variableValue)).getDocumentElement(), true);
+                            DocumentManager.generateDocument(getStringValue(value)).getDocumentElement(), true);
                 }
 
                 // if (isAppend) {
@@ -131,10 +133,10 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
                 parentNode.removeChild(node);
                 parentNode.appendChild(newNode);
                 // }
-            } else if (node == null && xpathExpression.endsWith("/text()") && variableValue instanceof String) {
+            } else if (node == null && xpathExpression.endsWith("/text()") && value instanceof String) {
                 final String parentPath = xpathExpression.substring(0, xpathExpression.lastIndexOf('/'));
                 final Node parentNode = (Node) xpath.compile(parentPath).evaluate(document, XPathConstants.NODE);
-                parentNode.appendChild(document.createTextNode(getStringValue(variableValue)));
+                parentNode.appendChild(document.createTextNode(getStringValue(value)));
             }
             return DocumentManager.getDocumentContent(document);
         } catch (final ParserConfigurationException | SAXException | IOException | XPathExpressionException
