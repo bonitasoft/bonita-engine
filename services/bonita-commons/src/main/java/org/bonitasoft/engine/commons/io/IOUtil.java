@@ -47,6 +47,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -79,7 +80,7 @@ public class IOUtil {
     }
 
     public static List<String> getClassNameList(final byte[] jarContent) throws IOException {
-        final List<String> classes = new ArrayList<String>(10);
+        final List<String> classes = new ArrayList<>(10);
         JarInputStream stream = null;
         ByteArrayInputStream byteArrayInputStream = null;
         try {
@@ -131,7 +132,7 @@ public class IOUtil {
             final String message = "No classes available";
             throw new IOException(message);
         }
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        final Map<String, byte[]> resources = new HashMap<>();
         for (final Class<?> clazz : classes) {
             resources.put(clazz.getName().replace(".", "/") + ".class", ClassDataUtil.getClassData(clazz));
             for (final Class<?> internalClass : clazz.getDeclaredClasses()) {
@@ -426,7 +427,7 @@ public class IOUtil {
         final ByteArrayInputStream bais = new ByteArrayInputStream(zipFile);
         final ZipInputStream zipInputstream = new ZipInputStream(bais);
         ZipEntry zipEntry = null;
-        final Map<String, byte[]> files = new HashMap<String, byte[]>();
+        final Map<String, byte[]> files = new HashMap<>();
         try {
             while ((zipEntry = zipInputstream.getNextEntry()) != null) {
                 final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -512,33 +513,24 @@ public class IOUtil {
         if (document == null) {
             throw new IllegalArgumentException("Document should not be null.");
         }
-        final Transformer tf = TransformerFactory.newInstance().newTransformer();
-        tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // security-compliant
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); // security-compliant
+        final Transformer tf = transformerFactory.newTransformer();
+        tf.setOutputProperty(OutputKeys.ENCODING, FILE_ENCODING);
         tf.setOutputProperty(OutputKeys.INDENT, "yes");
-        ByteArrayOutputStream out = null;
-        try {
-            out = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             tf.transform(new DOMSource(document), new StreamResult(out));
             return out.toByteArray();
-        } finally {
-            if (out != null) {
-                out.close();
-            }
         }
     }
 
     public static byte[] addJarEntry(final byte[] jarToUpdate, final String entryName, final byte[] entryContent)
             throws IOException {
-        ByteArrayOutputStream out = null;
-        ByteArrayInputStream bais = null;
-        JarOutputStream jos = null;
-        JarInputStream jis = null;
         final byte[] buffer = new byte[4096];
-        try {
-            bais = new ByteArrayInputStream(jarToUpdate);
-            jis = new JarInputStream(bais);
-            out = new ByteArrayOutputStream();
-            jos = new JarOutputStream(out);
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(jarToUpdate);
+                JarInputStream jis = new JarInputStream(bais); ByteArrayOutputStream out = new ByteArrayOutputStream();
+                JarOutputStream jos = new JarOutputStream(out)) {
             JarEntry inEntry;
             while ((inEntry = (JarEntry) jis.getNextEntry()) != null) {
                 if (!inEntry.getName().equals(entryName)) {
@@ -559,19 +551,6 @@ public class IOUtil {
             jos.finish();
             out.flush();
             return out.toByteArray();
-        } finally {
-            if (jos != null) {
-                jos.close();
-            }
-            if (out != null) {
-                out.close();
-            }
-            if (jis != null) {
-                jis.close();
-            }
-            if (bais != null) {
-                bais.close();
-            }
         }
     }
 
