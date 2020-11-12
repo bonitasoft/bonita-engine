@@ -43,7 +43,7 @@ public class PersistenceUnitBuilderTest {
         Document document = builder.done();
         assertThat(document).isNotNull();
         assertThat(document.getElementsByTagName("persistence-unit").getLength()).isEqualTo(1);
-        assertThat(document.getElementsByTagName("class").getLength()).isEqualTo(0);
+        assertThat(document.getElementsByTagName("class").getLength()).isZero();
     }
 
     @Test

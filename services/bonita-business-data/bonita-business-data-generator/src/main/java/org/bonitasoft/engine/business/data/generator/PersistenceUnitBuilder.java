@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -46,6 +47,8 @@ public class PersistenceUnitBuilder {
             throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setValidating(false);
+        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         final InputStream is = PersistenceUnitBuilder.class.getResourceAsStream("persistence.xml");
         try {
