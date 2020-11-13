@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.application.deployer.detector;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,9 +28,11 @@ public class ArtifactTypeDetectorFactory {
 
     private static ArtifactTypeDetector newArtifactDetector() {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            documentBuilderFactory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             XmlDetector xmlDetector = new XmlDetector(documentBuilder);
             return new ArtifactTypeDetector(xmlDetector, new CustomPageDetector(), new ProcessDetector(xmlDetector),
                     new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector());

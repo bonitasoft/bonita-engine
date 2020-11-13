@@ -157,15 +157,15 @@ public class IOUtils {
         if (document == null) {
             throw new IllegalArgumentException("Document should not be null.");
         }
-        final Transformer tf = TransformerFactory.newInstance().newTransformer();
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // security-compliant
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); // security-compliant
+        final Transformer tf = transformerFactory.newTransformer();
         tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         tf.setOutputProperty(OutputKeys.INDENT, "yes");
-        final FileOutputStream fos = new FileOutputStream(destination);
-        try {
+        try (FileOutputStream fos = new FileOutputStream(destination)) {
             final StreamResult outputTarget = new StreamResult(fos);
             tf.transform(new DOMSource(document), outputTarget);
-        } finally {
-            fos.close();
         }
     }
 

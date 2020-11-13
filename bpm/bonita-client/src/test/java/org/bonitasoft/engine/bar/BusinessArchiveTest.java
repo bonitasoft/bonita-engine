@@ -1365,12 +1365,9 @@ public class BusinessArchiveTest {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readBarWithConnectorFailActionsFails() throws Exception {
-        final InputStream resourceAsStream = BusinessArchiveTest.class
-                .getResourceAsStream("testBuy_a_mini_extended--6.1.bar");
-        try {
+        try (InputStream resourceAsStream = BusinessArchiveTest.class
+                .getResourceAsStream("testBuy_a_mini_extended--6.1.bar")) {
             BusinessArchiveFactory.readBusinessArchive(resourceAsStream);
-        } finally {
-            resourceAsStream.close();
         }
     }
 
@@ -1378,9 +1375,9 @@ public class BusinessArchiveTest {
     public void parameters() {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
-        processBuilder.addParameter("key1", String.class.getCanonicalName())
-                .addParameter("key.2", String.class.getCanonicalName()).addUserTask("userTask1",
-                        null);
+        processBuilder
+                .addParameter("key1", String.class.getCanonicalName())
+                .addParameter("key.2", String.class.getCanonicalName()).addUserTask("userTask1", null);
 
     }
 

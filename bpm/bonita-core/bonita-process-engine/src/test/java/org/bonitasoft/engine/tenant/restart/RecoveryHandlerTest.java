@@ -33,24 +33,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author Emmanuel Duchastenier
  */
 @ExtendWith(MockitoExtension.class)
-class ProcessInstanceRecoveryHandlerTest {
+class RecoveryHandlerTest {
 
     @Mock
-    private ProcessInstanceRecoveryService processInstanceRecoveryService;
+    private RecoveryService recoveryService;
 
     @InjectMocks
-    private ProcessInstanceRecoveryHandler processInstanceRecoveryHandler;
+    private RecoveryHandler recoveryHandler;
 
     @Test
     void should_delegate_to_ProcessInstancesRecoveryService() {
         final List<ElementToRecover> elementToRecovers = asList(
                 builder().id(17L).type(PROCESS).build(),
                 builder().id(44L).type(FLOWNODE).build());
-        doReturn(elementToRecovers).when(processInstanceRecoveryService).getAllElementsToRecover(Duration.ZERO);
+        doReturn(elementToRecovers).when(recoveryService).getAllElementsToRecover(Duration.ZERO);
 
-        processInstanceRecoveryHandler.beforeServicesStart();
-        processInstanceRecoveryHandler.afterServicesStart();
+        recoveryHandler.beforeServicesStart();
+        recoveryHandler.afterServicesStart();
 
-        verify(processInstanceRecoveryService).recover(elementToRecovers);
+        verify(recoveryService).recover(elementToRecovers);
     }
 }

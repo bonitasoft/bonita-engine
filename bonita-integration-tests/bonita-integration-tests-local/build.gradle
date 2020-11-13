@@ -1,3 +1,6 @@
+plugins {
+    id("bonita-docker-database")
+}
 dependencies {
     compile "junit:junit:${Deps.junit4Version}"
     compile "org.assertj:assertj-core:${Deps.assertjVersion}"
@@ -25,3 +28,5 @@ publishing {
         }
     }
 }
+
+databaseIntegrationTest { include "**/BDRepositoryLocalIT.class" }

@@ -17,10 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.CommonAPIIT;
@@ -35,6 +33,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
@@ -42,10 +41,9 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 public class BDRepositoryLocalIT extends CommonAPIIT {
@@ -488,6 +486,38 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         model.addBusinessObject(productBO);
         model.addBusinessObject(catalogBO);
         return model;
+    }
+
+    @Test
+    public void deploy_a_BDR_and_verify_sequence_behaviour_by_DBVendor() throws Exception {
+        String dbVendor = System.getProperty("sysprop.bonita.bdm.db.vendor");
+        Assume.assumeTrue("We don't test sequence behaviour on h2", !dbVendor.equals("h2"));
+        switch (dbVendor) {
+            case "postgres":
+                assertThat(execute_native_sql("SELECT 0 FROM pg_class where relname = 'hibernate_sequence'"))
+                        .containsOnly(0);
+                break;
+            case "oracle":
+                assertThat(((List<BigDecimal>) execute_native_sql(
+                        "SELECT COUNT(*) FROM user_sequences WHERE sequence_name = 'HIBERNATE_SEQUENCE'")).get(0)
+                                .intValue()).isEqualTo(1);
+                break;
+            case "mysql":
+                assertThat(Arrays.toString((Object[]) execute_native_sql("describe EMPLOYEE").get(0)))
+                        .contains("auto_increment", "persistenceId");
+                break;
+            case "sqlserver":
+                assertThat(Arrays.toString((Object[]) execute_native_sql("exec sp_columns EMPLOYEE").get(0)))
+                        .contains("bigint identity", "persistenceId");
+                break;
+        }
+    }
+
+    private List execute_native_sql(String query) throws Exception {
+        TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance();
+        return tenantServiceAccessor.getUserTransactionService().executeInTransaction(
+                () -> ((JPABusinessDataRepositoryImpl) (tenantServiceAccessor.getBusinessDataRepository()))
+                        .getEntityManagerFactory().createEntityManager().createNativeQuery(query).getResultList());
     }
 
 }

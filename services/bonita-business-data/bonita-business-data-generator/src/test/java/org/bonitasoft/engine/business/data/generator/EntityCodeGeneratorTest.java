@@ -26,16 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
@@ -118,7 +109,7 @@ public class EntityCodeGeneratorTest {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass);
+        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "postgres");
 
         final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
         assertThat(idFieldVar).isNotNull();
@@ -129,6 +120,86 @@ public class EntityCodeGeneratorTest {
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Id.class.getName());
         annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(GeneratedValue.class.getName());
+    }
+
+    @Test
+    public void should_add_sequence_strategy_to_fields_with_generatedValue_in_h2() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "h2");
+
+        final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
+        assertThat(idFieldVar.annotations()).hasSize(2);
+        final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
+        iterator.next();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(getAnnotationParamValue(annotationUse, "strategy"))
+                .isEqualTo("javax.persistence.GenerationType.SEQUENCE");
+    }
+
+    @Test
+    public void should_add_sequence_strategy_to_fields_with_generatedValue_in_postgres() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "postgres");
+
+        final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
+        assertThat(idFieldVar.annotations()).hasSize(2);
+        final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
+        iterator.next();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(getAnnotationParamValue(annotationUse, "strategy"))
+                .isEqualTo("javax.persistence.GenerationType.SEQUENCE");
+    }
+
+    @Test
+    public void should_add_sequence_strategy_to_fields_with_generatedValue_in_oracle() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "oracle");
+
+        final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
+        assertThat(idFieldVar.annotations()).hasSize(2);
+        final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
+        iterator.next();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(getAnnotationParamValue(annotationUse, "strategy"))
+                .isEqualTo("javax.persistence.GenerationType.SEQUENCE");
+    }
+
+    @Test
+    public void should_add_identity_strategy_to_fields_with_generatedValue_in_mysql() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "mysql");
+
+        final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
+        assertThat(idFieldVar.annotations()).hasSize(2);
+        final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
+        iterator.next();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(getAnnotationParamValue(annotationUse, "strategy"))
+                .isEqualTo("javax.persistence.GenerationType.IDENTITY");
+    }
+
+    @Test
+    public void should_add_identity_strategy_to_fields_with_generatedValue_in_SQLServer() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "sqlserver");
+
+        final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
+        assertThat(idFieldVar.annotations()).hasSize(2);
+        final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
+        iterator.next();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(getAnnotationParamValue(annotationUse, "strategy"))
+                .isEqualTo("javax.persistence.GenerationType.IDENTITY");
     }
 
     @Test
