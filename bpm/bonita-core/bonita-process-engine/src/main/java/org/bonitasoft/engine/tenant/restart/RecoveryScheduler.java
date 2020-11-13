@@ -35,11 +35,11 @@ public class RecoveryScheduler {
     public void triggerRecoveryAllElements() {
         try {
             if (tenantElementsRestartSupervisor.isResponsibleForRecovery()) {
-                log.info("Starting periodic recovery of elements...");
+                log.debug("Starting periodic recovery of elements...");
                 recoveryService.recoverAllElements();
-                log.info("Completed periodic recovery of elements.");
+                log.debug("Completed periodic recovery of elements.");
             } else {
-                log.info("Periodic recovery of elements not executed, an other node is responsible for it.");
+                log.debug("Periodic recovery of elements not executed, an other node is responsible for it.");
             }
         } catch (Exception e) {
             log.warn("Recovery of elements failed because of {} - {},  it will be re executed soon",

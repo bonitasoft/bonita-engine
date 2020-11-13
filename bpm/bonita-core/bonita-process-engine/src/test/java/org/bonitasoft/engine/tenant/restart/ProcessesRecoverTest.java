@@ -70,13 +70,14 @@ public class ProcessesRecoverTest {
     private UserTransactionService userTransactionService;
     private ProcessesRecover processesRecover;
 
-    private ExecutionMonitor executionMonitor;
+    private RecoveryMonitor recoveryMonitor;
     @Rule
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     @Before
     public void setUp() throws Exception {
-        executionMonitor = new ExecutionMonitor(100);
+        recoveryMonitor = new RecoveryMonitor();
+        recoveryMonitor.startNow(100);
         processesRecover = new ProcessesRecover(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
                 processDefinitionService, processInstanceService, processExecutor, new BPMWorkFactory());
         doAnswer(args -> ((Callable) args.getArgument(0)).call()).when(userTransactionService)
@@ -87,7 +88,7 @@ public class ProcessesRecoverTest {
     public void should_not_execute_process_with_no_caller_id() throws Exception {
         havingProcessInstance(COMPLETED, -1);
 
-        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(recoveryMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         // as it can never happen, because when a process instance goes into COMPLETED state, it is archived
         // in the same transaction
@@ -100,7 +101,7 @@ public class ProcessesRecoverTest {
         havingProcessInstance(COMPLETED, CALLER_ID);
         when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityState());
 
-        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(recoveryMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         verifyNoMoreInteractions(workService);
         assertThat(systemOutRule.getLog().toLowerCase()).doesNotContain("error");
@@ -112,7 +113,7 @@ public class ProcessesRecoverTest {
         havingProcessInstance(COMPLETED, CALLER_ID);
         when(flowNodeStateManager.getState(FlowNodeState.ID_ACTIVITY_FAILED)).thenReturn(new FailedActivityState());
 
-        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(recoveryMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         verify(workService)
                 .registerWork(argThat(workDescriptor -> workDescriptor.getType().equals("EXECUTE_FLOWNODE") &&
@@ -123,7 +124,7 @@ public class ProcessesRecoverTest {
     public void should_execute_on_enter_connector_of_process_instance() throws Exception {
         SProcessInstance processInstance = havingProcessInstance(INITIALIZING, -1);
 
-        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(recoveryMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         verify(processExecutor).registerConnectorsToExecute(any(), eq(processInstance), eq(ConnectorEvent.ON_ENTER),
                 any());
@@ -133,7 +134,7 @@ public class ProcessesRecoverTest {
     public void should_execute_on_finish_connector_of_process_instance() throws Exception {
         SProcessInstance processInstance = havingProcessInstance(COMPLETING, -1);
 
-        processesRecover.execute(executionMonitor, singletonList(PROCESS_INSTANCE_ID));
+        processesRecover.execute(recoveryMonitor, singletonList(PROCESS_INSTANCE_ID));
 
         verify(processExecutor).registerConnectorsToExecute(any(), eq(processInstance), eq(ConnectorEvent.ON_FINISH),
                 any());

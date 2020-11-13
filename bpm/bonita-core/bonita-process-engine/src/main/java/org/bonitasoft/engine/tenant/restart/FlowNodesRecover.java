@@ -60,42 +60,37 @@ public class FlowNodesRecover {
         this.flowNodeStateManager = flowNodeStateManager;
     }
 
-    void execute(ExecutionMonitor executionMonitor, List<Long> flowNodeIds) throws SBonitaException {
+    void execute(RecoveryMonitor recoveryMonitor, List<Long> flowNodeIds) throws SBonitaException {
         List<Long> unprocessed = new ArrayList<>(flowNodeIds);
         List<SFlowNodeInstance> flowNodeInstances = activityInstanceService.getFlowNodeInstancesByIds(flowNodeIds);
         for (SFlowNodeInstance flowNodeInstance : flowNodeInstances) {
-            try {
-                unprocessed.remove(flowNodeInstance.getId());
-                if (flowNodeInstance.isTerminal()) {
-                    executionMonitor.finishing++;
-                    logger.debug("Restarting flow node (Notify finished...) with name = <" + flowNodeInstance.getName()
+            unprocessed.remove(flowNodeInstance.getId());
+            if (flowNodeInstance.isTerminal()) {
+                recoveryMonitor.incrementFinishing();
+                logger.debug("Restarting flow node (Notify finished...) with name = <" + flowNodeInstance.getName()
+                        + ">, and id = <" + flowNodeInstance.getId()
+                        + " in state = <" + flowNodeInstance.getStateName() + ">");
+                workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(flowNodeInstance));
+            } else {
+                if (shouldBeRecovered(flowNodeInstance)) {
+                    recoveryMonitor.incrementExecuting();
+                    logger.debug("Recovering flow node (Execute ...) with name = <" + flowNodeInstance.getName()
                             + ">, and id = <" + flowNodeInstance.getId()
-                            + " in state = <" + flowNodeInstance.getStateName() + ">");
-                    workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(flowNodeInstance));
+                            + "> in state = <" + flowNodeInstance.getStateName() + ">");
+                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
                 } else {
-                    if (shouldBeRecovered(flowNodeInstance)) {
-                        executionMonitor.executing++;
-                        logger.debug("Recovering flow node (Execute ...) with name = <" + flowNodeInstance.getName()
-                                + ">, and id = <" + flowNodeInstance.getId()
-                                + "> in state = <" + flowNodeInstance.getStateName() + ">");
-                        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
-                    } else {
-                        executionMonitor.notExecutable++;
-                        logger.debug(
-                                "Flownode with name = <{}>, and id = <{}> in state = <{}> does not fulfill the recovered conditions.",
-                                flowNodeInstance.getName(), flowNodeInstance.getId(), flowNodeInstance.getStateName());
-                    }
+                    recoveryMonitor.incrementNotExecutable();
+                    logger.debug(
+                            "Flownode with name = <{}>, and id = <{}> in state = <{}> does not fulfill the recovered conditions.",
+                            flowNodeInstance.getName(), flowNodeInstance.getId(), flowNodeInstance.getStateName());
                 }
-            } catch (Exception e) {
-                logger.error("Error recovering flow node {}", flowNodeInstance.getId(), e);
-                executionMonitor.inError++;
             }
         }
-        executionMonitor.notFound += unprocessed.size();
+        recoveryMonitor.incrementNotFound(unprocessed.size());
     }
 
     @VisibleForTesting
-    boolean shouldBeRecovered(final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
+    boolean shouldBeRecovered(final SFlowNodeInstance sFlowNodeInstance) {
         //when state category is cancelling but the state is 'stable' (e.g. boundary event in waiting but that has been cancelled)
         if ((sFlowNodeInstance.getStateCategory().equals(SStateCategory.CANCELLING)
                 || sFlowNodeInstance.getStateCategory().equals(SStateCategory.ABORTING))
