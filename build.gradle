@@ -1,4 +1,15 @@
 plugins {
     id "com.bonitasoft.gradle.bonita-release"
+    id "org.sonarqube" version "3.0"
 }
+  
+sonarqube {
+    properties {
+          property "sonar.projectKey", "bonitasoft_bonita-engine"
+          property "sonar.organization", "bonitasoft"
+          property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
+
 apply from: "common.gradle"
