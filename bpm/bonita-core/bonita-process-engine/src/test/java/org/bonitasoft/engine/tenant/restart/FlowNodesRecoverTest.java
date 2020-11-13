@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.tenant.restart;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.bonitasoft.engine.execution.TestFlowNodeState.stableState;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -44,8 +45,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodesRecoverTest {
 
-    private static final int ABORTING_STATE_ID = 1111;
-    private static final int CANCELLING_STATE_ID = 33333;
+    private static final int ABORTING_STATE_ID = 2;
+    private static final int CANCELLING_STATE_ID = 3;
 
     @Mock
     private FlowNodeStateManager flownodeStateManager;
@@ -54,20 +55,19 @@ public class FlowNodesRecoverTest {
     @Mock
     private WorkService workService;
     @Mock
-    private ExecutionMonitor executionMonitor;
+    private RecoveryMonitor recoveryMonitor;
 
     private final BPMWorkFactory workFactory = new BPMWorkFactory();
     private FlowNodesRecover flowNodesRecover;
     private final List<SFlowNodeInstance> allFlowNodes = new ArrayList<>();
 
     private final FlowNodeState waitingState = stableState(1, SStateCategory.NORMAL);
-    private final FlowNodeState abortingState = stableState(2, SStateCategory.ABORTING);
-    private final FlowNodeState cancellingState = stableState(3, SStateCategory.CANCELLING);
+    private final FlowNodeState abortingState = stableState(ABORTING_STATE_ID, SStateCategory.ABORTING);
+    private final FlowNodeState cancellingState = stableState(CANCELLING_STATE_ID, SStateCategory.CANCELLING);
     private final FlowNodeState normalStableState = stableState(4, SStateCategory.NORMAL);
 
     @Before
     public void before() throws Exception {
-        ;
         flowNodesRecover = new FlowNodesRecover(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
                 flownodeStateManager, workFactory);
         when(activityInstanceService.getFlowNodeInstancesByIds(any())).thenAnswer(invocationOnMock -> {
@@ -84,7 +84,7 @@ public class FlowNodesRecoverTest {
     public final void should_register_FINISH_FLOWNODE_when_flownode_is_in_terminal_state() throws Exception {
         SAutomaticTaskInstance task = createTask(123L, true /* terminal */);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(task));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(task));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")));
 
@@ -94,7 +94,7 @@ public class FlowNodesRecoverTest {
     public void should_register_EXECUTE_FLOWNODE_when_flownode_is_not_in_terminal_state() throws Exception {
         SAutomaticTaskInstance task = createTask(123L, false /* not terminal */);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(task));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(task));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -106,7 +106,7 @@ public class FlowNodesRecoverTest {
             list.add(createTask(123L + i, false));
         }
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(list.toArray(new SFlowNodeInstance[] {})));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(list.toArray(new SFlowNodeInstance[] {})));
 
         assertThat(list.size()).isEqualTo(21);
         verify(workService, times(21)).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
@@ -119,7 +119,7 @@ public class FlowNodesRecoverTest {
         setState(autoTask, normalStableState);
         autoTask.setStateCategory(SStateCategory.ABORTING);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(autoTask));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(autoTask));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -131,7 +131,7 @@ public class FlowNodesRecoverTest {
         setState(autoTask, normalStableState);
         autoTask.setStateCategory(SStateCategory.CANCELLING);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(autoTask));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(autoTask));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -145,7 +145,7 @@ public class FlowNodesRecoverTest {
         autoTask.setStable(true);
         autoTask.setStateId(ABORTING_STATE_ID);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(autoTask));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(autoTask));
 
         verify(workService, never()).registerWork(any());
     }
@@ -159,7 +159,7 @@ public class FlowNodesRecoverTest {
         autoTask.setStable(true);
         autoTask.setStateId(CANCELLING_STATE_ID);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(autoTask));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(autoTask));
 
         verify(workService, never()).registerWork(any());
     }
@@ -170,7 +170,7 @@ public class FlowNodesRecoverTest {
         gatewayInstance.setId(333L);
         gatewayInstance.setHitBys("FINISH:2");
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -181,13 +181,13 @@ public class FlowNodesRecoverTest {
         gatewayInstance.setId(333L);
         gatewayInstance.setHitBys("1,2");
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService, never()).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
 
     @Test
-    public void should_continue_batch_if_one_flow_node_fails() throws Exception {
+    public void should_fail_batch_if_one_register_work_fails() throws Exception {
         SAutomaticTaskInstance automaticTaskInstance1 = new SAutomaticTaskInstance();
         automaticTaskInstance1.setId(333L);
         automaticTaskInstance1.setTerminal(true);
@@ -198,13 +198,9 @@ public class FlowNodesRecoverTest {
                 .registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")
                         && work.getParameter("flowNodeInstanceId").equals(333L)));
 
-        flowNodesRecover.execute(executionMonitor,
-                flowNodeIds(automaticTaskInstance1, automaticTaskInstance2));
-
-        verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")
-                && work.getParameter("flowNodeInstanceId").equals(344L)));
-        verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")
-                && work.getParameter("flowNodeInstanceId").equals(333L)));
+        assertThatThrownBy(() -> flowNodesRecover.execute(recoveryMonitor,
+                flowNodeIds(automaticTaskInstance1, automaticTaskInstance2)))
+                        .isInstanceOf(SWorkRegisterException.class);
     }
 
     @Test
@@ -212,7 +208,7 @@ public class FlowNodesRecoverTest {
         SGatewayInstance gatewayInstance = new SGatewayInstance();
         gatewayInstance.setId(333L);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService, never()).registerWork(any());
     }
@@ -272,7 +268,7 @@ public class FlowNodesRecoverTest {
         gatewayInstance.setId(333L);
         gatewayInstance.setStateCategory(SStateCategory.ABORTING);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
@@ -283,7 +279,7 @@ public class FlowNodesRecoverTest {
         gatewayInstance.setId(333L);
         gatewayInstance.setStateCategory(SStateCategory.CANCELLING);
 
-        flowNodesRecover.execute(executionMonitor, flowNodeIds(gatewayInstance));
+        flowNodesRecover.execute(recoveryMonitor, flowNodeIds(gatewayInstance));
 
         verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }

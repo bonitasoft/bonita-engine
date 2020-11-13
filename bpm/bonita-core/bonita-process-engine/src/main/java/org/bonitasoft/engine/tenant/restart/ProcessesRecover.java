@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * This class handles the continuation of unfinished process instances
- * passed as parameter in {@link #execute(ExecutionMonitor, List)} method.
+ * passed as parameter in {@link #execute(RecoveryMonitor, List)} method.
  * The logic ensure that if an instance fails to continue its execution,
  * the error is logged and other instances are continued anyways.
  */
@@ -67,7 +67,7 @@ public class ProcessesRecover {
         this.workFactory = workFactory;
     }
 
-    void execute(ExecutionMonitor executionMonitor, List<Long> ids) {
+    void execute(RecoveryMonitor recoveryMonitor, List<Long> ids) {
         for (Long processId : ids) {
             try {
                 final SProcessInstance processInstance = processInstanceService.getProcessInstance(processId);
@@ -77,33 +77,35 @@ public class ProcessesRecover {
                     case ABORTED:
                     case CANCELLED:
                     case COMPLETED:
-                        executionMonitor.finishing++;
+                        recoveryMonitor.incrementFinishing();
                         handleCompletion(processInstance);
                         break;
                     case COMPLETING:
-                        executionMonitor.finishing++;
+                        recoveryMonitor.incrementFinishing();
                         processExecutor.registerConnectorsToExecute(processDefinition, processInstance,
                                 ConnectorEvent.ON_FINISH,
                                 null);
                         break;
                     case INITIALIZING:
-                        executionMonitor.executing++;
+                        recoveryMonitor.incrementExecuting();
                         processExecutor.registerConnectorsToExecute(processDefinition, processInstance,
                                 ConnectorEvent.ON_ENTER,
                                 null);
                         break;
                     default:
-                        executionMonitor.notExecutable++;
+                        recoveryMonitor.incrementNotExecutable();
                         break;
                 }
             } catch (final SProcessInstanceNotFoundException e) {
-                executionMonitor.notFound++;
-                logger.debug("Unable to recover the process instance "
-                        + processId + ", it is not found (probably already completed).");
+                recoveryMonitor.incrementNotFound();
+                logger.debug("Unable to recover the process instance {}, it is not found (probably already completed).",
+                        processId);
             } catch (final Exception e) {
-                executionMonitor.inError++;
-                logger.error("Unable to recover the process instance "
-                        + processId + ", it will be retry in next recovery.", e);
+                recoveryMonitor.incrementInError();
+                logger.warn(
+                        "Unable to recover the process instance {}, it will be retry in next recovery. Because : {} ",
+                        processId, e.getMessage());
+                logger.debug("Cause", e);
             }
         }
     }

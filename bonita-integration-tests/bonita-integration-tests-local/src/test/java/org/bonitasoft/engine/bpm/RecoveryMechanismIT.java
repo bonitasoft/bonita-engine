@@ -25,14 +25,24 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.tenant.restart.RecoveryService;
 import org.bonitasoft.engine.test.CommonAPILocalIT;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class RecoveryMechanismIT extends CommonAPILocalIT {
 
+    private RecoveryService recoveryService;
+
     @Before
     public void before() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
+        recoveryService = getTenantAccessor().lookup("recoveryService");
+        recoveryService.setConsiderElementsOlderThan("PT0S");
+    }
+
+    @After
+    public void after() {
+        recoveryService.setConsiderElementsOlderThan("PT1H");
     }
 
     @Test
@@ -53,12 +63,10 @@ public class RecoveryMechanismIT extends CommonAPILocalIT {
         assertThat(getProcessAPI().getProcessInstance(processInstance.getId()).getState())
                 .isEqualToIgnoringCase(ProcessInstanceState.STARTED.name());
 
-        RecoveryService recoveryService = getTenantAccessor()
-                .lookup("recoveryService");
-        recoveryService.setConsiderElementsOlderThan("PT0S");
         recoveryService.recoverAllElements();
-        recoveryService.setConsiderElementsOlderThan("PT1H");
 
         waitForProcessToFinish(processInstance);
+
+        recoveryService.recoverAllElements();
     }
 }

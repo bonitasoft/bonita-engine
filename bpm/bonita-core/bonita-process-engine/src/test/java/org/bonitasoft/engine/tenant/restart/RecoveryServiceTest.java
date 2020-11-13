@@ -26,7 +26,15 @@ import static org.mockito.Mockito.*;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -35,9 +43,12 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectFactory;
 
 @ExtendWith(MockitoExtension.class)
 class RecoveryServiceTest {
@@ -54,12 +65,19 @@ class RecoveryServiceTest {
     private ProcessesRecover processesRecover;
     @Mock
     private SessionAccessor sessionAccessor;
+    @Mock(lenient = true)
+    private ObjectFactory<RecoveryMonitor> recoveryMonitorObjectFactory;
+    @Mock
+    private RecoveryMonitor recoveryMonitor;
+    @Spy
+    MeterRegistry meterRegistry = new SimpleMeterRegistry();
 
     @InjectMocks
     private RecoveryService recoveryService;
 
     @BeforeEach
     public void before() throws Exception {
+        doReturn(recoveryMonitor).when(recoveryMonitorObjectFactory).getObject();
         recoveryService.setReadBatchSize(2);
         recoveryService.setBatchRestartSize(1000);
         recoveryService.setConsiderElementsOlderThan(Duration.ofMillis(1000));
@@ -130,6 +148,55 @@ class RecoveryServiceTest {
 
         verify(flowNodesRecover).execute(any(), eq(asList(7L, 9L, 13L)));
         verify(processesRecover).execute(any(), eq(asList(1L, 2L, 4L)));
+    }
+
+    @Test
+    void should_measure_duration_of_recovery() throws Exception {
+        doReturn(singletonList(1L))
+                .doReturn(singletonList(4L))
+                .when(processInstanceService).getProcessInstanceIdsToRecover(any(), any());
+
+        doAnswer(invocationOnMock -> {
+            TimeUnit.MILLISECONDS.sleep(50);
+            return null;
+        }).when(processesRecover).execute(any(), any());
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        executorService.submit(() -> recoveryService.recoverAllElements());
+        Thread.sleep(5);
+        LongTaskTimer longTaskTimer = meterRegistry.find(RecoveryService.DURATION_OF_RECOVERY_TASK).longTaskTimer();
+        assertThat(longTaskTimer.activeTasks()).isEqualTo(1);
+        executorService.shutdownNow();
+    }
+
+    @Test
+    void should_measure_number_of_element_recovered() {
+        Gauge elementsRecoveredLast = meterRegistry.find(RecoveryService.NUMBER_OF_ELEMENTS_RECOVERED_LAST_RECOVERY)
+                .gauge();
+        Counter elementsRecoveredTotal = meterRegistry.find(RecoveryService.NUMBER_OF_ELEMENTS_RECOVERED_TOTAL)
+                .counter();
+        Counter numberOfExecution = meterRegistry.find(RecoveryService.NUMBER_OF_RECOVERY).counter();
+
+        doReturn(5L, 2L, 6L).when(recoveryMonitor).getNumberOfElementRecovered();
+
+        recoveryService.recoverAllElements();
+
+        assertThat(elementsRecoveredLast.value()).isEqualTo(5);
+        assertThat(elementsRecoveredTotal.count()).isEqualTo(5);
+        assertThat(numberOfExecution.count()).isEqualTo(1);
+
+        recoveryService.recoverAllElements();
+
+        assertThat(elementsRecoveredLast.value()).isEqualTo(2);
+        assertThat(elementsRecoveredTotal.count()).isEqualTo(7);
+        assertThat(numberOfExecution.count()).isEqualTo(2);
+
+        recoveryService.recoverAllElements();
+
+        assertThat(elementsRecoveredLast.value()).isEqualTo(6);
+        assertThat(elementsRecoveredTotal.count()).isEqualTo(13);
+        assertThat(numberOfExecution.count()).isEqualTo(3);
     }
 
     private ElementToRecover elementToRecover(long l, ElementToRecover.Type process) {
@@ -208,5 +275,19 @@ class RecoveryServiceTest {
         verify(flowNodesRecover).execute(any(), eq(asList(3L, 4L)));
         verify(flowNodesRecover).execute(any(), eq(singletonList(5L)));
         verify(userTransactionService, times(3)).executeInTransaction(any());
+    }
+
+    @Test
+    void should_recover_elements_using_a_new_RecoveryMonitor() throws Exception {
+        InOrder inOrder = inOrder(recoveryMonitor, flowNodesRecover, processesRecover);
+
+        recoveryService.recover(asList(
+                elementToRecover(1L, FLOWNODE),
+                elementToRecover(2L, PROCESS)));
+
+        inOrder.verify(recoveryMonitor).startNow(2);
+        inOrder.verify(flowNodesRecover).execute(recoveryMonitor, singletonList(1L));
+        inOrder.verify(processesRecover).execute(recoveryMonitor, singletonList(2L));
+        inOrder.verify(recoveryMonitor).printSummary();
     }
 }
