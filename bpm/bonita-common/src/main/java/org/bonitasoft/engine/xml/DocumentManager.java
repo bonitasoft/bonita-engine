@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,28 +45,28 @@ public class DocumentManager {
 
     public static Document generateDocument(final String s)
             throws ParserConfigurationException, SAXException, IOException {
-        final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        final InputStream is = new ByteArrayInputStream(s.getBytes());
-        try {
+        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        final DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
+        try (InputStream is = new ByteArrayInputStream(s.getBytes())) {
             return builder.parse(is, null);
-        } finally {
-            is.close();
         }
     }
 
     public static String getDocumentContent(final Document document)
             throws TransformerFactoryConfigurationError, TransformerException, IOException {
-        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // security-compliant
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); // security-compliant
+        final Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        final StringWriter writer = new StringWriter();
-        try {
+        try (StringWriter writer = new StringWriter()) {
             final StreamResult result = new StreamResult(writer);
             final DOMSource source = new DOMSource(document);
             transformer.transform(source, result);
             return result.getWriter().toString();
-        } finally {
-            writer.close();
         }
     }
 

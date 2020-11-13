@@ -13,14 +13,21 @@
  **/
 package org.bonitasoft.engine.tenant.restart;
 
+import static org.bonitasoft.engine.commons.CollectionUtil.split;
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.FLOWNODE;
 import static org.bonitasoft.engine.tenant.restart.ElementToRecover.Type.PROCESS;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -29,35 +36,66 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ProcessInstanceRecoveryService {
+public class RecoveryService {
+
+    public static final String DURATION_OF_RECOVERY_TASK = "bonita.bpmengine.recovery.duration";
+    public static final String NUMBER_OF_RECOVERY = "bonita.bpmengine.recovery.execution";
+    public static final String NUMBER_OF_ELEMENTS_RECOVERED_LAST_RECOVERY = "bonita.bpmengine.elements.recovered.last";
+    public static final String NUMBER_OF_ELEMENTS_RECOVERED_TOTAL = "bonita.bpmengine.elements.recovered.total";
 
     private final FlowNodeInstanceService flowNodeInstanceService;
     private final ProcessInstanceService processInstanceService;
     private final UserTransactionService userTransactionService;
-    private final ExecuteFlowNodes executeFlowNodes;
-    private final ExecuteProcesses executeProcesses;
+    private final FlowNodesRecover flowNodesRecover;
+    private final ProcessesRecover processesRecover;
     private long tenantId;
     private final SessionAccessor sessionAccessor;
+    private final ObjectFactory<RecoveryMonitor> recoveryMonitorProvider;
     private int readBatchSize;
+    private int batchRestartSize;
     private Duration considerElementsOlderThan;
+    private final LongTaskTimer longTaskTimer;
+    private final Counter numberOfElementsRecoveredTotal;
+    private final Counter numberOfRecoverExecuted;
+    private final AtomicLong numberOfElementsRecoveredDuringTheLastRecover = new AtomicLong();
 
-    public ProcessInstanceRecoveryService(FlowNodeInstanceService flowNodeInstanceService,
+    public RecoveryService(FlowNodeInstanceService flowNodeInstanceService,
             ProcessInstanceService processInstanceService,
             UserTransactionService userTransactionService,
-            ExecuteFlowNodes executeFlowNodes,
-            ExecuteProcesses executeProcesses,
-            SessionAccessor sessionAccessor) {
+            FlowNodesRecover flowNodesRecover,
+            ProcessesRecover processesRecover,
+            SessionAccessor sessionAccessor,
+            ObjectFactory<RecoveryMonitor> recoveryMonitorProvider,
+            MeterRegistry meterRegistry) {
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processInstanceService = processInstanceService;
         this.userTransactionService = userTransactionService;
-        this.executeFlowNodes = executeFlowNodes;
-        this.executeProcesses = executeProcesses;
+        this.flowNodesRecover = flowNodesRecover;
+        this.processesRecover = processesRecover;
         this.sessionAccessor = sessionAccessor;
+        this.recoveryMonitorProvider = recoveryMonitorProvider;
+        Tags tags = Tags.of("tenant", String.valueOf(tenantId));
+
+        this.longTaskTimer = LongTaskTimer
+                .builder(DURATION_OF_RECOVERY_TASK)
+                .description("duration of recovery task").tags(tags)
+                .register(meterRegistry);
+        Gauge.builder(NUMBER_OF_ELEMENTS_RECOVERED_LAST_RECOVERY, numberOfElementsRecoveredDuringTheLastRecover,
+                AtomicLong::doubleValue)
+                .description("number of elements recovered").baseUnit("elements").tags(tags)
+                .register(meterRegistry);
+        numberOfElementsRecoveredTotal = Counter.builder(NUMBER_OF_ELEMENTS_RECOVERED_TOTAL)
+                .baseUnit("elements").description("Total number of elements recovered").tags(tags)
+                .register(meterRegistry);
+        numberOfRecoverExecuted = Counter.builder(NUMBER_OF_RECOVERY)
+                .baseUnit("executions").description("Number of recovery executed").tags(tags)
+                .register(meterRegistry);
     }
 
     @Value("${bonita.tenant.recover.read_batch_size:5000}")
@@ -68,6 +106,11 @@ public class ProcessInstanceRecoveryService {
     @Value("${bonita.tenant.recover.consider_elements_older_than:PT1H}")
     public void setConsiderElementsOlderThan(String considerElementsOlderThan) {
         setConsiderElementsOlderThan(Duration.parse(considerElementsOlderThan));
+    }
+
+    @Value("${bonita.tenant.work.batch_restart_size:1000}")
+    public void setBatchRestartSize(int batchRestartSize) {
+        this.batchRestartSize = batchRestartSize;
     }
 
     @Value("${tenantId}")
@@ -104,14 +147,42 @@ public class ProcessInstanceRecoveryService {
      * @param elementsToRecover elements needs to be recovered
      */
     public void recover(List<ElementToRecover> elementsToRecover) {
-        executeFlowNodes.executeFlowNodes(elementsToRecover.stream()
-                .filter(e -> e.getType() == FLOWNODE)
-                .map(ElementToRecover::getId)
-                .collect(Collectors.toList()));
-        executeProcesses.execute(elementsToRecover.stream()
+        RecoveryMonitor recoveryMonitor = recoveryMonitorProvider.getObject();
+        recoveryMonitor.startNow(elementsToRecover.size());
+        executeInBatch(recoveryMonitor, elementsToRecover.stream()
+                .filter(e1 -> e1.getType() == FLOWNODE)
+                .collect(Collectors.toList()), ids -> flowNodesRecover.execute(recoveryMonitor, ids));
+        executeInBatch(recoveryMonitor, elementsToRecover.stream()
                 .filter(e -> e.getType() == PROCESS)
-                .map(ElementToRecover::getId)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()), ids -> processesRecover.execute(recoveryMonitor, ids));
+
+        recoveryMonitor.printSummary();
+        long numberOfElementRecovered = recoveryMonitor.getNumberOfElementRecovered();
+        numberOfElementsRecoveredTotal.increment(numberOfElementRecovered);
+        numberOfElementsRecoveredDuringTheLastRecover.set(numberOfElementRecovered);
+        numberOfRecoverExecuted.increment();
+    }
+
+    protected void executeInBatch(RecoveryMonitor recoveryMonitor, List<ElementToRecover> elements,
+            BatchExecution execution) {
+        for (List<ElementToRecover> batchElementsIds : split(elements, batchRestartSize)) {
+            try {
+                userTransactionService.executeInTransaction(() -> {
+                    execution.execute(
+                            batchElementsIds.stream().map(ElementToRecover::getId).collect(Collectors.toList()));
+                    return null;
+                });
+            } catch (Exception e) {
+                log.warn(
+                        "Error processing batch of elements to recover, they will be recovered next time: {}, Cause: {}: {}",
+                        batchElementsIds, e.getClass().getName(), e.getMessage());
+                log.debug("Cause", e);
+            }
+            if (batchElementsIds.size() == batchRestartSize) {
+                // only print progress when there is more than one page
+                recoveryMonitor.printProgress();
+            }
+        }
     }
 
     /**
@@ -119,16 +190,17 @@ public class ProcessInstanceRecoveryService {
      * Only recover elements older than a duration configured with {@link #setConsiderElementsOlderThan(String)}.
      */
     public void recoverAllElements() {
-        try {
-            sessionAccessor.setTenantId(tenantId);
-            List<ElementToRecover> allElementsToRecover = userTransactionService.executeInTransaction(
-                    () -> ProcessInstanceRecoveryService.this.getAllElementsToRecover(considerElementsOlderThan));
-            log.info("Found {} that can potentially be recovered", allElementsToRecover.size());
-            recover(allElementsToRecover);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
+        longTaskTimer.record(() -> {
+            try {
+                sessionAccessor.setTenantId(tenantId);
+                List<ElementToRecover> allElementsToRecover = userTransactionService.executeInTransaction(
+                        () -> RecoveryService.this.getAllElementsToRecover(considerElementsOlderThan));
+                log.debug("Found {} that can potentially be recovered", allElementsToRecover.size());
+                recover(allElementsToRecover);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private List<ElementToRecover> getAllFlowNodeInstancesToRecover(Duration considerElementsOlderThan)
@@ -138,13 +210,13 @@ public class ProcessInstanceRecoveryService {
         // As we retrieve only the id we can use a greater page size
         QueryOptions queryOptions = new QueryOptions(0, readBatchSize);
         List<Long> ids;
-        log.info("Start detecting flow nodes to restart...");
+        log.debug("Start detecting flow nodes to restart...");
         do {
             ids = flowNodeInstanceService.getFlowNodeInstanceIdsToRecover(considerElementsOlderThan, queryOptions);
             flownodesToRestart.addAll(ids);
             queryOptions = QueryOptions.getNextPage(queryOptions);
         } while (ids.size() == queryOptions.getNumberOfResults());
-        log.info("Found {} flow nodes to restart", flownodesToRestart.size());
+        log.debug("Found {} flow nodes to restart", flownodesToRestart.size());
         return flownodesToRestart
                 .stream()
                 .map(id -> ElementToRecover.builder().id(id).type(FLOWNODE).build())
@@ -165,6 +237,11 @@ public class ProcessInstanceRecoveryService {
         return ids
                 .stream().map(id -> ElementToRecover.builder().id(id).type(PROCESS).build())
                 .collect(Collectors.toList());
+    }
+
+    private interface BatchExecution {
+
+        void execute(List<Long> ids) throws Exception;
     }
 
 }

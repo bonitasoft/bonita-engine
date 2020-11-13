@@ -20,26 +20,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ProcessInstanceRecoveryScheduler {
+public class RecoveryScheduler {
 
     private final TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
-    private final ProcessInstanceRecoveryService processInstanceRecoveryService;
+    private final RecoveryService recoveryService;
 
-    ProcessInstanceRecoveryScheduler(TenantElementsRestartSupervisor tenantElementsRestartSupervisor,
-            ProcessInstanceRecoveryService processInstanceRecoveryService) {
+    RecoveryScheduler(TenantElementsRestartSupervisor tenantElementsRestartSupervisor,
+            RecoveryService recoveryService) {
         this.tenantElementsRestartSupervisor = tenantElementsRestartSupervisor;
-        this.processInstanceRecoveryService = processInstanceRecoveryService;
+        this.recoveryService = recoveryService;
     }
 
     @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT30M}", initialDelayString = "${bonita.tenant.recover.delay_before_first_recovery:PT2H}")
     public void triggerRecoveryAllElements() {
         try {
             if (tenantElementsRestartSupervisor.isResponsibleForRecovery()) {
-                log.info("Starting periodic recovery of elements...");
-                processInstanceRecoveryService.recoverAllElements();
-                log.info("Completed periodic recovery of elements.");
+                log.debug("Starting periodic recovery of elements...");
+                recoveryService.recoverAllElements();
+                log.debug("Completed periodic recovery of elements.");
             } else {
-                log.info("Periodic recovery of elements not executed, an other node is responsible for it.");
+                log.debug("Periodic recovery of elements not executed, an other node is responsible for it.");
             }
         } catch (Exception e) {
             log.warn("Recovery of elements failed because of {} - {},  it will be re executed soon",

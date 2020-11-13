@@ -24,17 +24,17 @@ import org.slf4j.LoggerFactory;
 
 public class ArtifactTypeDetector {
 
-    private static Logger logger = LoggerFactory.getLogger(ArtifactTypeDetector.class);
+    private static final Logger logger = LoggerFactory.getLogger(ArtifactTypeDetector.class);
 
     private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.0";
     private static final String REST_API_EXTENSION_CONTENT_TYPE = "apiExtension";
 
-    private XmlDetector xmlDetector;
-    private CustomPageDetector customPageDetector;
-    private ProcessDetector processDetector;
-    private ThemeDetector themeDetector;
-    private PageAndFormDetector pageAndFormDetector;
-    private LayoutDetector layoutDetector;
+    private final XmlDetector xmlDetector;
+    private final CustomPageDetector customPageDetector;
+    private final ProcessDetector processDetector;
+    private final ThemeDetector themeDetector;
+    private final PageAndFormDetector pageAndFormDetector;
+    private final LayoutDetector layoutDetector;
 
     public ArtifactTypeDetector(XmlDetector xmlDetector, CustomPageDetector customPageDetector,
             ProcessDetector processDetector,

@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipOutputStream;
@@ -108,7 +109,6 @@ public class BusinessArchiveFactory {
      *        the {@link BusinessArchive} to write
      * @param businessArchiveFile
      *        the folder into the business archive must be written
-     * @throws IOException
      */
     public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile)
             throws IOException {
@@ -119,11 +119,6 @@ public class BusinessArchiveFactory {
      * Save the uncompressed business archive folder to a compressed file.
      * <p>
      * this file can then be read using {@link #readBusinessArchive(File)}
-     *
-     * @param destFile
-     * @param folderPath
-     * @return
-     * @throws IOException
      */
     public static String businessArchiveFolderToFile(final File destFile, final String folderPath) throws IOException {
         return INSTANCE.businessArchiveFolderToFile(destFile, folderPath, contributions);
@@ -134,9 +129,7 @@ public class BusinessArchiveFactory {
     protected BusinessArchive readBusinessArchive(final InputStream inputStream,
             List<BusinessArchiveContribution> contributions)
             throws IOException, InvalidBusinessArchiveFormatException {
-        File barFolder = File.createTempFile("tempBarFolder", null);
-        barFolder.delete();
-        barFolder.mkdir();
+        File barFolder = Files.createTempDirectory("tempBarFolder").toFile();
         try {
             IOUtil.unzipToFolder(inputStream, barFolder);
             return getBusinessArchive(barFolder, contributions);
@@ -193,10 +186,7 @@ public class BusinessArchiveFactory {
 
     protected void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile,
             List<BusinessArchiveContribution> contributions) throws IOException {
-        final File tempFile = File.createTempFile("tempBarFolder", null);
-
-        tempFile.delete();
-        tempFile.mkdir();
+        final File tempFile = Files.createTempDirectory("tempBarFolder").toFile();
         try {
             writeBusinessArchiveToFolder(businessArchive, tempFile);
             zipBarFolder(businessArchiveFile, tempFile);

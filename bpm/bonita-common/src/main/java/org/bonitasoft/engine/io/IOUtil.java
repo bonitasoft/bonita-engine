@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URL;
 import java.nio.MappedByteBuffer;
@@ -70,16 +69,14 @@ public class IOUtil {
     public static final String FILE_ENCODING = "UTF-8";
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final int BUFFER_SIZE = 100000;
-    private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
+    private static final String CLASS_EXT = ".class";
 
     public static byte[] generateJar(final Class<?>... classes) throws IOException {
         return generateJar(getResources(classes));
     }
 
     public static byte[] generateJar(String className, String... content) throws IOException {
-        File root = File.createTempFile("tempCompile", "");
-        root.delete();
-        root.mkdir();
+        File root = Files.createTempDirectory("tempCompile").toFile();
         File sourceFile = new File(root, className + ".java");
         Files.write(sourceFile.toPath(), String.join("\n", content).getBytes(StandardCharsets.UTF_8));
 
@@ -88,9 +85,9 @@ public class IOUtil {
         if (run != 0) {
             throw new IllegalArgumentException("Unable to compile the file, see logs");
         }
-        byte[] bytes = Files.readAllBytes(root.toPath().resolve(className + ".class"));
+        byte[] bytes = Files.readAllBytes(root.toPath().resolve(className + CLASS_EXT));
 
-        return generateJar(singletonMap(className + ".class", bytes));
+        return generateJar(singletonMap(className + CLASS_EXT, bytes));
     }
 
     public static Map<String, byte[]> getResources(final Class<?>... classes) throws IOException {
@@ -100,9 +97,9 @@ public class IOUtil {
         }
         final Map<String, byte[]> resources = new HashMap<>();
         for (final Class<?> clazz : classes) {
-            resources.put(clazz.getName().replace(".", "/") + ".class", getClassData(clazz));
+            resources.put(clazz.getName().replace(".", "/") + CLASS_EXT, getClassData(clazz));
             for (final Class<?> internalClass : clazz.getDeclaredClasses()) {
-                resources.put(internalClass.getName().replace(".", "/") + ".class", getClassData(internalClass));
+                resources.put(internalClass.getName().replace(".", "/") + CLASS_EXT, getClassData(internalClass));
             }
         }
         return resources;
@@ -113,7 +110,7 @@ public class IOUtil {
             final String message = "Class is null";
             throw new IOException(message);
         }
-        final String resource = clazz.getName().replace('.', '/') + ".class";
+        final String resource = clazz.getName().replace('.', '/') + CLASS_EXT;
         byte[] data;
         try (InputStream inputStream = clazz.getClassLoader().getResourceAsStream(resource)) {
             if (inputStream == null) {

@@ -26,48 +26,48 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessInstanceRecoverySchedulerTest {
+class RecoverySchedulerTest {
 
     @Mock
     TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
     @Mock
-    ProcessInstanceRecoveryService processInstanceRecoveryService;
+    RecoveryService recoveryService;
     @InjectMocks
-    ProcessInstanceRecoveryScheduler processInstanceRecoveryScheduler;
+    RecoveryScheduler recoveryScheduler;
 
     @Test
     void should_recover_elements_when_node_is_responsible_for_recovery() {
         when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(true);
 
-        processInstanceRecoveryScheduler.triggerRecoveryAllElements();
+        recoveryScheduler.triggerRecoveryAllElements();
 
-        verify(processInstanceRecoveryService).recoverAllElements();
+        verify(recoveryService).recoverAllElements();
     }
 
     @Test
     void should_not_recover_elements_when_node_is_not_responsible_for_recovery() {
         when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(false);
 
-        processInstanceRecoveryScheduler.triggerRecoveryAllElements();
+        recoveryScheduler.triggerRecoveryAllElements();
 
-        verify(processInstanceRecoveryService, never()).recoverAllElements();
+        verify(recoveryService, never()).recoverAllElements();
     }
 
     @Test
     void should_catch_exception_on_error_during_call_of_isResponsibleForRecovery() {
         when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenThrow(new IllegalStateException("BAD"));
 
-        processInstanceRecoveryScheduler.triggerRecoveryAllElements();
+        recoveryScheduler.triggerRecoveryAllElements();
 
-        verify(processInstanceRecoveryService, never()).recoverAllElements();
+        verify(recoveryService, never()).recoverAllElements();
     }
 
     @Test
     void should_catch_exception_on_error_during_calls_of_triggerRecoveryAllElements() {
         when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(true);
-        doThrow(new IllegalStateException("BAD")).when(processInstanceRecoveryService).recoverAllElements();
+        doThrow(new IllegalStateException("BAD")).when(recoveryService).recoverAllElements();
 
-        processInstanceRecoveryScheduler.triggerRecoveryAllElements();
+        recoveryScheduler.triggerRecoveryAllElements();
 
         //no exception
     }
