@@ -418,6 +418,16 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
+    public <T> T lookup(final Class<T> beanClass) throws NotFoundException {
+        try {
+
+            return beanAccessor.getService(beanClass);
+        } catch (NoSuchBeanDefinitionException e) {
+            throw new NotFoundException(e);
+        }
+    }
+
+    @Override
     public PermissionService getPermissionService() {
         return beanAccessor.getService(PermissionService.class);
     }

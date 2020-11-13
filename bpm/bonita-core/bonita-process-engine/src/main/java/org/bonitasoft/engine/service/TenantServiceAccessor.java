@@ -217,6 +217,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     <T> T lookup(String serviceName) throws NotFoundException;
 
+    <T> T lookup(Class<T> beanClass) throws NotFoundException;
+
     GatewayInstanceService getGatewayInstanceService();
 
     void destroy();
