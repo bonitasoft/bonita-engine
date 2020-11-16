@@ -114,8 +114,7 @@ public class MonitoringConfigTest {
 
         @Test
         public void should_provide_ExecutorServiceMeterBinder() {
-            assertThat(executorServiceMetricsProvider)
-                    .isInstanceOf(DefaultExecutorServiceMetricsProvider.class);
+            assertThat(executorServiceMetricsProvider).isInstanceOf(DefaultExecutorServiceMetricsProvider.class);
         }
 
         @Test
@@ -123,6 +122,7 @@ public class MonitoringConfigTest {
             final Statistics stats = mock(Statistics.class);
             doReturn(true).when(stats).isStatisticsEnabled();
             doReturn(stats).when(sessionFactory).getStatistics();
+            doReturn(new String[0]).when(stats).getSecondLevelCacheRegionNames();
 
             hibernateMetricsBinder.bindMetrics(sessionFactory);
             assertThat(meterRegistry.find("hibernate.query.natural.id.executions.max").gauge()).isNotNull();
