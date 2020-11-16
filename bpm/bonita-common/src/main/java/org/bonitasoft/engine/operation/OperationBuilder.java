@@ -277,12 +277,12 @@ public class OperationBuilder {
     }
 
     /**
-     * Creates a new operation that sets a new value to a String search index.
+     * Creates a new operation that sets a new value to a String search key, also known as string index.
      *
      * @param index
-     *        the search index to set
+     *        the search key to set
      * @param setValue
-     *        the Expression to set the search index to.
+     *        the Expression to set the search key to.
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetStringIndexOperation(final int index, final Expression setValue) {

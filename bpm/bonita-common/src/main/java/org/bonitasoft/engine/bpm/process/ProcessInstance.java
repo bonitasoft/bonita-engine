@@ -134,55 +134,55 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     long getCallerId();
 
     /**
-     * This field is used to extend the meta data of the process instance.
-     * It's the value corresponding to the string index label.
-     * Return an empty string, if there is no first string index.
+     * Also known as search key, this field is used to extend the meta data of the process instance.
+     * It's the value corresponding to the search key label.
+     * Return an empty string, if there is no first search key.
      *
-     * @return The first string index of this process instance.
+     * @return The first search key of this process instance.
      * @see ProcessInstance#getStringIndexLabel(int)
      * @since 6.0.0
      */
     String getStringIndex1();
 
     /**
-     * This field is used to extend the meta data of the process instance.
-     * It's the value corresponding to the string index label.
-     * Return an empty string, if there is no second string index.
+     * Also known as search key, this field is used to extend the meta data of the process instance.
+     * It's the value corresponding to the search key label.
+     * Return an empty string, if there is no second search key.
      *
-     * @return The second string index of this process instance.
+     * @return The second search key of this process instance.
      * @see ProcessInstance#getStringIndexLabel(int)
      * @since 6.0.0
      */
     String getStringIndex2();
 
     /**
-     * This field is used to extend the meta data of the process instance.
-     * It's the value corresponding to the string index label.
-     * Return an empty string, if there is no third string index.
+     * Also known as search key, this field is used to extend the meta data of the process instance.
+     * It's the value corresponding to the search key label.
+     * Return an empty string, if there is no third search key.
      *
-     * @return The third string index of this process instance.
+     * @return The third search key of this process instance.
      * @see ProcessInstance#getStringIndexLabel(int)
      * @since 6.0.0
      */
     String getStringIndex3();
 
     /**
-     * This field is used to extend the meta data of the process instance.
-     * It's the value corresponding to the string index label.
-     * Return an empty string, if there is no fourth string index.
+     * Also known as search key, this field is used to extend the meta data of the process instance.
+     * It's the value corresponding to the search key label.
+     * Return an empty string, if there is no fourth search key.
      *
-     * @return The fourth string index of this process instance.
+     * @return The fourth search key of this process instance.
      * @see ProcessInstance#getStringIndexLabel(int)
      * @since 6.0.0
      */
     String getStringIndex4();
 
     /**
-     * This field is used to extend the meta data of the process instance.
-     * It's the value corresponding to the string index label.
-     * Return an empty string, if there is no fifth string index.
+     * Also known as search key, this field is used to extend the meta data of the process instance.
+     * It's the value corresponding to the search key label.
+     * Return an empty string, if there is no fifth search key.
      *
-     * @return The fifth string index of this process instance.
+     * @return The fifth search key of this process instance.
      * @see ProcessInstance#getStringIndexLabel(int)
      * @since 6.0.0
      */
@@ -193,7 +193,7 @@ public interface ProcessInstance extends NamedElement, BaseElement {
      *
      * @param index
      *        The index of the label
-     * @return The label of the string index corresponding to the parameter
+     * @return The label of the search key corresponding to the parameter
      * @exception IndexOutOfBoundsException
      *            It's thrown if the parameter is not between 1 and 5.
      * @since 6.0.0
