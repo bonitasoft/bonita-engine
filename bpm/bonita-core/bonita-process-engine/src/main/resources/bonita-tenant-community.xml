@@ -1288,7 +1288,7 @@
         <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
     </bean>
 
-    <bean id="tenantTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl">
+    <bean id="tenantTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" primary="true">
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 

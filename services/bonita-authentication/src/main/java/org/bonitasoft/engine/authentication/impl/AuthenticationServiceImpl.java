@@ -24,7 +24,6 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -44,8 +43,7 @@ public class AuthenticationServiceImpl implements GenericAuthenticationService {
 
     private final TechnicalLoggerService logger;
 
-    public AuthenticationServiceImpl(final IdentityService identityService,
-            @Qualifier("tenantTechnicalLoggerService") final TechnicalLoggerService logger) {
+    public AuthenticationServiceImpl(final IdentityService identityService, final TechnicalLoggerService logger) {
         this.identityService = identityService;
         this.logger = logger;
     }
