@@ -277,7 +277,7 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
                 stringIndexLabel5 = label;
                 break;
             default:
-                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+                throw new IndexOutOfBoundsException("search key label must be between 1 and 5 (included)");
         }
     }
 
@@ -295,7 +295,7 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
             case 5:
                 return stringIndexLabel5;
             default:
-                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+                throw new IndexOutOfBoundsException("search key label must be between 1 and 5 (included)");
         }
     }
 

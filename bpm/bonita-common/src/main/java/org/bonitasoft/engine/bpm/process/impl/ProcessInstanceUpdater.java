@@ -29,23 +29,23 @@ public class ProcessInstanceUpdater implements Serializable {
 
     public enum ProcessInstanceField {
         /**
-         * Corresponding to the first string index
+         * Corresponding to the first search key
          */
         STRING_INDEX_1,
         /**
-         * Corresponding to the second string index
+         * Corresponding to the second search key
          */
         STRING_INDEX_2,
         /**
-         * Corresponding to the third string index
+         * Corresponding to the third search key
          */
         STRING_INDEX_3,
         /**
-         * Corresponding to the fourth string index
+         * Corresponding to the fourth search key
          */
         STRING_INDEX_4,
         /**
-         * Corresponding to the fifth string index
+         * Corresponding to the fifth search key
          */
         STRING_INDEX_5
     }
@@ -60,50 +60,50 @@ public class ProcessInstanceUpdater implements Serializable {
     }
 
     /**
-     * Set the new value for the first string index.
+     * Set the new value for the first search key, also known as string index.
      *
      * @param stringIndex
-     *        The new value for the first string index.
+     *        The new value for the first search key.
      */
     public void setStringIndex1(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_1, stringIndex);
     }
 
     /**
-     * Set the new value for the second string index.
+     * Set the new value for the second search key, also known as string index.
      *
      * @param stringIndex
-     *        The new value for the second string index.
+     *        The new value for the second search key.
      */
     public void setStringIndex2(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_2, stringIndex);
     }
 
     /**
-     * Set the new value for the third string index.
+     * Set the new value for the third search key, also known as string index.
      *
      * @param stringIndex
-     *        The new value for the third string index.
+     *        The new value for the third search key.
      */
     public void setStringIndex3(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_3, stringIndex);
     }
 
     /**
-     * Set the new value for the fourth string index.
+     * Set the new value for the fourth search key, also known as string index.
      *
      * @param stringIndex
-     *        The new value for the fourth string index.
+     *        The new value for the fourth search keyx.
      */
     public void setStringIndex4(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_4, stringIndex);
     }
 
     /**
-     * Set the new value for the fifth string index.
+     * Set the new value for the fifth search key, also known as string index.
      *
      * @param stringIndex
-     *        The new value for the fifth string index.
+     *        The new value for the fifth search key.
      */
     public void setStringIndex5(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_5, stringIndex);

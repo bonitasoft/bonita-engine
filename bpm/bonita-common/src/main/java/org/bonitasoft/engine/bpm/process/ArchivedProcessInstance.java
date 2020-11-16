@@ -150,7 +150,7 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
      *
      * @param index
      *        The index of the value
-     * @return The value of the string index corresponding to the parameter
+     * @return The value of the search key corresponding to the parameter
      * @exception IndexOutOfBoundsException
      *            It's thrown if the parameter is not between 1 and 5.
      * @since 6.4.0
@@ -162,7 +162,7 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
      *
      * @param index
      *        The index of the label
-     * @return The label of the string index corresponding to the parameter
+     * @return The label of the search key corresponding to the parameter
      * @exception IndexOutOfBoundsException
      *            It's thrown if the parameter is not between 1 and 5.
      * @since 6.4.0

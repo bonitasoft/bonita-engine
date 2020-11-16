@@ -135,27 +135,27 @@ public class ProcessInstanceSearchDescriptor {
     public static final String CALLER_ID = "callerId";
 
     /**
-     * The field corresponding to the first string index of the process instance.
+     * The field corresponding to the first search key of the process instance.
      */
     public static final String STRING_INDEX_1 = "index1";
 
     /**
-     * The field corresponding to the second string index of the process instance.
+     * The field corresponding to the second search key of the process instance.
      */
     public static final String STRING_INDEX_2 = "index2";
 
     /**
-     * The field corresponding to the third string index of the process instance.
+     * The field corresponding to the third search key of the process instance.
      */
     public static final String STRING_INDEX_3 = "index3";
 
     /**
-     * The field corresponding to the fourth string index of the process instance.
+     * The field corresponding to the fourth search key of the process instance.
      */
     public static final String STRING_INDEX_4 = "index4";
 
     /**
-     * The field corresponding to the fifth string index of the process instance.
+     * The field corresponding to the fifth search key of the process instance.
      */
     public static final String STRING_INDEX_5 = "index5";
 

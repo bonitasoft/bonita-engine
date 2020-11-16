@@ -30,7 +30,7 @@ import org.bonitasoft.engine.expression.Expression;
  * <li>description</li>
  * <li>parameters</li>
  * <li>actors</li>
- * <li>search indexes</li>
+ * <li>search keys</li>
  * </ul>
  *
  * @author Matthieu Chaffotte
@@ -116,59 +116,58 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     ActorDefinition getActorInitiator();
 
     /**
-     * Retrieves the label for the ProcessDefinition given search index.
+     * Retrieves the label for the ProcessDefinition given search key, also known as string index.
      * <p>
-     * You can define up to five search indexes for a process. See more at <a
+     * You can define up to five search keys for a process. See more at <a
      * href="http://documentation.bonitasoft.com/bonita/current/define-a-search-index">Define a search
-     * index</a> Bonitasoft documentation page
+     * key</a> Bonitasoft documentation page
      * </p>
      *
      * @param index
-     *        The position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
+     *        The position of search key to retrieve. Valid values are between 1 and 5 (inclusive)
      * @throws IndexOutOfBoundsException if index is invalid
-     * @return The label the Expression of the search index
+     * @return The label of the search key
      */
-
     String getStringIndexLabel(int index);
 
     /**
-     * Retrieves the label list for the ProcessDefinition given search index.
+     * Retrieves the label list for the ProcessDefinition given search key, also known as string index.
      * <p>
-     * You can define up to five search indexes for a process. See more at <a
+     * You can define up to five search keys for a process. See more at <a
      * href="http://documentation.bonitasoft.com/bonita/current/define-a-search-index">Define a search
-     * index</a> Bonitasoft documentation page
+     * key</a> Bonitasoft documentation page
      * </p>
      *
      * @throws IndexOutOfBoundsException if index is invalid
-     * @return The label list of the search index
+     * @return The label list of the search keys
      */
 
     List<String> getStringIndexLabels();
 
     /**
-     * Retrieves the Expression for the ProcessDefinition given search index.
+     * Retrieves the Expression for the ProcessDefinition given search key, also known as string index.
      * <p>
-     * You can define up to five search indexes for a process. See more at <a
+     * You can define up to five search keys for a process. See more at <a
      * href="http://documentation.bonitasoft.com/bonita/current/define-a-search-index">Define a search
-     * index</a> Bonitasoft documentation page
+     * key</a> Bonitasoft documentation page
      * </p>
      *
      * @param index
-     *        The position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
+     *        The position of search key to retrieve. Valid values are between 1 and 5 (inclusive)
      * @throws IndexOutOfBoundsException if index is invalid
-     * @return The {@link Expression} of the search index
+     * @return The {@link Expression} of the search key
      */
     Expression getStringIndexValue(int index);
 
     /**
-     * Retrieves the Expression list of the ProcessDefinition search index values.
+     * Retrieves the Expression list of the ProcessDefinition search key values, also known as string index.
      * <p>
-     * You can define up to five search indexes for a process. See more at <a
+     * You can define up to five search keys for a process. See more at <a
      * href="http://documentation.bonitasoft.com/bonita/current/define-a-search-index">Define a search
-     * index</a> Bonitasoft documentation page
+     * key</a> Bonitasoft documentation page
      * </p>
      *
-     * @return The {@link Expression} list of the search index
+     * @return The {@link Expression} list of the search keys
      */
     List<Expression> getStringIndexValues();
 
