@@ -54,11 +54,12 @@ public class ApplicationModelConverter {
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
+        final long now = System.currentTimeMillis();
         return SApplication.builder().token((String) fields.get(ApplicationField.TOKEN))
                 .displayName((String) fields.get(ApplicationField.DISPLAY_NAME))
                 .version((String) fields.get(ApplicationField.VERSION))
-                .creationDate(System.currentTimeMillis())
-                .lastUpdateDate(System.currentTimeMillis())
+                .creationDate(now)
+                .lastUpdateDate(now)
                 .createdBy(creatorUserId)
                 .state(SApplicationState.ACTIVATED.name())
                 .layoutId(getLayoutId(creator))
