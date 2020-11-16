@@ -31,7 +31,6 @@ import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.WorkService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,7 +51,7 @@ public class ProcessesRecover {
     private final BPMWorkFactory workFactory;
 
     public ProcessesRecover(WorkService workService,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            TechnicalLoggerService logger,
             ActivityInstanceService activityInstanceService,
             ProcessDefinitionService processDefinitionService,
             ProcessInstanceService processInstanceService,

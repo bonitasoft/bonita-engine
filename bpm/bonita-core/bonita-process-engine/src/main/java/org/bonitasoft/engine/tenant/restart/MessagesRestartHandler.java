@@ -21,7 +21,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +38,7 @@ public class MessagesRestartHandler implements TenantRestartHandler {
     private MessagesHandlingService messagesHandlingService;
 
     public MessagesRestartHandler(
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService technicalLoggerService,
+            TechnicalLoggerService technicalLoggerService,
             EventInstanceRepository eventInstanceRepository, UserTransactionService userTransactionService,
             MessagesHandlingService messagesHandlingService) {
         this.technicalLoggerService = technicalLoggerService;
