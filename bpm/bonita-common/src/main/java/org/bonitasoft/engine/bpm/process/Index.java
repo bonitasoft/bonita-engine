@@ -28,23 +28,23 @@ package org.bonitasoft.engine.bpm.process;
 public enum Index {
 
     /**
-     * Corresponding to the first string index
+     * Corresponding to the first search key
      */
     FIRST,
     /**
-     * Corresponding to the second string index
+     * Corresponding to the second search key
      */
     SECOND,
     /**
-     * Corresponding to the third string index
+     * Corresponding to the third search key
      */
     THIRD,
     /**
-     * Corresponding to the fourth string index
+     * Corresponding to the fourth search key
      */
     FOURTH,
     /**
-     * Corresponding to the fifth string index
+     * Corresponding to the fifth search key
      */
     FIFTH
 }

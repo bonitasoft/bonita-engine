@@ -36,7 +36,7 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
 
     private final long tenantId;
 
-    public EhCacheCacheService(@Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+    public EhCacheCacheService(TechnicalLoggerService logger,
             List<CacheConfiguration> cacheConfigurations,
             @Qualifier("defaultTenantCacheConfiguration") CacheConfiguration defaultCacheConfiguration,
             @Value("java.io.tmpdir/tenant.${tenantId}.cache") String diskStorePath,

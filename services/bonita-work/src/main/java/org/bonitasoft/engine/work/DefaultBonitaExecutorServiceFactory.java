@@ -26,7 +26,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +57,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     private final ExecutorServiceMetricsProvider executorServiceMetricsProvider;
 
     public DefaultBonitaExecutorServiceFactory(
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            TechnicalLoggerService logger,
             WorkFactory workFactory,
             @Value("${tenantId}") long tenantId,
             @Value("${bonita.tenant.work.corePoolSize}") int corePoolSize,

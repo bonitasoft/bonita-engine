@@ -26,7 +26,6 @@ import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
@@ -53,7 +52,7 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
     private BonitaExecutorService executor;
 
     public RetryingWorkExecutorService(BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService loggerService,
+            TechnicalLoggerService loggerService,
             EngineClock engineClock,
             @Value("${bonita.tenant.work.terminationTimeout}") long workTerminationTimeout,
             @Value("${bonita.tenant.work.maxRetry}") int maxRetry,

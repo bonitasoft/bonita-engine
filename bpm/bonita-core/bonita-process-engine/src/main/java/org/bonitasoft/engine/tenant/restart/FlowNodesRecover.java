@@ -29,7 +29,6 @@ import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.WorkService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,7 +49,7 @@ public class FlowNodesRecover {
     private final FlowNodeStateManager flowNodeStateManager;
 
     public FlowNodesRecover(WorkService workService,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            TechnicalLoggerService logger,
             ActivityInstanceService activityInstanceService,
             FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory) {
         this.workService = workService;

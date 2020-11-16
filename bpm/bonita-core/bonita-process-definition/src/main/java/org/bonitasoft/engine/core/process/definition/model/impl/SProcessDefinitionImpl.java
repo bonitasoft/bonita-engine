@@ -180,7 +180,7 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
             case 5:
                 return stringIndexLabel5;
             default:
-                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+                throw new IndexOutOfBoundsException("search key label must be between 1 and 5 (included)");
         }
     }
 
@@ -207,7 +207,7 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
                 stringIndexValue5 = initialValue;
                 break;
             default:
-                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+                throw new IndexOutOfBoundsException("search key label must be between 1 and 5 (included)");
         }
     }
 
@@ -225,7 +225,7 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
             case 5:
                 return stringIndexValue5;
             default:
-                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+                throw new IndexOutOfBoundsException("search key label must be between 1 and 5 (included)");
         }
     }
 

@@ -19,7 +19,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,7 +38,7 @@ public class WorkServiceImpl implements WorkService {
     private final EngineClock engineClock;
 
     public WorkServiceImpl(UserTransactionService transactionService,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService loggerService,
+            TechnicalLoggerService loggerService,
             SessionAccessor sessionAccessor,
             WorkExecutorService workExecutorService,
             EngineClock engineClock) {

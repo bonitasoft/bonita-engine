@@ -35,7 +35,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -58,7 +57,7 @@ public class OperationServiceImpl implements OperationService {
             List<LeftOperandHandler> leftOperandHandlers,
             ExpressionResolverService expressionResolverService,
             PersistRightOperandResolver persistRightOperandResolver,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger) {
+            TechnicalLoggerService logger) {
         super();
         this.operationExecutorStrategyProvider = operationExecutorStrategyProvider;
         this.expressionResolverService = expressionResolverService;

@@ -20,7 +20,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
 import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +37,7 @@ public class ProfilesUpdaterRestartHandler implements TenantRestartHandler {
     private TransactionService transactionService;
 
     public ProfilesUpdaterRestartHandler(@Value("${tenantId}") Long tenantId,
-            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            TechnicalLoggerService logger,
             ProfilesImporter profileImporter, TransactionService transactionService) {
         this.tenantId = tenantId;
         this.logger = logger;

@@ -58,15 +58,15 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
             index = Integer.parseInt(name);
         } catch (final NumberFormatException e) {
             throw new SOperationExecutionException(
-                    "name of left operand for string index operation must be 1,2,3,4 or 5 but was " + name);
+                    "name of left operand for search key operation must be 1,2,3,4 or 5 but was " + name);
         }
         if (index < 1 || index > 5) {
             throw new SOperationExecutionException(
-                    "name of left operand for string index operation must be 1,2,3,4 or 5 but was " + name);
+                    "name of left operand for search key operation must be 1,2,3,4 or 5 but was " + name);
         }
         if (newValue != null && !(newValue instanceof String)) {
             throw new SOperationExecutionException(
-                    "expression of string index operation must return a string, was:" + newValue.getClass().getName());
+                    "expression of search key operation must return a string, was:" + newValue.getClass().getName());
         }
         try {
             SProcessInstance processInstance;
@@ -99,7 +99,7 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
     @Override
     public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        throw new SOperationExecutionException("Deleting a string index is not supported");
+        throw new SOperationExecutionException("Deleting a search key is not supported");
     }
 
     @Override

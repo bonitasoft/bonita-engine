@@ -3056,13 +3056,13 @@ public interface ProcessRuntimeAPI {
             throws ProcessInstanceNotFoundException, UpdateException;
 
     /**
-     * Update a string index of a process instance.
+     * Update a search key of a process instance, also known as string index.
      *
      * @param processInstanceId
      *        identifier of the process instance
-     * @param index the string {@link Index} to update
+     * @param index the search to update
      * @param value
-     *        the new value for the string index
+     *        the new value for the search key
      * @return the updated process instance
      * @throws ProcessInstanceNotFoundException
      *         Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
