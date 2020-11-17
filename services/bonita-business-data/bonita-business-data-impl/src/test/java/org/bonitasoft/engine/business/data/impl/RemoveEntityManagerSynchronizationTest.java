@@ -67,4 +67,20 @@ public class RemoveEntityManagerSynchronizationTest {
         assertThat(localManager.get()).as("should remove entity manager").isNull();
 
     }
+
+    @Test
+    public void should_not_throw_NPE_after_transaction_completion_in_case_there_was_a_problem() throws Exception {
+        //given
+        ThreadLocal<EntityManager> localManager = new ThreadLocal<>();
+        localManager.set(null);
+        RemoveEntityManagerSynchronization removeEntityManagerSynchronization = new RemoveEntityManagerSynchronization(
+                localManager);
+
+        //when
+        removeEntityManagerSynchronization.afterCompletion(STATUS_ACTIVE);
+
+        //then
+        assertThat(localManager.get()).as("should remove entity manager").isNull();
+
+    }
 }
