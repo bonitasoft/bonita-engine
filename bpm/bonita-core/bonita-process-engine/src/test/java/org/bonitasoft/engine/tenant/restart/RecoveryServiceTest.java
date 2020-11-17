@@ -77,6 +77,8 @@ class RecoveryServiceTest {
 
     @BeforeEach
     public void before() throws Exception {
+        recoveryService.setTenantId(12);
+        recoveryService.initMetrics();
         doReturn(recoveryMonitor).when(recoveryMonitorObjectFactory).getObject();
         recoveryService.setReadBatchSize(2);
         recoveryService.setBatchRestartSize(1000);
@@ -197,6 +199,22 @@ class RecoveryServiceTest {
         assertThat(elementsRecoveredLast.value()).isEqualTo(6);
         assertThat(elementsRecoveredTotal.count()).isEqualTo(13);
         assertThat(numberOfExecution.count()).isEqualTo(3);
+    }
+
+    @Test
+    void metrics_shoul_have_tenant_tag() {
+        Gauge elementsRecoveredLast = meterRegistry.find(RecoveryService.NUMBER_OF_ELEMENTS_RECOVERED_LAST_RECOVERY)
+                .tag("tenant", "12")
+                .gauge();
+        Counter elementsRecoveredTotal = meterRegistry.find(RecoveryService.NUMBER_OF_ELEMENTS_RECOVERED_TOTAL)
+                .tag("tenant", "12")
+                .counter();
+        Counter numberOfExecution = meterRegistry.find(RecoveryService.NUMBER_OF_RECOVERY).tag("tenant", "12")
+                .counter();
+
+        assertThat(elementsRecoveredLast).isNotNull();
+        assertThat(elementsRecoveredTotal).isNotNull();
+        assertThat(numberOfExecution).isNotNull();
     }
 
     private ElementToRecover elementToRecover(long l, ElementToRecover.Type process) {

@@ -60,6 +60,8 @@ dependencies {
     compile "org.codehaus.groovy:groovy-all:${Deps.groovyAllVersion}"
     compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     compile "io.micrometer:micrometer-registry-jmx:${Deps.micrometerVersion}"
+    // Dependency on javax.annotations as it is not provided anymore in Java 11:
+    compile("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
