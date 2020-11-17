@@ -47,8 +47,12 @@ public class PersistenceUnitBuilder {
             throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setValidating(false);
-        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        try {
+            documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // security-compliant
+            documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // security-compliant
+        } catch (IllegalArgumentException e) {
+            //ignored, if not supported by the implementation
+        }
         final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         final InputStream is = PersistenceUnitBuilder.class.getResourceAsStream("persistence.xml");
         try {

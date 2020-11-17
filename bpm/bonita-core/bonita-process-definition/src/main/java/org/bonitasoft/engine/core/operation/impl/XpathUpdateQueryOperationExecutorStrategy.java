@@ -84,8 +84,12 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
             final String dataValue = (String) expressionContext.getInputValues().get(dataInstanceName);
 
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            try {
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // security-compliant
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // security-compliant
+            } catch (IllegalArgumentException e) {
+                //ignored, if not supported by the implementation
+            }
             final DocumentBuilder builder = factory.newDocumentBuilder();
             final Document document = builder.parse(new InputSource(new StringReader(dataValue)));
             final XPath xpath = XPathFactory.newInstance().newXPath();
