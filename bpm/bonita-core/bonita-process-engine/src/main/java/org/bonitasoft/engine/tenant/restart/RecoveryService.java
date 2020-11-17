@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.LongTaskTimer;
@@ -46,23 +48,24 @@ public class RecoveryService {
 
     public static final String DURATION_OF_RECOVERY_TASK = "bonita.bpmengine.recovery.duration";
     public static final String NUMBER_OF_RECOVERY = "bonita.bpmengine.recovery.execution";
-    public static final String NUMBER_OF_ELEMENTS_RECOVERED_LAST_RECOVERY = "bonita.bpmengine.elements.recovered.last";
-    public static final String NUMBER_OF_ELEMENTS_RECOVERED_TOTAL = "bonita.bpmengine.elements.recovered.total";
+    public static final String NUMBER_OF_ELEMENTS_RECOVERED_LAST_RECOVERY = "bonita.bpmengine.recovery.recovered.last";
+    public static final String NUMBER_OF_ELEMENTS_RECOVERED_TOTAL = "bonita.bpmengine.recovery.recovered.total";
 
     private final FlowNodeInstanceService flowNodeInstanceService;
     private final ProcessInstanceService processInstanceService;
     private final UserTransactionService userTransactionService;
     private final FlowNodesRecover flowNodesRecover;
     private final ProcessesRecover processesRecover;
-    private long tenantId;
     private final SessionAccessor sessionAccessor;
     private final ObjectFactory<RecoveryMonitor> recoveryMonitorProvider;
+    private final MeterRegistry meterRegistry;
+    private long tenantId;
     private int readBatchSize;
     private int batchRestartSize;
     private Duration considerElementsOlderThan;
-    private final LongTaskTimer longTaskTimer;
-    private final Counter numberOfElementsRecoveredTotal;
-    private final Counter numberOfRecoverExecuted;
+    private LongTaskTimer longTaskTimer;
+    private Counter numberOfElementsRecoveredTotal;
+    private Counter numberOfRecoverExecuted;
     private final AtomicLong numberOfElementsRecoveredDuringTheLastRecover = new AtomicLong();
 
     public RecoveryService(FlowNodeInstanceService flowNodeInstanceService,
@@ -80,8 +83,12 @@ public class RecoveryService {
         this.processesRecover = processesRecover;
         this.sessionAccessor = sessionAccessor;
         this.recoveryMonitorProvider = recoveryMonitorProvider;
-        Tags tags = Tags.of("tenant", String.valueOf(tenantId));
+        this.meterRegistry = meterRegistry;
+    }
 
+    @PostConstruct
+    protected void initMetrics() {
+        Tags tags = Tags.of("tenant", String.valueOf(tenantId));
         this.longTaskTimer = LongTaskTimer
                 .builder(DURATION_OF_RECOVERY_TASK)
                 .description("duration of recovery task").tags(tags)
