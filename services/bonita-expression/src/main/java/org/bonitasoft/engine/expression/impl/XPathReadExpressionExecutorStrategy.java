@@ -85,8 +85,12 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
                         expressionName);
             }
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            try {
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // security-compliant
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // security-compliant
+            } catch (IllegalArgumentException e) {
+                //ignored, if not supported by the implementation
+            }
             final DocumentBuilder builder = factory.newDocumentBuilder();
             // Check has already been done above:
             final SExpression dep = expression.getDependencies().get(0);
