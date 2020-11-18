@@ -22,7 +22,7 @@ class Deps {
     public static String groovyAllVersion = "2.4.16"
     public static String javassistVersion = "3.18.1-GA"
     public static String httpComponentsVersion = "4.5.2"
-    public static String xstreamVersion = "1.4.11.1"
+    public static String xstreamVersion = "1.4.14"
     public static String hibernateJpaVersion = "1.0.2.Final"
     public static String ehcacheVersion = "2.10.6"
     public static String eclipseCompilerVersion = "3.20.0"
