@@ -284,6 +284,8 @@ CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObj
 GO
 CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId, rootContainerId, parentContainerId)
 GO
+CREATE INDEX idx_lg4_lg2 on arch_flownode_instance(tenantid, logicalGroup4, logicalGroup2);
+GO
 
 CREATE TABLE arch_connector_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
