@@ -91,7 +91,7 @@
 						<index>6</index>
 						<description>Install / Export a complete organization</description>
 						<type>link</type>
-						<page>custompage_installExportOrganizationBonita</page>
+						<page>custompage_adminInstallExportOrganizationBonita</page>
 					</profileEntry>
 					<profileEntry name="Profiles" isCustom="false">
 						<parentName>Organization</parentName>
