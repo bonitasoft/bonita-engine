@@ -31,7 +31,7 @@ public class RecoveryScheduler {
         this.recoveryService = recoveryService;
     }
 
-    @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT30M}", initialDelayString = "${bonita.tenant.recover.delay_before_first_recovery:PT2H}")
+    @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT30M}", initialDelayString = "${bonita.tenant.recover.delay_between_recovery:PT30M}")
     public void triggerRecoveryAllElements() {
         try {
             if (tenantElementsRestartSupervisor.isResponsibleForRecovery()) {
