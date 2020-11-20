@@ -100,7 +100,12 @@ class RecoveryMonitor {
 
     public void printSummary() {
         // only print a single status line for that
-        log.info("Recovery of elements executed, {} elements recovered.", getNumberOfElementRecovered());
+        long numberOfElementRecovered = getNumberOfElementRecovered();
+        if (numberOfElementRecovered == 0) {
+            log.info("Recovery of elements executed. Nothing detected that needs recovery.");
+        } else {
+            log.info("Recovery of elements executed, {} elements recovered.", numberOfElementRecovered);
+        }
         // details in debug
         log.debug("Handled {} elements candidates to be recovered in {}",
                 (getFinishing() + getExecuting() + getNotExecutable() + getNotFound() + getInError()),
