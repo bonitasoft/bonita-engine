@@ -1489,7 +1489,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             throws SBonitaException {
         List<SUserMembership> sUserMemberships;
         if (userId == -1) {
-            sUserMemberships = identityService.getUserMemberships(startIndex, maxResults);
+            sUserMemberships = identityService.getUserMemberships(startIndex, maxResults, orderByOption);
         } else if (orderByOption != null) {
             sUserMemberships = identityService.getUserMembershipsOfUser(userId, startIndex, maxResults, orderByOption);
         } else if (fieldExecutor == null) {
