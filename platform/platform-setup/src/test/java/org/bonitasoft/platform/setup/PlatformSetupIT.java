@@ -472,8 +472,11 @@ public class PlatformSetupIT {
         //then
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage(
-                "Database schema version [bad version] is not supported by current platform setup version ["
-                        + versionService.getPlatformSetupVersion() + "]");
+                "The version of the platform (binaries) you are running [" + versionService.getPlatformSetupVersion() +
+                        "] only support database schema in version ["
+                        + versionService.getSupportedDatabaseSchemaVersion() + "]" +
+                        " but the current database schema version is [bad version]." +
+                        " You might need to migrate your platform or use a different version of the binaries.");
 
         //when
         final Path confFolder = temporaryFolder.newFolder().toPath();
@@ -491,8 +494,11 @@ public class PlatformSetupIT {
         //then
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage(
-                "Database schema version [bad version] is not supported by current platform setup version ["
-                        + versionService.getPlatformSetupVersion() + "]");
+                "The version of the platform (binaries) you are running [" + versionService.getPlatformSetupVersion() +
+                        "] only support database schema in version ["
+                        + versionService.getSupportedDatabaseSchemaVersion() + "]" +
+                        " but the current database schema version is [bad version]." +
+                        " You might need to migrate your platform or use a different version of the binaries.");
 
         //when
         platformSetup.pull();
