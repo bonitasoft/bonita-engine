@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -278,9 +279,13 @@ public class PlatformSetup {
 
     private void checkPlatformVersion() throws PlatformException {
         if (!versionService.isValidPlatformVersion()) {
-            throw new PlatformException("Database schema version [" + versionService.retrieveDatabaseSchemaVersion() +
-                    "] is not supported by current platform setup version [" + versionService.getPlatformSetupVersion()
-                    + "]");
+            String message = "The version of the platform (binaries) you are running [{0}] " +
+                    "only support database schema in version [{1}] but the current database schema version is [{2}]. " +
+                    "You might need to migrate your platform or use a different version of the binaries.";
+            throw new PlatformException(MessageFormat.format(message,
+                    versionService.getPlatformSetupVersion(),
+                    versionService.getSupportedDatabaseSchemaVersion(),
+                    versionService.retrieveDatabaseSchemaVersion()));
         }
     }
 

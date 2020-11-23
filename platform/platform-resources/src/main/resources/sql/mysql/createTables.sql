@@ -252,6 +252,7 @@ CREATE INDEX idx_afi_kind_lg3 ON arch_flownode_instance(tenantId, kind, logicalG
 CREATE INDEX idx_afi_kind_lg4 ON arch_flownode_instance(tenantId, logicalGroup4);
 CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind);
 CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId, rootContainerId, parentContainerId);
+CREATE INDEX idx_lg4_lg2 on arch_flownode_instance(tenantid, logicalGroup4, logicalGroup2);
 
 CREATE TABLE arch_connector_instance (
   tenantid BIGINT NOT NULL,

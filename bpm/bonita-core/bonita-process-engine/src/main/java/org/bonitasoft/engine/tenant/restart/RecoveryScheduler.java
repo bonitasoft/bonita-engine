@@ -18,6 +18,10 @@ import org.bonitasoft.engine.tenant.TenantElementsRestartSupervisor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * The RecoveryScheduler is responsible to trigger the recovery mechanism periodically.
+ * The scheduling values can be changed using engine properties files.
+ */
 @Component
 @Slf4j
 public class RecoveryScheduler {
@@ -31,8 +35,8 @@ public class RecoveryScheduler {
         this.recoveryService = recoveryService;
     }
 
-    @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT30M}", initialDelayString = "${bonita.tenant.recover.delay_before_first_recovery:PT2H}")
-    public void triggerRecoveryAllElements() {
+    @Scheduled(fixedDelayString = "${bonita.tenant.recover.delay_between_recovery:PT2H}", initialDelayString = "${bonita.tenant.recover.delay_between_recovery:PT2H}")
+    public void triggerRecoveryOfAllElements() {
         try {
             if (tenantElementsRestartSupervisor.isResponsibleForRecovery()) {
                 log.debug("Starting periodic recovery of elements...");
@@ -42,7 +46,7 @@ public class RecoveryScheduler {
                 log.debug("Periodic recovery of elements not executed, an other node is responsible for it.");
             }
         } catch (Exception e) {
-            log.warn("Recovery of elements failed because of {} - {},  it will be re executed soon",
+            log.warn("Recovery of elements failed because of {} - {}, it will be re-executed soon",
                     e.getClass().getName(), e.getMessage());
             log.debug("Cause by ", e);
         }

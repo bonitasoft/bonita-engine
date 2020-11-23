@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -21,9 +22,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
+import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -121,4 +126,51 @@ public class ExportOrganizationTest {
                 .addCustomUserInfoValue(new ExportedCustomUserInfoValue(SKILSS_NAME, SKILLS_VALUE));
     }
 
+    @Test
+    public void getAllUserMemberships_should_call_getUserMemberships_with_order_by_option() throws SIdentityException {
+        //given
+        when(identityService.getNumberOfUserMemberships()).thenReturn(5L);
+        OrderByOption orderByOption = new OrderByOption(SUserMembership.class, SUserMembership.ID, OrderByType.ASC);
+
+        // when
+        exportOrganization.getAllUserMemberships();
+
+        // then
+        verify(identityService, times(3)).getUserMemberships(anyInt(), anyInt(), eq(orderByOption));
+    }
+
+    @Test
+    public void getAllGroups_should_call_getGroups_with_order_by_option() throws SIdentityException {
+        //given
+        when(identityService.getNumberOfGroups()).thenReturn(5L);
+
+        // when
+        exportOrganization.getAllGroups();
+
+        // then
+        verify(identityService, times(3)).getGroups(anyInt(), anyInt(), eq("id"), eq(OrderByType.ASC));
+    }
+
+    @Test
+    public void getAllRoles_should_call_getRoles_with_order_by_option() throws SIdentityException {
+        //given
+        when(identityService.getNumberOfRoles()).thenReturn(5L);
+
+        // when
+        exportOrganization.getAllRoles();
+
+        // then
+        verify(identityService, times(3)).getRoles(anyInt(), anyInt(), eq("id"), eq(OrderByType.ASC));
+    }
+
+    @Test
+    public void getNextUsersPage_should_call_getUsers_with_order_by_option() throws SBonitaException {
+        //given
+
+        // when
+        exportOrganization.getNextUsersPage(0, 10, emptyMap());
+
+        // then
+        verify(identityService, times(1)).getUsers(anyInt(), anyInt(), eq("id"), eq(OrderByType.ASC));
+    }
 }

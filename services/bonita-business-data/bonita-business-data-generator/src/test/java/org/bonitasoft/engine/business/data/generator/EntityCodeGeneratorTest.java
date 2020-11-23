@@ -26,7 +26,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.Version;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
@@ -42,6 +51,7 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.hibernate.annotations.GenericGenerator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -114,12 +124,14 @@ public class EntityCodeGeneratorTest {
         final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
         assertThat(idFieldVar).isNotNull();
         assertThat(idFieldVar.type()).isEqualTo(codeGenerator.getModel().ref(Long.class.getName()));
-        assertThat(idFieldVar.annotations()).hasSize(2);
+        assertThat(idFieldVar.annotations()).hasSize(3);
         final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
         JAnnotationUse annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Id.class.getName());
         annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(GeneratedValue.class.getName());
+        annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(GenericGenerator.class.getName());
     }
 
     @Test
@@ -130,12 +142,11 @@ public class EntityCodeGeneratorTest {
         entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "h2");
 
         final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
-        assertThat(idFieldVar.annotations()).hasSize(2);
+        assertThat(idFieldVar.annotations()).hasSize(3);
         final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
         iterator.next();
         JAnnotationUse annotationUse = iterator.next();
-        assertThat(getAnnotationParamValue(annotationUse, "strategy"))
-                .isEqualTo("javax.persistence.GenerationType.SEQUENCE");
+        assertThat(getAnnotationParamValue(annotationUse, "generator")).isEqualTo("default_bonita_seq_generator");
     }
 
     @Test
@@ -146,12 +157,11 @@ public class EntityCodeGeneratorTest {
         entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "postgres");
 
         final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
-        assertThat(idFieldVar.annotations()).hasSize(2);
+        assertThat(idFieldVar.annotations()).hasSize(3);
         final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
         iterator.next();
         JAnnotationUse annotationUse = iterator.next();
-        assertThat(getAnnotationParamValue(annotationUse, "strategy"))
-                .isEqualTo("javax.persistence.GenerationType.SEQUENCE");
+        assertThat(getAnnotationParamValue(annotationUse, "generator")).isEqualTo("default_bonita_seq_generator");
     }
 
     @Test
@@ -162,12 +172,11 @@ public class EntityCodeGeneratorTest {
         entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass, "oracle");
 
         final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
-        assertThat(idFieldVar.annotations()).hasSize(2);
+        assertThat(idFieldVar.annotations()).hasSize(3);
         final Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
         iterator.next();
         JAnnotationUse annotationUse = iterator.next();
-        assertThat(getAnnotationParamValue(annotationUse, "strategy"))
-                .isEqualTo("javax.persistence.GenerationType.SEQUENCE");
+        assertThat(getAnnotationParamValue(annotationUse, "generator")).isEqualTo("default_bonita_seq_generator");
     }
 
     @Test

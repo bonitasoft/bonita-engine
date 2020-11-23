@@ -1540,6 +1540,9 @@
         <constructor-arg name="configuration">
             <map>
                 <!-- to prevent Hibernate 5 from changing its way of managing ID generation: -->
+                <!-- WARNING: do not remove this parameter, as it allows to preserve compatibility with BDMs generated
+                               with Bonita versions pre-7.12. Otherwise Hibernate 5 would interpret the generated
+                                BDM code with some logics that make it incompatible on MySQL and SQL Server -->
                 <entry key="hibernate.id.new_generator_mappings" value="false" />
 
                 <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
@@ -1576,6 +1579,9 @@
         <constructor-arg name="configuration">
             <map>
                 <!-- to prevent Hibernate 5 from changing its way of managing ID generation: -->
+                <!-- WARNING: do not remove this parameter, as it allows to preserve compatibility with BDMs generated
+                               with Bonita versions pre-7.12. Otherwise Hibernate 5 would interpret the generated
+                                BDM code with some logics that make it incompatible on MySQL and SQL Server -->
                 <entry key="hibernate.id.new_generator_mappings" value="false" />
 
                 <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
