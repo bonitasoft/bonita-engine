@@ -37,6 +37,9 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,8 +158,6 @@ public class EntityCodeGenerator {
     /**
      * get real column name used in database
      *
-     * @param businessObject
-     * @param fieldName
      * @return fieldName for simple fields or reduced name suffix by "_PID" when we have an entity relationship
      */
     private String getFieldRealColumnName(BusinessObject businessObject, String fieldName) {
@@ -170,8 +171,7 @@ public class EntityCodeGenerator {
     }
 
     private void addNamedQuery(final JDefinedClass entityClass, final JAnnotationArrayMember valueArray,
-            final String name,
-            final String content) {
+            final String name, final String content) {
         final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
         nameQueryAnnotation.param("name", entityClass.name() + "." + name);
         nameQueryAnnotation.param("query", content);
@@ -215,7 +215,23 @@ public class EntityCodeGenerator {
             case "h2":
             case "postgres":
             case "oracle":
-                generateValue.param("strategy", GenerationType.SEQUENCE);
+                // This generates the following annotation:
+                // @GeneratedValue(generator = "default_bonita_seq_generator")
+                // @GenericGenerator(
+                //      name = "default_bonita_seq_generator",
+                //      strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+                //      parameters = {
+                //          @Parameter(name = "sequence_name", value = "hibernate_sequence")
+                //      })
+                // maps to default Hibernate sequence name in database 'hibernate_sequence'
+                generateValue.param("generator", "default_bonita_seq_generator");
+                JAnnotationUse genericGenerator = codeGenerator.addAnnotation(idFieldVar, GenericGenerator.class);
+                genericGenerator.param("name", "default_bonita_seq_generator");
+                genericGenerator.param("strategy", SequenceStyleGenerator.class.getName());
+                final JAnnotationArrayMember parametersAnnotation = genericGenerator.paramArray("parameters");
+                final JAnnotationUse paramAnnotation = parametersAnnotation.annotate(Parameter.class);
+                paramAnnotation.param("name", "sequence_name");
+                paramAnnotation.param("value", "hibernate_sequence");
                 break;
             case "mysql":
             case "sqlserver":
@@ -233,7 +249,7 @@ public class EntityCodeGenerator {
     }
 
     public JFieldVar addField(final JDefinedClass entityClass, final Field field) {
-        JFieldVar fieldVar = null;
+        JFieldVar fieldVar;
         if (field.isCollection()) {
             fieldVar = codeGenerator.addListField(entityClass, field);
         } else {
