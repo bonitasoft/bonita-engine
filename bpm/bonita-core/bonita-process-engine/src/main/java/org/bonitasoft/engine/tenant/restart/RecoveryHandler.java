@@ -18,6 +18,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * The Recovery handler is responsible for recovering all candidate elements
+ * at Engine startup.
+ * It is called only once in a cluster startup (handled by TenantElementsRestartSupervisor)
+ */
 @Component
 public class RecoveryHandler implements TenantRestartHandler {
 
