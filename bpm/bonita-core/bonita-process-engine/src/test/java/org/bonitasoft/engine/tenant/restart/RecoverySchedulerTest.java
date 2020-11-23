@@ -39,7 +39,7 @@ class RecoverySchedulerTest {
     void should_recover_elements_when_node_is_responsible_for_recovery() {
         when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(true);
 
-        recoveryScheduler.triggerRecoveryAllElements();
+        recoveryScheduler.triggerRecoveryOfAllElements();
 
         verify(recoveryService).recoverAllElements();
     }
@@ -48,7 +48,7 @@ class RecoverySchedulerTest {
     void should_not_recover_elements_when_node_is_not_responsible_for_recovery() {
         when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(false);
 
-        recoveryScheduler.triggerRecoveryAllElements();
+        recoveryScheduler.triggerRecoveryOfAllElements();
 
         verify(recoveryService, never()).recoverAllElements();
     }
@@ -57,7 +57,7 @@ class RecoverySchedulerTest {
     void should_catch_exception_on_error_during_call_of_isResponsibleForRecovery() {
         when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenThrow(new IllegalStateException("BAD"));
 
-        recoveryScheduler.triggerRecoveryAllElements();
+        recoveryScheduler.triggerRecoveryOfAllElements();
 
         verify(recoveryService, never()).recoverAllElements();
     }
@@ -67,7 +67,7 @@ class RecoverySchedulerTest {
         when(tenantElementsRestartSupervisor.isResponsibleForRecovery()).thenReturn(true);
         doThrow(new IllegalStateException("BAD")).when(recoveryService).recoverAllElements();
 
-        recoveryScheduler.triggerRecoveryAllElements();
+        recoveryScheduler.triggerRecoveryOfAllElements();
 
         //no exception
     }

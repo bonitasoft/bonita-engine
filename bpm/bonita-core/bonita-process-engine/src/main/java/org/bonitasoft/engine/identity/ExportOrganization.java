@@ -123,30 +123,31 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         return allCustomUserInfoDefinitions;
     }
 
-    private List<SUserMembership> getAllUserMemberships() throws SIdentityException {
+    List<SUserMembership> getAllUserMemberships() throws SIdentityException {
         final long numberOfUserMemberships = identityService.getNumberOfUserMemberships();
         final List<SUserMembership> sUserMemberships = new ArrayList<>();
         for (int startIndex = 0; startIndex < numberOfUserMemberships; startIndex = startIndex + maxResults) {
-            sUserMemberships.addAll(identityService.getUserMemberships(startIndex, maxResults));
+            OrderByOption orderByOption = new OrderByOption(SUserMembership.class, SUserMembership.ID, OrderByType.ASC);
+            sUserMemberships.addAll(identityService.getUserMemberships(startIndex, maxResults, orderByOption));
         }
         return sUserMemberships;
     }
 
-    private List<SGroup> getAllGroups() throws SIdentityException {
+    List<SGroup> getAllGroups() throws SIdentityException {
         List<SGroup> groups;
         final long groupNumber = identityService.getNumberOfGroups();
         groups = new ArrayList<>();
         for (int startIndex = 0; startIndex < groupNumber; startIndex = startIndex + maxResults) {
-            groups.addAll(identityService.getGroups(startIndex, maxResults));
+            groups.addAll(identityService.getGroups(startIndex, maxResults, "id", OrderByType.ASC));
         }
         return groups;
     }
 
-    private List<ExportedRole> getAllRoles() throws SIdentityException {
+    List<ExportedRole> getAllRoles() throws SIdentityException {
         final long roleNumber = identityService.getNumberOfRoles();
         final List<ExportedRole> roles = new ArrayList<>();
         for (int startIndex = 0; startIndex < roleNumber; startIndex = startIndex + maxResults) {
-            final List<SRole> sRoles = identityService.getRoles(startIndex, maxResults);
+            final List<SRole> sRoles = identityService.getRoles(startIndex, maxResults, "id", OrderByType.ASC);
             roles.addAll(ModelConvertor.toExportedRoles(sRoles));
         }
         return roles;
@@ -161,11 +162,11 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         return users;
     }
 
-    private List<ExportedUser> getNextUsersPage(final int startIndex, final int numberPerPage,
+    List<ExportedUser> getNextUsersPage(final int startIndex, final int numberPerPage,
             final Map<Long, String> userInfoDefinitionNames)
             throws SBonitaException {
         final List<ExportedUser> currentUsersPage = new ArrayList<>(numberPerPage);
-        final List<SUser> sUsers = identityService.getUsers(startIndex, numberPerPage);
+        final List<SUser> sUsers = identityService.getUsers(startIndex, numberPerPage, "id", OrderByType.ASC);
         for (final SUser sUser : sUsers) {
             userNames.put(sUser.getId(), sUser.getUserName());
             currentUsersPage.add(toExportedUser(sUser, userInfoDefinitionNames));

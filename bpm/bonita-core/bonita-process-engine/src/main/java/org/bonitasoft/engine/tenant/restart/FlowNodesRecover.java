@@ -35,9 +35,6 @@ import org.springframework.stereotype.Component;
  * Recover flow nodes
  * <p>
  * This class is called after the start of the engine or periodically and will recover elements given their ids.
- * <p>
- * It will recover these elements using multiple transaction using a batch size configured by the property
- * `bonita.tenant.work.batch_restart_size`
  */
 @Component
 public class FlowNodesRecover {
