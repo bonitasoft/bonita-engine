@@ -21,6 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * Responsible for monitoring the recovery mechanism.
+ * It measures some recovery metrics and prints them in standard logger when the recovery triggers.
+ */
 @Slf4j
 @Component
 @Scope(SCOPE_PROTOTYPE)

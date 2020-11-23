@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 /**
  * This class handles the continuation of unfinished process instances
  * passed as parameter in {@link #execute(RecoveryMonitor, List)} method.
- * The logic ensure that if an instance fails to continue its execution,
+ * The logic ensures that if an instance fails to continue its execution,
  * the error is logged and other instances are continued anyways.
  */
 @Component

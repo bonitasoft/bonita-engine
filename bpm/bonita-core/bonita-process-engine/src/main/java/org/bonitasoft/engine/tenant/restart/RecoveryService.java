@@ -42,6 +42,12 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * Responsible to recover from incidents like database or network outage.
+ * It scans the database (on-demand) and reschedules the elements to recover.
+ * It will recover these elements using multiple transaction using a batch size configured by the property
+ * `bonita.tenant.work.batch_restart_size`
+ */
 @Component
 @Slf4j
 public class RecoveryService {
