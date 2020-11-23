@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
@@ -154,22 +155,36 @@ class RecoveryServiceTest {
 
     @Test
     void should_measure_duration_of_recovery() throws Exception {
+        // This test verifies that we call the LongTaskTimer when executing the recovery
+        // In order to verify the long task timer is running we must execute it in background
+        // To simulate a long-running of this task we use sleep and locks
+        // this could be replaced by a mocked metric
+        ReentrantLock lock = new ReentrantLock();
+        lock.lock();
         doReturn(singletonList(1L))
                 .doReturn(singletonList(4L))
                 .when(processInstanceService).getProcessInstanceIdsToRecover(any(), any());
 
+        // simulate some work when executing recovery
         doAnswer(invocationOnMock -> {
-            TimeUnit.MILLISECONDS.sleep(50);
+            lock.unlock();
+            TimeUnit.MILLISECONDS.sleep(20);
             return null;
         }).when(processesRecover).execute(any(), any());
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         executorService.submit(() -> recoveryService.recoverAllElements());
-        Thread.sleep(5);
+
+        //wait for the recovery to start
+        lock.lock();
         LongTaskTimer longTaskTimer = meterRegistry.find(RecoveryService.DURATION_OF_RECOVERY_TASK).longTaskTimer();
         assertThat(longTaskTimer.activeTasks()).isEqualTo(1);
-        executorService.shutdownNow();
+
+        //cleanup
+        lock.unlock();
+        executorService.shutdown();
+        executorService.awaitTermination(30, TimeUnit.MILLISECONDS);
     }
 
     @Test
