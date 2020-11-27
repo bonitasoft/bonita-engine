@@ -26,10 +26,9 @@ import static org.mockito.Mockito.*;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
@@ -155,36 +154,29 @@ class RecoveryServiceTest {
 
     @Test
     void should_measure_duration_of_recovery() throws Exception {
-        // This test verifies that we call the LongTaskTimer when executing the recovery
-        // In order to verify the long task timer is running we must execute it in background
-        // To simulate a long-running of this task we use sleep and locks
-        // this could be replaced by a mocked metric
-        ReentrantLock lock = new ReentrantLock();
-        lock.lock();
         doReturn(singletonList(1L))
                 .doReturn(singletonList(4L))
                 .when(processInstanceService).getProcessInstanceIdsToRecover(any(), any());
+        LongTaskTimer longTaskTimer = meterRegistry.find(RecoveryService.DURATION_OF_RECOVERY_TASK).longTaskTimer();
+        AtomicInteger activeTasks = new AtomicInteger();
+        AtomicLong durationMillis = new AtomicLong();
 
-        // simulate some work when executing recovery
         doAnswer(invocationOnMock -> {
-            lock.unlock();
-            TimeUnit.MILLISECONDS.sleep(20);
+            // do the measure on the long task timer while the recovery is executing (that mock is executed by the recovery)
+            Thread.sleep(2);
+            activeTasks.set(longTaskTimer.activeTasks());
+            durationMillis.set(Math.round(longTaskTimer.duration(TimeUnit.MILLISECONDS)));
             return null;
         }).when(processesRecover).execute(any(), any());
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        recoveryService.recoverAllElements();
 
-        executorService.submit(() -> recoveryService.recoverAllElements());
+        //during execution of the task, it was:
+        assertThat(activeTasks.get()).isEqualTo(1);
+        assertThat(durationMillis.get()).isGreaterThan(0);
 
-        //wait for the recovery to start
-        lock.lock();
-        LongTaskTimer longTaskTimer = meterRegistry.find(RecoveryService.DURATION_OF_RECOVERY_TASK).longTaskTimer();
-        assertThat(longTaskTimer.activeTasks()).isEqualTo(1);
-
-        //cleanup
-        lock.unlock();
-        executorService.shutdown();
-        executorService.awaitTermination(30, TimeUnit.MILLISECONDS);
+        //when no tasks are being executed
+        assertThat(longTaskTimer.activeTasks()).isEqualTo(0);
     }
 
     @Test
