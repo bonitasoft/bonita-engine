@@ -113,11 +113,12 @@ public class PageAPIIT extends CommonAPIIT {
         loginOnDefaultTenantWith("john", "bpm");
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(
+        final Page pageBeforeUpdate = getPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
-        assertThat(page.getInstalledBy()).isEqualTo(john.getId());
-        assertThat(page.getLastUpdatedBy()).isEqualTo(john.getId());
+        Thread.sleep(10);
+        assertThat(pageBeforeUpdate.getInstalledBy()).isEqualTo(john.getId());
+        assertThat(pageBeforeUpdate.getLastUpdatedBy()).isEqualTo(john.getId());
         logoutOnTenant();
         loginOnDefaultTenantWith("jack", "bpm");
         // when
@@ -131,15 +132,15 @@ public class PageAPIIT extends CommonAPIIT {
         pageUpdater.setContentType(ContentType.FORM);
         pageUpdater.setProcessDefinitionId(5L);
 
-        final Page returnedPage = getPageAPI().updatePage(page.getId(), pageUpdater);
+        final Page returnedPage = getPageAPI().updatePage(pageBeforeUpdate.getId(), pageUpdater);
 
         // then
         PageAssert.assertThat(returnedPage)
                 .hasInstalledBy(john.getId())
-                .hasInstalledBy(page.getInstalledBy())
+                .hasInstalledBy(pageBeforeUpdate.getInstalledBy())
                 .hasLastUpdatedBy(jack.getId())
                 .hasName(pageName)
-                .hasInstallationDate(page.getInstallationDate())
+                .hasInstallationDate(pageBeforeUpdate.getInstallationDate())
                 .hasDisplayName(newDisplayName)
                 .hasContentName(newContentName)
                 .hasDescription(newDescription)
@@ -147,7 +148,7 @@ public class PageAPIIT extends CommonAPIIT {
                 .hasProcessDefinitionId(5L);
 
         assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated")
-                .isAfter(page.getLastModificationDate());
+                .isAfter(pageBeforeUpdate.getLastModificationDate());
 
         logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
