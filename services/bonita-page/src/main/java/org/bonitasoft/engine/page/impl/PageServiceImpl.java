@@ -343,8 +343,10 @@ public class PageServiceImpl implements PageService {
     private SPage buildPage(final String name, final String displayName, final String description,
             final String contentName, final long creatorUserId,
             final boolean provided, boolean hidden, final String contentType) {
+        Long currentTime = System.currentTimeMillis();
         return SPage.builder().name(name).description(description).displayName(displayName)
-                .installationDate(System.currentTimeMillis()).installedBy(creatorUserId).provided(provided)
+                .installationDate(currentTime).installedBy(creatorUserId).provided(provided)
+                .lastModificationDate(currentTime).lastUpdatedBy(creatorUserId)
                 .hidden(hidden)
                 .contentName(contentName)
                 .contentType(contentType)

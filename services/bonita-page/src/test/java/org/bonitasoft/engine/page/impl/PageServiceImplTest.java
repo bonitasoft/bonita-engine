@@ -15,7 +15,7 @@ package org.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.engine.commons.Pair.pair;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -1064,6 +1064,24 @@ public class PageServiceImplTest {
 
         //then
         verify(pageServiceImpl).insertPage(sPage, content);
+    }
+
+    @Test
+    public void should_add_page_with_correct_last_modification_date() throws Exception {
+        //given
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair());
+
+        //when
+        SPage pageAfterAddition = pageServiceImpl.addPage(content, CONTENT_NAME, 45);
+
+        //then
+        final Long pageDate = pageAfterAddition.getLastModificationDate();
+        final SPage sPage = new SPage("custompage_mypage", "mypage description", "mypage display name",
+                pageDate, 45, false, pageDate, 45, CONTENT_NAME);
+
+        assertEquals(pageAfterAddition, sPage);
+        assertThat(pageAfterAddition.getLastModificationDate()).isGreaterThan(0);
     }
 
     @Test
