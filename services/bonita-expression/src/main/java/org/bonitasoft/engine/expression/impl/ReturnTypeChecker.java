@@ -105,7 +105,7 @@ public class ReturnTypeChecker {
         return Thread.currentThread().getContextClassLoader().loadClass(type);
     }
 
-    private static Boolean isConvertible(String targetType, String sourceType) {
+    public static boolean isConvertible(String targetType, String sourceType) {
         return ofNullable(CONVERTIBLE_TYPES.get(targetType)).map(targets -> targets.contains(sourceType)).orElse(false);
     }
 

@@ -15,7 +15,11 @@ package org.bonitasoft.engine.expression.impl;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyCodeSource;
@@ -30,25 +34,23 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.expression.ContainerState;
+import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.runtime.typehandling.GroovyCastException;
 
-/**
- * @author Zhao na
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
-public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyScriptExpressionExecutorStrategy
+public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContentExpressionExecutorStrategy
         implements ClassLoaderListener {
 
     public static final String GROOVY_SCRIPT_CACHE_NAME = "GROOVY_SCRIPT_CACHE_NAME";
 
     public static final String SCRIPT_KEY = "SCRIPT_";
-
+    public static final String CAST_SCRIPT_KEY = "CAST_SCRIPT_";
     public static final String SHELL_KEY = "SHELL_";
 
     private final CacheService cacheService;
@@ -57,7 +59,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
 
     private final TechnicalLoggerService logger;
 
-    private static int counter;
+    private static final AtomicLong counter = new AtomicLong();
 
     public GroovyScriptExpressionExecutorCacheStrategy(final CacheService cacheService,
             final ClassLoaderService classLoaderService,
@@ -67,8 +69,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         this.logger = logger;
     }
 
-    protected synchronized String generateScriptName() {
-        return "BScript" + (++counter) + ".groovy";
+    private String generateScriptName() {
+        return String.format("BScript%s.groovy", counter.incrementAndGet());
     }
 
     Class getScriptFromCache(final String expressionContent, final Long definitionId)
@@ -77,25 +79,23 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
             throw new SBonitaRuntimeException("Unable to evaluate expression without a definitionId");
         }
         final GroovyShell shell = getShell(definitionId);
-        final String key = getScriptKey(expressionContent);
 
-        GroovyCodeSource gcs = (GroovyCodeSource) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
-
-        if (gcs == null) {
-            gcs = AccessController.doPrivileged(new PrivilegedAction<GroovyCodeSource>() {
-
-                public GroovyCodeSource run() {
-                    return new GroovyCodeSource(expressionContent, generateScriptName(), GroovyShell.DEFAULT_CODE_BASE);
-                }
-            });
-            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, gcs);
-        }
+        GroovyCodeSource gcs = getOrCreateGroovyCodeSource(SCRIPT_KEY + expressionContent.hashCode(),
+                expressionContent);
         // parse the groovy source code with cache set to true
         return shell.getClassLoader().parseClass(gcs, true);
     }
 
-    private String getScriptKey(String expressionContent) {
-        return SCRIPT_KEY + expressionContent.hashCode();
+    private GroovyCodeSource getOrCreateGroovyCodeSource(String key, String scriptContent) throws SCacheException {
+        GroovyCodeSource gcs = (GroovyCodeSource) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+
+        if (gcs == null) {
+            gcs = AccessController
+                    .doPrivileged((PrivilegedAction<GroovyCodeSource>) () -> new GroovyCodeSource(scriptContent,
+                            generateScriptName(), GroovyShell.DEFAULT_CODE_BASE));
+            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, gcs);
+        }
+        return gcs;
     }
 
     GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
@@ -139,10 +139,11 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         final String expressionName = expression.getName();
         try {
             final Binding binding = new Binding(context);
+            Long definitionId = (Long) context.get(DEFINITION_ID);
             final Script script = InvokerHelper
-                    .createScript(getScriptFromCache(expressionContent, (Long) context.get(DEFINITION_ID)), binding);
+                    .createScript(getScriptFromCache(expressionContent, definitionId), binding);
             script.setBinding(binding);
-            return script.run();
+            return castResult(getShell(definitionId), script.run(), expression.getReturnType());
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             throw new SExpressionEvaluationException("Expression " + expressionName + " with content = <"
@@ -189,5 +190,61 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
     @Override
     public void onDestroy(ClassLoader oldClassLoader) {
         clearCache();
+    }
+
+    @Override
+    public ExpressionKind getExpressionKind() {
+        return KIND_READ_ONLY_SCRIPT_GROOVY;
+    }
+
+    @Override
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+        final List<Object> list = new ArrayList<>(expressions.size());
+        for (final SExpression expression : expressions) {
+            list.add(evaluate(expression, context, resolvedExpressions, containerState));
+        }
+        return list;
+    }
+
+    /**
+     * Execute a Groovy expression that cast the result into the returnType
+     *
+     * @param shell, the Groovy shell use for script evaluation
+     * @param result, the evaluation result
+     * @param returnType, expected expression return type
+     * @return the result with the expected type or a {@link GroovyCastException} if the cast fails
+     * @throws ClassNotFoundException
+     */
+    protected Object castResult(GroovyShell shell, Object result, String returnType)
+            throws ClassNotFoundException, SCacheException {
+        if (result == null) {
+            return null;
+        }
+        String resultClassName = result.getClass().getName();
+        if (Objects.equals(resultClassName, returnType) // Already in the expected type
+                || ReturnTypeChecker.isConvertible(returnType, resultClassName)) { // Bonita specific type conversion
+            return result;
+        }
+        String scriptContent = String.format("(%s) result",
+                returnType.startsWith("[") ? canonicalClassName(returnType) : returnType);
+
+        GroovyCodeSource gcs = getOrCreateGroovyCodeSource(CAST_SCRIPT_KEY + returnType, scriptContent);
+        Binding binding = new Binding();
+        binding.setVariable("result", result);
+        Script script = InvokerHelper
+                .createScript(shell.getClassLoader().parseClass(gcs, true), binding);
+        return script.run();
+    }
+
+    private String canonicalClassName(String returnType) throws ClassNotFoundException {
+        return Class.forName(returnType).getCanonicalName();
+    }
+
+    @Override
+    public boolean mustPutEvaluatedExpressionInContext() {
+        return false;
     }
 }

@@ -13,7 +13,12 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.expression.ExpressionExecutorStrategy.DEFINITION_ID;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -26,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 import groovy.lang.GroovyShell;
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
+import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
@@ -34,16 +42,21 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.expression.ContainerState;
-import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
+import org.bonitasoft.engine.expression.model.builder.impl.SExpressionBuilderFactoryImpl;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.codehaus.groovy.runtime.typehandling.GroovyCastException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -85,7 +98,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService)
                 .getLocalClassLoader(anyString(), anyLong());
         context = new HashMap<>();
-        context.put(ExpressionExecutorStrategy.DEFINITION_ID, 123456789L);
+        context.put(DEFINITION_ID, 123456789L);
     }
 
     @After
@@ -230,10 +243,10 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     public void should_evaluate_return_the_evaluation() throws Exception {
         //given
         final SExpressionImpl expression = new SExpressionImpl("myExpr", "'toto'", null, "java.lang.String", null,
-                Collections.<SExpression> emptyList());
+                Collections.emptyList());
         // when
         final Object evaluate = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context,
-                Collections.<Integer, Object> emptyMap(),
+                Collections.emptyMap(),
                 ContainerState.ACTIVE);
 
         // then
@@ -245,10 +258,10 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         //given
         final SExpressionImpl expression = new SExpressionImpl("myExpr", "throw new java.lang.NoClassDefFoundError()",
                 null, "java.lang.String", null,
-                Collections.<SExpression> emptyList());
+                Collections.emptyList());
         // when
         groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context,
-                Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
+                Collections.emptyMap(), ContainerState.ACTIVE);
 
         // then
         //exception
@@ -259,11 +272,221 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         //given
         final SExpressionImpl expression = new SExpressionImpl("myExpr", "throw new java.lang.Throwable()", null,
                 "java.lang.String", null,
-                Collections.<SExpression> emptyList());
+                Collections.emptyList());
         // when
         groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context,
-                Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
+                Collections.emptyMap(), ContainerState.ACTIVE);
         // then
         //exception
+    }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void evaluation_with_DefaultGroovyMethod_size_should_return_4()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "import static org.codehaus.groovy.runtime.DefaultGroovyMethods.*\n"
+                + "size(new StringBuffer('test'))";
+        SExpression expression = integerExpression(content);
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value)
+                .isInstanceOf(Integer.class)
+                .isEqualTo(4);
+    }
+
+    @Test
+    public void evaluation_with_string_size_should_return_4()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "new StringBuffer('test').size()";
+        SExpression expression = integerExpression(content);
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value)
+                .isInstanceOf(Integer.class)
+                .isEqualTo(4);
+    }
+
+    private static SExpressionBuilder expressionBuilder() {
+        return new SExpressionBuilderFactoryImpl().createNewInstance().setName("test");
+    }
+
+    private static SExpression integerExpression(String content) throws SInvalidExpressionException {
+        return expressionBuilder().setContent(content).setReturnType(Integer.class.getName()).done();
+    }
+
+    @Test
+    public void evaluation_with_jsonBuilder_toString_should_work_on_java_8_and_java_11()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "import groovy.json.JsonBuilder\n"
+                + "new JsonBuilder('hello').toString()";
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(String.class.getName()).done();
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value)
+                .isInstanceOf(String.class)
+                .isEqualTo("\"hello\"");
+    }
+
+    @Test
+    public void evaluation_should_auto_cast_to_string_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "1";
+
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(String.class.getName()).done();
+        Object stringValue = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(),
+                null);
+        assertThat(stringValue)
+                .isInstanceOf(String.class)
+                .isEqualTo("1");
+    }
+
+    @Test
+    public void evaluation_should_auto_cast_groovy_string_to_string_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "\"\"\"Hello ${firstName}\"\"\"";
+
+        Map<String, Object> context = new HashMap<>();
+        context.put(DEFINITION_ID, 42L);
+        context.put("firstName", "Romain");
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(String.class.getName()).done();
+        Object stringValue = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, emptyMap(),
+                null);
+        assertThat(stringValue)
+                .isInstanceOf(String.class)
+                .isEqualTo("Hello Romain");
+    }
+
+    @Test
+    public void evaluation_should_auto_cast_to_integer_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "1";
+
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(Integer.class.getName()).done();
+        Object intergerValue = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(),
+                null);
+        assertThat(intergerValue)
+                .isInstanceOf(Integer.class)
+                .isEqualTo(1);
+    }
+
+    @Test
+    public void evaluation_should_auto_cast_to_double_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "1";
+
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(Double.class.getName()).done();
+        Object doubleValue = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(),
+                null);
+        assertThat(doubleValue)
+                .isInstanceOf(Double.class)
+                .isEqualTo(1d);
+    }
+
+    @Test
+    public void evaluation_should_auto_cast_thruthy_expression_to_boolean_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String thruthyContent = "1"; // 1 is truthy
+
+        SExpression expression = expressionBuilder().setContent(thruthyContent).setReturnType(Boolean.class.getName())
+                .done();
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value)
+                .isInstanceOf(Boolean.class)
+                .isEqualTo(true);
+
+    }
+
+    @Test
+    public void evaluation_should_auto_cast_falsy_expression_to_boolean_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String falsyContent = "0"; // 0 is falsy
+
+        SExpression expression = expressionBuilder().setContent(falsyContent).setReturnType(Boolean.class.getName())
+                .done();
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value)
+                .isInstanceOf(Boolean.class)
+                .isEqualTo(false);
+
+    }
+
+    @Test
+    public void evaluation_should_auto_cast_list_expression_to_array_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String falsyContent = "[1,2,3]";
+
+        SExpression expression = expressionBuilder().setContent(falsyContent).setReturnType(String[].class.getName())
+                .done();
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value)
+                .isInstanceOf(String[].class)
+                .isEqualTo(new String[] { "1", "2", "3" });
+
+    }
+
+    @Test
+    public void evaluation_should_not_auto_cast_FileInputValue_to_Document_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "document";
+
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(Document.class.getName())
+                .done();
+        Map<String, Object> context = new HashMap<>();
+        FileInputValue fileInputValue = new FileInputValue("someDoc", null);
+        context.put("document", fileInputValue);
+        context.put(DEFINITION_ID, 42L);
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, emptyMap(), null);
+        assertThat(value)
+                .isInstanceOf(FileInputValue.class)
+                .isEqualTo(fileInputValue);
+    }
+
+    @Test
+    public void evaluation_should_not_auto_cast_FileInputValue_to_DocumentValue_return_type()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "documentValue";
+
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(DocumentValue.class.getName())
+                .done();
+        Map<String, Object> context = new HashMap<>();
+        FileInputValue fileInputValue = new FileInputValue("someDoc", null);
+        context.put("documentValue", fileInputValue);
+        context.put(DEFINITION_ID, 42L);
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, emptyMap(), null);
+        assertThat(value)
+                .isInstanceOf(FileInputValue.class)
+                .isEqualTo(fileInputValue);
+    }
+
+    @Test
+    public void evaluation_should_not_auto_cast_null_result()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "null";
+
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(String.class.getName())
+                .done();
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value).isNull();
+    }
+
+    @Test
+    public void evaluation_should_throw_a_GroovyCastException_when_casting_incompatible_types()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String notAList = "1"; // cannot be casted into List
+
+        SExpression expression = expressionBuilder().setContent(notAList).setReturnType(List.class.getName()).done();
+
+        expectedException.expectCause(is(instanceOf(GroovyCastException.class)));
+        groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, singletonMap(DEFINITION_ID, 42L), emptyMap(),
+                null);
     }
 }

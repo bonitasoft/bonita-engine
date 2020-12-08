@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
@@ -41,6 +42,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -69,6 +71,52 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
         assertEquals("stringFromPublicMethod", task.getDisplayName());
         assertThat(processDeployLog)
                 .containsOnlyOnce(" Refreshing class loader of type PROCESS with id " + processDefinition.getId());
+    }
+
+    public String toString() {
+        return "MyObject";
+    }
+
+    @Test
+    public void should_be_able_to_execute_scripts_on_processes_having_same_classes() throws Exception {
+        byte[] myObjectJar1 = IOUtil.generateJar(
+                Pair.of("MyObject",
+                        "public interface MyObject extends java.io.Serializable {}"),
+                Pair.of("MyObjectImpl1",
+                        "public class MyObjectImpl1 implements MyObject {\n" +
+                                "   public String toString() {\n" +
+                                "        return \"MyObjectImpl\";\n" +
+                                "    }\n" +
+                                "}"));
+        byte[] myObjectJar2 = IOUtil.generateJar(
+                Pair.of("MyObject",
+                        "public interface MyObject extends java.io.Serializable {}"),
+                Pair.of("MyObjectImpl2",
+                        "public class MyObjectImpl2 implements MyObject {\n" +
+                                "   public String toString() {\n" +
+                                "        return \"MyObjectImpl\";\n" +
+                                "    }\n" +
+                                "}"));
+        BusinessArchive bar1 = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("process1 with MyObject", "1.0")
+                        .addData("myObject", "MyObject", new ExpressionBuilder().createGroovyScriptExpression("s1",
+                                "new MyObjectImpl1()", "MyObject"))
+                        .getProcess())
+                .addClasspathResource(new BarResource("myObjectJar.jar", myObjectJar1)).done();
+        BusinessArchive bar2 = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("process2 with MyObject", "1.0")
+                        .addData("myObject", "MyObject", new ExpressionBuilder().createGroovyScriptExpression("s1",
+                                "new MyObjectImpl2()", "MyObject"))
+                        .getProcess())
+                .addClasspathResource(new BarResource("myObjectJar.jar", myObjectJar2)).done();
+
+        ProcessDefinition processDefinition1 = deployAndEnableProcess(bar1);
+        ProcessDefinition processDefinition2 = deployAndEnableProcess(bar2);
+
+        ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
+        waitForProcessToFinish(processInstance1);
+        ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
+        waitForProcessToFinish(processInstance2);
     }
 
     @Test
