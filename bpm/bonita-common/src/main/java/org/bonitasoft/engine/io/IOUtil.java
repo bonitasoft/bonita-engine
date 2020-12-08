@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.io;
 
-import static java.util.Collections.singletonMap;
+import static java.util.Arrays.stream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -34,11 +34,13 @@ import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -55,7 +57,9 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.xml.sax.SAXException;
 
@@ -76,18 +80,34 @@ public class IOUtil {
     }
 
     public static byte[] generateJar(String className, String... content) throws IOException {
+        return generateJar(Pair.of(className, String.join("\n", content)));
+    }
+
+    public static byte[] generateJar(Pair<String, String>... classFiles) throws IOException {
         File root = Files.createTempDirectory("tempCompile").toFile();
-        File sourceFile = new File(root, className + ".java");
-        Files.write(sourceFile.toPath(), String.join("\n", content).getBytes(StandardCharsets.UTF_8));
+        List<String> sourceFiles = stream(classFiles).map(classFile -> {
+            File sourceFile = new File(root, classFile.getKey() + ".java");
+            write(classFile, sourceFile);
+            return sourceFile.getPath();
+        }).collect(Collectors.toList());
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        int run = compiler.run(null, null, null, sourceFile.getPath());
+        int run = compiler.run(null, null, null, sourceFiles.toArray(new String[] {}));
         if (run != 0) {
             throw new IllegalArgumentException("Unable to compile the file, see logs");
         }
-        byte[] bytes = Files.readAllBytes(root.toPath().resolve(className + CLASS_EXT));
+        return generateJar(
+                stream(classFiles).collect(Collectors.toMap(p -> p.getKey() + CLASS_EXT, p -> read(root, p))));
+    }
 
-        return generateJar(singletonMap(className + CLASS_EXT, bytes));
+    @SneakyThrows
+    protected static void write(Pair<String, String> classFile, File sourceFile) {
+        Files.write(sourceFile.toPath(), classFile.getValue().getBytes(StandardCharsets.UTF_8));
+    }
+
+    @SneakyThrows
+    protected static byte[] read(File root, Pair<String, String> p) {
+        return Files.readAllBytes(root.toPath().resolve(p.getKey() + CLASS_EXT));
     }
 
     public static Map<String, byte[]> getResources(final Class<?>... classes) throws IOException {
