@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.ProcessAPI
+import org.bonitasoft.engine.api.IdentityAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance
@@ -28,6 +29,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType
 import org.bonitasoft.engine.exception.NotFoundException
+import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.identity.UserSearchDescriptor
 import org.bonitasoft.engine.search.SearchOptionsBuilder
 import org.bonitasoft.engine.session.APISession
@@ -44,6 +46,7 @@ import org.bonitasoft.engine.session.APISession
  *     <li>bpm/archivedHumanTask</li>
  *     <li>bpm/archivedUserTask</li>
  *     <li>bpm/activity</li>
+ *     <li>bpm/activityReplay</li>
  *     <li>bpm/archivedActivity</li>
  *     <li>bpm/task</li>
  *     <li>bpm/archivedTask</li>
@@ -69,7 +72,8 @@ class TaskPermissionRule implements PermissionRule {
             if (apiCallContext.isGET()) {
                 return checkGetMethod(apiCallContext, processAPI, logger, currentUserId, userName, filters)
             } else if (apiCallContext.isPUT() && apiCallContext.getResourceId() != null) {
-                return isTaskAccessibleByUser(processAPI, apiCallContext, logger, currentUserId, userName)
+                def assignUser = getAssignedUser(apiCallContext, apiAccessor, logger)
+                return isTaskAccessibleByUser(processAPI, apiCallContext, logger, currentUserId, userName, assignUser)
             } else if (apiCallContext.isPOST()) {
                 return checkPostMethod(apiCallContext, currentUserId, processAPI, userName, logger)
             }
@@ -80,18 +84,38 @@ class TaskPermissionRule implements PermissionRule {
         return true
     }
 
+    private User getAssignedUser(APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
+        if (apiCallContext.getBody() != null) {
+            ObjectMapper mapper = new ObjectMapper()
+            def map = mapper.readValue(apiCallContext.getBody(), Map.class)
+            if (map != null) {
+                def assignedId = map.get("assigned_id")
+                if (assignedId != null && !assignedId.toString().isEmpty()) {
+                    try {
+                        def assignedUserId = Long.valueOf(assignedId.toString())
+                        def identityAPI = apiAccessor.getIdentityAPI()
+                        return identityAPI.getUser(assignedUserId)
+                    } catch (Exception e) {
+                        logger.debug("assigned Id is not a long or does not match an existing user")
+                    }
+                }
+            }
+        }
+        return null
+    }
+
     private boolean checkGetMethod(APICallContext apiCallContext, ProcessAPI processAPI, Logger logger, long currentUserId, String userName, Map<String, String> filters) {
         if (apiCallContext.getResourceId() != null) {
-            return isTaskAccessibleByUser(processAPI, apiCallContext, logger, currentUserId, userName)
+            return isTaskAccessibleByUser(processAPI, apiCallContext, logger, currentUserId, userName, null)
         } else if (hasFilter(currentUserId, filters, "assigned_id") || hasFilter(currentUserId, filters, "user_id") || hasFilter(currentUserId, filters, "hidden_user_id") || hasFilter(currentUserId, filters, "supervisor_id")) {
             logger.debug("FilterOnUser or FilterOnAssignUser")
             return true
         } else if (filters.containsKey("parentTaskId")) {
             def long parentTaskId = Long.parseLong(filters.get("parentTaskId"))
             try {
-                return isTaskAccessible(processAPI, filters.get("parentTaskId"), currentUserId, userName, logger)
+                return isTaskAccessible(processAPI, filters.get("parentTaskId"), currentUserId, userName, null, logger)
             } catch (NotFoundException e) {
-                return isArchivedFlowNodeAccessible(processAPI, parentTaskId, currentUserId, userName)
+                return isArchivedFlowNodeAccessible(processAPI, parentTaskId, currentUserId, userName, logger)
             }
         } else if (filters.containsKey("processId")) {
             def long processId = Long.valueOf(filters.get("processId"))
@@ -124,15 +148,15 @@ class TaskPermissionRule implements PermissionRule {
         return String.valueOf(currentUserId).equals(filters.get(assigned_id))
     }
 
-    protected boolean isTaskAccessibleByUser(ProcessAPI processAPI, APICallContext apiCallContext, Logger logger, long currentUserId, String username) throws NotFoundException {
+    protected boolean isTaskAccessibleByUser(ProcessAPI processAPI, APICallContext apiCallContext, Logger logger, long currentUserId, String username, User assignedUser) throws NotFoundException {
         if (apiCallContext.getResourceName().startsWith("archived")) {
-            return isArchivedFlowNodeAccessible(processAPI, Long.valueOf(apiCallContext.getResourceId()), currentUserId, username)
+            return isArchivedFlowNodeAccessible(processAPI, Long.valueOf(apiCallContext.getResourceId()), currentUserId, username, logger)
         } else {
-            return isTaskAccessible(processAPI, apiCallContext.getResourceId(), currentUserId, username, logger)
+            return isTaskAccessible(processAPI, apiCallContext.getResourceId(), currentUserId, username, assignedUser, logger)
         }
     }
 
-    private boolean isArchivedFlowNodeAccessible(ProcessAPI processAPI, long taskId, long currentUserId, String username) throws NotFoundException {
+    private boolean isArchivedFlowNodeAccessible(ProcessAPI processAPI, long taskId, long currentUserId, String username, Logger logger) throws NotFoundException {
         def archivedFlowNodeInstance = processAPI.getArchivedFlowNodeInstance(taskId)
         if (FlowNodeType.MANUAL_TASK.equals(archivedFlowNodeInstance.getType()) || FlowNodeType.USER_TASK.equals(archivedFlowNodeInstance.getType())) {
             if (currentUserId == archivedFlowNodeInstance.getExecutedBy()) {
@@ -140,12 +164,12 @@ class TaskPermissionRule implements PermissionRule {
             }
             //get the last flow node in journal
             if(archivedFlowNodeInstance.getExecutedBy() == 0){
-                try{
+                try {
                     def instance1 = processAPI.getHumanTaskInstance(archivedFlowNodeInstance.getSourceObjectId())
                     if(currentUserId == instance1.getAssigneeId()){
                         return true
                     }
-                }catch(NotFoundException e){
+                } catch(NotFoundException e){
                     //do nothing
                 }
             }
@@ -185,7 +209,7 @@ class TaskPermissionRule implements PermissionRule {
         return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
     }
 
-    private boolean isTaskAccessible(ProcessAPI processAPI, String flowNodeIdAsString, long currentUserId, String username, Logger logger) throws NotFoundException {
+    private boolean isTaskAccessible(ProcessAPI processAPI, String flowNodeIdAsString, long currentUserId, String username, User assignedUser, Logger logger) throws NotFoundException {
         def long flowNodeId = Long.valueOf(flowNodeIdAsString)
         def instance = processAPI.getFlowNodeInstance(flowNodeId)
         if (instance instanceof HumanTaskInstance) {
@@ -227,6 +251,12 @@ class TaskPermissionRule implements PermissionRule {
             }
         }
         def processDefinitionId = instance.getProcessDefinitionId()
-        return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
+        if (processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)) {
+            if (assignedUser != null){
+                return isTaskAccessible(processAPI, flowNodeIdAsString, assignedUser.getId(), assignedUser.getUserName(), null, logger)
+            }
+            return true
+        }
+        return false
     }
 }
