@@ -14,6 +14,7 @@
 package org.bonitasoft.platform.setup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -49,7 +50,8 @@ import org.springframework.context.annotation.ComponentScan;
         "org.bonitasoft.platform.version" })
 public class PlatformSetupApplication {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(PlatformSetupApplication.class);
+    // /!\ Leave this logger NON-STATIC, so that DEBUG property may be set before it is initialized:
+    private final Logger LOGGER = LoggerFactory.getLogger(PlatformSetupApplication.class);
     private HelpCommand helpCommand;
     private List<PlatformSetupCommand> commands;
     private Options options;
@@ -61,6 +63,9 @@ public class PlatformSetupApplication {
     PlatformSetup platformSetup;
 
     public static void main(String[] args) {
+        if (args != null && Arrays.asList(args).contains("--debug")) {
+            System.setProperty("bonita.platform.setup.log", "DEBUG"); // so that it is set before used by Logger
+        }
         new PlatformSetupApplication().run(args);
     }
 
@@ -152,6 +157,7 @@ public class PlatformSetupApplication {
         systemPropertyOption.setArgs(2);
         options.addOption(systemPropertyOption);
         options.addOption("f", "force", false, "Force push even if critical folders will be deleted");
+        options.addOption("d", "debug", false, "Provides more details in case of error");
         return options;
     }
 
