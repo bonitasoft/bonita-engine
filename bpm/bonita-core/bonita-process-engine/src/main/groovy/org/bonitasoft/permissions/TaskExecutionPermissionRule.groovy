@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.ProcessAPI
+import org.bonitasoft.engine.api.IdentityAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeType
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance
 import org.bonitasoft.engine.exception.NotFoundException
+import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.identity.UserSearchDescriptor
 import org.bonitasoft.engine.search.SearchOptionsBuilder
 import org.bonitasoft.engine.session.APISession
@@ -51,45 +53,62 @@ import org.bonitasoft.engine.session.APISession
  */
 class TaskExecutionPermissionRule implements PermissionRule {
 
+    private static final String USER_PARAM = "user"
+
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         long currentUserId = apiSession.getUserId()
         def userName = apiSession.getUserName()
         def processAPI = apiAccessor.getProcessAPI()
+        def identityAPI = apiAccessor.getIdentityAPI()
         try {
-            return isTaskAccessibleByUser(processAPI, apiCallContext, logger, currentUserId, userName)
+            return isTaskAccessibleByUser(processAPI, identityAPI, apiCallContext, logger, currentUserId, userName)
         } catch (NotFoundException e) {
             logger.debug("flow node not found: is allowed")
             return true
         }
     }
 
-    protected boolean isTaskAccessibleByUser(ProcessAPI processAPI, APICallContext apiCallContext, Logger logger, long currentUserId, String username) throws NotFoundException {
+    protected boolean isTaskAccessibleByUser(ProcessAPI processAPI, IdentityAPI identityAPI, APICallContext apiCallContext, Logger logger, long currentUserId, String username) throws NotFoundException {
         def taskInstanceId = getTaskInstanceId(apiCallContext)
         if (taskInstanceId <= 0) {
             return true
         }
         if (apiCallContext.getResourceName().startsWith("archived")) {
-            return isArchivedFlowNodeAccessible(processAPI, taskInstanceId, currentUserId, username)
+            return isArchivedFlowNodeAccessible(processAPI, taskInstanceId, currentUserId, username, logger)
         } else {
-            return isTaskAccessible(processAPI, taskInstanceId, currentUserId, username, logger)
+            def assignedUser = getAssignedUser(apiCallContext, identityAPI, logger)
+            return isTaskAccessible(processAPI, taskInstanceId, currentUserId, username, assignedUser, logger)
         }
     }
 
-    private boolean isArchivedFlowNodeAccessible(ProcessAPI processAPI, long taskId, long currentUserId, String username) throws NotFoundException {
+    private User getAssignedUser(APICallContext apiCallContext, IdentityAPI identityAPI, Logger logger) {
+        def assignedId = apiCallContext.getParameters().get(USER_PARAM)
+        if (assignedId != null && assignedId.length > 0) {
+            try {
+                def assignedUserId = Long.valueOf(assignedId[0])
+                return identityAPI.getUser(assignedUserId)
+            } catch (Exception e) {
+                logger.debug("user Id is not a long or does not match an existing user")
+            }
+        }
+        return null
+    }
+
+    private boolean isArchivedFlowNodeAccessible(ProcessAPI processAPI, long taskId, long currentUserId, String username, Logger logger) throws NotFoundException {
         def archivedFlowNodeInstance = processAPI.getArchivedFlowNodeInstance(taskId)
         if (FlowNodeType.MANUAL_TASK.equals(archivedFlowNodeInstance.getType()) || FlowNodeType.USER_TASK.equals(archivedFlowNodeInstance.getType())) {
             if (currentUserId == archivedFlowNodeInstance.getExecutedBy()) {
                 return true
             }
             //get the last flow node in journal
-            if(archivedFlowNodeInstance.getExecutedBy() == 0){
-                try{
+            if (archivedFlowNodeInstance.getExecutedBy() == 0){
+                try {
                     def instance1 = processAPI.getHumanTaskInstance(archivedFlowNodeInstance.getSourceObjectId())
                     if(currentUserId == instance1.getAssigneeId()){
                         return true
                     }
-                }catch(NotFoundException e){
+                } catch(NotFoundException e){
                     //do nothing
                 }
             }
@@ -129,7 +148,7 @@ class TaskExecutionPermissionRule implements PermissionRule {
         return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
     }
 
-    private boolean isTaskAccessible(ProcessAPI processAPI, long flowNodeId, long currentUserId, String username, Logger logger) throws NotFoundException {
+    private boolean isTaskAccessible(ProcessAPI processAPI, long flowNodeId, long currentUserId, String username, User assignedUser, Logger logger) throws NotFoundException {
         def instance = processAPI.getFlowNodeInstance(flowNodeId)
         if (FlowNodeType.MANUAL_TASK.equals(instance.getType()) || FlowNodeType.USER_TASK.equals(instance.getType())) {
             if (instance.assigneeId > 0) {
@@ -170,7 +189,13 @@ class TaskExecutionPermissionRule implements PermissionRule {
             }
         }
         def processDefinitionId = instance.getProcessDefinitionId()
-        return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
+        if (processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)) {
+            if (assignedUser != null){
+                return isTaskAccessible(processAPI, flowNodeId, assignedUser.getId(), assignedUser.getUserName(), null, logger)
+            }
+            return true
+        }
+        return false
     }
 
     private long getTaskInstanceId(APICallContext apiCallContext) {
