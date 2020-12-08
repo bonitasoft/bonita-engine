@@ -24,18 +24,7 @@ IF NOT "%BONITA_DATABASE%" == "h2" IF NOT "%BONITA_DATABASE%" == "postgres" IF N
     exit /b 1
 )
 
-:: extract specific parameters
-set otherArgs=
-set JVM_OPTS=
-FOR %%a IN (%*) DO (
-    if "%%a" == "--debug" (
-        set JVM_OPTS="-Dbonita.platform.setup.log=DEBUG"
-    ) else (
-        set otherArgs=!otherArgs! %%~a
-    )
-)
-
-"%JAVA_CMD%" -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*" %JVM_OPTS% -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication %otherArgs%
+"%JAVA_CMD%" -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*" -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication %*
 
 if errorlevel 1 (
     exit /b 1
