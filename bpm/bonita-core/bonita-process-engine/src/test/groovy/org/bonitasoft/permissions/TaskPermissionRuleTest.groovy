@@ -61,6 +61,7 @@ public class TaskPermissionRuleTest {
     @Before
     public void before() {
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
+        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 
@@ -257,7 +258,6 @@ public class TaskPermissionRuleTest {
         assertThat(isAuthorized).isTrue()
     }
 
-
     @Test
     public void should_GET_humanTasks_providing_a_parentCaseId() {
         //given
@@ -275,7 +275,7 @@ public class TaskPermissionRuleTest {
     }
 
     @Test
-    public void should_GET_humanTasks_providing_a_caseId() {
+    public void should_GET_humanTasks_providing_a_caseId_if_supervisor() {
         //given
         havingFilters([caseId: "5"])
         doReturn("humanTask").when(apiCallContext).getResourceName()
@@ -288,6 +288,52 @@ public class TaskPermissionRuleTest {
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
         assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void should_PUT_on_a_human_task_if_supervisor() {
+        //given
+        doReturn(true).when(apiCallContext).isPUT()
+        doReturn("458").when(apiCallContext).getResourceId()
+        doReturn("humanTask").when(apiCallContext).getResourceName()
+        def instance = mock(UserTaskInstance.class)
+        doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doReturn(10l).when(instance).getProcessDefinitionId()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
+        doReturn('''{"assigned_id":"4"}''').when(apiCallContext).getBody()
+        def assigneUser = mock(User.class)
+        doReturn(assigneUser).when(identityAPI).getUser(4l)
+        doReturn(4l).when(assigneUser).getId()
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
+        doReturn(4l).when(instance).getAssigneeId()
+        doReturn(false).when(processAPI).isUserProcessSupervisor(10l, 4l)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void should_not_PUT_on_a_human_task_if_supervisor_but_assigned_id_no_actor() {
+        //given
+        doReturn(true).when(apiCallContext).isPUT()
+        doReturn("458").when(apiCallContext).getResourceId()
+        doReturn("humanTask").when(apiCallContext).getResourceName()
+        def instance = mock(UserTaskInstance.class)
+        doReturn(instance).when(processAPI).getFlowNodeInstance(458)
+        doReturn(10l).when(instance).getProcessDefinitionId()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
+        doReturn('''{"assigned_id":"4"}''').when(apiCallContext).getBody()
+        def assigneUser = mock(User.class)
+        doReturn(assigneUser).when(identityAPI).getUser(4l)
+        doReturn(4l).when(assigneUser).getId()
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
+        doReturn(99l).when(instance).getAssigneeId()
+        doReturn(false).when(processAPI).isUserProcessSupervisor(10l, 4l)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test

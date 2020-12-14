@@ -58,6 +58,7 @@ public class TaskExecutionPermissionRuleTest {
     @Before
     public void before() {
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
+        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 
@@ -165,6 +166,50 @@ public class TaskExecutionPermissionRuleTest {
         doReturn(-1l).when(instance).getAssigneeId()
         doReturn(instance).when(processAPI).getFlowNodeInstance(458)
         doReturn(new SearchResultImpl(0, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isFalse()
+    }
+
+    @Test
+    public void should_POST_on_a_pending_task_if_supervisor() {
+        //given
+        havingResource("userTask")
+        def instance = mock(UserTaskInstance.class)
+        doReturn(10l).when(instance).getProcessDefinitionId()
+        doReturn(FlowNodeType.USER_TASK).when(instance).getType()
+        doReturn(4l).when(instance).getAssigneeId()
+        doReturn(instance).when(processAPI).getFlowNodeInstance(458l)
+        doReturn(true).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
+        doReturn([user: ["4"] as String[]]).when(apiCallContext).getParameters()
+        def assigneUser = mock(User.class)
+        doReturn(assigneUser).when(identityAPI).getUser(4l)
+        doReturn(4l).when(assigneUser).getId()
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
+        doReturn(false).when(processAPI).isUserProcessSupervisor(10l, 4l)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void should_not_POST_on_a_pending_task_if_supervisor_but_assigned_id_no_actor() {
+        //given
+        havingResource("userTask")
+        def instance = mock(UserTaskInstance.class)
+        doReturn(10l).when(instance).getProcessDefinitionId()
+        doReturn(FlowNodeType.USER_TASK).when(instance).getType()
+        doReturn(-1l).when(instance).getAssigneeId()
+        doReturn(instance).when(processAPI).getFlowNodeInstance(458l)
+        doReturn(true).when(processAPI).isUserProcessSupervisor(10l, currentUserId)
+        doReturn([user: ["4"] as String[]]).when(apiCallContext).getParameters()
+        def assigneUser = mock(User.class)
+        doReturn(assigneUser).when(identityAPI).getUser(4l)
+        doReturn(4l).when(assigneUser).getId()
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchUsersWhoCanExecutePendingHumanTask(eq(458l), any(SearchOptions.class))
+        doReturn(false).when(processAPI).isUserProcessSupervisor(10l, 4l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
