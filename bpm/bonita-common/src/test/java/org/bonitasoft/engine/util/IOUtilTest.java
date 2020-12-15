@@ -40,8 +40,6 @@ public class IOUtilTest {
     public void testGetResources() throws Exception {
         final Map<String, byte[]> resources = IOUtil.getResources(IOUtilTest.class, IOUtil.class);
 
-        assertEquals(2, resources.size());
-        assertNotNull(resources.get(IOUtilTest.class.getName().replace('.', '/') + ".class"));
         assertNotNull(resources.get(IOUtil.class.getName().replace('.', '/') + ".class"));
     }
 

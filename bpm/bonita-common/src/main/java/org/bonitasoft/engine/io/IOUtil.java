@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.io;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 
 import java.io.BufferedInputStream;
@@ -31,9 +33,13 @@ import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -44,6 +50,10 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -76,18 +86,49 @@ public class IOUtil {
     }
 
     public static byte[] generateJar(String className, String... content) throws IOException {
-        File root = Files.createTempDirectory("tempCompile").toFile();
-        File sourceFile = new File(root, className + ".java");
-        Files.write(sourceFile.toPath(), String.join("\n", content).getBytes(StandardCharsets.UTF_8));
+        return generateJar(emptyList(), className, content);
+    }
 
+    static class StringJavaFileObject extends SimpleJavaFileObject {
+
+        private final String sourceCode;
+
+        StringJavaFileObject(String className, String content) {
+            super(URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
+            this.sourceCode = content;
+        }
+
+        public CharSequence getCharContent(boolean var1) {
+            return this.sourceCode;
+        }
+    }
+
+    public static byte[] generateJar(List<Path> additionalJar, String className, String... content) throws IOException {
+        String fullContent = String.join("\n", content);
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        int run = compiler.run(null, null, null, sourceFile.getPath());
-        if (run != 0) {
+        StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
+        updateClassPath(additionalJar, standardFileManager);
+        standardFileManager.setLocation(StandardLocation.CLASS_OUTPUT,
+                Collections.singleton(Files.createTempDirectory("compile-test").toFile()));
+        JavaCompiler.CompilationTask run = compiler.getTask(null, standardFileManager, null, null, null,
+                singletonList(new StringJavaFileObject(className, fullContent)));
+        Boolean call = run.call();
+        if (!call) {
             throw new IllegalArgumentException("Unable to compile the file, see logs");
         }
-        byte[] bytes = Files.readAllBytes(root.toPath().resolve(className + CLASS_EXT));
+        JavaFileObject javaFileForInput = standardFileManager.getJavaFileForInput(StandardLocation.CLASS_OUTPUT,
+                className, JavaFileObject.Kind.CLASS);
+        byte[] bytes = Files.readAllBytes(Paths.get(javaFileForInput.toUri()));
+        return generateJar(singletonMap(className.replace(".", "/") + ".class", bytes));
+    }
 
-        return generateJar(singletonMap(className + CLASS_EXT, bytes));
+    private static void updateClassPath(List<Path> additionalJar, StandardJavaFileManager standardFileManager)
+            throws IOException {
+        Iterable<? extends File> location = standardFileManager.getLocation(StandardLocation.CLASS_PATH);
+        ArrayList<File> classPath = new ArrayList<>();
+        location.forEach(classPath::add);
+        additionalJar.stream().map(Path::toFile).forEach(classPath::add);
+        standardFileManager.setLocation(StandardLocation.CLASS_PATH, classPath);
     }
 
     public static Map<String, byte[]> getResources(final Class<?>... classes) throws IOException {

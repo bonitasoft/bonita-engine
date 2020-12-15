@@ -42,7 +42,7 @@ import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.junit.Ignore;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -51,6 +51,16 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
 
     @Rule
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+
+    @After
+    public void cleanUp() throws Exception {
+        String businessDataModelVersion = getTenantAdministrationAPI().getBusinessDataModelVersion();
+        if (businessDataModelVersion != null) {
+            getTenantAdministrationAPI().pause();
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            getTenantAdministrationAPI().resume();
+        }
+    }
 
     @Test
     public void should_refresh_classloader_only_once_on_deploy_process() throws Exception {
@@ -72,7 +82,6 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Ignore("We should have only one refresh when deploying bdm see BS-19229")
     public void should_refresh_classloader_only_once_on_deploy_bdm() throws Exception {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildCustomBOM());
@@ -82,11 +91,10 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
         String deployBDMLog = systemOutRule.getLog();
         getTenantAdministrationAPI().resume();
 
-        assertThat(deployBDMLog).containsOnlyOnce("Refreshing classloader with key: TENANT:");
+        assertThat(deployBDMLog).containsOnlyOnce("Refreshing class loader of type TENANT with id");
     }
 
     @Test
-    @Ignore("We should remove this call to refresh classloader on delete")
     public void should_not_refresh_classloader_on_delete_process_definition() throws Exception {
         BusinessArchive businessArchive = createProcessWithDependencies();
         User user = getIdentityAPI().createUser("john", "bpm");
@@ -98,7 +106,7 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
         String processDeployLog = systemOutRule.getLog();
 
         assertThat(processDeployLog)
-                .doesNotContain("Refreshing classloader with key: PROCESS:" + processDefinition.getId());
+                .doesNotContain("Refreshing class loader of type PROCESS with id" + processDefinition.getId());
     }
 
     private BusinessObjectModel buildCustomBOM() {
