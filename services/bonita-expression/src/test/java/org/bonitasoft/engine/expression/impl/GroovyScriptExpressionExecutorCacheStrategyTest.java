@@ -330,7 +330,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_auto_cast_to_string_return_type()
+    public void evaluation_should_coerce_to_string_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String content = "1";
 
@@ -344,7 +344,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_auto_cast_groovy_string_to_string_return_type()
+    public void evaluation_should_coerce_groovy_string_to_string_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String content = "\"\"\"Hello ${firstName}\"\"\"";
 
@@ -360,7 +360,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_auto_cast_to_integer_return_type()
+    public void evaluation_should_coerce_to_integer_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String content = "1";
 
@@ -374,7 +374,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_auto_cast_to_double_return_type()
+    public void evaluation_should_coerce_to_double_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String content = "1";
 
@@ -388,7 +388,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_auto_cast_thruthy_expression_to_boolean_return_type()
+    public void evaluation_should_coerce_thruthy_expression_to_boolean_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String thruthyContent = "1"; // 1 is truthy
 
@@ -403,7 +403,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_auto_cast_falsy_expression_to_boolean_return_type()
+    public void evaluation_should_coerce_falsy_expression_to_boolean_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String falsyContent = "0"; // 0 is falsy
 
@@ -418,7 +418,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_auto_cast_list_expression_to_array_return_type()
+    public void evaluation_should_coerce_list_expression_to_array_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String falsyContent = "[1,2,3]";
 
@@ -433,7 +433,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_not_auto_cast_FileInputValue_to_Document_return_type()
+    public void evaluation_should_not_coerce_FileInputValue_to_Document_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String content = "document";
 
@@ -450,7 +450,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_not_auto_cast_FileInputValue_to_DocumentValue_return_type()
+    public void evaluation_should_not_coerce_FileInputValue_to_DocumentValue_return_type()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String content = "documentValue";
 
@@ -467,7 +467,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_not_auto_cast_null_result()
+    public void evaluation_should_not_coerce_null_result()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String content = "null";
 
@@ -479,13 +479,49 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void evaluation_should_throw_a_GroovyCastException_when_casting_incompatible_types()
+    public void evaluation_should_throw_a_GroovyCastException_when_coercing_incompatible_types()
             throws SExpressionEvaluationException, SInvalidExpressionException {
-        String notAList = "1"; // cannot be casted into List
+        String notAList = "[1]"; // cannot be casted into Long
 
-        SExpression expression = expressionBuilder().setContent(notAList).setReturnType(List.class.getName()).done();
+        SExpression expression = expressionBuilder().setContent(notAList).setReturnType(Long.class.getName()).done();
 
         expectedException.expectCause(is(instanceOf(GroovyCastException.class)));
+        groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, singletonMap(DEFINITION_ID, 42L), emptyMap(),
+                null);
+    }
+
+    @Test
+    public void evaluation_should_coerce_string_into_long()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "'123'";
+
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(Long.class.getName()).done();
+
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value).isEqualTo(123L);
+    }
+
+    @Test
+    public void evaluation_should_coerce_double_into_long()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String content = "123d";
+
+        SExpression expression = expressionBuilder().setContent(content).setReturnType(Long.class.getName()).done();
+
+        Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
+                singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
+        assertThat(value).isEqualTo(123L);
+    }
+
+    @Test
+    public void evaluation_should_throw_a_NumberFormatException_when_string_cannot_be_formatted()
+            throws SExpressionEvaluationException, SInvalidExpressionException {
+        String notAList = "'123a'"; // cannot be coerce into Long
+
+        SExpression expression = expressionBuilder().setContent(notAList).setReturnType(Long.class.getName()).done();
+
+        expectedException.expectCause(is(instanceOf(NumberFormatException.class)));
         groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, singletonMap(DEFINITION_ID, 42L), emptyMap(),
                 null);
     }

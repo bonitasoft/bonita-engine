@@ -147,7 +147,7 @@ public class ExpressionServiceIT extends CommonBPMServicesTest {
     public void evaluateWrongTypeGroovyExpression() throws Exception {
         final String strContent = "return new ArrayList();";
         final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT,
-                Map.class.getName(), SExpression.GROOVY, null);
+                Long.class.getName(), SExpression.GROOVY, null);
         evaluate(strExpr, EMPTY_RESOLVED_EXPRESSIONS);
     }
 

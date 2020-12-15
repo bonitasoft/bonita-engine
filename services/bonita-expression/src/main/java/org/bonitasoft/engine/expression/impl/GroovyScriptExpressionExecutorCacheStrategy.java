@@ -50,7 +50,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
     public static final String GROOVY_SCRIPT_CACHE_NAME = "GROOVY_SCRIPT_CACHE_NAME";
 
     public static final String SCRIPT_KEY = "SCRIPT_";
-    public static final String CAST_SCRIPT_KEY = "CAST_SCRIPT_";
+    public static final String COERCION_SCRIPT_KEY = "COERCION_SCRIPT_";
     public static final String SHELL_KEY = "SHELL_";
 
     private final CacheService cacheService;
@@ -143,7 +143,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
             final Script script = InvokerHelper
                     .createScript(getScriptFromCache(expressionContent, definitionId), binding);
             script.setBinding(binding);
-            return castResult(getShell(definitionId), script.run(), expression.getReturnType());
+            return coerceResult(getShell(definitionId), script.run(), expression.getReturnType());
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             throw new SExpressionEvaluationException("Expression " + expressionName + " with content = <"
@@ -210,15 +210,15 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
     }
 
     /**
-     * Execute a Groovy expression that cast the result into the returnType
+     * Execute a Groovy expression that coerce the result into the returnType
      *
      * @param shell, the Groovy shell use for script evaluation
      * @param result, the evaluation result
      * @param returnType, expected expression return type
-     * @return the result with the expected type or a {@link GroovyCastException} if the cast fails
+     * @return the result with the expected type or a {@link GroovyCastException} if the coercion fails
      * @throws ClassNotFoundException
      */
-    protected Object castResult(GroovyShell shell, Object result, String returnType)
+    protected Object coerceResult(GroovyShell shell, Object result, String returnType)
             throws ClassNotFoundException, SCacheException {
         if (result == null) {
             return null;
@@ -228,10 +228,10 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
                 || ReturnTypeChecker.isConvertible(returnType, resultClassName)) { // Bonita specific type conversion
             return result;
         }
-        String scriptContent = String.format("(%s) result",
+        String scriptContent = String.format("result as %s",
                 returnType.startsWith("[") ? canonicalClassName(returnType) : returnType);
 
-        GroovyCodeSource gcs = getOrCreateGroovyCodeSource(CAST_SCRIPT_KEY + returnType, scriptContent);
+        GroovyCodeSource gcs = getOrCreateGroovyCodeSource(COERCION_SCRIPT_KEY + returnType, scriptContent);
         Binding binding = new Binding();
         binding.setVariable("result", result);
         Script script = InvokerHelper
