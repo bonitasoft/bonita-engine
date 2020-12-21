@@ -37,6 +37,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -52,6 +53,8 @@ public class PlatformManagerTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Rule
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    @Rule
+    public RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
 
     @Mock
     private NodeConfiguration nodeConfiguration;
@@ -246,6 +249,25 @@ public class PlatformManagerTest {
     private STenant activated(STenant tenant) {
         tenant.setStatus(STenant.ACTIVATED);
         return tenant;
+    }
+
+    @Test
+    public void should_warn_when_using_java_8() throws Exception {
+        System.setProperty("java.specification.version", "1.8");
+
+        platformManager.start();
+
+        assertThat(systemOutRule.getLog()).containsPattern("WARN.*You are running the platform using java version 8");
+    }
+
+    @Test
+    public void should_not_warn_when_using_java_11() throws Exception {
+        System.setProperty("java.specification.version", "11");
+
+        platformManager.start();
+
+        assertThat(systemOutRule.getLog())
+                .doesNotContainPattern("WARN.*You are running the platform using java version 8");
     }
 
 }
