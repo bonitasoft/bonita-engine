@@ -68,22 +68,31 @@ public class VirtualClassLoader extends ClassLoader {
         virtualParent.addChild(this);
     }
 
+    /**
+     * invalidate that classloader, so next time someone requires it, it will be initialized,
+     * see {@link #isInitialized()}
+     */
+    void invalidateClassloader() {
+        replaceClassLoader(null);
+    }
+
+    /**
+     * Replace the real classloader bound to that Virtual classloader
+     *
+     * @param classloader
+     */
     void replaceClassLoader(final BonitaClassLoader classloader) {
         BonitaClassLoader oldClassLoader = this.classloader;
         this.classloader = classloader;
-        notifyUpdate();
-        if (oldClassLoader != null) {
-            destroy(oldClassLoader);
-        }
-    }
-
-    private void notifyUpdate() {
         for (ClassLoaderListener listener : getListeners()) {
             log.debug("Notify listener of virtual classloader {} of update: {}", identifier, listener);
             listener.onUpdate(this);
         }
         for (VirtualClassLoader child : children) {
-            child.notifyUpdate();
+            child.invalidateClassloader();
+        }
+        if (oldClassLoader != null) {
+            destroy(oldClassLoader);
         }
     }
 
@@ -92,6 +101,7 @@ public class VirtualClassLoader extends ClassLoader {
         if (classloader != null) {
             return classloader.loadClass(name, false);
         }
+        log.debug("Tried to load class {} on the un-initialized classloader {}", name, identifier);
         return getParent().loadClass(name);
     }
 

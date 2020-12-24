@@ -24,7 +24,7 @@ import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
  * represents a helper for creating {@link User}. Chaining is possible with this creator to ease the {@link User}
  * creation.
  * <br>
- * For instance, new UserCreator("john.doe", "password").setFirstname("John").setLastname("Doe");
+ * For instance, new UserCreator("john.doe", "password").setFirstName("John").setLastName("Doe");
  *
  * @author Matthieu Chaffotte
  * @see User
