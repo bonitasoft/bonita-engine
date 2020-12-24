@@ -13,12 +13,14 @@
  **/
 package org.bonitasoft.engine.business.data;
 
+import static java.util.Collections.singletonList;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.fail;
+import static org.bonitasoft.engine.test.BuildTestUtil.generateConnectorImplementation;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,6 +28,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -92,6 +96,7 @@ import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -105,9 +110,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BDRepositoryIT extends CommonAPIIT {
 
+    private static final Logger log = LoggerFactory.getLogger(BDRepositoryIT.class);
     private static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
     private static final String ENTITY_CLASS_NAME = "entityClassName";
     private static String bdmDeployedVersion = "0";
@@ -2518,6 +2526,94 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         disableAndDeleteProcess(catchProcessDefinition);
         disableAndDeleteProcess(throwProcessDefinition);
+    }
+
+    @Test
+    public void should_connector_using_bdm_still_work_after_bdm_update() throws Exception {
+
+        installBusinessDataModel(bomMyObjectWith1Field());
+
+        //connector that call setter on the bdm object
+        byte[] setNameConnectorJar = IOUtil.generateJar(singletonList(retrieveClientBDMModelJar()),
+                "com.acme.SetNameOfBDM",
+                "package com.acme;",
+                "public class SetNameOfBDM extends org.bonitasoft.engine.connector.AbstractConnector {",
+                "    public void validateInputParameters() {}",
+                "    protected void executeBusinessLogic() {",
+                "       System.out.println(\"setting the name of a bdm object in a connector:\"+getInputParameter(\"objectToUpdate\"));",
+                "       ((com.acme.MyObject)getInputParameter(\"objectToUpdate\")).setName(\"someName\");",
+                "       System.out.println(\"Done!\"+getInputParameter(\"objectToUpdate\"));",
+                "   }",
+                "}");
+
+        //process that call the connector on the bdm object
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessThatUpdateBDM", "1.0");
+        processBuilder.addBusinessData("myObject", "com.acme.MyObject",
+                new ExpressionBuilder().createGroovyScriptExpression("init",
+                        "new com.acme.MyObject()", "com.acme.MyObject"));
+        processBuilder.addAutomaticTask("task1")
+                .addConnector("setNameOfBDM", "setNameOfBDM", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput("objectToUpdate",
+                        new ExpressionBuilder().createBusinessDataExpression("myObject", "com.acme.MyObject"));
+        BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processBuilder.done())
+                .addClasspathResource(new BarResource("setNameConnectorJar.jar", setNameConnectorJar))
+                .addConnectorImplementation(generateConnectorImplementation("setNameOfBDM", "1.0",
+                        "com.acme.SetNameOfBDM", "setNameConnectorJar.jar"))
+                .done();
+        ProcessDefinition processDefinition = getProcessAPI().deployAndEnableProcess(bar);
+        //        log.
+        //start and wait for finish, it should work
+        log.info("start process 1");
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForProcessToFinish(processInstance);
+
+        log.info("install new BDM");
+        //deploy a new version of the bdm that is compatible
+        installBusinessDataModel(bomMyObjectWith2Fields());
+
+        //connector should still work
+
+        log.info("start process 2");
+        ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
+        waitForProcessToFinish(processInstance2);
+    }
+
+    private Path retrieveClientBDMModelJar() throws BusinessDataRepositoryException, IOException {
+        byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
+        byte[] bdmModelJar = org.bonitasoft.engine.io.IOUtils.unzip(clientBDMZip).get("bdm-model.jar");
+        Path tmpBdmJar = Files.createTempFile("tmpbdmJar", ".jar");
+        Files.write(tmpBdmJar, bdmModelJar);
+        return tmpBdmJar;
+    }
+
+    private BusinessObjectModel bomMyObjectWith2Fields() {
+        BusinessObjectModel bom2 = new BusinessObjectModel();
+        BusinessObject businessObject2 = new BusinessObject();
+        SimpleField name = new SimpleField();
+        name.setName("name");
+        name.setType(FieldType.STRING);
+        SimpleField age = new SimpleField();
+        age.setName("age");
+        age.setType(FieldType.INTEGER);
+        businessObject2.addField(name);
+        businessObject2.addField(age);
+        businessObject2.setQualifiedName("com.acme.MyObject");
+        bom2.addBusinessObject(businessObject2);
+        return bom2;
+    }
+
+    private BusinessObjectModel bomMyObjectWith1Field() {
+        BusinessObjectModel bom1 = new BusinessObjectModel();
+        BusinessObject businessObject1 = new BusinessObject();
+        SimpleField name = new SimpleField();
+        name.setName("name");
+        name.setType(FieldType.STRING);
+        businessObject1.addField(name);
+        businessObject1.setQualifiedName("com.acme.MyObject");
+        bom1.addBusinessObject(businessObject1);
+        return bom1;
     }
 
     class AddressRef {

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.io;
 
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -31,8 +32,11 @@ import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +50,10 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -57,7 +65,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -80,34 +87,67 @@ public class IOUtil {
     }
 
     public static byte[] generateJar(String className, String... content) throws IOException {
-        return generateJar(Pair.of(className, String.join("\n", content)));
+        return generateJar(emptyList(), Pair.of(className, String.join("\n", content)));
+    }
+
+    static class StringJavaFileObject extends SimpleJavaFileObject {
+
+        private final String sourceCode;
+
+        StringJavaFileObject(String className, String content) {
+            super(URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
+            this.sourceCode = content;
+        }
+
+        public CharSequence getCharContent(boolean var1) {
+            return this.sourceCode;
+        }
     }
 
     public static byte[] generateJar(Pair<String, String>... classFiles) throws IOException {
-        File root = Files.createTempDirectory("tempCompile").toFile();
-        List<String> sourceFiles = stream(classFiles).map(classFile -> {
-            File sourceFile = new File(root, classFile.getKey() + ".java");
-            write(classFile, sourceFile);
-            return sourceFile.getPath();
+        return generateJar(emptyList(), classFiles);
+    }
+
+    public static byte[] generateJar(List<Path> additionalJar, String className, String... content) throws IOException {
+        return generateJar(additionalJar, Pair.of(className, String.join("\n", content)));
+    }
+
+    public static byte[] generateJar(List<Path> additionalJar, Pair<String, String>... classFiles) throws IOException {
+        List<StringJavaFileObject> sourceFiles = stream(classFiles).map(classFile -> {
+            StringJavaFileObject sourceFile = new StringJavaFileObject(classFile.getKey(), classFile.getValue());
+            return sourceFile;
         }).collect(Collectors.toList());
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        int run = compiler.run(null, null, null, sourceFiles.toArray(new String[] {}));
-        if (run != 0) {
+        StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
+        updateClassPath(additionalJar, standardFileManager);
+        standardFileManager.setLocation(StandardLocation.CLASS_OUTPUT,
+                Collections.singleton(Files.createTempDirectory("compile-test").toFile()));
+        JavaCompiler.CompilationTask run = compiler.getTask(null, standardFileManager, null, null, null,
+                sourceFiles);
+        Boolean call = run.call();
+        if (!call) {
             throw new IllegalArgumentException("Unable to compile the file, see logs");
         }
-        return generateJar(
-                stream(classFiles).collect(Collectors.toMap(p -> p.getKey() + CLASS_EXT, p -> read(root, p))));
+
+        Map<String, byte[]> resources = new HashMap<>();
+        for (Pair<String, String> classFile : classFiles) {
+            String className = classFile.getKey();
+            JavaFileObject javaFileForInput = standardFileManager.getJavaFileForInput(StandardLocation.CLASS_OUTPUT,
+                    className, JavaFileObject.Kind.CLASS);
+            byte[] bytes = Files.readAllBytes(Paths.get(javaFileForInput.toUri()));
+            resources.put(className.replace(".", "/") + ".class", bytes);
+        }
+        return generateJar(resources);
     }
 
-    @SneakyThrows
-    protected static void write(Pair<String, String> classFile, File sourceFile) {
-        Files.write(sourceFile.toPath(), classFile.getValue().getBytes(StandardCharsets.UTF_8));
-    }
-
-    @SneakyThrows
-    protected static byte[] read(File root, Pair<String, String> p) {
-        return Files.readAllBytes(root.toPath().resolve(p.getKey() + CLASS_EXT));
+    private static void updateClassPath(List<Path> additionalJar, StandardJavaFileManager standardFileManager)
+            throws IOException {
+        Iterable<? extends File> location = standardFileManager.getLocation(StandardLocation.CLASS_PATH);
+        ArrayList<File> classPath = new ArrayList<>();
+        location.forEach(classPath::add);
+        additionalJar.stream().map(Path::toFile).forEach(classPath::add);
+        standardFileManager.setLocation(StandardLocation.CLASS_PATH, classPath);
     }
 
     public static Map<String, byte[]> getResources(final Class<?>... classes) throws IOException {

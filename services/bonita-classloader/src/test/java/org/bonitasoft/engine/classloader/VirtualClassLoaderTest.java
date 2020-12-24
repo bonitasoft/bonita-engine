@@ -13,17 +13,17 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import static java.util.Collections.singletonList;
 import static java.util.stream.Stream.empty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.bonitasoft.engine.home.BonitaResource.resource;
 import static org.bonitasoft.engine.io.IOUtil.generateJar;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +55,7 @@ public class VirtualClassLoaderTest {
     private ClassLoaderListener myClassLoaderListener;
     private VirtualClassLoader localClassLoader;
     private BonitaClassLoader newClassLoader;
-    private File tempDir;
+    private int idCounter = 1;
 
     @Before
     public void before() throws IOException {
@@ -65,7 +65,6 @@ public class VirtualClassLoaderTest {
 
         newClassLoader = new BonitaClassLoader(empty(), "test", 125,
                 File.createTempFile("test", ".tmp").toURI(), testClassLoader);
-        tempDir = temporaryFolder.newFolder();
     }
 
     @After
@@ -80,7 +79,7 @@ public class VirtualClassLoaderTest {
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
                 Stream.of(resource("UOSFaasApplication.jar",
                         FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")))),
-                "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
+                "here", 154L, temporaryFolder.newFolder().toURI(), BonitaClassLoader.class.getClassLoader());
 
         vcl.replaceClassLoader(bonitaClassLoader);
         URL url = vcl.getResource("au/edu/sydney/faas/applicationstudent/StudentInformation.class");
@@ -105,7 +104,7 @@ public class VirtualClassLoaderTest {
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
                 Stream.of(resource("UOSFaasApplication.jar",
                         FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")))),
-                "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
+                "here", 154L, temporaryFolder.newFolder().toURI(), BonitaClassLoader.class.getClassLoader());
 
         vcl.replaceClassLoader(bonitaClassLoader);
         final Object objectToInvokeJavaMethodOn = vcl.loadClass("au.edu.sydney.faas.applicationstudent.StudentRequest")
@@ -181,13 +180,13 @@ public class VirtualClassLoaderTest {
     @Test
     public void should_replaceClassLoader_call_destroy_on_old_classloader() throws Exception {
         //given
-        BonitaClassLoader classLoader1 = spy(classloader(1231L));
-        BonitaClassLoader classLoader2 = classloader(53412L);
+        BonitaClassLoader classLoader1 = createClassloader(resource("test-1.jar", new byte[] { 1, 2, 3 }));
+        BonitaClassLoader classLoader2 = createClassloader(resource("test-1.jar", new byte[] { 1, 2, 3 }));
         //when
         localClassLoader.replaceClassLoader(classLoader1);
         localClassLoader.replaceClassLoader(classLoader2);
         //then
-        verify(classLoader1).destroy();
+        assertThat(classLoader1.isDestroyed()).isTrue();
     }
 
     @Test
@@ -236,50 +235,82 @@ public class VirtualClassLoaderTest {
 
     }
 
-    private BonitaClassLoader classloader(long id) {
-        return new BonitaClassLoader(Stream.of(resource("test-1.jar", new byte[] { 1, 2, 3 })), "here", id,
-                tempDir.toURI(),
-                BonitaClassLoader.class.getClassLoader());
+    private BonitaClassLoader createClassloader(BonitaResource... resources) throws IOException {
+        return createClassloader(testClassLoader, resources);
+    }
+
+    private BonitaClassLoader createClassloader(ClassLoader parent, BonitaResource... resources) throws IOException {
+        return new BonitaClassLoader(Stream.of(resources), "someType", idCounter++,
+                temporaryFolder.newFolder().toURI(),
+                parent);
     }
 
     @Test
-    public void should_be_able_to_replace_class_with_same_name_in_defferent_classloader() throws Exception {
-        temporaryFolder.create();
-        File jar1File = temporaryFolder.newFile("jar1.jar");
-        File jar2File = temporaryFolder.newFile("jar2.jar");
-        byte[] jar1 = generateJar("Hello",
+    public void should_be_able_to_replace_class_with_same_name_in_different_classloader() throws Exception {
+        VirtualClassLoader mainClassLoader = new VirtualClassLoader("type1", 1, testClassLoader);
+        mainClassLoader.replaceClassLoader(createClassloader(resource("jar1.jar", generateJar("Hello",
                 "public class Hello{",
                 "public String there(){",
                 "return \"hello\";",
                 "}",
-                "}");
-        byte[] jar2 = generateJar("Hello",
+                "}"))));
+        // Class.forName keep a reference in the classloader. We can't override that, it's an native method
+        // That is one reason why we should remove virtual classloaders
+        //        assertThat(invoke(Class.forName("Hello", false, mainClassLoader), "there")).isEqualTo("hello");
+        assertThat(invoke(mainClassLoader.loadClass("Hello"), "there")).isEqualTo("hello");
+
+        mainClassLoader.replaceClassLoader(createClassloader(resource("jar2.jar", generateJar("Hello",
                 "public class Hello{",
                 "public String there(){",
                 "return \"hello there\";",
                 "}",
+                "}"))));
+
+        //        assertThat(invoke(Class.forName("Hello", false, mainClassLoader), "there")).isEqualTo("hello there");
+        assertThat(invoke(mainClassLoader.loadClass("Hello"), "there")).isEqualTo("hello there");
+    }
+
+    @Test
+    public void should_be_able_to_replace_implementation_of_parent_classloader() throws Exception {
+        VirtualClassLoader mainClassLoader = new VirtualClassLoader("type1", 1, testClassLoader);
+
+        mainClassLoader.replaceClassLoader(createClassloader(resource("lib.jar", generateJar("ParentLib",
+                "public class ParentLib {",
+                "   public String getVersion(){",
+                "       return \"1.0\";",
+                "   }",
+                "}"))));
+        VirtualClassLoader childClassLoader = new VirtualClassLoader("child", 2, mainClassLoader);
+        byte[] childJar = generateJar("Child",
+                "public class Child {",
+                "   public String getVersion() throws Exception {",
+                "       Class parentLibClass = Class.forName(\"ParentLib\");",
+                // When we remove the Class.forName to load the ParentLib class, it works. Class.forName is native and keep the class loaded in the child.
+                //                "       Class parentLibClass = Child.class.getClassLoader().loadClass(\"ParentLib\");",
+                "       return \"Version of the lib in parent is \" + parentLibClass.getMethod(\"getVersion\").invoke(parentLibClass.newInstance());",
+                "   }",
                 "}");
-        Files.write(jar1File.toPath(), jar1);
-        Files.write(jar2File.toPath(), jar2);
-        VirtualClassLoader mainClassLoader = new VirtualClassLoader("type1", 1,
-                Thread.currentThread().getContextClassLoader());
+        childClassLoader.replaceClassLoader(createClassloader(mainClassLoader, resource("child.jar", childJar)));
 
-        BonitaClassLoader classLoader1 = new BonitaClassLoader(
-                singletonList(jar1File).stream().map(j -> new BonitaResource("jar1.jar", jar1)), "type1", 1,
-                temporaryFolder.newFolder("cl1").toURI(), Thread.currentThread().getContextClassLoader());
-        BonitaClassLoader classLoader2 = new BonitaClassLoader(
-                singletonList(jar1File).stream().map(j -> new BonitaResource("jar2.jar", jar2)), "type1", 1,
-                temporaryFolder.newFolder("cl2").toURI(), Thread.currentThread().getContextClassLoader());
-        mainClassLoader.replaceClassLoader(classLoader1);
+        assertThat(invoke(childClassLoader.loadClass("Child"), "getVersion"))
+                .isEqualTo("Version of the lib in parent is 1.0");
 
-        // Class.forName do not work, it keeps the class from the previous classloader
-        // Class<?> class1 = Class.forName("Hello", false, mainClassLoader);
-        Class<?> class1 = mainClassLoader.loadClass("Hello");
-        assertThat(class1.getMethod("there").invoke(class1.newInstance())).isEqualTo("hello");
-        mainClassLoader.replaceClassLoader(classLoader2);
+        mainClassLoader.replaceClassLoader(createClassloader(resource("lib.jar", generateJar("ParentLib",
+                "public class ParentLib {",
+                "   public String getVersion(){",
+                "       return \"2.0\";",
+                "   }",
+                "}"))));
+        assertThatThrownBy(() -> childClassLoader.loadClass("Child")).isInstanceOf(ClassNotFoundException.class)
+                .hasMessageContaining("Child"); // Because all children classloaders have been invalidated
 
-        //Class<?> class2 = Class.forName("Hello", false, mainClassLoader); KO
-        Class<?> class2 = mainClassLoader.loadClass("Hello");
-        assertThat(class2.getMethod("there").invoke(class2.newInstance())).isEqualTo("hello there");
+        childClassLoader.replaceClassLoader(createClassloader(mainClassLoader, resource("child.jar", childJar)));
+        assertThat(invoke(childClassLoader.loadClass("Child"), "getVersion"))
+                .isEqualTo("Version of the lib in parent is 2.0");
+    }
+
+    protected Object invoke(Class<?> class1, String name)
+            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException {
+        return class1.getMethod(name).invoke(class1.newInstance());
     }
 }
