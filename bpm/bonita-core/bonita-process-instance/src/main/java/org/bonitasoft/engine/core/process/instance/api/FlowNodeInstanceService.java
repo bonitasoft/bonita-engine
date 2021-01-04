@@ -347,8 +347,10 @@ public interface FlowNodeInstanceService {
             throws SFlowNodeReadException, SFlowNodeDeletionException;
 
     /**
-     * Retrieve ids of flow nodes that need to be recovered.
-     * This is used by recover mechanism ProcessInstanceRecoveryService
+     * retrieve ids of elements that need to be recovered
+     * Called on start node to set the flag to tell the engine to restart these flow nodes
+     * Should not be called when the engine is started!
+     * This does not retrieve SGatewayInstances
      *
      * @param considerElementsOlderThan consider elements older than that duration
      * @param queryOptions used for pagination
@@ -357,6 +359,16 @@ public interface FlowNodeInstanceService {
             throws SBonitaReadException;
 
     List<SFlowNodeInstance> getFlowNodeInstancesByIds(List<Long> ids) throws SBonitaReadException;
+
+    /**
+     * Retrieve ids of SGatewayInstances that need to be recovered
+     *
+     * @param queryOptions
+     * @return
+     * @throws SBonitaReadException
+     */
+    List<Long> getGatewayInstanceIdsToRecover(Duration considerElementsOlderThan, QueryOptions queryOptions)
+            throws SBonitaReadException;
 
     /**
      * get the number of flow node is this root container

@@ -46,7 +46,9 @@ import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThro
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,24 +126,23 @@ public class FlowNodeInstanceTest {
         final SFlowNodeInstance terminal = repository
                 .add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
                         .build());
-        final SFlowNodeInstance failed = repository
-                .add(aUserTask().withName("failedTask").withStateExecuting(true).withStable(true).withTerminal(true)
-                        .withStateId(3)
-                        .build());
-        repository
-                .add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
-                        .build());
+        repository.add(aUserTask().withName("failedTask").withStateExecuting(true).withStable(true).withTerminal(true)
+                .withStateId(3).build());
+        repository.add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true)
+                .withTerminal(false).build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_completed").withStateId(2).withStable(true)
+                .withTerminal(true).withHitBys("FINISH:12").build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_initializing_but_not_finished1").withStateId(61)
+                .withStable(false).withHitBys("1").build());
 
-        SFlowNodeInstance abortingBoundary = repository
-                .add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10)
-                        .withStateExecuting(false).withStable(true)
-                        .withTerminal(false).withStateName("WAITING")
-                        .withStateCategory(SStateCategory.ABORTING).build());
-        SFlowNodeInstance cancellingBoundary = repository
-                .add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10)
-                        .withStateExecuting(false).withStable(true)
-                        .withTerminal(false).withStateName("WAITING")
-                        .withStateCategory(SStateCategory.CANCELLING).build());
+        repository.add(aBoundary().withName("abortingBoundary").withActivity(terminal.getId()).withStateId(10)
+                .withStateExecuting(false).withStable(true)
+                .withTerminal(false).withStateName("WAITING")
+                .withStateCategory(SStateCategory.ABORTING).build());
+        repository.add(aBoundary().withName("cancellingBoundary").withActivity(terminal.getId()).withStateId(10)
+                .withStateExecuting(false).withStable(true)
+                .withTerminal(false).withStateName("WAITING")
+                .withStateCategory(SStateCategory.CANCELLING).build());
         repository.add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10)
                 .withStateExecuting(false).withStable(true)
                 .withTerminal(false).withStateName("WAITING")
@@ -152,8 +153,74 @@ public class FlowNodeInstanceTest {
         final List<Long> nodeToRestart = repository.getFlowNodeInstanceIdsToRecover(Duration.ZERO, options);
 
         // then
-        assertThat(nodeToRestart).containsOnly(executing.getId(), notStable.getId(), terminal.getId(),
-                abortingBoundary.getId(), cancellingBoundary.getId());
+        assertThat(nodeToRestart.stream()
+                .map(id -> repository.getSession()
+                        .get(SFlowNodeInstance.class,
+                                new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))
+                        .getName()))
+                                .containsOnly("executingTask", "notStableTask", "terminalTask",
+                                        "abortingBoundary", "cancellingBoundary");
+    }
+
+    @Test
+    public void getGatewayInstanceIdsToRecover_should_return_ids_of_gateways_flagged_as_FINISH() {
+        // given
+        repository.add(aGatewayInstanceBuilder().withName("gateway_initializing_but_not_finished1").withStateId(61)
+                .withStable(false).withHitBys("1").build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_initializing_but_not_finished2").withStateId(61)
+                .withStable(false).withHitBys("1,2").build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_initializing_but_finished").withStateId(61)
+                .withStable(false).withHitBys("FINISH:12").build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_failed").withStateExecuting(true).withStable(true)
+                .withTerminal(true).withStateId(3).build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_completed").withStateId(2).withStable(true)
+                .withTerminal(true).withHitBys("FINISH:12").build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_aborting").withStateId(61).withStable(true)
+                .withHitBys("1,2").withStateCategory(SStateCategory.ABORTING).build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_cancelling").withStateId(61).withStable(true)
+                .withHitBys("1,2").withStateCategory(SStateCategory.ABORTING).build());
+
+        repository.flush();
+        // when
+        final QueryOptions options = new QueryOptions(0, 10);
+        final List<Long> nodeToRestart = repository.getGatewayInstanceIdsToRecover(Duration.ZERO, options);
+
+        // then
+        assertThat(nodeToRestart.stream()
+                .map(id -> (repository.getSession().get(SFlowNodeInstance.class,
+                        new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))).getName()))
+                                .containsOnly(
+                                        "gateway_initializing_but_finished",
+                                        "gateway_completed",
+                                        "gateway_aborting",
+                                        "gateway_cancelling");
+    }
+
+    @Test
+    public void getGatewayInstanceIdsToRecover_should_return_ids_of_gateways_flagged_as_FINISH_and_older_than_given_duration() {
+        // given
+        repository.add(aGatewayInstanceBuilder().withName("gateway_initializing_but_finished")
+                .withLastUpdateDate(now().minusSeconds(200).toEpochMilli()).withStateId(61).withStable(false)
+                .withHitBys("FINISH:12").build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_completed").withStateId(2).withStable(true)
+                .withLastUpdateDate(now().minusSeconds(600).toEpochMilli()).withTerminal(true).withHitBys("FINISH:12")
+                .build());
+        repository.add(aGatewayInstanceBuilder().withName("gateway_aborting")
+                .withLastUpdateDate(now().minus(2, DAYS).toEpochMilli()).withStateId(61).withStable(true)
+                .withHitBys("1,2").withStateCategory(SStateCategory.ABORTING).build());
+
+        repository.flush();
+        // when
+        final QueryOptions options = new QueryOptions(0, 10);
+        final List<Long> nodeToRestart = repository.getGatewayInstanceIdsToRecover(Duration.ofSeconds(500), options);
+
+        // then
+        assertThat(nodeToRestart.stream()
+                .map(id -> (repository.getSession().get(SFlowNodeInstance.class,
+                        new PersistentObjectId(id, PersistentObjectBuilder.DEFAULT_TENANT_ID))).getName()))
+                                .containsOnly(
+                                        "gateway_completed",
+                                        "gateway_aborting");
     }
 
     @Test
