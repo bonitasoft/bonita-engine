@@ -30,4 +30,4 @@ if [ -z ${CATALINA_PID+x} ]; then
 fi
 
 # extra lib required at Tomcat startup (for instance bonita juli extensions)
-CLASSPATH="${CATALINA_HOME}/lib/ext/*"
+export CLASSPATH="${CATALINA_HOME}/lib/ext/*"

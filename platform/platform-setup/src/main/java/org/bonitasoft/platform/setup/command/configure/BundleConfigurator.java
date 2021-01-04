@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 abstract class BundleConfigurator {
 
-    final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
     private static final String H2 = "h2";
     private static final String ORACLE = "oracle";
@@ -140,9 +140,10 @@ abstract class BundleConfigurator {
             final Path targetDriverFolder = targetDriverFile.getParent();
             targetDriverFolder.toFile().mkdirs();
             Files.copy(srcDriverFile, targetDriverFile);
-            LOGGER.info("Copying your " + dbVendor + " driver file '" + getRelativePath(srcDriverFile)
-                    + "' to tomcat lib folder '"
-                    + getRelativePath(targetDriverFolder) + "'");
+            LOGGER.info("Copying your {} driver file ''{}'' to tomcat lib folder ''{}''",
+                    dbVendor,
+                    getRelativePath(srcDriverFile),
+                    getRelativePath(targetDriverFolder));
         } catch (IOException e) {
             throw new PlatformException(
                     "Fail to copy driver file lib/" + srcDriverFile.getFileName() + " to "
@@ -161,7 +162,7 @@ abstract class BundleConfigurator {
     // Visible for testing
     static String convertWindowsBackslashes(String value) {
         // forward slashes is valid in database connection URLs on Windows, and and easier and more homogeneous to manage in
-        return value.replaceAll("\\\\", "/");
+        return value.replace("\\", "/");
     }
 
     private void writeContentToFile(Path path, String content) throws PlatformException {
@@ -226,7 +227,7 @@ abstract class BundleConfigurator {
         }
         final Collection<File> driversFiles = FileUtils.listFiles(driverFolder.toFile(), getDriverFilter(dbVendor),
                 null);
-        if (driversFiles.size() == 0) {
+        if (driversFiles.isEmpty()) {
             throw new PlatformException("No " + dbVendor + " drivers found in folder " + driverFolder.toString()
                     + ". Make sure to put a jar or zip file containing drivers there.");
         } else if (driversFiles.size() == 1) {

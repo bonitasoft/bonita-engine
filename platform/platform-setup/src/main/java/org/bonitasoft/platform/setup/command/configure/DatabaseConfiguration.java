@@ -14,6 +14,7 @@
 package org.bonitasoft.platform.setup.command.configure;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.bonitasoft.platform.exception.PlatformException;
@@ -24,6 +25,7 @@ import org.bonitasoft.platform.exception.PlatformException;
 public class DatabaseConfiguration {
 
     public static final String H2_DB_VENDOR = "h2";
+    private static final String H2_DATABASE_DIR = "${h2.database.dir}";
 
     private String dbVendor;
     private String nonXaDriverClassName;
@@ -49,10 +51,15 @@ public class DatabaseConfiguration {
         url = getMandatoryProperty(dbVendor + "." + prefix + "url");
         // Configuration for H2 is a little different from other DB vendors:
         if (H2_DB_VENDOR.equals(dbVendor)) {
-            final String h2DatabaseDir = getMandatoryProperty("h2.database.dir");
-            // generate absolute path:
-            url = url.replace("${h2.database.dir}", rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath()
-                    .normalize().toString());
+            String h2DatabaseDir = getMandatoryProperty("h2.database.dir");
+            Path h2DatabasePath = Paths.get(h2DatabaseDir);
+            if (h2DatabasePath.isAbsolute() || h2DatabaseDir.startsWith("${")) {
+                url = url.replace(H2_DATABASE_DIR, h2DatabasePath.normalize().toString());
+            } else {
+                // generate absolute path
+                url = url.replace(H2_DATABASE_DIR,
+                        rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath().normalize().toString());
+            }
         } else {
             serverName = getMandatoryProperty(prefix + "db.server.name");
             url = url.replace("${" + prefix + "db.server.name}", serverName);

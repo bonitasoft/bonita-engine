@@ -47,10 +47,10 @@ public class BundleConfiguratorTest {
     @Test
     public void escapeWindowsBackslashesIfAny_should_double_backslashes() {
         // when:
-        final String windowsValue = BundleConfigurator.convertWindowsBackslashes("C:\\Windows");
+        final String windowsValue = BundleConfigurator.convertWindowsBackslashes("C:\\Windows\\Path");
 
         // then:
-        assertThat(windowsValue).isEqualTo("C:/Windows");
+        assertThat(windowsValue).isEqualTo("C:/Windows/Path");
     }
 
     @Test
