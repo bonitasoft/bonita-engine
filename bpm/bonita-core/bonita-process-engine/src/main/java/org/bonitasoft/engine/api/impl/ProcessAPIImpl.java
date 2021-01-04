@@ -684,6 +684,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         try {
+            TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
+            ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
+            SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
+            logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                    String.format(
+                            "executeFlowNode was called: <%s> is forcing the execution of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s>. "
+                                    +
+                                    "Executing a flow node directly through that API method is not recommended and can affect the normal behavior of the platform. "
+                                    +
+                                    "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore. "
+                                    +
+                                    "If you are trying to execute a user task, please use executeUserTask method instead.",
+                            getLoggedUsername(logger), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                            flowNodeInstance.getType().name(),
+                            flowNodeInstance.getStateId(), flowNodeInstance.getStateName()));
             executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Serializable>(), false);
         } catch (final ContractViolationException | SBonitaException e) {
             throw new FlowNodeExecutionException(e);
@@ -3473,10 +3488,40 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void setActivityStateById(final long activityInstanceId, final int stateId) throws UpdateException {
         try {
+            ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
+            SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(activityInstanceId);
+            TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
+            FlowNodeState state = getTenantAccessor().getFlowNodeStateManager().getState(stateId);
+            logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                    String.format(
+                            "setActivityStateById was called: <%s> is forcing state of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s> to the state <%s: %s>. "
+                                    +
+                                    "Setting the state of a flow node through the API is not recommended and can affect the normal behavior of the platform. "
+                                    +
+                                    "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore.",
+                            getLoggedUsername(logger), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                            flowNodeInstance.getType().name(),
+                            flowNodeInstance.getStateId(), flowNodeInstance.getStateName(),
+                            stateId, state.getName()));
             getTenantAccessor().getFlowNodeExecutor().setStateByStateId(activityInstanceId, stateId);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
+    }
+
+    private String getLoggedUsername(TechnicalLoggerService logger) {
+        SSession session = getSession();
+        if (session == null || session.getUserId() <= 0) {
+            return "SYSTEM";
+        }
+        long userId = session.getUserId();
+        try {
+            return getTenantAccessor().getIdentityService().getUser(userId).getUserName();
+        } catch (Exception ignored) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Unable to retrieve user with id " + userId
+                    + " exception: " + ignored.getClass().getName() + " " + ignored.getMessage());
+        }
+        return String.valueOf(userId);
     }
 
     @Override

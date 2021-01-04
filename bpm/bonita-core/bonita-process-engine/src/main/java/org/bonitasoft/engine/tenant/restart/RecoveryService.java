@@ -144,10 +144,14 @@ public class RecoveryService {
      * @return elements to be recovered
      */
     public List<ElementToRecover> getAllElementsToRecover(Duration considerElementsOlderThan) {
-        List<ElementToRecover> elementsToRecover;
+        List<ElementToRecover> elementsToRecover = new ArrayList<>();
         try {
-            elementsToRecover = getAllProcessInstancesToRecover(considerElementsOlderThan);
-            elementsToRecover.addAll(getAllFlowNodeInstancesToRecover(considerElementsOlderThan));
+            elementsToRecover.addAll(getAllElementsToRecover(PROCESS,
+                    (q) -> processInstanceService.getProcessInstanceIdsToRecover(considerElementsOlderThan, q)));
+            elementsToRecover.addAll(getAllElementsToRecover(FLOWNODE,
+                    (q) -> flowNodeInstanceService.getFlowNodeInstanceIdsToRecover(considerElementsOlderThan, q)));
+            elementsToRecover.addAll(getAllElementsToRecover(FLOWNODE,
+                    (q) -> flowNodeInstanceService.getGatewayInstanceIdsToRecover(considerElementsOlderThan, q)));
             return elementsToRecover;
         } catch (SBonitaException e) {
             throw new RuntimeException(e);
@@ -216,39 +220,22 @@ public class RecoveryService {
         });
     }
 
-    private List<ElementToRecover> getAllFlowNodeInstancesToRecover(Duration considerElementsOlderThan)
+    private List<ElementToRecover> getAllElementsToRecover(ElementToRecover.Type type, IdsRetriever idsRetriever)
             throws SBonitaException {
-        List<Long> flownodesToRestart = new ArrayList<>();
         // using a too low page size (100) causes too many access to the database and causes timeout exception if there are lot of elements.
         // As we retrieve only the id we can use a greater page size
         QueryOptions queryOptions = new QueryOptions(0, readBatchSize);
-        List<Long> ids;
-        log.debug("Start detecting flow nodes to restart...");
-        do {
-            ids = flowNodeInstanceService.getFlowNodeInstanceIdsToRecover(considerElementsOlderThan, queryOptions);
-            flownodesToRestart.addAll(ids);
-            queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (ids.size() == queryOptions.getNumberOfResults());
-        log.debug("Found {} flow nodes to restart", flownodesToRestart.size());
-        return flownodesToRestart
-                .stream()
-                .map(id -> ElementToRecover.builder().id(id).type(FLOWNODE).build())
-                .collect(Collectors.toList());
-    }
-
-    private List<ElementToRecover> getAllProcessInstancesToRecover(Duration considerElementsOlderThan)
-            throws SBonitaException {
         final List<Long> ids = new ArrayList<>();
-        QueryOptions queryOptions = new QueryOptions(0, readBatchSize);
-        List<Long> processInstancesIds;
+        List<Long> elementsIds;
+        log.debug("Start detecting {} to recover...", type);
         do {
-            processInstancesIds = processInstanceService.getProcessInstanceIdsToRecover(considerElementsOlderThan,
-                    queryOptions);
+            elementsIds = idsRetriever.getIds(queryOptions);
             queryOptions = QueryOptions.getNextPage(queryOptions);
-            ids.addAll(processInstancesIds);
-        } while (processInstancesIds.size() == queryOptions.getNumberOfResults());
+            ids.addAll(elementsIds);
+        } while (elementsIds.size() == queryOptions.getNumberOfResults());
+        log.debug("Found {} {} to recover", elementsIds.size(), type);
         return ids
-                .stream().map(id -> ElementToRecover.builder().id(id).type(PROCESS).build())
+                .stream().map(id -> ElementToRecover.builder().id(id).type(type).build())
                 .collect(Collectors.toList());
     }
 
@@ -257,4 +244,8 @@ public class RecoveryService {
         void execute(List<Long> ids) throws Exception;
     }
 
+    private interface IdsRetriever {
+
+        List<Long> getIds(QueryOptions queryOptions) throws SBonitaException;
+    }
 }
