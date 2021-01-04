@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.bonitasoft.platform.setup.PlatformSetup;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,8 +34,6 @@ public class ConfigureCommandTest {
 
     @Spy
     private ConfigureCommand configureCommand;
-    @Mock
-    private PlatformSetup platformSetup;
     @Mock
     private BundleConfigurator bundleConfigurator;
     @Mock

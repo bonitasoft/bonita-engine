@@ -21,7 +21,7 @@ import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -75,7 +75,7 @@ public class PlatformSetupApplication {
     }
 
     private void run(String[] args) {
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         options = createOptions();
         commands = createCommands();
         helpCommand.setCommands(commands);
@@ -85,11 +85,11 @@ public class PlatformSetupApplication {
     }
 
     private PlatformSetupCommand getCommand(CommandLine line) {
-        List argList = line.getArgList();
+        List<String> argList = line.getArgList();
         if (argList.isEmpty()) {
             return helpCommand;
         }
-        final String commandName = argList.get(0).toString();
+        final String commandName = argList.get(0);
         for (PlatformSetupCommand platformSetupCommand : commands) {
             if (commandName.equals(platformSetupCommand.getName())) {
                 return platformSetupCommand;
@@ -149,16 +149,16 @@ public class PlatformSetupApplication {
     }
 
     private Options createOptions() {
-        Options options = new Options();
+        Options opts = new Options();
         Option systemPropertyOption = new Option("D",
                 "specify system property to override configuration from database.properties");
         systemPropertyOption.setArgName("property=value");
         systemPropertyOption.setValueSeparator('=');
         systemPropertyOption.setArgs(2);
-        options.addOption(systemPropertyOption);
-        options.addOption("f", "force", false, "Force push even if critical folders will be deleted");
-        options.addOption("d", "debug", false, "Provides more details in case of error");
-        return options;
+        opts.addOption(systemPropertyOption);
+        opts.addOption("f", "force", false, "Force push even if critical folders will be deleted");
+        opts.addOption("d", "debug", false, "Provides more details in case of error");
+        return opts;
     }
 
 }

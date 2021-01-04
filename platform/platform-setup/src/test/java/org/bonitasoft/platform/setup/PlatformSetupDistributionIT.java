@@ -14,11 +14,13 @@
 package org.bonitasoft.platform.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -27,13 +29,13 @@ import java.util.Properties;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.h2.tools.Server;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ClearSystemProperties;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 
@@ -42,12 +44,7 @@ import org.junit.rules.TestRule;
  */
 public class PlatformSetupDistributionIT {
 
-    //
-    // WARNING !!!! This IT test class must be launched after a MAVEN build has been run:
-    // See PlatformSetupTestUtils.extractDistributionTo() to better understand why.
-    //
-
-    private File distFolder;
+    private File setupFolder;
 
     @Rule
     public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user",
@@ -55,14 +52,12 @@ public class PlatformSetupDistributionIT {
             "db.admin.password", "sysprop.bonita.bdm.db.vendor", "db.server.port", "db.database.name");
 
     @Rule
-    public EnvironmentVariables envVar = new EnvironmentVariables();
-    @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Before
     public void before() throws Exception {
-        distFolder = temporaryFolder.newFolder();
-        PlatformSetupTestUtils.extractDistributionTo(distFolder);
+        setupFolder = temporaryFolder.newFolder();
+        PlatformSetupTestUtils.extractDistributionTo(setupFolder);
     }
 
     @Test
@@ -70,7 +65,7 @@ public class PlatformSetupDistributionIT {
         //given
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArgument("init");
-        DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
+        DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(setupFolder);
         executor.setStreamHandler(PlatformSetupTestUtils.getExecuteStreamHandler("yes"));
 
         //when
@@ -78,7 +73,7 @@ public class PlatformSetupDistributionIT {
 
         //then
         assertThat(iExitValue).isEqualTo(0);
-        Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(distFolder);
+        Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(setupFolder);
         Statement statement = jdbcConnection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
@@ -89,7 +84,7 @@ public class PlatformSetupDistributionIT {
         iExitValue = executor.execute(oCmdLine);
         assertThat(iExitValue).isEqualTo(0);
 
-        final Path platform_engine = distFolder.toPath().resolve("platform_conf").resolve("current")
+        final Path platform_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
                 .resolve("platform_engine");
         FileUtils.deleteDirectory(platform_engine.toFile());
 
@@ -110,13 +105,13 @@ public class PlatformSetupDistributionIT {
         //given
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArguments("init -Ddb.user=myUser");
-        DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
+        DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(setupFolder);
         executor.setStreamHandler(PlatformSetupTestUtils.getExecuteStreamHandler("Y"));
         //when
         int iExitValue = executor.execute(oCmdLine);
         //then
         assertThat(iExitValue).isEqualTo(0);
-        Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(distFolder, "myUser");
+        Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(setupFolder, "myUser");
         Statement statement = jdbcConnection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
@@ -127,7 +122,7 @@ public class PlatformSetupDistributionIT {
     public void setupSh_should_have_error_with_no_argument() throws Exception {
         //given
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
-        DefaultExecutor oDefaultExecutor = PlatformSetupTestUtils.createExecutor(distFolder);
+        DefaultExecutor oDefaultExecutor = PlatformSetupTestUtils.createExecutor(setupFolder);
         oDefaultExecutor.setExitValue(1);
         //when
         int iExitValue = oDefaultExecutor.execute(oCmdLine);
@@ -145,9 +140,9 @@ public class PlatformSetupDistributionIT {
         try {
             //server must be started to have a valid port
             pgServer.start();
-            DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
+            DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(setupFolder);
             //when
-            Path databaseProperties = distFolder.toPath().resolve("database.properties");
+            Path databaseProperties = setupFolder.toPath().resolve("database.properties");
             Properties properties = new Properties();
             properties.load(new ByteArrayInputStream(Files.readAllBytes(databaseProperties)));
             properties.setProperty("db.vendor", "postgres");
@@ -164,5 +159,30 @@ public class PlatformSetupDistributionIT {
         } finally {
             pgServer.shutdown();
         }
+    }
+
+    @Test
+    public void commandLine_should_support_H2_path_with_space_characters() throws Exception {
+        //setup
+        final File temporaryFolderRoot = temporaryFolder.newFolder();
+        Path bundleFolder = temporaryFolderRoot.toPath().toRealPath();
+        Path tomcatFolder = bundleFolder.resolve("server");
+        PathUtils.copyDirectory(Paths.get("../resources/test/tomcat_conf/server").toAbsolutePath(), tomcatFolder);
+        final File newSetupFolder = bundleFolder.resolve("setup").toFile();
+        FileUtils.copyDirectory(setupFolder, newSetupFolder);
+        //given
+        CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
+        oCmdLine.addArguments("configure");
+        oCmdLine.addArguments("-Dh2.database.dir=\"my h2 path\"", false);
+        DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(newSetupFolder);
+        executor.setStreamHandler(PlatformSetupTestUtils.getExecuteStreamHandler("yes"));
+
+        //when
+        int iExitValue = executor.execute(oCmdLine);
+
+        //then
+        assertThat(iExitValue).isZero();
+        checkFileContains(tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml"),
+                "/my h2 path/");
     }
 }

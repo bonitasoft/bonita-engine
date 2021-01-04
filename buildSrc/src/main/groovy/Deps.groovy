@@ -8,6 +8,7 @@ class Deps {
     public static String commonsBeanutilsVersion = "1.9.4"
     public static String commonsCollections4Version = "4.4"
     public static String commonsLangVersion = "3.11"
+    public static String commonsTextVersion = "1.9"
     public static String commonsDbcp2Version = "2.5.0"
     public static String commonsExecVersion = "1.3"
     public static String commonsCLIVersion = "1.4"

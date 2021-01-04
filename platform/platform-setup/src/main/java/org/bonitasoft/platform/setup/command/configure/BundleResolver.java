@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 class BundleResolver {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
     private final Path rootPath;
 

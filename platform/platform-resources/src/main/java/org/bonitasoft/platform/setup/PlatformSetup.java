@@ -174,7 +174,7 @@ public class PlatformSetup {
                 + currentConfigurationFolder.toString());
         ensureNoCriticalFoldersAreDeleted(forcePush);
         pull(backupConfigurationFolder, backupLicensesFolder);
-        LOGGER.info("Backup directory created: " + backupConfigurationFolder.toString());
+        LOGGER.info("Backup directory created: {}", backupConfigurationFolder.toString());
         clean();
         pushFromFolder(currentConfigurationFolder);
         pushLicenses();
@@ -190,7 +190,7 @@ public class PlatformSetup {
             final Path folder = getFolderFromConfiguration(configuration);
             if (!Files.isDirectory(folder)) {
                 if (forcePush) {
-                    LOGGER.warn("Force-pushing the deletion of folder " + folder.toString());
+                    LOGGER.warn("Force-pushing the deletion of folder {}", folder.toString());
                 } else {
                     throw new PlatformException("You are trying to remove a protected folder from configuration: " +
                             getSpecificErrorMessage(configuration, folder));
@@ -231,9 +231,9 @@ public class PlatformSetup {
     public void pull() throws PlatformException {
         initPlatformSetup();
         checkPlatformVersion();
-        LOGGER.info("Pulling configuration into folder: " + currentConfigurationFolder);
+        LOGGER.info("Pulling configuration into folder: {}", currentConfigurationFolder);
         if (Files.isDirectory(licensesFolder)) {
-            LOGGER.info("Pulling licenses into folder: " + licensesFolder);
+            LOGGER.info("Pulling licenses into folder: {}", licensesFolder);
         }
         pull(currentConfigurationFolder, licensesFolder);
         LOGGER.info(
@@ -249,7 +249,7 @@ public class PlatformSetup {
             List<File> licenses = new ArrayList<>();
             List<File> files = configurationService.writeAllConfigurationToFolder(configurationFolder.toFile(),
                     licensesFolder.toFile());
-            LOGGER.info("Retrieved following files in " + configurationFolder);
+            LOGGER.info("Retrieved following files in {}", configurationFolder);
             for (File file : files) {
                 if (file.toPath().getParent().equals(licensesFolder)) {
                     licenses.add(file);
@@ -258,7 +258,7 @@ public class PlatformSetup {
                 }
             }
             if (!licenses.isEmpty()) {
-                LOGGER.info("Retrieved following licenses in " + licensesFolder);
+                LOGGER.info("Retrieved following licenses in {}", licensesFolder);
                 for (File license : licenses) {
                     LOGGER.info(licensesFolder.relativize(license.toPath()).toString());
                 }
@@ -297,7 +297,7 @@ public class PlatformSetup {
             //do nothing in community
             return;
         }
-        LOGGER.info("Pushing license files from folder:" + licensesFolder.toString());
+        LOGGER.info("Pushing license files from folder:{}", licensesFolder.toString());
         configurationService.storeLicenses(licensesFolder.toFile());
     }
 
@@ -312,7 +312,7 @@ public class PlatformSetup {
         String setupFolderPath = System.getProperty(BONITA_SETUP_FOLDER);
         Path platformConfFolder;
         if (setupFolderPath != null) {
-            LOGGER.info("System property " + BONITA_SETUP_FOLDER + " is set to " + setupFolderPath);
+            LOGGER.info("System property {} is set to {}", BONITA_SETUP_FOLDER, setupFolderPath);
             platformConfFolder = Paths.get(setupFolderPath).resolve(PLATFORM_CONF_FOLDER_NAME);
         } else {
             platformConfFolder = Paths.get(PLATFORM_CONF_FOLDER_NAME);
@@ -454,8 +454,8 @@ public class PlatformSetup {
         try {
             try (Connection connection = dataSource.getConnection()) {
                 DatabaseMetaData metaData = connection.getMetaData();
-                LOGGER.info("Connected to '" + dbVendor + "' database with url: '" + metaData.getURL()
-                        + "' with user: '" + metaData.getUserName() + "'");
+                LOGGER.info("Connected to '{}' database with url: '{}' with user: '{}'", dbVendor, metaData.getURL(),
+                        metaData.getUserName());
             }
         } catch (SQLException e) {
             throw new PlatformException(e);
@@ -468,7 +468,7 @@ public class PlatformSetup {
             if (resourceAsStream == null) {
                 return null;
             }
-            LOGGER.debug("Using configuration from classpath " + resourceName);
+            LOGGER.debug("Using configuration from classpath {}", resourceName);
             return new BonitaConfiguration(resourceName, IOUtils.toByteArray(resourceAsStream));
         }
     }

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class PropertyReader {
 
     // Use BundleConfigurator logger for easier configuration (no need for a specific logger here):
-    private final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
     private final Properties properties;
 
@@ -37,9 +37,9 @@ public class PropertyReader {
         // Any property value can be overridden by system property with the same name:
         final String sysPropValue = System.getProperty(propertyName);
         if (sysPropValue != null) {
-            LOGGER.info("System property '" + propertyName + "' set to '" + sysPropValue
-                    + "', overriding value from file database.properties.");
-            return sysPropValue;
+            LOGGER.info("System property '{}' set to '{}', overriding value from file database.properties.",
+                    propertyName, sysPropValue);
+            return sysPropValue.trim();
         }
 
         final String property = properties.getProperty(propertyName);
@@ -49,7 +49,7 @@ public class PropertyReader {
                             " Ensure you did not remove lines from file 'database.properties' (neither from file 'internal.properties')"
                             + " and that the line is NOT commented out with a '#' character at start of line.");
         }
-        return property;
+        return property.trim();
     }
 
 }
