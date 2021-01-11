@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
-import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.Application;
@@ -34,6 +33,7 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -99,7 +99,8 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    public SearchResult<Application> searchApplications(final SearchApplications searchApplications)
+    public SearchResult<Application> searchApplications(
+            final AbstractSearchEntity<Application, SApplication> searchApplications)
             throws SearchException {
         try {
             searchApplications.execute();

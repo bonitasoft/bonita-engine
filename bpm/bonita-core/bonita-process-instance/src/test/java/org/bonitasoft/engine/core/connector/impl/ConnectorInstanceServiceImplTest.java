@@ -73,10 +73,8 @@ public class ConnectorInstanceServiceImplTest {
     @Test
     public void should_persist_stack_trace_on_failure() throws Exception {
         SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = new SConnectorInstanceWithFailureInfo();
-
         connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailure,
                 new Exception("Root cause"));
-
         verify(recorder).recordUpdate(argThat(r -> r.getFields().get("exceptionMessage").equals("Root cause") &&
                 ((String) r.getFields().get("stackTrace")).startsWith("java.lang.Exception: Root cause\n" +
                         "\tat org.bonitasoft.engine.core.connector.impl.ConnectorInstanceServiceImplTest.should_persist_stack_trace_on_failure(ConnectorInstanceServiceImplTest.java:")),

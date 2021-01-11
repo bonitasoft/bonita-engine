@@ -110,4 +110,7 @@ public interface ApplicationService {
 
     int getLastUsedIndex(Long parentMenuId) throws SBonitaReadException;
 
+    long getNumberOfApplicationsOfUser(long userId, QueryOptions options) throws SBonitaReadException;
+
+    List<SApplication> searchApplicationsOfUser(long userId, QueryOptions options) throws SBonitaReadException;
 }
