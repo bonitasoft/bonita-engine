@@ -73,6 +73,9 @@ shade {
             new ShadeDependency(group: 'javax.activation', name: 'javax.activation-api'))
     excludeLibs('jaxb-runtime',
             new ShadeDependency(group: 'javax.activation', name: 'javax.activation-api'))
+    excludeLibs('quartz',
+            new ShadeDependency(group: 'com.mchange', name: '*'),
+            new ShadeDependency(group: 'com.zaxxer', name: 'HikariCP-java7'))
 }
 
 afterEvaluate {
