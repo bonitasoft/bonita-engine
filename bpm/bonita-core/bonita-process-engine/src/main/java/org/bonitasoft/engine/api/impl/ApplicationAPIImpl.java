@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.ImportStatus;
@@ -27,6 +29,7 @@ import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationPageAPI
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
+import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationsOfUser;
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
@@ -68,10 +71,12 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
+import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -183,9 +188,20 @@ public class ApplicationAPIImpl implements ApplicationAPI {
                 .getSearchApplicationDescriptor();
         final ApplicationModelConverter converter = getApplicationModelConverter(tenantAccessor.getPageService());
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor,
-                searchOptions, converter);
-        return getLivingApplicationAPIDelegate().searchApplications(searchApplications);
+        final Optional<SearchFilter> searchFilter = searchOptions.getFilters().stream()
+                .filter(s -> s.getField().equals("userId")).findFirst();
+        if (searchFilter.isPresent()) {
+            final SearchOptions newSearchOptions = new SearchOptionsBuilder(searchOptions)
+                    .setFilters(searchOptions.getFilters().stream().filter(s -> !s.getField().equals("userId"))
+                            .collect(Collectors.toList()))
+                    .done();
+            return getLivingApplicationAPIDelegate().searchApplications(new SearchApplicationsOfUser(
+                    (long) searchFilter.get().getValue(), applicationService, appSearchDescriptor,
+                    newSearchOptions, converter));
+        }
+        return getLivingApplicationAPIDelegate()
+                .searchApplications(new SearchApplications(applicationService, appSearchDescriptor,
+                        searchOptions, converter));
     }
 
     @Override

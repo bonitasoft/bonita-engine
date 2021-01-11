@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application;
 
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptions;
 
@@ -108,4 +109,13 @@ public class ApplicationSearchDescriptor {
      * @see Application
      */
     public static final String THEME_ID = "themeId";
+
+    /**
+     * Used to filter by the identifier of {@link User} that has access to the {@link Application}.
+     *
+     * @since 7.13.0
+     * @see User
+     * @see Application
+     */
+    public static final String USER_ID = "userId";
 }
