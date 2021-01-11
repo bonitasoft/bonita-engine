@@ -53,6 +53,17 @@ public class FlowNodeInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
+    public List<Long> getGatewayInstanceIdsToRecover(Duration considerElementsOlderThan,
+            final QueryOptions queryOptions) {
+        getSessionWithTenantFilter();
+        final Query namedQuery = getNamedQuery("getGatewayInstanceIdsToRecover");
+        namedQuery.setMaxResults(queryOptions.getNumberOfResults());
+        namedQuery.setFirstResult(queryOptions.getFromIndex());
+        namedQuery.setParameter("maxLastUpdate", System.currentTimeMillis() - considerElementsOlderThan.toMillis());
+        return (List<Long>) namedQuery.list();
+    }
+
+    @SuppressWarnings("unchecked")
     public SGatewayInstance getActiveGatewayInstanceOfProcess(long parentProcessInstanceId, String name) {
         getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getActiveGatewayInstanceOfProcess");

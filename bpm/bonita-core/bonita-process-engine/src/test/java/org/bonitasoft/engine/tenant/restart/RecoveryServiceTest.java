@@ -92,6 +92,8 @@ class RecoveryServiceTest {
     void should_return_list_of_elements_to_recover() throws Exception {
         doReturn(asList(1L, 2L)).doReturn(emptyList()).when(flowNodeInstanceService)
                 .getFlowNodeInstanceIdsToRecover(eq(Duration.ZERO), any());
+        doReturn(asList(3L, 4L)).doReturn(emptyList()).when(flowNodeInstanceService)
+                .getGatewayInstanceIdsToRecover(eq(Duration.ZERO), any());
         doReturn(asList(1L, 2L)).doReturn(emptyList())
                 .when(processInstanceService).getProcessInstanceIdsToRecover(eq(Duration.ZERO), any());
 
@@ -100,7 +102,8 @@ class RecoveryServiceTest {
 
         assertThat(allElementsToRecover).containsExactlyInAnyOrder(
                 elementToRecover(1L, PROCESS), elementToRecover(2L, PROCESS),
-                elementToRecover(1L, FLOWNODE), elementToRecover(2L, FLOWNODE));
+                elementToRecover(1L, FLOWNODE), elementToRecover(2L, FLOWNODE),
+                elementToRecover(3L, FLOWNODE), elementToRecover(4L, FLOWNODE));
     }
 
     @Test

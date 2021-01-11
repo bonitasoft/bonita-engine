@@ -82,6 +82,7 @@
 		SELECT f.id
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
 		WHERE f.stateId != 3
+		AND type(f) != org.bonitasoft.engine.core.process.instance.model.SGatewayInstance
 		AND (f.stateExecuting = TRUE
 			OR f.stable = FALSE
 			OR f.terminal = TRUE
@@ -90,6 +91,19 @@
 		AND f.lastUpdateDate &lt; :maxLastUpdate
 		ORDER BY id
 	</query>
+
+	<query name="getGatewayInstanceIdsToRecover">
+		SELECT f.id
+		FROM org.bonitasoft.engine.core.process.instance.model.SGatewayInstance AS f
+		WHERE f.stateId != 3
+		AND   (f.stateId != 61
+		      OR f.hitBys LIKE 'FINISH:%'
+		      OR f.stateCategory = 'ABORTING'
+		      OR f.stateCategory = 'CANCELLING')
+		AND f.lastUpdateDate &lt; :maxLastUpdate
+		ORDER BY id
+	</query>
+
 	<query name="getFlowNodeInstancesByNameAndParentContainerId">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f
@@ -622,7 +636,7 @@
 		SELECT COUNT(t.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
 	</query>
-	
+
 	<query name="getNumberOfSTimerEventTriggerInstanceByProcessInstance">
 		SELECT COUNT(t.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t,

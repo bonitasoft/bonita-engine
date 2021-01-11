@@ -36,6 +36,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
@@ -518,6 +519,18 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
                         singletonMap("maxLastUpdate",
                                 System.currentTimeMillis() - considerElementsOlderThan.toMillis()),
                         SFlowNodeInstance.class,
+                        queryOptions));
+        return getUnmodifiableList(selectList);
+    }
+
+    @Override
+    public List<Long> getGatewayInstanceIdsToRecover(Duration considerElementsOlderThan,
+            final QueryOptions queryOptions) throws SBonitaReadException {
+        final List<Long> selectList = getPersistenceService().selectList(
+                new SelectListDescriptor<>("getGatewayInstanceIdsToRecover",
+                        singletonMap("maxLastUpdate",
+                                System.currentTimeMillis() - considerElementsOlderThan.toMillis()),
+                        SGatewayInstance.class,
                         queryOptions));
         return getUnmodifiableList(selectList);
     }
