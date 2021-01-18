@@ -95,15 +95,15 @@ public class ApplicationRepository extends TestRepository {
         return namedQuery.list();
     }
 
-    public Long getNumberOfApplicationOfUser(final long userId) {
-        final Query namedQuery = getNamedQuery("getNumberOfSApplicationOfUser");
-        namedQuery.setParameter("userId", userId);
+    public Long getNumberOfApplicationOfProfiles(final List<Long> profileIds) {
+        final Query namedQuery = getNamedQuery("getNumberOfSApplicationOfProfiles");
+        namedQuery.setParameter("profileIds", profileIds);
         return (Long) namedQuery.uniqueResult();
     }
 
-    public List<SApplication> searchApplicationOfUser(final long userId) {
-        final Query namedQuery = getNamedQuery("searchSApplicationOfUser");
-        namedQuery.setParameter("userId", userId);
+    public List<SApplication> searchApplicationOfProfiles(final List<Long> profileIds) {
+        final Query namedQuery = getNamedQuery("searchSApplicationOfProfiles");
+        namedQuery.setParameter("profileIds", profileIds);
         return namedQuery.list();
     }
 

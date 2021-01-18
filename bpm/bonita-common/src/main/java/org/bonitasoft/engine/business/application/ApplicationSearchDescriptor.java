@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptions;
 
@@ -85,7 +84,9 @@ public class ApplicationSearchDescriptor {
 
     /**
      * Used to filter or order by the identifier of {@link org.bonitasoft.engine.profile.Profile} associated to the
-     * {@link org.bonitasoft.engine.business.application.Application}.
+     * {@link org.bonitasoft.engine.business.application.Application}
+     * One or multiple values separated by "," are possible for this filter.
+     * Example: "filter(ApplicationSearchDescriptor.PROFILE_ID, profile1.getId() + "," + profile2.getId());"
      *
      * @see org.bonitasoft.engine.profile.Profile
      * @see org.bonitasoft.engine.business.application.Application
@@ -109,13 +110,4 @@ public class ApplicationSearchDescriptor {
      * @see Application
      */
     public static final String THEME_ID = "themeId";
-
-    /**
-     * Used to filter by the identifier of {@link User} that has access to the {@link Application}.
-     *
-     * @since 7.13.0
-     * @see User
-     * @see Application
-     */
-    public static final String USER_ID = "userId";
 }

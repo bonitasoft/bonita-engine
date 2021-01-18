@@ -19,11 +19,10 @@
         FROM org.bonitasoft.engine.business.application.model.SApplication AS application
     </query>
 
-    <query name="getNumberOfSApplicationOfUser">
+    <query name="getNumberOfSApplicationOfProfiles">
         SELECT count(application.id)
-        FROM org.bonitasoft.engine.business.application.model.SApplication AS application, org.bonitasoft.engine.profile.model.SProfileMember as profileMember
-        WHERE application.profileId = profileMember.profileId
-        AND profileMember.userId = :userId
+        FROM org.bonitasoft.engine.business.application.model.SApplication AS application
+        WHERE application.profileId IN (:profileIds)
     </query>
 
     <query name="searchSApplication">
@@ -31,11 +30,10 @@
         FROM org.bonitasoft.engine.business.application.model.SApplication AS application
     </query>
 
-    <query name="searchSApplicationOfUser">
+    <query name="searchSApplicationOfProfiles">
         SELECT application
-        FROM org.bonitasoft.engine.business.application.model.SApplication AS application, org.bonitasoft.engine.profile.model.SProfileMember as profileMember
-        WHERE application.profileId = profileMember.profileId
-        AND profileMember.userId = :userId
+        FROM org.bonitasoft.engine.business.application.model.SApplication AS application
+        WHERE application.profileId IN (:profileIds)
     </query>
     
     <query name="getApplicationPageById">
