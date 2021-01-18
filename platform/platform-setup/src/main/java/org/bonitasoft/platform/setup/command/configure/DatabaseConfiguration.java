@@ -60,6 +60,8 @@ public class DatabaseConfiguration {
                 url = url.replace(H2_DATABASE_DIR,
                         rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath().normalize().toString());
             }
+            // h2 path on windows must have forward slashes (H2 convention):
+            url = url.replace("\\", "/");
         } else {
             serverName = getMandatoryProperty(prefix + "db.server.name");
             url = url.replace("${" + prefix + "db.server.name}", serverName);

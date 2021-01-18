@@ -107,6 +107,10 @@ public class DatabaseConfigurationTest {
         String h2DatabaseDir = "/h2Database";
         Properties properties = new PropertyLoader().loadProperties();
 
+        if (org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS) {
+            h2DatabaseDir = "C:/h2Database";
+        }
+
         System.setProperty("db.vendor", "h2");
         System.setProperty("h2.database.dir", h2DatabaseDir);
 
@@ -157,6 +161,7 @@ public class DatabaseConfigurationTest {
         assertThat(dbConfig.getUrl())
                 .isEqualTo("jdbc:h2:file:"
                         + rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath().normalize().toString()
+                                .replace("\\", "/")
                         + "/bonita;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
     }
 
