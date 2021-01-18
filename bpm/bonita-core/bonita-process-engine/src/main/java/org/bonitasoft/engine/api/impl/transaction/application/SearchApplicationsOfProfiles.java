@@ -25,29 +25,29 @@ import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
-public class SearchApplicationsOfUser extends AbstractSearchEntity<Application, SApplication> {
+public class SearchApplicationsOfProfiles extends AbstractSearchEntity<Application, SApplication> {
 
-    private long userId;
+    private List<Long> profileIds;
     private final ApplicationService applicationService;
     private final ApplicationModelConverter convertor;
 
-    public SearchApplicationsOfUser(final long userId, final ApplicationService applicationService,
+    public SearchApplicationsOfProfiles(final List<Long> profileIds, final ApplicationService applicationService,
             final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
             final ApplicationModelConverter convertor) {
         super(searchDescriptor, options);
-        this.userId = userId;
+        this.profileIds = profileIds;
         this.applicationService = applicationService;
         this.convertor = convertor;
     }
 
     @Override
     public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
-        return applicationService.getNumberOfApplicationsOfUser(userId, queryOptions);
+        return applicationService.getNumberOfApplicationsOfProfiles(profileIds, queryOptions);
     }
 
     @Override
     public List<SApplication> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
-        return applicationService.searchApplicationsOfUser(userId, queryOptions);
+        return applicationService.searchApplicationsOfProfiles(profileIds, queryOptions);
     }
 
     @Override
