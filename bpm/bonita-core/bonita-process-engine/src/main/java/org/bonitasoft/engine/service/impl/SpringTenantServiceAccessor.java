@@ -220,7 +220,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public ClassLoaderService getClassLoaderService() {
-        return beanAccessor.getService("classLoaderService", ClassLoaderService.class);
+        return beanAccessor.getService(ClassLoaderService.class);
     }
 
     @Override

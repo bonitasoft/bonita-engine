@@ -31,7 +31,9 @@ import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.springframework.stereotype.Component;
 
+@Component
 class ClassLoaderUpdater {
 
     private BonitaTaskExecutor bonitaTaskExecutor;

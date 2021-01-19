@@ -158,7 +158,6 @@
         <constructor-arg name="processResourcesService" ref="processResourcesService" />
         <constructor-arg name="connectorService" ref="connectorService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="expressionService" ref="expressionService" />
@@ -257,7 +256,6 @@
         <constructor-arg name="dependencyService" ref="dependencyService" />
         <constructor-arg name="businessArchiveArtifactsManager" ref="dependencyResolver" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
     </bean>
 
     <bean id="commandService" class="org.bonitasoft.engine.command.api.impl.CommandServiceImpl">
@@ -788,13 +786,11 @@
 
     <bean id="groovyScriptExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy">
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="groovyScriptConditionExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptConditionExpressionExecutorStrategy">
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
@@ -1085,7 +1081,6 @@
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="documentService" ref="documentService" />
         <constructor-arg name="commentService" ref="commentService" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
@@ -1151,7 +1146,6 @@
 
 
     <bean id="permissionService" class="org.bonitasoft.engine.service.impl.PermissionServiceImpl">
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
@@ -1317,7 +1311,6 @@
           class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl">
         <constructor-arg name="expressionService" ref="expressionService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
     </bean>
 
@@ -1347,7 +1340,6 @@
 
     <bean class="org.bonitasoft.engine.dependency.impl.DependencyServiceRegistrator" init-method="registerDependencyService">
         <constructor-arg name="tenantDependencyService" ref="dependencyService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
@@ -1381,7 +1373,6 @@
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
         <constructor-arg name="processResourcesService" ref="processResourcesService" />
@@ -1561,14 +1552,12 @@
             </map>
         </constructor-arg>
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="businessDataModelRepository"
           class="org.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
         <constructor-arg name="dependencyService" ref="dependencyService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="schemaManager" ref="schemaManager" />
         <constructor-arg name="tenantResourcesService" ref="tenantResourcesService" />
         <constructor-arg name="tenantId" value="${tenantId}" />
@@ -1602,7 +1591,6 @@
 
     <bean id="jsonBusinessDataSerializer"
           class="org.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl">
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
     </bean>
 
     <bean id="typeConverterUtil" class="org.bonitasoft.engine.commons.TypeConverterUtil">
@@ -1772,7 +1760,6 @@
         <constructor-arg name="commentService" ref="commentService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
         <constructor-arg name="contractDataService" ref="contractDataService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
