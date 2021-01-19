@@ -47,6 +47,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -54,6 +55,7 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  * @author Matthieu Chaffotte
  */
 @Slf4j
+@Component("classLoaderService") //id  used by RefreshClassLoaderTask and @InjectedService
 public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final Object synchroLock = new Object();

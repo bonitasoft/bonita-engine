@@ -168,21 +168,6 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
-    <bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
-        <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
-        <constructor-arg name="eventService" ref="platformEventService" />
-        <constructor-arg name="platformDependencyService" ref="platformDependencyService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="userTransactionService" ref="transactionService" />
-        <constructor-arg name="classLoaderUpdater" ref="classLoaderUpdater" />
-    </bean>
-
-    <bean id="classLoaderUpdater" class="org.bonitasoft.engine.classloader.ClassLoaderUpdater">
-        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="userTransactionService" ref="transactionService" />
-    </bean>
-
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="cacheConfigurations" ref="platformCacheConfigurations" />

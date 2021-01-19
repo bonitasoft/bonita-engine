@@ -79,7 +79,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     @Override
     public ClassLoaderService getClassLoaderService() {
-        return beanAccessor.getService("classLoaderService", ClassLoaderService.class);
+        return beanAccessor.getService(ClassLoaderService.class);
     }
 
     @Override

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.platform.configuration;
 
+import org.bonitasoft.engine.classloader.ClassloaderConfiguration;
 import org.bonitasoft.engine.lock.LockServiceConfiguration;
 import org.bonitasoft.engine.platform.configuration.monitoring.MonitoringConfiguration;
 import org.bonitasoft.engine.platform.session.PlatformSessionConfiguration;
@@ -33,7 +34,8 @@ import org.springframework.context.annotation.Import;
         MonitoringConfiguration.class,
         SchedulerConfiguration.class,
         LockServiceConfiguration.class,
-        PlatformSessionConfiguration.class
+        PlatformSessionConfiguration.class,
+        ClassloaderConfiguration.class
 })
 @ComponentScan("org.bonitasoft.engine.platform")
 public class EnginePlatformConfiguration {
