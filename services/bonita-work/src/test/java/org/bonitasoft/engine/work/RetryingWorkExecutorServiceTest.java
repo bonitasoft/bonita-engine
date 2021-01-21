@@ -47,6 +47,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.commons.time.FixedEngineClock;
+import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
@@ -74,7 +75,7 @@ public class RetryingWorkExecutorServiceTest {
     private RetryingWorkExecutorService workExecutorService;
     @Mock
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
-    @Mock
+    @Mock(lenient = true)
     private BonitaExecutorService bonitaExecutorService;
     @Mock
     private TechnicalLoggerService technicalLoggerService;
@@ -86,6 +87,8 @@ public class RetryingWorkExecutorServiceTest {
     @Mock
     private WorkExecutionAuditor workExecutionAuditor;
     @Mock
+    private IncidentService incidentService;
+    @Mock(lenient = true)
     private ExceptionRetryabilityEvaluator retryabilityEvaluator;
     private final FixedEngineClock engineClock = new FixedEngineClock(Instant.EPOCH);
 
@@ -106,7 +109,7 @@ public class RetryingWorkExecutorServiceTest {
                 bonitaExecutorServiceFactory,
                 technicalLoggerService, engineClock, WORK_TERMINATION_TIMEOUT, MAX_RETRY, DELAY, DELAY_FACTOR,
                 retryabilityEvaluator,
-                workExecutionAuditor, meterRegistry, TENANT_ID);
+                workExecutionAuditor, meterRegistry, incidentService, TENANT_ID);
         doReturn(true).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
         workExecutorService.start();
     }
@@ -288,7 +291,7 @@ public class RetryingWorkExecutorServiceTest {
                 new LockException("lock timeout", new Exception()));
 
         verify(bonitaExecutorService).submit(eq(workDescriptor));
-        verify(logger).warn(any(), any(Exception.class));
+        verify(logger).warn(any(), any(), any(Exception.class));
     }
 
     @Test
@@ -312,7 +315,6 @@ public class RetryingWorkExecutorServiceTest {
                 new SWorkPreconditionException("My precondition"));
 
         verifyNoMoreInteractions(bonitaExecutorService);
-        verifyNoMoreInteractions(bonitaWork);
         verify(logger).warn(contains("Work was not executed because preconditions were not met,"), (Object) any(),
                 (Object) any());
     }
@@ -407,6 +409,35 @@ public class RetryingWorkExecutorServiceTest {
         verify(bonitaExecutorService, never()).submit(eq(workDescriptor));
         verify(bonitaWork).handleFailure(rootCause, context);
         assertThat(workDescriptor.getRetryCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void should_report_incident_when_we_are_unable_to_handle_the_failure_and_the_work_is_not_handled_by_the_recovery()
+            throws Exception {
+        WorkDescriptor workDescriptor = WorkDescriptor.create("MY_WORK");
+        doThrow(new Exception("HandleFailureError")).when(bonitaWork).handleFailure(any(), anyMap());
+
+        Exception rootCause = new Exception("rootCause");
+        Map<String, Object> context = emptyMap();
+        workExecutorService.onFailure(workDescriptor, bonitaWork, context,
+                rootCause);
+
+        verify(bonitaWork).handleFailure(any(), anyMap());
+        verify(incidentService).report(anyLong(), any());
+    }
+
+    @Test
+    public void should_do_nothing_when_we_are_unable_to_handle_the_failure_and_the_work_is_handled_by_the_recovery()
+            throws Exception {
+        WorkDescriptor workDescriptor = WorkDescriptor.create("MY_WORK");
+        doThrow(new Exception("HandleFailureError")).when(bonitaWork).handleFailure(any(), anyMap());
+        doReturn(true).when(bonitaWork).canBeRecoveredByTheRecoveryMechanism();
+
+        Map<String, Object> context = emptyMap();
+        workExecutorService.onFailure(workDescriptor, bonitaWork, context, new Exception("rootCause"));
+
+        verify(bonitaWork).handleFailure(any(), anyMap());
+        verify(incidentService, never()).report(anyLong(), any());
     }
 
     @Test

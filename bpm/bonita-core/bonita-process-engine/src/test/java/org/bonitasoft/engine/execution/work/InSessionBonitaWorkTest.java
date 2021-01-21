@@ -14,9 +14,6 @@
 package org.bonitasoft.engine.execution.work;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -24,15 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.incident.Incident;
-import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
@@ -41,79 +30,54 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-/**
- * @author Celine Souchet
- */
-@SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
 public class InSessionBonitaWorkTest {
 
     @Mock
     private BonitaWork wrappedWork;
-
     @Mock
     private TenantServiceAccessor tenantAccessor;
-
-    @Mock
-    private SessionService sessionService;
-
-    @Mock
-    private IncidentService incidentService;
-
-    @Mock
-    private TechnicalLoggerService loggerService;
-
     @Mock
     private SessionAccessor sessionAccessor;
-
-    @Mock
-    private ProcessDefinitionService processDefinitionService;
-
-    @Mock
-    private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
 
     private InSessionBonitaWork txBonitawork;
 
     @Before
     public void before() {
         txBonitawork = spy(new InSessionBonitaWork(wrappedWork));
-        doReturn(false).when(loggerService).isLoggable(eq(txBonitawork.getClass()), any(TechnicalLogSeverity.class));
 
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
-        when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
         doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
     }
 
     @Test
     public void testWork() throws Exception {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Map<String, Object> singletonMap = new HashMap<>();
         txBonitawork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
     }
 
     @Test
     public void testWorkFailureIsHandled() throws Throwable {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Map<String, Object> singletonMap = new HashMap<>();
         final Exception e = new Exception();
         txBonitawork.handleFailure(e, singletonMap);
         verify(wrappedWork).handleFailure(e, singletonMap);
     }
 
-    @Test
+    @Test(expected = Exception.class)
     public void testFailureHandlingFail() throws Throwable {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Map<String, Object> singletonMap = new HashMap<>();
         final Exception e1 = new Exception();
         final Exception e2 = new Exception();
         doThrow(e2).when(wrappedWork).handleFailure(e1, singletonMap);
         txBonitawork.handleFailure(e1, singletonMap);
         verify(wrappedWork).handleFailure(e1, singletonMap);
-        verify(incidentService).report(eq(0l), any(Incident.class));
     }
 
     @Test
     public void putInMap() throws Exception {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Map<String, Object> singletonMap = new HashMap<>();
         txBonitawork.work(singletonMap);
         assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
     }
@@ -166,36 +130,10 @@ public class InSessionBonitaWorkTest {
 
     @Test(expected = Exception.class)
     public void should_throw_the_exception_of_wrapped_work() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
+        final Map<String, Object> context = new HashMap<>();
         final Exception e = new Exception();
         doThrow(e).when(wrappedWork).work(context);
         txBonitawork.work(context);
-    }
-
-    @Test
-    public void work_should_log_in_error_level_when_an_exception_occurs_in_wrapped_work() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
-        when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
-
-        txBonitawork.handleFailure(seee, context);
-
-        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR),
-                eq(seee.getClass().getName() + " : \"message\""), eq(seee));
-    }
-
-    @Test
-    public void handleFailure_should_log_in_error_level_when_an_exception_occurs_in_wrapped_work() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
-        // Yes for all log level, in order to simulate a TRACE configuration
-        // Since latest change, exception stack trace is logged in the ERROR level message. DEBUG level have no impact
-        when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
-
-        txBonitawork.handleFailure(seee, context);
-
-        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString(),
-                any(Throwable.class));
     }
 
 }

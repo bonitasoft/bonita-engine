@@ -173,9 +173,4 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         }
         return sConnectorDefinition;
     }
-
-    @Override
-    public String getRecoveryProcedure() {
-        return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
-    }
 }
