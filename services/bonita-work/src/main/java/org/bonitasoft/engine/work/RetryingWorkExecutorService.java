@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.work;
 
 import static java.lang.String.format;
+import static org.bonitasoft.engine.work.ExceptionUtils.printLightWeightStacktrace;
+import static org.bonitasoft.engine.work.ExceptionUtils.printRootCauseOnly;
 
 import java.time.Instant;
 import java.util.Map;
@@ -23,6 +25,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
+import org.bonitasoft.engine.incident.Incident;
+import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
@@ -50,6 +54,9 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
     private final BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     private final long workTerminationTimeout;
     private BonitaExecutorService executor;
+    private final IncidentService incidentService;
+    private final long tenantId;
+    public int numberOfFramesToLogInExceptions = 3;
 
     public RetryingWorkExecutorService(BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
             TechnicalLoggerService loggerService,
@@ -61,6 +68,7 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
             ExceptionRetryabilityEvaluator exceptionRetryabilityEvaluator,
             WorkExecutionAuditor workExecutionAuditor,
             MeterRegistry meterRegistry,
+            IncidentService incidentService,
             @Value("${tenantId}") long tenantId) {
         this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
         this.logger = loggerService.asLogger(RetryingWorkExecutorService.class);
@@ -71,10 +79,17 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
         this.delayFactor = delayFactor;
         this.exceptionRetryabilityEvaluator = exceptionRetryabilityEvaluator;
         this.workExecutionAuditor = workExecutionAuditor;
+        this.incidentService = incidentService;
+        this.tenantId = tenantId;
         Gauge.builder(NUMBER_OF_WORKS_RETRIED, retriedWorks, AtomicLong::get)
                 .tag("tenant", String.valueOf(tenantId)).baseUnit("works")
                 .description("Works currently waiting for execution that have been retried at least once")
                 .register(meterRegistry);
+    }
+
+    @Value("${bonita.tenant.work.exceptionsNumberOfFrameToLog:3}")
+    public void setNumberOfFramesToLogInExceptions(int numberOfFramesToLogInExceptions) {
+        this.numberOfFramesToLogInExceptions = numberOfFramesToLogInExceptions;
     }
 
     @Override
@@ -95,37 +110,50 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
                 logger.debug("Tried to execute the work, but it was unable to acquire a lock {}", work);
             } else {
                 //Caused
-                logger.warn("Tried to execute the work, but it was unable to acquire a lock " + work, thrown);
+                logger.warn("Tried to execute the work, but it was unable to acquire a lock {}",
+                        bonitaWork.getDescription(), thrown);
             }
             execute(work);
             return;
         }
+        logger.debug("Work {} failed because of ", work, thrown);
         switch (exceptionRetryabilityEvaluator.evaluateRetryability(thrown)) {
             case NOT_RETRYABLE:
                 if (thrown instanceof SWorkPreconditionException) {
-                    logger.warn("Work was not executed because preconditions were not met, {} : {}", work,
-                            thrown.getMessage());
+                    logger.warn("Work was not executed because preconditions were not met, {} : {}",
+                            bonitaWork.getDescription(), thrown.getMessage());
                     decrementRetryCounterIfNeeded(work);
                 } else {
+                    logger.warn("Work {} failed. The element will be marked as failed. Exception is: {}",
+                            bonitaWork.getDescription(),
+                            printLightWeightStacktrace(thrown, numberOfFramesToLogInExceptions));
                     handleFailure(work, bonitaWork, context, thrown);
                 }
                 break;
             case UNCERTAIN_COMPLETION_OF_COMMIT:
                 // Do the same as retryable but add a warning log
                 logger.warn(
-                        "Work {} will be retried but the issue happened during the commit. We are uncertain that the "
+                        "Work {} has failed and will be retried but the issue happened during the commit. We are uncertain that the "
                                 +
                                 "commit was really completed. If the retry fails with a SWorkPreconditionException it might indicate that "
                                 +
-                                "the work was already completed and you will need to restart your platform to trigger potential subsequent works.");
+                                "the work was already completed and the recovery mechanism will restart it. No manual action is required.",
+                        bonitaWork.getDescription());
             case RETRYABLE:
                 if (work.getRetryCount() < maxRetry) {
+                    logger.warn(
+                            "Work {} failed because of {}. It will be retried. Attempt {} on {} with a delay of {} ms",
+                            bonitaWork.getDescription(),
+                            printRootCauseOnly(thrown),
+                            work.getRetryCount() + 1,
+                            maxRetry, getDelayInMillis(work.getRetryCount()));
                     incrementRetryCounterIfNeeded(work);
-                    retry(work, thrown);
+                    retry(work);
                 } else {
-                    logger.warn("Work {} has encountered an {} and has already been retried {} times. " +
-                            "No more retries will be attempted, see what is the failure in subsequent logs.",
-                            work, thrown.getClass().getCanonicalName(), maxRetry);
+                    logger.warn("Work {} failed. It has already been retried {} times. " +
+                            "No more retries will be attempted, it will be marked as failed. Exception is: {}",
+                            bonitaWork.getDescription(), maxRetry,
+                            printLightWeightStacktrace(thrown, numberOfFramesToLogInExceptions));
                     handleFailure(work, bonitaWork, context, thrown);
                 }
                 break;
@@ -141,7 +169,22 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
         try {
             bonitaWork.handleFailure(thrown, context);
         } catch (Exception e) {
-            logger.warn("Work failed with error {}", work, e);
+            if (bonitaWork.canBeRecoveredByTheRecoveryMechanism()) {
+                logger.warn("Work {} failed and we were not able to mark the element as failed. " +
+                        "However, the element can be recovered by the recovery mechanism, it will be recovered automatically "
+                        +
+                        "the next time the recovery is executed. We were not able to mark it as failed because of {} ",
+                        bonitaWork.getDescription(), printLightWeightStacktrace(e, numberOfFramesToLogInExceptions));
+                logger.debug("Unable to put the element as failed because:", e);
+            } else {
+                logger.warn(
+                        "Work {} failed and we were not able to mark the element as failed. An incident will be reported. "
+                                +
+                                "We were not able to mark it as failed because of {}",
+                        bonitaWork.getDescription(), printLightWeightStacktrace(e, numberOfFramesToLogInExceptions));
+                incidentService.report(tenantId,
+                        new Incident(bonitaWork.getDescription(), bonitaWork.getRecoveryProcedure(), thrown, e));
+            }
         }
     }
 
@@ -157,15 +200,11 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
         }
     }
 
-    private void retry(WorkDescriptor work, Throwable thrown) {
+    private void retry(WorkDescriptor work) {
         long delayInMillis = getDelayInMillis(work.getRetryCount());
         Instant mustBeExecutedAfter = engineClock.now().plusMillis(delayInMillis);
         work.incrementRetryCount();
         work.mustBeExecutedAfter(mustBeExecutedAfter);
-        logger.warn("Work {} encountered an {} but it can be retried. Will retry. Attempt {} on {} " +
-                "with a delay of {} ms", work.getDescription(), thrown.getClass().getCanonicalName(),
-                work.getRetryCount(), maxRetry, delayInMillis);
-        logger.debug("Exception encountered during retry", thrown);
         execute(work);
     }
 

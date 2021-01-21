@@ -326,4 +326,9 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             return null;
         }
     }
+
+    @Override
+    public boolean canBeRecoveredByTheRecoveryMechanism() {
+        return true;
+    }
 }

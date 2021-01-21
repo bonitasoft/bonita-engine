@@ -56,6 +56,13 @@ public abstract class BonitaWork {
 
     public abstract void handleFailure(Throwable e, Map<String, Object> context) throws Exception;
 
+    /**
+     * @return true if the RecoveryService can recover this kind of failure
+     */
+    public boolean canBeRecoveredByTheRecoveryMechanism() {
+        return false;
+    }
+
     public long getTenantId() {
         if (tenantId <= 0) {
             throw new IllegalStateException("TenantId is not set !!");

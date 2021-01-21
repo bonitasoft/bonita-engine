@@ -57,11 +57,6 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public String getRecoveryProcedure() {
-        return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
-    }
-
-    @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
 
@@ -112,6 +107,11 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     @Override
     public String toString() {
         return "Work[" + getDescription() + "]";
+    }
+
+    @Override
+    public boolean canBeRecoveredByTheRecoveryMechanism() {
+        return true;
     }
 
 }
