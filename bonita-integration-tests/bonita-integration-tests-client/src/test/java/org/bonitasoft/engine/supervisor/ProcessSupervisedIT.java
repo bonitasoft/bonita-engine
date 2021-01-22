@@ -31,10 +31,6 @@ import org.bonitasoft.engine.bpm.document.ArchivedDocumentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityStates;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
@@ -48,15 +44,11 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -209,41 +201,6 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         taskInstance = (UserTaskInstance) searchResult.getResult().get(1);
         assertEquals("step1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
-    }
-
-    @Test
-    public void superviseMyArchivedTask() throws Exception {
-        final List<HumanTaskInstance> instanceList = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10,
-                null);
-        final HumanTaskInstance humanTaskInstance = instanceList.get(0);
-        // one archive tasks
-        final long activityInstanceId = humanTaskInstance.getId();
-
-        final Map<String, Serializable> fieldValues = new HashMap<>(1);
-        fieldValues.put("field_fieldId1", "Excel");
-        final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1",
-                String.class.getName());
-        final Operation operation = BuildTestUtil.buildOperation("Application", false, OperatorType.ASSIGNMENT, "=",
-                rightOperand);
-        final List<Operation> operationsMap = new ArrayList<>(1);
-        operationsMap.add(operation);
-        final Map<String, Serializable> executeParameters = new HashMap<>(2);
-        executeParameters.put("ACTIVITY_INSTANCE_ID_KEY", activityInstanceId);
-        executeParameters.put("OPERATIONS_LIST_KEY", (Serializable) operationsMap);
-        executeParameters.put("OPERATIONS_INPUT_KEY", (Serializable) fieldValues);
-        getCommandAPI().execute("executeActionsAndTerminate", executeParameters);
-        waitForProcessToFinish(humanTaskInstance.getParentProcessInstanceId());
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.sort(ArchivedHumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
-
-        final SearchResult<ArchivedHumanTaskInstance> searchResult = getProcessAPI()
-                .searchArchivedHumanTasksSupervisedBy(matti.getId(), builder.done());
-        assertEquals(1, searchResult.getCount());
-        assertEquals(1, searchResult.getResult().size());
-        final ArchivedUserTaskInstance taskInstance = (ArchivedUserTaskInstance) searchResult.getResult().get(0);
-        assertEquals("step1", taskInstance.getName());
-        assertEquals(john.getId(), taskInstance.getAssigneeId());
-        assertEquals(ActivityStates.COMPLETED_STATE, taskInstance.getState());
     }
 
     @Test

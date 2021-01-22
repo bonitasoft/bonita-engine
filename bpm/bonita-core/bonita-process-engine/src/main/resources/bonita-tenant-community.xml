@@ -279,7 +279,6 @@
                 <ref bean="getSupervisor" />
                 <ref bean="deleteSupervisor" />
                 <ref bean="searchProcessSupervisors" />
-                <ref bean="executeActionsAndTerminate" />
                 <ref bean="isAllowedToStartProcess" />
                 <ref bean="isAllowedToSeeOverviewForm" />
                 <ref bean="isAllowedToSeeInstanciationForm" />
@@ -455,18 +454,6 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.external.web.profile.command.ExportDefaultProfilesCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="executeActionsAndTerminate" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>executeActionsAndTerminate</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>execute actions and terminate a user task instance</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask</value>
         </constructor-arg>
     </bean>
 
