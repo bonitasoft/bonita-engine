@@ -127,7 +127,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 throw e;
             } catch (final SBonitaException sbe) {
                 throw new SCommandExecutionException("No processInstance that involves user :" + userId
-                        + " found durng executing method IsAllowedToSeeOverviewForm.", sbe);
+                        + " found during executing method IsAllowedToSeeOverviewForm.", sbe);
             }
             if (processInstanceRes.getCount() > 0) {// ==1?
                 isAllowed = true;
