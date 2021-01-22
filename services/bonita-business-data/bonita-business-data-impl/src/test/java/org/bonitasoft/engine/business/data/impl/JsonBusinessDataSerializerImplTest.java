@@ -35,22 +35,13 @@ import com.company.model.PersonWithDetails;
 import com.company.model.Phone;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.junit.Before;
 import org.junit.Test;
 
 public class JsonBusinessDataSerializerImplTest {
 
     private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
 
-    private JsonBusinessDataSerializerImpl jsonBusinessDataSerializer;
-
-    private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
-
-    @Before
-    public void setUp() throws Exception {
-        jsonBusinessDataSerializer = new JsonBusinessDataSerializerImpl(classLoaderService);
-    }
+    private final JsonBusinessDataSerializerImpl jsonBusinessDataSerializer = new JsonBusinessDataSerializerImpl();
 
     @Test
     public void entity_should_be_serialized() throws Exception {

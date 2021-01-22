@@ -42,8 +42,8 @@ import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
-import org.bonitasoft.engine.classloader.ClassLoaderListener;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SingleClassLoaderListener;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
@@ -59,7 +59,7 @@ import org.hibernate.proxy.HibernateProxy;
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
  */
-public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, ClassLoaderListener {
+public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, SingleClassLoaderListener {
 
     private static final String BDR_PERSISTENCE_UNIT = "BDR";
 

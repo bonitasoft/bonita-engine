@@ -14,12 +14,11 @@
 package org.bonitasoft.engine.classloader.listeners;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderListener;
+import org.bonitasoft.engine.classloader.PlatformClassLoaderListener;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Baptiste Mesta
- */
-public class JacksonCacheClearer implements ClassLoaderListener {
+@Component
+public class JacksonCacheClearer implements PlatformClassLoaderListener {
 
     @Override
     public void onUpdate(ClassLoader newClassLoader) {

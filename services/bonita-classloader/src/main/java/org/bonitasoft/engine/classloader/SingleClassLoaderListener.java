@@ -14,9 +14,11 @@
 package org.bonitasoft.engine.classloader;
 
 /**
+ * Listens to events occurring on a single tenant-level classloader.
+ *
  * @author Baptiste Mesta
  */
-public interface ClassLoaderListener {
+public interface SingleClassLoaderListener {
 
     void onUpdate(ClassLoader newClassLoader);
 

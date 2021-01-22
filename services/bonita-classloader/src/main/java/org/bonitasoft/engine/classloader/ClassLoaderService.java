@@ -74,34 +74,18 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      *
      * @param type the classloader type
      * @param id the classloader id
-     * @param classLoaderListener the listener to add
+     * @param singleClassLoaderListener the listener to add
      * @return true if the listener was added
      */
-    boolean addListener(final String type, final long id, ClassLoaderListener classLoaderListener);
+    boolean addListener(final String type, final long id, SingleClassLoaderListener singleClassLoaderListener);
 
     /**
      * @param type the classloader type
      * @param id the classloader id
-     * @param classLoaderListener classloader listener to remove
+     * @param singleClassLoaderListener classloader listener to remove
      * @return true if the listener was removed
      */
-    boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener);
-
-    /**
-     * add a listener that will listen all classloader events
-     *
-     * @param classLoaderListener the listener to add
-     * @return true if the listener was added
-     */
-    boolean addListener(ClassLoaderListener classLoaderListener);
-
-    /**
-     * remove a global listener
-     *
-     * @param classLoaderListener classloader listener to remove
-     * @return true if the listener was removed
-     */
-    boolean removeListener(ClassLoaderListener classLoaderListener);
+    boolean removeListener(String type, long id, SingleClassLoaderListener singleClassLoaderListener);
 
     void refreshClassLoaderAfterUpdate(ScopeType type, long id) throws SClassLoaderException;
 

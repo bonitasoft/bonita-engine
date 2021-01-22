@@ -18,6 +18,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -27,8 +28,6 @@ import java.util.stream.Stream;
 import javax.transaction.Status;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.classloader.listeners.ClassReflectorClearer;
-import org.bonitasoft.engine.classloader.listeners.JacksonCacheClearer;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
@@ -62,30 +61,31 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private final ThreadLocal<RefreshClassloaderSynchronization> currentRefreshTask = new ThreadLocal<>();
     private final ParentClassLoaderResolver parentClassLoaderResolver;
 
-    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(ClassLoaderIdentifier.GLOBAL_TYPE,
+    private final VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(
+            ClassLoaderIdentifier.GLOBAL_TYPE,
             ClassLoaderIdentifier.GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
     private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
 
-    private final Set<ClassLoaderListener> globalListeners = new HashSet<>();
+    private final Set<PlatformClassLoaderListener> platformClassLoaderListeners = new HashSet<>();
 
     private final Object mutex = new ClassLoaderServiceMutex();
 
     private boolean shuttingDown = false;
 
     private final EventService eventService;
-    private PlatformDependencyService platformDependencyService;
-    private Map<Long, TenantDependencyService> dependencyServicesByTenant = new HashMap<>();
-    private SessionAccessor sessionAccessor;
-    private UserTransactionService userTransactionService;
-    private BroadcastService broadcastService;
-    private ClassLoaderUpdater classLoaderUpdater;
+    private final PlatformDependencyService platformDependencyService;
+    private final Map<Long, TenantDependencyService> dependencyServicesByTenant = new HashMap<>();
+    private final SessionAccessor sessionAccessor;
+    private final UserTransactionService userTransactionService;
+    private final BroadcastService broadcastService;
+    private final ClassLoaderUpdater classLoaderUpdater;
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver,
             final EventService eventService, PlatformDependencyService platformDependencyService,
             SessionAccessor sessionAccessor,
             UserTransactionService userTransactionService, BroadcastService broadcastService,
-            ClassLoaderUpdater classLoaderUpdater) {
+            ClassLoaderUpdater classLoaderUpdater, List<PlatformClassLoaderListener> platformClassLoaderListeners) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.eventService = eventService;
         this.platformDependencyService = platformDependencyService;
@@ -93,8 +93,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         this.userTransactionService = userTransactionService;
         this.broadcastService = broadcastService;
         this.classLoaderUpdater = classLoaderUpdater;
-        globalListeners.add(new ClassReflectorClearer());
-        globalListeners.add(new JacksonCacheClearer());
+        this.platformClassLoaderListeners.addAll(platformClassLoaderListeners);
     }
 
     @Override
@@ -210,7 +209,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             }
             localClassLoader.destroy();
             localClassLoaders.remove(key);
-            for (ClassLoaderListener globalListener : globalListeners) {
+            for (PlatformClassLoaderListener globalListener : platformClassLoaderListeners) {
                 log.debug("Notify global classloader listener that classloader {} is destroyed: {}",
                         localClassLoader.getIdentifier(), globalListener);
                 globalListener.onDestroy(localClassLoader);
@@ -258,7 +257,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         final BonitaClassLoader classLoader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
         log.debug("Replacing {} with {}", virtualClassloader.getClassLoader(), classLoader);
         virtualClassloader.replaceClassLoader(classLoader);
-        for (ClassLoaderListener globalListener : new HashSet<>(globalListeners)) {
+        for (PlatformClassLoaderListener globalListener : new HashSet<>(platformClassLoaderListeners)) {
             log.debug("Notify global classloader listener that classloader {} is updated: {}",
                     virtualClassloader.getIdentifier(), globalListener);
             globalListener.onUpdate(virtualClassloader);
@@ -305,31 +304,19 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public boolean addListener(String type, long id, ClassLoaderListener classLoaderListener) {
-        log.debug("Added listener {} on {} {}", classLoaderListener, type, id);
+    public boolean addListener(String type, long id, SingleClassLoaderListener singleClassLoaderListener) {
+        log.debug("Added listener {} on {} {}", singleClassLoaderListener, type, id);
         final VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(
                 new ClassLoaderIdentifier(type, id));
-        return localClassLoader.addListener(classLoaderListener);
+        return localClassLoader.addListener(singleClassLoaderListener);
     }
 
     @Override
-    public boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener) {
-        log.debug("Removed listener {} on {} {}", classLoaderListener, type, id);
+    public boolean removeListener(String type, long id, SingleClassLoaderListener singleClassLoaderListener) {
+        log.debug("Removed listener {} on {} {}", singleClassLoaderListener, type, id);
         VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(
                 new ClassLoaderIdentifier(type, id));
-        return localClassLoader.removeListener(classLoaderListener);
-    }
-
-    @Override
-    public boolean addListener(ClassLoaderListener classLoaderListener) {
-        log.debug("Added global listener {}", classLoaderListener);
-        return globalListeners.add(classLoaderListener);
-    }
-
-    @Override
-    public boolean removeListener(ClassLoaderListener classLoaderListener) {
-        log.debug("Removed global listener {}", classLoaderListener);
-        return globalListeners.remove(classLoaderListener);
+        return localClassLoader.removeListener(singleClassLoaderListener);
     }
 
     @Override
