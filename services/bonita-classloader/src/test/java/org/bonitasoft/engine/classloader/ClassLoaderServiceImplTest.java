@@ -21,6 +21,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.events.EventService;
@@ -85,8 +88,14 @@ public class ClassLoaderServiceImplTest {
     @Mock
     private ClassLoaderUpdater classLoaderUpdater;
 
+    @Mock
+    private PlatformClassLoaderListener platformClassLoaderListener1;
+    @Mock
+    private PlatformClassLoaderListener platformClassLoaderListener2;
+
     @Captor
     private ArgumentCaptor<RefreshClassloaderSynchronization> synchronizationArgumentCaptor;
+
     private ClassLoaderServiceImpl classLoaderService;
     private ClassLoader testClassLoader;
     private VirtualClassLoader processClassLoader;
@@ -102,7 +111,7 @@ public class ClassLoaderServiceImplTest {
     public void before() throws Exception {
         classLoaderService = new ClassLoaderServiceImpl(parentClassLoaderResolver, eventService,
                 platformDependencyService, sessionAccessor, userTransactionService, broadcastService,
-                classLoaderUpdater);
+                classLoaderUpdater, Arrays.asList(platformClassLoaderListener1, platformClassLoaderListener2));
         //tenant in theses tests is 0L
         classLoaderService.registerDependencyServiceOfTenant(0L, tenantDependencyService);
         processClassLoader = classLoaderService.getLocalClassLoader(PROCESS.name(), CHILD_ID);
@@ -237,7 +246,7 @@ public class ClassLoaderServiceImplTest {
         //given
         classLoaderService = new ClassLoaderServiceImpl(badParentClassLoaderResolver, eventService,
                 platformDependencyService, sessionAccessor, userTransactionService, broadcastService,
-                classLoaderUpdater);
+                classLoaderUpdater, Collections.emptyList());
         //when
         processClassLoader = classLoaderService.getLocalClassLoader(PROCESS.name(), CHILD_ID);
 
@@ -249,28 +258,26 @@ public class ClassLoaderServiceImplTest {
     public void should_globalListeners_be_called_on_destroy() throws Exception {
         //given
         classLoaderService.getLocalClassLoader(PROCESS.name(), 17);//second classloader
-        ClassLoaderListener listener = mock(ClassLoaderListener.class);
-        classLoaderService.addListener(listener);
         //when
         classLoaderService.removeLocalClassLoader(PROCESS.name(), CHILD_ID);
         classLoaderService.removeLocalClassLoader(PROCESS.name(), 17);
 
         //then
-        verify(listener, times(2)).onDestroy(any(VirtualClassLoader.class));
+        verify(platformClassLoaderListener1, times(2)).onDestroy(any(VirtualClassLoader.class));
+        verify(platformClassLoaderListener2, times(2)).onDestroy(any(VirtualClassLoader.class));
     }
 
     @Test
     public void should_globalListeners_be_called_on_update() throws Exception {
         //given
         classLoaderService.getLocalClassLoader(PROCESS.name(), 17);//second classloader
-        ClassLoaderListener listener = mock(ClassLoaderListener.class);
-        classLoaderService.addListener(listener);
         //when
         classLoaderService.refreshClassLoaderImmediately(PROCESS, CHILD_ID);
         classLoaderService.refreshClassLoaderImmediately(PROCESS, 17);
 
         //then
-        verify(listener, times(2)).onUpdate(any(VirtualClassLoader.class));
+        verify(platformClassLoaderListener1, times(2)).onUpdate(any(VirtualClassLoader.class));
+        verify(platformClassLoaderListener2, times(2)).onUpdate(any(VirtualClassLoader.class));
     }
 
     @Test
@@ -355,10 +362,10 @@ public class ClassLoaderServiceImplTest {
 
     @Test
     public void should_not_initialize_classloader_when_adding_and_removing_listener() {
-        ClassLoaderListener classLoaderListener = mock(ClassLoaderListener.class);
+        SingleClassLoaderListener singleClassLoaderListener = mock(SingleClassLoaderListener.class);
 
-        assertThat(classLoaderService.addListener(TENANT.name(), 44L, classLoaderListener)).isTrue();
-        assertThat(classLoaderService.removeListener(TENANT.name(), 44L, classLoaderListener)).isTrue();
+        assertThat(classLoaderService.addListener(TENANT.name(), 44L, singleClassLoaderListener)).isTrue();
+        assertThat(classLoaderService.removeListener(TENANT.name(), 44L, singleClassLoaderListener)).isTrue();
 
         verify(classLoaderUpdater, never()).initializeClassLoader(any(), any(),
                 eq(new ClassLoaderIdentifier(TENANT.name(), 44L)));

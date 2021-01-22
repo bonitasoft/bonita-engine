@@ -16,7 +16,7 @@ package org.bonitasoft.engine.classloader;
 /**
  * @author Baptiste Mesta
  */
-class MyClassLoaderListener implements ClassLoaderListener {
+class MyClassLoaderListener implements SingleClassLoaderListener {
 
     int onDestroyCalled = 0;
     int onUpdateCalled = 0;

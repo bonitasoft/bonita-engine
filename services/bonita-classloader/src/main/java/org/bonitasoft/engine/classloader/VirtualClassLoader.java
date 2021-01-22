@@ -51,7 +51,7 @@ public class VirtualClassLoader extends ClassLoader {
 
     private VirtualClassLoader virtualParent;
 
-    private List<ClassLoaderListener> listeners;
+    private List<SingleClassLoaderListener> listeners;
 
     private Set<VirtualClassLoader> children = new HashSet<>();
     private ClassLoaderIdentifier identifier;
@@ -84,7 +84,7 @@ public class VirtualClassLoader extends ClassLoader {
     void replaceClassLoader(final BonitaClassLoader classloader) {
         BonitaClassLoader oldClassLoader = this.classloader;
         this.classloader = classloader;
-        for (ClassLoaderListener listener : getListeners()) {
+        for (SingleClassLoaderListener listener : getListeners()) {
             log.debug("Notify listener of virtual classloader {} of update: {}", identifier, listener);
             listener.onUpdate(this);
         }
@@ -151,14 +151,14 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     private void notifyDestroy() {
-        for (ClassLoaderListener listener : getListeners()) {
+        for (SingleClassLoaderListener listener : getListeners()) {
             log.debug("Notify listener of virtual classloader {} of destroy: {}", identifier, listener);
             listener.onDestroy(this);
         }
         //do not notify children, it should not happen
     }
 
-    private synchronized List<ClassLoaderListener> getListeners() {
+    private synchronized List<SingleClassLoaderListener> getListeners() {
         return new ArrayList<>(listeners);
     }
 
@@ -175,12 +175,12 @@ public class VirtualClassLoader extends ClassLoader {
                 + classloader;
     }
 
-    public synchronized boolean addListener(ClassLoaderListener listener) {
+    public synchronized boolean addListener(SingleClassLoaderListener listener) {
         return !listeners.contains(listener) && listeners.add(listener);
     }
 
-    public synchronized boolean removeListener(ClassLoaderListener classLoaderListener) {
-        return listeners.remove(classLoaderListener);
+    public synchronized boolean removeListener(SingleClassLoaderListener singleClassLoaderListener) {
+        return listeners.remove(singleClassLoaderListener);
     }
 
     public void addChild(VirtualClassLoader virtualClassLoader) {

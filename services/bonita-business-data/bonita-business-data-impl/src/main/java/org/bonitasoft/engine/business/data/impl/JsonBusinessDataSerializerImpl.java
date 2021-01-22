@@ -28,19 +28,15 @@ import org.bonitasoft.engine.business.data.impl.jackson.EntityBeanSerializerModi
 import org.bonitasoft.engine.business.data.impl.jackson.EntityJacksonAnnotationIntrospector;
 import org.bonitasoft.engine.business.data.impl.jackson.EntityMixin;
 import org.bonitasoft.engine.business.data.impl.jackson.utils.LinkUtils;
-import org.bonitasoft.engine.classloader.ClassLoaderListener;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
-        implements JsonBusinessDataSerializer, ClassLoaderListener {
+        implements JsonBusinessDataSerializer {
 
     private static Logger LOG = LoggerFactory.getLogger(JsonBusinessDataSerializerImpl.class);
 
-    public JsonBusinessDataSerializerImpl(ClassLoaderService classLoaderService) {
-        classLoaderService.addListener(this);
-
+    public JsonBusinessDataSerializerImpl() {
         SimpleModule module = new SimpleModule();
         module.setSerializerModifier(new EntityBeanSerializerModifier());
         objectMapper.registerModule(module);
@@ -91,14 +87,6 @@ public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
         String json = "[" + list.get(0).toString() + "]";
         LOG.trace("Serialization result: {}", json);
         return json;
-    }
-
-    @Override
-    public void onUpdate(ClassLoader newClassLoader) {
-    }
-
-    @Override
-    public void onDestroy(ClassLoader oldClassLoader) {
     }
 
 }

@@ -11,25 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.classloader.listeners;
-
-import org.bonitasoft.engine.classloader.PlatformClassLoaderListener;
-import org.bonitasoft.engine.commons.ClassReflector;
-import org.springframework.stereotype.Component;
+package org.bonitasoft.engine.classloader;
 
 /**
- * @author Baptiste Mesta
+ * Listen to events happening to all classloaders (all tenants, platform-wide)
  */
-@Component
-public class ClassReflectorClearer implements PlatformClassLoaderListener {
+public interface PlatformClassLoaderListener {
 
-    @Override
-    public void onUpdate(ClassLoader newClassLoader) {
-        ClassReflector.clearCache();
-    }
+    void onUpdate(ClassLoader newClassLoader);
 
-    @Override
-    public void onDestroy(ClassLoader oldClassLoader) {
-        ClassReflector.clearCache();
-    }
+    void onDestroy(ClassLoader oldClassLoader);
+
 }

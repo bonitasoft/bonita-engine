@@ -52,7 +52,7 @@ public class VirtualClassLoaderTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private ClassLoader testClassLoader;
     @Mock
-    private ClassLoaderListener myClassLoaderListener;
+    private SingleClassLoaderListener mySingleClassLoaderListener;
     private VirtualClassLoader localClassLoader;
     private BonitaClassLoader newClassLoader;
     private int idCounter = 1;
@@ -170,11 +170,11 @@ public class VirtualClassLoaderTest {
     @Test
     public void should_replaceClassLoader_notify_listeners() throws Exception {
         //given
-        localClassLoader.addListener(myClassLoaderListener);
+        localClassLoader.addListener(mySingleClassLoaderListener);
         //when
         localClassLoader.replaceClassLoader(newClassLoader);
         //then
-        verify(myClassLoaderListener).onUpdate(localClassLoader);
+        verify(mySingleClassLoaderListener).onUpdate(localClassLoader);
     }
 
     @Test
@@ -192,46 +192,46 @@ public class VirtualClassLoaderTest {
     @Test
     public void should_destroy_notify_listeners() throws Exception {
         //given
-        localClassLoader.addListener(myClassLoaderListener);
+        localClassLoader.addListener(mySingleClassLoaderListener);
         localClassLoader.replaceClassLoader(newClassLoader);
         //when
         localClassLoader.destroy();
         //then
-        verify(myClassLoaderListener).onDestroy(localClassLoader);
+        verify(mySingleClassLoaderListener).onDestroy(localClassLoader);
     }
 
     @Test
     public void should_add_same_classloader_do_not_add_it_2_times() throws Exception {
         //given
-        localClassLoader.addListener(myClassLoaderListener);
-        localClassLoader.addListener(myClassLoaderListener);
+        localClassLoader.addListener(mySingleClassLoaderListener);
+        localClassLoader.addListener(mySingleClassLoaderListener);
         //when
         localClassLoader.replaceClassLoader(newClassLoader);
         //then
-        verify(myClassLoaderListener, times(1)).onUpdate(localClassLoader);
+        verify(mySingleClassLoaderListener, times(1)).onUpdate(localClassLoader);
     }
 
     @Test
     public void should_removeListener_remove_listener() throws Exception {
         //given
-        localClassLoader.addListener(myClassLoaderListener);
-        localClassLoader.removeListener(myClassLoaderListener);
+        localClassLoader.addListener(mySingleClassLoaderListener);
+        localClassLoader.removeListener(mySingleClassLoaderListener);
         //when
         localClassLoader.replaceClassLoader(newClassLoader);
         //then
-        verify(myClassLoaderListener, never()).onUpdate(localClassLoader);
+        verify(mySingleClassLoaderListener, never()).onUpdate(localClassLoader);
     }
 
     @Test
     public void should_notifyUpdate_call_notify_on_children() throws Exception {
         //given
         VirtualClassLoader child = new VirtualClassLoader("child", 12, localClassLoader);
-        ClassLoaderListener classLoaderListener = mock(ClassLoaderListener.class);
-        child.addListener(classLoaderListener);
+        SingleClassLoaderListener singleClassLoaderListener = mock(SingleClassLoaderListener.class);
+        child.addListener(singleClassLoaderListener);
         //when
         localClassLoader.replaceClassLoader(newClassLoader);
         //then
-        verify(classLoaderListener).onUpdate(child);
+        verify(singleClassLoaderListener).onUpdate(child);
 
     }
 
