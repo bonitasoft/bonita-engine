@@ -412,9 +412,4 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
             throw new SRetryableException(e);
         }
     }
-
-    @Override
-    public void onDestroy(ClassLoader oldClassLoader) {
-
-    }
 }

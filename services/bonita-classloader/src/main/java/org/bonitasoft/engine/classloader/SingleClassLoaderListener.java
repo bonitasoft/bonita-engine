@@ -20,8 +20,10 @@ package org.bonitasoft.engine.classloader;
  */
 public interface SingleClassLoaderListener {
 
-    void onUpdate(ClassLoader newClassLoader);
+    default void onUpdate(ClassLoader newClassLoader) {
+    }
 
-    void onDestroy(ClassLoader oldClassLoader);
+    default void onDestroy(ClassLoader oldClassLoader) {
+    }
 
 }

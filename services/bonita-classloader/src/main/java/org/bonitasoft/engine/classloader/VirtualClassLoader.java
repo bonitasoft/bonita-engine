@@ -16,10 +16,8 @@ package org.bonitasoft.engine.classloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,18 +46,13 @@ public class VirtualClassLoader extends ClassLoader {
      * should override all methods...
      */
     private BonitaClassLoader classloader;
-
     private VirtualClassLoader virtualParent;
-
-    private List<SingleClassLoaderListener> listeners;
-
-    private Set<VirtualClassLoader> children = new HashSet<>();
-    private ClassLoaderIdentifier identifier;
+    private final Set<VirtualClassLoader> children = new HashSet<>();
+    private final ClassLoaderIdentifier identifier;
 
     VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
         super(parent);
         identifier = new ClassLoaderIdentifier(artifactType, artifactId);
-        listeners = new ArrayList<>();
     }
 
     VirtualClassLoader(final String artifactType, final long artifactId, final VirtualClassLoader parent) {
@@ -84,10 +77,6 @@ public class VirtualClassLoader extends ClassLoader {
     void replaceClassLoader(final BonitaClassLoader classloader) {
         BonitaClassLoader oldClassLoader = this.classloader;
         this.classloader = classloader;
-        for (SingleClassLoaderListener listener : getListeners()) {
-            log.debug("Notify listener of virtual classloader {} of update: {}", identifier, listener);
-            listener.onUpdate(this);
-        }
         for (VirtualClassLoader child : children) {
             child.invalidateClassloader();
         }
@@ -142,24 +131,10 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     public void destroy() {
-        final BonitaClassLoader classloader = this.classloader;
-        destroy(classloader);
-        notifyDestroy();
+        destroy(this.classloader);
         if (virtualParent != null) {
             virtualParent.removeChild(this);
         }
-    }
-
-    private void notifyDestroy() {
-        for (SingleClassLoaderListener listener : getListeners()) {
-            log.debug("Notify listener of virtual classloader {} of destroy: {}", identifier, listener);
-            listener.onDestroy(this);
-        }
-        //do not notify children, it should not happen
-    }
-
-    private synchronized List<SingleClassLoaderListener> getListeners() {
-        return new ArrayList<>(listeners);
     }
 
     private void destroy(BonitaClassLoader classloader) {
@@ -175,21 +150,12 @@ public class VirtualClassLoader extends ClassLoader {
                 + classloader;
     }
 
-    public synchronized boolean addListener(SingleClassLoaderListener listener) {
-        return !listeners.contains(listener) && listeners.add(listener);
-    }
-
-    public synchronized boolean removeListener(SingleClassLoaderListener singleClassLoaderListener) {
-        return listeners.remove(singleClassLoaderListener);
-    }
-
     public void addChild(VirtualClassLoader virtualClassLoader) {
         children.add(virtualClassLoader);
     }
 
     private void removeChild(VirtualClassLoader child) {
         children.remove(child);
-
     }
 
     public boolean hasChildren() {

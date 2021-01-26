@@ -13,8 +13,11 @@
  **/
 package org.bonitasoft.engine.classloader;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.transaction.Status;
@@ -68,6 +72,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
 
     private final Set<PlatformClassLoaderListener> platformClassLoaderListeners = new HashSet<>();
+    private final Map<ClassLoaderIdentifier, Set<SingleClassLoaderListener>> singleClassLoaderListenersMap = Collections
+            .synchronizedMap(new HashMap<>());
 
     private final Object mutex = new ClassLoaderServiceMutex();
 
@@ -106,7 +112,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private ClassLoaderIdentifier getKey(final String type, final long id) {
-        return new ClassLoaderIdentifier(type, id);
+        return identifier(ScopeType.valueOf(type), id);
     }
 
     @Override
@@ -196,6 +202,19 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
         // Remove the class loader
         final ClassLoaderIdentifier key = getKey(type, id);
+        VirtualClassLoader virtualClassLoader = localClassLoaders.get(key);
+        if (virtualClassLoader == null) {
+            log.debug("No classloader found for identifier {}, nothing to remove", key);
+            return;
+        }
+        if (virtualClassLoader.hasChildren()) {
+            throw new SClassLoaderException("Unable to remove classloader " + key + ", it has children (" +
+                    virtualClassLoader.getChildren().stream()
+                            .map(VirtualClassLoader::getIdentifier)
+                            .map(ClassLoaderIdentifier::toString)
+                            .collect(Collectors.joining(", "))
+                    + "), remove the children first");
+        }
         destroyLocalClassLoader(key);
     }
 
@@ -209,11 +228,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             }
             localClassLoader.destroy();
             localClassLoaders.remove(key);
-            for (PlatformClassLoaderListener globalListener : platformClassLoaderListeners) {
-                log.debug("Notify global classloader listener that classloader {} is destroyed: {}",
-                        localClassLoader.getIdentifier(), globalListener);
-                globalListener.onDestroy(localClassLoader);
-            }
+            notifyDestroyed(localClassLoader);
         }
     }
 
@@ -250,18 +265,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void refreshClassLoader(final VirtualClassLoader virtualClassloader, Stream<BonitaResource> resources,
-            final String type, final long id,
-            final URI temporaryFolder, final ClassLoader parent) {
+            final String type, final long id, final URI temporaryFolder, final ClassLoader parent) {
         log.info("Refreshing class loader of type {} with id {}", type, id);
 
         final BonitaClassLoader classLoader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
         log.debug("Replacing {} with {}", virtualClassloader.getClassLoader(), classLoader);
         virtualClassloader.replaceClassLoader(classLoader);
-        for (PlatformClassLoaderListener globalListener : new HashSet<>(platformClassLoaderListeners)) {
-            log.debug("Notify global classloader listener that classloader {} is updated: {}",
-                    virtualClassloader.getIdentifier(), globalListener);
-            globalListener.onUpdate(virtualClassloader);
-        }
+        notifyUpdateOnClassLoaderAndItsChildren(virtualClassloader);
     }
 
     @Override
@@ -287,8 +297,10 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             final Iterator<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> iterator = entries.iterator();
             while (iterator.hasNext()) {
                 Map.Entry<ClassLoaderIdentifier, VirtualClassLoader> next = iterator.next();
-                if (!next.getValue().hasChildren()) {
-                    next.getValue().destroy();
+                VirtualClassLoader currentClassLoader = next.getValue();
+                if (!currentClassLoader.hasChildren()) {
+                    currentClassLoader.destroy();
+                    notifyDestroyed(currentClassLoader);
                     iterator.remove();
                 }
             }
@@ -306,17 +318,48 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public boolean addListener(String type, long id, SingleClassLoaderListener singleClassLoaderListener) {
         log.debug("Added listener {} on {} {}", singleClassLoaderListener, type, id);
-        final VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(
-                new ClassLoaderIdentifier(type, id));
-        return localClassLoader.addListener(singleClassLoaderListener);
+        return getListeners(getKey(type, id)).add(singleClassLoaderListener);
     }
 
     @Override
     public boolean removeListener(String type, long id, SingleClassLoaderListener singleClassLoaderListener) {
         log.debug("Removed listener {} on {} {}", singleClassLoaderListener, type, id);
-        VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(
-                new ClassLoaderIdentifier(type, id));
-        return localClassLoader.removeListener(singleClassLoaderListener);
+        return getListeners(new ClassLoaderIdentifier(type, id)).remove(singleClassLoaderListener);
+    }
+
+    Set<SingleClassLoaderListener> getListeners(ClassLoaderIdentifier key) {
+        return this.singleClassLoaderListenersMap.computeIfAbsent(key, k -> new HashSet<>());
+    }
+
+    /**
+     * Notify listeners that the classloader was destroyed
+     * That method do not notify children because we can't destroy a classloader that have children
+     */
+    private void notifyDestroyed(VirtualClassLoader localClassLoader) {
+        getListeners(localClassLoader.getIdentifier()).forEach(l -> {
+            log.debug("Notify listener that classloader {} was destroyed: {}", localClassLoader.getIdentifier(), l);
+            l.onDestroy(localClassLoader);
+        });
+        platformClassLoaderListeners.forEach(l -> {
+            log.debug("Notify listener that classloader {} was destroyed: {}", localClassLoader.getIdentifier(), l);
+            l.onDestroy(localClassLoader);
+        });
+    }
+
+    /**
+     * Notify listeners that the classloader was updated
+     * Also notify that children classloader were updated
+     */
+    void notifyUpdateOnClassLoaderAndItsChildren(VirtualClassLoader virtualClassLoader) {
+        getListeners(virtualClassLoader.getIdentifier()).forEach(l -> {
+            log.debug("Notify listener that classloader {} was updated: {}", virtualClassLoader.getIdentifier(), l);
+            l.onUpdate(virtualClassLoader);
+        });
+        platformClassLoaderListeners.forEach(l -> {
+            log.debug("Notify listener that classloader {} was updated: {}", virtualClassLoader.getIdentifier(), l);
+            l.onUpdate(virtualClassLoader);
+        });
+        virtualClassLoader.getChildren().forEach(this::notifyUpdateOnClassLoaderAndItsChildren);
     }
 
     @Override
