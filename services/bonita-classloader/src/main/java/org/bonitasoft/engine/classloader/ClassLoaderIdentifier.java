@@ -33,6 +33,10 @@ public class ClassLoaderIdentifier implements Serializable {
     private String type;
     private long id;
 
+    public static ClassLoaderIdentifier identifier(ScopeType scopeType, long id) {
+        return new ClassLoaderIdentifier(scopeType.name(), id);
+    }
+
     public ScopeType getScopeType() {
         return ScopeType.valueOf(type);
     }

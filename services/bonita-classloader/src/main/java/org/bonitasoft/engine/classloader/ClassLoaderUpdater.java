@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -33,12 +34,13 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 class ClassLoaderUpdater {
 
-    private BonitaTaskExecutor bonitaTaskExecutor;
-    private SessionAccessor sessionAccessor;
-    private UserTransactionService userTransactionService;
+    private final BonitaTaskExecutor bonitaTaskExecutor;
+    private final SessionAccessor sessionAccessor;
+    private final UserTransactionService userTransactionService;
 
     public ClassLoaderUpdater(BonitaTaskExecutor bonitaTaskExecutor,
             SessionAccessor sessionAccessor, UserTransactionService userTransactionService) {
@@ -76,6 +78,7 @@ class ClassLoaderUpdater {
                 classLoaderService.getLocalTemporaryFolder(identifier.getType(), identifier.getId()),
                 virtualClassLoader.getParent());
         virtualClassLoader.replaceClassLoader(bonitaClassLoader);
+        classLoaderService.notifyUpdateOnClassLoaderAndItsChildren(virtualClassLoader);
     }
 
     private void execute(Long tenantId, Callable<Void> callable) {
