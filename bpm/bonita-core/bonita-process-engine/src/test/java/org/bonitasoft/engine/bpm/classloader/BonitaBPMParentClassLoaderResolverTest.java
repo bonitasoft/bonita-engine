@@ -14,11 +14,13 @@
 package org.bonitasoft.engine.bpm.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
+import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -42,39 +44,19 @@ public class BonitaBPMParentClassLoaderResolverTest {
     @Test
     public void should_getParentClassLoaderIdentifier_return_global_on_tenant_classloader() throws Exception {
         //given
-        final ClassLoaderIdentifier childId = new ClassLoaderIdentifier(ScopeType.TENANT.name(), 124);
+        final ClassLoaderIdentifier childId = identifier(TENANT, 124);
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver
                 .getParentClassLoaderIdentifier(childId);
         //then
         assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
-    }
-
-    @Test
-    public void should_getParentClassLoaderIdentifier_return_global_on_datasource_classloader() throws Exception {
-        //given
-        final ClassLoaderIdentifier childId = new ClassLoaderIdentifier("___datasource___", 124);
-        //when
-        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver
-                .getParentClassLoaderIdentifier(childId);
-        //then
-        assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
-    }
-
-    @Test(expected = BonitaRuntimeException.class)
-    public void should_getParentClassLoaderIdentifier_throw_exception_on_unkown_type() throws Exception {
-        //given
-        final ClassLoaderIdentifier childId = new ClassLoaderIdentifier("unkown", 124);
-        //when
-        bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
-        //then exception
     }
 
     @Test(expected = BonitaRuntimeException.class)
     public void should_getParentClassLoaderIdentifier_throw_exception_on_process_if_no_tenant() throws Exception {
         //given
         doThrow(new STenantIdNotSetException("")).when(sessionAccessor).getTenantId();
-        final ClassLoaderIdentifier childId = new ClassLoaderIdentifier(ScopeType.PROCESS.name(), 124);
+        final ClassLoaderIdentifier childId = identifier(PROCESS, 124);
         //when
         bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
         //then exception
@@ -84,12 +66,12 @@ public class BonitaBPMParentClassLoaderResolverTest {
     public void should_getParentClassLoaderIdentifier_return_tenant() throws Exception {
         //given
         doReturn(25l).when(sessionAccessor).getTenantId();
-        final ClassLoaderIdentifier childId = new ClassLoaderIdentifier(ScopeType.PROCESS.name(), 124);
+        final ClassLoaderIdentifier childId = identifier(PROCESS, 124);
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver
                 .getParentClassLoaderIdentifier(childId);
         //then
-        assertThat(parentClassLoaderIdentifier).isEqualTo(new ClassLoaderIdentifier(ScopeType.TENANT.name(), 25));
+        assertThat(parentClassLoaderIdentifier).isEqualTo(identifier(TENANT, 25));
     }
 
 }

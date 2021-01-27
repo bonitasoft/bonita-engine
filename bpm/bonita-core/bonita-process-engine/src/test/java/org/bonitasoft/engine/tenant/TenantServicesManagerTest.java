@@ -16,6 +16,7 @@ package org.bonitasoft.engine.tenant;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -80,7 +81,7 @@ public class TenantServicesManagerTest {
     public void should_not_refresh_classloaders_on_start() throws Exception {
         tenantServicesManager.start();
 
-        verify(classLoaderService).getLocalClassLoader(ScopeType.TENANT.name(), TENANT_ID);
+        verify(classLoaderService).getLocalClassLoader(identifier(ScopeType.TENANT, TENANT_ID));
         verifyNoMoreInteractions(classLoaderService);
     }
 

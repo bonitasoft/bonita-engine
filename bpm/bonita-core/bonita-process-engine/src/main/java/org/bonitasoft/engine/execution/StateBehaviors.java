@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -308,8 +310,8 @@ public class StateBehaviors {
             SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException,
             SFlowNodeReadException,
             SActivityModificationException {
-        final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
-                processDefinitionId);
+        final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(
+                identifier(ScopeType.PROCESS, processDefinitionId));
         final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(),
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 flowNodeInstance.getLogicalGroup(0));

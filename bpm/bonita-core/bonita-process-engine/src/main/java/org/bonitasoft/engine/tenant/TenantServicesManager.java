@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.tenant;
 
 import static java.text.MessageFormat.format;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.tenant.TenantServicesManager.ServiceAction.*;
 
 import java.util.ArrayList;
@@ -205,8 +206,8 @@ public class TenantServicesManager {
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             // Set the right classloader only on start and resume because we destroy it on stop and pause anyway
-            final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(),
-                    tenantId);
+            final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(
+                    identifier(ScopeType.TENANT, tenantId));
             Thread.currentThread().setContextClassLoader(serverClassLoader);
             runnable.run();
         } finally {

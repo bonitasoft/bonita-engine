@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.SingleClassLoaderListener;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -125,8 +128,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
                         illegalStateException);
             }
         } else {
-            classLoader = classLoaderService.getLocalClassLoader(DEFINITION_TYPE, definitionId);
-            classLoaderService.addListener(DEFINITION_TYPE, definitionId, this);
+            classLoader = classLoaderService.getLocalClassLoader(identifier(ScopeType.PROCESS, definitionId));
+            classLoaderService.addListener(identifier(ScopeType.PROCESS, definitionId), this);
         }
         return classLoader;
     }

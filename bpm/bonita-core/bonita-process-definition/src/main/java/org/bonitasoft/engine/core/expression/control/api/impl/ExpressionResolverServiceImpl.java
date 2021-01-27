@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.expression.control.api.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +31,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -161,7 +164,8 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             processId = evaluationContext.getProcessDefinitionId();
         }
         if (processId != null) {
-            Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("PROCESS", processId));
+            Thread.currentThread().setContextClassLoader(
+                    classLoaderService.getLocalClassLoader(identifier(ScopeType.PROCESS, processId)));
         }
     }
 

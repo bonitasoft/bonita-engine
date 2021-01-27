@@ -35,6 +35,7 @@ import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.home.BonitaResource;
 import org.junit.After;
 import org.junit.Before;
@@ -60,7 +61,8 @@ public class VirtualClassLoaderTest {
     @Before
     public void before() throws IOException {
         testClassLoader = Thread.currentThread().getContextClassLoader();
-        localClassLoader = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
+        localClassLoader = new VirtualClassLoader(ScopeType.PROCESS, 1L,
+                Thread.currentThread().getContextClassLoader());
         Thread.currentThread().setContextClassLoader(localClassLoader);
 
         newClassLoader = new BonitaClassLoader(empty(), "test", 125,
@@ -74,7 +76,7 @@ public class VirtualClassLoaderTest {
 
     @Test
     public void loadClassStudentInformation_to_VirtualClassLoarder_should_be_get_as_resource() throws Exception {
-        VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L,
+        VirtualClassLoader vcl = new VirtualClassLoader(ScopeType.PROCESS, 1L,
                 Thread.currentThread().getContextClassLoader());
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
                 Stream.of(resource("UOSFaasApplication.jar",
@@ -99,7 +101,7 @@ public class VirtualClassLoaderTest {
      */
     @Test
     public void loadStudentInformation_toVirtualClassLoader_should_be_usable_via_JavaMethodInvoker() throws Exception {
-        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L,
+        final VirtualClassLoader vcl = new VirtualClassLoader(ScopeType.PROCESS, 1L,
                 Thread.currentThread().getContextClassLoader());
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
                 Stream.of(resource("UOSFaasApplication.jar",
@@ -148,7 +150,7 @@ public class VirtualClassLoaderTest {
         //given
         // set class loader to new VirtualClassLoader
         ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
-        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, previousClassLoader);
+        final VirtualClassLoader vcl = new VirtualClassLoader(ScopeType.PROCESS, 1L, previousClassLoader);
         Thread.currentThread().setContextClassLoader(vcl);
 
         // retrieve the XStream instance related to this class loader
@@ -179,7 +181,7 @@ public class VirtualClassLoaderTest {
 
     @Test
     public void should_be_able_to_replace_class_with_same_name_in_different_classloader() throws Exception {
-        VirtualClassLoader mainClassLoader = new VirtualClassLoader("type1", 1, testClassLoader);
+        VirtualClassLoader mainClassLoader = new VirtualClassLoader(ScopeType.PROCESS, 1, testClassLoader);
         mainClassLoader.replaceClassLoader(createClassloader(resource("jar1.jar", generateJar("Hello",
                 "public class Hello{",
                 "public String there(){",
@@ -204,7 +206,7 @@ public class VirtualClassLoaderTest {
 
     @Test
     public void should_be_able_to_replace_implementation_of_parent_classloader() throws Exception {
-        VirtualClassLoader mainClassLoader = new VirtualClassLoader("type1", 1, testClassLoader);
+        VirtualClassLoader mainClassLoader = new VirtualClassLoader(ScopeType.TENANT, 1, testClassLoader);
 
         mainClassLoader.replaceClassLoader(createClassloader(resource("lib.jar", generateJar("ParentLib",
                 "public class ParentLib {",
@@ -212,7 +214,7 @@ public class VirtualClassLoaderTest {
                 "       return \"1.0\";",
                 "   }",
                 "}"))));
-        VirtualClassLoader childClassLoader = new VirtualClassLoader("child", 2, mainClassLoader);
+        VirtualClassLoader childClassLoader = new VirtualClassLoader(ScopeType.PROCESS, 2, mainClassLoader);
         byte[] childJar = generateJar("Child",
                 "public class Child {",
                 "   public String getVersion() throws Exception {",

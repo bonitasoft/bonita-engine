@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -55,8 +57,8 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     }
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
-        return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader(ScopeType.PROCESS.name(),
-                processDefinitionId);
+        return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader(
+                identifier(ScopeType.PROCESS, processDefinitionId));
     }
 
     @Override

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -99,7 +100,7 @@ public class JPABusinessDataRepositoryImplTest {
         //when
         repository.start();
         //then
-        verify(classLoaderService).addListener(ScopeType.TENANT.name(), 1L, repository);
+        verify(classLoaderService).addListener(identifier(ScopeType.TENANT, 1L), repository);
     }
 
     @Test
@@ -107,7 +108,7 @@ public class JPABusinessDataRepositoryImplTest {
         //when
         repository.stop();
         //then
-        verify(classLoaderService).removeListener(ScopeType.TENANT.name(), 1L, repository);
+        verify(classLoaderService).removeListener(identifier(ScopeType.TENANT, 1L), repository);
     }
 
     @Test

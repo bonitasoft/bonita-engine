@@ -30,16 +30,14 @@ public class BonitaBPMParentClassLoaderResolver implements ParentClassLoaderReso
 
     @Override
     public ClassLoaderIdentifier getParentClassLoaderIdentifier(ClassLoaderIdentifier childId) {
-        if (ScopeType.PROCESS.name().equals(childId.getType())) {
+        if (ScopeType.PROCESS.equals(childId.getType())) {
             try {
-                return new ClassLoaderIdentifier(ScopeType.TENANT.name(), sessionAccessor.getTenantId());
+                return ClassLoaderIdentifier.identifier(ScopeType.TENANT, sessionAccessor.getTenantId());
             } catch (final STenantIdNotSetException e) {
                 throw new BonitaRuntimeException("No tenant id set while creating the process classloader: " + childId);
             }
-        } else if (ScopeType.TENANT.name().equals(childId.getType())) {
+        } else if (ScopeType.TENANT.equals(childId.getType())) {
             return ClassLoaderIdentifier.GLOBAL;//global
-        } else if ("___datasource___".equals(childId.getType())) {
-            return ClassLoaderIdentifier.GLOBAL;
         } else {
             throw new BonitaRuntimeException("unable to find a parent for type: " + childId);
         }

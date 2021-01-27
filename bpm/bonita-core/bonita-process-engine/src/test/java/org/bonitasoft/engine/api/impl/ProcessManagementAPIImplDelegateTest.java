@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -22,7 +24,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -115,7 +116,7 @@ public class ProcessManagementAPIImplDelegateTest {
 
         delegate.purgeClassLoader(processDefinitionId);
 
-        verify(classLoaderService).removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+        verify(classLoaderService).removeLocalClassloader(identifier(PROCESS, processDefinitionId));
     }
 
 }

@@ -14,8 +14,7 @@
 package org.bonitasoft.engine.expression.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
@@ -75,7 +74,7 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
         executorStrategy = new GroovyScriptConditionExpressionExecutorStrategy(cacheService, classLoaderService,
                 logger);
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService)
-                .getLocalClassLoader(anyString(), anyLong());
+                .getLocalClassLoader(any());
         context = new HashMap<>();
         context.put(ExpressionExecutorStrategy.DEFINITION_ID, 123456789L);
     }
