@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1010,8 +1012,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private void setProcessClassloader(SProcessDefinition sProcessDefinition) throws SClassLoaderException {
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
-                sProcessDefinition.getId());
+        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(
+                identifier(ScopeType.PROCESS, sProcessDefinition.getId()));
         Thread.currentThread().setContextClassLoader(localClassLoader);
         // initialize the process classloader by getting it one time
         try {

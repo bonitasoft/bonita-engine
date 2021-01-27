@@ -13,14 +13,15 @@
  **/
 package org.bonitasoft.engine.core.expression.control.api.impl;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -58,7 +59,7 @@ public class ExpressionResolverServiceImplTest {
 
         resolverService.evaluate(expression, context);
 
-        verify(classLoaderService).getLocalClassLoader("PROCESS", processDefinitionId);
+        verify(classLoaderService).getLocalClassLoader(identifier(ScopeType.PROCESS, processDefinitionId));
     }
 
     @Test
@@ -70,7 +71,8 @@ public class ExpressionResolverServiceImplTest {
 
         resolverService.evaluate(expression, context);
 
-        verify(classLoaderService).getLocalClassLoader("PROCESS", parentProcessDefinitionId);
+        verify(classLoaderService)
+                .getLocalClassLoader(identifier(ScopeType.PROCESS, parentProcessDefinitionId));
     }
 
     @Test
@@ -79,7 +81,7 @@ public class ExpressionResolverServiceImplTest {
 
         resolverService.evaluate(expression, context);
 
-        verify(classLoaderService, never()).getLocalClassLoader(anyString(), anyLong());
+        verify(classLoaderService, never()).getLocalClassLoader(any());
     }
 
 }

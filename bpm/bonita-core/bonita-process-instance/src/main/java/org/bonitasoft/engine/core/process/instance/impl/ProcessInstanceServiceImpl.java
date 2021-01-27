@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import static java.util.Collections.singletonMap;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -71,6 +72,7 @@ import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuil
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -342,7 +344,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final long processDefinitionId = sProcessInstance.getProcessDefinitionId();
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId);
+            final ClassLoader localClassLoader = classLoaderService
+                    .getLocalClassLoader(identifier(ScopeType.valueOf("PROCESS"), processDefinitionId));
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteProcessInstanceElements(sProcessInstance);
             final DeleteRecord deleteRecord = new DeleteRecord(sProcessInstance);

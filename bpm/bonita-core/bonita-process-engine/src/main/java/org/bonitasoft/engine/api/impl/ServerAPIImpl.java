@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -473,7 +475,7 @@ public class ServerAPIImpl implements ServerAPI {
         final TenantServiceAccessor tenantAccessor = platformServiceAccessor
                 .getTenantServiceAccessor(apiSession.getTenantId());
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        return classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), apiSession.getTenantId());
+        return classLoaderService.getLocalClassLoader(identifier(ScopeType.TENANT, apiSession.getTenantId()));
     }
 
     private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor)

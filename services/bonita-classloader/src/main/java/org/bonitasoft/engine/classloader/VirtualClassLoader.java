@@ -22,6 +22,7 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -50,12 +51,12 @@ public class VirtualClassLoader extends ClassLoader {
     private final Set<VirtualClassLoader> children = new HashSet<>();
     private final ClassLoaderIdentifier identifier;
 
-    VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
+    VirtualClassLoader(final ScopeType artifactType, final long artifactId, final ClassLoader parent) {
         super(parent);
-        identifier = new ClassLoaderIdentifier(artifactType, artifactId);
+        identifier = ClassLoaderIdentifier.identifier(artifactType, artifactId);
     }
 
-    VirtualClassLoader(final String artifactType, final long artifactId, final VirtualClassLoader parent) {
+    VirtualClassLoader(final ScopeType artifactType, final long artifactId, final VirtualClassLoader parent) {
         this(artifactType, artifactId, (ClassLoader) parent);
         virtualParent = parent;
         virtualParent.addChild(this);

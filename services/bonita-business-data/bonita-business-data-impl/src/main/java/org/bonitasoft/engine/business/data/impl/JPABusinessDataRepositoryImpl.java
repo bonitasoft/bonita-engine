@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,7 +98,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
             entityManagerFactory = createEntityManagerFactory();
             log.debug("Entity factory created");
         }
-        classLoaderService.addListener(ScopeType.TENANT.name(), tenantId, this);
+        classLoaderService.addListener(identifier(ScopeType.TENANT, tenantId), this);
     }
 
     EntityManagerFactory createEntityManagerFactory() {
@@ -111,7 +113,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
             entityManagerFactory = null;
             log.debug("Entity factory closed");
         }
-        classLoaderService.removeListener(ScopeType.TENANT.name(), tenantId, this);
+        classLoaderService.removeListener(identifier(ScopeType.TENANT, tenantId), this);
     }
 
     private synchronized void recreateEntityManagerFactory(ClassLoader newClassLoader) {

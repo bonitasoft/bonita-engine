@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.GLOBAL;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.GLOBAL_ID;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.GLOBAL_TYPE;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +41,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -72,10 +76,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final DependencyService dependencyService = platformAccessor.getDependencyService();
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
         try {
-            ScopeType type = ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType());
-            long id = classLoaderService.getGlobalClassLoaderId();
-            dependencyService.createMappedDependency(name, jar, name, id, type);
-            classLoaderService.refreshClassLoaderAfterUpdate(type, id);
+            dependencyService.createMappedDependency(name, jar, name, GLOBAL_ID, GLOBAL_TYPE);
+            classLoaderService.refreshClassLoaderAfterUpdate(GLOBAL);
         } catch (SDependencyException | SClassLoaderException e) {
             throw new CreationException(e);
         }
@@ -90,8 +92,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         try {
             dependencyService.deleteDependency(name);
             classLoaderService.refreshClassLoaderAfterUpdate(
-                    ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
-                    classLoaderService.getGlobalClassLoaderId());
+                    identifier(GLOBAL_TYPE, GLOBAL_ID));
         } catch (final SDependencyNotFoundException e) {
             throw new DependencyNotFoundException(e);
         } catch (final SBonitaException e) {

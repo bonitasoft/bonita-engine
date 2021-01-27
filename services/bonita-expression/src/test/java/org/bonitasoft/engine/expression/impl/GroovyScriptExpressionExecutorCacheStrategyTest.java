@@ -19,8 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.expression.ExpressionExecutorStrategy.DEFINITION_ID;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
@@ -96,7 +95,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         groovyScriptExpressionExecutorCacheStrategy = new GroovyScriptExpressionExecutorCacheStrategy(cacheService,
                 classLoaderService, logger);
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService)
-                .getLocalClassLoader(anyString(), anyLong());
+                .getLocalClassLoader(any());
         context = new HashMap<>();
         context.put(DEFINITION_ID, 123456789L);
     }

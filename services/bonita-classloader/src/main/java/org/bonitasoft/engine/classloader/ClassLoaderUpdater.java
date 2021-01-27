@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.classloader;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -23,9 +25,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
@@ -50,11 +50,11 @@ class ClassLoaderUpdater {
     }
 
     public void refreshClassloaders(ClassLoaderServiceImpl classLoaderService, Long tenantId,
-            Set<Pair<ScopeType, Long>> ids) {
+            Set<ClassLoaderIdentifier> ids) {
 
         execute(tenantId, () -> {
-            for (Pair<ScopeType, Long> id : ids) {
-                classLoaderService.refreshClassLoaderImmediately(id.getKey(), id.getValue());
+            for (ClassLoaderIdentifier id : ids) {
+                classLoaderService.refreshClassLoaderImmediately(id);
             }
             return null;
         });
@@ -71,11 +71,10 @@ class ClassLoaderUpdater {
     private void doInitializeClassLoader(ClassLoaderServiceImpl classLoaderService,
             VirtualClassLoader virtualClassLoader, ClassLoaderIdentifier identifier)
             throws SClassLoaderException, BonitaHomeNotSetException, IOException {
-        Stream<BonitaResource> dependencies = classLoaderService.getDependencies(identifier.getScopeType(),
-                identifier.getId());
-        BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(dependencies, identifier.getType(),
+        Stream<BonitaResource> dependencies = classLoaderService.getDependencies(identifier);
+        BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(dependencies, identifier.getType().name(),
                 identifier.getId(),
-                classLoaderService.getLocalTemporaryFolder(identifier.getType(), identifier.getId()),
+                classLoaderService.getLocalTemporaryFolder(identifier),
                 virtualClassLoader.getParent());
         virtualClassLoader.replaceClassLoader(bonitaClassLoader);
         classLoaderService.notifyUpdateOnClassLoaderAndItsChildren(virtualClassLoader);

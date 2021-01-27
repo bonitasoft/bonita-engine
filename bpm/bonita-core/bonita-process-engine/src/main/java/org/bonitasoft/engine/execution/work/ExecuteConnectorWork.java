@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -95,8 +97,8 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             throws SBonitaException;
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
-        return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader(ScopeType.PROCESS.name(),
-                processDefinitionId);
+        return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader(
+                identifier(ScopeType.PROCESS, processDefinitionId));
     }
 
     protected void setConnectorAndContainerToFailed(final Map<String, Object> context, final Throwable t)

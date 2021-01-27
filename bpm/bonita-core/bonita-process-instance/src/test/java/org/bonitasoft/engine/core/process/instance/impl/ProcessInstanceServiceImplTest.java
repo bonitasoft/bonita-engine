@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.instance.impl;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl.IN_REQUEST_SIZE;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,6 +69,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventIns
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -218,7 +220,8 @@ public class ProcessInstanceServiceImplTest {
     public void testDeleteProcessInstance_delete_archived_activity() throws Exception {
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        when(classLoaderService.getLocalClassLoader("PROCESS", sProcessInstance.getId())).thenReturn(classLoader);
+        when(classLoaderService.getLocalClassLoader(identifier(ScopeType.PROCESS, sProcessInstance.getId())))
+                .thenReturn(classLoader);
         doReturn(new HashSet<>(asList(4L, 5L, 6L))).when(activityInstanceService)
                 .getSourceObjectIdsOfArchivedFlowNodeInstances(any());
         processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);

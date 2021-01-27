@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -428,7 +430,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             }
             updateJarDependencies(sDefinition, connectorArchive, connectorImplementationDescriptorToReplace);
             updateConnectorImplementationFile(sDefinition, connectorArchive, connectorImplementationFile);
-            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.PROCESS, sDefinition.getId());
+            classLoaderService.refreshClassLoaderAfterUpdate(identifier(ScopeType.PROCESS, sDefinition.getId()));
         } catch (final SRecorderException | SDependencyException | SBonitaReadException | SClassLoaderException e) {
             throw new SConnectorException("Problem replacing connector implementation of connector " + connectorId
                     + " of process " + sDefinition.getId(), e);

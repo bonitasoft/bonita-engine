@@ -15,7 +15,6 @@ package org.bonitasoft.engine.classloader;
 
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -32,66 +31,42 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      */
     ClassLoader getGlobalClassLoader() throws SClassLoaderException;
 
-    /**
-     * Get type of global class loader
-     *
-     * @return type of global class loader
-     */
-    String getGlobalClassLoaderType();
-
     void registerDependencyServiceOfTenant(Long tenantId, TenantDependencyService tenantDependencyService);
-
-    /**
-     * Get id of global class loader
-     *
-     * @return id of global class loader
-     */
-    long getGlobalClassLoaderId();
 
     /**
      * Get the local ClassLoader for the given type and id. If no ClassLoader is associated to them,
      * a new one is created.
      *
-     * @param type The classloader's type identifier
-     * @param id The local ClassLoader's id
      * @return the local ClassLoader for the given type and id
      * @throws SClassLoaderException Error thrown if it's impossible to get a local ClassLoader for the given type and
      *         id
+     * @param identifier
      */
-    ClassLoader getLocalClassLoader(final String type, final long id) throws SClassLoaderException;
+    ClassLoader getLocalClassLoader(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
-    /**
-     * Remove the local ClassLoader identified by the given type and id;
-     *
-     * @param type The classloader's type identifier
-     * @param id The local ClassLoader's id
-     * @throws SClassLoaderException if we can't remove the classloader because it contains children
-     */
-    void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException;
+    void removeLocalClassloader(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
     /**
      * add listener on a classloader
      *
-     * @param type the classloader type
-     * @param id the classloader id
+     * @param identifier the classloader id
      * @param singleClassLoaderListener the listener to add
      * @return true if the listener was added
      */
-    boolean addListener(final String type, final long id, SingleClassLoaderListener singleClassLoaderListener);
+    boolean addListener(ClassLoaderIdentifier identifier, SingleClassLoaderListener singleClassLoaderListener);
 
     /**
-     * @param type the classloader type
-     * @param id the classloader id
+     * @param identifier the classloader id
      * @param singleClassLoaderListener classloader listener to remove
      * @return true if the listener was removed
      */
-    boolean removeListener(String type, long id, SingleClassLoaderListener singleClassLoaderListener);
+    boolean removeListener(ClassLoaderIdentifier identifier, SingleClassLoaderListener singleClassLoaderListener);
 
-    void refreshClassLoaderAfterUpdate(ScopeType type, long id) throws SClassLoaderException;
+    void refreshClassLoaderAfterUpdate(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
-    void refreshClassLoaderOnOtherNodes(ScopeType type, long id) throws SClassLoaderException;
+    void refreshClassLoaderOnOtherNodes(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
-    void refreshClassLoaderImmediately(ScopeType type, long id) throws SClassLoaderException;
+    void refreshClassLoaderImmediately(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
     void removeRefreshClassLoaderSynchronization();
 }

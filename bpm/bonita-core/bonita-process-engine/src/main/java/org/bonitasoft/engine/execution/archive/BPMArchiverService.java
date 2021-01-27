@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.archive;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.util.List;
 
 import org.bonitasoft.engine.SArchivingException;
@@ -129,8 +131,8 @@ public class BPMArchiverService {
         //set the classloader to this process because we need it e.g. to archive data instance
         ClassLoader processClassLoader;
         try {
-            processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
-                    processInstance.getProcessDefinitionId());
+            processClassLoader = classLoaderService.getLocalClassLoader(
+                    identifier(ScopeType.PROCESS, processInstance.getProcessDefinitionId()));
 
         } catch (SClassLoaderException e) {
             throw new SArchivingException(e);

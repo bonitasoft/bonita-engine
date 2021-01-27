@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bar;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.form.FormMappingTarget.LEGACY;
 
 import java.util.List;
@@ -80,7 +81,7 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
             if (isResolved) {
                 processDefinitionService.resolveProcess(sProcessDefinition.getId());
             }
-            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.PROCESS, sProcessDefinition.getId());
+            classLoaderService.refreshClassLoaderAfterUpdate(identifier(ScopeType.PROCESS, sProcessDefinition.getId()));
         } catch (SV6FormsDeployException | SAlreadyExistsException e) {
             throw e;
         } catch (final SBonitaException e) {
@@ -139,7 +140,7 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
                     .getProcessDefinition(processDefinitionId);
             businessArchiveArtifactsManager.deleteDependencies(processDefinition);
             processDefinitionService.delete(processDefinition.getId());
-            classLoaderService.removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinition.getId());
+            classLoaderService.removeLocalClassloader(identifier(ScopeType.PROCESS, processDefinition.getId()));
         } catch (SBonitaReadException | SProcessDeletionException | SDeletingEnabledProcessException
                 | SRecorderException | SClassLoaderException e) {
             throw new SObjectModificationException(

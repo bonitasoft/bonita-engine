@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +89,8 @@ public class CommandAPIImpl implements CommandAPI {
         try {
             dependencyService.createMappedDependency(name, jar, name + ".jar", tenantAccessor.getTenantId(),
                     ScopeType.TENANT);
-            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantAccessor.getTenantId());
+            classLoaderService
+                    .refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, tenantAccessor.getTenantId()));
         } catch (final SDependencyAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
         } catch (final SDependencyException | SClassLoaderException sbe) {
@@ -102,7 +105,8 @@ public class CommandAPIImpl implements CommandAPI {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
             dependencyService.deleteDependency(name);
-            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantAccessor.getTenantId());
+            classLoaderService
+                    .refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, tenantAccessor.getTenantId()));
         } catch (final SDependencyNotFoundException e) {
             throw new DependencyNotFoundException(e);
         } catch (final SBonitaException e) {

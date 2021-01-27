@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -60,7 +59,7 @@ public class NotifyChildFinishedWorkTest {
 
     @Before
     public void before() throws SClassLoaderException {
-        doReturn(this.getClass().getClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
+        doReturn(this.getClass().getClassLoader()).when(classLoaderService).getLocalClassLoader(any());
         context = Collections.singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
 
         doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();

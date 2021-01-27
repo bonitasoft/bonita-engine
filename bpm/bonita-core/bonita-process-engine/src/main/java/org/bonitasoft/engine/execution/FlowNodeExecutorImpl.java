@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
 
 import org.bonitasoft.engine.SArchivingException;
@@ -133,8 +134,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final long processDefinitionId = flowNodeInstance
                     .getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
                             .getProcessDefinitionIndex());
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
-                    processDefinitionId);
+            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(
+                    identifier(ScopeType.PROCESS, processDefinitionId));
             Thread.currentThread().setContextClassLoader(localClassLoader);
 
             if (!flowNodeInstance.isStateExecuting()) {

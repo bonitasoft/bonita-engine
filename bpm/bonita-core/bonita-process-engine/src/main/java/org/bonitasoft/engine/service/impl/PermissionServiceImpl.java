@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -107,7 +109,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void start() throws SBonitaException {
         groovyClassLoader = new GroovyClassLoader(
-                classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId));
+                classLoaderService.getLocalClassLoader(identifier(ScopeType.TENANT, tenantId)));
         groovyClassLoader.setShouldRecompile(true);
         try {
             final File folder = getBonitaHomeServer().getSecurityScriptsFolder(tenantId);

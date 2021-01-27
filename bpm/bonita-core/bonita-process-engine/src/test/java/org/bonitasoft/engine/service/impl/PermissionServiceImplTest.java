@@ -16,7 +16,6 @@ package org.bonitasoft.engine.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -83,7 +82,7 @@ public class PermissionServiceImplTest {
         securityFolder = temporaryFolder.newFolder("security");
 
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
-                .getLocalClassLoader(anyString(), anyLong());
+                .getLocalClassLoader(any());
         permissionService = spy(
                 new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID));
         doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();

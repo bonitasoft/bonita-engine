@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -169,8 +171,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                     BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
-            classLoaderService.refreshClassLoaderImmediately(ScopeType.TENANT, tenantId);
-            classLoaderService.refreshClassLoaderOnOtherNodes(ScopeType.TENANT, tenantId);
+            classLoaderService.refreshClassLoaderImmediately(identifier(ScopeType.TENANT, tenantId));
+            classLoaderService.refreshClassLoaderOnOtherNodes(identifier(ScopeType.TENANT, tenantId));
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
         } catch (final SDependencyException | SClassLoaderException e) {
@@ -267,7 +269,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     public void uninstall(final long tenantId) throws SBusinessDataRepositoryException {
         try {
             dependencyService.deleteDependency(BDR_DEPENDENCY_NAME);
-            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantId);
+            classLoaderService.refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, tenantId));
         } catch (final SDependencyNotFoundException sde) {
             // do nothing
         } catch (final SDependencyException | SClassLoaderException e) {

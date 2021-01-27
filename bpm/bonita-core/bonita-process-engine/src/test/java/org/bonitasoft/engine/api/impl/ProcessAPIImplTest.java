@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
@@ -617,7 +618,8 @@ public class ProcessAPIImplTest {
         verify(tenantAccessor).getClassLoaderService();
         verify(tenantAccessor).getActivityInstanceService();
         verify(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
-        verify(classLoaderService).getLocalClassLoader(eq(ScopeType.PROCESS.name()), anyLong());
+        verify(classLoaderService)
+                .getLocalClassLoader(argThat(id -> id.getType().equals(ScopeType.PROCESS)));
     }
 
     @Test
@@ -641,7 +643,8 @@ public class ProcessAPIImplTest {
         verify(tenantAccessor).getClassLoaderService();
         verify(tenantAccessor).getActivityInstanceService();
         verify(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
-        verify(classLoaderService).getLocalClassLoader(eq(ScopeType.PROCESS.name()), nullable(Long.class));
+        verify(classLoaderService)
+                .getLocalClassLoader(argThat(id -> id.getType().equals(ScopeType.PROCESS)));
     }
 
     @Test
@@ -651,7 +654,7 @@ public class ProcessAPIImplTest {
         final String dataName = "dataName";
         ClassLoader processClassLoader = mock(ClassLoader.class);
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
-        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
+        when(classLoaderService.getLocalClassLoader(any())).thenReturn(processClassLoader);
 
         final SBlobDataInstance dataInstance = new SBlobDataInstance();
         dataInstance.setClassName(List.class.getName());
@@ -683,7 +686,8 @@ public class ProcessAPIImplTest {
         final String dataName = "dataName";
         ClassLoader processClassLoader = mock(ClassLoader.class);
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
-        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
+        when(classLoaderService.getLocalClassLoader(any()))
+                .thenReturn(processClassLoader);
 
         final SBlobDataInstance dataInstance = new SBlobDataInstance();
         dataInstance.setClassName(List.class.getName());
@@ -714,7 +718,7 @@ public class ProcessAPIImplTest {
         final String dataValue = "TestOfCourse";
         final String dataName = "TransientName";
         ClassLoader contextClassLoader = mock(ClassLoader.class);
-        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(contextClassLoader);
+        when(classLoaderService.getLocalClassLoader(any())).thenReturn(contextClassLoader);
         doNothing().when(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue,
                 transientDataService, contextClassLoader);
 
@@ -729,7 +733,8 @@ public class ProcessAPIImplTest {
         verify(tenantAccessor).getClassLoaderService();
         verify(tenantAccessor).getActivityInstanceService();
         verify(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
-        verify(classLoaderService).getLocalClassLoader(eq(ScopeType.PROCESS.name()), anyLong());
+        verify(classLoaderService)
+                .getLocalClassLoader(argThat(id -> id.getType().equals(ScopeType.PROCESS)));
     }
 
     @Test(expected = UpdateException.class)
@@ -812,8 +817,7 @@ public class ProcessAPIImplTest {
                 .setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
         final ClassLoader contextClassLoader = mock(ClassLoader.class);
-        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(contextClassLoader);
-        final SProcessDefinition processDef = mock(SProcessDefinition.class);
+        when(classLoaderService.getLocalClassLoader(any())).thenReturn(contextClassLoader);
         final SActivityInstance activityInstance = mock(SActivityInstance.class);
         when(activityInstanceService.getActivityInstance(anyLong())).thenReturn(activityInstance);
 
@@ -823,7 +827,7 @@ public class ProcessAPIImplTest {
 
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
-        verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
+        verify(classLoaderService).getLocalClassLoader(any());
     }
 
     @Test(expected = IllegalArgumentException.class)

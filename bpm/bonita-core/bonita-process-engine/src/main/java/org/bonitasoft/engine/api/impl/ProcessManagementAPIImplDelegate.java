@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +39,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -131,8 +133,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             if (numberOfProcessInstances != 0) {
                 throw new UpdateException("Purge can only be done on a disabled process with no running instances");
             }
-            tenantAccessor.getClassLoaderService().removeLocalClassLoader(ScopeType.PROCESS.name(),
-                    processDefinitionId);
+            tenantAccessor.getClassLoaderService().removeLocalClassloader(identifier(PROCESS, processDefinitionId));
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaReadException e) {

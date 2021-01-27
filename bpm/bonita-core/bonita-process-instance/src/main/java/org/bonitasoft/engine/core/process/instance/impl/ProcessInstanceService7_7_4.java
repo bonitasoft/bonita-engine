@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -54,6 +56,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -183,7 +186,8 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
             throws SProcessInstanceModificationException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId);
+            final ClassLoader localClassLoader = classLoaderService
+                    .getLocalClassLoader(identifier(ScopeType.valueOf("PROCESS"), processDefinitionId));
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteArchivedFlowNodeInstances(processInstanceId);
             deleteLocalArchivedDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString());
