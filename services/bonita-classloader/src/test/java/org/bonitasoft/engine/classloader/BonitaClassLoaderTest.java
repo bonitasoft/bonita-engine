@@ -36,7 +36,7 @@ public class BonitaClassLoaderTest {
 
     @Test
     public void destroyShouldRemoveAllScopeFolderAndItsContent() throws IOException {
-        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
+        final BonitaClassLoader bonitaClassLoader = BonitaClassLoaderFactory.createClassLoader(
                 Stream.of(resource("myJar.jar", "Salut le monde".getBytes())), identifier(PROCESS, 154L),
                 temporaryFolder.newFolder().toURI(), BonitaClassLoader.class.getClassLoader());
         File temporaryFolder = bonitaClassLoader.getTemporaryFolder();
@@ -57,10 +57,10 @@ public class BonitaClassLoaderTest {
         //given
         File tempFolder = temporaryFolder.newFolder();
         //when
-        BonitaClassLoader classLoader1 = new BonitaClassLoader(
+        BonitaClassLoader classLoader1 = BonitaClassLoaderFactory.createClassLoader(
                 Stream.of(resource("myJar1.jar", "content".getBytes())), identifier(PROCESS, 12L), tempFolder.toURI(),
                 BonitaClassLoaderTest.class.getClassLoader());
-        BonitaClassLoader classLoader2 = new BonitaClassLoader(
+        BonitaClassLoader classLoader2 = BonitaClassLoaderFactory.createClassLoader(
                 Stream.of(resource("myJar2.jar", "content".getBytes())), identifier(PROCESS, 13L), tempFolder.toURI(),
                 BonitaClassLoaderTest.class.getClassLoader());
         //then

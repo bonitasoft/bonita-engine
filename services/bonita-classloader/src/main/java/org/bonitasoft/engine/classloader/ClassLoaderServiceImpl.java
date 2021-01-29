@@ -236,7 +236,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             ClassLoaderIdentifier id, URI temporaryFolder, ClassLoader parent) throws IOException {
         log.info("Refreshing class loader {}", id);
 
-        final BonitaClassLoader classLoader = new BonitaClassLoader(resources, id, temporaryFolder, parent);
+        final BonitaClassLoader classLoader = BonitaClassLoaderFactory.createClassLoader(resources, id, temporaryFolder,
+                parent);
         log.debug("Replacing {} with {}", virtualClassloader.getClassLoader(), classLoader);
         virtualClassloader.replaceClassLoader(classLoader);
         notifyUpdateOnClassLoaderAndItsChildren(virtualClassloader);
