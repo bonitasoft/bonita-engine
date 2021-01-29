@@ -503,11 +503,11 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     }
 
     private void checkGlobalClassLoader(final ClassLoader classLoader) {
-        assertThat(((BonitaClassLoader) classLoader).getType()).isEqualTo(ClassLoaderIdentifier.GLOBAL_TYPE.name());
+        assertThat(((BonitaClassLoader) classLoader).getId()).isEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
 
     private void checkLocalClassLoader(final ClassLoader classLoader) {
-        assertThat(((BonitaClassLoader) classLoader).getType()).isNotEqualTo(ClassLoaderIdentifier.GLOBAL_TYPE.name());
+        assertThat(((BonitaClassLoader) classLoader).getId()).isNotEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
 
     private boolean isBonitaClassLoader(final ClassLoader classLoader) {

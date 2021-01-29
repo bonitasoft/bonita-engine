@@ -72,8 +72,7 @@ class ClassLoaderUpdater {
             VirtualClassLoader virtualClassLoader, ClassLoaderIdentifier identifier)
             throws SClassLoaderException, BonitaHomeNotSetException, IOException {
         Stream<BonitaResource> dependencies = classLoaderService.getDependencies(identifier);
-        BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(dependencies, identifier.getType().name(),
-                identifier.getId(),
+        BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(dependencies, identifier,
                 classLoaderService.getLocalTemporaryFolder(identifier),
                 virtualClassLoader.getParent());
         virtualClassLoader.replaceClassLoader(bonitaClassLoader);

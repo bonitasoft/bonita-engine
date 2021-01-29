@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import static java.util.stream.Stream.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.bonitasoft.engine.home.BonitaResource.resource;
 import static org.bonitasoft.engine.io.IOUtil.generateJar;
-import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 import java.util.stream.Stream;
 
 import com.thoughtworks.xstream.XStream;
@@ -43,7 +42,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -52,21 +50,14 @@ public class VirtualClassLoaderTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private ClassLoader testClassLoader;
-    @Mock
-    private SingleClassLoaderListener mySingleClassLoaderListener;
-    private VirtualClassLoader localClassLoader;
-    private BonitaClassLoader newClassLoader;
     private int idCounter = 1;
 
     @Before
-    public void before() throws IOException {
+    public void before() {
         testClassLoader = Thread.currentThread().getContextClassLoader();
-        localClassLoader = new VirtualClassLoader(ScopeType.PROCESS, 1L,
+        VirtualClassLoader localClassLoader = new VirtualClassLoader(PROCESS, 1L,
                 Thread.currentThread().getContextClassLoader());
         Thread.currentThread().setContextClassLoader(localClassLoader);
-
-        newClassLoader = new BonitaClassLoader(empty(), "test", 125,
-                File.createTempFile("test", ".tmp").toURI(), testClassLoader);
     }
 
     @After
@@ -76,12 +67,13 @@ public class VirtualClassLoaderTest {
 
     @Test
     public void loadClassStudentInformation_to_VirtualClassLoarder_should_be_get_as_resource() throws Exception {
-        VirtualClassLoader vcl = new VirtualClassLoader(ScopeType.PROCESS, 1L,
+        VirtualClassLoader vcl = new VirtualClassLoader(PROCESS, 1L,
                 Thread.currentThread().getContextClassLoader());
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
                 Stream.of(resource("UOSFaasApplication.jar",
                         FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")))),
-                "here", 154L, temporaryFolder.newFolder().toURI(), BonitaClassLoader.class.getClassLoader());
+                identifier(PROCESS, 154L), temporaryFolder.newFolder().toURI(),
+                BonitaClassLoader.class.getClassLoader());
 
         vcl.replaceClassLoader(bonitaClassLoader);
         URL url = vcl.getResource("au/edu/sydney/faas/applicationstudent/StudentInformation.class");
@@ -96,17 +88,16 @@ public class VirtualClassLoaderTest {
 
     /**
      * BS-7152 : test the loading of class when calling the JavaMethodInvoker
-     *
-     * @throws Exception
      */
     @Test
     public void loadStudentInformation_toVirtualClassLoader_should_be_usable_via_JavaMethodInvoker() throws Exception {
-        final VirtualClassLoader vcl = new VirtualClassLoader(ScopeType.PROCESS, 1L,
+        final VirtualClassLoader vcl = new VirtualClassLoader(PROCESS, 1L,
                 Thread.currentThread().getContextClassLoader());
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
                 Stream.of(resource("UOSFaasApplication.jar",
                         FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")))),
-                "here", 154L, temporaryFolder.newFolder().toURI(), BonitaClassLoader.class.getClassLoader());
+                identifier(PROCESS, 154L), temporaryFolder.newFolder().toURI(),
+                BonitaClassLoader.class.getClassLoader());
 
         vcl.replaceClassLoader(bonitaClassLoader);
         final Object objectToInvokeJavaMethodOn = vcl.loadClass("au.edu.sydney.faas.applicationstudent.StudentRequest")
@@ -114,14 +105,10 @@ public class VirtualClassLoaderTest {
         final Object valueToSetObjectWith = vcl.loadClass("au.edu.sydney.faas.applicationstudent.StudentInformation")
                 .getConstructors()[0].newInstance();
 
-        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread t = new Thread(r);
-                t.setContextClassLoader(vcl);
-                return t;
-            }
+        ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r);
+            t.setContextClassLoader(vcl);
+            return t;
         });
 
         Future<Object> jmiFuture = executor.submit(new Callable<Object>() {
@@ -150,7 +137,7 @@ public class VirtualClassLoaderTest {
         //given
         // set class loader to new VirtualClassLoader
         ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
-        final VirtualClassLoader vcl = new VirtualClassLoader(ScopeType.PROCESS, 1L, previousClassLoader);
+        final VirtualClassLoader vcl = new VirtualClassLoader(PROCESS, 1L, previousClassLoader);
         Thread.currentThread().setContextClassLoader(vcl);
 
         // retrieve the XStream instance related to this class loader
@@ -174,14 +161,14 @@ public class VirtualClassLoaderTest {
     }
 
     private BonitaClassLoader createClassloader(ClassLoader parent, BonitaResource... resources) throws IOException {
-        return new BonitaClassLoader(Stream.of(resources), "someType", idCounter++,
+        return new BonitaClassLoader(Stream.of(resources), identifier(PROCESS, idCounter++),
                 temporaryFolder.newFolder().toURI(),
                 parent);
     }
 
     @Test
     public void should_be_able_to_replace_class_with_same_name_in_different_classloader() throws Exception {
-        VirtualClassLoader mainClassLoader = new VirtualClassLoader(ScopeType.PROCESS, 1, testClassLoader);
+        VirtualClassLoader mainClassLoader = new VirtualClassLoader(PROCESS, 1, testClassLoader);
         mainClassLoader.replaceClassLoader(createClassloader(resource("jar1.jar", generateJar("Hello",
                 "public class Hello{",
                 "public String there(){",
@@ -214,7 +201,7 @@ public class VirtualClassLoaderTest {
                 "       return \"1.0\";",
                 "   }",
                 "}"))));
-        VirtualClassLoader childClassLoader = new VirtualClassLoader(ScopeType.PROCESS, 2, mainClassLoader);
+        VirtualClassLoader childClassLoader = new VirtualClassLoader(PROCESS, 2, mainClassLoader);
         byte[] childJar = generateJar("Child",
                 "public class Child {",
                 "   public String getVersion() throws Exception {",

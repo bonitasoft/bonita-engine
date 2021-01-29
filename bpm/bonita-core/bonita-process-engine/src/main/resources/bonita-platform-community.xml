@@ -164,10 +164,6 @@
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
     </bean>
 
-    <bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-    </bean>
-
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="cacheConfigurations" ref="platformCacheConfigurations" />

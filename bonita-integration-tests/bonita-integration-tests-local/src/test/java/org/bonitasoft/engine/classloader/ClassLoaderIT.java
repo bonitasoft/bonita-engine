@@ -80,7 +80,7 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
 
         assertEquals("stringFromPublicMethod", task.getDisplayName());
         assertThat(processDeployLog)
-                .containsOnlyOnce(" Refreshing class loader of type PROCESS with id " + processDefinition.getId());
+                .containsOnlyOnce("Refreshing class loader PROCESS:" + processDefinition.getId());
     }
 
     public String toString() {
@@ -139,7 +139,7 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
         String deployBDMLog = systemOutRule.getLog();
         getTenantAdministrationAPI().resume();
 
-        assertThat(deployBDMLog).containsOnlyOnce("Refreshing class loader of type TENANT with id");
+        assertThat(deployBDMLog).containsOnlyOnce("Refreshing class loader TENANT:");
     }
 
     @Test
