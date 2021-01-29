@@ -13,27 +13,20 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URI;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.home.BonitaResource;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -45,63 +38,32 @@ import org.bonitasoft.engine.home.BonitaResource;
 public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     private final ClassLoaderIdentifier id;
-    protected Map<String, byte[]> nonJarResources = new HashMap<>();
-    protected Set<URL> urls = new HashSet<>();
+    protected Map<String, File> nonJarResources;
     private final File temporaryDirectory;
     private boolean isActive = true;
     private final long creationTime = System.currentTimeMillis();
     private final String uuid = generateUUID();
     private Set<BonitaClassLoader> children = new HashSet<>();
 
-    BonitaClassLoader(Stream<BonitaResource> resources, ClassLoaderIdentifier id, URI temporaryDirectoryUri,
-            ClassLoader parent) throws IOException {
-        super(id.getType().name() + "__" + id.getId(), new URL[] {}, parent);
-        NullCheckingUtil.checkArgsNotNull(resources, id, temporaryDirectoryUri, parent);
+    BonitaClassLoader(ClassLoaderIdentifier id, ClassLoader parent, Set<File> jars, Map<String, File> nonJarResources,
+            File temporaryDirectory) {
+        super(id.getType().name() + "__" + id.getId(), jars.stream().map(BonitaClassLoader::toURL).toArray(URL[]::new),
+                parent);
         this.id = id;
-        this.temporaryDirectory = createTemporaryDirectory(temporaryDirectoryUri, uuid);
-        addResources(resources);
-        addURLs(urls.toArray(new URL[0]));
-        log.debug("Created {}", this);
-    }
-
-    private static File createTemporaryDirectory(URI temporaryDirectoryUri, String uuid) throws IOException {
-        Path temporaryDirectory = new File(temporaryDirectoryUri).toPath();
-        if (!Files.exists(temporaryDirectory)) {
-            Files.createDirectory(temporaryDirectory);
-        }
-        Path tempDir = temporaryDirectory.resolve(uuid.substring(0, 8));
-        Files.createDirectory(tempDir);
-        return tempDir.toFile();
+        this.nonJarResources = new HashMap<>(nonJarResources);
+        this.temporaryDirectory = temporaryDirectory;
     }
 
     private static String generateUUID() {
         return UUID.randomUUID().toString();
     }
 
-    protected void addResources(final Stream<BonitaResource> resources) {
-        if (resources == null) {
-            return;
+    private static URL toURL(File f) {
+        try {
+            return f.toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e);
         }
-        resources.forEach(resource -> {
-            if (resource.getName().matches(".*\\.jar")) {
-                try {
-                    final File file = writeResource(resource);
-                    final String path = file.getAbsolutePath();
-                    final URL url = new File(path).toURI().toURL();
-                    urls.add(url);
-                } catch (final IOException e) {
-                    throw new BonitaRuntimeException(e);
-                }
-            } else {
-                nonJarResources.put(resource.getName(), resource.getContent());
-            }
-        });
-    }
-
-    File writeResource(BonitaResource resource) throws IOException {
-        final File file = File.createTempFile(resource.getName(), ".jar", temporaryDirectory);
-        IOUtil.write(file, resource.getContent());
-        return file;
     }
 
     @Override
@@ -114,18 +76,15 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     }
 
     private InputStream getInternalInputStream(final String name) {
-        final byte[] classData = loadProcessResource(name);
+        File classData = nonJarResources.get(name);
         if (classData != null) {
-            return new ByteArrayInputStream(classData);
+            try {
+                return new FileInputStream(classData);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
         return super.getResourceAsStream(name);
-    }
-
-    private byte[] loadProcessResource(final String resourceName) {
-        if (nonJarResources == null) {
-            return new byte[0];
-        }
-        return nonJarResources.get(resourceName);
     }
 
     @Override
@@ -155,7 +114,6 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         return c;
     }
 
-    @Override
     public void destroy() {
         super.destroy();
         FileUtils.deleteQuietly(temporaryDirectory);

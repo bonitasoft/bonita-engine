@@ -69,7 +69,7 @@ public class VirtualClassLoaderTest {
     public void loadClassStudentInformation_to_VirtualClassLoarder_should_be_get_as_resource() throws Exception {
         VirtualClassLoader vcl = new VirtualClassLoader(PROCESS, 1L,
                 Thread.currentThread().getContextClassLoader());
-        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
+        final BonitaClassLoader bonitaClassLoader = BonitaClassLoaderFactory.createClassLoader(
                 Stream.of(resource("UOSFaasApplication.jar",
                         FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")))),
                 identifier(PROCESS, 154L), temporaryFolder.newFolder().toURI(),
@@ -93,7 +93,7 @@ public class VirtualClassLoaderTest {
     public void loadStudentInformation_toVirtualClassLoader_should_be_usable_via_JavaMethodInvoker() throws Exception {
         final VirtualClassLoader vcl = new VirtualClassLoader(PROCESS, 1L,
                 Thread.currentThread().getContextClassLoader());
-        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
+        final BonitaClassLoader bonitaClassLoader = BonitaClassLoaderFactory.createClassLoader(
                 Stream.of(resource("UOSFaasApplication.jar",
                         FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")))),
                 identifier(PROCESS, 154L), temporaryFolder.newFolder().toURI(),
@@ -161,7 +161,7 @@ public class VirtualClassLoaderTest {
     }
 
     private BonitaClassLoader createClassloader(ClassLoader parent, BonitaResource... resources) throws IOException {
-        return new BonitaClassLoader(Stream.of(resources), identifier(PROCESS, idCounter++),
+        return BonitaClassLoaderFactory.createClassLoader(Stream.of(resources), identifier(PROCESS, idCounter++),
                 temporaryFolder.newFolder().toURI(),
                 parent);
     }
