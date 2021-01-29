@@ -53,13 +53,12 @@ public class VirtualClassLoader extends ClassLoader {
 
     VirtualClassLoader(final ScopeType artifactType, final long artifactId, final ClassLoader parent) {
         super(parent);
+        if (parent instanceof VirtualClassLoader) {
+            //To be removed. parent/child relationship should be handled by ClassLoaderService
+            virtualParent = (VirtualClassLoader) parent;
+            virtualParent.addChild(this);
+        }
         identifier = ClassLoaderIdentifier.identifier(artifactType, artifactId);
-    }
-
-    VirtualClassLoader(final ScopeType artifactType, final long artifactId, final VirtualClassLoader parent) {
-        this(artifactType, artifactId, (ClassLoader) parent);
-        virtualParent = parent;
-        virtualParent.addChild(this);
     }
 
     /**

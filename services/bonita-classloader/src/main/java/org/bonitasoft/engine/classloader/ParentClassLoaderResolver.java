@@ -13,10 +13,38 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-public interface ParentClassLoaderResolver {
+import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ParentClassLoaderResolver {
+
+    private final ReadSessionAccessor sessionAccessor;
+
+    public ParentClassLoaderResolver(final ReadSessionAccessor sessionAccessor) {
+        this.sessionAccessor = sessionAccessor;
+    }
 
     /**
      * @return the key of the parent or null if it is the global
      */
-    ClassLoaderIdentifier getParentClassLoaderIdentifier(final ClassLoaderIdentifier childId);
+    public ClassLoaderIdentifier getParentClassLoaderIdentifier(ClassLoaderIdentifier childId) {
+        if (ScopeType.PROCESS.equals(childId.getType())) {
+            try {
+                //We should not depend on the session to know what is the parent of a classloader
+                return ClassLoaderIdentifier.identifier(ScopeType.TENANT, sessionAccessor.getTenantId());
+            } catch (final STenantIdNotSetException e) {
+                throw new BonitaRuntimeException("No tenant id set while creating the process classloader: " + childId);
+            }
+        } else if (ScopeType.TENANT.equals(childId.getType())) {
+            return ClassLoaderIdentifier.GLOBAL;//global
+        } else if (ClassLoaderIdentifier.GLOBAL.equals(childId)) {
+            return ClassLoaderIdentifier.APPLICATION;
+        } else {
+            throw new BonitaRuntimeException("unable to find a parent for type: " + childId);
+        }
+    }
 }

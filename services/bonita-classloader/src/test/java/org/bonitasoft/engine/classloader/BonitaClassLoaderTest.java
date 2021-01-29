@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
+import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.bonitasoft.engine.home.BonitaResource.resource;
 
 import java.io.File;
@@ -33,9 +35,9 @@ public class BonitaClassLoaderTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void releaseShouldRemoveAllScopeFolderAndItsContent() throws IOException {
+    public void destroyShouldRemoveAllScopeFolderAndItsContent() throws IOException {
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
-                Stream.of(resource("myJar.jar", "Salut le monde".getBytes())), "here", 154L,
+                Stream.of(resource("myJar.jar", "Salut le monde".getBytes())), identifier(PROCESS, 154L),
                 temporaryFolder.newFolder().toURI(), BonitaClassLoader.class.getClassLoader());
         File temporaryFolder = bonitaClassLoader.getTemporaryFolder();
         assertThat(temporaryFolder).as("bonitaClassLoader tempDir:%s should exists after bonitaClassLoader creation",
@@ -56,10 +58,10 @@ public class BonitaClassLoaderTest {
         File tempFolder = temporaryFolder.newFolder();
         //when
         BonitaClassLoader classLoader1 = new BonitaClassLoader(
-                Stream.of(resource("myJar1.jar", "content".getBytes())), "type", 12L, tempFolder.toURI(),
+                Stream.of(resource("myJar1.jar", "content".getBytes())), identifier(PROCESS, 12L), tempFolder.toURI(),
                 BonitaClassLoaderTest.class.getClassLoader());
         BonitaClassLoader classLoader2 = new BonitaClassLoader(
-                Stream.of(resource("myJar2.jar", "content".getBytes())), "type", 13L, tempFolder.toURI(),
+                Stream.of(resource("myJar2.jar", "content".getBytes())), identifier(PROCESS, 13L), tempFolder.toURI(),
                 BonitaClassLoaderTest.class.getClassLoader());
         //then
         assertThat(classLoader1.getTemporaryFolder().getAbsolutePath())

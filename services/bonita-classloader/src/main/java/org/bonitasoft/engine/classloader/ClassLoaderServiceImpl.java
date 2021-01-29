@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
@@ -65,11 +63,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private final ThreadLocal<RefreshClassloaderSynchronization> currentRefreshTask = new ThreadLocal<>();
     private final ParentClassLoaderResolver parentClassLoaderResolver;
 
-    private final VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(
-            ClassLoaderIdentifier.GLOBAL_TYPE,
-            ClassLoaderIdentifier.GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
-
-    private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
+    private final Map<ClassLoaderIdentifier, VirtualClassLoader> classLoaders = new HashMap<>();
 
     private final Set<PlatformClassLoaderListener> platformClassLoaderListeners = new HashSet<>();
     private final Map<ClassLoaderIdentifier, Set<SingleClassLoaderListener>> singleClassLoaderListenersMap = Collections
@@ -111,13 +105,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     }
 
-    private VirtualClassLoader getVirtualGlobalClassLoader() {
-        return virtualGlobalClassLoader;
-    }
-
     @Override
     public ClassLoader getGlobalClassLoader() {
-        return getVirtualGlobalClassLoader();
+        return getLocalClassLoader(ClassLoaderIdentifier.GLOBAL);
     }
 
     private void warnOnShuttingDown(final ClassLoaderIdentifier key) {
@@ -143,37 +133,35 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private VirtualClassLoader getVirtualClassLoaderWithoutInitializingIt(ClassLoaderIdentifier identifier) {
-        if (!localClassLoaders.containsKey(identifier)) {
+        if (!classLoaders.containsKey(identifier)) {
             synchronized (mutex) {
                 // double check synchronization
-                if (!localClassLoaders.containsKey(identifier)) {
+                if (!classLoaders.containsKey(identifier)) {
                     createClassLoader(identifier);
                 }
             }
         }
-        return localClassLoaders.get(identifier);
+        return classLoaders.get(identifier);
     }
 
     private void createClassLoader(ClassLoaderIdentifier identifier) {
         log.debug("creating classloader with key {}", identifier);
-        VirtualClassLoader parent = getParentClassLoader(identifier);
+        ClassLoader parent = getParentClassLoader(identifier);
         final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(),
                 parent);
 
-        localClassLoaders.put(identifier, virtualClassLoader);
+        classLoaders.put(identifier, virtualClassLoader);
     }
 
-    private VirtualClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
+    private ClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
         final ClassLoaderIdentifier parentIdentifier = parentClassLoaderResolver
                 .getParentClassLoaderIdentifier(identifier);
-        NullCheckingUtil.checkArgsNotNull(parentIdentifier);
-        VirtualClassLoader parent;
-        if (ClassLoaderIdentifier.GLOBAL.equals(parentIdentifier)) {
-            parent = getVirtualGlobalClassLoader();
+        if (ClassLoaderIdentifier.APPLICATION.equals(parentIdentifier)) {
+            // Application classloader is the one bootstrapping bonita platform
+            return ClassLoaderServiceImpl.class.getClassLoader();
         } else {
-            parent = getLocalClassLoader(parentIdentifier);
+            return getLocalClassLoader(parentIdentifier);
         }
-        return parent;
     }
 
     @Override
@@ -182,7 +170,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         NullCheckingUtil.checkArgsNotNull(identifier);
 
         // Remove the class loader
-        VirtualClassLoader virtualClassLoader = localClassLoaders.get(identifier);
+        VirtualClassLoader virtualClassLoader = classLoaders.get(identifier);
         if (virtualClassLoader == null) {
             log.debug("No classloader found for identifier {}, nothing to remove", identifier);
             return;
@@ -200,7 +188,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private void destroyLocalClassLoader(final ClassLoaderIdentifier identifier) throws SClassLoaderException {
         log.debug("Destroying local classloader with key: {}", identifier);
-        final VirtualClassLoader localClassLoader = localClassLoaders.get(identifier);
+        final VirtualClassLoader localClassLoader = classLoaders.get(identifier);
         if (localClassLoader != null) {
             if (localClassLoader.hasChildren()) {
                 throw new SClassLoaderException(
@@ -208,7 +196,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                                 + localClassLoader.getChildren());
             }
             localClassLoader.destroy();
-            localClassLoaders.remove(identifier);
+            classLoaders.remove(identifier);
             notifyDestroyed(localClassLoader);
         }
     }
@@ -217,8 +205,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         log.info("Refreshing global classloader");
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
         try {
-            refreshClassLoader(virtualClassloader, resources, ClassLoaderIdentifier.GLOBAL_TYPE.name(),
-                    ClassLoaderIdentifier.GLOBAL_ID,
+            refreshClassLoader(virtualClassloader, resources, ClassLoaderIdentifier.GLOBAL,
                     BonitaHomeServer.getInstance().getGlobalTemporaryFolder(),
                     ClassLoaderServiceImpl.class.getClassLoader());
         } catch (Exception e) {
@@ -230,7 +217,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             throws SClassLoaderException {
         final VirtualClassLoader virtualClassloader = getVirtualClassLoaderWithoutInitializingIt(identifier);
         try {
-            refreshClassLoader(virtualClassloader, resources, identifier.getType().name(), identifier.getId(),
+            refreshClassLoader(virtualClassloader, resources, identifier,
                     getLocalTemporaryFolder(identifier),
                     getParentClassLoader(identifier));
             final SEvent event = new SEvent("ClassLoaderRefreshed");
@@ -245,11 +232,11 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return BonitaHomeServer.getInstance().getLocalTemporaryFolder(identifier.getType().name(), identifier.getId());
     }
 
-    private void refreshClassLoader(final VirtualClassLoader virtualClassloader, Stream<BonitaResource> resources,
-            final String type, final long id, final URI temporaryFolder, final ClassLoader parent) {
-        log.info("Refreshing class loader of type {} with id {}", type, id);
+    private void refreshClassLoader(VirtualClassLoader virtualClassloader, Stream<BonitaResource> resources,
+            ClassLoaderIdentifier id, URI temporaryFolder, ClassLoader parent) throws IOException {
+        log.info("Refreshing class loader {}", id);
 
-        final BonitaClassLoader classLoader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
+        final BonitaClassLoader classLoader = new BonitaClassLoader(resources, id, temporaryFolder, parent);
         log.debug("Replacing {} with {}", virtualClassloader.getClassLoader(), classLoader);
         virtualClassloader.replaceClassLoader(classLoader);
         notifyUpdateOnClassLoaderAndItsChildren(virtualClassloader);
@@ -273,7 +260,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         log.debug("Destroying all classloaders");
         //remove elements only that don't have children
         //there is no loop in this so the algorithm finishes
-        final Set<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> entries = localClassLoaders.entrySet();
+        final Set<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> entries = classLoaders.entrySet();
         while (!entries.isEmpty()) {
             final Iterator<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> iterator = entries.iterator();
             while (iterator.hasNext()) {

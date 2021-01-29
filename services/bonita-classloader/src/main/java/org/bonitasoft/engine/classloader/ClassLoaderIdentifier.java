@@ -29,7 +29,15 @@ public class ClassLoaderIdentifier implements Serializable {
 
     public static final ScopeType GLOBAL_TYPE = ScopeType.GLOBAL;
     public static final long GLOBAL_ID = -1;
+    /**
+     * The GLOBAL classloader is the unique one at platform level
+     */
     public static final ClassLoaderIdentifier GLOBAL = identifier(GLOBAL_TYPE, GLOBAL_ID);
+    /**
+     * The APPLICATION classloader is the parent classloader of the GLOBAL classloader. It the one in which bonita is
+     * bootstrapped
+     */
+    public static final ClassLoaderIdentifier APPLICATION = identifier(null, Long.MIN_VALUE);
 
     private ScopeType type;
     private long id;

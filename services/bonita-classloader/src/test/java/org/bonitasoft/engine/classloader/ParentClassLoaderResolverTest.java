@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.classloader;
+package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
@@ -20,7 +20,6 @@ import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
-import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -34,19 +33,19 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @author Baptiste Mesta
  */
 @RunWith(MockitoJUnitRunner.class)
-public class BonitaBPMParentClassLoaderResolverTest {
+public class ParentClassLoaderResolverTest {
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
     @InjectMocks
-    private BonitaBPMParentClassLoaderResolver bonitaBPMParentClassLoaderResolver;
+    private ParentClassLoaderResolver parentClassLoaderResolver;
 
     @Test
     public void should_getParentClassLoaderIdentifier_return_global_on_tenant_classloader() throws Exception {
         //given
         final ClassLoaderIdentifier childId = identifier(TENANT, 124);
         //when
-        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver
+        final ClassLoaderIdentifier parentClassLoaderIdentifier = parentClassLoaderResolver
                 .getParentClassLoaderIdentifier(childId);
         //then
         assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
@@ -58,7 +57,7 @@ public class BonitaBPMParentClassLoaderResolverTest {
         doThrow(new STenantIdNotSetException("")).when(sessionAccessor).getTenantId();
         final ClassLoaderIdentifier childId = identifier(PROCESS, 124);
         //when
-        bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
+        parentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
         //then exception
     }
 
@@ -68,10 +67,18 @@ public class BonitaBPMParentClassLoaderResolverTest {
         doReturn(25l).when(sessionAccessor).getTenantId();
         final ClassLoaderIdentifier childId = identifier(PROCESS, 124);
         //when
-        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver
+        final ClassLoaderIdentifier parentClassLoaderIdentifier = parentClassLoaderResolver
                 .getParentClassLoaderIdentifier(childId);
         //then
         assertThat(parentClassLoaderIdentifier).isEqualTo(identifier(TENANT, 25));
+    }
+
+    @Test
+    public void should_give_APPLICATION_for_parent_of_global_classloader() throws Exception {
+        ClassLoaderIdentifier parentClassLoaderIdentifier = parentClassLoaderResolver
+                .getParentClassLoaderIdentifier(ClassLoaderIdentifier.GLOBAL);
+
+        assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.APPLICATION);
     }
 
 }
