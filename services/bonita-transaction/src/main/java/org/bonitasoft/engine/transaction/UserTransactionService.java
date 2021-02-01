@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.transaction;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import javax.transaction.Synchronization;
@@ -54,5 +55,7 @@ public interface UserTransactionService {
     void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException;
 
     boolean isTransactionActive();
+
+    Optional<Boolean> hasMultipleResources();
 
 }

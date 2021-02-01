@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import javax.transaction.Synchronization;
@@ -187,6 +188,11 @@ public class PlatformAPIImplTest {
         @Override
         public boolean isTransactionActive() {
             return false;
+        }
+
+        @Override
+        public Optional<Boolean> hasMultipleResources() {
+            return Optional.empty();
         }
 
         @Override

@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -294,6 +295,7 @@ public class ProcessAPIImplTest {
     @InjectMocks
     private ProcessAPIImpl processAPI;
     private SUserTaskInstance sUserTaskInstance;
+
     private TestUserTransactionService userTransactionService;
 
     @Before
@@ -1609,6 +1611,11 @@ public class ProcessAPIImplTest {
         @Override
         public boolean isTransactionActive() {
             return false;
+        }
+
+        @Override
+        public Optional<Boolean> hasMultipleResources() {
+            return Optional.empty();
         }
 
         public void failFirstTx() {
