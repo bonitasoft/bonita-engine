@@ -15,6 +15,7 @@ package org.bonitasoft.engine.transaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -40,12 +41,19 @@ public class JTATransactionServiceImpl implements TransactionService {
     private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
 
     private final ThreadLocal<TransactionServiceContext> txContextThreadLocal;
+    private XAResourceRetriever xaResourceRetriever;
 
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
-        if (txManager == null) {
-            throw new IllegalArgumentException("The TransactionManager cannot be null.");
-        }
+        this.txManager = txManager;
+        txContextThreadLocal = new TransactionServiceContextThreadLocal();
+        xaResourceRetriever = new XAResourceRetriever();
+    }
+
+    protected JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager,
+            XAResourceRetriever xaResourceRetriever) {
+        this.logger = logger;
+        this.xaResourceRetriever = xaResourceRetriever;
         this.txManager = txManager;
         txContextThreadLocal = new TransactionServiceContextThreadLocal();
     }
@@ -337,6 +345,16 @@ public class JTATransactionServiceImpl implements TransactionService {
         @Override
         protected TransactionServiceContext initialValue() {
             return new TransactionServiceContext();
+        }
+    }
+
+    @Override
+    public Optional<Boolean> hasMultipleResources() {
+        try {
+            return xaResourceRetriever.retrieveResources(txManager.getTransaction()).map(List::size)
+                    .map(size -> size > 1);
+        } catch (SystemException e) {
+            throw new RuntimeException(e);
         }
     }
 }
