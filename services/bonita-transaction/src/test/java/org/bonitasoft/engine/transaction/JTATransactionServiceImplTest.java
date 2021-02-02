@@ -18,6 +18,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import javax.transaction.Status;
@@ -25,6 +28,7 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -36,7 +40,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.class)
 public class JTATransactionServiceImplTest {
 
     @Mock
@@ -45,6 +49,8 @@ public class JTATransactionServiceImplTest {
     TransactionManager txManager;
     @Mock
     Transaction transaction;
+    @Mock
+    XAResourceRetriever xaResourceRetriever;
     @InjectMocks
     private JTATransactionServiceImpl txService;
     @Mock
@@ -70,7 +76,6 @@ public class JTATransactionServiceImplTest {
     @Test(expected = STransactionCreationException.class)
     public void should_throw_exception_if_call_is_nested() throws Exception {
         when(txManager.getStatus()).thenReturn(Status.STATUS_ACTIVE);
-        when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
 
         JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
 
@@ -359,4 +364,43 @@ public class JTATransactionServiceImplTest {
 
         assertThat(active).isFalse();
     }
+
+    @Test
+    public void hasMultipleResources_should_have_no_value_when_xaResourceRetriever_gives_no_resources()
+            throws Exception {
+        when(xaResourceRetriever.retrieveResources(any())).thenReturn(Optional.empty());
+
+        Optional<Boolean> hasMultipleResources = txService.hasMultipleResources();
+
+        assertThat(hasMultipleResources).isEmpty();
+    }
+
+    @Test
+    public void hasMultipleResources_should_return_false_when_transaction_has_one_resource() {
+        doReturn(Optional.of(Collections.singletonList(mock(XAResource.class)))).when(xaResourceRetriever)
+                .retrieveResources(any());
+
+        Optional<Boolean> hasMultipleResources = txService.hasMultipleResources();
+
+        assertThat(hasMultipleResources.get()).isFalse();
+    }
+
+    @Test
+    public void hasMultipleResources_should_return_true_when_transaction_has_multiple_resource() {
+        doReturn(Optional.of(Arrays.asList(mock(XAResource.class), mock(XAResource.class)))).when(xaResourceRetriever)
+                .retrieveResources(any());
+
+        Optional<Boolean> hasMultipleResources = txService.hasMultipleResources();
+
+        assertThat(hasMultipleResources.get()).isTrue();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void hasMultipleResources_should_throw_runtime_exception_when_getTransaction_throws_SystemException()
+            throws SystemException {
+        doThrow(SystemException.class).when(txManager).getTransaction();
+
+        txService.hasMultipleResources();
+    }
+
 }

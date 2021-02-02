@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import javax.transaction.Synchronization;
@@ -40,6 +41,11 @@ public class TransactionServiceForTest implements UserTransactionService {
     @Override
     public boolean isTransactionActive() {
         return false;
+    }
+
+    @Override
+    public Optional<Boolean> hasMultipleResources() {
+        return Optional.empty();
     }
 
 }
