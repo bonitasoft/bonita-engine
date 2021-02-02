@@ -90,6 +90,11 @@ public class WorkServiceImpl implements WorkService {
 
     @Override
     public synchronized void start() {
+        if (workDelayOnMultipleXAResource > 0) {
+            log.info(
+                    "The property 'delayOnMultipleXAResource' is set to {} ms, that delay will be added when triggering works from a transaction having multiple XA resources. This is the case when the BDM is updated.",
+                    workDelayOnMultipleXAResource);
+        }
     }
 
     @Override
