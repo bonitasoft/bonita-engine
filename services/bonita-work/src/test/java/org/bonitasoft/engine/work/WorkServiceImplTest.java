@@ -51,7 +51,7 @@ public class WorkServiceImplTest {
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
         doReturn(1L).when(sessionAccessor).getTenantId();
         workService = new WorkServiceImpl(transactionService, loggerService, sessionAccessor, workExecutorService,
-                engineClock);
+                engineClock, 0);
     }
 
     @Test
