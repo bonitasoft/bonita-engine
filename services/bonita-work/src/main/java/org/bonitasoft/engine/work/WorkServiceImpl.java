@@ -44,7 +44,7 @@ public class WorkServiceImpl implements WorkService {
             SessionAccessor sessionAccessor,
             WorkExecutorService workExecutorService,
             EngineClock engineClock,
-            @Value("${bonita.tenant.work.${sysprop.bonita.bdm.db.vendor}.delayOnMultipleXAResource:0}") int workDelayOnMultipleXAResource) {
+            @Value("${bonita.tenant.work.${bdm.db.vendor}.delayOnMultipleXAResource:0}") int workDelayOnMultipleXAResource) {
         this.transactionService = transactionService;
         this.log = loggerService.asLogger(WorkServiceImpl.class);
         this.sessionAccessor = sessionAccessor;
