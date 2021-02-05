@@ -417,7 +417,6 @@ public class PlatformSetup {
                     "dynamic-permissions-checks.properties");
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
                     "dynamic-permissions-checks-custom.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "forms-config.properties");
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
                     "resources-permissions-mapping.properties");
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
