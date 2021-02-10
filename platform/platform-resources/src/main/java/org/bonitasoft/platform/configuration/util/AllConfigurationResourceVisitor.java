@@ -35,7 +35,7 @@ public class AllConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
 
     private final List<FullBonitaConfiguration> fullBonitaConfigurations;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(AllConfigurationResourceVisitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AllConfigurationResourceVisitor.class);
 
     private static final List<String> PLATFORM_FOLDERS = Arrays.asList(PLATFORM_PORTAL.name().toLowerCase(),
             PLATFORM_INIT_ENGINE.name().toLowerCase(), PLATFORM_ENGINE.name().toLowerCase(),
@@ -69,12 +69,10 @@ public class AllConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
         } catch (NumberFormatException e) {
             return 0L;
         }
-
     }
 
     private boolean isPlatformFolder(Path dir) {
         return PLATFORM_FOLDERS.contains(dir.getFileName().toString());
-
     }
 
     @Override

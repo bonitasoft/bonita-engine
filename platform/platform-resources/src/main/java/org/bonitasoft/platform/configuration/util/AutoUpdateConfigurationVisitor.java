@@ -33,7 +33,7 @@ public class AutoUpdateConfigurationVisitor extends SimpleFileVisitor<Path> {
 
     private final List<BonitaConfiguration> bonitaConfigurations;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(AutoUpdateConfigurationVisitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoUpdateConfigurationVisitor.class);
 
     public AutoUpdateConfigurationVisitor(List<BonitaConfiguration> bonitaConfigurations) {
         this.bonitaConfigurations = bonitaConfigurations;
@@ -44,7 +44,7 @@ public class AutoUpdateConfigurationVisitor extends SimpleFileVisitor<Path> {
             "dynamic-permissions-checks.properties", "resources-permissions-mapping.properties");
 
     @Override
-    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attributes) throws IOException {
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attributes) {
         return FileVisitResult.CONTINUE;
     }
 

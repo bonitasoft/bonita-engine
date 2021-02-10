@@ -35,7 +35,7 @@ public class StoreConfigurationInTransaction extends TransactionCallbackWithoutR
     private final long tenantId;
     private final String dbVendor;
 
-    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(StoreConfigurationInTransaction.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(StoreConfigurationInTransaction.class);
 
     public StoreConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor,
             List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type,

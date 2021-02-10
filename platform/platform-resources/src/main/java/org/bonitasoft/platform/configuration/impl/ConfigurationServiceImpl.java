@@ -42,6 +42,7 @@ import org.bonitasoft.platform.configuration.util.GetConfigurationsInTransaction
 import org.bonitasoft.platform.configuration.util.GetMandatoryStructureConfiguration;
 import org.bonitasoft.platform.configuration.util.LicensesResourceVisitor;
 import org.bonitasoft.platform.configuration.util.StoreConfigurationInTransaction;
+import org.bonitasoft.platform.configuration.util.StoreConfigurationsIfNotExist;
 import org.bonitasoft.platform.configuration.util.UpdateConfigurationInTransactionForAllTenants;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private static final int NON_TENANT_RESOURCE = 0;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
     private JdbcTemplate jdbcTemplate;
 
@@ -332,5 +333,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public List<LightBonitaConfiguration> getMandatoryStructureConfiguration() {
         return transactionTemplate.execute(new GetMandatoryStructureConfiguration(jdbcTemplate));
+    }
+
+    @Override
+    public List<Long> getAllTenants() {
+        return transactionTemplate.execute(ts -> jdbcTemplate
+                .queryForList("SELECT distinct tenant_id FROM configuration WHERE tenant_id <> 0", Long.class));
+    }
+
+    @Override
+    public void storeConfigurationsIfNotExist(List<FullBonitaConfiguration> configurations) {
+        transactionTemplate.execute(new StoreConfigurationsIfNotExist(jdbcTemplate, dbVendor, configurations));
     }
 }
