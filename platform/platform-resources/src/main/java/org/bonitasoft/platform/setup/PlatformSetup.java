@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.platform.setup;
 
+import static org.bonitasoft.platform.configuration.type.ConfigurationType.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
 import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
 import org.bonitasoft.platform.exception.PlatformException;
@@ -57,7 +60,7 @@ public class PlatformSetup {
 
     public static final String BONITA_SETUP_FOLDER = "org.bonitasoft.platform.setup.folder";
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(PlatformSetup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlatformSetup.class);
 
     public static final String PLATFORM_CONF_FOLDER_NAME = "platform_conf";
 
@@ -108,6 +111,7 @@ public class PlatformSetup {
                 LOGGER.info("Upgrading default configuration with files from classpath");
                 updateDefaultConfigurationFromClasspath();
             }
+            insertNewConfigurationsFromClasspathIfExist();
             return;
         }
         preventFromPushingZeroLicense();
@@ -343,15 +347,53 @@ public class PlatformSetup {
         configurationService.updateDefaultConfigurationForAllTenantsAndTemplate(folderToPush);
     }
 
+    private void insertNewConfigurationsFromClasspathIfExist() throws PlatformException {
+        final ArrayList<FullBonitaConfiguration> configurations = new ArrayList<>();
+        try {
+            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE, "bonita-platform-hibernate-cache.xml",
+                    0L);
+            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE, "bonita-tenant-hibernate-cache.xml",
+                    0L);
+            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE, "bonita-platform-sp-custom.xml", 0L);
+            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE,
+                    "bonita-platform-sp-cluster-custom.properties", 0L);
+            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE, "bonita-platform-sp-custom.properties",
+                    0L);
+            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml",
+                    0L);
+            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_ENGINE,
+                    "bonita-tenant-sp-cluster-custom.properties", 0L);
+            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_ENGINE,
+                    "bonita-tenant-sp-custom.properties", 0L);
+            // configurations.add(getConfigurationFromClassPath(TENANT_TEMPLATE_PORTAL,
+            //        "authenticationManager-config.properties", 0L));
+            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_PORTAL, "keycloak-oidc.json", 0L);
+            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_PORTAL, "keycloak-saml.xml", 0L);
+            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_PORTAL, "spnego-config.properties", 0L);
+            for (Long tenant : configurationService.getAllTenants()) {
+                addConfigurationFromClassPathToList(configurations, TENANT_ENGINE, "bonita-tenant-sp-custom.xml",
+                        tenant);
+                addConfigurationFromClassPathToList(configurations, TENANT_ENGINE,
+                        "bonita-tenant-sp-cluster-custom.properties", tenant);
+                addConfigurationFromClassPathToList(configurations, TENANT_ENGINE, "bonita-tenant-sp-custom.properties",
+                        tenant);
+                // configurations.add(getConfigurationFromClassPath(TENANT_PORTAL, "authenticationManager-config.properties", tenant));
+                addConfigurationFromClassPathToList(configurations, TENANT_PORTAL, "keycloak-oidc.json", tenant);
+                addConfigurationFromClassPathToList(configurations, TENANT_PORTAL, "keycloak-saml.xml", tenant);
+                addConfigurationFromClassPathToList(configurations, TENANT_PORTAL, "spnego-config.properties", tenant);
+            }
+        } catch (IOException e) {
+            throw new PlatformException(e);
+        }
+        configurationService.storeConfigurationsIfNotExist(configurations);
+    }
+
     private void updateDefaultConfigurationFromClasspath() throws PlatformException {
         List<BonitaConfiguration> portalTenant = new ArrayList<>(3);
         try {
-            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "compound-permissions-mapping.properties");
-            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "dynamic-permissions-checks.properties");
-            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "resources-permissions-mapping.properties");
+            addIfExists(portalTenant, TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping.properties");
+            addIfExists(portalTenant, TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks.properties");
+            addIfExists(portalTenant, TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping.properties");
         } catch (IOException e) {
             throw new PlatformException(e);
         }
@@ -361,77 +403,60 @@ public class PlatformSetup {
     private void initConfigurationWithClasspath() throws PlatformException {
         try {
             List<BonitaConfiguration> platformInitConfigurations = new ArrayList<>(2);
-            addIfExists(platformInitConfigurations, ConfigurationType.PLATFORM_INIT_ENGINE,
-                    "bonita-platform-init-custom.xml");
+            addIfExists(platformInitConfigurations, PLATFORM_INIT_ENGINE, "bonita-platform-init-custom.xml");
             configurationService.storePlatformInitEngineConf(platformInitConfigurations);
 
             List<BonitaConfiguration> platformConfigurations = new ArrayList<>(8);
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
-                    "bonita-platform-community-custom.properties");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-custom.xml");
+            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-community-custom.properties");
+            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-custom.xml");
             //SP
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
-                    "bonita-platform-private-community.properties");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
-                    "bonita-platform-sp-custom.properties");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
-                    "bonita-platform-sp-cluster-custom.properties");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-sp-custom.xml");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
-                    "bonita-platform-hibernate-cache.xml");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-tenant-hibernate-cache.xml");
+            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-private-community.properties"); // FIXME: should not be necessary, as internal only
+            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-sp-custom.properties");
+            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-sp-cluster-custom.properties");
+            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-sp-custom.xml");
+            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-hibernate-cache.xml");
+            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-tenant-hibernate-cache.xml");
             configurationService.storePlatformEngineConf(platformConfigurations);
 
             List<BonitaConfiguration> tenantTemplateConfigurations = new ArrayList<>(5);
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
+            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE,
                     "bonita-tenant-community-custom.properties");
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
-                    "bonita-tenants-custom.xml");
+            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE, "bonita-tenants-custom.xml");
             //SP
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
-                    "bonita-tenant-sp-custom.properties");
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
+            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.properties");
+            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE,
                     "bonita-tenant-sp-cluster-custom.properties");
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
-                    "bonita-tenant-sp-custom.xml");
+            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml");
             configurationService.storeTenantTemplateEngineConf(tenantTemplateConfigurations);
 
             List<BonitaConfiguration> securityScripts = new ArrayList<>();
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS,
-                    "SamplePermissionRule.groovy.sample");
+            addIfExists(securityScripts, TENANT_TEMPLATE_SECURITY_SCRIPTS, "SamplePermissionRule.groovy.sample");
             configurationService.storeTenantTemplateSecurityScripts(securityScripts);
 
             List<BonitaConfiguration> portalTenantTemplate = new ArrayList<>(14);
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "authenticationManager-config.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "compound-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "compound-permissions-mapping-custom.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "authenticationManager-config.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping-custom.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL,
                     "compound-permissions-mapping-internal.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "console-config.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "custom-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "dynamic-permissions-checks.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "dynamic-permissions-checks-custom.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
-                    "resources-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "console-config.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "custom-permissions-mapping.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks-custom.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL,
                     "resources-permissions-mapping-custom.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL,
                     "resources-permissions-mapping-internal.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "security-config.properties");
+            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "security-config.properties");
 
             configurationService.storeTenantTemplatePortalConf(portalTenantTemplate);
 
             List<BonitaConfiguration> portalPlatform = new ArrayList<>(4);
-            addIfExists(portalPlatform, ConfigurationType.PLATFORM_PORTAL, "cache-config.xml");
-            addIfExists(portalPlatform, ConfigurationType.PLATFORM_PORTAL, "jaas-standard.cfg");
-            addIfExists(portalPlatform, ConfigurationType.PLATFORM_PORTAL, "platform-tenant-config.properties");
-            addIfExists(portalPlatform, ConfigurationType.PLATFORM_PORTAL, "security-config.properties");
+            addIfExists(portalPlatform, PLATFORM_PORTAL, "cache-config.xml");
+            addIfExists(portalPlatform, PLATFORM_PORTAL, "jaas-standard.cfg");
+            addIfExists(portalPlatform, PLATFORM_PORTAL, "platform-tenant-config.properties");
+            addIfExists(portalPlatform, PLATFORM_PORTAL, "security-config.properties");
             configurationService.storePlatformPortalConf(portalPlatform);
 
         } catch (IOException e) {
@@ -439,13 +464,12 @@ public class PlatformSetup {
         }
     }
 
-    private void addIfExists(List<BonitaConfiguration> tenantTemplateConfigurations,
-            ConfigurationType configurationType, String resourceName)
-            throws IOException {
+    private void addIfExists(List<BonitaConfiguration> configurations, ConfigurationType configurationType,
+            String resourceName) throws IOException {
         BonitaConfiguration bonitaConfiguration = getBonitaConfigurationFromClassPath(
                 configurationType.name().toLowerCase(), resourceName);
         if (bonitaConfiguration != null) {
-            tenantTemplateConfigurations.add(bonitaConfiguration);
+            configurations.add(bonitaConfiguration);
         }
     }
 
@@ -469,6 +493,17 @@ public class PlatformSetup {
             }
             LOGGER.debug("Using configuration from classpath {}", resourceName);
             return new BonitaConfiguration(resourceName, IOUtils.toByteArray(resourceAsStream));
+        }
+    }
+
+    private void addConfigurationFromClassPathToList(ArrayList<FullBonitaConfiguration> configurations,
+            ConfigurationType type, String resourceName, Long tenantId) throws IOException {
+        try (InputStream resourceAsStream = this.getClass()
+                .getResourceAsStream("/" + type.name().toLowerCase() + "/" + resourceName)) {
+            if (resourceAsStream != null) {
+                configurations.add(new FullBonitaConfiguration(resourceName, IOUtils.toByteArray(resourceAsStream),
+                        type.name().toUpperCase(), tenantId));
+            }
         }
     }
 
