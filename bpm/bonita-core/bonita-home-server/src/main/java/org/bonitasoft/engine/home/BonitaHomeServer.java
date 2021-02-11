@@ -77,6 +77,12 @@ public class BonitaHomeServer {
         return configurationService;
     }
 
+    /**
+     * Properties inheritance is defined like that:
+     * <ol>
+     * <li>platform properties in database overrides platform properties in classpath</li>
+     * </ol>
+     */
     public Properties getPlatformProperties() throws IOException {
         return mergeProperties(getPropertiesFromClassPath("bonita-platform-community.properties",
                 "bonita-platform-private-community.properties",
@@ -85,11 +91,23 @@ public class BonitaHomeServer {
                 "bonita-platform-sp-cluster.properties"), getConfigurationService().getPlatformEngineConf());
     }
 
+    /**
+     * Properties inheritance is defined like that:
+     * <ol>
+     * <li>tenant properties in database overrides tenant properties in classpath</li>
+     * <li>tenant properties in classpath overrides platform properties in database</li>
+     * <li>platform properties in database overrides platform properties in classpath</li>
+     * </ol>
+     */
     public Properties getTenantProperties(long tenantId) throws IOException {
-        Properties allProperties = mergeProperties(getPropertiesFromClassPath("bonita-tenant-community.properties",
+        Properties allProperties = getPlatformProperties();
+        Properties tenantProperties = mergeProperties(getPropertiesFromClassPath(
+                "bonita-tenant-community.properties",
                 "bonita-tenant-private-community.properties",
                 "bonita-tenant-sp.properties",
                 "bonita-tenant-sp-cluster.properties"), getConfigurationService().getTenantEngineConf(tenantId));
+        allProperties.putAll(tenantProperties);
+
         allProperties.setProperty("tenantId", String.valueOf(tenantId));
         return allProperties;
     }
