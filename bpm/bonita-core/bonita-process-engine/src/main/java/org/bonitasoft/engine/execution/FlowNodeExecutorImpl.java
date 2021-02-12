@@ -134,7 +134,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final long processDefinitionId = flowNodeInstance
                     .getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
                             .getProcessDefinitionIndex());
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(
+            final ClassLoader localClassLoader = classLoaderService.getClassLoader(
                     identifier(ScopeType.PROCESS, processDefinitionId));
             Thread.currentThread().setContextClassLoader(localClassLoader);
 

@@ -345,7 +345,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         try {
             final long processDefinitionId = sProcessInstance.getProcessDefinitionId();
             final ClassLoader localClassLoader = classLoaderService
-                    .getLocalClassLoader(identifier(ScopeType.valueOf("PROCESS"), processDefinitionId));
+                    .getClassLoader(identifier(ScopeType.valueOf("PROCESS"), processDefinitionId));
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteProcessInstanceElements(sProcessInstance);
             final DeleteRecord deleteRecord = new DeleteRecord(sProcessInstance);

@@ -164,7 +164,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadGlobalClassUsingGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
+        final ClassLoader globalClassLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
 
@@ -177,7 +177,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadLocalClassUsingLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader localClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.LocalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkLocalClassLoader(classLoader);
@@ -190,7 +190,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadGlobalClassUsingLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader localClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader);
@@ -203,7 +203,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadSharedClassUsingLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader localClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkLocalClassLoader(classLoader);
@@ -216,7 +216,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadSharedClassUsingGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
+        final ClassLoader globalClassLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader);
@@ -229,7 +229,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadOnlyInPathClassUsingGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader classLoader = classLoaderService.getGlobalClassLoader();
+        final ClassLoader classLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.OnlyInPathClass1");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
         // getTransactionService().complete();
@@ -239,7 +239,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadOnlyInPathClassUsingLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader classLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.OnlyInPathClass1");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
         // getTransactionService().complete();
@@ -249,7 +249,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadLocalClassUsingGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader virtualGlobalClassLoader = classLoaderService.getGlobalClassLoader();
+        final ClassLoader virtualGlobalClassLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
 
         final Class<?> clazz = virtualGlobalClassLoader.loadClass("org.bonitasoft.engine.classloader.LocalClass1");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
@@ -261,7 +261,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         initializeClassLoaderService();
         // getTransactionService().begin();
         final ClassLoader localClassLoaderP1 = classLoaderService
-                .getLocalClassLoader(identifier(PROCESS, ID1));
+                .getClassLoader(identifier(PROCESS, ID1));
         final Class<?> clazzP1 = localClassLoaderP1.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader = clazzP1.getClassLoader();
         checkGlobalClassLoader(classLoader);
@@ -269,7 +269,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         assertFalse(localClassLoaderP1 == classLoader);
 
         final ClassLoader localClassLoaderP2 = classLoaderService
-                .getLocalClassLoader(identifier(PROCESS, ID2));
+                .getClassLoader(identifier(PROCESS, ID2));
         final Class<?> clazzP2 = localClassLoaderP2.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader2 = clazzP2.getClassLoader();
         checkGlobalClassLoader(classLoader2);
@@ -285,7 +285,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadLocalClassUsingUsingBadLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID2));
+        final ClassLoader classLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID2));
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.LocalClass3");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
         // getTransactionService().complete();
@@ -295,7 +295,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testLoadSharedClassUsingBadLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // Should not be found with ID2 (bad scope):
-        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID2));
+        final ClassLoader classLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID2));
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader2 = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader2);
@@ -306,22 +306,22 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     @Test
     public void testRemoveLocalClassLoader() throws Exception {
         initializeClassLoaderService();
-        final ClassLoader localClassLoader1 = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
-        final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID2));
+        final ClassLoader localClassLoader1 = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader localClassLoader2 = classLoaderService.getClassLoader(identifier(PROCESS, ID2));
 
         classLoaderService.removeLocalClassloader(identifier(PROCESS, ID1));
 
-        assertNotSameClassloader(localClassLoader1, classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1)));
+        assertNotSameClassloader(localClassLoader1, classLoaderService.getClassLoader(identifier(PROCESS, ID1)));
 
         classLoaderService.removeLocalClassloader(identifier(PROCESS, ID2));
 
-        assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(identifier(PROCESS, ID2)));
+        assertNotSameClassloader(localClassLoader2, classLoaderService.getClassLoader(identifier(PROCESS, ID2)));
     }
 
     @Test
     public void testAddResourcesToGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
-        final ClassLoader globalClassLoaderBefore = classLoaderService.getGlobalClassLoader();
+        final ClassLoader globalClassLoaderBefore = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
 
         //GlobalClass 3 is in the app classloader
         assertThat(globalClassLoaderBefore.loadClass("org.bonitasoft.engine.classloader.GlobalClass3").getClassLoader())
@@ -330,7 +330,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         inTx(() -> {
             createPlatformDependency("newlib", "newlib.jar", generateJar(GlobalClass3.class));
         });
-        ClassLoader globalClassLoaderAfter = classLoaderService.getGlobalClassLoader();
+        ClassLoader globalClassLoaderAfter = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         final ClassLoader classLoader2 = globalClassLoaderAfter
                 .loadClass("org.bonitasoft.engine.classloader.GlobalClass3").getClassLoader();
         checkGlobalClassLoader(classLoader2);
@@ -346,14 +346,14 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
 
         //at first, the local classloader does contains GlobalClass2, only the root classloader contains the GlobalClass2
         ClassLoader classLoaderBefore = inTx(
-                () -> classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1)));
+                () -> classLoaderService.getClassLoader(identifier(PROCESS, ID1)));
         checkGlobalClassLoader(
                 classLoaderBefore.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
 
         //add a dependency with GlobalClass2 and re-ask for the classloader
         ClassLoader classLoaderAfter = inTx(() -> {
             createDependency(ID1, PROCESS, "newlib", "newlib.jar", generateJar(GlobalClass2.class));
-            return classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+            return classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         });
 
         checkGlobalClassLoader(
@@ -362,10 +362,10 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
                 classLoaderAfter.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
 
         assertThat(classLoaderBefore)
-                .isNotEqualTo(classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1)));
+                .isNotEqualTo(classLoaderService.getClassLoader(identifier(PROCESS, ID1)));
         assertThat(((BonitaClassLoader) classLoaderBefore).isDestroyed()).isTrue();
         assertThat(classLoaderAfter)
-                .isEqualTo(classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1)));
+                .isEqualTo(classLoaderService.getClassLoader(identifier(PROCESS, ID1)));
     }
 
     @Test
@@ -377,7 +377,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         });
 
         inTx(() -> {
-            ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
+            ClassLoader globalClassLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
             Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
             final ClassLoader classLoader = clazz.getClassLoader();
             checkGlobalClassLoader(classLoader);
@@ -388,7 +388,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
 
         });
         inTx(() -> {
-            ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
+            ClassLoader globalClassLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
             Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
             // dependency is not in the bonita classloader anymore but only in the Test classloader
             assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
@@ -402,7 +402,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
+        final ClassLoader globalClassLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathGlobalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader);
@@ -417,11 +417,11 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader localClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathGlobalClass1");
         checkGlobalClassLoader(clazz.getClassLoader());
         assertNotSameClassloader(localClassLoader, clazz.getClassLoader());
-        assertSameClassloader(classLoaderService.getGlobalClassLoader(), clazz.getClassLoader());
+        assertSameClassloader(classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL), clazz.getClassLoader());
         // getTransactionService().complete();
     }
 
@@ -431,7 +431,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader localClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathLocalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkLocalClassLoader(classLoader);
@@ -446,7 +446,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID2));
+        final ClassLoader classLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID2));
         // getTransactionService().complete();
         classLoader.loadClass("org.bonitasoft.classloader.test.NotInPathLocalClass1");
         fail("load class with wrong classloader");
@@ -458,7 +458,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
+        final ClassLoader globalClassLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathSharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader);
@@ -473,7 +473,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+        final ClassLoader localClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathSharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader);
@@ -491,7 +491,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         createPlatformDependency("resource", "resource.txt", resourceFileContent);
         getTransactionService().complete();
 
-        final ClassLoader virtualGlobalClassLoader = classLoaderService.getGlobalClassLoader();
+        final ClassLoader virtualGlobalClassLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         final InputStream resourceStream = virtualGlobalClassLoader.getResourceAsStream("resource.txt");
         assertEquals(resourceFileContent.length, IOUtil.getAllContentFrom(resourceStream).length);
         resourceStream.close();
@@ -501,20 +501,21 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void testDifferentsApplicationHaveDifferentGlobalClassLoader() throws Exception {
         initializeClassLoaderServiceWithTwoApplications();
         final ClassLoader process1Classloader = classLoaderService
-                .getLocalClassLoader(identifier(PROCESS, ID1));
+                .getClassLoader(identifier(PROCESS, ID1));
         final ClassLoader tenant1Classloader = classLoaderService
-                .getLocalClassLoader(identifier(TENANT, ID1));
+                .getClassLoader(identifier(TENANT, ID1));
 
         final Class<?> sharedClassLoadedFromProcess1 = process1Classloader
                 .loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final Class<?> sharedClassLoadedFromTenant1 = tenant1Classloader
                 .loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         checkGlobalClassLoader(sharedClassLoadedFromProcess1.getClassLoader());
-        assertSameClassloader(classLoaderService.getGlobalClassLoader(),
+        assertSameClassloader(classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL),
                 sharedClassLoadedFromProcess1.getClassLoader());
 
         checkGlobalClassLoader(sharedClassLoadedFromTenant1.getClassLoader());
-        assertSameClassloader(classLoaderService.getGlobalClassLoader(), sharedClassLoadedFromTenant1.getClassLoader());
+        assertSameClassloader(classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL),
+                sharedClassLoadedFromTenant1.getClassLoader());
     }
 
     private void checkGlobalClassLoader(final ClassLoader classLoader) {
@@ -554,7 +555,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         getTransactionService().complete();
 
         //when
-        ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, ID1));
+        ClassLoader localClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, ID1));
         URL resource = localClassLoader.getResource("test.xml");
         assertThat(resource).isNotNull();
         String stringUrl = resource.toExternalForm();

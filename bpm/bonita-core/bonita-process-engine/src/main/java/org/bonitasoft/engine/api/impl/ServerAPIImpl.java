@@ -32,6 +32,7 @@ import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -475,7 +476,7 @@ public class ServerAPIImpl implements ServerAPI {
         final TenantServiceAccessor tenantAccessor = platformServiceAccessor
                 .getTenantServiceAccessor(apiSession.getTenantId());
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        return classLoaderService.getLocalClassLoader(identifier(ScopeType.TENANT, apiSession.getTenantId()));
+        return classLoaderService.getClassLoader(identifier(ScopeType.TENANT, apiSession.getTenantId()));
     }
 
     private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor)
@@ -500,7 +501,7 @@ public class ServerAPIImpl implements ServerAPI {
         }
         if (platformService.isPlatformCreated()) {
             final ClassLoaderService classLoaderService = platformServiceAccessor.getClassLoaderService();
-            classLoader = classLoaderService.getGlobalClassLoader();
+            classLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         }
         return classLoader;
     }

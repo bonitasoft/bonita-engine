@@ -109,7 +109,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void start() throws SBonitaException {
         groovyClassLoader = new GroovyClassLoader(
-                classLoaderService.getLocalClassLoader(identifier(ScopeType.TENANT, tenantId)));
+                classLoaderService.getClassLoader(identifier(ScopeType.TENANT, tenantId)));
         groovyClassLoader.setShouldRecompile(true);
         try {
             final File folder = getBonitaHomeServer().getSecurityScriptsFolder(tenantId);

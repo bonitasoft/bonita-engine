@@ -59,7 +59,7 @@ public class NotifyChildFinishedWorkTest {
 
     @Before
     public void before() throws SClassLoaderException {
-        doReturn(this.getClass().getClassLoader()).when(classLoaderService).getLocalClassLoader(any());
+        doReturn(this.getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
         context = Collections.singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
 
         doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();

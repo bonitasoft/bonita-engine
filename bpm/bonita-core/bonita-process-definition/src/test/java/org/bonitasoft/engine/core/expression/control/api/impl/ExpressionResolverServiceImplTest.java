@@ -59,7 +59,7 @@ public class ExpressionResolverServiceImplTest {
 
         resolverService.evaluate(expression, context);
 
-        verify(classLoaderService).getLocalClassLoader(identifier(ScopeType.PROCESS, processDefinitionId));
+        verify(classLoaderService).getClassLoader(identifier(ScopeType.PROCESS, processDefinitionId));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class ExpressionResolverServiceImplTest {
         resolverService.evaluate(expression, context);
 
         verify(classLoaderService)
-                .getLocalClassLoader(identifier(ScopeType.PROCESS, parentProcessDefinitionId));
+                .getClassLoader(identifier(ScopeType.PROCESS, parentProcessDefinitionId));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ExpressionResolverServiceImplTest {
 
         resolverService.evaluate(expression, context);
 
-        verify(classLoaderService, never()).getLocalClassLoader(any());
+        verify(classLoaderService, never()).getClassLoader(any());
     }
 
 }

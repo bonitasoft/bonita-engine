@@ -220,7 +220,7 @@ public class ProcessInstanceServiceImplTest {
     public void testDeleteProcessInstance_delete_archived_activity() throws Exception {
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        when(classLoaderService.getLocalClassLoader(identifier(ScopeType.PROCESS, sProcessInstance.getId())))
+        when(classLoaderService.getClassLoader(identifier(ScopeType.PROCESS, sProcessInstance.getId())))
                 .thenReturn(classLoader);
         doReturn(new HashSet<>(asList(4L, 5L, 6L))).when(activityInstanceService)
                 .getSourceObjectIdsOfArchivedFlowNodeInstances(any());

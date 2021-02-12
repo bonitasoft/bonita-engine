@@ -206,7 +206,7 @@ public class TenantServicesManager {
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             // Set the right classloader only on start and resume because we destroy it on stop and pause anyway
-            final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(
+            final ClassLoader serverClassLoader = classLoaderService.getClassLoader(
                     identifier(ScopeType.TENANT, tenantId));
             Thread.currentThread().setContextClassLoader(serverClassLoader);
             runnable.run();

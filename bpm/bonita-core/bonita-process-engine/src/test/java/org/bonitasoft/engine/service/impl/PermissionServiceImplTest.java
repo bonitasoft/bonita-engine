@@ -82,7 +82,7 @@ public class PermissionServiceImplTest {
         securityFolder = temporaryFolder.newFolder("security");
 
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
-                .getLocalClassLoader(any());
+                .getClassLoader(any());
         permissionService = spy(
                 new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID));
         doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();

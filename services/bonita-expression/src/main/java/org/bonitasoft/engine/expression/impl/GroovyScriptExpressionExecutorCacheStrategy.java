@@ -128,7 +128,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
                         illegalStateException);
             }
         } else {
-            classLoader = classLoaderService.getLocalClassLoader(identifier(ScopeType.PROCESS, definitionId));
+            classLoader = classLoaderService.getClassLoader(identifier(ScopeType.PROCESS, definitionId));
             classLoaderService.addListener(identifier(ScopeType.PROCESS, definitionId), this);
         }
         return classLoader;

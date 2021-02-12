@@ -95,7 +95,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         groovyScriptExpressionExecutorCacheStrategy = new GroovyScriptExpressionExecutorCacheStrategy(cacheService,
                 classLoaderService, logger);
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService)
-                .getLocalClassLoader(any());
+                .getClassLoader(any());
         context = new HashMap<>();
         context.put(DEFINITION_ID, 123456789L);
     }

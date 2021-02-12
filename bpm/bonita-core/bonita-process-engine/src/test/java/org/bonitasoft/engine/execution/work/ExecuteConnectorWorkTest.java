@@ -120,7 +120,7 @@ public class ExecuteConnectorWorkTest {
         doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
         executeConnectorWork.setTenantId(TENANT_ID);
         doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();
-        doReturn(this.getClass().getClassLoader()).when(classLoaderService).getLocalClassLoader(any());
+        doReturn(this.getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
         doReturn(timeTracker).when(tenantServiceAccessor).getTimeTracker();
         doReturn(connectorService).when(tenantServiceAccessor).getConnectorService();
     }

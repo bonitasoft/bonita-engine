@@ -165,7 +165,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         }
         if (processId != null) {
             Thread.currentThread().setContextClassLoader(
-                    classLoaderService.getLocalClassLoader(identifier(ScopeType.PROCESS, processId)));
+                    classLoaderService.getClassLoader(identifier(ScopeType.PROCESS, processId)));
         }
     }
 
