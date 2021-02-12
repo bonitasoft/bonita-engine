@@ -20,12 +20,16 @@ import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -139,13 +143,59 @@ public class BonitaHomeServerTest {
         classPathProperties.setProperty("overriddenProperty", "classPathValue");
         classPathProperties.setProperty("classPathProperty", "aValueInClassPath");
         doReturn(classPathProperties).when(bonitaHomeServer)
-                .getPropertiesFromClassPath(ArgumentMatchers.<String> anyVararg());
+                .getPropertiesFromClassPath(ArgumentMatchers.<String> any());
         //when
         Properties allProperties = bonitaHomeServer.getPlatformProperties();
         //then
         assertThat(allProperties).containsOnly(entry("overriddenProperty", "databaseValue"),
                 entry("databaseProperty", "aValueInDb"),
                 entry("classPathProperty", "aValueInClassPath"));
+    }
+
+    @Test
+    public void tenant_properties_should_inherit_from_platform_properties() throws Exception {
+        //given
+        Thread.currentThread().setContextClassLoader(getClassLoaderWithProperties(
+                new BonitaConfiguration("bonita-platform-community.properties",
+                        getPropertiesAsByteArray("prop1=prop1PlatformCP", "prop2=prop2PlatformCP",
+                                "prop3=prop3PlatformCP", "prop4=prop4PlatformCP")),
+                new BonitaConfiguration("bonita-tenant-community.properties",
+                        getPropertiesAsByteArray("prop3=prop3TenantCP", "prop4=prop4TenantCP"))));
+
+        doReturn(Collections.singletonList(new BonitaConfiguration("platform.properties",
+                getPropertiesAsByteArray("prop2=prop2PlatformDB", "prop3=prop3PlatformDB", "prop4=prop4PlatformDB"))))
+                        .when(configurationService).getPlatformEngineConf();
+
+        doReturn(Collections.singletonList(new BonitaConfiguration("tenant.properties",
+                getPropertiesAsByteArray("prop4=prop4TenantDB"))))
+                        .when(configurationService).getTenantEngineConf(1);
+        //when
+        Properties allProperties = bonitaHomeServer.getTenantProperties(1);
+        //then
+        assertThat(allProperties).containsOnly(
+                entry("prop1", "prop1PlatformCP"),
+                entry("prop2", "prop2PlatformDB"),
+                entry("prop3", "prop3TenantCP"),
+                entry("prop4", "prop4TenantDB"),
+                entry("tenantId", "1"));
+    }
+
+    private byte[] getPropertiesAsByteArray(String... propertiesV) {
+        return String.join("\n", propertiesV).getBytes(StandardCharsets.UTF_8);
+    }
+
+    private Properties getPropertiesAsProp(String... propertiesV) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new StringReader(String.join("\n", propertiesV)));
+        return properties;
+    }
+
+    private ClassLoader getClassLoaderWithProperties(BonitaConfiguration... bonitaConfigurations) throws IOException {
+        File jar1 = temporaryFolder.newFile("myJar1.jar");
+        FileUtils.writeByteArrayToFile(jar1, IOUtil.generateJar(
+                Arrays.stream(bonitaConfigurations).collect(Collectors.toMap(BonitaConfiguration::getResourceName,
+                        BonitaConfiguration::getResourceContent))));
+        return new URLClassLoader(new URL[] { jar1.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
     }
 
     @Test
