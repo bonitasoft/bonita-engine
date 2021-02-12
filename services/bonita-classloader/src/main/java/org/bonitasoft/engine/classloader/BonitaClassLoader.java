@@ -19,14 +19,19 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -41,9 +46,9 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     protected Map<String, File> nonJarResources;
     private final File temporaryDirectory;
     private boolean isActive = true;
-    private final long creationTime = System.currentTimeMillis();
+    private final Instant creationTime = Instant.now();
     private final String uuid = generateUUID();
-    private Set<BonitaClassLoader> children = new HashSet<>();
+    private final Set<BonitaClassLoader> children = new HashSet<>();
 
     BonitaClassLoader(ClassLoaderIdentifier id, ClassLoader parent, Set<File> jars, Map<String, File> nonJarResources,
             File temporaryDirectory) {
@@ -52,6 +57,16 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         this.id = id;
         this.nonJarResources = new HashMap<>(nonJarResources);
         this.temporaryDirectory = temporaryDirectory;
+        if (parent instanceof BonitaClassLoader) {
+            //The parent is not a BonitaClassloader when we are on the Global classloader
+            ((BonitaClassLoader) parent).children.add(this);
+            log.debug("Classloader {} added as a child of {}", this, parent);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Classloader {} created with \n jars: {}, \n nonJarResources: {}", this,
+                    jars.stream().map(File::getPath).collect(Collectors.joining(", ")),
+                    nonJarResources.values().stream().map(File::getPath).collect(Collectors.joining(", ")));
+        }
     }
 
     private static String generateUUID() {
@@ -115,13 +130,19 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     }
 
     public void destroy() {
+        XStreamFactory.remove(this);
+        ClassLoader parent = getParent();
+        if (parent instanceof BonitaClassLoader) {
+            //The parent is not a BonitaClassloader when we are on the Global classloader
+            ((BonitaClassLoader) parent).children.remove(this);
+        }
         super.destroy();
         FileUtils.deleteQuietly(temporaryDirectory);
         isActive = false;
         log.debug("Destroyed {}", this);
     }
 
-    public ClassLoaderIdentifier getId() {
+    public ClassLoaderIdentifier getIdentifier() {
         return id;
     }
 
@@ -129,11 +150,23 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         return temporaryDirectory;
     }
 
+    public boolean hasChildren() {
+        return !children.isEmpty();
+    }
+
+    public Set<BonitaClassLoader> getChildren() {
+        return Collections.unmodifiableSet(new HashSet<>(children));
+    }
+
     @Override
     public String toString() {
-        return "[" + this.getClass().getName() + ":" + " uuid=" + uuid + ", name=" + this.getName() + ", creationTime="
-                + creationTime + ", id=" + id
-                + ", isActive: " + isActive
-                + ", parent= " + getParent();
+        return new StringJoiner(", ", BonitaClassLoader.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("isActive=" + isActive)
+                .add("creationTime=" + creationTime)
+                .add("uuid='" + uuid + "'")
+                .add("children=" + children.stream().map(BonitaClassLoader::getIdentifier)
+                        .map(ClassLoaderIdentifier::toString).collect(Collectors.joining(", ", "[", "]")))
+                .toString();
     }
 }

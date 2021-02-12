@@ -43,6 +43,7 @@ import org.bonitasoft.engine.business.data.generator.client.ResourcesLoader;
 import org.bonitasoft.engine.business.data.generator.filter.OnlyDAOImplementationFileFilter;
 import org.bonitasoft.engine.business.data.generator.filter.WithoutDAOImplementationFileFilter;
 import org.bonitasoft.engine.business.data.generator.server.ServerBDMJarBuilder;
+import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -171,8 +172,11 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                     BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
-            classLoaderService.refreshClassLoaderImmediately(identifier(ScopeType.TENANT, tenantId));
-            classLoaderService.refreshClassLoaderOnOtherNodes(identifier(ScopeType.TENANT, tenantId));
+            ClassLoaderIdentifier tenantClassLoader = identifier(ScopeType.TENANT, tenantId);
+            classLoaderService.refreshClassLoaderImmediately(tenantClassLoader);
+            classLoaderService.refreshClassLoaderOnOtherNodes(tenantClassLoader);
+            //replace the tenant classloader by the one that was just refreshed
+            Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader(tenantClassLoader));
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
         } catch (final SDependencyException | SClassLoaderException e) {

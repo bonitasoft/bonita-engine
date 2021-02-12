@@ -55,6 +55,8 @@ class RefreshClassloaderSynchronization implements BonitaTransactionSynchronizat
     public void afterCompletion(final int txState) {
         classLoaderService.removeRefreshClassLoaderSynchronization();
         if (txState == Status.STATUS_COMMITTED) {
+            //we use the ClassLoaderUpdater to refresh those classloader in an other thread/transaction.
+            //This can't be done in the current thread because we are still executing afterCompletion transactionSync
             classLoaderUpdater.refreshClassloaders(classLoaderService, tenantId, identifiers);
             refreshClassLoaderOnOtherNodes();
         }
