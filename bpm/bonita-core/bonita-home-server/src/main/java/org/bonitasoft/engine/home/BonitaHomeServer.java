@@ -211,8 +211,7 @@ public class BonitaHomeServer {
         return FolderMgr.getPlatformGlobalClassLoaderFolder().toURI();
     }
 
-    public URI getLocalTemporaryFolder(final String artifactType, final long artifactId)
-            throws BonitaHomeNotSetException, IOException {
+    public URI getLocalTemporaryFolder(final String artifactType, final long artifactId) throws IOException {
         return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType, artifactId).toURI();
     }
 

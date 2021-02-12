@@ -15,16 +15,17 @@ package org.bonitasoft.engine.classloader;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.transaction.Status;
@@ -37,7 +38,6 @@ import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.home.BonitaResource;
@@ -62,17 +62,11 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private final Object synchroLock = new Object();
     private final ThreadLocal<RefreshClassloaderSynchronization> currentRefreshTask = new ThreadLocal<>();
     private final ParentClassLoaderResolver parentClassLoaderResolver;
-
-    private final Map<ClassLoaderIdentifier, VirtualClassLoader> classLoaders = new HashMap<>();
-
+    private final Map<ClassLoaderIdentifier, BonitaClassLoader> classLoaders = new ConcurrentHashMap<>();
     private final Set<PlatformClassLoaderListener> platformClassLoaderListeners = new HashSet<>();
     private final Map<ClassLoaderIdentifier, Set<SingleClassLoaderListener>> singleClassLoaderListenersMap = Collections
             .synchronizedMap(new HashMap<>());
-
-    private final Object mutex = new ClassLoaderServiceMutex();
-
     private boolean shuttingDown = false;
-
     private final EventService eventService;
     private final PlatformDependencyService platformDependencyService;
     private final Map<Long, TenantDependencyService> dependencyServicesByTenant = new HashMap<>();
@@ -101,10 +95,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         dependencyServicesByTenant.put(tenantId, tenantDependencyService);
     }
 
-    private static final class ClassLoaderServiceMutex {
-
-    }
-
     @Override
     public ClassLoader getGlobalClassLoader() {
         return getLocalClassLoader(ClassLoaderIdentifier.GLOBAL);
@@ -117,130 +107,92 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public VirtualClassLoader getLocalClassLoader(ClassLoaderIdentifier identifier) {
-        NullCheckingUtil.checkArgsNotNull(identifier);
-        warnOnShuttingDown(identifier);
-        VirtualClassLoader virtualClassLoader = getVirtualClassLoaderWithoutInitializingIt(identifier);
-        if (!virtualClassLoader.isInitialized()) {
-            synchronized (mutex) {
-                // double check synchronization
-                if (!virtualClassLoader.isInitialized()) {
-                    classLoaderUpdater.initializeClassLoader(this, virtualClassLoader, identifier);
-                }
+    public BonitaClassLoader getLocalClassLoader(ClassLoaderIdentifier id) {
+        NullCheckingUtil.checkArgsNotNull(id);
+        log.trace("Get classloader {}", id);
+        warnOnShuttingDown(id);
+        // when the classloader is initialized, it is done in another thread/transaction
+        // We might not need to do so.
+        return getOrInitializeClassloader(id, k -> classLoaderUpdater.initializeClassLoader(this, k));
+    }
+
+    public BonitaClassLoader getOrInitializeClassloader(ClassLoaderIdentifier id,
+            Function<ClassLoaderIdentifier, BonitaClassLoader> createClassloaderFunction) {
+        if (!classLoaders.containsKey(id)) {
+            log.trace("getOrInitializeClassloader: classloader not found {}, it will be created", id);
+            //computed before to avoid having nested "computeIfAbsent"
+            BonitaClassLoader newClassLoader = createClassloaderFunction.apply(id);
+            BonitaClassLoader classLoader = classLoaders.computeIfAbsent(id, k -> newClassLoader);
+            if (!classLoader.equals(newClassLoader)) {
+                log.debug("Due to concurrent initialization, the Classloader created here {} will not be used " +
+                        "and will be destroyed. {} is the one that will be used", newClassLoader, classLoader);
+                newClassLoader.destroy();
             }
+            return classLoader;
+        } else {
+            return classLoaders.get(id);
         }
-        return virtualClassLoader;
     }
 
-    private VirtualClassLoader getVirtualClassLoaderWithoutInitializingIt(ClassLoaderIdentifier identifier) {
-        if (!classLoaders.containsKey(identifier)) {
-            synchronized (mutex) {
-                // double check synchronization
-                if (!classLoaders.containsKey(identifier)) {
-                    createClassLoader(identifier);
-                }
-            }
-        }
-        return classLoaders.get(identifier);
-    }
-
-    private void createClassLoader(ClassLoaderIdentifier identifier) {
-        log.debug("creating classloader with key {}", identifier);
-        ClassLoader parent = getParentClassLoader(identifier);
-        final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(),
-                parent);
-
-        classLoaders.put(identifier, virtualClassLoader);
-    }
-
-    private ClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
+    ClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
         final ClassLoaderIdentifier parentIdentifier = parentClassLoaderResolver
                 .getParentClassLoaderIdentifier(identifier);
         if (ClassLoaderIdentifier.APPLICATION.equals(parentIdentifier)) {
             // Application classloader is the one bootstrapping bonita platform
             return ClassLoaderServiceImpl.class.getClassLoader();
         } else {
-            return getLocalClassLoader(parentIdentifier);
+            //get or initialize parent in the same thread/transaction
+            return getOrInitializeClassloader(parentIdentifier, k -> {
+                try {
+                    return createClassloader(k);
+                } catch (IOException | SClassLoaderException e) {
+                    throw new BonitaRuntimeException(e);
+                }
+            });
         }
     }
 
     @Override
     public void removeLocalClassloader(ClassLoaderIdentifier identifier) throws SClassLoaderException {
-        log.debug("Removing local classloader with {}", identifier);
         NullCheckingUtil.checkArgsNotNull(identifier);
-
-        // Remove the class loader
-        VirtualClassLoader virtualClassLoader = classLoaders.get(identifier);
-        if (virtualClassLoader == null) {
-            log.debug("No classloader found for identifier {}, nothing to remove", identifier);
-            return;
-        }
-        if (virtualClassLoader.hasChildren()) {
-            throw new SClassLoaderException("Unable to remove classloader " + identifier + ", it has children (" +
-                    virtualClassLoader.getChildren().stream()
-                            .map(VirtualClassLoader::getIdentifier)
-                            .map(ClassLoaderIdentifier::toString)
-                            .collect(Collectors.joining(", "))
-                    + "), remove the children first");
-        }
-        destroyLocalClassLoader(identifier);
-    }
-
-    private void destroyLocalClassLoader(final ClassLoaderIdentifier identifier) throws SClassLoaderException {
-        log.debug("Destroying local classloader with key: {}", identifier);
-        final VirtualClassLoader localClassLoader = classLoaders.get(identifier);
+        log.debug("Removing local classloader with {}", identifier);
+        BonitaClassLoader localClassLoader = classLoaders.get(identifier);
         if (localClassLoader != null) {
-            if (localClassLoader.hasChildren()) {
-                throw new SClassLoaderException(
-                        "Unable to delete classloader " + identifier + " because it has children: "
-                                + localClassLoader.getChildren());
-            }
-            localClassLoader.destroy();
-            classLoaders.remove(identifier);
+            destroyAndRemoveClassLoader(localClassLoader);
             notifyDestroyed(localClassLoader);
         }
     }
 
-    private void refreshGlobalClassLoader(Stream<BonitaResource> resources) throws SClassLoaderException {
-        log.info("Refreshing global classloader");
-        final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
-        try {
-            refreshClassLoader(virtualClassloader, resources, ClassLoaderIdentifier.GLOBAL,
-                    BonitaHomeServer.getInstance().getGlobalTemporaryFolder(),
-                    ClassLoaderServiceImpl.class.getClassLoader());
-        } catch (Exception e) {
-            throw new SClassLoaderException(e);
+    private void destroyAndRemoveClassLoader(BonitaClassLoader localClassLoader) throws SClassLoaderException {
+        if (localClassLoader.hasChildren()) {
+            throw new SClassLoaderException(
+                    "Unable to delete classloader " + localClassLoader.getIdentifier() + " because it has children: "
+                            + localClassLoader.getChildren());
         }
+        localClassLoader.destroy();
+        classLoaders.remove(localClassLoader.getIdentifier());
     }
 
-    private void refreshLocalClassLoader(ClassLoaderIdentifier identifier, Stream<BonitaResource> resources)
-            throws SClassLoaderException {
-        final VirtualClassLoader virtualClassloader = getVirtualClassLoaderWithoutInitializingIt(identifier);
-        try {
-            refreshClassLoader(virtualClassloader, resources, identifier,
-                    getLocalTemporaryFolder(identifier),
-                    getParentClassLoader(identifier));
-            final SEvent event = new SEvent("ClassLoaderRefreshed");
-            event.setObject(identifier);
-            eventService.fireEvent(event);
-        } catch (Exception e) {
-            throw new SClassLoaderException(e);
+    private List<BonitaClassLoader> getClassLoaderTreeLeavesFirst(BonitaClassLoader root) {
+        List<BonitaClassLoader> tree = new ArrayList<>();
+        for (BonitaClassLoader child : root.getChildren()) {
+            tree.addAll(getClassLoaderTreeLeavesFirst(child));
         }
+        tree.add(root);
+        return tree;
     }
 
-    URI getLocalTemporaryFolder(ClassLoaderIdentifier identifier) throws BonitaHomeNotSetException, IOException {
+    URI getLocalTemporaryFolder(ClassLoaderIdentifier identifier) throws IOException {
         return BonitaHomeServer.getInstance().getLocalTemporaryFolder(identifier.getType().name(), identifier.getId());
     }
 
-    private void refreshClassLoader(VirtualClassLoader virtualClassloader, Stream<BonitaResource> resources,
-            ClassLoaderIdentifier id, URI temporaryFolder, ClassLoader parent) throws IOException {
-        log.info("Refreshing class loader {}", id);
-
-        final BonitaClassLoader classLoader = BonitaClassLoaderFactory.createClassLoader(resources, id, temporaryFolder,
-                parent);
-        log.debug("Replacing {} with {}", virtualClassloader.getClassLoader(), classLoader);
-        virtualClassloader.replaceClassLoader(classLoader);
-        notifyUpdateOnClassLoaderAndItsChildren(virtualClassloader);
+    BonitaClassLoader createClassloader(ClassLoaderIdentifier id) throws IOException, SClassLoaderException {
+        log.debug("Creating classloader {}", id);
+        BonitaClassLoader classLoader = BonitaClassLoaderFactory.createClassLoader(getDependencies(id), id,
+                getLocalTemporaryFolder(id),
+                getParentClassLoader(id));
+        log.info("Created classloader {}: {}", id, classLoader);
+        return classLoader;
     }
 
     @Override
@@ -261,19 +213,28 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         log.debug("Destroying all classloaders");
         //remove elements only that don't have children
         //there is no loop in this so the algorithm finishes
-        final Set<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> entries = classLoaders.entrySet();
-        while (!entries.isEmpty()) {
-            final Iterator<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> iterator = entries.iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<ClassLoaderIdentifier, VirtualClassLoader> next = iterator.next();
-                VirtualClassLoader currentClassLoader = next.getValue();
-                if (!currentClassLoader.hasChildren()) {
-                    currentClassLoader.destroy();
-                    notifyDestroyed(currentClassLoader);
-                    iterator.remove();
-                }
+        BonitaClassLoader global = classLoaders.get(ClassLoaderIdentifier.GLOBAL);
+        if (global == null) {
+            log.debug("No ClassLoaders to destroy");
+            return;
+        }
+        //destroy classloader starting from the leaves to avoid checking for children
+        List<BonitaClassLoader> allClassLoaders = getClassLoaderTreeLeavesFirst(global);
+        for (BonitaClassLoader currentClassLoader : allClassLoaders) {
+            currentClassLoader.destroy();
+            notifyDestroyed(currentClassLoader);
+            if (classLoaders.remove(currentClassLoader.getIdentifier()) == null) {
+                log.warn("One classloader of the tree is not present in the list: classloader = {} and list = {}",
+                        currentClassLoader, classLoaders);
             }
         }
+        //the classloader map should be empty at this point. Clearing it to ensure that we never reuse old classloader in that case
+        if (!classLoaders.isEmpty()) {
+
+            log.warn("Classloader tree was destroyed but some classloaders were still references in the map {}",
+                    classLoaders);
+        }
+        classLoaders.clear();
     }
 
     @Override
@@ -304,15 +265,17 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     /**
      * Notify listeners that the classloader was destroyed
      * That method do not notify children because we can't destroy a classloader that have children
+     *
+     * @param classLoader
      */
-    private void notifyDestroyed(VirtualClassLoader localClassLoader) {
-        getListeners(localClassLoader.getIdentifier()).forEach(l -> {
-            log.debug("Notify listener that classloader {} was destroyed: {}", localClassLoader.getIdentifier(), l);
-            l.onDestroy(localClassLoader);
+    private void notifyDestroyed(BonitaClassLoader classLoader) {
+        getListeners(classLoader.getIdentifier()).forEach(l -> {
+            log.debug("Notify listener that classloader {} was destroyed: {}", classLoader.getIdentifier(), l);
+            l.onDestroy(classLoader);
         });
         platformClassLoaderListeners.forEach(l -> {
-            log.debug("Notify listener that classloader {} was destroyed: {}", localClassLoader.getIdentifier(), l);
-            l.onDestroy(localClassLoader);
+            log.debug("Notify listener that classloader {} was destroyed: {}", classLoader.getIdentifier(), l);
+            l.onDestroy(classLoader);
         });
     }
 
@@ -320,26 +283,45 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
      * Notify listeners that the classloader was updated
      * Also notify that children classloader were updated
      */
-    void notifyUpdateOnClassLoaderAndItsChildren(VirtualClassLoader virtualClassLoader) {
-        getListeners(virtualClassLoader.getIdentifier()).forEach(l -> {
-            log.debug("Notify listener that classloader {} was updated: {}", virtualClassLoader.getIdentifier(), l);
-            l.onUpdate(virtualClassLoader);
+    void notifyUpdated(BonitaClassLoader newClassLoader) {
+        getListeners(newClassLoader.getIdentifier()).forEach(l -> {
+            log.debug("Notify listener that classloader {} was updated: {}", newClassLoader.getIdentifier(), l);
+            l.onUpdate(newClassLoader);
         });
         platformClassLoaderListeners.forEach(l -> {
-            log.debug("Notify listener that classloader {} was updated: {}", virtualClassLoader.getIdentifier(), l);
-            l.onUpdate(virtualClassLoader);
+            log.debug("Notify listener that classloader {} was updated: {}", newClassLoader.getIdentifier(), l);
+            l.onUpdate(newClassLoader);
         });
-        virtualClassLoader.getChildren().forEach(this::notifyUpdateOnClassLoaderAndItsChildren);
     }
 
     @Override
     public void refreshClassLoaderImmediately(ClassLoaderIdentifier identifier) throws SClassLoaderException {
-        final Stream<BonitaResource> resources;
-        resources = getDependencies(identifier);
-        if (identifier.getType() == ScopeType.GLOBAL) {
-            refreshGlobalClassLoader(resources);
-        } else {
-            refreshLocalClassLoader(identifier, resources);
+        try {
+            log.info("Refreshing classloader {}", identifier);
+            BonitaClassLoader newClassloader = createClassloader(identifier);
+            BonitaClassLoader previous = classLoaders.put(identifier, newClassloader);
+            // Destroy and remove all children classloaders of the `previous` classloader. They need to be recreated
+            if (previous != null) {
+                //destroy classloader starting from the leaves to avoid checking for children
+                for (BonitaClassLoader classLoader : getClassLoaderTreeLeavesFirst(previous)) {
+                    classLoader.destroy();
+                    notifyDestroyed(classLoader);
+                    // remove(key,value) only remove the value if its the one given,
+                    // We do that to avoid removing the one we just added to the map
+                    classLoaders.remove(classLoader.getIdentifier(), classLoader);
+                }
+                log.debug("Refreshed classloader {}, {} was replaced by {}", identifier, previous, classLoaders);
+            } else {
+                log.debug("Refreshed classloader {}, There was no classloader, classloader set: {}", identifier,
+                        classLoaders);
+            }
+            notifyUpdated(newClassloader);
+            final SEvent event = new SEvent("ClassLoaderRefreshed");
+            event.setObject(identifier);
+            eventService.fireEvent(event);
+
+        } catch (Exception e) {
+            throw new SClassLoaderException(e);
         }
     }
 

@@ -177,6 +177,13 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
 
     @Override
     public void onUpdate(ClassLoader newClassLoader) {
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Groovy cache cleared after update on {}", newClassLoader);
+        clearCache();
+    }
+
+    @Override
+    public void onDestroy(ClassLoader oldClassLoader) {
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Groovy cache cleared after destroy of {}", oldClassLoader);
         clearCache();
     }
 
@@ -188,11 +195,6 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
                     "error while clearing the cache of the groovy script executor strategy, you might have classloading issue, restart the server if it's the case",
                     e);
         }
-    }
-
-    @Override
-    public void onDestroy(ClassLoader oldClassLoader) {
-        clearCache();
     }
 
     @Override

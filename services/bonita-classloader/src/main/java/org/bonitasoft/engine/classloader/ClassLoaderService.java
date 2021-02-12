@@ -34,13 +34,15 @@ public interface ClassLoaderService extends PlatformLifecycleService {
     void registerDependencyServiceOfTenant(Long tenantId, TenantDependencyService tenantDependencyService);
 
     /**
-     * Get the local ClassLoader for the given type and id. If no ClassLoader is associated to them,
-     * a new one is created.
+     * Get the local ClassLoader for the given type and id.
+     * If no ClassLoader already exists, a new one is created and initialized.
+     * This initialization is executed in a <b>different thread/transaction</b>.
+     * It eagerly initialize parent classloaders.
      *
      * @return the local ClassLoader for the given type and id
      * @throws SClassLoaderException Error thrown if it's impossible to get a local ClassLoader for the given type and
      *         id
-     * @param identifier
+     * @param identifier of the classloader to refresh
      */
     ClassLoader getLocalClassLoader(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
@@ -66,6 +68,23 @@ public interface ClassLoaderService extends PlatformLifecycleService {
 
     void refreshClassLoaderOnOtherNodes(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
+    /**
+     * This method refreshes in the current thread/transaction the classLoader with the given identifier.
+     * It eagerly initializes parents classloaders.
+     * <p>
+     * A new classloader will be created. In order to use the new classloader, references to the old one should be
+     * updated.
+     * <p>
+     * e.g. If the classloader was set as the current context classloader, it should be reset like this
+     *
+     * <pre>
+     *  {@code
+     * Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader(identifier));
+     * }
+     * </pre>
+     *
+     * @param identifier of the classloader to refresh
+     */
     void refreshClassLoaderImmediately(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
     void removeRefreshClassLoaderSynchronization();

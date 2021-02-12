@@ -12,6 +12,8 @@ dependencies {
     runtime "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     runtime "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testCompile "org.projectlombok:lombok:${Deps.lombokVersion}"
 }
 
 task testsJar(type: Jar) {

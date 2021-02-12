@@ -26,18 +26,18 @@ public class ClassReflectorClearerTest {
     public void testOnUpdate() throws Exception {
         ClassReflector.getMethod(this.getClass(), "testOnUpdate");
 
-        Assertions.assertThat(ClassReflector.getCacheSize()).isGreaterThan(0);
+        Assertions.assertThat(ClassReflector.getCacheSize()).isPositive();
         new ClassReflectorClearer().onUpdate(null);
-        Assertions.assertThat(ClassReflector.getCacheSize()).isEqualTo(0);
+        Assertions.assertThat(ClassReflector.getCacheSize()).isZero();
     }
 
     @Test
     public void testOnDestroy() throws Exception {
         ClassReflector.getMethod(this.getClass(), "testOnUpdate");
 
-        Assertions.assertThat(ClassReflector.getCacheSize()).isGreaterThan(0);
+        Assertions.assertThat(ClassReflector.getCacheSize()).isPositive();
         new ClassReflectorClearer().onDestroy(null);
-        Assertions.assertThat(ClassReflector.getCacheSize()).isEqualTo(0);
+        Assertions.assertThat(ClassReflector.getCacheSize()).isZero();
 
     }
 }

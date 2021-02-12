@@ -48,6 +48,9 @@ public class ClassLoaderIdentifier implements Serializable {
 
     @Override
     public String toString() {
+        if (this.equals(GLOBAL)) {
+            return "GLOBAL";
+        }
         return type.name() + ':' + id;
     }
 }
