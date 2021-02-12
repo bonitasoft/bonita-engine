@@ -97,7 +97,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             throws SBonitaException;
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
-        return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader(
+        return getTenantAccessor(context).getClassLoaderService().getClassLoader(
                 identifier(ScopeType.PROCESS, processDefinitionId));
     }
 

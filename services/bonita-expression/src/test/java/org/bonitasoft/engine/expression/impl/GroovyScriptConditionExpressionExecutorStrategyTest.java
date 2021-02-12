@@ -74,7 +74,7 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
         executorStrategy = new GroovyScriptConditionExpressionExecutorStrategy(cacheService, classLoaderService,
                 logger);
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService)
-                .getLocalClassLoader(any());
+                .getClassLoader(any());
         context = new HashMap<>();
         context.put(ExpressionExecutorStrategy.DEFINITION_ID, 123456789L);
     }

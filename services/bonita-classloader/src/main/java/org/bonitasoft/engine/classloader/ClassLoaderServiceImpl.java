@@ -95,11 +95,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         dependencyServicesByTenant.put(tenantId, tenantDependencyService);
     }
 
-    @Override
-    public ClassLoader getGlobalClassLoader() {
-        return getLocalClassLoader(ClassLoaderIdentifier.GLOBAL);
-    }
-
     private void warnOnShuttingDown(final ClassLoaderIdentifier key) {
         if (shuttingDown) {
             log.warn("Using local classloader on after ClassLoaderService shuttingdown: " + key);
@@ -107,7 +102,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public BonitaClassLoader getLocalClassLoader(ClassLoaderIdentifier id) {
+    public BonitaClassLoader getClassLoader(ClassLoaderIdentifier id) {
         NullCheckingUtil.checkArgsNotNull(id);
         log.trace("Get classloader {}", id);
         warnOnShuttingDown(id);

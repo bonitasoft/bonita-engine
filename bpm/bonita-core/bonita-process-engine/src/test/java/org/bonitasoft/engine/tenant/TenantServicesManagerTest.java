@@ -81,7 +81,7 @@ public class TenantServicesManagerTest {
     public void should_not_refresh_classloaders_on_start() throws Exception {
         tenantServicesManager.start();
 
-        verify(classLoaderService).getLocalClassLoader(identifier(ScopeType.TENANT, TENANT_ID));
+        verify(classLoaderService).getClassLoader(identifier(ScopeType.TENANT, TENANT_ID));
         verifyNoMoreInteractions(classLoaderService);
     }
 

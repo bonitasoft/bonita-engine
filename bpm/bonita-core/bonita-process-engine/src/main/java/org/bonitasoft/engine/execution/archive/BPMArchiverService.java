@@ -131,7 +131,7 @@ public class BPMArchiverService {
         //set the classloader to this process because we need it e.g. to archive data instance
         ClassLoader processClassLoader;
         try {
-            processClassLoader = classLoaderService.getLocalClassLoader(
+            processClassLoader = classLoaderService.getClassLoader(
                     identifier(ScopeType.PROCESS, processInstance.getProcessDefinitionId()));
 
         } catch (SClassLoaderException e) {

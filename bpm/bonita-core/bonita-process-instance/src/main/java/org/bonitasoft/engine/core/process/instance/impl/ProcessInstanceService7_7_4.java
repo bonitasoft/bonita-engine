@@ -187,7 +187,7 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final ClassLoader localClassLoader = classLoaderService
-                    .getLocalClassLoader(identifier(ScopeType.valueOf("PROCESS"), processDefinitionId));
+                    .getClassLoader(identifier(ScopeType.valueOf("PROCESS"), processDefinitionId));
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteArchivedFlowNodeInstances(processInstanceId);
             deleteLocalArchivedDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString());

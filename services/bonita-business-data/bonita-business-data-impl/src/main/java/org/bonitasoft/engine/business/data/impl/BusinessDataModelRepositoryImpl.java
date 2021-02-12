@@ -176,7 +176,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             classLoaderService.refreshClassLoaderImmediately(tenantClassLoader);
             classLoaderService.refreshClassLoaderOnOtherNodes(tenantClassLoader);
             //replace the tenant classloader by the one that was just refreshed
-            Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader(tenantClassLoader));
+            Thread.currentThread().setContextClassLoader(classLoaderService.getClassLoader(tenantClassLoader));
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
         } catch (final SDependencyException | SClassLoaderException e) {

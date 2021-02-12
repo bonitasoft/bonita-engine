@@ -23,14 +23,6 @@ import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
  */
 public interface ClassLoaderService extends PlatformLifecycleService {
 
-    /**
-     * Get the global ClassLoader. If no global ClassLoader already exists, create it.
-     *
-     * @return the global ClassLoader
-     * @throws SClassLoaderException Error thrown if it's impossible to get the global ClassLoader
-     */
-    ClassLoader getGlobalClassLoader() throws SClassLoaderException;
-
     void registerDependencyServiceOfTenant(Long tenantId, TenantDependencyService tenantDependencyService);
 
     /**
@@ -44,7 +36,7 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      *         id
      * @param identifier of the classloader to refresh
      */
-    ClassLoader getLocalClassLoader(ClassLoaderIdentifier identifier) throws SClassLoaderException;
+    ClassLoader getClassLoader(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 
     void removeLocalClassloader(ClassLoaderIdentifier identifier) throws SClassLoaderException;
 

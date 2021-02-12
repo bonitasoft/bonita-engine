@@ -102,8 +102,8 @@ public class ClassLoaderServiceImplTest {
                 .thenAnswer(a -> classLoaderService.createClassloader(a.getArgument(1)));
         doReturn(TENANT_ID).when(sessionAccessor).getTenantId();
         classLoaderService.registerDependencyServiceOfTenant(TENANT_ID, tenantDependencyService);
-        processClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, PROCESS_ID));
-        classLoaderService.getLocalClassLoader(identifier(TENANT, TENANT_ID));
+        processClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, PROCESS_ID));
+        classLoaderService.getClassLoader(identifier(TENANT, TENANT_ID));
         testClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(processClassLoader);
         myClassLoaderListener = new MyClassLoaderListener();
@@ -171,17 +171,17 @@ public class ClassLoaderServiceImplTest {
         //given
         classLoaderService.addListener(identifier(PROCESS, PROCESS_ID), myClassLoaderListener);
         classLoaderService.addListener(identifier(TENANT, TENANT_ID), myClassLoaderListener);
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 125));
+        classLoaderService.getClassLoader(identifier(PROCESS, 125));
         classLoaderService.addListener(identifier(PROCESS, 125), myClassLoaderListener);
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 126));
+        classLoaderService.getClassLoader(identifier(PROCESS, 126));
         classLoaderService.addListener(identifier(PROCESS, 126), myClassLoaderListener);
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 127));
+        classLoaderService.getClassLoader(identifier(PROCESS, 127));
         classLoaderService.addListener(identifier(PROCESS, 127), myClassLoaderListener);
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 128));
+        classLoaderService.getClassLoader(identifier(PROCESS, 128));
         classLoaderService.addListener(identifier(PROCESS, 128), myClassLoaderListener);
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 129));
+        classLoaderService.getClassLoader(identifier(PROCESS, 129));
         classLoaderService.addListener(identifier(PROCESS, 129), myClassLoaderListener);
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 130));
+        classLoaderService.getClassLoader(identifier(PROCESS, 130));
         classLoaderService.addListener(identifier(PROCESS, 130), myClassLoaderListener);
         //when
         classLoaderService.stop();
@@ -205,7 +205,7 @@ public class ClassLoaderServiceImplTest {
     @Test(expected = SClassLoaderException.class)
     public void should_removeLocalClassLoader_throw_exception_if_parent_not_removed() throws Exception {
         //given
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 17));//second classloader
+        classLoaderService.getClassLoader(identifier(PROCESS, 17));//second classloader
         //when
         classLoaderService.removeLocalClassloader(identifier(PROCESS, PROCESS_ID));
         classLoaderService.removeLocalClassloader(identifier(TENANT, TENANT_ID));
@@ -222,7 +222,7 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_getLocalClassLoader_create_expected_hierarchy() {
         //given
-        BonitaClassLoader localClassLoader = classLoaderService.getLocalClassLoader(identifier(PROCESS, PROCESS_ID));
+        BonitaClassLoader localClassLoader = classLoaderService.getClassLoader(identifier(PROCESS, PROCESS_ID));
         //when
 
         assertThat(localClassLoader.getIdentifier()).isEqualTo(identifier(PROCESS, PROCESS_ID));
@@ -240,7 +240,7 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_globalListeners_be_called_on_destroy() throws Exception {
         //given
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 17));//second classloader
+        classLoaderService.getClassLoader(identifier(PROCESS, 17));//second classloader
         //when
         classLoaderService.removeLocalClassloader(identifier(PROCESS, PROCESS_ID));
         classLoaderService.removeLocalClassloader(identifier(PROCESS, 17));
@@ -253,7 +253,7 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_globalListeners_be_called_on_update() throws Exception {
         //given
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 17));//second classloader
+        classLoaderService.getClassLoader(identifier(PROCESS, 17));//second classloader
         //when
         classLoaderService.refreshClassLoaderImmediately(identifier(PROCESS, PROCESS_ID));
         classLoaderService.refreshClassLoaderImmediately(identifier(PROCESS, 17));
@@ -325,7 +325,7 @@ public class ClassLoaderServiceImplTest {
 
     @Test
     public void should_initialize_class_loader_when_getting_it() {
-        classLoaderService.getLocalClassLoader(identifier(TENANT, 43L));
+        classLoaderService.getClassLoader(identifier(TENANT, 43L));
 
         verify(classLoaderUpdater).initializeClassLoader(classLoaderService, identifier(TENANT, 43L));
     }
@@ -333,8 +333,8 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_initialize_only_once_classloader() {
 
-        classLoaderService.getLocalClassLoader(identifier(TENANT, 43L));
-        classLoaderService.getLocalClassLoader(identifier(TENANT, 43L));
+        classLoaderService.getClassLoader(identifier(TENANT, 43L));
+        classLoaderService.getClassLoader(identifier(TENANT, 43L));
 
         verify(classLoaderUpdater, times(1)).initializeClassLoader(classLoaderService, identifier(TENANT, 43L));
     }
@@ -375,8 +375,8 @@ public class ClassLoaderServiceImplTest {
         MyClassLoaderListener globalListener = new MyClassLoaderListener();
         classLoaderService.addListener(GLOBAL, globalListener);
 
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 12));
-        classLoaderService.getLocalClassLoader(identifier(PROCESS, 13));
+        classLoaderService.getClassLoader(identifier(PROCESS, 12));
+        classLoaderService.getClassLoader(identifier(PROCESS, 13));
 
         classLoaderService.refreshClassLoaderImmediately(GLOBAL);
 

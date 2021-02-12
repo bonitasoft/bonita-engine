@@ -310,7 +310,7 @@ public class StateBehaviors {
             SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException,
             SFlowNodeReadException,
             SActivityModificationException {
-        final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(
+        final ClassLoader processClassloader = classLoaderService.getClassLoader(
                 identifier(ScopeType.PROCESS, processDefinitionId));
         final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(),
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(),
