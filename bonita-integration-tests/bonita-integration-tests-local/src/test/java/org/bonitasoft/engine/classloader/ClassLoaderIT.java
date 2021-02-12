@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.io.IOUtil.generateJar;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -21,7 +22,8 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bonitasoft.engine.CommonAPIIT;
-import org.bonitasoft.engine.TestWithTechnicalUser;
+import org.bonitasoft.engine.TestWithUser;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -42,14 +44,14 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
-public class ClassLoaderIT extends TestWithTechnicalUser {
+public class ClassLoaderIT extends TestWithUser {
 
     @Rule
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
@@ -89,7 +91,7 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
 
     @Test
     public void should_be_able_to_execute_scripts_on_processes_having_same_classes() throws Exception {
-        byte[] myObjectJar1 = IOUtil.generateJar(
+        byte[] myObjectJar1 = generateJar(
                 Pair.of("MyObject",
                         "public interface MyObject extends java.io.Serializable {}"),
                 Pair.of("MyObjectImpl1",
@@ -98,7 +100,7 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
                                 "        return \"MyObjectImpl\";\n" +
                                 "    }\n" +
                                 "}"));
-        byte[] myObjectJar2 = IOUtil.generateJar(
+        byte[] myObjectJar2 = generateJar(
                 Pair.of("MyObject",
                         "public interface MyObject extends java.io.Serializable {}"),
                 Pair.of("MyObjectImpl2",
@@ -131,6 +133,7 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
 
     @Test
     public void should_refresh_classloader_only_once_on_deploy_bdm() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildCustomBOM());
         getTenantAdministrationAPI().pause();
@@ -155,6 +158,49 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
 
         assertThat(processDeployLog)
                 .doesNotContain("Refreshing classloader PROCESS:" + processDefinition.getId());
+    }
+
+    @Test
+    public void should_be_able_to_fix_groovy_script_by_updating_dependency_in_platform_classlaoder() throws Exception {
+        PlatformSession session = loginOnPlatform();
+        PlatformAPIAccessor.getPlatformCommandAPI(session).addDependency("hello-there-1.0.0.jar", generateJar("Hello",
+                "public class Hello{",
+                "public String hello(){",
+                "return \"Hello there!\";",
+                "}",
+                "}"));
+        logoutOnPlatform(session);
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
+                "processWithDisplayName",
+                "1.0");
+        designProcessDefinition.addActor(ACTOR_NAME);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addDisplayName(
+                new ExpressionBuilder().createGroovyScriptExpression("groovyExpr",
+                        "new Hello().hello()", String.class.getName()));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                ACTOR_NAME, user);
+        ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
+
+        assertThat(waitForUserTaskAndGetIt(p1, "step0").getDisplayName()).isEqualTo("Hello there!");
+
+        session = loginOnPlatform();
+        PlatformAPIAccessor.getPlatformCommandAPI(session).removeDependency("hello-there-1.0.0.jar");
+        PlatformAPIAccessor.getPlatformCommandAPI(session).addDependency("hello-there-1.0.1.jar", generateJar("Hello",
+                "public class Hello{",
+                "public String hello(){",
+                "return \"Hello there! General Kenobi.\";",
+                "}",
+                "}"));
+        logoutOnPlatform(session);
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
+
+        assertThat(waitForUserTaskAndGetIt(p2, "step0").getDisplayName()).isEqualTo("Hello there! General Kenobi.");
+
+        disableAndDeleteProcess(processDefinition);
     }
 
     private BusinessObjectModel buildCustomBOM() {
