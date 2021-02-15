@@ -156,6 +156,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public void executeAgain(final long jobId, final String groupName, final String jobName,
             final boolean disallowConcurrentExecution, int delayInMillis)
             throws SSchedulerException {
+        checkSchedulerState();
         try {
             JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobName, String.valueOf(groupName)));
             if (jobDetail == null) {
@@ -286,10 +287,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public void shutdown() throws SSchedulerException {
         try {
             if (scheduler != null && !scheduler.isShutdown()) {
-                //                System.err.println("/////////////////// shutting down scheduler ////////////////////");
-                //                for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-                //                    System.err.println(element);
-                //                }
                 scheduler.shutdown(true);
             }
         } catch (final SchedulerException e) {
@@ -301,6 +298,9 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             if (scheduler == null || scheduler.isShutdown()) {
                 throw new SSchedulerException("The scheduler is not started");
+            }
+            if (!transactionService.isTransactionActive()) {
+                throw new SSchedulerException("The scheduler cannot be used without opening a transaction first");
             }
         } catch (SchedulerException e) {
             throw new SSchedulerException("The scheduler is not started", e);
@@ -362,7 +362,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public List<String> getAllJobs() throws SSchedulerException {
         try {
-            checkSchedulerState();
             final Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.jobGroupStartsWith(""));
             final List<String> jobsNames = new ArrayList<String>(jobKeys.size());
             for (final JobKey jobKey : jobKeys) {
@@ -377,6 +376,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public boolean mayFireAgain(final String groupName, final String jobName) throws SSchedulerException {
         try {
+            checkSchedulerState();
             List<? extends org.quartz.Trigger> triggersOfJob = scheduler
                     .getTriggersOfJob(new JobKey(jobName, groupName));
             return triggersOfJob.stream()
@@ -408,6 +408,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     @Override
     public void pauseJobs(final String groupName) throws SSchedulerException {
+        checkSchedulerState();
         final GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(groupName);
         try {
             scheduler.pauseTriggers(groupEquals);
@@ -418,17 +419,19 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     @Override
     public void resumeJobs(final String groupName) throws SSchedulerException {
+        checkSchedulerState();
         final GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(groupName);
         try {
             scheduler.resumeTriggers(groupEquals);
         } catch (final SchedulerException e) {
-            throw new SSchedulerException("Unable to put jobs of tenant " + groupName + " in pause", e);
+            throw new SSchedulerException("Unable to resume jobs of tenant " + groupName, e);
         }
     }
 
     @Override
     public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime)
             throws SSchedulerException {
+        checkSchedulerState();
         final TriggerKey triggerKey = new TriggerKey(triggerName, groupName);
         try {
             final org.quartz.Trigger oldTrigger = scheduler.getTrigger(triggerKey);
@@ -436,6 +439,15 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             return scheduler.rescheduleJob(triggerKey, newTrigger);
         } catch (final SchedulerException e) {
             throw new SSchedulerException("Can't get the trigger " + triggerKey, e);
+        }
+    }
+
+    // For tests only
+    public Set<String> getPausedTriggerGroups() throws SSchedulerException {
+        try {
+            return quartzScheduler.getPausedTriggerGroups();
+        } catch (SchedulerException e) {
+            throw new SSchedulerException(e);
         }
     }
 

@@ -18,7 +18,7 @@ import java.util.Date;
 /**
  * @author Matthieu Chaffotte
  */
-public class UnixCronTriggerForTest extends OneExecutionTrigger implements CronTrigger {
+public class UnixCronTriggerForTest extends OneShotTrigger implements CronTrigger {
 
     private final String expression;
 
