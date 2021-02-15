@@ -103,5 +103,4 @@ public interface SchedulerExecutor {
      * @since 6.4.0
      */
     boolean isExistingJob(String jobName, String groupName) throws SSchedulerException;
-
 }
