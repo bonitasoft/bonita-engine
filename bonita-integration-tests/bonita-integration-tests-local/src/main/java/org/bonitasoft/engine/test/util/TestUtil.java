@@ -55,6 +55,7 @@ public class TestUtil {
         }
     }
 
+    // Always call the startScheduler method after calling this one
     public static void stopScheduler(final SchedulerService scheduler, final TransactionService txService)
             throws Exception {
         if (scheduler.isStarted() && !scheduler.isStopped()) {
