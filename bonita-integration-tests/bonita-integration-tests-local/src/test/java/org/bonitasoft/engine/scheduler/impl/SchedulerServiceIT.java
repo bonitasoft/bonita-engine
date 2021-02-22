@@ -16,16 +16,9 @@ package org.bonitasoft.engine.scheduler.impl;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.ERROR;
-import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.FAIL_ONCE;
-import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.FAIL_ONCE_WITH_RETRYABLE;
-import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.JOBEXCEPTION;
-import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.NO_EXCEPTION;
-import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.TYPE;
+import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,7 +37,6 @@ import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
@@ -99,11 +91,11 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         final SJobDescriptor jobDescriptor = SJobDescriptor.builder()
                 .jobClassName("org.bonitasoft.engine.scheduler.job.IncrementVariableJob")
                 .jobName("IncrementVariableJob").build();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+        final List<SJobParameter> parameters = new ArrayList<>();
         parameters.add(SJobParameter.builder().key("jobName").value("testDoNotExecuteAFutureJob").build());
         parameters.add(SJobParameter.builder().key("variableName").value(variableName).build());
         parameters.add(SJobParameter.builder().key("throwExceptionAfterNIncrements").value(-1).build());
-        final Trigger trigger = new OneExecutionTrigger("events", future, 10);
+        final Trigger trigger = new OneShotTrigger("events", future, 10);
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
@@ -136,7 +128,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         Date now = new Date();
         SJobDescriptor jobDescriptor = SJobDescriptor.builder()
                 .jobClassName(ReleaseWaitersJob.class.getName()).jobName(jobName + "1").build();
-        List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+        List<SJobParameter> parameters = new ArrayList<>();
         parameters.add(SJobParameter.builder().key("jobName").value(jobName).build());
         parameters.add(SJobParameter.builder().key("jobKey").value("1").build());
         Trigger trigger = new UnixCronTriggerForTest("events", now, 10, "0/1 * * * * ?");

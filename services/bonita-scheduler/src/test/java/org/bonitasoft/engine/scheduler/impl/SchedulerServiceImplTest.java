@@ -20,14 +20,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.nullable;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
@@ -48,7 +41,6 @@ import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
@@ -76,19 +68,22 @@ public class SchedulerServiceImplTest {
     private PersistenceService persistenceService;
     @Mock
     private ServicesResolver servicesResolver;
+    @Mock
+    private TransactionService transactionService;
 
     @Before
-    public void setUp() throws STenantIdNotSetException {
+    public void setUp() throws Exception {
         initMocks(this);
 
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TransactionService transactionService = mock(TransactionService.class);
+        transactionService = mock(TransactionService.class);
 
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
 
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService,
                 transactionService, sessionAccessor, servicesResolver,
                 persistenceService);
+
     }
 
     @Test
@@ -190,9 +185,8 @@ public class SchedulerServiceImplTest {
 
     @Test
     public void should_pauseJobs_of_tenant_call_schedulerExecutor() throws Exception {
-        schedulerService.resumeJobs(123l);
-
-        verify(schedulerExecutor, times(1)).resumeJobs("123");
+        schedulerService.resumeJobs(123L);
+        verify(schedulerExecutor).resumeJobs("123");
     }
 
     @Test
@@ -200,7 +194,7 @@ public class SchedulerServiceImplTest {
         final SSchedulerException theException = new SSchedulerException("My exception");
         doThrow(theException).when(schedulerExecutor).resumeJobs("123");
         try {
-            schedulerService.resumeJobs(123l);
+            schedulerService.resumeJobs(123L);
             fail("should have rethrown the exception");
         } catch (final SSchedulerException e) {
             assertEquals(theException, e);

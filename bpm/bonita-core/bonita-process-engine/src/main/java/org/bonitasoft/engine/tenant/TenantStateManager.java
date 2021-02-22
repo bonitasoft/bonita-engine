@@ -126,7 +126,7 @@ public class TenantStateManager {
         }
         sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
         pauseTenantInTransaction();
-        schedulerService.pauseJobs(tenantId);
+        pauseSchedulerJobsInTransaction(tenantId);
         tenantServicesManager.pause();
         pauseServicesOnOtherNodes();
         LOGGER.info("Paused tenant {}", tenantId);
@@ -153,9 +153,23 @@ public class TenantStateManager {
             throw e;
         }
         resumeServicesOnOtherNodes();
-        schedulerService.resumeJobs(tenantId);
+        resumeSchedulerJobsinTransaction(tenantId);
 
         LOGGER.info("Resumed tenant {}", tenantId);
+    }
+
+    private void resumeSchedulerJobsinTransaction(long tenantId) throws Exception {
+        transactionService.executeInTransaction(() -> {
+            schedulerService.resumeJobs(tenantId);
+            return null;
+        });
+    }
+
+    private void pauseSchedulerJobsInTransaction(long tenantId) throws Exception {
+        transactionService.executeInTransaction(() -> {
+            schedulerService.pauseJobs(tenantId);
+            return null;
+        });
     }
 
     private void pauseTenantInTransaction() throws Exception {
@@ -197,7 +211,7 @@ public class TenantStateManager {
         activateTenantInTransaction();
         tenantServicesManager.start();
         startServicesOnOtherNodes();
-        schedulerService.resumeJobs(tenantId);
+        resumeSchedulerJobsinTransaction(tenantId);
         LOGGER.info("Activated tenant {}", tenantId);
     }
 
@@ -250,7 +264,7 @@ public class TenantStateManager {
         sessionService.deleteSessionsOfTenant(tenantId);
         deactivateTenantInTransaction();
         if (previousStatus.equals(STenant.ACTIVATED)) {
-            schedulerService.pauseJobs(tenantId);
+            pauseSchedulerJobsInTransaction(tenantId);
             tenantServicesManager.stop();
             stopServicesOnOtherNodes();
         }
