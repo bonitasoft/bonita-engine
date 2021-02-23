@@ -585,4 +585,28 @@ public class PlatformSetupIT {
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0).get("resource_content")).isEqualTo(new_7_6_0_content.getBytes());
     }
+
+    @Test
+    public void init_on_existing_platform_should_add_new_config_files() throws Exception {
+        //given
+        platformSetup.init();
+        final String countConfigFile = "SELECT count(1) FROM CONFIGURATION WHERE resource_name = 'bonita-tenant-community-custom.properties'";
+        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class)).isEqualTo(1);
+
+        // Delete it to check that init method adds it again:
+        jdbcTemplate
+                .update("DELETE from configuration WHERE resource_name = 'bonita-tenant-community-custom.properties'");
+
+        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class)).isZero();
+        systemOutRule.clearLog();
+
+        //when
+        platformSetup.init();
+
+        //then
+        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class))
+                .isEqualTo(1);
+        assertThat(systemOutRule.getLog()).contains(
+                "New configuration file detected 'bonita-tenant-community-custom.properties'");
+    }
 }
