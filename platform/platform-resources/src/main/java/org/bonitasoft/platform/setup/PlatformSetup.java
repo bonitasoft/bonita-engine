@@ -44,6 +44,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 /**
@@ -86,6 +89,8 @@ public class PlatformSetup {
     private Path backupConfigurationFolder;
     private Path licensesFolder;
     private Path backupLicensesFolder;
+    private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
+            PlatformSetup.class.getClassLoader());
 
     @Autowired
     PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService,
@@ -349,43 +354,49 @@ public class PlatformSetup {
 
     private void insertNewConfigurationsFromClasspathIfExist() throws PlatformException {
         final ArrayList<FullBonitaConfiguration> configurations = new ArrayList<>();
+        final List<Long> allTenants = configurationService.getAllTenants();
         try {
-            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE, "bonita-platform-hibernate-cache.xml",
-                    0L);
-            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE, "bonita-tenant-hibernate-cache.xml",
-                    0L);
-            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE, "bonita-platform-sp-custom.xml", 0L);
-            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE,
-                    "bonita-platform-sp-cluster-custom.properties", 0L);
-            addConfigurationFromClassPathToList(configurations, PLATFORM_ENGINE, "bonita-platform-sp-custom.properties",
-                    0L);
-            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml",
-                    0L);
-            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_ENGINE,
-                    "bonita-tenant-sp-cluster-custom.properties", 0L);
-            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_ENGINE,
-                    "bonita-tenant-sp-custom.properties", 0L);
-            // configurations.add(getConfigurationFromClassPath(TENANT_TEMPLATE_PORTAL,
-            //        "authenticationManager-config.properties", 0L));
-            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_PORTAL, "keycloak-oidc.json", 0L);
-            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_PORTAL, "keycloak-saml.xml", 0L);
-            addConfigurationFromClassPathToList(configurations, TENANT_TEMPLATE_PORTAL, "spnego-config.properties", 0L);
-            for (Long tenant : configurationService.getAllTenants()) {
-                addConfigurationFromClassPathToList(configurations, TENANT_ENGINE, "bonita-tenant-sp-custom.xml",
-                        tenant);
-                addConfigurationFromClassPathToList(configurations, TENANT_ENGINE,
-                        "bonita-tenant-sp-cluster-custom.properties", tenant);
-                addConfigurationFromClassPathToList(configurations, TENANT_ENGINE, "bonita-tenant-sp-custom.properties",
-                        tenant);
-                // configurations.add(getConfigurationFromClassPath(TENANT_PORTAL, "authenticationManager-config.properties", tenant));
-                addConfigurationFromClassPathToList(configurations, TENANT_PORTAL, "keycloak-oidc.json", tenant);
-                addConfigurationFromClassPathToList(configurations, TENANT_PORTAL, "keycloak-saml.xml", tenant);
-                addConfigurationFromClassPathToList(configurations, TENANT_PORTAL, "spnego-config.properties", tenant);
-            }
+            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_ENGINE, allTenants));
+            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_INIT_ENGINE, allTenants));
+            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_PORTAL, allTenants));
+            configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_ENGINE, allTenants));
+            configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_PORTAL, allTenants));
+            configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_SECURITY_SCRIPTS, allTenants));
+
         } catch (IOException e) {
             throw new PlatformException(e);
         }
         configurationService.storeConfigurationsIfNotExist(configurations);
+    }
+
+    public List<FullBonitaConfiguration> getConfigurationsMatchingPattern(ConfigurationType type, List<Long> allTenants)
+            throws IOException {
+        final ArrayList<FullBonitaConfiguration> configurations = new ArrayList<>();
+        final String typeLowercase = type.name().toLowerCase();
+        Resource[] resources = cpResourceResolver
+                .getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + typeLowercase + "/**");
+        for (Resource resource : resources) {
+            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
+                String resourceName = resource.getFilename();
+                LOGGER.debug("Found configuration file '{}' of type {} in classpath", resourceName, typeLowercase);
+                try (InputStream resourceAsStream = resource.getInputStream()) {
+                    final byte[] content = IOUtils.toByteArray(resourceAsStream);
+                    // insert the file both at platform level for the template...
+                    // eg. (configurations, TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml", 0L):
+                    configurations.add(new FullBonitaConfiguration(resourceName, content, type.name(), 0L));
+                    if (typeLowercase.contains("_template_")) {
+                        // also add a version of the configuration file for each existing tenant.
+                        // eg. (configurations, TENANT_ENGINE, "bonita-tenant-sp-custom.xml", tenantId):
+                        for (Long tenantId : allTenants) {
+                            configurations.add(new FullBonitaConfiguration(resourceName, content,
+                                    type.name().replace("_TEMPLATE", ""), tenantId));
+                        }
+                    }
+                    LOGGER.debug("Using configuration from classpath {}", resourceName);
+                }
+            }
+        }
+        return configurations;
     }
 
     private void updateDefaultConfigurationFromClasspath() throws PlatformException {
