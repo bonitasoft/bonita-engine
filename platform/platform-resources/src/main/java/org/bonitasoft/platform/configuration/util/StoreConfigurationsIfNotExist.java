@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.platform.configuration.util;
 
+import static java.util.Collections.singletonList;
 import static org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl.LOGGER;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.platform.configuration.impl.BonitaAllConfigurationPreparedStatementSetter;
@@ -45,16 +45,16 @@ public class StoreConfigurationsIfNotExist extends TransactionCallbackWithoutRes
 
     @Override
     public void doInTransactionWithoutResult(TransactionStatus status) {
-        List<FullBonitaConfiguration> newConfigurations = new ArrayList<>();
         for (FullBonitaConfiguration configuration : configurations) {
             final Integer nbRows = jdbcTemplate.queryForObject(SELECT_CONFIGURATION_EXISTS, Integer.class,
                     configuration.getTenantId(), configuration.getConfigurationType(), configuration.getResourceName());
 
             if (nbRows == 0) {
                 // only keep elements that do not already exist in database...
-                newConfigurations.add(configuration);
                 LOGGER.info("New configuration file detected '{}'. Storing it to database.",
                         configuration.getResourceName());
+                jdbcTemplate.batchUpdate(BonitaConfigurationPreparedStatementSetter.INSERT_CONFIGURATION,
+                        new BonitaAllConfigurationPreparedStatementSetter(singletonList(configuration), dbVendor));
             } else {
                 LOGGER.debug("Configuration already exists for type: {}, resource: {} and tenant id: {}. Ignoring it.",
                         configuration.getConfigurationType(),
@@ -62,9 +62,5 @@ public class StoreConfigurationsIfNotExist extends TransactionCallbackWithoutRes
                         configuration.getTenantId());
             }
         }
-
-        // ... to insert only new configurations:
-        jdbcTemplate.batchUpdate(BonitaConfigurationPreparedStatementSetter.INSERT_CONFIGURATION,
-                new BonitaAllConfigurationPreparedStatementSetter(newConfigurations, dbVendor));
     }
 }
