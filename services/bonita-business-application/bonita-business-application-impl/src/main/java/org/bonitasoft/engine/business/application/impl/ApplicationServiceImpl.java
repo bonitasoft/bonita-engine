@@ -306,11 +306,10 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public long getNumberOfApplicationsOfProfiles(List<Long> profileIds, QueryOptions options)
-            throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("profileIds",
-                (Object) profileIds);
-        return persistenceService.getNumberOfEntities(SApplication.class, "OfProfiles", options, parameters);
+    public long getNumberOfApplicationsOfUser(long userId, QueryOptions options) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("userId",
+                (Object) userId);
+        return persistenceService.getNumberOfEntities(SApplication.class, "OfUser", options, parameters);
     }
 
     @Override
@@ -319,11 +318,10 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<SApplication> searchApplicationsOfProfiles(List<Long> profileIds, QueryOptions options)
-            throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("profileIds",
-                (Object) profileIds);
-        return persistenceService.searchEntity(SApplication.class, "OfProfiles", options, parameters);
+    public List<SApplication> searchApplicationsOfUser(long userId, QueryOptions options) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("userId",
+                (Object) userId);
+        return persistenceService.searchEntity(SApplication.class, "OfUser", options, parameters);
     }
 
     @Override
