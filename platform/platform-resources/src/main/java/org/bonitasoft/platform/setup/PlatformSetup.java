@@ -128,7 +128,7 @@ public class PlatformSetup {
             pushFromFolder(initialConfigurationFolder);
         } else {
             LOGGER.warn("Database will be initialized with configuration files from classpath");
-            initConfigurationWithClasspath();
+            insertNewConfigurationsFromClasspathIfExist();
         }
         pushLicenses();
         LOGGER.info("Initial configuration files successfully pushed to database");
@@ -378,21 +378,20 @@ public class PlatformSetup {
         for (Resource resource : resources) {
             if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
                 String resourceName = resource.getFilename();
-                LOGGER.debug("Found configuration file '{}' of type {} in classpath", resourceName, typeLowercase);
+                LOGGER.debug("Found configuration file '{}' of type '{}' in classpath", resourceName, type);
                 try (InputStream resourceAsStream = resource.getInputStream()) {
                     final byte[] content = IOUtils.toByteArray(resourceAsStream);
                     // insert the file both at platform level for the template...
-                    // eg. (configurations, TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml", 0L):
+                    // eg. (TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml", 0L):
                     configurations.add(new FullBonitaConfiguration(resourceName, content, type.name(), 0L));
                     if (typeLowercase.contains("_template_")) {
                         // also add a version of the configuration file for each existing tenant.
-                        // eg. (configurations, TENANT_ENGINE, "bonita-tenant-sp-custom.xml", tenantId):
+                        // eg. (TENANT_ENGINE, "bonita-tenant-sp-custom.xml", tenantId):
                         for (Long tenantId : allTenants) {
                             configurations.add(new FullBonitaConfiguration(resourceName, content,
                                     type.name().replace("_TEMPLATE", ""), tenantId));
                         }
                     }
-                    LOGGER.debug("Using configuration from classpath {}", resourceName);
                 }
             }
         }
@@ -409,70 +408,6 @@ public class PlatformSetup {
             throw new PlatformException(e);
         }
         configurationService.updateTenantPortalConfForAllTenantsAndTemplate(portalTenant);
-    }
-
-    private void initConfigurationWithClasspath() throws PlatformException {
-        try {
-            List<BonitaConfiguration> platformInitConfigurations = new ArrayList<>(2);
-            addIfExists(platformInitConfigurations, PLATFORM_INIT_ENGINE, "bonita-platform-init-custom.xml");
-            configurationService.storePlatformInitEngineConf(platformInitConfigurations);
-
-            List<BonitaConfiguration> platformConfigurations = new ArrayList<>(8);
-            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-community-custom.properties");
-            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-custom.xml");
-            //SP
-            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-private-community.properties"); // FIXME: should not be necessary, as internal only
-            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-sp-custom.properties");
-            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-sp-cluster-custom.properties");
-            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-sp-custom.xml");
-            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-platform-hibernate-cache.xml");
-            addIfExists(platformConfigurations, PLATFORM_ENGINE, "bonita-tenant-hibernate-cache.xml");
-            configurationService.storePlatformEngineConf(platformConfigurations);
-
-            List<BonitaConfiguration> tenantTemplateConfigurations = new ArrayList<>(5);
-            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE,
-                    "bonita-tenant-community-custom.properties");
-            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE, "bonita-tenants-custom.xml");
-            //SP
-            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.properties");
-            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE,
-                    "bonita-tenant-sp-cluster-custom.properties");
-            addIfExists(tenantTemplateConfigurations, TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml");
-            configurationService.storeTenantTemplateEngineConf(tenantTemplateConfigurations);
-
-            List<BonitaConfiguration> securityScripts = new ArrayList<>();
-            addIfExists(securityScripts, TENANT_TEMPLATE_SECURITY_SCRIPTS, "SamplePermissionRule.groovy.sample");
-            configurationService.storeTenantTemplateSecurityScripts(securityScripts);
-
-            List<BonitaConfiguration> portalTenantTemplate = new ArrayList<>(14);
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "authenticationManager-config.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping-custom.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL,
-                    "compound-permissions-mapping-internal.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "console-config.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "custom-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks-custom.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL,
-                    "resources-permissions-mapping-custom.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL,
-                    "resources-permissions-mapping-internal.properties");
-            addIfExists(portalTenantTemplate, TENANT_TEMPLATE_PORTAL, "security-config.properties");
-
-            configurationService.storeTenantTemplatePortalConf(portalTenantTemplate);
-
-            List<BonitaConfiguration> portalPlatform = new ArrayList<>(4);
-            addIfExists(portalPlatform, PLATFORM_PORTAL, "cache-config.xml");
-            addIfExists(portalPlatform, PLATFORM_PORTAL, "jaas-standard.cfg");
-            addIfExists(portalPlatform, PLATFORM_PORTAL, "platform-tenant-config.properties");
-            addIfExists(portalPlatform, PLATFORM_PORTAL, "security-config.properties");
-            configurationService.storePlatformPortalConf(portalPlatform);
-
-        } catch (IOException e) {
-            throw new PlatformException(e);
-        }
     }
 
     private void addIfExists(List<BonitaConfiguration> configurations, ConfigurationType configurationType,

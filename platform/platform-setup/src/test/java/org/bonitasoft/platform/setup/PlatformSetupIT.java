@@ -70,13 +70,13 @@ public class PlatformSetupIT {
     public final ClearSystemProperties clearSystemProperties = new ClearSystemProperties(BONITA_SETUP_FOLDER);
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();//.muteForSuccessfulTests();
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Value("${db.vendor}")
-    String dbVendor;
+    private String dbVendor;
 
     @Autowired
     MemoryJNDISetup memoryJNDISetup;
@@ -325,9 +325,6 @@ public class PlatformSetupIT {
                         "Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
     }
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Test
     public void push_should_fail_if_required_folder_would_be_deleted() throws Exception {
         // on windows, the test fails to delete the 'platform init engine' directory
@@ -344,10 +341,10 @@ public class PlatformSetupIT {
         FileUtils.deleteDirectory(platform_init_engine.toFile());
 
         // then
-        exception.expect(PlatformException.class);
-        exception.expectMessage("You are trying to remove a protected folder from configuration");
-        exception.expectMessage(platform_init_engine.toString());
-        exception.expectMessage("To restore the deleted folders");
+        expectedException.expect(PlatformException.class);
+        expectedException.expectMessage("You are trying to remove a protected folder from configuration");
+        expectedException.expectMessage(platform_init_engine.toString());
+        expectedException.expectMessage("To restore the deleted folders");
 
         // when
         platformSetup.push();

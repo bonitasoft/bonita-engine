@@ -43,27 +43,25 @@ public class BonitaAllConfigurationPreparedStatementSetter
 
     @Override
     public void setValues(PreparedStatement ps, int i) throws SQLException {
-        final TemporaryLobCreator temporaryLobCreator = new TemporaryLobCreator();
-
-        final FullBonitaConfiguration bonitaConfiguration = bonitaConfigurations.get(i);
-        ps.setLong(COLUMN_INDEX_TENANT_ID, bonitaConfiguration.getTenantId());
-        ps.setString(COLUMN_INDEX_TYPE, bonitaConfiguration.getConfigurationType());
-        ps.setString(COLUMN_INDEX_RESOURCE_NAME, bonitaConfiguration.getResourceName());
-        switch (dbVendor) {
-            case "h2":
-            case "postgres":
-                ps.setBytes(COLUMN_INDEX_RESOURCE_CONTENT, bonitaConfiguration.getResourceContent());
-                break;
-            case "oracle":
-            case "mysql":
-            case "sqlserver":
-                temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT,
-                        bonitaConfiguration.getResourceContent());
-                break;
-            default:
-                throw new IllegalArgumentException(
-                        new StringBuilder("unsupported db vendor:").append(dbVendor).toString());
-
+        try (TemporaryLobCreator temporaryLobCreator = new TemporaryLobCreator()) {
+            final FullBonitaConfiguration bonitaConfiguration = bonitaConfigurations.get(i);
+            ps.setLong(COLUMN_INDEX_TENANT_ID, bonitaConfiguration.getTenantId());
+            ps.setString(COLUMN_INDEX_TYPE, bonitaConfiguration.getConfigurationType());
+            ps.setString(COLUMN_INDEX_RESOURCE_NAME, bonitaConfiguration.getResourceName());
+            switch (dbVendor) {
+                case "h2":
+                case "postgres":
+                    ps.setBytes(COLUMN_INDEX_RESOURCE_CONTENT, bonitaConfiguration.getResourceContent());
+                    break;
+                case "oracle":
+                case "mysql":
+                case "sqlserver":
+                    temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT,
+                            bonitaConfiguration.getResourceContent());
+                    break;
+                default:
+                    throw new IllegalArgumentException("unsupported db vendor:" + dbVendor);
+            }
         }
 
     }
