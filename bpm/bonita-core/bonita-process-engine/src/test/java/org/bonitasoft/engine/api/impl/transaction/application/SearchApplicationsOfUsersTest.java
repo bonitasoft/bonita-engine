@@ -42,7 +42,7 @@ public class SearchApplicationsOfUsersTest {
 
     private static final int MAX_RESULTS = 10;
 
-    private static final List<Long> profileIds = new ArrayList<>();
+    private static final long userId = 12;
 
     @Mock
     private ApplicationService applicationService;
@@ -56,12 +56,11 @@ public class SearchApplicationsOfUsersTest {
     @Mock
     private ApplicationModelConverter convertor;
 
-    private SearchApplicationsOfProfiles searchApplicationsOfProfiles;
+    private SearchApplicationsOfUser searchApplicationsOfUser;
 
     @Before
     public void before() {
-        searchApplicationsOfProfiles = new SearchApplicationsOfProfiles(profileIds, applicationService, descriptor,
-                options,
+        searchApplicationsOfUser = new SearchApplicationsOfUser(userId, applicationService, descriptor, options,
                 convertor);
     }
 
@@ -69,10 +68,10 @@ public class SearchApplicationsOfUsersTest {
     public void executeCount_should_return_result_of_applicationService_getNumberOfApplications() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(START_INDEX, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
-        given(applicationService.getNumberOfApplicationsOfProfiles(profileIds, options)).willReturn(10L);
+        given(applicationService.getNumberOfApplicationsOfUser(userId, options)).willReturn(10L);
 
         //when
-        final long count = searchApplicationsOfProfiles.executeCount(options);
+        final long count = searchApplicationsOfUser.executeCount(options);
 
         //then
         assertThat(count).isEqualTo(10L);
@@ -83,11 +82,11 @@ public class SearchApplicationsOfUsersTest {
             throws Exception {
         //given
         final QueryOptions options = new QueryOptions(START_INDEX, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
-        given(applicationService.getNumberOfApplicationsOfProfiles(profileIds, options))
+        given(applicationService.getNumberOfApplicationsOfUser(userId, options))
                 .willThrow(new SBonitaReadException(""));
 
         //when
-        searchApplicationsOfProfiles.executeCount(options);
+        searchApplicationsOfUser.executeCount(options);
 
         //then exception
     }
@@ -98,10 +97,10 @@ public class SearchApplicationsOfUsersTest {
         final QueryOptions queryOptions = new QueryOptions(START_INDEX, MAX_RESULTS);
         final List<SApplication> applications = new ArrayList<SApplication>(1);
         applications.add(mock(SApplication.class));
-        given(applicationService.searchApplicationsOfProfiles(profileIds, queryOptions)).willReturn(applications);
+        given(applicationService.searchApplicationsOfUser(userId, queryOptions)).willReturn(applications);
 
         //when
-        final List<SApplication> retrievedApplications = searchApplicationsOfProfiles.executeSearch(queryOptions);
+        final List<SApplication> retrievedApplications = searchApplicationsOfUser.executeSearch(queryOptions);
 
         //then
         assertThat(retrievedApplications).isEqualTo(applications);
@@ -116,7 +115,7 @@ public class SearchApplicationsOfUsersTest {
         given(convertor.toApplication(sApplications)).willReturn(Arrays.asList(app));
 
         //when
-        final List<Application> applications = searchApplicationsOfProfiles.convertToClientObjects(sApplications);
+        final List<Application> applications = searchApplicationsOfUser.convertToClientObjects(sApplications);
 
         //then
         assertThat(applications).containsExactly(app);

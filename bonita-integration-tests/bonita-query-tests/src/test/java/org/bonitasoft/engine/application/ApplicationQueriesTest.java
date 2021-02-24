@@ -19,8 +19,9 @@ import static org.bonitasoft.engine.test.persistence.builder.ApplicationMenuBuil
 import static org.bonitasoft.engine.test.persistence.builder.ApplicationPageBuilder.anApplicationPage;
 import static org.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileBuilder.aProfile;
+import static org.bonitasoft.engine.test.persistence.builder.ProfileMemberBuilder.aProfileMember;
+import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.page.AbstractSPage;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.test.persistence.repository.ApplicationRepository;
@@ -370,52 +372,28 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getNumberOfApplicationOfProfiles_returns_the_application_for_list_of_profiles() throws Exception {
+    public void getNumberOfApplicationOfUser_returns_the_application_for_the_given_user() throws Exception {
         //given
-        final SProfile profile1 = aProfile().withName("firstProfile").build();
+        SUser user1 = aUser().withId(1L).withUserName("walter.bates").build();
+        repository.add(user1);
+        SUser user2 = aUser().withId(2L).withUserName("helen.kelly").build();
+        repository.add(user2);
+        SUser user3 = aUser().withId(3L).withUserName("daniela.angelo").build();
+        repository.add(user3);
+        SUser user4 = aUser().withId(4L).withUserName("jan.fisher").build();
+        repository.add(user4);
+
+        final String profileName1 = "firstProfile";
+        final SProfile profile1 = aProfile().withName(profileName1).build();
         repository.add(profile1);
+        repository.add(aProfileMember().withUserId(user1.getId()).withProfileId(profile1.getId()).build());
+        repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile1.getId()).build());
 
-        final SProfile profile2 = aProfile().withName("secondProfile").build();
+        final String profileName2 = "secondProfile";
+        final SProfile profile2 = aProfile().withName(profileName2).build();
         repository.add(profile2);
-
-        repository
-                .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
-                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build());
-        repository
-                .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
-                        .withDisplayName("my app2").withVersion("1.0").withPath("/app2").withProfile(profile1.getId())
-                        .build());
-        repository
-                .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
-                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build());
-
-        repository.flush();
-
-        //when
-        final Long numberOfApplicationsForProfile1 = repository
-                .getNumberOfApplicationOfProfiles(Arrays.asList(profile1.getId()));
-        final Long numberOfApplicationsForProfile2 = repository
-                .getNumberOfApplicationOfProfiles(Arrays.asList(profile2.getId()));
-        final Long numberOfApplicationsForProfile3 = repository
-                .getNumberOfApplicationOfProfiles(Arrays.asList(profile1.getId(), profile2.getId(), 500L));
-        final Long numberOfApplicationsForProfileDoesNotExist = repository
-                .getNumberOfApplicationOfProfiles(Arrays.asList(500L));
-
-        //then
-        assertThat(numberOfApplicationsForProfile1).isEqualTo(2);
-        assertThat(numberOfApplicationsForProfile2).isEqualTo(1);
-        assertThat(numberOfApplicationsForProfile3).isEqualTo(3);
-        assertThat(numberOfApplicationsForProfileDoesNotExist).isEqualTo(0);
-    }
-
-    @Test
-    public void searchApplicationOfProfiles_returns_the_application_for_a_list_of_profiles() throws Exception {
-        //given
-        final SProfile profile1 = aProfile().withName("firstProfile").build();
-        repository.add(profile1);
-
-        final SProfile profile2 = aProfile().withName("secondProfile").build();
-        repository.add(profile2);
+        repository.add(aProfileMember().withUserId(user2.getId()).withProfileId(profile2.getId()).build());
+        repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile2.getId()).build());
 
         final SApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
@@ -431,20 +409,71 @@ public class ApplicationQueriesTest {
         repository.flush();
 
         //when
-        final List<SApplication> numberOfApplicationsForProfile1 = repository
-                .searchApplicationOfProfiles(Arrays.asList(profile1.getId()));
-        final List<SApplication> numberOfApplicationsForProfile2 = repository
-                .searchApplicationOfProfiles(Arrays.asList(profile2.getId()));
-        final List<SApplication> numberOfApplicationsForProfile3 = repository
-                .searchApplicationOfProfiles(Arrays.asList(profile1.getId(), profile2.getId(), 500L));
-        final List<SApplication> numberOfApplicationsForProfileDoesNotExist = repository
-                .searchApplicationOfProfiles(Arrays.asList(500L));
+
+        final Long numberOfApplicationsForUser1 = repository.getNumberOfApplicationOfUser(user1.getId());
+        final Long numberOfApplicationsForUser2 = repository.getNumberOfApplicationOfUser(user2.getId());
+        final Long numberOfApplicationsForUser3 = repository.getNumberOfApplicationOfUser(user3.getId());
+        final Long numberOfApplicationsForUser4 = repository.getNumberOfApplicationOfUser(user4.getId());
+        final Long numberOfApplicationsForUserDoesNotExist = repository.getNumberOfApplicationOfUser(5L);
 
         //then
-        assertThat(numberOfApplicationsForProfile1).containsExactly(application1, application2);
-        assertThat(numberOfApplicationsForProfile2).containsExactly(application3);
-        assertThat(numberOfApplicationsForProfile3).containsExactly(application1, application2, application3);
-        assertThat(numberOfApplicationsForProfileDoesNotExist).isEmpty();
+        assertThat(numberOfApplicationsForUser1).isEqualTo(2);
+        assertThat(numberOfApplicationsForUser2).isEqualTo(1);
+        assertThat(numberOfApplicationsForUser3).isEqualTo(3);
+        assertThat(numberOfApplicationsForUser4).isEqualTo(0);
+        assertThat(numberOfApplicationsForUserDoesNotExist).isEqualTo(0);
+    }
+
+    @Test
+    public void searchApplicationOfUser_returns_the_application_for_the_given_user() throws Exception {
+        //given
+        SUser user1 = aUser().withId(1L).withUserName("walter.bates").build();
+        repository.add(user1);
+        SUser user2 = aUser().withId(2L).withUserName("helen.kelly").build();
+        repository.add(user2);
+        SUser user3 = aUser().withId(3L).withUserName("daniela.angelo").build();
+        repository.add(user3);
+        SUser user4 = aUser().withId(4L).withUserName("jan.fisher").build();
+        repository.add(user4);
+
+        final String profileName1 = "firstProfile";
+        final SProfile profile1 = aProfile().withName(profileName1).build();
+        repository.add(profile1);
+        repository.add(aProfileMember().withUserId(user1.getId()).withProfileId(profile1.getId()).build());
+        repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile1.getId()).build());
+
+        final String profileName2 = "secondProfile";
+        final SProfile profile2 = aProfile().withName(profileName2).build();
+        repository.add(profile2);
+        repository.add(aProfileMember().withUserId(user2.getId()).withProfileId(profile2.getId()).build());
+        repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile2.getId()).build());
+
+        final SApplication application1 = repository
+                .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
+                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build());
+        final SApplication application2 = repository
+                .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
+                        .withDisplayName("my app2").withVersion("1.0").withPath("/app2").withProfile(profile1.getId())
+                        .build());
+        final SApplication application3 = repository
+                .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
+                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build());
+
+        repository.flush();
+
+        //when
+        final List<SApplication> numberOfApplicationsForUser1 = repository.searchApplicationOfUser(user1.getId());
+        final List<SApplication> numberOfApplicationsForUser2 = repository.searchApplicationOfUser(user2.getId());
+        final List<SApplication> numberOfApplicationsForUser3 = repository.searchApplicationOfUser(user3.getId());
+        final List<SApplication> numberOfApplicationsForUser4 = repository.searchApplicationOfUser(user4.getId());
+        final List<SApplication> numberOfApplicationsForUserDoesNotExist = repository.searchApplicationOfUser(5L);
+
+        //then
+        assertThat(numberOfApplicationsForUser1).containsExactly(application1, application2);
+        assertThat(numberOfApplicationsForUser2).containsExactly(application3);
+        assertThat(numberOfApplicationsForUser3).containsExactly(application1, application2, application3);
+        assertThat(numberOfApplicationsForUser4).isEmpty();
+        assertThat(numberOfApplicationsForUserDoesNotExist).isEmpty();
     }
 
 }

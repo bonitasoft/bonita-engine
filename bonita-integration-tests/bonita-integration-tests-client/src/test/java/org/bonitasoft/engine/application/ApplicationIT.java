@@ -29,6 +29,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.profile.Profile;
@@ -119,86 +120,89 @@ public class ApplicationIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void searchApplications_can_filter_by_profile_ids() throws Exception {
+    public void searchApplications_can_filter_by_user_id() throws Exception {
         //given
+        final User user1 = createUser("walter.bates", "bpm");
+        final User user2 = createUser("helen.kelly", "bpm");
+        final User user3 = createUser("daniela.angelo", "bpm");
+        final User user4 = createUser("jan.fisher", "bpm");
+
         final List<Profile> profiles = getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 10).done())
                 .getResult();
 
-        final Application hr = getApplicationAPI()
-                .createApplication(new ApplicationCreator("HR-dashboard", "HR dashboard", "1.0")
-                        .setProfileId(profiles.get(0).getId()));
-        final Application engineering = getApplicationAPI()
-                .createApplication(new ApplicationCreator("Engineering-dashboard",
-                        "Engineering dashboard", "1.0").setProfileId(profiles.get(0).getId()));
-        final Application marketing = getApplicationAPI()
-                .createApplication(new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
-                        "1.0").setProfileId(profiles.get(1).getId()));
-        getApplicationAPI().createApplication(new ApplicationCreator("AppNotConnected", "App not connected",
-                "1.0"));
+        getProfileAPI().createProfileMember(profiles.get(0).getId(), user1.getId(), null, null);
+        getProfileAPI().createProfileMember(profiles.get(1).getId(), user2.getId(), null, null);
+        getProfileAPI().createProfileMember(profiles.get(0).getId(), user3.getId(), null, null);
+        getProfileAPI().createProfileMember(profiles.get(1).getId(), user3.getId(), null, null);
+
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dashboard", "1.0")
+                .setProfileId(profiles.get(0).getId());
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0").setProfileId(profiles.get(0).getId());
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
+                "1.0").setProfileId(profiles.get(1).getId());
+
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builderProfile1 = new SearchOptionsBuilder(0, 10);
-        builderProfile1.filter(ApplicationSearchDescriptor.PROFILE_ID, profiles.get(0).getId());
-        builderProfile1.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
-        final SearchResult<Application> applicationsProfile1 = getApplicationAPI()
-                .searchApplications(builderProfile1.done());
-        assertThat(applicationsProfile1).isNotNull();
-        assertThat(applicationsProfile1.getCount()).isEqualTo(2);
-        assertThat(applicationsProfile1.getResult()).containsExactly(engineering, hr);
+        final SearchOptionsBuilder builderUser1 = new SearchOptionsBuilder(0, 10);
+        builderUser1.filter(ApplicationSearchDescriptor.USER_ID, user1.getId());
+        final SearchResult<Application> applicationsUser1 = getApplicationAPI().searchApplications(builderUser1.done());
+        assertThat(applicationsUser1).isNotNull();
+        assertThat(applicationsUser1.getCount()).isEqualTo(2);
+        assertThat(applicationsUser1.getResult()).containsExactly(hr, engineering);
 
-        final SearchOptionsBuilder builderProfile2 = new SearchOptionsBuilder(0, 10);
-        builderProfile2.filter(ApplicationSearchDescriptor.PROFILE_ID, profiles.get(1).getId());
-        builderProfile2.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
-        final SearchResult<Application> applicationsProfile2 = getApplicationAPI()
-                .searchApplications(builderProfile2.done());
-        assertThat(applicationsProfile2).isNotNull();
-        assertThat(applicationsProfile2.getCount()).isEqualTo(1);
-        assertThat(applicationsProfile2.getResult()).containsExactly(marketing);
+        final SearchOptionsBuilder builderUser2 = new SearchOptionsBuilder(0, 10);
+        builderUser2.filter(ApplicationSearchDescriptor.USER_ID, user2.getId());
+        final SearchResult<Application> applicationsUser2 = getApplicationAPI().searchApplications(builderUser2.done());
+        assertThat(applicationsUser2).isNotNull();
+        assertThat(applicationsUser2.getCount()).isEqualTo(1);
+        assertThat(applicationsUser2.getResult()).containsExactly(marketing);
 
-        final SearchOptionsBuilder builderProfile3 = new SearchOptionsBuilder(0, 10);
-        builderProfile3.filter(ApplicationSearchDescriptor.PROFILE_ID,
-                profiles.get(0).getId() + "," + profiles.get(1).getId() + "," + "500");
-        builderProfile3.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
-        final SearchResult<Application> applicationsProfile3 = getApplicationAPI()
-                .searchApplications(builderProfile3.done());
-        assertThat(applicationsProfile3).isNotNull();
-        assertThat(applicationsProfile3.getCount()).isEqualTo(3);
-        assertThat(applicationsProfile3.getResult()).containsExactly(engineering, hr, marketing);
+        final SearchOptionsBuilder builderUser3 = new SearchOptionsBuilder(0, 10);
+        builderUser3.filter(ApplicationSearchDescriptor.USER_ID, user3.getId());
+        final SearchResult<Application> applicationsUser3 = getApplicationAPI().searchApplications(builderUser3.done());
+        assertThat(applicationsUser3).isNotNull();
+        assertThat(applicationsUser3.getCount()).isEqualTo(3);
+        assertThat(applicationsUser3.getResult()).containsExactly(hr, engineering, marketing);
 
-        final SearchOptionsBuilder builderProfile4 = new SearchOptionsBuilder(0, 10);
-        builderProfile4.filter(ApplicationSearchDescriptor.PROFILE_ID, "500");
-        builderProfile4.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
-        final SearchResult<Application> applicationsProfile4 = getApplicationAPI()
-                .searchApplications(builderProfile4.done());
-        assertThat(applicationsProfile4.getResult()).isEmpty();
+        final SearchOptionsBuilder builderUser4 = new SearchOptionsBuilder(0, 10);
+        builderUser4.filter(ApplicationSearchDescriptor.USER_ID, user4.getId());
+        final SearchResult<Application> applicationsUser4 = getApplicationAPI().searchApplications(builderUser4.done());
+        assertThat(applicationsUser4.getResult()).isEmpty();
     }
 
     @Test
-    public void searchApplications_can_filter_by_profile_ids_and_profile_display_name() throws Exception {
+    public void searchApplications_can_filter_by_user_id_and_process_display_name() throws Exception {
         //given
+        final User user1 = createUser("walter.bates", "bpm");
+
         final List<Profile> profiles = getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 10).done())
                 .getResult();
 
-        getApplicationAPI().createApplication(new ApplicationCreator("HR-dashboard", "HR dashboard", "1.0")
-                .setProfileId(profiles.get(0).getId()));
-        final Application engineering = getApplicationAPI()
-                .createApplication(new ApplicationCreator("Engineering-dashboard",
-                        "Engineering dashboard", "1.0").setProfileId(profiles.get(0).getId()));
-        getApplicationAPI().createApplication(new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
-                "1.0").setProfileId(profiles.get(1).getId()));
-        getApplicationAPI().createApplication(new ApplicationCreator("AppNotConnected", "App not connected",
-                "1.0"));
+        getProfileAPI().createProfileMember(profiles.get(0).getId(), user1.getId(), null, null);
+
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dashboard", "1.0")
+                .setProfileId(profiles.get(0).getId());
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0").setProfileId(profiles.get(0).getId());
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
+                "1.0").setProfileId(profiles.get(1).getId());
+
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builderProfile1 = new SearchOptionsBuilder(0, 10);
-        builderProfile1.filter(ApplicationSearchDescriptor.PROFILE_ID,
-                profiles.get(0).getId() + "," + profiles.get(1).getId() + "," + "500");
-        builderProfile1.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "Engineering dashboard");
-        final SearchResult<Application> applicationsProfile1 = getApplicationAPI()
-                .searchApplications(builderProfile1.done());
-        assertThat(applicationsProfile1).isNotNull();
-        assertThat(applicationsProfile1.getCount()).isEqualTo(1);
-        assertThat(applicationsProfile1.getResult()).containsExactly(engineering);
+        final SearchOptionsBuilder builderUser1 = new SearchOptionsBuilder(0, 10);
+        builderUser1.filter(ApplicationSearchDescriptor.USER_ID, user1.getId());
+        builderUser1.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "Engineering dashboard");
+        final SearchResult<Application> applicationsUser1 = getApplicationAPI().searchApplications(builderUser1.done());
+        assertThat(applicationsUser1).isNotNull();
+        assertThat(applicationsUser1.getCount()).isEqualTo(1);
+        assertThat(applicationsUser1.getResult()).containsExactly(engineering);
     }
 
     private byte[] createCompleteApplication() throws IOException {

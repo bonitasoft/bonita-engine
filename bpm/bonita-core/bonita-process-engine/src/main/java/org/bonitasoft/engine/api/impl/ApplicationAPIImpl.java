@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,7 +29,7 @@ import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationPageAPI
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
-import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationsOfProfiles;
+import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationsOfUser;
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
@@ -61,7 +60,6 @@ import org.bonitasoft.engine.business.application.importer.ApplicationMenuImport
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImporter;
 import org.bonitasoft.engine.business.application.importer.ApplicationsImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -190,20 +188,16 @@ public class ApplicationAPIImpl implements ApplicationAPI {
                 .getSearchApplicationDescriptor();
         final ApplicationModelConverter converter = getApplicationModelConverter(tenantAccessor.getPageService());
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final Optional<SearchFilter> profileFilters = searchOptions.getFilters().stream()
-                .filter(s -> s.getField().equals(SApplication.PROFILE_ID)).findFirst();
-        if (profileFilters.isPresent()) {
-            final SearchOptions otherFilters = new SearchOptionsBuilder(searchOptions)
-                    .setFilters(searchOptions.getFilters().stream()
-                            .filter(s -> !s.getField().equals(SApplication.PROFILE_ID))
+        final Optional<SearchFilter> searchFilter = searchOptions.getFilters().stream()
+                .filter(s -> s.getField().equals("userId")).findFirst();
+        if (searchFilter.isPresent()) {
+            final SearchOptions newSearchOptions = new SearchOptionsBuilder(searchOptions)
+                    .setFilters(searchOptions.getFilters().stream().filter(s -> !s.getField().equals("userId"))
                             .collect(Collectors.toList()))
                     .done();
-            return getLivingApplicationAPIDelegate().searchApplications(new SearchApplicationsOfProfiles(
-                    Arrays.stream(String.valueOf(profileFilters.get().getValue()).split(",")).map(Long::parseLong)
-                            .collect(Collectors.toList()),
-                    applicationService,
-                    appSearchDescriptor,
-                    otherFilters, converter));
+            return getLivingApplicationAPIDelegate().searchApplications(new SearchApplicationsOfUser(
+                    (long) searchFilter.get().getValue(), applicationService, appSearchDescriptor,
+                    newSearchOptions, converter));
         }
         return getLivingApplicationAPIDelegate()
                 .searchApplications(new SearchApplications(applicationService, appSearchDescriptor,
