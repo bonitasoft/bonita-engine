@@ -196,7 +196,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
                             .collect(Collectors.toList()))
                     .done();
             return getLivingApplicationAPIDelegate().searchApplications(new SearchApplicationsOfUser(
-                    (long) searchFilter.get().getValue(), applicationService, appSearchDescriptor,
+                    Long.parseLong(String.valueOf(searchFilter.get().getValue())), applicationService,
+                    appSearchDescriptor,
                     newSearchOptions, converter));
         }
         return getLivingApplicationAPIDelegate()

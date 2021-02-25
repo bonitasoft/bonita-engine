@@ -20,10 +20,21 @@
     </query>
 
     <query name="getNumberOfSApplicationOfUser">
-        SELECT count(application.id)
+        SELECT count(application)
         FROM org.bonitasoft.engine.business.application.model.SApplication AS application, org.bonitasoft.engine.profile.model.SProfileMember as profileMember
         WHERE application.profileId = profileMember.profileId
-        AND profileMember.userId = :userId
+        AND (
+            profileMember.userId = :userId
+            OR profileMember.id IN (
+                SELECT profileMember.id
+                FROM org.bonitasoft.engine.profile.model.SProfileMember AS profileMember, org.bonitasoft.engine.identity.model.SUserMembership AS userMember
+                WHERE userMember.userId = :userId
+                AND ((profileMember.groupId = userMember.groupId AND profileMember.roleId &lt;= 0)
+                    OR (profileMember.roleId = userMember.roleId AND profileMember.groupId &lt;= 0)
+                    OR (profileMember.groupId = userMember.groupId AND profileMember.roleId = userMember.roleId)
+                )
+            )
+        )
     </query>
 
     <query name="searchSApplication">
@@ -35,7 +46,18 @@
         SELECT application
         FROM org.bonitasoft.engine.business.application.model.SApplication AS application, org.bonitasoft.engine.profile.model.SProfileMember as profileMember
         WHERE application.profileId = profileMember.profileId
-        AND profileMember.userId = :userId
+        AND (
+            profileMember.userId = :userId
+            OR profileMember.id IN (
+                SELECT profileMember.id
+                FROM org.bonitasoft.engine.profile.model.SProfileMember AS profileMember, org.bonitasoft.engine.identity.model.SUserMembership AS userMember
+                WHERE userMember.userId = :userId
+                AND ((profileMember.groupId = userMember.groupId AND profileMember.roleId &lt;= 0)
+                    OR (profileMember.roleId = userMember.roleId AND profileMember.groupId &lt;= 0)
+                    OR (profileMember.groupId = userMember.groupId AND profileMember.roleId = userMember.roleId)
+                )
+            )
+        )
     </query>
     
     <query name="getApplicationPageById">

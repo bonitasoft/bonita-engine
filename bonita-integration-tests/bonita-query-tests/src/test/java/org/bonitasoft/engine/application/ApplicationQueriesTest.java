@@ -17,10 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.test.persistence.builder.ApplicationBuilder.anApplication;
 import static org.bonitasoft.engine.test.persistence.builder.ApplicationMenuBuilder.anApplicationMenu;
 import static org.bonitasoft.engine.test.persistence.builder.ApplicationPageBuilder.anApplicationPage;
+import static org.bonitasoft.engine.test.persistence.builder.GroupBuilder.aGroup;
 import static org.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileBuilder.aProfile;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileMemberBuilder.aProfileMember;
+import static org.bonitasoft.engine.test.persistence.builder.RoleBuilder.aRole;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
+import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 
 import java.util.List;
 
@@ -29,6 +32,8 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.page.AbstractSPage;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -372,26 +377,18 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getNumberOfApplicationOfUser_returns_the_application_for_the_given_user() throws Exception {
+    public void getApplicationOfUser_returns_the_application_for_the_given_user() throws Exception {
         //given
-        SUser user1 = aUser().withId(1L).withUserName("walter.bates").build();
-        repository.add(user1);
-        SUser user2 = aUser().withId(2L).withUserName("helen.kelly").build();
-        repository.add(user2);
-        SUser user3 = aUser().withId(3L).withUserName("daniela.angelo").build();
-        repository.add(user3);
-        SUser user4 = aUser().withId(4L).withUserName("jan.fisher").build();
-        repository.add(user4);
+        SUser user1 = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
+        SUser user2 = repository.add(aUser().withId(2L).withUserName("helen.kelly").build());
+        SUser user3 = repository.add(aUser().withId(3L).withUserName("daniela.angelo").build());
+        SUser user4 = repository.add(aUser().withId(4L).withUserName("jan.fisher").build());
 
-        final String profileName1 = "firstProfile";
-        final SProfile profile1 = aProfile().withName(profileName1).build();
-        repository.add(profile1);
+        final SProfile profile1 = repository.add(aProfile().withName("firstProfile").build());
         repository.add(aProfileMember().withUserId(user1.getId()).withProfileId(profile1.getId()).build());
         repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile1.getId()).build());
 
-        final String profileName2 = "secondProfile";
-        final SProfile profile2 = aProfile().withName(profileName2).build();
-        repository.add(profile2);
+        final SProfile profile2 = repository.add(aProfile().withName("secondProfile").build());
         repository.add(aProfileMember().withUserId(user2.getId()).withProfileId(profile2.getId()).build());
         repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile2.getId()).build());
 
@@ -408,45 +405,46 @@ public class ApplicationQueriesTest {
 
         repository.flush();
 
-        //when
-
-        final Long numberOfApplicationsForUser1 = repository.getNumberOfApplicationOfUser(user1.getId());
-        final Long numberOfApplicationsForUser2 = repository.getNumberOfApplicationOfUser(user2.getId());
-        final Long numberOfApplicationsForUser3 = repository.getNumberOfApplicationOfUser(user3.getId());
-        final Long numberOfApplicationsForUser4 = repository.getNumberOfApplicationOfUser(user4.getId());
-        final Long numberOfApplicationsForUserDoesNotExist = repository.getNumberOfApplicationOfUser(5L);
-
         //then
-        assertThat(numberOfApplicationsForUser1).isEqualTo(2);
-        assertThat(numberOfApplicationsForUser2).isEqualTo(1);
-        assertThat(numberOfApplicationsForUser3).isEqualTo(3);
-        assertThat(numberOfApplicationsForUser4).isEqualTo(0);
-        assertThat(numberOfApplicationsForUserDoesNotExist).isEqualTo(0);
+        assertThat(repository.searchApplicationOfUser(user1.getId())).containsExactly(application1, application2);
+        assertThat(repository.searchApplicationOfUser(user2.getId())).containsExactly(application3);
+        assertThat(repository.searchApplicationOfUser(user3.getId())).containsExactly(application1, application2,
+                application3);
+        assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
+        assertThat(repository.searchApplicationOfUser(5L)).isEmpty();
+
+        assertThat(repository.getNumberOfApplicationOfUser(user1.getId())).isEqualTo(2);
+        assertThat(repository.getNumberOfApplicationOfUser(user2.getId())).isEqualTo(1);
+        assertThat(repository.getNumberOfApplicationOfUser(user3.getId())).isEqualTo(3);
+        assertThat(repository.getNumberOfApplicationOfUser(user4.getId())).isEqualTo(0);
+        assertThat(repository.getNumberOfApplicationOfUser(5L)).isEqualTo(0);
     }
 
     @Test
-    public void searchApplicationOfUser_returns_the_application_for_the_given_user() throws Exception {
+    public void searchApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_group()
+            throws Exception {
         //given
-        SUser user1 = aUser().withId(1L).withUserName("walter.bates").build();
-        repository.add(user1);
-        SUser user2 = aUser().withId(2L).withUserName("helen.kelly").build();
-        repository.add(user2);
-        SUser user3 = aUser().withId(3L).withUserName("daniela.angelo").build();
-        repository.add(user3);
-        SUser user4 = aUser().withId(4L).withUserName("jan.fisher").build();
-        repository.add(user4);
+        SUser user1 = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
+        SUser user2 = repository.add(aUser().withId(2L).withUserName("helen.kelly").build());
+        SUser user3 = repository.add(aUser().withId(3L).withUserName("daniela.angelo").build());
+        SUser user4 = repository.add(aUser().withId(4L).withUserName("jan.fisher").build());
+        SUser user5 = repository.add(aUser().withId(5L).withUserName("antonio.banderas").build());
+        SGroup group1 = repository.add(aGroup().forGroupId(20L).forGroupName("Group1").build());
+        SGroup group2 = repository
+                .add(aGroup().forGroupId(21L).forGroupName("Group2").forParentPath("/Group1").build());
+        SGroup group3 = repository.add(aGroup().forGroupId(22L).forGroupName("Group3").forParentPath("").build());
 
-        final String profileName1 = "firstProfile";
-        final SProfile profile1 = aProfile().withName(profileName1).build();
-        repository.add(profile1);
-        repository.add(aProfileMember().withUserId(user1.getId()).withProfileId(profile1.getId()).build());
-        repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile1.getId()).build());
+        final SProfile profile1 = repository.add(aProfile().withName("firstProfile").build());
+        repository.add(aProfileMember().withGroupId(group1.getId()).withProfileId(profile1.getId()).build());
+        repository.add(aUserMembership().forUser(user1.getId()).memberOf(group1.getId(), -1L).build());
+        repository.add(aUserMembership().forUser(user3.getId()).memberOf(group1.getId(), -1L).build());
 
-        final String profileName2 = "secondProfile";
-        final SProfile profile2 = aProfile().withName(profileName2).build();
-        repository.add(profile2);
-        repository.add(aProfileMember().withUserId(user2.getId()).withProfileId(profile2.getId()).build());
-        repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile2.getId()).build());
+        final SProfile profile2 = repository.add(aProfile().withName("secondProfile").build());
+        repository.add(aProfileMember().withGroupId(group2.getId()).withProfileId(profile2.getId()).build());
+        repository.add(aUserMembership().forUser(user2.getId()).memberOf(group2.getId(), -1L).build());
+        repository.add(aUserMembership().forUser(user3.getId()).memberOf(group2.getId(), -1L).build());
+
+        repository.add(aUserMembership().forUser(user4.getId()).memberOf(group3.getId(), -1L).build());
 
         final SApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
@@ -461,19 +459,137 @@ public class ApplicationQueriesTest {
 
         repository.flush();
 
-        //when
-        final List<SApplication> numberOfApplicationsForUser1 = repository.searchApplicationOfUser(user1.getId());
-        final List<SApplication> numberOfApplicationsForUser2 = repository.searchApplicationOfUser(user2.getId());
-        final List<SApplication> numberOfApplicationsForUser3 = repository.searchApplicationOfUser(user3.getId());
-        final List<SApplication> numberOfApplicationsForUser4 = repository.searchApplicationOfUser(user4.getId());
-        final List<SApplication> numberOfApplicationsForUserDoesNotExist = repository.searchApplicationOfUser(5L);
+        //then
+        assertThat(repository.searchApplicationOfUser(user1.getId())).containsExactly(application1, application2);
+        assertThat(repository.searchApplicationOfUser(user2.getId())).containsExactly(application3);
+        assertThat(repository.searchApplicationOfUser(user3.getId())).containsExactly(application1, application2,
+                application3);
+        assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
+        assertThat(repository.searchApplicationOfUser(user5.getId())).isEmpty();
+        assertThat(repository.searchApplicationOfUser(6L)).isEmpty();
+        assertThat(repository.getNumberOfApplicationOfUser(user1.getId())).isEqualTo(2);
+        assertThat(repository.getNumberOfApplicationOfUser(user2.getId())).isEqualTo(1);
+        assertThat(repository.getNumberOfApplicationOfUser(user3.getId())).isEqualTo(3);
+        assertThat(repository.getNumberOfApplicationOfUser(user4.getId())).isEqualTo(0);
+        assertThat(repository.getNumberOfApplicationOfUser(user5.getId())).isEqualTo(0);
+        assertThat(repository.getNumberOfApplicationOfUser(6L)).isEqualTo(0);
+    }
+
+    @Test
+    public void getApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_role() throws Exception {
+        //given
+        SUser user1 = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
+        SUser user2 = repository.add(aUser().withId(2L).withUserName("helen.kelly").build());
+        SUser user3 = repository.add(aUser().withId(3L).withUserName("daniela.angelo").build());
+        SUser user4 = repository.add(aUser().withId(4L).withUserName("jan.fisher").build());
+        SUser user5 = repository.add(aUser().withId(5L).withUserName("antonio.banderas").build());
+        SRole role1 = repository.add(aRole().forRoleId(40L).forRoleName("Role1").build());
+        SRole role2 = repository.add(aRole().forRoleId(41L).forRoleName("Role2").build());
+        SRole role3 = repository.add(aRole().forRoleId(42L).forRoleName("Role3").build());
+
+        final SProfile profile1 = repository.add(aProfile().withName("firstProfile").build());
+        repository.add(aProfileMember().withRoleId(role1.getId()).withProfileId(profile1.getId()).build());
+        repository.add(aUserMembership().forUser(user1.getId()).memberOf(-1L, role1.getId()).build());
+        repository.add(aUserMembership().forUser(user3.getId()).memberOf(-1L, role1.getId()).build());
+
+        final SProfile profile2 = repository.add(aProfile().withName("secondProfile").build());
+        repository.add(aProfileMember().withRoleId(role2.getId()).withProfileId(profile2.getId()).build());
+        repository.add(aUserMembership().forUser(user2.getId()).memberOf(-1L, role2.getId()).build());
+        repository.add(aUserMembership().forUser(user3.getId()).memberOf(-1L, role2.getId()).build());
+
+        repository.add(aUserMembership().forUser(user4.getId()).memberOf(-1L, role3.getId()).build());
+
+        final SApplication application1 = repository
+                .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
+                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build());
+        final SApplication application2 = repository
+                .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
+                        .withDisplayName("my app2").withVersion("1.0").withPath("/app2").withProfile(profile1.getId())
+                        .build());
+        final SApplication application3 = repository
+                .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
+                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build());
+
+        repository.flush();
 
         //then
-        assertThat(numberOfApplicationsForUser1).containsExactly(application1, application2);
-        assertThat(numberOfApplicationsForUser2).containsExactly(application3);
-        assertThat(numberOfApplicationsForUser3).containsExactly(application1, application2, application3);
-        assertThat(numberOfApplicationsForUser4).isEmpty();
-        assertThat(numberOfApplicationsForUserDoesNotExist).isEmpty();
+        assertThat(repository.searchApplicationOfUser(user1.getId())).containsExactly(application1, application2);
+        assertThat(repository.searchApplicationOfUser(user2.getId())).containsExactly(application3);
+        assertThat(repository.searchApplicationOfUser(user3.getId())).containsExactly(application1, application2,
+                application3);
+        assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
+        assertThat(repository.searchApplicationOfUser(user5.getId())).isEmpty();
+        assertThat(repository.searchApplicationOfUser(6L)).isEmpty();
+
+        //then
+        assertThat(repository.getNumberOfApplicationOfUser(user1.getId())).isEqualTo(2);
+        assertThat(repository.getNumberOfApplicationOfUser(user2.getId())).isEqualTo(1);
+        assertThat(repository.getNumberOfApplicationOfUser(user3.getId())).isEqualTo(3);
+        assertThat(repository.getNumberOfApplicationOfUser(user4.getId())).isEqualTo(0);
+        assertThat(repository.getNumberOfApplicationOfUser(user5.getId())).isEqualTo(0);
+        assertThat(repository.getNumberOfApplicationOfUser(6L)).isEqualTo(0);
+    }
+
+    @Test
+    public void getApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_group_and_role()
+            throws Exception {
+        //given
+        SUser user1 = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
+        SUser user2 = repository.add(aUser().withId(2L).withUserName("helen.kelly").build());
+        SUser user3 = repository.add(aUser().withId(3L).withUserName("daniela.angelo").build());
+        SUser user4 = repository.add(aUser().withId(4L).withUserName("jan.fisher").build());
+        SUser user5 = repository.add(aUser().withId(5L).withUserName("antonio.banderas").build());
+        SGroup group1 = repository.add(aGroup().forGroupId(20L).forGroupName("Group1").build());
+        SGroup group2 = repository
+                .add(aGroup().forGroupId(21L).forGroupName("Group2").forParentPath("/Group1").build());
+        SGroup group3 = repository.add(aGroup().forGroupId(22L).forGroupName("Group3").forParentPath("").build());
+        SRole role1 = repository.add(aRole().forRoleId(40L).forRoleName("Role1").build());
+        SRole role2 = repository.add(aRole().forRoleId(41L).forRoleName("Role2").build());
+        SRole role3 = repository.add(aRole().forRoleId(42L).forRoleName("Role3").build());
+
+        final SProfile profile1 = repository.add(aProfile().withName("firstProfile").build());
+        repository.add(aProfileMember().withGroupId(group1.getId()).withRoleId(role1.getId())
+                .withProfileId(profile1.getId()).build());
+        repository.add(aUserMembership().forUser(user1.getId()).memberOf(group1.getId(), role1.getId()).build());
+        repository.add(aUserMembership().forUser(user3.getId()).memberOf(group1.getId(), role1.getId()).build());
+
+        final SProfile profile2 = repository.add(aProfile().withName("secondProfile").build());
+        repository.add(aProfileMember().withGroupId(group2.getId()).withRoleId(role2.getId())
+                .withProfileId(profile2.getId()).build());
+        repository.add(aUserMembership().forUser(user2.getId()).memberOf(group2.getId(), role2.getId()).build());
+        repository.add(aUserMembership().forUser(user3.getId()).memberOf(group2.getId(), role2.getId()).build());
+
+        repository.add(aUserMembership().forUser(user4.getId()).memberOf(group3.getId(), role3.getId()).build());
+
+        final SApplication application1 = repository
+                .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
+                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build());
+        final SApplication application2 = repository
+                .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
+                        .withDisplayName("my app2").withVersion("1.0").withPath("/app2").withProfile(profile1.getId())
+                        .build());
+        final SApplication application3 = repository
+                .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
+                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build());
+
+        repository.flush();
+
+        //then
+        assertThat(repository.searchApplicationOfUser(user1.getId())).containsExactly(application1, application2);
+        assertThat(repository.searchApplicationOfUser(user2.getId())).containsExactly(application3);
+        assertThat(repository.searchApplicationOfUser(user3.getId())).containsExactly(application1, application2,
+                application3);
+        assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
+        assertThat(repository.searchApplicationOfUser(user5.getId())).isEmpty();
+        assertThat(repository.searchApplicationOfUser(6L)).isEmpty();
+
+        //then
+        assertThat(repository.getNumberOfApplicationOfUser(user1.getId())).isEqualTo(2);
+        assertThat(repository.getNumberOfApplicationOfUser(user2.getId())).isEqualTo(1);
+        assertThat(repository.getNumberOfApplicationOfUser(user3.getId())).isEqualTo(3);
+        assertThat(repository.getNumberOfApplicationOfUser(user4.getId())).isEqualTo(0);
+        assertThat(repository.getNumberOfApplicationOfUser(user5.getId())).isEqualTo(0);
+        assertThat(repository.getNumberOfApplicationOfUser(6L)).isEqualTo(0);
     }
 
 }
