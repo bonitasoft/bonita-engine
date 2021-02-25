@@ -149,13 +149,15 @@ public class ApplicationIT extends TestWithTechnicalUser {
         //when
         final SearchOptionsBuilder builderUser1 = new SearchOptionsBuilder(0, 10);
         builderUser1.filter(ApplicationSearchDescriptor.USER_ID, user1.getId());
+        builderUser1.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
         final SearchResult<Application> applicationsUser1 = getApplicationAPI().searchApplications(builderUser1.done());
         assertThat(applicationsUser1).isNotNull();
         assertThat(applicationsUser1.getCount()).isEqualTo(2);
-        assertThat(applicationsUser1.getResult()).containsExactly(hr, engineering);
+        assertThat(applicationsUser1.getResult()).containsExactly(engineering, hr);
 
         final SearchOptionsBuilder builderUser2 = new SearchOptionsBuilder(0, 10);
         builderUser2.filter(ApplicationSearchDescriptor.USER_ID, user2.getId());
+        builderUser2.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
         final SearchResult<Application> applicationsUser2 = getApplicationAPI().searchApplications(builderUser2.done());
         assertThat(applicationsUser2).isNotNull();
         assertThat(applicationsUser2.getCount()).isEqualTo(1);
@@ -163,13 +165,15 @@ public class ApplicationIT extends TestWithTechnicalUser {
 
         final SearchOptionsBuilder builderUser3 = new SearchOptionsBuilder(0, 10);
         builderUser3.filter(ApplicationSearchDescriptor.USER_ID, user3.getId());
+        builderUser3.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
         final SearchResult<Application> applicationsUser3 = getApplicationAPI().searchApplications(builderUser3.done());
         assertThat(applicationsUser3).isNotNull();
         assertThat(applicationsUser3.getCount()).isEqualTo(3);
-        assertThat(applicationsUser3.getResult()).containsExactly(hr, engineering, marketing);
+        assertThat(applicationsUser3.getResult()).containsExactly(engineering, hr, marketing);
 
         final SearchOptionsBuilder builderUser4 = new SearchOptionsBuilder(0, 10);
         builderUser4.filter(ApplicationSearchDescriptor.USER_ID, user4.getId());
+        builderUser4.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
         final SearchResult<Application> applicationsUser4 = getApplicationAPI().searchApplications(builderUser4.done());
         assertThat(applicationsUser4.getResult()).isEmpty();
     }
