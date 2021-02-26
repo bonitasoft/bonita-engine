@@ -19,7 +19,6 @@ import static org.bonitasoft.platform.configuration.impl.ConfigurationServiceImp
 import java.util.List;
 
 import org.bonitasoft.platform.configuration.impl.BonitaAllConfigurationPreparedStatementSetter;
-import org.bonitasoft.platform.configuration.impl.BonitaConfigurationPreparedStatementSetter;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.TransactionStatus;
@@ -53,7 +52,7 @@ public class StoreConfigurationsIfNotExist extends TransactionCallbackWithoutRes
                 // only keep elements that do not already exist in database...
                 LOGGER.info("New configuration file detected '{}'. Storing it to database.",
                         configuration.getResourceName());
-                jdbcTemplate.batchUpdate(BonitaConfigurationPreparedStatementSetter.INSERT_CONFIGURATION,
+                jdbcTemplate.batchUpdate(BonitaAllConfigurationPreparedStatementSetter.INSERT_CONFIGURATION,
                         new BonitaAllConfigurationPreparedStatementSetter(singletonList(configuration), dbVendor));
             } else {
                 LOGGER.debug("Configuration already exists for type: {}, resource: {} and tenant id: {}. Ignoring it.",
