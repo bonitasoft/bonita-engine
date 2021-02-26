@@ -16,8 +16,13 @@ package org.bonitasoft.engine.configuration;
 import org.bonitasoft.engine.authentication.AuthenticationConfiguration;
 import org.bonitasoft.engine.cache.CacheServiceConfiguration;
 import org.bonitasoft.engine.core.operation.OperationServiceConfiguration;
+import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.impl.EventServiceImpl;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionServiceConfiguration;
 import org.bonitasoft.engine.work.WorkServiceConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -37,5 +42,14 @@ import org.springframework.context.annotation.Import;
         CacheServiceConfiguration.class
 })
 public class EngineTenantConfiguration {
+
+    //There is one instance of that bean in the platform context and one in the tenant context
+    // Also it is overridden in cluster mode
+    // the bean is injected using the name "tenantEventService" and is overridden thanks to the ConditionalOnMissingBean condition on the name
+    @Bean("tenantEventService")
+    @ConditionalOnMissingBean(name = "tenantEventService")
+    EventService tenantEventService(TechnicalLoggerService logger) {
+        return new EventServiceImpl(logger);
+    }
 
 }

@@ -712,10 +712,6 @@
         </constructor-arg>
     </bean>
 
-    <bean id="tenantEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-    </bean>
-
     <bean id="connectorExecutor" class="org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl">
         <constructor-arg name="queueCapacity" value="${bonita.tenant.connector.queueCapacity}" />
         <constructor-arg name="corePoolSize" value="${bonita.tenant.connector.corePoolSize}" />
@@ -1401,27 +1397,6 @@
         <property name="copyOnRead" value="${bonita.tenant.cache.default.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.tenant.cache.default.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.tenant.cache.default.readIntensive}" />
-    </bean>
-
-    <bean id="cacheConfigurations" parent="communityCacheConfigurations"
-          class="org.springframework.beans.factory.config.ListFactoryBean">
-        <property name="sourceList">
-            <list merge="true">
-            </list>
-        </property>
-    </bean>
-
-    <bean id="communityCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
-        <property name="sourceList">
-            <list merge="true">
-                <ref bean="processDefinitionCacheConfig" />
-                <ref bean="connectorCacheConfig" />
-                <ref bean="parameterCacheConfig" />
-                <ref bean="userFilterCacheConfig" />
-                <ref bean="groovyScriptCacheConfig" />
-                <ref bean="transientDataCacheConfig" />
-            </list>
-        </property>
     </bean>
 
     <bean id="connectorCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
