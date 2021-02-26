@@ -56,9 +56,10 @@ class DockerDatabaseContainerTasksCreator {
             ]
     ]
 
-    private static String getDockerHost() {
+    private static String getDockerHost(def project) {
         def dockerHost = System.getenv('DOCKER_HOST')
         if (dockerHost?.trim()) {
+            project.logger.quiet("using DOCKER_HOST: ${dockerHost}")
             return new URI(dockerHost).host
         }
         return 'localhost'
@@ -130,7 +131,7 @@ class DockerDatabaseContainerTasksCreator {
                     it.networkSettings.ports.getBindings().each { exposedPort, bindingArr ->
                         if (exposedPort.port == vendor.portBinding) {
                             int portBinding = bindingArr.first().hostPortSpec as int
-                            def dockerHost = getDockerHost()
+                            def dockerHost = getDockerHost(project)
                             dbConnectionSettings.dbUrl = vendor.name == "oracle" ? String.format(vendor.uriTemplate, dockerHost, portBinding) : String.format(vendor.uriTemplate, dockerHost, portBinding, "bonita")
                             dbConnectionSettings.serverName = dockerHost
                             dbConnectionSettings.portNumber = portBinding
