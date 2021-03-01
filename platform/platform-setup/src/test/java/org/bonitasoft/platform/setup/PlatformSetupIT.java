@@ -147,9 +147,8 @@ public class PlatformSetupIT {
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '"
                         + ConfigurationType.TENANT_TEMPLATE_PORTAL + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(12);
+        assertThat(rows).hasSize(11);
         int rowId = 0;
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("authenticationManager-config.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping-custom.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME"))
                 .isEqualTo("compound-permissions-mapping-internal.properties");
@@ -245,7 +244,6 @@ public class PlatformSetupIT {
                 "security-config.properties",
                 "bonita-tenant-community-custom.properties",
                 "bonita-tenants-custom.xml",
-                "authenticationManager-config.properties",
                 "compound-permissions-mapping.properties",
                 "compound-permissions-mapping-custom.properties",
                 "compound-permissions-mapping-internal.properties",
