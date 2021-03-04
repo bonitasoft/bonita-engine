@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.junit.Before;
@@ -70,6 +71,21 @@ public class TomcatBundleConfiguratorTest {
         databaseAbsolutePath = BundleConfigurator
                 .convertWindowsBackslashes(bundleFolder.resolve("h2_database").normalize().toString());
         spy = spy(configurator);
+    }
+
+    @Test
+    public void should_not_fail_if_bonita_xml_file_does_not_pre_exist() throws Exception {
+        // given:
+        final Path bonitaXmlPath = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost")
+                .resolve("bonita.xml");
+        PathUtils.deleteFile(bonitaXmlPath);
+        assertThat(bonitaXmlPath).doesNotExist();
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        assertThat(bonitaXmlPath).exists();
     }
 
     @Test

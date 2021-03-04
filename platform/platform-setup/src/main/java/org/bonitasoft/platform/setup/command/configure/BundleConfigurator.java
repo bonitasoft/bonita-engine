@@ -108,13 +108,19 @@ abstract class BundleConfigurator {
     }
 
     void backupAndReplaceContentIfNecessary(Path path, String newContent, String message) throws PlatformException {
-        String previousContent = readContentFromFile(path);
-        if (!previousContent.equals(newContent)) {
-            makeBackupOfFile(path);
-            writeContentToFile(path, newContent);
-            LOGGER.info(message);
+        if (Files.exists(path)) {
+            String previousContent = readContentFromFile(path);
+            if (!previousContent.equals(newContent)) {
+                makeBackupOfFile(path);
+                writeContentToFile(path, newContent);
+                LOGGER.info(message);
+            } else {
+                LOGGER.info(
+                        "Same configuration detected for file '" + getRelativePath(path) + "'. No need to change it.");
+            }
         } else {
-            LOGGER.info("Same configuration detected for file '" + getRelativePath(path) + "'. No need to change it.");
+            LOGGER.info("File '" + getRelativePath(path) + "' did not already exist. Creating it.");
+            writeContentToFile(path, newContent);
         }
     }
 

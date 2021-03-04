@@ -46,7 +46,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         final String bdmDbVendor = bdmConfiguration.getDbVendor();
         final Path setEnvUnixFile = getPathUnderAppServer("bin/setenv.sh", true);
         final Path setEnvWindowsFile = getPathUnderAppServer("bin/setenv.bat", true);
-        final Path bonitaXmlFile = getPathUnderAppServer("conf/Catalina/localhost/bonita.xml", true);
+        final Path bonitaXmlFile = getPathUnderAppServer("conf/Catalina/localhost/bonita.xml", false);
         final File bonitaDbDriverFile = getDriverFile(dbVendor);
         final File bdmDriverFile = getDriverFile(bdmDbVendor);
 
