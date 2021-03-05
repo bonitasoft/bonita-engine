@@ -174,11 +174,15 @@ class ShadePlugin implements Plugin<Project> {
      * get the Project (object) from the ResolvedDependency (object)
      */
     private Project getAssociatedProjectFromDependency(Project project, ResolvedDependency dependency) {
-        def identifier = dependency.getModuleArtifacts().first().id.componentIdentifier
-        if (!(identifier instanceof ProjectComponentIdentifier)) {
+        if(dependency.getModuleArtifacts()) {
+            def identifier = dependency.getModuleArtifacts().first().id.componentIdentifier
+            if (!(identifier instanceof ProjectComponentIdentifier)) {
+                return null
+            }
+            project.project(identifier.projectPath)
+        }else {
             return null
         }
-        project.project(identifier.projectPath)
     }
 
     private boolean isAShadeProject(Project it) {

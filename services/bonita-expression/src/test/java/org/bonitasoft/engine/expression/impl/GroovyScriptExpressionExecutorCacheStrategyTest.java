@@ -286,7 +286,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     public void evaluation_with_DefaultGroovyMethod_size_should_return_4()
             throws SExpressionEvaluationException, SInvalidExpressionException {
         String content = "import static org.codehaus.groovy.runtime.DefaultGroovyMethods.*\n"
-                + "size(new StringBuffer('test'))";
+                + "size('test'.toCharArray())";
         SExpression expression = integerExpression(content);
         Object value = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression,
                 singletonMap(DEFINITION_ID, 42L), emptyMap(), null);
