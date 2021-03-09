@@ -1,4 +1,4 @@
-<configuration debug="false" scan="true" scanPeriod="30 seconds">
+<configuration debug="false" scan="false">
 
 <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
@@ -8,7 +8,6 @@
 </appender>
 
 <root level="INFO">
-
     <appender-ref ref="STDOUT"/>
 </root>
 

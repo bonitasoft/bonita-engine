@@ -14,8 +14,6 @@
 package org.bonitasoft.engine;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
@@ -30,6 +28,8 @@ import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Initialize the engine and create/start or not the platform based on bonita-platform.xml
@@ -42,7 +42,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class EngineInitializer {
 
-    private static final Logger LOGGER = Logger.getLogger(EngineInitializer.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EngineInitializer.class.getName());
 
     private static PlatformAPI platformAPI;
 
@@ -51,7 +51,7 @@ public class EngineInitializer {
     }
 
     public void initializeEngine() throws Exception {
-        LOGGER.log(Level.INFO, "Initializing Bonita Engine...");
+        LOGGER.info("Initializing Bonita Engine...");
         final long before = System.currentTimeMillis();
         // create a session to call the engine
         final PlatformSessionService platformSessionService = getPlatformSessionService();
@@ -65,20 +65,26 @@ public class EngineInitializer {
             }
             // initialization of the platform
             if (!platformAPI.isPlatformInitialized()) {
-                LOGGER.log(Level.INFO, "First run on this platform, initializing it...");
+                LOGGER.info("First run on this platform, initializing it...");
                 platformAPI.initializePlatform();
-                LOGGER.log(Level.INFO, "Platform initialized successfully.");
+                LOGGER.info("Platform initialized successfully.");
             } else {
-                LOGGER.log(Level.INFO, "Platform is already initialized.");
+                LOGGER.info("Platform is already initialized.");
             }
-            LOGGER.log(Level.INFO, "Starting node...");
+            LOGGER.info("Starting node...");
+
+            LOGGER.info(getEditionMessage());
             platformAPI.startNode();
-            LOGGER.log(Level.INFO, "Node started successfully.");
+            LOGGER.info("Node started successfully.");
             final long after = System.currentTimeMillis();
-            LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
+            LOGGER.info("Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
+    }
+
+    protected String getEditionMessage() {
+        return "Bonita platform is Community edition";
     }
 
     SessionAccessor getSessionAccessor() throws BonitaHomeNotSetException, InstantiationException,
@@ -125,7 +131,7 @@ public class EngineInitializer {
     }
 
     public void unloadEngine() throws Exception {
-        LOGGER.log(Level.INFO, "Stopping Bonita Engine...");
+        LOGGER.info("Stopping Bonita Engine...");
         // create a session to call the engine
         final SessionAccessor sessionAccessor = getSessionAccessor();
         PlatformSessionService platformSessionService = getPlatformSessionService();
@@ -133,18 +139,18 @@ public class EngineInitializer {
         final PlatformAPI platformAPI = getPlatformAPI();
         try {
             if (!platformAPI.isNodeStarted()) {
-                LOGGER.log(Level.INFO, "Node is not started, nothing to do.");
+                LOGGER.info("Node is not started, nothing to do.");
                 return;
             }
-            LOGGER.log(Level.INFO, "Stopping node...");
+            LOGGER.info("Stopping node...");
             platformAPI.stopNode();
         } catch (final Throwable e) {
-            LOGGER.log(Level.SEVERE, "Issue while stopping the platform", e);
+            LOGGER.warn("Error while stopping the platform", e);
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
             // after that the engine is unloaded
             getServiceAccessorFactory().destroyAccessors();
-            LOGGER.log(Level.INFO, "Bonita Engine stopped!");
+            LOGGER.info("Bonita Engine stopped!");
         }
 
     }
