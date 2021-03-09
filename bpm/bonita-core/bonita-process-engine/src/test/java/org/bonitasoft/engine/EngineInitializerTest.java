@@ -25,7 +25,9 @@ import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -49,6 +51,9 @@ public class EngineInitializerTest {
     @Mock
     private SPlatformSession sPlatformSession;
 
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+
     @Before
     public void before() throws Exception {
         doReturn(platformAPI).when(engineInitializer).getPlatformAPI();
@@ -59,13 +64,19 @@ public class EngineInitializerTest {
     }
 
     @Test
-    public void testInitializeEngine() throws Exception {
+    public void initializeEngine_should_initialize_platform_and_start_node() throws Exception {
+        // given
         doReturn(true).when(platformAPI).isPlatformCreated();
+        systemOutRule.clearLog();
 
+        // when
         engineInitializer.initializeEngine();
 
+        //then
         verify(platformAPI).initializePlatform();
         verify(platformAPI).startNode();
+        assertThat(systemOutRule.getLog()).contains("Bonita platform is Community edition");
+
     }
 
     @Test
