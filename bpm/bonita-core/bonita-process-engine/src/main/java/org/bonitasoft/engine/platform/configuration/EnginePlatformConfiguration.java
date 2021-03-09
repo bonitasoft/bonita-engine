@@ -14,10 +14,15 @@
 package org.bonitasoft.engine.platform.configuration;
 
 import org.bonitasoft.engine.classloader.ClassloaderConfiguration;
+import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.impl.EventServiceImpl;
 import org.bonitasoft.engine.lock.LockServiceConfiguration;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.configuration.monitoring.MonitoringConfiguration;
 import org.bonitasoft.engine.platform.session.PlatformSessionConfiguration;
 import org.bonitasoft.engine.scheduler.SchedulerConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -39,5 +44,11 @@ import org.springframework.context.annotation.Import;
 })
 @ComponentScan("org.bonitasoft.engine.platform")
 public class EnginePlatformConfiguration {
+
+    @Bean("platformEventService")
+    @ConditionalOnMissingBean(name = "platformEventService")
+    EventService platformEventService(TechnicalLoggerService loggerService) {
+        return new EventServiceImpl(loggerService);
+    }
 
 }
