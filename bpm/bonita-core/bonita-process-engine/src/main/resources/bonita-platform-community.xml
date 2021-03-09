@@ -166,7 +166,6 @@
 
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="cacheConfigurations" ref="platformCacheConfigurations" />
         <constructor-arg name="defaultCacheConfiguration" ref="defaultPlatformCacheConfiguration" />
         <constructor-arg name="diskStorePath" value="java.io.tmpdir/platform.cache" />
     </bean>
@@ -182,22 +181,6 @@
         <property name="copyOnRead" value="${bonita.platform.cache.default.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.platform.cache.default.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.platform.cache.default.readIntensive}" />
-    </bean>
-
-    <bean id="platformCacheConfigurations" parent="communityPlatformCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
-        <property name="sourceList">
-            <list merge="true">
-            </list>
-        </property>
-    </bean>
-
-    <bean id="communityPlatformCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
-        <property name="sourceList">
-            <list merge="true">
-                <ref bean="synchroServiceCacheConfig" />
-                <ref bean="platformCacheConfig" />
-            </list>
-        </property>
     </bean>
 
     <bean id="synchroServiceCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
@@ -238,10 +221,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
-    </bean>
-
-    <bean id="platformEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="sequenceMappingProvider" class="org.bonitasoft.engine.sequence.SequenceMappingProvider" autowire="byType" />
