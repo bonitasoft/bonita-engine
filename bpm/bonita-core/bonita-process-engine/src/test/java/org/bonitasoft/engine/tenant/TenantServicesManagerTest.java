@@ -280,4 +280,13 @@ public class TenantServicesManagerTest {
         assertThat(tenantServicesManager.isStarted()).isFalse();
     }
 
+    @Test
+    public void initServices_should_call_init_on_all_the_services() throws Exception {
+
+        tenantServicesManager.initServices();
+        verify(tenantService1).init();
+        verify(tenantService2).init();
+        verify(tenantService3).init();
+
+    }
 }

@@ -136,4 +136,9 @@ public interface PageService extends TenantLifecycleService {
      */
     List<SPage> getPageByProcessDefinitionId(long processDefinitionId, int fromIndex, int numberOfResults)
             throws SBonitaReadException;
+
+    /**
+     * @return true if the service has been started again since it was last paused/stopped
+     */
+    boolean initialized();
 }

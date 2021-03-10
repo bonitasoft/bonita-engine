@@ -131,6 +131,8 @@ public class PageServiceImpl implements PageService {
 
     private List<ImportPageDescriptor> providedPages = Collections.EMPTY_LIST;
 
+    private boolean initialized = false;
+
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
             final ProfileService profileService) {
@@ -626,10 +628,36 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void init() throws SBonitaException {
         for (final ImportPageDescriptor page : getProvidedPages()) {
             importProvidedPage(page);
         }
+        initialized = true;
+    }
+
+    @Override
+    public void start() throws SBonitaException {
+        // nothing to do
+    }
+
+    @Override
+    public void stop() {
+        // nothing to do
+    }
+
+    @Override
+    public void pause() {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do
+    }
+
+    @Override
+    public boolean initialized() {
+        return initialized;
     }
 
     private void importProvidedPage(final ImportPageDescriptor pageDesc) throws SBonitaException {
@@ -691,21 +719,6 @@ public class PageServiceImpl implements PageService {
             }
             return IOUtil.getAllContentFrom(inputStream);
         }
-    }
-
-    @Override
-    public void stop() {
-        // nothing to do
-    }
-
-    @Override
-    public void pause() {
-        // nothing to do
-    }
-
-    @Override
-    public void resume() {
-        // nothing to do
     }
 
     public List<PageServiceListener> getPageServiceListeners() {

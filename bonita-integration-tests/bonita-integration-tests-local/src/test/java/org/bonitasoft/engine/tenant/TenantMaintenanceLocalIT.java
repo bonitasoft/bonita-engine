@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -22,6 +21,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.WorkService;
@@ -34,11 +34,12 @@ import org.junit.Test;
 public class TenantMaintenanceLocalIT extends TestWithUser {
 
     @Test
-    public void should_pause_tenant_then_stop_start_node_dont_restart_elements_but_resume_restart_them()
+    public void should_pause_tenant_then_stop_start_node_start_pageService_again_but_dont_restart_elements_but_resume_restart_them()
             throws Exception {
         // given: tenant is paused
         long tenantId = getSession().getTenantId();
         WorkService workService = getTenantAccessor(tenantId).getWorkService();
+        PageService pageService = getTenantAccessor(tenantId).getPageService();
         assertFalse(workService.isStopped());
 
         logoutThenloginAs(USERNAME, PASSWORD);
@@ -59,6 +60,8 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         // when: we stop and start the node
         stopAndStartPlatform();
 
+        // assert the page service has been restarted even though the tenant is paused, and that provided pages have been re-imported
+        assertTrue(pageService.initialized());
         // then: work service is not running
         workService = getTenantAccessor(tenantId).getWorkService();
         assertTrue(workService.isStopped());
