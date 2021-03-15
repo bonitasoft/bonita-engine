@@ -13,12 +13,16 @@
  **/
 package org.bonitasoft.engine.platform.configuration;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.classloader.ClassloaderConfiguration;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.impl.EventServiceImpl;
 import org.bonitasoft.engine.lock.LockServiceConfiguration;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.platform.configuration.monitoring.MonitoringConfiguration;
+import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
 import org.bonitasoft.engine.platform.session.PlatformSessionConfiguration;
 import org.bonitasoft.engine.scheduler.SchedulerConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -36,7 +40,6 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @Import({
-        MonitoringConfiguration.class,
         SchedulerConfiguration.class,
         LockServiceConfiguration.class,
         PlatformSessionConfiguration.class,
@@ -49,6 +52,25 @@ public class EnginePlatformConfiguration {
     @ConditionalOnMissingBean(name = "platformEventService")
     EventService platformEventService(TechnicalLoggerService loggerService) {
         return new EventServiceImpl(loggerService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    MeterRegistry meterRegistry() {
+        return new SimpleMeterRegistry();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public HibernateMetricsBinder noOpHibernateMetrics() {
+        return (sessionFactory -> {
+        });
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ExecutorServiceMetricsProvider noOpExecutorServiceBinder() {
+        return new NoOpExecutorServiceMetricsProvider();
     }
 
 }
