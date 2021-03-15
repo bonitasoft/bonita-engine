@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 Bonitasoft S.A.
+ * Copyright (C) 2021 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,7 +16,7 @@ package org.bonitasoft.permissions
 
 
 
-
+import org.bonitasoft.engine.api.ApplicationAPI
 import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.permission.APICallContext
@@ -31,37 +31,51 @@ import org.bonitasoft.engine.session.APISession
  *
  * can be added to
  * <ul>
- *     <li>portal/profile</li>
- *     <li>userXP/profile</li>
+ *     <li>GET|living/application-menu</li>
  * </ul>
- * @author Baptiste Mesta
+ * @author Anthony Birembaut
  */
-class ProfilePermissionRule  implements PermissionRule {
+class ApplicationMenuPermissionRule implements PermissionRule {
 
     @Override
     boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         try {
             if (apiCallContext.isGET()) {
-                if(apiCallContext.getResourceId() != null){
-                    def profileId = Long.valueOf(apiCallContext.getResourceId())
-                    def processAPI = apiAccessor.getProfileAPI()
-
+                def applicationAPI = apiAccessor.getLivingApplicationAPI()
+                def applicationId = getApplicationId(apiCallContext, applicationAPI)
+                if (applicationId != -1l) {
+                    def profileAPI = apiAccessor.getProfileAPI()
+                    def application = applicationAPI.getApplication(applicationId)
+                    def profileId = application.getProfileId()
                     def index = 0
                     def profile
                     def list = []
-                    while ((list = processAPI.getProfilesForUser(apiSession.getUserId(),index,100,ProfileCriterion.ID_ASC)).size() == 100 && (profile = list.find{it.getId() == profileId}) == null){
+                    while ((list = profileAPI.getProfilesForUser(apiSession.getUserId(), index, 100, ProfileCriterion.ID_ASC)).size() == 100 && (profile = list.find{it.getId() == profileId}) == null){
                         index += 100
                     }
                     return profile != null || list.find{it.getId() == profileId} != null
-                } else {
-                    return apiSession.getUserId().toString().equals(apiCallContext.getFilters().get("user_id"))
                 }
             }
             return false
         } catch (NotFoundException e) {
-            logger.debug("profile not found: is allowed")
+            logger.debug("application menu not found: is allowed")
             //let the API handle the 404
             return true
         }
+    }
+
+    private long getApplicationId(APICallContext apiCallContext, ApplicationAPI applicationAPI) {
+        def applicationId = -1l
+        if (apiCallContext.getResourceId() != null) {
+            def menuId = Long.valueOf(apiCallContext.getResourceId())
+            def applicationMenu = applicationAPI.getApplicationMenu(menuId)
+            applicationId = applicationMenu.getApplicationId()
+        } else {
+            def filters = apiCallContext.getFilters()
+            if (filters.containsKey("applicationId")){
+                applicationId = Long.valueOf(filters.get("applicationId"))
+            }
+        }
+        return applicationId
     }
 }

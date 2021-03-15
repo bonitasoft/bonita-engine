@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 Bonitasoft S.A.
+ * Copyright (C) 2021 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -31,35 +31,36 @@ import org.bonitasoft.engine.session.APISession
  *
  * can be added to
  * <ul>
- *     <li>portal/profile</li>
- *     <li>userXP/profile</li>
+ *     <li>GET|living/application</li>
  * </ul>
- * @author Baptiste Mesta
+ * @author Anthony Birembaut
  */
-class ProfilePermissionRule  implements PermissionRule {
+class ApplicationPermissionRule implements PermissionRule {
 
     @Override
     boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         try {
             if (apiCallContext.isGET()) {
-                if(apiCallContext.getResourceId() != null){
-                    def profileId = Long.valueOf(apiCallContext.getResourceId())
-                    def processAPI = apiAccessor.getProfileAPI()
-
+                if (apiCallContext.getResourceId() != null) {
+                    def applicationId = Long.valueOf(apiCallContext.getResourceId())
+                    def profileAPI = apiAccessor.getProfileAPI()
+                    def applicationAPI = apiAccessor.getLivingApplicationAPI()
+                    def application = applicationAPI.getApplication(applicationId)
+                    def profileId = application.getProfileId()
                     def index = 0
                     def profile
                     def list = []
-                    while ((list = processAPI.getProfilesForUser(apiSession.getUserId(),index,100,ProfileCriterion.ID_ASC)).size() == 100 && (profile = list.find{it.getId() == profileId}) == null){
+                    while ((list = profileAPI.getProfilesForUser(apiSession.getUserId(),index,100,ProfileCriterion.ID_ASC)).size() == 100 && (profile = list.find{it.getId() == profileId}) == null) {
                         index += 100
                     }
                     return profile != null || list.find{it.getId() == profileId} != null
                 } else {
-                    return apiSession.getUserId().toString().equals(apiCallContext.getFilters().get("user_id"))
+                    return apiSession.getUserId().toString().equals(apiCallContext.getFilters().get("userId"))
                 }
             }
             return false
         } catch (NotFoundException e) {
-            logger.debug("profile not found: is allowed")
+            logger.debug("application not found: is allowed")
             //let the API handle the 404
             return true
         }
