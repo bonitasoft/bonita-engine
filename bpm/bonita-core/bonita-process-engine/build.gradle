@@ -72,7 +72,6 @@ dependencies {
     compile "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
     compile "org.codehaus.groovy:groovy-test:${Deps.groovyVersion}"
     compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
-    compile "io.micrometer:micrometer-registry-jmx:${Deps.micrometerVersion}"
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
     compile("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
 
