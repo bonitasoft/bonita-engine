@@ -1,5 +1,4 @@
-plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
-
+configurations { schemagen }
 dependencies {
     compile project(':bpm:bonita-common')
     compile project(':services:bonita-recorder')
@@ -31,19 +30,37 @@ dependencies {
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+
+    schemagen(
+            "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",
+            "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}",
+            "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}",
+            "org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbVersion}",
+            "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
 }
-jaxb {
-    //generates schema from java code
-    schemaGen {
-        //generates java code for project from project schema
-        connectors {
-            javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/core/connector/parser/*.java')
-            namespaceconfigs = ['http://www.bonitasoft.org/ns/connector/implementation/6.0': 'connectors-impl.xsd']
+
+task('schemagen') {
+    def destDir = file("$buildDir/schemas")
+    doLast {
+        destDir.mkdirs()
+        ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
+        try {
+            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+                classpath { pathelement(path: configurations.schemagen.asPath) }
+                include(name: 'org/bonitasoft/engine/core/connector/parser/*.java')
+            }
+        } catch (Exception e) {
+            def schema = file("$destDir/schema1.xsd")
+            if (!schema.exists()) throw e
+            schema.renameTo(file("$destDir/connectors-impl.xsd"))
         }
     }
+    inputs.dir('src/main/java/')
+    outputs.file("$destDir/connectors-impl.xsd")
 }
 
-processResources { from "$buildDir/generated/jaxb/schema/connectors" }
+processResources { from "$buildDir/schemas" }
 
-tasks.jaxbSchemaGenConnectors.outputs.cacheIf { true }
-tasks.processResources.dependsOn tasks.jaxbSchemaGenConnectors
+tasks.processResources.dependsOn tasks.schemagen
+
+tasks.schemagen.outputs.cacheIf { true }

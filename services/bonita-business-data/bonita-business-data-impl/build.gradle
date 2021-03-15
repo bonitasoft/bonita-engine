@@ -14,7 +14,7 @@ dependencies {
     }
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile project(':services:bonita-classloader')
-    compileOnly "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
+    runtime "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"

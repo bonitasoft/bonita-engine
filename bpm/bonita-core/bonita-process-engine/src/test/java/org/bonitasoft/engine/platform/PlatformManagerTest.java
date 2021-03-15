@@ -252,15 +252,6 @@ public class PlatformManagerTest {
     }
 
     @Test
-    public void should_warn_when_using_java_8() throws Exception {
-        System.setProperty("java.specification.version", "1.8");
-
-        platformManager.start();
-
-        assertThat(systemOutRule.getLog()).containsPattern("WARN.*You are running the platform using java version 8");
-    }
-
-    @Test
     public void should_not_warn_when_using_java_11() throws Exception {
         System.setProperty("java.specification.version", "11");
 

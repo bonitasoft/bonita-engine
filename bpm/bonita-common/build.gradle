@@ -1,7 +1,6 @@
 import org.bonitasoft.engine.gradle.PomUtils
 
-plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
-
+configurations { schemagen }
 
 dependencies {
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
@@ -9,10 +8,10 @@ dependencies {
     compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile "com.fasterxml.jackson.core:jackson-annotations:${Deps.jacksonDataBindingVersion}"
-    runtime("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"){
+    compile("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    runtime("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}"){
+    compile("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
     runtime "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
@@ -26,6 +25,13 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly project(':bpm:bonita-sap-jco-connector-api')
     testCompile project(':bpm:bonita-sap-jco-connector-api')
+
+    schemagen(
+            "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",
+            "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}",
+            "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}",
+            "org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbVersion}",
+            "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
 }
 
 def generateInfoProperties = task("generateInfoProperties") {
@@ -78,52 +84,69 @@ publishing {
     }
 }
 
-
-jaxb {
-    //generates schema from java code
-    schemaGen {
-        forms {
-            javaFiles = fileTree(dir: 'src/main/java', includes: [
-                    'org/bonitasoft/engine/bpm/bar/form/model/*.java',
-                    'org/bonitasoft/engine/form/*.java'
-            ])
-            namespaceconfigs = ['http://www.bonitasoft.org/ns/form/6.0': 'form-mapping.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas/form-mapping")
+task('schemagen') {
+    def destDir = file("$buildDir/schemas")
+    doLast {
+        destDir.mkdirs()
+        ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
+        try {
+            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+                classpath { pathelement(path: configurations.schemagen.asPath) }
+                include(name: 'org/bonitasoft/engine/bpm/bar/form/model/*.java')
+                include(name: 'org/bonitasoft/engine/form/*.java')
+            }
+        } catch (Exception e) {
+            def schema = file("$destDir/schema1.xsd")
+            if (!schema.exists()) throw e
+            schema.renameTo(file("$destDir/form-mapping.xsd"))
         }
-        application {
-            javaFiles = fileTree(dir: 'src/main/java', includes: ['org/bonitasoft/engine/business/application/xml/**/*.java'],
-                    excludes: ['**/*Builder.java'])
-            namespaceconfigs = ['http://documentation.bonitasoft.com/application-xml-schema/1.0': 'application.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas/application")
+        try {
+            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+                classpath { pathelement(path: configurations.schemagen.asPath) }
+                include(name: 'org/bonitasoft/engine/business/application/xml/**/*.java')
+                exclude(name: '**/*Builder.java')
+            }
+        } catch (Exception e) {
+            def schema = file("$destDir/schema1.xsd")
+            if (!schema.exists()) throw e
+            schema.renameTo(file("$destDir/application.xsd"))
         }
-        bom {
-            javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/bdm/model/**/*.java')
-            namespaceconfigs = ['http://documentation.bonitasoft.com/bdm-xml-schema/1.0': 'bom.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas/bom")
+        try {
+            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+                classpath { pathelement(path: configurations.schemagen.asPath) }
+                include(name: 'org/bonitasoft/engine/bdm/model/**/*.java')
+                exclude(name: 'org/bonitasoft/engine/bdm/model/QueryParameterTypes.java')
+            }
+        } catch (Exception e) {
+            def schema = file("$destDir/schema1.xsd")
+            if (!schema.exists()) throw e
+            schema.renameTo(file("$destDir/bom.xsd"))
         }
-        profile {
-            javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/profile/xml/**/*.java')
-            namespaceconfigs = ['http://www.bonitasoft.org/ns/profile/6.1': 'profiles.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas/profiles")
+        try {
+            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+                classpath { pathelement(path: configurations.schemagen.asPath) }
+                include(name: 'org/bonitasoft/engine/profile/xml/**/*.java')
+            }
+        } catch (Exception e) {
+            def schema = file("$destDir/schema1.xsd")
+            if (!schema.exists()) throw e
+            schema.renameTo(file("$destDir/profiles.xsd"))
         }
     }
+    inputs.dir('src/main/java/')
+    outputs.file("$destDir/form-mapping.xsd")
+    outputs.file("$destDir/application.xsd")
+    outputs.file("$destDir/bom.xsd")
+    outputs.file("$destDir/profiles.xsd")
 }
 
 processResources {
-    from "$buildDir/generated/jaxb/schemas/form-mapping"
-    from "$buildDir/generated/jaxb/schemas/application"
-    from "$buildDir/generated/jaxb/schemas/bom"
-    from "$buildDir/generated/jaxb/schemas/profiles"
+    from "$buildDir/schemas"
 }
 
+tasks.processResources.dependsOn tasks.schemagen
+
 //tasks.processResources.dependsOn tasks.jaxbSchemaGenProcessdefinition
-tasks.jaxbSchemaGenApplication.outputs.cacheIf { true }
-tasks.jaxbSchemaGenBom.outputs.cacheIf { true }
-tasks.jaxbSchemaGenProfile.outputs.cacheIf { true }
-tasks.jaxbSchemaGenForms.outputs.cacheIf { true }
-tasks.processResources.dependsOn tasks.jaxbSchemaGenApplication
-tasks.processResources.dependsOn tasks.jaxbSchemaGenBom
-tasks.processResources.dependsOn tasks.jaxbSchemaGenProfile
-tasks.processResources.dependsOn tasks.jaxbSchemaGenForms
+tasks.schemagen.outputs.cacheIf { true }
 
 test { jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}" }

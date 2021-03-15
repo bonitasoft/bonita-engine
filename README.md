@@ -17,7 +17,7 @@ The engine can however be included as a standalone dependency in a custom Applic
 ## Running the Project
 
 ### Prerequisites
->     Java JDK 1.8 (to compile), and JVM 8 or 11 (to run)
+>     Java JDK 11 (to compile), and 11 (to run)
 
 This project bundles the [Gradle Wrapper][wrapper], so the `gradlew` script is available at
 the project root.
