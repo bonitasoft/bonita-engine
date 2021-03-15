@@ -98,7 +98,6 @@ public class PlatformManager {
      * @return true if the node was started, false if it was not startable (already started, starting or stopping)
      */
     public synchronized boolean start() throws Exception {
-        verifyJavaVersion();
         logger.info("Starting platform:");
         if (!platformStateProvider.initializeStart()) {
             logger.info("Platform cannot be started, it is: {}", platformStateProvider.getState());
@@ -115,14 +114,6 @@ public class PlatformManager {
         restartHandlersOfPlatform();
         logger.info("Platform started.");
         return true;
-    }
-
-    private void verifyJavaVersion() {
-        String javaVersion = System.getProperty("java.specification.version");
-        if (javaVersion != null && javaVersion.startsWith("1.8")) {
-            logger.warn("You are running the platform using java version 8, the next version of Bonita platform will " +
-                    "only work with java version 11 and above. Upgrade as soon as possible");
-        }
     }
 
     TenantStateManager getTenantStateManager(STenant tenant) {

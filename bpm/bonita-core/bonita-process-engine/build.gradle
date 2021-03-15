@@ -1,7 +1,7 @@
 plugins {
-    id 'com.intershop.gradle.jaxb' version '2.0.0'
     id 'groovy'
 }
+configurations { schemagen }
 dependencies {
     compile project(':bpm:bonita-core:bonita-home-server')
     compile project(':bpm:bonita-core:bonita-actor-mapping')
@@ -93,22 +93,40 @@ dependencies {
     testCompile project(':bpm:bonita-common')
     testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+
+    schemagen(
+            "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",
+            "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}",
+            "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}",
+            "org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbVersion}",
+            "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
 }
-jaxb {
-    schemaGen {
-        organization {
-            javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/identity/xml/**/*.java')
-            namespaceconfigs = ['http://documentation.bonitasoft.com/organization-xml-schema/1.1': 'organization.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas")
+
+task('schemagen') {
+    def destDir = file("$buildDir/schemas")
+    doLast {
+        destDir.mkdirs()
+        ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
+        try {
+            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+                classpath { pathelement(path: configurations.schemagen.asPath) }
+                include(name: 'org/bonitasoft/engine/identity/xml/**/*.java')
+            }
+        } catch (Exception e) {
+            def schema = file("$destDir/schema1.xsd")
+            if (!schema.exists()) throw e
+            schema.renameTo(file("$destDir/organization.xsd"))
         }
     }
+    inputs.dir('src/main/java/')
+    outputs.file("$destDir/organization.xsd")
 }
 
-processResources { from "$buildDir/generated/jaxb/schemas" }
+processResources { from "$buildDir/schemas" }
 
-tasks.jaxbSchemaGenOrganization.outputs.cacheIf { true }
-tasks.processResources.dependsOn tasks.jaxbSchemaGenOrganization
+tasks.processResources.dependsOn tasks.schemagen
 
+tasks.schemagen.outputs.cacheIf { true }
 
 
 test {
