@@ -75,7 +75,9 @@ public class EngineInitializerTest {
         //then
         verify(platformAPI).initializePlatform();
         verify(platformAPI).startNode();
-        assertThat(systemOutRule.getLog()).contains("Bonita platform is Community edition");
+        // This message below is a line of the "Bonita Community" message:
+        assertThat(systemOutRule.getLog()).contains(
+                "|____/ \\___/|_| |_|_|\\__\\__,_|  \\_____\\___/|_| |_| |_|_| |_| |_|\\__,_|_| |_|_|\\__|\\__, |");
 
     }
 

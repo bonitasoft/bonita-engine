@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EngineInitializer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EngineInitializer.class.getName());
+    protected static final Logger LOGGER = LoggerFactory.getLogger(EngineInitializer.class.getName());
 
     private static PlatformAPI platformAPI;
 
@@ -73,7 +73,7 @@ public class EngineInitializer {
             }
             LOGGER.info("Starting node...");
 
-            LOGGER.info(getEditionMessage());
+            logEditionMessage();
             platformAPI.startNode();
             LOGGER.info("Node started successfully.");
             final long after = System.currentTimeMillis();
@@ -83,8 +83,16 @@ public class EngineInitializer {
         }
     }
 
-    protected String getEditionMessage() {
-        return "Bonita platform is Community edition";
+    protected void logEditionMessage() {
+        LOGGER.info("  ____              _ _           _____                                      _ _         ");
+        LOGGER.info(" |  _ \\            (_) |         / ____|                                    (_) |        ");
+        LOGGER.info(" | |_) | ___  _ __  _| |_ __ _  | |     ___  _ __ ___  _ __ ___  _   _ _ __  _| |_ _   _ ");
+        LOGGER.info(" |  _ < / _ \\| '_ \\| | __/ _` | | |    / _ \\| '_ ` _ \\| '_ ` _ \\| | | | '_ \\| | __| | | |");
+        LOGGER.info(" | |_) | (_) | | | | | || (_| | | |___| (_) | | | | | | | | | | | |_| | | | | | |_| |_| |");
+        LOGGER.info(
+                " |____/ \\___/|_| |_|_|\\__\\__,_|  \\_____\\___/|_| |_| |_|_| |_| |_|\\__,_|_| |_|_|\\__|\\__, |");
+        LOGGER.info("                                                                                    __/ |");
+        LOGGER.info("                                                                                   |___/ ");
     }
 
     SessionAccessor getSessionAccessor() throws BonitaHomeNotSetException, InstantiationException,
