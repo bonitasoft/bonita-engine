@@ -40,6 +40,9 @@ import org.hibernate.annotations.Filter;
 @Table(name = "external_identity_mapping")
 public class SExternalIdentityMapping implements PersistentObject {
 
+    // class must be present for the javadoc generation
+    public static class SExternalIdentityMappingBuilder {}
+
     public static final String ID_KEY = "id";
     public static final String KIND_KEY = "kind";
     public static final String USER_ID_KEY = "userId";
