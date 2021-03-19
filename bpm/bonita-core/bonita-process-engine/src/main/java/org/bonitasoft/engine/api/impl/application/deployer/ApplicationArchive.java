@@ -28,6 +28,9 @@ import org.bonitasoft.engine.io.FileAndContent;
 @Builder
 public class ApplicationArchive {
 
+    // class must be present for the javadoc generation
+    public static class ApplicationArchiveBuilder {}
+
     @Singular
     private List<FileAndContent> processes;
     @Singular

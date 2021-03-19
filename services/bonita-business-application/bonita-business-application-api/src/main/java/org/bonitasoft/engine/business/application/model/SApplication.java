@@ -37,6 +37,9 @@ import org.hibernate.annotations.Filter;
 @Filter(name = "tenantFilter")
 public class SApplication implements PersistentObject {
 
+    // class must be present for the javadoc generation
+    public static class SApplicationBuilder{}
+
     public static final String ID = "id";
     public static final String TOKEN = "token";
     public static final String DISPLAY_NAME = "displayName";
