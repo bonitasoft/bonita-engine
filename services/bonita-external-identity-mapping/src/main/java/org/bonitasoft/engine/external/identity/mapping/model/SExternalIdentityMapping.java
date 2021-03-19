@@ -41,7 +41,8 @@ import org.hibernate.annotations.Filter;
 public class SExternalIdentityMapping implements PersistentObject {
 
     // class must be present for the javadoc generation
-    public static class SExternalIdentityMappingBuilder {}
+    public static class SExternalIdentityMappingBuilder {
+    }
 
     public static final String ID_KEY = "id";
     public static final String KIND_KEY = "kind";
