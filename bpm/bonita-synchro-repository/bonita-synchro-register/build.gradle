@@ -3,7 +3,7 @@
 dependencies {
     compile project(':bpm:bonita-core:bonita-process-engine')
     compile project(':bpm:bonita-synchro-repository:bonita-synchro-service-impl')
-    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-commons')
     compileOnly 'javax.jms:jms-api:1.1-rev-1'
     compileOnly 'org.apache.activemq:activemq-client:5.8.0'
 }

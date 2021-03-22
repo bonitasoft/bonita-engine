@@ -6,7 +6,6 @@ dependencies {
     compile project(':services:bonita-cache')
     compile project(':services:bonita-time-tracker')
     compile project(':services:bonita-classloader')
-    compile project(':services:bonita-log-technical')
     compile "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
     compile "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
     compile "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"

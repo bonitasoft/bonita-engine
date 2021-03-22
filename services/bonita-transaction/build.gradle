@@ -1,6 +1,5 @@
 dependencies {
     compile project(':services:bonita-commons')
-    compile project(':services:bonita-log-technical')
     compile "javax.transaction:jta:${Deps.javaxJtaVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"

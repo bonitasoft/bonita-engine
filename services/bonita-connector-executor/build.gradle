@@ -2,7 +2,6 @@
 
 dependencies {
     compile project(':services:bonita-commons')
-    compile project(':services:bonita-log-technical')
     compile project(':services:bonita-time-tracker')
     compile project(':services:bonita-session')
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"

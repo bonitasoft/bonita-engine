@@ -51,7 +51,6 @@ dependencies {
     compile project(':services:bonita-time-tracker')
     compile project(':services:bonita-transaction')
     compile project(':bpm:bonita-core:bonita-core-data')
-    compile project(':services:bonita-log-technical')
     compile project(':bpm:bonita-core:bonita-user-filter')
     compile project(':services:bonita-work')
     compile project(':bpm:bonita-external')

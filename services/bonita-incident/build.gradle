@@ -3,7 +3,6 @@
 dependencies {
     compile project(':bpm:bonita-common')
     compile project(':bpm:bonita-core:bonita-home-server')
-    compile project(':services:bonita-log-technical')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }

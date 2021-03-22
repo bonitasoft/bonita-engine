@@ -7,11 +7,13 @@ dependencies {
     compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     compile "org.springframework:spring-context:${Deps.springVersion}"
     compile  "org.springframework.boot:spring-boot-autoconfigure:${Deps.springBootVersion}"
+    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: Deps.junit5Version
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: Deps.junit5Version
     testRuntime group: 'org.junit.vintage', name: 'junit-vintage-engine', version: Deps.junit5Version
 }

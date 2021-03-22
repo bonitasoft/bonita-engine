@@ -5,7 +5,6 @@ dependencies {
     compile project(':services:bonita-incident')
     compile project(':services:bonita-commons')
     compile project(':services:bonita-transaction')
-    compile project(':services:bonita-log-technical')
     compile "org.springframework:spring-jdbc:${Deps.springVersion}"
     compile "org.springframework:spring-context:${Deps.springVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
