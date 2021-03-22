@@ -103,6 +103,16 @@ public class TenantServicesManager {
         doStop(PAUSE);
     }
 
+    public void initServices() throws Exception {
+        inTenantSession(() -> transactionService.executeInTransaction((Callable<Void>) () -> {
+            for (TenantLifecycleService tenantService : services) {
+                LOGGER.info("Initializing service {} of tenant {}", tenantService.getClass().getName(), tenantId);
+                tenantService.init();
+            }
+            return null;
+        }));
+    }
+
     private void doStart(ServiceAction startAction) throws Exception {
         LOGGER.debug("Starting services of tenant {}", tenantId);
         if (tenantServiceState != TenantServiceState.STOPPED) {

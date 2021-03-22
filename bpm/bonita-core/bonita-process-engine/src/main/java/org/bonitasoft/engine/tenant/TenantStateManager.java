@@ -87,13 +87,14 @@ public class TenantStateManager {
     }
 
     /**
-     * Stop the tenant:
+     * Start the tenant:
      * - start services
      * - resume elements if its the only node
      * **Called outside of a transaction in a platform-level session**
      */
     public void start() throws Exception {
         STenant tenant = getTenantInTransaction();
+        tenantServicesManager.initServices();
         if (!tenant.isActivated()) {
             LOGGER.debug("Not starting tenant {}. It is in state {}", tenantId, tenant.getStatus());
             return;

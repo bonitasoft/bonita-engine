@@ -312,7 +312,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void start_should_import_provided_page() throws SBonitaException {
+    public void init_should_import_provided_page() throws SBonitaException {
         // given
         // resource in the classpath bonita-groovy-example-page.zip
         pageServiceImpl.setProvidedPages(getProvidedPageList(Arrays.asList(
@@ -338,7 +338,7 @@ public class PageServiceImplTest {
         }).when(pageServiceImpl).insertPage(any(), any());
 
         // when
-        pageServiceImpl.start();
+        pageServiceImpl.init();
 
         // then
         verify(pageServiceImpl, times(5)).insertPage(any(SPage.class), any(byte[].class));
@@ -359,7 +359,7 @@ public class PageServiceImplTest {
         doNothing().when(pageServiceImpl).createPage(any(), any(), any());
 
         // when
-        pageServiceImpl.start();
+        pageServiceImpl.init();
 
         // then
         verify(pageServiceImpl, times(1)).createPage(eq(importPageDescriptor1), any(byte[].class),
@@ -369,7 +369,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void start_should_update_provided_page_if_different() throws SBonitaException {
+    public void init_should_update_provided_page_if_different() throws SBonitaException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
         final SPage currentGroovyPage = new SPage("custompage_groovyexample", "example", "example",
@@ -427,7 +427,7 @@ public class PageServiceImplTest {
                 "bonita-html-page-example.zip",
                 BONITA_DEFAULT_LAYOUT_ZIP_NAME,
                 BONITA_DEFAULT_THEME_ZIP_NAME)));
-        pageServiceImpl.start();
+        pageServiceImpl.init();
 
         // then
         verify(pageServiceImpl, times(0)).insertPage(any(SPage.class), any(byte[].class));
@@ -538,7 +538,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void start_should_do_nothing_if_already_here_and_the_same() throws SBonitaException, IOException {
+    public void init_should_do_nothing_if_already_here_and_the_same() throws SBonitaException, IOException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
         final SPage currentGroovyPage = new SPage("custompage_groovyexample", "example", "example",
@@ -576,7 +576,7 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentThemePage.setId(16);
         // when
-        pageServiceImpl.start();
+        pageServiceImpl.init();
         // then
         verify(pageServiceImpl, times(0)).insertPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
