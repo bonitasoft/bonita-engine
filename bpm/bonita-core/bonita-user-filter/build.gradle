@@ -8,7 +8,6 @@ dependencies {
     compile project(':services:bonita-cache')
     compile project(':services:bonita-resources')
     compile project(':services:bonita-connector-executor')
-    compile project(':services:bonita-log-technical')
     compile project(':bpm:bonita-core:bonita-process-instance')
     compile project(':bpm:bonita-core:bonita-home-server')
     compile project(':services:bonita-commons')

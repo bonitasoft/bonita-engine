@@ -4,7 +4,6 @@ dependencies {
     compile project(':services:bonita-commons')
     compile project(':services:bonita-events')
     compile project(':bpm:bonita-core:bonita-home-server')
-    compile project(':services:bonita-log-technical')
     compile project(':services:bonita-transaction')
     compile project(':services:bonita-builder')
     compile project(':services:bonita-persistence')

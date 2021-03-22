@@ -11,7 +11,6 @@ dependencies {
     compile project(':services:bonita-time-tracker')
     compile project(':services:bonita-data-instance')
     compile project(':services:bonita-classloader')
-    compile project(':services:bonita-log-technical')
     compile project(':services:bonita-builder')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"

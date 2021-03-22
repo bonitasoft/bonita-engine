@@ -3,7 +3,6 @@
 dependencies {
     compile project(':services:bonita-commons')
     compile "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
-    compile project(':services:bonita-log-technical')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"

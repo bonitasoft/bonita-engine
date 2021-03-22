@@ -2,7 +2,6 @@
 
 dependencies {
     compile project(':services:bonita-commons')
-    compile project(':services:bonita-log-technical')
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
 }
