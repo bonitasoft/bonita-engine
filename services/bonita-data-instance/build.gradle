@@ -8,7 +8,6 @@ dependencies {
     compile project(':services:bonita-data-definition')
     compile project(':services:bonita-commons')
     compile project(':services:bonita-events')
-    compile project(':services:bonita-recorder')
     compile project(':services:bonita-log')
     compile project(':services:bonita-archive')
     testCompile "junit:junit:${Deps.junit4Version}"

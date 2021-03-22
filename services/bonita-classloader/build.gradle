@@ -8,7 +8,6 @@ dependencies {
     compile project(':services:bonita-transaction')
     compile project(':services:bonita-builder')
     compile project(':services:bonita-persistence')
-    compile project(':services:bonita-recorder')
     compile project(':services:bonita-log')
     compile "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"

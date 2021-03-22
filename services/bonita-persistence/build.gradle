@@ -3,6 +3,7 @@
 dependencies {
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-events')
     compile(group: 'org.hibernate', name: 'hibernate-core', version:Deps.hibernateVersion) {
         exclude(module: "jboss-transaction-api_1.2_spec")
         exclude(group: "javax.activation") //replaced by jakarta

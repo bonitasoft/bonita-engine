@@ -6,7 +6,6 @@ dependencies {
     compile project(':services:bonita-commons')
     compile project(':services:bonita-cache')
     compile project(':services:bonita-builder')
-    compile project(':services:bonita-recorder')
     compile project(':services:bonita-persistence')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"

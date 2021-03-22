@@ -7,7 +7,6 @@ dependencies {
     compile project(':services:bonita-commons')
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile project(':services:bonita-cache')
-    compile project(':services:bonita-recorder')
     compile project(':services:bonita-persistence')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"

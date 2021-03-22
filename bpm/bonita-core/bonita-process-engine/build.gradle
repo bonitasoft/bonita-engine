@@ -42,7 +42,6 @@ dependencies {
     compile project(':services:bonita-platform-command')
     compile project(':services:bonita-platform-session')
     compile project(':services:bonita-profile')
-    compile project(':services:bonita-recorder')
     compile project(':services:bonita-scheduler')
     compile project(':services:bonita-session')
     compile project(':services:bonita-theme')
