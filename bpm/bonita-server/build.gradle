@@ -42,7 +42,6 @@ dependencies {
     compile project(':bpm:bonita-core:bonita-process-comment')
     compile project(':bpm:bonita-core:bonita-process-definition')
     compile project(':bpm:bonita-core:bonita-process-instance')
-    compile project(':services:bonita-recorder')
     compile project(':services:bonita-scheduler')
     compile project(':services:bonita-session')
     compile project(':bpm:bonita-core:bonita-supervisor-mapping')

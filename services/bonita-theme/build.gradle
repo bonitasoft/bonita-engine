@@ -2,7 +2,6 @@
 
 dependencies {
     compile project(':services:bonita-log')
-    compile project(':services:bonita-recorder')
     compile project(':services:bonita-builder')
     compile project(':services:bonita-persistence')
     compile project(':services:bonita-commons')

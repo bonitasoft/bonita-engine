@@ -6,7 +6,6 @@ dependencies {
     compile project(':services:bonita-expression')
     compile project(':services:bonita-data-definition')
     compile project(':services:bonita-commons')
-    compile project(':services:bonita-recorder')
     compile project(':services:bonita-log')
     compile project(':services:bonita-persistence')
     compile project(':services:bonita-time-tracker')

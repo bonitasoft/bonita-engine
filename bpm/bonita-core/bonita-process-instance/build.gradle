@@ -1,7 +1,6 @@
 configurations { schemagen }
 dependencies {
     compile project(':bpm:bonita-common')
-    compile project(':services:bonita-recorder')
     compile project(':bpm:bonita-core:bonita-process-definition')
     compile project(':services:bonita-identity')
     compile project(':services:bonita-persistence')
