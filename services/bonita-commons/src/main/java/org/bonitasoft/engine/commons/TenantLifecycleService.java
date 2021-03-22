@@ -13,9 +13,21 @@
  **/
 package org.bonitasoft.engine.commons;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+
 /**
  * @author Matthieu Chaffotte
  */
 public interface TenantLifecycleService extends LifecycleService {
+
+    /**
+     * This method performs actions to initialize a TenantLifecycleService
+     * This method is called when creating a new tenant and when starting the platform.
+     *
+     * @throws SBonitaException
+     */
+    default void init() throws SBonitaException {
+        // nothing
+    }
 
 }

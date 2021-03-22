@@ -291,4 +291,14 @@ public class TenantStateManagerTest {
         verify(tenantServicesManager).start();
     }
 
+    @Test
+    public void start_should_init_services_even_if_tenant_paused() throws Exception {
+        whenTenantIsInState(STenant.PAUSED);
+
+        tenantStateManager.start();
+
+        verify(tenantServicesManager).initServices();
+
+    }
+
 }
