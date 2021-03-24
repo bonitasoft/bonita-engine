@@ -27,7 +27,7 @@
         <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
     </bean>
 
-    <bean id="tenantRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+    <bean id="tenantRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl" primary="true">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
@@ -1271,10 +1271,8 @@
 
 
     <bean id="identityService" class="org.bonitasoft.engine.identity.impl.IdentityServiceImpl">
-        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="encrypter">
             <bean class="org.bonitasoft.engine.identity.impl.MD5CredentialsEncrypter" />

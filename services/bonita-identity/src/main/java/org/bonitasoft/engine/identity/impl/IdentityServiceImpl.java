@@ -20,11 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.MimetypesFileTypeMap;
-
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionCreationException;
@@ -49,7 +46,6 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SHavingIcon;
-import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
@@ -67,13 +63,11 @@ import org.bonitasoft.engine.identity.model.builder.SUserLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -90,6 +84,8 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.services.icon.IconService;
+import org.bonitasoft.engine.services.icon.SIcon;
 
 /**
  * Default implementation of the Identity service
@@ -102,36 +98,20 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  */
 public class IdentityServiceImpl implements IdentityService {
 
-    private static final MimetypesFileTypeMap MIMETYPES_FILE_TYPE_MAP = new MimetypesFileTypeMap();
     private final ReadPersistenceService persistenceService;
-
     private final Recorder recorder;
-
-    private final TechnicalLoggerService logger;
-
     private final QueriableLoggerService queriableLoggerService;
-
-    private final EventService eventService;
-
     private final CredentialsEncrypter encrypter;
+    private final IconService iconService;
 
-    static {
-        //on jdk 8 there is no png by default in mime types
-        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/png\t\tpng PNG");
-        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/gif\t\tgif GIF");
-        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/jpeg\t\tjpeg jpg jpe JPG");
-    }
-
-    public IdentityServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
-            final CredentialsEncrypter encrypter) {
+    public IdentityServiceImpl(ReadPersistenceService persistenceService, Recorder recorder,
+            QueriableLoggerService queriableLoggerService,
+            CredentialsEncrypter encrypter, IconService iconService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
-        this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         this.encrypter = encrypter;
+        this.iconService = iconService;
     }
 
     @Override
@@ -143,7 +123,7 @@ public class IdentityServiceImpl implements IdentityService {
                 "Adding a new group with name " + group.getName());
         try {
             if (iconFileName != null && iconContent != null) {
-                SIcon icon = createIcon(iconFileName, iconContent);
+                SIcon icon = iconService.createIcon(iconFileName, iconContent);
                 group.setIconId(icon.getId());
             }
             final InsertRecord insertRecord = new InsertRecord(group);
@@ -209,7 +189,7 @@ public class IdentityServiceImpl implements IdentityService {
                 "Adding a new role with name " + role.getName());
         try {
             if (iconFilename != null && iconContent != null) {
-                SIcon icon = createIcon(iconFilename, iconContent);
+                SIcon icon = iconService.createIcon(iconFilename, iconContent);
                 role.setIconId(icon.getId());
             }
             recorder.recordInsert(new InsertRecord(role), ROLE);
@@ -265,6 +245,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     private void insertUser(SUser hashedUser) throws SRecorderException {
         final InsertRecord insertRecord = new InsertRecord(hashedUser);
+        // FIXME: 23/03/2021 the second parameter must be USER instead of USER_LOGIN to have a better event consistency
         recorder.recordInsert(insertRecord, USER_LOGIN);
     }
 
@@ -311,7 +292,7 @@ public class IdentityServiceImpl implements IdentityService {
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.DELETED, "Deleting group " + group.getName());
         try {
             if (group.getIconId() != null) {
-                deleteIcon(group.getIconId());
+                iconService.deleteIcon(group.getIconId());
             }
             recorder.recordDelete(new DeleteRecord(group), GROUP);
             log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteGroup");
@@ -457,7 +438,7 @@ public class IdentityServiceImpl implements IdentityService {
         final SRoleLogBuilder logBuilder = getRoleLog(ActionType.DELETED, "Deleting role with name " + role.getName());
         try {
             if (role.getIconId() != null) {
-                deleteIcon(role.getIconId());
+                iconService.deleteIcon(role.getIconId());
             }
             recorder.recordDelete(new DeleteRecord(role), ROLE);
             log(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
@@ -483,7 +464,7 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             user = getUser(userId);
             if (user.getIconId() != null) {
-                deleteIcon(user.getIconId());
+                iconService.deleteIcon(user.getIconId());
             }
             deleteUser(user);
         } catch (final SUserNotFoundException e) {
@@ -491,14 +472,6 @@ public class IdentityServiceImpl implements IdentityService {
         } catch (SRecorderException | SBonitaReadException e) {
             throw new SUserDeletionException(e);
         }
-    }
-
-    private void deleteIcon(Long iconId) throws SBonitaReadException, SRecorderException {
-        SIcon icon = getIcon(iconId);
-        if (icon == null) {
-            return;
-        }
-        recorder.recordDelete(new DeleteRecord(icon), ICON);
     }
 
     @Override
@@ -1710,7 +1683,7 @@ public class IdentityServiceImpl implements IdentityService {
             throws SBonitaReadException, SRecorderException {
         Long previousIconId = element.getIconId();
         if (previousIconId != null) {
-            deleteIcon(previousIconId);
+            iconService.deleteIcon(previousIconId);
             updateDescriptor.addField("iconId", null);
         }
     }
@@ -1718,11 +1691,11 @@ public class IdentityServiceImpl implements IdentityService {
     private void replaceIcon(EntityUpdateDescriptor updateDescriptor, byte[] content, String filename,
             SHavingIcon element)
             throws SRecorderException, SBonitaReadException {
-        SIcon newIcon = createIcon(filename, content);
+        SIcon newIcon = iconService.createIcon(filename, content);
         updateDescriptor.addField("iconId", newIcon.getId());
         Long previousIconId = element.getIconId();
         if (previousIconId != null) {
-            deleteIcon(previousIconId);
+            iconService.deleteIcon(previousIconId);
         }
     }
 
@@ -1732,7 +1705,7 @@ public class IdentityServiceImpl implements IdentityService {
             throws SUserCreationException {
         if (iconFilename != null && iconContent != null) {
             try {
-                SIcon icon = createIcon(iconFilename, iconContent);
+                SIcon icon = iconService.createIcon(iconFilename, iconContent);
                 sUser.setIconId(icon.getId());
             } catch (SRecorderException e) {
                 throw new SUserCreationException(e);
@@ -1750,23 +1723,5 @@ public class IdentityServiceImpl implements IdentityService {
             createUserContactInfo(sContactInfo);
         }
         return user;
-    }
-
-    private SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException {
-        SIcon entity = new SIcon(getContentType(iconFilename), iconContent);
-        recorder.recordInsert(new InsertRecord(entity), ICON);
-        return entity;
-    }
-
-    private String getContentType(String iconFilename) {
-        if (iconFilename == null) {
-            return "image/png";
-        }
-        return MIMETYPES_FILE_TYPE_MAP.getContentType(iconFilename);
-    }
-
-    @Override
-    public SIcon getIcon(long id) throws SBonitaReadException {
-        return persistenceService.selectById(new SelectByIdDescriptor<>(SIcon.class, id));
     }
 }

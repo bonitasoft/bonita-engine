@@ -19,7 +19,6 @@ import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -1559,15 +1558,5 @@ public interface IdentityService {
     SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo, String iconFilename,
             byte[] iconContent)
             throws SUserCreationException;
-
-    /**
-     * get the icon using its id
-     *
-     * @param id
-     *        id of the icon
-     * @return the icon
-     * @throws SBonitaReadException
-     */
-    SIcon getIcon(long id) throws SBonitaReadException;
 
 }

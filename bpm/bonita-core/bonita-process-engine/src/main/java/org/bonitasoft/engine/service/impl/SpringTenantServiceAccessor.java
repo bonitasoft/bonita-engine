@@ -84,6 +84,7 @@ import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.services.icon.IconService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
@@ -137,6 +138,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public IdentityService getIdentityService() {
         return beanAccessor.getService(IdentityService.class);
+    }
+
+    @Override
+    public IconService getIconService() {
+        return beanAccessor.getService(IconService.class);
     }
 
     @Override

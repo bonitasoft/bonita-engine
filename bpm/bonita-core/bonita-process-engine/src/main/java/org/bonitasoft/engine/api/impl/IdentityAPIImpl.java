@@ -106,7 +106,6 @@ import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.identity.impl.UserWithContactDataImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -137,6 +136,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.services.icon.SIcon;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
@@ -1638,7 +1638,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public Icon getIcon(long id) throws NotFoundException {
         try {
-            SIcon icon = getTenantAccessor().getIdentityService().getIcon(id);
+            SIcon icon = getTenantAccessor().getIconService().getIcon(id);
             if (icon == null) {
                 throw new NotFoundException("unable to find icon with id " + id);
             }

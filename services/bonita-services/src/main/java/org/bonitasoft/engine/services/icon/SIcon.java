@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.identity.model;
+package org.bonitasoft.engine.services.icon;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -30,6 +31,7 @@ import org.hibernate.annotations.Type;
  * @author Baptiste Mesta
  */
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "icon")
