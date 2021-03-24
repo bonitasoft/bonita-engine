@@ -81,6 +81,7 @@ import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.services.icon.IconService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
@@ -114,6 +115,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     SessionService getSessionService();
 
     IdentityService getIdentityService();
+
+    IconService getIconService();
 
     LoginService getLoginService();
 
