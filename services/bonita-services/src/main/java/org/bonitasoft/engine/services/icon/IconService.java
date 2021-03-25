@@ -13,16 +13,21 @@
  **/
 package org.bonitasoft.engine.services.icon;
 
+import java.util.Optional;
+
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 
 public interface IconService {
 
-    String ICON = "ICON";
+    String EVENT_NAME = "ICON";
+
+    Optional<Long> replaceIcon(String iconFilename, byte[] iconContent, Long iconIdToReplace)
+            throws SBonitaReadException, SRecorderException;
 
     SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException;
 
-    SIcon getIcon(long id) throws SBonitaReadException;
+    SIcon getIcon(Long id) throws SBonitaReadException;
 
     void deleteIcon(Long iconId) throws SBonitaReadException, SRecorderException;
 }

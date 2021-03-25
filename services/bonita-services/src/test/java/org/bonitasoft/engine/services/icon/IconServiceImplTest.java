@@ -14,11 +14,15 @@
 package org.bonitasoft.engine.services.icon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+import java.util.Optional;
 
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -56,6 +60,46 @@ class IconServiceImplTest {
                     assertThat(entity.getMimeType()).isEqualTo("image/png");
                     assertThat(entity.getContent()).isEqualTo(new byte[] { 1, 2, 3 });
                 });
+    }
+
+    @Test
+    void should_replace_existing_icon() throws Exception {
+        SIcon previousIcon = new SIcon(1L, 42L, "image/jpeg", new byte[] { 1, 2, 3 });
+        doReturn(previousIcon).when(persistenceService)
+                .selectById(new SelectByIdDescriptor<>(SIcon.class, 42L));
+
+        Optional<Long> newIconId = iconService.replaceIcon("myAvatar12.png", "contents".getBytes(), 42L);
+
+        verify(recorder).recordInsert(((InsertRecord) record.capture()), eq("ICON"));
+        assertThat(((SIcon) record.getValue().getEntity())).satisfies(
+                entity -> {
+                    assertThat(entity.getMimeType()).isEqualTo("image/png");
+                    assertThat(entity.getContent()).isEqualTo("contents".getBytes());
+                });
+        verify(recorder).recordDelete(argThat(r -> r.getEntity().equals(previousIcon)), eq("ICON"));
+        assertThat(newIconId).get().isEqualTo(0L);//id is set by reflection by the persistence service
+    }
+
+    @Test
+    void should_replace_non_existing_icon() throws Exception {
+        Optional<Long> newIconId = iconService.replaceIcon("myAvatar12.png", "contents".getBytes(), null);
+
+        verify(recorder).recordInsert((any()), eq("ICON"));
+        verifyNoMoreInteractions(recorder);
+        assertThat(newIconId).get().isEqualTo(0L);//id is set by reflection by the persistence service
+    }
+
+    @Test
+    void should_remove_existing_icon() throws Exception {
+        SIcon previousIcon = new SIcon(1L, 42L, "image/jpeg", new byte[] { 1, 2, 3 });
+        doReturn(previousIcon).when(persistenceService)
+                .selectById(new SelectByIdDescriptor<>(SIcon.class, 42L));
+
+        Optional<Long> newIconId = iconService.replaceIcon(null, null, 42L);
+
+        verify(recorder).recordDelete(argThat(r -> r.getEntity().equals(previousIcon)), eq("ICON"));
+        verifyNoMoreInteractions(recorder);
+        assertThat(newIconId).isNotPresent();
     }
 
     @Test

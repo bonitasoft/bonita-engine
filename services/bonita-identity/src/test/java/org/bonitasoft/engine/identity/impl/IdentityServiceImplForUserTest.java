@@ -349,7 +349,6 @@ public class IdentityServiceImplForUserTest {
     public void should_updateUser_create_the_icon_if_it_does_not_exists() throws Exception {
         //given
         haveUser();
-        when(iconService.createIcon(any(), any())).thenReturn(new SIcon());
         //when
         EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
         iconUpdateDescriptor.addField("filename", "theNewIcon.gif");
@@ -358,8 +357,7 @@ public class IdentityServiceImplForUserTest {
         //then
         verify(recorder).recordUpdate(argThat(updateRecord -> updateRecord.getEntity() instanceof SUser
                 && updateRecord.getFields().containsKey("iconId")), nullable(String.class));
-        verify(iconService, never()).deleteIcon(any());
-        verify(iconService).createIcon("theNewIcon.gif", "theContent".getBytes());
+        verify(iconService).replaceIcon("theNewIcon.gif", "theContent".getBytes(), null);
     }
 
     @Test
@@ -367,7 +365,6 @@ public class IdentityServiceImplForUserTest {
         //given
         SUser sUser = haveUser();
         SIcon sIcon = haveIcon(sUser);
-        when(iconService.createIcon(any(), any())).thenReturn(new SIcon());
         //when
         EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
         iconUpdateDescriptor.addField("filename", "theNewIcon.jpg");
@@ -376,23 +373,23 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
         //then
         verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), nullable(String.class));
-        verify(iconService).deleteIcon(sIcon.getId());
-        verify(iconService).createIcon("theNewIcon.jpg", "updated content".getBytes());
+        verify(iconService).replaceIcon("theNewIcon.jpg", "updated content".getBytes(), sIcon.getId());
     }
 
     @Test
-    public void should_update_user_with_null_content_remove_the_icon() throws Exception {
+    public void should_update_user_and_invoke_replace_icon_with_icon_content_null() throws Exception {
         //given
         SUser sUser = haveUser();
         SIcon sIcon = haveIcon(sUser);
         //when
         EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
+        iconUpdateDescriptor.addField("filename", "filename");
         iconUpdateDescriptor.addField("content", null);
         identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
         //then
         verify(recorder).recordUpdate(argThat(updateRecord -> updateRecord.getEntity() instanceof SUser
                 && updateRecord.getFields().containsKey("iconId")), nullable(String.class));
-        verify(iconService).deleteIcon(sIcon.getId());
+        verify(iconService).replaceIcon("filename", null, sIcon.getId());
         verifyNoMoreInteractions(iconService);
     }
 

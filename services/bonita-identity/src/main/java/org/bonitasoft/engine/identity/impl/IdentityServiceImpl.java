@@ -45,7 +45,6 @@ import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SHavingIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
@@ -1321,12 +1320,10 @@ public class IdentityServiceImpl implements IdentityService {
             EntityUpdateDescriptor iconUpdater) throws SIdentityException {
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.UPDATED, "Updating the group");
         try {
-            if (iconUpdater != null && iconUpdater.getFields().containsKey("content")) {
-                updateIcon(descriptor, iconUpdater, group);
-            }
+            updateIcon(descriptor, group.getIconId(), iconUpdater);
             recorder.recordUpdate(UpdateRecord.buildSetFields(group, descriptor), GROUP);
             log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateGroup");
-        } catch (final SRecorderException | SBonitaReadException e) {
+        } catch (final SRecorderException e) {
             log(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateGroup");
             throw new SIdentityException("Can't update group " + group, e);
         }
@@ -1365,12 +1362,10 @@ public class IdentityServiceImpl implements IdentityService {
         final SRoleLogBuilder logBuilder = getRoleLog(ActionType.UPDATED,
                 "Updating the role with name " + role.getName());
         try {
-            if (iconUpdater != null && iconUpdater.getFields().containsKey("content")) {
-                updateIcon(descriptor, iconUpdater, role);
-            }
+            updateIcon(descriptor, role.getIconId(), iconUpdater);
             recorder.recordUpdate(UpdateRecord.buildSetFields(role, descriptor), ROLE);
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-        } catch (final SRecorderException | SBonitaReadException e) {
+        } catch (final SRecorderException e) {
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SIdentityException("Can't update role " + role, e);
         }
@@ -1634,13 +1629,7 @@ public class IdentityServiceImpl implements IdentityService {
             throws SIdentityException {
         // User change
         SUser sUser = getUser(userId);
-        if (iconUpdater.getFields().containsKey("content")) {
-            try {
-                updateIcon(userUpdateDescriptor, iconUpdater, sUser);
-            } catch (SBonitaReadException | SRecorderException e) {
-                throw new SIdentityException(e);
-            }
-        }
+        updateIcon(userUpdateDescriptor, sUser.getIconId(), iconUpdater);
         if (userUpdateDescriptor != null && !userUpdateDescriptor.getFields().isEmpty()) {
             updateUser(sUser, userUpdateDescriptor);
         }
@@ -1667,35 +1656,16 @@ public class IdentityServiceImpl implements IdentityService {
         return sUser;
     }
 
-    private void updateIcon(EntityUpdateDescriptor updateDescriptor, EntityUpdateDescriptor iconUpdater,
-            SHavingIcon element)
-            throws SBonitaReadException, SRecorderException {
-        byte[] content = (byte[]) iconUpdater.getFields().get("content");
-        String filename = (String) iconUpdater.getFields().get("filename");
-        if (content != null) {
-            replaceIcon(updateDescriptor, content, filename, element);
-        } else {
-            removeIcon(updateDescriptor, element);
-        }
-    }
-
-    private void removeIcon(EntityUpdateDescriptor updateDescriptor, SHavingIcon element)
-            throws SBonitaReadException, SRecorderException {
-        Long previousIconId = element.getIconId();
-        if (previousIconId != null) {
-            iconService.deleteIcon(previousIconId);
-            updateDescriptor.addField("iconId", null);
-        }
-    }
-
-    private void replaceIcon(EntityUpdateDescriptor updateDescriptor, byte[] content, String filename,
-            SHavingIcon element)
-            throws SRecorderException, SBonitaReadException {
-        SIcon newIcon = iconService.createIcon(filename, content);
-        updateDescriptor.addField("iconId", newIcon.getId());
-        Long previousIconId = element.getIconId();
-        if (previousIconId != null) {
-            iconService.deleteIcon(previousIconId);
+    private void updateIcon(EntityUpdateDescriptor updateDescriptor,
+            Long iconId, EntityUpdateDescriptor iconUpdater) throws SIdentityException {
+        try {
+            if (iconUpdater != null && !iconUpdater.getFields().isEmpty()) {
+                updateDescriptor.addField("iconId",
+                        iconService.replaceIcon((String) iconUpdater.getFields().get("filename"),
+                                (byte[]) iconUpdater.getFields().get("content"), iconId).orElse(null));
+            }
+        } catch (SBonitaReadException | SRecorderException e) {
+            throw new SIdentityException(e);
         }
     }
 
