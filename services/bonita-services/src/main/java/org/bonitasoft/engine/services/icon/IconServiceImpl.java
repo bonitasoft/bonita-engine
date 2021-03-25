@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.services.icon;
 
+import java.util.Optional;
+
 import javax.activation.MimetypesFileTypeMap;
 
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -36,8 +38,8 @@ public class IconServiceImpl implements IconService {
         MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/jpeg\t\tjpeg jpg jpe JPG");
     }
 
-    private Recorder recorder;
-    private PersistenceService persistenceService;
+    private final Recorder recorder;
+    private final PersistenceService persistenceService;
 
     public IconServiceImpl(Recorder recorder, PersistenceService persistenceService) {
         this.recorder = recorder;
@@ -45,9 +47,19 @@ public class IconServiceImpl implements IconService {
     }
 
     @Override
+    public Optional<Long> replaceIcon(String iconFilename, byte[] iconContent, Long iconIdToReplace)
+            throws SBonitaReadException, SRecorderException {
+        deleteIcon(iconIdToReplace);
+        if (iconContent != null) {
+            return Optional.of(createIcon(iconFilename, iconContent).getId());
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException {
         SIcon entity = new SIcon(getContentType(iconFilename), iconContent);
-        recorder.recordInsert(new InsertRecord(entity), ICON);
+        recorder.recordInsert(new InsertRecord(entity), EVENT_NAME);
         return entity;
     }
 
@@ -59,16 +71,23 @@ public class IconServiceImpl implements IconService {
     }
 
     @Override
-    public SIcon getIcon(long id) throws SBonitaReadException {
-        return persistenceService.selectById(new SelectByIdDescriptor<>(SIcon.class, id));
+    public SIcon getIcon(Long iconId) throws SBonitaReadException {
+        if (iconId == null) {
+            return null;
+        }
+        return persistenceService.selectById(new SelectByIdDescriptor<>(SIcon.class, iconId));
     }
 
     @Override
     public void deleteIcon(Long iconId) throws SBonitaReadException, SRecorderException {
+        if (iconId == null) {
+            return;
+        }
+
         SIcon icon = getIcon(iconId);
         if (icon == null) {
             return;
         }
-        recorder.recordDelete(new DeleteRecord(icon), ICON);
+        recorder.recordDelete(new DeleteRecord(icon), EVENT_NAME);
     }
 }
