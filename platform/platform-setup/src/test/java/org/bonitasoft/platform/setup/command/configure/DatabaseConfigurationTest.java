@@ -97,7 +97,8 @@ public class DatabaseConfigurationTest {
 
         // then:
         assertThat(dbConfig.getUrl()).isEqualTo("jdbc:postgresql://localhost:5135/bonita");
-        assertThat(bdmDbConfig.getUrl()).isEqualTo("jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_DATABASE");
+        assertThat(bdmDbConfig.getUrl())
+                .isEqualTo("jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_DATABASE?oracle.net.disableOob=true");
     }
 
     @Test

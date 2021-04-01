@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.commons.io.IOUtil.zip;
@@ -20,6 +21,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import com.pholser.junit.quickcheck.Property;
@@ -38,9 +44,11 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
+import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -62,12 +70,16 @@ public class BusinessDataModelRepositoryImplTest {
     @Mock
     private TenantResourcesService tenantResourcesService;
 
+    @Mock
+    private SchemaManagerUpdate schemaManager;
+
     private BusinessDataModelRepositoryImpl businessDataModelRepository;
 
     @Before
     public void setUp() {
+        schemaManager = mock(SchemaManagerUpdate.class);
         businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService,
-                classLoaderService, mock(SchemaManagerUpdate.class), tenantResourcesService, TENANT_ID));
+                classLoaderService, schemaManager, tenantResourcesService, TENANT_ID));
     }
 
     @Test
@@ -205,4 +217,63 @@ public class BusinessDataModelRepositoryImplTest {
         // then:
         assertThat(installedBDMVersion).isEqualTo(String.valueOf(version));
     }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void update_should_convert_exceptions_to_allow_to_see_entire_root_cause() throws Exception {
+        // given:
+        doReturn(singletonList(new CommandAcceptanceException("Error executing DDL bla bla bla...",
+                new SQLSyntaxErrorException("ORA-02275: une telle contrainte référentielle existe déjà dans la table",
+                        new Exception("Root Oracle Cause"))))).when(schemaManager).update(anySet());
+
+        // then:
+        expectedException.expect(SBusinessDataRepositoryDeploymentException.class);
+        expectedException.expectMessage(
+                "1: org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL bla bla bla...");
+        expectedException.expectMessage("caused by java.sql.SQLSyntaxErrorException");
+        expectedException.expectMessage("caused by java.lang.Exception: Root Oracle Cause");
+
+        // when:
+        businessDataModelRepository.update(new HashSet<>());
+    }
+
+    @Test
+    public void update_should_convert_all_exceptions_in_the_list() throws Exception {
+        // given:
+        doReturn(Arrays.asList(
+                new CommandAcceptanceException("Error executing DDL bla bla bla...",
+                        new SQLSyntaxErrorException(
+                                "ORA-02275: une telle contrainte référentielle existe déjà dans la table",
+                                new Exception("Root Oracle Cause"))),
+                new CommandAcceptanceException("CommandAcceptanceException bliblibli",
+                        new SQLSyntaxErrorException("Hibernate error")))).when(schemaManager).update(anySet());
+
+        // then:
+        expectedException.expect(SBusinessDataRepositoryDeploymentException.class);
+        expectedException.expectMessage(
+                "1: org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL bla bla bla...");
+        expectedException.expectMessage("caused by java.lang.Exception: Root Oracle Cause");
+        expectedException.expectMessage(
+                "2: org.hibernate.tool.schema.spi.CommandAcceptanceException: CommandAcceptanceException bliblibli");
+        expectedException.expectMessage("caused by java.sql.SQLSyntaxErrorException: Hibernate error");
+
+        // when:
+        businessDataModelRepository.update(new HashSet<>());
+    }
+
+    @Test
+    public void convertExceptions_should_filter_out_empty_message_lines() {
+        // given:
+        final List<Exception> exceptions = singletonList(new SQLSyntaxErrorException(
+                "message with trailing carriage return\n", new SQLException("syntax error")));
+
+        // when:
+        final String message = businessDataModelRepository.convertExceptions(exceptions);
+
+        // then:
+        assertThat(Arrays.asList(message.split("\n"))).doesNotContain("");
+    }
+
 }
