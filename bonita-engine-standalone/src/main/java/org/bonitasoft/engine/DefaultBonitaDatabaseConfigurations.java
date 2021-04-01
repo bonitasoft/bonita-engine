@@ -44,7 +44,7 @@ public class DefaultBonitaDatabaseConfigurations {
     private static BonitaDatabaseConfiguration defaultOracleConfiguration(String schemaName) {
         return BonitaDatabaseConfiguration.builder()
                 .dbVendor("oracle")
-                .url("jdbc:oracle:thin:@//localhost:1521/ORCLPDB1")
+                .url("jdbc:oracle:thin:@//localhost:1521/ORCLPDB1?oracle.net.disableOob=true")
                 .user(schemaName)
                 .password("bpm").build();
     }
