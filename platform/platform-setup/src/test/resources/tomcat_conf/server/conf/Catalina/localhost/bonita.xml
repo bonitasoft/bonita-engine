@@ -98,7 +98,7 @@
               username="bonita"
               password="bpm"
               driverClassName="oracle.jdbc.OracleDriver"
-              url="jdbc:oracle:thin:@localhost:1521:XE"/>
+              url="jdbc:oracle:thin:@localhost:1521:XE?oracle.net.disableOob=true"/>
     -->
 
     <!-- SQL Server Example -->
@@ -235,7 +235,7 @@
               username="business_data"
               password="bpm"
               driverClassName="oracle.jdbc.OracleDriver"
-              url="jdbc:oracle:thin:@localhost:1521:XE"/>
+              url="jdbc:oracle:thin:@localhost:1521:XE?oracle.net.disableOob=true"/>
     -->
 
     <!-- SQL Server Example -->
