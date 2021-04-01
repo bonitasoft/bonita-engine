@@ -14,7 +14,7 @@
                 <prop key="db.instance.name">${db.database.name:ORCLPDB1.localdomain}</prop>
                 <prop key="db.user">bonita</prop>
                 <prop key="db.password">bpm</prop>
-                <prop key="db.url">jdbc:oracle:thin:@//${db.server.name}:${db.server.port}/${db.instance.name}</prop>
+                <prop key="db.url">jdbc:oracle:thin:@//${db.server.name}:${db.server.port}/${db.instance.name}?oracle.net.disableOob=true</prop>
             </props>
         </property>
     </bean>
@@ -24,7 +24,7 @@
             <props>
                 <prop key="user">${db.user}</prop>
                 <prop key="password">${db.password}</prop>
-                <prop key="URL">jdbc:oracle:thin:@//${db.server.name}:${db.server.port}/${db.instance.name}</prop>
+                <prop key="URL">jdbc:oracle:thin:@//${db.server.name}:${db.server.port}/${db.instance.name}?oracle.net.disableOob=true</prop>
             </props>
         </property>
     </bean>
