@@ -34,7 +34,7 @@ class DockerDatabaseContainerTasksCreator {
              repository : 'registry.rd.lan/bonitasoft/oracle-19c-ee',
              tag        : '0.0.1',
              portBinding: 1521,
-             uriTemplate: 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1',
+             uriTemplate: 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1?oracle.net.disableOob=true',
             ],
             [name       : 'postgres',
              repository : 'bonitasoft/bonita-postgres',

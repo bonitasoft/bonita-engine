@@ -121,7 +121,7 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml,
                 "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"",
                 "driverClassName=\"oracle.jdbc.OracleDriver\"",
-                "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash\"");
+                "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash?oracle.net.disableOob=true\"");
         checkFileContains(bonita_xml, "type=\"org.postgresql.xa.PGXADataSource\"",
                 "class=\"org.postgresql.xa.PGXADataSource\"", "factory=\"org.postgresql.xa.PGXADataSourceFactory\"",
                 "serverName=\"localhost\"", "portNumber=\"5432\"", "port=\"5432\"", "databaseName=\"bonita\"");
@@ -151,7 +151,7 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"",
                 "password=\"bizPwd\"",
                 "driverClassName=\"oracle.jdbc.OracleDriver\"",
-                "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash\"");
+                "url=\"jdbc:oracle:thin:@//ora1.rd.lan:1521/ORCL_with\\backslash?oracle.net.disableOob=true\"");
     }
 
     @Test
@@ -210,7 +210,8 @@ public class TomcatBundleConfiguratorTest {
         System.setProperty("db.password", "bpm_With$dollar\\andBackSlash");
 
         System.setProperty("bdm.db.vendor", "oracle");
-        System.setProperty("bdm.db.database.name", "bonita_bdm_with$dollarXXX\\myInstance.of.bdm&perf=good");
+        System.setProperty("bdm.db.database.name",
+                "bonita_bdm_with$dollarXXX\\myInstance.of.bdm&perf=good?oracle.net.disableOob=true");
         System.setProperty("bdm.db.user", "_bdmWith$dollar\\andBackSlash");
         System.setProperty("bdm.db.password", "bdm_bpm_With$dollar\\andBackSlash");
 
@@ -224,7 +225,7 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"",
                 "username=\"_bonita_with$dollar\\andBackSlash\"", "password=\"bpm_With$dollar\\andBackSlash\"",
                 "driverClassName=\"oracle.jdbc.OracleDriver\"",
-                "url=\"jdbc:oracle:thin:@//localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good\"");
+                "url=\"jdbc:oracle:thin:@//localhost:5432/bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good?oracle.net.disableOob=true\"");
     }
 
     @Test
