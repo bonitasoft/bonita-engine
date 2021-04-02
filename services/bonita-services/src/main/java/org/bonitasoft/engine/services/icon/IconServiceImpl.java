@@ -15,8 +15,7 @@ package org.bonitasoft.engine.services.icon;
 
 import java.util.Optional;
 
-import javax.activation.MimetypesFileTypeMap;
-
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -28,15 +27,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class IconServiceImpl implements IconService {
-
-    private static final MimetypesFileTypeMap MIMETYPES_FILE_TYPE_MAP = new MimetypesFileTypeMap();
-
-    static {
-        //on jdk 8 there is no png by default in mime types
-        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/png\t\tpng PNG");
-        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/gif\t\tgif GIF");
-        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/jpeg\t\tjpeg jpg jpe JPG");
-    }
 
     private final Recorder recorder;
     private final PersistenceService persistenceService;
@@ -58,16 +48,9 @@ public class IconServiceImpl implements IconService {
 
     @Override
     public SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException {
-        SIcon entity = new SIcon(getContentType(iconFilename), iconContent);
+        SIcon entity = new SIcon(IOUtil.getContentType(iconFilename), iconContent);
         recorder.recordInsert(new InsertRecord(entity), EVENT_NAME);
         return entity;
-    }
-
-    private String getContentType(String iconFilename) {
-        if (iconFilename == null) {
-            return "image/png";
-        }
-        return MIMETYPES_FILE_TYPE_MAP.getContentType(iconFilename);
     }
 
     @Override

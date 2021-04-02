@@ -80,9 +80,24 @@ public class ApplicationCreator implements Serializable {
      * @param iconPath the <code>Application</code> icon path
      * @return the current <code>ApplicationCreator</code>
      * @see Application
+     * @deprecated since 7.13.0, use {@link #setIcon(String, byte[])}
      */
     public ApplicationCreator setIconPath(final String iconPath) {
         fields.put(ApplicationField.ICON_PATH, iconPath);
+        return this;
+    }
+
+    /**
+     * Defines the icon for the {@link Application}.
+     *
+     * @param fileName of the icon
+     * @param content of the icon
+     * @return the current builder
+     * @since 7.13.0
+     */
+    public ApplicationCreator setIcon(String fileName, byte[] content) {
+        fields.put(ApplicationField.ICON_FILE_NAME, fileName);
+        fields.put(ApplicationField.ICON_CONTENT, content);
         return this;
     }
 

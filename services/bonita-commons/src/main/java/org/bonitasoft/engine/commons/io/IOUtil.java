@@ -47,6 +47,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -71,6 +72,14 @@ public class IOUtil {
 
     public static final String TMP_DIRECTORY = System.getProperty("java.io.tmpdir");
 
+    public static final MimetypesFileTypeMap MIMETYPES_FILE_TYPE_MAP = new MimetypesFileTypeMap();
+
+    static {
+        //on jdk 8 there is no png by default in mime types
+        IOUtil.MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/png\t\tpng PNG");
+        IOUtil.MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/gif\t\tgif GIF");
+        IOUtil.MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/jpeg\t\tjpeg jpg jpe JPG");
+    }
     private static final int BUFFER_SIZE = 100000;
 
     public static final String FILE_ENCODING = "UTF-8";
@@ -630,5 +639,12 @@ public class IOUtil {
                 br.close();
             }
         }
+    }
+
+    public static String getContentType(String iconFilename) {
+        if (iconFilename == null) {
+            return "image/png";
+        }
+        return MIMETYPES_FILE_TYPE_MAP.getContentType(iconFilename);
     }
 }

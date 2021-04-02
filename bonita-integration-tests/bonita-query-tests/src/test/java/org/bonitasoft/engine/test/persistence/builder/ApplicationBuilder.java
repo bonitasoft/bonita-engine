@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationBuilder extends PersistentObjectBuilder<SApplication, ApplicationBuilder> {
+public class ApplicationBuilder extends PersistentObjectBuilder<AbstractSApplication, ApplicationBuilder> {
 
     private String name;
     private String version;
@@ -34,9 +35,10 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplication, Ap
     }
 
     @Override
-    SApplication _build() {
-        SApplication application = new SApplication(name, displayName, version, System.currentTimeMillis(), 21,
-                SApplicationState.DEACTIVATED.name(), layoutId, themeId);
+    SApplicationWithIcon _build() {
+        SApplicationWithIcon application = new SApplicationWithIcon(name, displayName, version,
+                System.currentTimeMillis(), 21,
+                SApplicationState.DEACTIVATED.name(), layoutId, themeId, null, null);
         application.setIconPath(path);
         application.setProfileId(profileId);
         return application;

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application.impl;
 
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderFactoryImpl;
@@ -105,24 +107,23 @@ public class ApplicationServiceImplTest {
     @Mock
     private ApplicationMenuDestructor applicationMenuDestructor;
 
-    private SApplication application;
+    private SApplicationWithIcon application;
 
     private ApplicationServiceImpl applicationServiceImpl;
 
     @Before
     public void setUp() throws Exception {
         applicationServiceImpl = new ApplicationServiceImpl(recorder, persistenceService, queriableLogService,
-                indexManager, convertor,
-                applicationDestructor, applicationPageDestructor, applicationMenuDestructor);
+                indexManager, convertor, applicationDestructor, applicationPageDestructor, applicationMenuDestructor);
 
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
         application = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
         application.setId(10L);
     }
 
-    private SApplication buildApplication(final String applicationName, final String applicationDisplayName) {
+    private SApplicationWithIcon buildApplication(final String applicationName, final String applicationDisplayName) {
         final long currentDate = System.currentTimeMillis();
-        return SApplication.builder().token(applicationName).displayName(applicationDisplayName).version("1.0")
+        return SApplicationWithIcon.builder().token(applicationName).displayName(applicationDisplayName).version("1.0")
                 .creationDate(currentDate).lastUpdateDate(currentDate)
                 .createdBy((long) CREATED_BY).state(SApplicationState.ACTIVATED.name()).layoutId(LAYOUT_ID)
                 .themeId(THEME_ID).build();
@@ -134,7 +135,7 @@ public class ApplicationServiceImplTest {
         final InsertRecord record = new InsertRecord(application);
 
         //when
-        final SApplication createdApplication = applicationServiceImpl.createApplication(application);
+        final SApplicationWithIcon createdApplication = applicationServiceImpl.createApplication(application);
 
         //then
         assertThat(createdApplication).isEqualTo(application);
@@ -157,12 +158,14 @@ public class ApplicationServiceImplTest {
     public void createApplication_should_throw_SObjectAlreadyExistsException_when_an_application_with_the_same_name_already_exists()
             throws Exception {
         //given
+        SApplication app = new SApplication();
+        app.setId(125);
         given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken",
                 Collections.<String, Object> singletonMap("name",
                         APPLICATION_TOKEN),
-                SApplication.class))).willReturn(application);
+                SApplication.class))).willReturn(app);
 
-        final SApplication newApp = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
+        final SApplicationWithIcon newApp = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
 
         //when
         try {
@@ -180,14 +183,16 @@ public class ApplicationServiceImplTest {
     @Test
     public void getApplication_should_return_result_of_persistence_service_selectById() throws Exception {
         //given
+        SApplication app = new SApplication();
+        app.setId(10L);
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, 10L)))
-                .willReturn(application);
+                .willReturn(app);
 
         //when
         final SApplication retrievedApp = applicationServiceImpl.getApplication(10L);
 
         //then
-        assertThat(retrievedApp).isEqualTo(application);
+        assertThat(retrievedApp).isEqualTo(app);
     }
 
     @Test
@@ -213,16 +218,17 @@ public class ApplicationServiceImplTest {
     public void getApplicationByToken_should_return_result_of_persistence_service_getApplicationByToken()
             throws Exception {
         //given
+        SApplication app = new SApplication();
+        app.setToken("name");
         given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken",
-                Collections.<String, Object> singletonMap("name",
-                        APPLICATION_TOKEN),
-                SApplication.class))).willReturn(application);
+                singletonMap("name", APPLICATION_TOKEN),
+                SApplication.class))).willReturn(app);
 
         //when
-        final SApplication retriedApplication = applicationServiceImpl.getApplicationByToken(APPLICATION_TOKEN);
+        SApplication retriedApplication = applicationServiceImpl.getApplicationByToken(APPLICATION_TOKEN);
 
         //then
-        assertThat(retriedApplication).isEqualTo(application);
+        assertThat(retriedApplication).isEqualTo(app);
 
     }
 
@@ -230,14 +236,15 @@ public class ApplicationServiceImplTest {
     public void deleteApplication_should_call_record_delete() throws Exception {
         //given
         final long applicationId = 10L;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
-                application);
+        SApplication app = new SApplication();
+        app.setId(10L);
+        given(persistenceService.selectById(argThat(s -> s.getId() == 10L))).willReturn(app);
 
         //when
         applicationServiceImpl.deleteApplication(applicationId);
 
         //then
-        verify(recorder, times(1)).recordDelete(new DeleteRecord(application), ApplicationService.APPLICATION);
+        verify(recorder, times(1)).recordDelete(new DeleteRecord(app), ApplicationService.APPLICATION);
     }
 
     @Test
@@ -246,8 +253,8 @@ public class ApplicationServiceImplTest {
         final ApplicationServiceImpl applicationService = spy(applicationServiceImpl);
 
         final long applicationId = 10L;
-        final SApplication app = buildApplication("app", "my app");
-        app.setId(27);
+        SApplication app = new SApplication();
+        app.setId(10L);
         doReturn(app).when(applicationService).getApplication(applicationId);
 
         //when
@@ -275,13 +282,12 @@ public class ApplicationServiceImplTest {
     public void deleteApplication_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException()
             throws Exception {
         //given
-        final long applicationId = 10L;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
-                application);
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, 10L)))
+                .willReturn(new SApplication());
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), anyString());
 
         //when
-        applicationServiceImpl.deleteApplication(applicationId);
+        applicationServiceImpl.deleteApplication(10L);
 
         //then exception
     }
@@ -525,12 +531,13 @@ public class ApplicationServiceImplTest {
         updateBuilder.updateDisplayName("new display name");
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
-        final int applicationId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
-                application);
+        long applicationId = 17;
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationWithIcon.class, applicationId)))
+                .willReturn(
+                        application);
 
         //when
-        final SApplication updatedApplication = applicationServiceImpl.updateApplication(applicationId,
+        final SApplicationWithIcon updatedApplication = applicationServiceImpl.updateApplication(applicationId,
                 updateDescriptor);
 
         //then
@@ -579,17 +586,21 @@ public class ApplicationServiceImplTest {
     public void updateApplication_should_throw_SObjectAlreadyExistsException_when_another_application_exists_with_the_same_name()
             throws Exception {
         //given
-        final ApplicationServiceImpl applicationService = spy(applicationServiceImpl);
         final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl()
                 .createNewInstance(0L);
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.updateToken("newToken").done();
 
-        final int applicationId = 17;
-        doReturn(application).when(applicationService).getApplication(applicationId);
-        doReturn(true).when(applicationService).hasApplicationWithToken("newToken");
+        SApplicationWithIcon applicationToUpdate = new SApplicationWithIcon();
+        applicationToUpdate.setToken("oldToken");
+        doReturn(applicationToUpdate).when(persistenceService).selectById(argThat(s -> s.getId() == 17));
+        SApplication existingApplication = new SApplication();
+        existingApplication.setToken("newToken");
+        doReturn(existingApplication).when(persistenceService)
+                .selectOne(argThat(s -> s.getQueryName().equals("getApplicationByToken") &&
+                        s.getInputParameter("token").equals("newToken")));
 
         //when
-        applicationService.updateApplication(applicationId, updateDescriptor);
+        applicationServiceImpl.updateApplication(17, updateDescriptor);
 
         //then exception
     }

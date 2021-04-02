@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.junit.Test;
 
 public class ImportResultTest {
@@ -25,11 +25,11 @@ public class ImportResultTest {
     @Test
     public void getImportedObject_should_return_object_passed_by_constructor() throws Exception {
         //given
-        final SApplication application = mock(SApplication.class);
+        final SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         final ImportResult importResult = new ImportResult(application, mock(ImportStatus.class));
 
         // when
-        final SApplication retrievedApp = importResult.getApplication();
+        final SApplicationWithIcon retrievedApp = importResult.getApplication();
 
         //then
         assertThat(retrievedApp).isEqualTo(application);
@@ -39,7 +39,7 @@ public class ImportResultTest {
     public void getImportStatus() throws Exception {
         //given
         final ImportStatus status = mock(ImportStatus.class);
-        final ImportResult importResult = new ImportResult(mock(SApplication.class), status);
+        final ImportResult importResult = new ImportResult(mock(SApplicationWithIcon.class), status);
 
         //when
         final ImportStatus retrievedStatus = importResult.getImportStatus();

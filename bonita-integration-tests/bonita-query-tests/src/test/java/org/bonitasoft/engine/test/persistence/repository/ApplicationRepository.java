@@ -15,9 +15,7 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
-import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
@@ -30,12 +28,6 @@ public class ApplicationRepository extends TestRepository {
 
     public ApplicationRepository(final SessionFactory sessionFactory) {
         super(sessionFactory);
-    }
-
-    public SApplication getApplication(final long applicationId) {
-        final Query namedQuery = getNamedQuery("getApplicationById");
-        namedQuery.setParameter("id", applicationId);
-        return (SApplication) namedQuery.uniqueResult();
     }
 
     public SApplication getApplicationByToken(final String token) {
@@ -105,6 +97,10 @@ public class ApplicationRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("searchSApplicationOfUser");
         namedQuery.setParameter("userId", userId);
         return namedQuery.list();
+    }
+
+    public void update(final AbstractSApplication application) {
+        getSession().update(application);
     }
 
 }

@@ -18,8 +18,7 @@ import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
-import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.model.SApplicationState;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -53,19 +52,24 @@ public class NodeToApplicationConverter {
         Long layoutId = getLayoutId(getLayoutName(applicationNode), token, importStatus);
         Long themeId = getThemeId(getThemeName(applicationNode), token, importStatus);
         final long currentDate = System.currentTimeMillis();
-        final SApplication.SApplicationBuilder builder = SApplication.builder().token(token)
-                .displayName(applicationNode.getDisplayName()).version(applicationNode.getVersion())
-                .creationDate(currentDate).lastUpdateDate(currentDate)
-                .createdBy(createdBy).state(SApplicationState.ACTIVATED.name()).layoutId(layoutId).themeId(themeId)
-                .iconPath(applicationNode.getIconPath()).description(applicationNode.getDescription())
-                .state(applicationNode.getState());
+        SApplicationWithIcon application = new SApplicationWithIcon();
+        application.setToken(token);
+        application.setDisplayName(applicationNode.getDisplayName());
+        application.setVersion(applicationNode.getVersion());
+        application.setCreationDate(currentDate);
+        application.setLastUpdateDate(currentDate);
+        application.setCreatedBy(createdBy);
+        application.setLayoutId(layoutId);
+        application.setThemeId(themeId);
+        application.setIconPath(applicationNode.getIconPath());
+        application.setDescription(applicationNode.getDescription());
+        application.setState(applicationNode.getState());
 
-        final ImportError importError = setProfile(applicationNode, builder);
+        final ImportError importError = setProfile(applicationNode, application);
         if (importError != null) {
             importStatus.addError(importError);
         }
 
-        final SApplication application = builder.build();
         return new ImportResult(application, importStatus);
     }
 
@@ -111,12 +115,12 @@ public class NodeToApplicationConverter {
     }
 
     private ImportError setProfile(final ApplicationNode applicationNode,
-            final SApplication.SApplicationBuilder builder) {
+            SApplicationWithIcon application) {
         ImportError importError = null;
         if (applicationNode.getProfile() != null) {
             try {
                 final SProfile profile = profileService.getProfileByName(applicationNode.getProfile());
-                builder.profileId(profile.getId());
+                application.setProfileId(profile.getId());
             } catch (final SProfileNotFoundException | SBonitaReadException e) {
                 importError = new ImportError(applicationNode.getProfile(), ImportError.Type.PROFILE);
             }

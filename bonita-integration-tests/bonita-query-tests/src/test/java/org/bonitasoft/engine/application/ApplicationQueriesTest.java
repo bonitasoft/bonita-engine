@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.test.persistence.builder.ApplicationMenuBuil
 import static org.bonitasoft.engine.test.persistence.builder.ApplicationPageBuilder.anApplicationPage;
 import static org.bonitasoft.engine.test.persistence.builder.GroupBuilder.aGroup;
 import static org.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
+import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileBuilder.aProfile;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileMemberBuilder.aProfileMember;
 import static org.bonitasoft.engine.test.persistence.builder.RoleBuilder.aRole;
@@ -29,9 +30,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -60,7 +63,7 @@ public class ApplicationQueriesTest {
         //given
         repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
                 .withVersion("1.0").withPath("app1").build());
-        final SApplication application2 = repository
+        final AbstractSApplication application2 = repository
                 .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
                         .withDisplayName("my app2").withVersion("1.0").withPath("/app2")
                         .build());
@@ -71,7 +74,8 @@ public class ApplicationQueriesTest {
         final SApplication retrievedApp = repository.getApplicationByToken("app2");
 
         //then
-        assertThat(retrievedApp).isEqualTo(application2);
+        assertThat(retrievedApp)
+                .isEqualTo(repository.getById(SApplication.class, application2.getId(), DEFAULT_TENANT_ID));
     }
 
     @Test
@@ -79,14 +83,15 @@ public class ApplicationQueriesTest {
         //given
         repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
                 .withVersion("1.0").withPath("app1").build());
-        final SApplication application2 = repository
+        final AbstractSApplication application2 = repository
                 .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
                         .withVersion("1.0").withPath("app1").build());
         repository.add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
                 .withVersion("1.0").withPath("app1").build());
 
         //when
-        final SApplication retrievedApp = repository.getApplication(application2.getId());
+        final SApplicationWithIcon retrievedApp = repository.getById(SApplicationWithIcon.class, application2.getId(),
+                DEFAULT_TENANT_ID);
 
         //then
         assertThat(retrievedApp).isEqualTo(application2);
@@ -95,7 +100,7 @@ public class ApplicationQueriesTest {
     @Test
     public void getApplicationPageById_should_return_the_applicationPage_identified_by_the_given_id() throws Exception {
         //given
-        final SApplication application1 = repository
+        final AbstractSApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app1").build());
         final AbstractSPage page = repository
@@ -119,11 +124,11 @@ public class ApplicationQueriesTest {
     public void getApplicationPageByNameAnApplicationName_should_return_the_applicationPage_with_the_given_name_in_the_given_application()
             throws Exception {
         //given
-        final SApplication application1 = repository
+        final AbstractSApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app1")
                         .build());
-        final SApplication application2 = repository
+        final AbstractSApplication application2 = repository
                 .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app2")
                         .build());
@@ -151,11 +156,11 @@ public class ApplicationQueriesTest {
     public void getApplicationPageByTokenAndApplicationId_should_return_the_applicationPage_with_the_given_name_in_the_given_application()
             throws Exception {
         //given
-        final SApplication application1 = repository
+        final AbstractSApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app1")
                         .build());
-        final SApplication application2 = repository
+        final AbstractSApplication application2 = repository
                 .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app2")
                         .build());
@@ -199,19 +204,22 @@ public class ApplicationQueriesTest {
                 .add(aPage().withName("layoutApp4").withContent("The content".getBytes()).build());
         AbstractSPage themeApp4 = repository
                 .add(aPage().withName("themeApp4").withContent("The content".getBytes()).build());
-        final SApplication application1 = repository.add(anApplication().withToken("app1").withDisplayName("my app1")
+        final AbstractSApplication application1 = repository.add(anApplication().withToken("app1")
+                .withDisplayName("my app1")
                 .withDisplayName("my app1")
                 .withVersion("1.0").withPath("/app1").withProfile(firstProfile.getId()).withLayout(layoutApp1.getId())
                 .build());
-        final SApplication application2 = repository.add(anApplication().withToken("app2").withDisplayName("my app2")
+        final AbstractSApplication application2 = repository.add(anApplication().withToken("app2")
+                .withDisplayName("my app2")
                 .withDisplayName("my app2")
                 .withVersion("1.0").withPath("/app2").withProfile(firstProfile.getId()).withTheme(themeApp2.getId())
                 .build());
-        final SApplication application3 = repository
+        final AbstractSApplication application3 = repository
                 .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
                         .withVersion("1.0").withPath("/app3").withProfile(secondProfile.getId())
                         .build());
-        final SApplication application4 = repository.add(anApplication().withToken("app4").withDisplayName("my app4")
+        final AbstractSApplication application4 = repository.add(anApplication().withToken("app4")
+                .withDisplayName("my app4")
                 .withDisplayName("my app4")
                 .withVersion("1.0").withPath("/app4").withLayout(layoutApp4.getId()).withTheme(themeApp4.getId())
                 .build());
@@ -276,7 +284,7 @@ public class ApplicationQueriesTest {
     public void getApplicationHomePage_should_return_the_applicationPage_set_as_home_page_for_the_given_application()
             throws Exception {
         //given
-        final SApplication application = repository
+        final AbstractSApplication application = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app1")
                         .build());
@@ -302,7 +310,7 @@ public class ApplicationQueriesTest {
     public void getApplicationMenu_by_id_should_return_the_application_menu_identified_by_the_given_id()
             throws Exception {
         //given
-        final SApplication application = repository
+        final AbstractSApplication application = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app1")
                         .build());
@@ -326,7 +334,7 @@ public class ApplicationQueriesTest {
     @Test
     public void getLastIndexForRootMenu_should_return_last_used_index() throws Exception {
         //given
-        final SApplication application = repository
+        final AbstractSApplication application = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app1")
                         .build());
@@ -351,7 +359,7 @@ public class ApplicationQueriesTest {
     public void getLastIndexForChildMenu_should_return_last_used_index_by_children_of_a_given_parent()
             throws Exception {
         //given
-        final SApplication application = repository
+        final AbstractSApplication application = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                         .withVersion("1.0").withPath("/app1")
                         .build());
@@ -392,32 +400,37 @@ public class ApplicationQueriesTest {
         repository.add(aProfileMember().withUserId(user2.getId()).withProfileId(profile2.getId()).build());
         repository.add(aProfileMember().withUserId(user3.getId()).withProfileId(profile2.getId()).build());
 
-        final SApplication application1 = repository
+        long application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
-                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build());
-        final SApplication application2 = repository
+                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build())
+                .getId();
+        long application2 = repository
                 .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
                         .withDisplayName("my app2").withVersion("1.0").withPath("/app2").withProfile(profile1.getId())
-                        .build());
-        final SApplication application3 = repository
+                        .build())
+                .getId();
+        long application3 = repository
                 .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
-                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build());
+                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build())
+                .getId();
 
         repository.flush();
 
         //then
-        assertThat(repository.searchApplicationOfUser(user1.getId())).containsExactly(application1, application2);
-        assertThat(repository.searchApplicationOfUser(user2.getId())).containsExactly(application3);
-        assertThat(repository.searchApplicationOfUser(user3.getId())).containsExactly(application1, application2,
-                application3);
-        assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
-        assertThat(repository.searchApplicationOfUser(5L)).isEmpty();
-
         assertThat(repository.getNumberOfApplicationOfUser(user1.getId())).isEqualTo(2);
         assertThat(repository.getNumberOfApplicationOfUser(user2.getId())).isEqualTo(1);
         assertThat(repository.getNumberOfApplicationOfUser(user3.getId())).isEqualTo(3);
         assertThat(repository.getNumberOfApplicationOfUser(user4.getId())).isEqualTo(0);
         assertThat(repository.getNumberOfApplicationOfUser(5L)).isEqualTo(0);
+        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactly(application1,
+                application2);
+        assertThat(repository.searchApplicationOfUser(user2.getId())).extracting("id").containsExactly(application3);
+        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactly(application1,
+                application2,
+                application3);
+        assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
+        assertThat(repository.searchApplicationOfUser(5L)).isEmpty();
+
     }
 
     @Test
@@ -446,24 +459,26 @@ public class ApplicationQueriesTest {
 
         repository.add(aUserMembership().forUser(user4.getId()).memberOf(group3.getId(), -1L).build());
 
-        final SApplication application1 = repository
+        final AbstractSApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
                         .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build());
-        final SApplication application2 = repository
+        final AbstractSApplication application2 = repository
                 .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
                         .withDisplayName("my app2").withVersion("1.0").withPath("/app2").withProfile(profile1.getId())
                         .build());
-        final SApplication application3 = repository
+        final AbstractSApplication application3 = repository
                 .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
                         .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build());
 
         repository.flush();
 
         //then
-        assertThat(repository.searchApplicationOfUser(user1.getId())).containsExactly(application1, application2);
-        assertThat(repository.searchApplicationOfUser(user2.getId())).containsExactly(application3);
-        assertThat(repository.searchApplicationOfUser(user3.getId())).containsExactly(application1, application2,
-                application3);
+        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id")
+                .containsExactly(application1.getId(), application2.getId());
+        assertThat(repository.searchApplicationOfUser(user2.getId())).extracting("id")
+                .containsExactly(application3.getId());
+        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id")
+                .containsExactly(application1.getId(), application2.getId(), application3.getId());
         assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
         assertThat(repository.searchApplicationOfUser(user5.getId())).isEmpty();
         assertThat(repository.searchApplicationOfUser(6L)).isEmpty();
@@ -499,23 +514,28 @@ public class ApplicationQueriesTest {
 
         repository.add(aUserMembership().forUser(user4.getId()).memberOf(-1L, role3.getId()).build());
 
-        final SApplication application1 = repository
+        long application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
-                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build());
-        final SApplication application2 = repository
+                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build())
+                .getId();
+        long application2 = repository
                 .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
                         .withDisplayName("my app2").withVersion("1.0").withPath("/app2").withProfile(profile1.getId())
-                        .build());
-        final SApplication application3 = repository
+                        .build())
+                .getId();
+        long application3 = repository
                 .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
-                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build());
+                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build())
+                .getId();
 
         repository.flush();
 
         //then
-        assertThat(repository.searchApplicationOfUser(user1.getId())).containsExactly(application1, application2);
-        assertThat(repository.searchApplicationOfUser(user2.getId())).containsExactly(application3);
-        assertThat(repository.searchApplicationOfUser(user3.getId())).containsExactly(application1, application2,
+        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactly(application1,
+                application2);
+        assertThat(repository.searchApplicationOfUser(user2.getId())).extracting("id").containsExactly(application3);
+        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactly(application1,
+                application2,
                 application3);
         assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
         assertThat(repository.searchApplicationOfUser(user5.getId())).isEmpty();
@@ -561,23 +581,28 @@ public class ApplicationQueriesTest {
 
         repository.add(aUserMembership().forUser(user4.getId()).memberOf(group3.getId(), role3.getId()).build());
 
-        final SApplication application1 = repository
+        long application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
-                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build());
-        final SApplication application2 = repository
+                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build())
+                .getId();
+        long application2 = repository
                 .add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
                         .withDisplayName("my app2").withVersion("1.0").withPath("/app2").withProfile(profile1.getId())
-                        .build());
-        final SApplication application3 = repository
+                        .build())
+                .getId();
+        long application3 = repository
                 .add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
-                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build());
+                        .withVersion("1.0").withPath("app3").withProfile(profile2.getId()).build())
+                .getId();
 
         repository.flush();
 
         //then
-        assertThat(repository.searchApplicationOfUser(user1.getId())).containsExactly(application1, application2);
-        assertThat(repository.searchApplicationOfUser(user2.getId())).containsExactly(application3);
-        assertThat(repository.searchApplicationOfUser(user3.getId())).containsExactly(application1, application2,
+        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactly(application1,
+                application2);
+        assertThat(repository.searchApplicationOfUser(user2.getId())).extracting("id").containsExactly(application3);
+        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactly(application1,
+                application2,
                 application3);
         assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
         assertThat(repository.searchApplicationOfUser(user5.getId())).isEmpty();

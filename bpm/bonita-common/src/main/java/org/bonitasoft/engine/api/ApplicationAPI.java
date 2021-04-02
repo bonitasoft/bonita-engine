@@ -26,6 +26,7 @@ import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.Icon;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -370,4 +371,13 @@ public interface ApplicationAPI {
      */
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException;
+
+    /**
+     * Return the icon associated to the application
+     *
+     * @param applicationId id of the application
+     * @return Icon of the application or null or there is no icon for the application
+     * @throws ApplicationNotFoundException when there is no application having that id
+     */
+    Icon getIconOfApplication(long applicationId) throws ApplicationNotFoundException;
 }

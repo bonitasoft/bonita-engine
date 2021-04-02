@@ -41,6 +41,7 @@
                 <value>org.bonitasoft.engine.actor.mapping.model.SActor</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActorMember</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplication</value>
+                <value>org.bonitasoft.engine.business.application.model.SApplicationWithIcon</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
                 <value>org.bonitasoft.engine.platform.model.SPlatform</value>

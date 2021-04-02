@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.application.importer;
 
 import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 
@@ -22,7 +23,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
  */
 public interface ApplicationImportStrategy {
 
-    void whenApplicationExists(SApplication existing, SApplication toBeImported)
+    void whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported)
             throws AlreadyExistsException, SBonitaException;
 
 }

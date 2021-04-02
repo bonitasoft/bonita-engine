@@ -16,8 +16,8 @@ package org.bonitasoft.engine.business.application.converter;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -40,11 +40,11 @@ public class NodeToApplicationPageConverter {
 
     /**
      * @param applicationPageNode the XML node to convert to {@link SApplicationPage}
-     * @param application the {@link SApplication} where the {@code SApplicationPage} will be attached
+     * @param application the {@link SApplicationWithIcon} where the {@code SApplicationPage} will be attached
      * @return an ApplicationPageImportResult containing the converted {@code SApplicationPage} and an error (if any)
      */
     public ApplicationPageImportResult toSApplicationPage(ApplicationPageNode applicationPageNode,
-            SApplication application) throws SBonitaReadException, ImportException {
+            SApplicationWithIcon application) throws SBonitaReadException, ImportException {
         String token = applicationPageNode.getToken();
         importValidator.validate(token);
         long pageId = 0;

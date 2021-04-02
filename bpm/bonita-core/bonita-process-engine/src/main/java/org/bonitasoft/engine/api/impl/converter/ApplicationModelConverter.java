@@ -27,10 +27,13 @@ import org.bonitasoft.engine.business.application.ApplicationField;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
@@ -48,14 +51,14 @@ public class ApplicationModelConverter {
         this.pageService = pageService;
     }
 
-    public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId)
+    public SApplicationWithIcon buildSApplication(final ApplicationCreator creator, final long creatorUserId)
             throws CreationException {
         final Map<ApplicationField, Serializable> fields = creator.getFields();
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
         final long now = System.currentTimeMillis();
-        return SApplication.builder().token((String) fields.get(ApplicationField.TOKEN))
+        return SApplicationWithIcon.builder().token((String) fields.get(ApplicationField.TOKEN))
                 .displayName((String) fields.get(ApplicationField.DISPLAY_NAME))
                 .version((String) fields.get(ApplicationField.VERSION))
                 .creationDate(now)
@@ -65,6 +68,9 @@ public class ApplicationModelConverter {
                 .layoutId(getLayoutId(creator))
                 .themeId(getThemeId(creator))
                 .updatedBy(creatorUserId)
+                .iconContent((byte[]) fields.get(ApplicationField.ICON_CONTENT))
+                .iconMimeType(fields.get(ApplicationField.ICON_FILE_NAME) == null ? null
+                        : IOUtil.getContentType((String) fields.get(ApplicationField.ICON_FILE_NAME)))
                 .description(description).iconPath(iconPath).profileId(profileId).build();
     }
 
@@ -100,20 +106,22 @@ public class ApplicationModelConverter {
         }
     }
 
-    public Application toApplication(final SApplication sApplication) {
-        final ApplicationImpl application = new ApplicationImpl(sApplication.getToken(), sApplication.getVersion(),
-                sApplication.getDescription(),
-                sApplication.getLayoutId(), sApplication.getThemeId());
-        application.setId(sApplication.getId());
-        application.setDisplayName(sApplication.getDisplayName());
-        application.setCreatedBy(sApplication.getCreatedBy());
-        application.setCreationDate(new Date(sApplication.getCreationDate()));
-        application.setUpdatedBy(sApplication.getUpdatedBy());
-        application.setLastUpdateDate(new Date(sApplication.getLastUpdateDate()));
-        application.setState(sApplication.getState());
-        application.setIconPath(sApplication.getIconPath());
-        application.setHomePageId(sApplication.getHomePageId());
-        application.setProfileId(sApplication.getProfileId());
+    public Application toApplication(final AbstractSApplication abstractSApplication) {
+        final ApplicationImpl application = new ApplicationImpl(abstractSApplication.getToken(),
+                abstractSApplication.getVersion(),
+                abstractSApplication.getDescription(),
+                abstractSApplication.getLayoutId(), abstractSApplication.getThemeId());
+        application.setId(abstractSApplication.getId());
+        application.setDisplayName(abstractSApplication.getDisplayName());
+        application.setCreatedBy(abstractSApplication.getCreatedBy());
+        application.setCreationDate(new Date(abstractSApplication.getCreationDate()));
+        application.setUpdatedBy(abstractSApplication.getUpdatedBy());
+        application.setLastUpdateDate(new Date(abstractSApplication.getLastUpdateDate()));
+        application.setState(abstractSApplication.getState());
+        application.setIconPath(abstractSApplication.getIconPath());
+        application.setHomePageId(abstractSApplication.getHomePageId());
+        application.setProfileId(abstractSApplication.getProfileId());
+        application.setHasIcon(abstractSApplication.hasIcon());
         return application;
     }
 
@@ -140,35 +148,39 @@ public class ApplicationModelConverter {
                 case TOKEN:
                     builder.updateToken((String) entry.getValue());
                     break;
-
                 case DESCRIPTION:
                     builder.updateDescription((String) entry.getValue());
                     break;
-
                 case DISPLAY_NAME:
                     builder.updateDisplayName((String) entry.getValue());
                     break;
-
                 case ICON_PATH:
                     builder.updateIconPath((String) entry.getValue());
                     break;
-
+                case ICON_FILE_NAME:
+                    builder.updateIconMimeType(
+                            entry.getValue() == null ? null : IOUtil.getContentType((String) entry.getValue()));
+                    break;
+                case ICON_CONTENT:
+                    builder.updateIconContent((byte[]) entry.getValue());
+                    break;
                 case PROFILE_ID:
                     builder.updateProfileId((Long) entry.getValue());
                     break;
-
                 case STATE:
                     builder.updateState((String) entry.getValue());
                     break;
-
                 case VERSION:
                     builder.updateVersion((String) entry.getValue());
                     break;
                 case HOME_PAGE_ID:
                     builder.updateHomePageId((Long) entry.getValue());
                     break;
-                default:
+                case THEME_ID:
+                case LAYOUT_ID:
                     break;
+                default:
+                    throw new IllegalArgumentException("Unknown application field " + entry.getKey());
             }
         }
     }

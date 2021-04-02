@@ -57,8 +57,23 @@ public enum ApplicationField {
      * References the {@link Application} icon path
      *
      * @see Application
+     * @deprecated since 7.13.0, use ICON_CONTENT and ICON_FILE_NAME instead
      */
     ICON_PATH,
+
+    /**
+     * byte array content of the icon of the {@link Application}
+     *
+     * @since 7.13.0
+     */
+    ICON_CONTENT,
+
+    /**
+     * Filename of the icon of the {@link Application}
+     *
+     * @since 7.13.0
+     */
+    ICON_FILE_NAME,
 
     /**
      * References the {@link Application} state

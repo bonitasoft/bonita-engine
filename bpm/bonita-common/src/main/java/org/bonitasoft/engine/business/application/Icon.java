@@ -11,29 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.importer;
+package org.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
+import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * @author Elias Ricken de Medeiros
+ * Icon of a Bonita Living Application.
+ *
+ * @since 7.13.0
  */
-public class ImportResult {
+public interface Icon extends BonitaObject {
 
-    private final SApplicationWithIcon application;
-    private final ImportStatus importStatus;
+    /**
+     * @return the mime type of the icon
+     */
+    String getMimeType();
 
-    public ImportResult(SApplicationWithIcon application, ImportStatus importStatus) {
-        this.application = application;
-        this.importStatus = importStatus;
-    }
+    /**
+     * @return the content of the icon
+     */
+    byte[] getContent();
 
-    public SApplicationWithIcon getApplication() {
-        return application;
-    }
-
-    public ImportStatus getImportStatus() {
-        return importStatus;
-    }
 }

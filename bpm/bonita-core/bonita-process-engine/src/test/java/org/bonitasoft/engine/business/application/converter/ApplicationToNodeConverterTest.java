@@ -73,7 +73,7 @@ public class ApplicationToNodeConverterTest {
         //given
         long createdBy = 11L;
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), createdBy,
-                "enabled", null, null);
+                "enabled", null, null, null);
         application.setDescription("this is my app");
         application.setIconPath("/icon.jpg");
 
@@ -97,7 +97,7 @@ public class ApplicationToNodeConverterTest {
     public void toNode_should_replace_profile_id_by_profile_name() throws Exception {
         //given
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10, "enabled",
-                null, null);
+                null, null, null);
         application.setProfileId(7L);
         final SProfile profile = mock(SProfile.class);
         given(profile.getName()).willReturn("admin");
@@ -116,7 +116,7 @@ public class ApplicationToNodeConverterTest {
     public void toNode_should_throw_ExportException_when_profileService_throws_exception() throws Exception {
         //given
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                null, null);
+                null, null, null);
         application.setProfileId(7L);
 
         given(profileService.getProfile(7L)).willThrow(new SProfileNotFoundException(""));
@@ -131,7 +131,7 @@ public class ApplicationToNodeConverterTest {
     public void toNode_should_replaceHomePageId_by_application_page_token() throws Exception {
         //given
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                null, null);
+                null, null, null);
         application.setHomePageId(8L);
         final SApplicationPage homePage = mock(SApplicationPage.class);
         given(homePage.getToken()).willReturn("home");
@@ -150,7 +150,7 @@ public class ApplicationToNodeConverterTest {
     public void toNode_should_throw_ExportException_when_applicationService_throws_exception() throws Exception {
         //given
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                null, null);
+                null, null, null);
         application.setHomePageId(8L);
 
         given(applicationService.getApplicationPage(8L)).willThrow(new SObjectNotFoundException());
@@ -165,7 +165,7 @@ public class ApplicationToNodeConverterTest {
     public void toNode_should_replaceLayoutId_by_page_name() throws Exception {
         //given
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                9L, null);
+                9L, null, null);
         final SPage layout = mock(SPage.class);
         given(layout.getName()).willReturn("mainLayout");
 
@@ -184,7 +184,7 @@ public class ApplicationToNodeConverterTest {
         //given
         long themeId = 20L;
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                null, themeId);
+                null, themeId, null);
         final SPage layout = mock(SPage.class);
         given(layout.getName()).willReturn("mainTheme");
 
@@ -202,7 +202,7 @@ public class ApplicationToNodeConverterTest {
     public void toNodeShouldThrowExceptionAtMenuConversion() throws Exception {
         //given
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                null, null);
+                null, null, null);
 
         doThrow(new SBonitaReadException("")).when(menuConverter).addMenusToApplicationNode(nullable(Long.class),
                 nullable(Long.class), nullable(ApplicationNode.class),
@@ -216,7 +216,7 @@ public class ApplicationToNodeConverterTest {
         //given
         final long applicationId = 1191L;
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                null, null);
+                null, null, null);
         application.setId(applicationId);
 
         doNothing().when(menuConverter).addMenusToApplicationNode(eq(applicationId), isNull(Long.class),
@@ -235,7 +235,7 @@ public class ApplicationToNodeConverterTest {
     public void toNodeShouldAddThrowExceptionAtPageConversion() throws Exception {
         //given
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                null, null);
+                null, null, null);
 
         given(applicationService.searchApplicationPages(any(QueryOptions.class)))
                 .willThrow(new SBonitaReadException(""));
@@ -247,7 +247,7 @@ public class ApplicationToNodeConverterTest {
     public void toNodeShouldAddConvertedPages() throws Exception {
         //given
         final SApplication application = new SApplication("app", "my app", "1.0", new Date().getTime(), 10L, "enabled",
-                null, null);
+                null, null, null);
         final List<SApplicationPage> pages = new ArrayList<>(1);
         final SApplicationPage page = mock(SApplicationPage.class);
         pages.add(page);

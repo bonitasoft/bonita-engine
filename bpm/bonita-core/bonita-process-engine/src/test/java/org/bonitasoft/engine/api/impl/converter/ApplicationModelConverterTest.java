@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -27,8 +28,10 @@ import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationState;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
@@ -56,6 +59,8 @@ public class ApplicationModelConverterTest {
     public static final long LAYOUT_ID = 55L;
     public static final long THEME_ID = 56L;
     public static final String APP_NAME2 = "app2";
+    private static final String ICON_MIME_TYPE = "app mime_type";
+    private static final byte[] ICON_CONTENT = "app_icon_content".getBytes(StandardCharsets.UTF_8);
 
     @Mock
     private PageService pageService;
@@ -83,7 +88,7 @@ public class ApplicationModelConverterTest {
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(theme);
 
         //when
-        final SApplication application = converter.buildSApplication(creator, userId);
+        final SApplicationWithIcon application = converter.buildSApplication(creator, userId);
 
         //then
         assertThat(application).isNotNull();
@@ -141,8 +146,9 @@ public class ApplicationModelConverterTest {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
-        final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID,
-                state, LAYOUT_ID, THEME_ID);
+        final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION,
+                currentDate, CREATOR_ID,
+                state, LAYOUT_ID, THEME_ID, ICON_MIME_TYPE);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
@@ -170,6 +176,25 @@ public class ApplicationModelConverterTest {
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
         assertThat(application.getThemeId()).isEqualTo(THEME_ID);
+        assertThat(application.hasIcon()).isTrue();
+
+    }
+
+    @Test
+    public void toApplication_must_set_false_when_application_icon_mime_type_is_null() throws Exception {
+        //given
+        final long currentDate = System.currentTimeMillis();
+        final String state = SApplicationState.DEACTIVATED.name();
+        final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION,
+                currentDate, CREATOR_ID,
+                state, LAYOUT_ID, THEME_ID, null);
+
+        //when
+        final Application application = converter.toApplication(sApp);
+
+        //then
+        assertThat(application.hasIcon()).isFalse();
+
     }
 
     @Test
@@ -178,10 +203,10 @@ public class ApplicationModelConverterTest {
         //given
         final SApplication sApp1 = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(),
                 CREATOR_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID, null);
         final SApplication sApp2 = new SApplication(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(),
                 CREATOR_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID, null);
 
         //when
         final List<Application> applications = converter.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));
@@ -211,15 +236,15 @@ public class ApplicationModelConverterTest {
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
         assertThat(fields).hasSize(10); // field lastUpdateDate cannot be checked:
-        assertThat(fields.get(SApplication.TOKEN)).isEqualTo("My-updated-app");
-        assertThat(fields.get(SApplication.DISPLAY_NAME)).isEqualTo("Updated display name");
-        assertThat(fields.get(SApplication.VERSION)).isEqualTo("1.1");
-        assertThat(fields.get(SApplication.DESCRIPTION)).isEqualTo("Up description");
-        assertThat(fields.get(SApplication.ICON_PATH)).isEqualTo("/newIcon.jpg");
-        assertThat(fields.get(SApplication.PROFILE_ID)).isEqualTo(10L);
-        assertThat(fields.get(SApplication.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
-        assertThat(fields.get(SApplication.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
-        assertThat(fields.get(SApplication.HOME_PAGE_ID)).isEqualTo(11L);
+        assertThat(fields.get(AbstractSApplication.TOKEN)).isEqualTo("My-updated-app");
+        assertThat(fields.get(AbstractSApplication.DISPLAY_NAME)).isEqualTo("Updated display name");
+        assertThat(fields.get(AbstractSApplication.VERSION)).isEqualTo("1.1");
+        assertThat(fields.get(AbstractSApplication.DESCRIPTION)).isEqualTo("Up description");
+        assertThat(fields.get(AbstractSApplication.ICON_PATH)).isEqualTo("/newIcon.jpg");
+        assertThat(fields.get(AbstractSApplication.PROFILE_ID)).isEqualTo(10L);
+        assertThat(fields.get(AbstractSApplication.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
+        assertThat(fields.get(AbstractSApplication.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
+        assertThat(fields.get(AbstractSApplication.HOME_PAGE_ID)).isEqualTo(11L);
     }
 
     @Test

@@ -18,7 +18,6 @@ import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBui
 import java.util.List;
 import java.util.Random;
 
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -134,10 +133,6 @@ public class TestRepository {
         }
         getSession().save(entity);
         return (T) getSession().get(entity.getClass(), new PersistentObjectId(entity.getId(), getTenantId(entity)));
-    }
-
-    public void update(final SApplication application) {
-        getSession().update(application);
     }
 
     public <T extends PersistentObject> void add(T... entities) {

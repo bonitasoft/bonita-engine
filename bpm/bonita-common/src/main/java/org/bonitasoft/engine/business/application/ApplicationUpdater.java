@@ -105,9 +105,27 @@ public class ApplicationUpdater implements Serializable {
      * @param iconPath the new value for the {@code Application} icon path
      * @return the current {@code ApplicationUpdater}
      * @see Application
+     * @deprecated since 7.13.0, use {@link #setIcon(String, byte[])}
      */
     public ApplicationUpdater setIconPath(final String iconPath) {
         fields.put(ApplicationField.ICON_PATH, iconPath);
+        return this;
+    }
+
+    /**
+     * Defines the new icon for the {@link Application}.
+     * <p/>
+     * The icons are accessible using {@link org.bonitasoft.engine.api.ApplicationAPI#getIconOfApplication(long)}
+     * Calling that method with {@code setIcon(null, null)} will remove the icon.
+     *
+     * @param iconFileName of the icon
+     * @param content of the icon
+     * @return the current builder
+     * @since 7.13.0
+     */
+    public ApplicationUpdater setIcon(String iconFileName, byte[] content) {
+        fields.put(ApplicationField.ICON_FILE_NAME, iconFileName);
+        fields.put(ApplicationField.ICON_CONTENT, content);
         return this;
     }
 
