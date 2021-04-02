@@ -21,8 +21,8 @@ import static org.mockito.Mockito.*;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationPageConverter;
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.exception.ImportException;
@@ -47,7 +47,7 @@ public class ApplicationPageImporterTest {
     @Test
     public void importApplicationPage_should_create_applicationPage_when_there_is_no_error() throws Exception {
         //given
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         ApplicationPageNode applicationPageNode = mock(ApplicationPageNode.class);
         SApplicationPage applicationPage = mock(SApplicationPage.class);
         ApplicationPageImportResult importResult = new ApplicationPageImportResult(applicationPage, null);
@@ -65,7 +65,7 @@ public class ApplicationPageImporterTest {
     @Test
     public void importApplicationPage_should_not_create_applicationPage_when_there_is_an_error() throws Exception {
         //given
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         ApplicationPageNode applicationPageNode = mock(ApplicationPageNode.class);
         SApplicationPage applicationPage = mock(SApplicationPage.class);
         ImportError error = mock(ImportError.class);
@@ -85,7 +85,7 @@ public class ApplicationPageImporterTest {
     public void importApplicationPage_should_throw_Exception_when_create_applicationPage_throws_exception()
             throws Exception {
         //given
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         ApplicationPageNode applicationPageNode = mock(ApplicationPageNode.class);
         SApplicationPage applicationPage = mock(SApplicationPage.class);
         ApplicationPageImportResult importResult = new ApplicationPageImportResult(applicationPage, null);

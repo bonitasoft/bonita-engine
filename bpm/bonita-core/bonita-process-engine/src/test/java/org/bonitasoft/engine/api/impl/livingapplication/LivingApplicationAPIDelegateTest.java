@@ -18,6 +18,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import java.nio.charset.StandardCharsets;
+
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
@@ -30,6 +32,7 @@ import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -94,6 +97,10 @@ public class LivingApplicationAPIDelegateTest {
 
     private static final String DESCRIPTION = "app desc";
 
+    private static final String ICON_MIME_TYPE = "app mime_type";
+
+    private static final byte[] ICON_CONTENT = "app_icon_content".getBytes(StandardCharsets.UTF_8);
+
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
@@ -107,7 +114,7 @@ public class LivingApplicationAPIDelegateTest {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
         creator.setDescription(DESCRIPTION);
-        final SApplication sApp = buildDefaultApplication();
+        final SApplicationWithIcon sApp = buildDefaultApplicationWithMetadata();
         sApp.setDescription(DESCRIPTION);
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, DESCRIPTION);
         given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
@@ -123,7 +130,13 @@ public class LivingApplicationAPIDelegateTest {
 
     private SApplication buildDefaultApplication() {
         return new SApplication(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID, null);
+    }
+
+    private SApplicationWithIcon buildDefaultApplicationWithMetadata() {
+        return new SApplicationWithIcon(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(),
+                LOGGED_USER_ID,
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID, ICON_MIME_TYPE, ICON_CONTENT);
     }
 
     @Test(expected = AlreadyExistsException.class)
@@ -131,9 +144,10 @@ public class LivingApplicationAPIDelegateTest {
             throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
-        final SApplication sApp = buildDefaultApplication();
+        final SApplicationWithIcon sApp = buildDefaultApplicationWithMetadata();
         given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
-        given(applicationService.createApplication(sApp)).willThrow(new SObjectAlreadyExistsException(""));
+        given(applicationService.createApplication(sApp))
+                .willThrow(new SObjectAlreadyExistsException(""));
 
         //when
         delegate.createApplication(creator);
@@ -146,9 +160,10 @@ public class LivingApplicationAPIDelegateTest {
             throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
-        final SApplication sApp = buildDefaultApplication();
+        final SApplicationWithIcon sApp = buildDefaultApplicationWithMetadata();
         given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
-        given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
+        given(applicationService.createApplication(sApp))
+                .willThrow(new SObjectCreationException(""));
 
         //when
         delegate.createApplication(creator);
@@ -226,9 +241,9 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
-    public void getApplication_should_return_the_application_returned_by_applicationService_coverted()
+    public void getApplication_should_return_the_application_returned_by_applicationService_converted()
             throws Exception {
-        final SApplication sApp = buildDefaultApplication();
+        SApplication sApp = buildDefaultApplication();
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, null);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApp);
         given(converter.toApplication(sApp)).willReturn(application);
@@ -268,14 +283,15 @@ public class LivingApplicationAPIDelegateTest {
     @Test
     public void updateApplication_should_return_result_of_applicationservice_updateApplication() throws Exception {
         //given
-        final SApplication sApplication = mock(SApplication.class);
+        final SApplicationWithIcon sApplicationWithIcon = mock(SApplicationWithIcon.class);
         final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
-        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willReturn(sApplication);
-        given(converter.toApplication(sApplication)).willReturn(application);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor))
+                .willReturn(sApplicationWithIcon);
+        given(converter.toApplication(sApplicationWithIcon)).willReturn(application);
 
         //when
         final Application updatedApplication = delegate.updateApplication(APPLICATION_ID, updater);

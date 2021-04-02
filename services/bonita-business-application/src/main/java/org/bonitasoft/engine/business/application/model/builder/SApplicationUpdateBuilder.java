@@ -42,4 +42,8 @@ public interface SApplicationUpdateBuilder {
 
     public SApplicationUpdateBuilder updateThemeId(final Long themeId);
 
+    public SApplicationUpdateBuilder updateIconMimeType(String mimeType);
+
+    public SApplicationUpdateBuilder updateIconContent(byte[] content);
+
 }

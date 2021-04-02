@@ -45,6 +45,7 @@ import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.Icon;
 import org.bonitasoft.engine.business.application.converter.ApplicationMenuToNodeConverter;
 import org.bonitasoft.engine.business.application.converter.ApplicationPageToNodeConverter;
 import org.bonitasoft.engine.business.application.converter.ApplicationToNodeConverter;
@@ -309,4 +310,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getApplicationImporter(policy).importApplications(xmlContent, SessionInfos.getUserIdFromSession());
     }
 
+    @Override
+    public Icon getIconOfApplication(long applicationId) throws ApplicationNotFoundException {
+        return getLivingApplicationAPIDelegate().getIconOfApplication(applicationId);
+    }
 }

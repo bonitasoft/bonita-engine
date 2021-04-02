@@ -2,12 +2,6 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false">
 
-    <query name="getApplicationById">
-        SELECT application
-        FROM org.bonitasoft.engine.business.application.model.SApplication AS application
-        WHERE id = :id
-    </query>
-
     <query name="getApplicationByToken">
         SELECT application
         FROM org.bonitasoft.engine.business.application.model.SApplication AS application
@@ -59,7 +53,7 @@
             )
         )
     </query>
-    
+
     <query name="getApplicationPageById">
         SELECT applicationPage
         FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage
@@ -84,27 +78,27 @@
     <query name="getApplicationHomePage">
         SELECT applicationPage
         FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage, org.bonitasoft.engine.business.application.model.SApplication as application
-        WHERE applicationPage.id = application.homePageId 
+        WHERE applicationPage.id = application.homePageId
         AND applicationPage.applicationId = application.id
         AND application.id = :applicationId
     </query>
-    
+
     <query name="getNumberOfSApplicationPage">
         SELECT count(applicationPage.id)
         FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage
     </query>
-    
+
     <query name="searchSApplicationPage">
         SELECT applicationPage
         FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage
     </query>
-    
+
     <query name="getApplicationMenuById">
         SELECT applicationMenu
         FROM org.bonitasoft.engine.business.application.model.SApplicationMenu as applicationMenu
         WHERE id = :id
     </query>
-    
+
     <query name="getNumberOfSApplicationMenu">
         SELECT count(applicationMenu.id)
         FROM org.bonitasoft.engine.business.application.model.SApplicationMenu as applicationMenu

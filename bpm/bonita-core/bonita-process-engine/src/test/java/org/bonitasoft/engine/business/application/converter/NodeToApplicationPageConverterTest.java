@@ -21,8 +21,8 @@ import static org.mockito.Mockito.mock;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -53,11 +53,11 @@ public class NodeToApplicationPageConverterTest {
 
     private static long APPLICATION_ID = 11L;
 
-    private SApplication application;
+    private SApplicationWithIcon application;
 
     @Before
     public void setUp() throws Exception {
-        application = new SApplication();
+        application = new SApplicationWithIcon();
         application.setId(APPLICATION_ID);
     }
 

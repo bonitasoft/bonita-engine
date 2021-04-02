@@ -13,7 +13,8 @@
  **/
 package org.bonitasoft.engine.business.application.model.builder.impl;
 
-import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -27,8 +28,8 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
 
     public SApplicationUpdateBuilderImpl(final long updaterUserId) {
         descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(SApplication.UPDATED_BY, updaterUserId);
-        descriptor.addField(SApplication.LAST_UPDATE_DATE, System.currentTimeMillis());
+        descriptor.addField(AbstractSApplication.UPDATED_BY, updaterUserId);
+        descriptor.addField(AbstractSApplication.LAST_UPDATE_DATE, System.currentTimeMillis());
     }
 
     @Override
@@ -38,61 +39,73 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
 
     @Override
     public SApplicationUpdateBuilder updateToken(final String token) {
-        descriptor.addField(SApplication.TOKEN, token);
+        descriptor.addField(AbstractSApplication.TOKEN, token);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateDisplayName(final String displayName) {
-        descriptor.addField(SApplication.DISPLAY_NAME, displayName);
+        descriptor.addField(AbstractSApplication.DISPLAY_NAME, displayName);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateVersion(final String version) {
-        descriptor.addField(SApplication.VERSION, version);
+        descriptor.addField(AbstractSApplication.VERSION, version);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateDescription(final String description) {
-        descriptor.addField(SApplication.DESCRIPTION, description);
+        descriptor.addField(AbstractSApplication.DESCRIPTION, description);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateIconPath(final String iconPath) {
-        descriptor.addField(SApplication.ICON_PATH, iconPath);
+        descriptor.addField(AbstractSApplication.ICON_PATH, iconPath);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateState(final String state) {
-        descriptor.addField(SApplication.STATE, state);
+        descriptor.addField(AbstractSApplication.STATE, state);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateProfileId(final Long profileId) {
-        descriptor.addField(SApplication.PROFILE_ID, profileId);
+        descriptor.addField(AbstractSApplication.PROFILE_ID, profileId);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateHomePageId(final Long homePageId) {
-        descriptor.addField(SApplication.HOME_PAGE_ID, homePageId);
+        descriptor.addField(AbstractSApplication.HOME_PAGE_ID, homePageId);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateLayoutId(final Long layoutId) {
-        descriptor.addField(SApplication.LAYOUT_ID, layoutId);
+        descriptor.addField(AbstractSApplication.LAYOUT_ID, layoutId);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateThemeId(final Long themeId) {
-        descriptor.addField(SApplication.THEME_ID, themeId);
+        descriptor.addField(AbstractSApplication.THEME_ID, themeId);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updateIconMimeType(String mimeType) {
+        descriptor.addField(AbstractSApplication.ICON_MIME_TYPE, mimeType);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updateIconContent(byte[] content) {
+        descriptor.addField(SApplicationWithIcon.ICON_CONTENT, content);
         return this;
     }
 }

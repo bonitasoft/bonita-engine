@@ -16,7 +16,7 @@ package org.bonitasoft.engine.business.application.importer;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationPageConverter;
-import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.ImportException;
@@ -35,7 +35,8 @@ public class ApplicationPageImporter {
         this.nodeToApplicationPageConverter = nodeToApplicationPageConverter;
     }
 
-    public ImportError importApplicationPage(ApplicationPageNode applicationPageNode, SApplication application)
+    public ImportError importApplicationPage(ApplicationPageNode applicationPageNode,
+            SApplicationWithIcon application)
             throws ImportException {
         try {
             ApplicationPageImportResult importResult = nodeToApplicationPageConverter

@@ -534,6 +534,8 @@ CREATE TABLE business_app (
   profileId BIGINT,
   layoutId BIGINT,
   themeId BIGINT,
+  iconMimeType VARCHAR(255),
+  iconContent LONGBLOB,
   displayName VARCHAR(255) NOT NULL
 ) ENGINE = INNODB;
 

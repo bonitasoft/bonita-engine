@@ -21,9 +21,9 @@ import static org.mockito.Mockito.*;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ApplicationMenuImportResult;
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class NodetoApplicationMenuConverterTest {
     public void toSApplicationMenu_should_convert_all_fields() throws Exception {
         //given
         long applicationId = 3L;
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         given(application.getId()).willReturn(applicationId);
         given(application.getToken()).willReturn("app");
 
@@ -82,7 +82,7 @@ public class NodetoApplicationMenuConverterTest {
     public void toSApplicationMenu_should_not_set_parent_id_when_parent_is_null() throws Exception {
         //given
         long applicationId = 3L;
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         given(application.getId()).willReturn(applicationId);
         given(application.getToken()).willReturn("app");
 
@@ -123,7 +123,7 @@ public class NodetoApplicationMenuConverterTest {
             throws Exception {
         //given
         long applicationId = 3L;
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         given(application.getId()).willReturn(applicationId);
 
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
@@ -155,7 +155,7 @@ public class NodetoApplicationMenuConverterTest {
     public void toSApplicationMenu_return_error_when_ApplicationPage_is_not_found() throws Exception {
         //given
         long applicationId = 3L;
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         given(application.getId()).willReturn(applicationId);
         given(application.getToken()).willReturn("app");
 

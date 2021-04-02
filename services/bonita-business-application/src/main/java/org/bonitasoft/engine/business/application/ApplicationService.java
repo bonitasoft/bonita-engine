@@ -18,6 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -41,20 +42,24 @@ public interface ApplicationService {
 
     String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
 
-    SApplication createApplication(SApplication application)
+    SApplicationWithIcon createApplication(SApplicationWithIcon application)
             throws SObjectCreationException, SObjectAlreadyExistsException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
+
+    SApplicationWithIcon getApplicationWithIcon(long applicationId)
+            throws SBonitaReadException, SObjectNotFoundException;
 
     SApplication getApplicationByToken(String token) throws SBonitaReadException;
 
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
 
-    SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor)
+    SApplicationWithIcon updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor)
             throws SObjectModificationException,
             SObjectAlreadyExistsException, SObjectNotFoundException;
 
-    SApplication updateApplication(SApplication application, EntityUpdateDescriptor updateDescriptor)
+    SApplicationWithIcon updateApplication(SApplicationWithIcon application,
+            EntityUpdateDescriptor updateDescriptor)
             throws SObjectModificationException,
             SObjectAlreadyExistsException;
 

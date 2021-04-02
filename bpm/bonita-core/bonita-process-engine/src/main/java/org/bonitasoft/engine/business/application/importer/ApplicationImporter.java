@@ -22,6 +22,7 @@ import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
@@ -57,7 +58,7 @@ public class ApplicationImporter {
             throws ImportException, AlreadyExistsException {
         try {
             ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, createdBy);
-            SApplication application = importApplication(importResult.getApplication(), importResult);
+            SApplicationWithIcon application = importApplication(importResult.getApplication(), importResult);
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);
             updateHomePage(application, applicationNode, createdBy, importResult);
@@ -67,7 +68,7 @@ public class ApplicationImporter {
         }
     }
 
-    private void updateHomePage(final SApplication application, final ApplicationNode applicationNode,
+    private void updateHomePage(final SApplicationWithIcon application, final ApplicationNode applicationNode,
             final long createdBy, final ImportResult importResult)
             throws SBonitaException {
         if (applicationNode.getHomePage() != null) {
@@ -86,7 +87,7 @@ public class ApplicationImporter {
     }
 
     private void importApplicationMenus(final ApplicationNode applicationNode, final ImportResult importResult,
-            final SApplication application)
+            final SApplicationWithIcon application)
             throws ImportException {
         for (ApplicationMenuNode applicationMenuNode : applicationNode.getApplicationMenus()) {
             List<ImportError> importErrors = applicationMenuImporter.importApplicationMenu(applicationMenuNode,
@@ -98,7 +99,7 @@ public class ApplicationImporter {
     }
 
     private void importApplicationPages(final ApplicationNode applicationNode, final ImportResult importResult,
-            final SApplication application)
+            final SApplicationWithIcon application)
             throws ImportException {
         for (ApplicationPageNode applicationPageNode : applicationNode.getApplicationPages()) {
             ImportError importError = applicationPageImporter.importApplicationPage(applicationPageNode, application);
@@ -112,7 +113,8 @@ public class ApplicationImporter {
         }
     }
 
-    private SApplication importApplication(SApplication applicationToBeImported, ImportResult importResult)
+    private SApplicationWithIcon importApplication(SApplicationWithIcon applicationToBeImported,
+            ImportResult importResult)
             throws SBonitaException, AlreadyExistsException {
         SApplication conflictingApplication = applicationService
                 .getApplicationByToken(applicationToBeImported.getToken());

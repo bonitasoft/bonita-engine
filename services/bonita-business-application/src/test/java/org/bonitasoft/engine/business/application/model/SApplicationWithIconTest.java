@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
-import static org.bonitasoft.engine.business.application.model.impl.SApplicationAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class SApplicationTest {
+public class SApplicationWithIconTest {
 
     @Test
     public void constructor_and_setter_are_ok() {
@@ -32,8 +32,9 @@ public class SApplicationTest {
         long themeId = 21L;
 
         //when
-        SApplication application = new SApplication("token", "Name to display", "1.0", creationDate, createdBy, state,
-                layoutId, themeId);
+        SApplicationWithIcon application = new SApplicationWithIcon("token", "Name to display", "1.0",
+                creationDate, createdBy, state,
+                layoutId, themeId, null, null);
         application.setDescription("This is my application");
         application.setHomePageId(homePageId);
         application.setIconPath("/icon.jpg");
@@ -42,12 +43,20 @@ public class SApplicationTest {
         application.setUpdatedBy(updatedBy);
 
         //then
-        assertThat(application).hasToken("token").hasDisplayName("Name to display").hasVersion("1.0")
-                .hasCreationDate(creationDate).hasCreatedBy(createdBy)
-                .hasState(state).hasDescription("This is my application").hasHomePageId(homePageId)
-                .hasIconPath("/icon.jpg")
-                .hasLastUpdateDate(creationDate + 1).hasProfileId(profileId).hasUpdatedBy(updatedBy)
-                .hasLayoutId(layoutId).hasThemeId(themeId);
+        assertThat(application.getToken()).isEqualTo("token");
+        assertThat(application.getDisplayName()).isEqualTo("Name to display");
+        assertThat(application.getVersion()).isEqualTo("1.0");
+        assertThat(application.getCreationDate()).isEqualTo(creationDate);
+        assertThat(application.getCreatedBy()).isEqualTo(createdBy);
+        assertThat(application.getState()).isEqualTo(state);
+        assertThat(application.getDescription()).isEqualTo("This is my application");
+        assertThat(application.getHomePageId()).isEqualTo(homePageId);
+        assertThat(application.getIconPath()).isEqualTo("/icon.jpg");
+        assertThat(application.getLastUpdateDate()).isEqualTo(creationDate + 1);
+        assertThat(application.getProfileId()).isEqualTo(profileId);
+        assertThat(application.getUpdatedBy()).isEqualTo(updatedBy);
+        assertThat(application.getLayoutId()).isEqualTo(layoutId);
+        assertThat(application.getThemeId()).isEqualTo(themeId);;
     }
 
 }

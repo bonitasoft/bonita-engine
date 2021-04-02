@@ -1595,12 +1595,6 @@
         <constructor-arg ref="transactionService" />
     </bean>
 
-    <bean id="applicationService" class="org.bonitasoft.engine.business.application.impl.ApplicationServiceImpl">
-        <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-    </bean>
-
     <bean id="contractDataService" class="org.bonitasoft.engine.core.contract.data.ContractDataServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />

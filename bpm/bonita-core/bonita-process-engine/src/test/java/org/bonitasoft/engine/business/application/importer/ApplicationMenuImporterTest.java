@@ -23,8 +23,8 @@ import java.util.List;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationMenuConverter;
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -50,7 +50,7 @@ public class ApplicationMenuImporterTest {
     @Test
     public void importApplicationMenu_should_create_applicationMenu_and_sub_menus_when_no_error() throws Exception {
         //given
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         ApplicationMenuNode subMenuNode = ApplicationNodeBuilder.newMenu("subMenuNode", "").create();
 
         ApplicationMenuNode menuNode = ApplicationNodeBuilder.newMenu("menuNode", "").create();
@@ -80,7 +80,7 @@ public class ApplicationMenuImporterTest {
     @Test
     public void importApplicationMenu_should_not_create_applicationMenu_when_there_is_error() throws Exception {
         //given
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
 
         ImportError error = new ImportError("page", ImportError.Type.APPLICATION_PAGE);
@@ -101,7 +101,7 @@ public class ApplicationMenuImporterTest {
     @Test(expected = ImportException.class)
     public void importApplicationMenu_should_throw_Exception_when_menu_creation_throws_exception() throws Exception {
         //given
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
 
         SApplicationMenu mainMenu = mock(SApplicationMenu.class);
@@ -121,7 +121,7 @@ public class ApplicationMenuImporterTest {
     @Test
     public void importApplicationMenu_should_return_errors_for_sub_menus() throws Exception {
         //given
-        SApplication application = mock(SApplication.class);
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
         ApplicationMenuNode subMenuNode1 = ApplicationNodeBuilder.newMenu("subMenuNode1", "").create();
         ApplicationMenuNode subMenuNode2 = ApplicationNodeBuilder.newMenu("subMenuNode2", "").create();
 

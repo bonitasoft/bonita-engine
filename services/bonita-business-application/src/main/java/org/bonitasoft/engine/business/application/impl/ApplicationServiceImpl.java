@@ -24,27 +24,15 @@ import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuCl
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationPageDestructor;
 import org.bonitasoft.engine.business.application.impl.converter.MenuIndexConverter;
-import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.*;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuLogBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationPageLogBuilder;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationLogBuilderImpl;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuLogBuilderImpl;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageLogBuilderImpl;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.commons.exceptions.*;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -58,28 +46,31 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Service
 public class ApplicationServiceImpl implements ApplicationService {
 
     public static final int MAX_RESULTS = 1000;
     private final Recorder recorder;
-
     private final ReadPersistenceService persistenceService;
-
     private final QueriableLoggerService queriableLoggerService;
+    private final IndexManager indexManager;
+    private final MenuIndexConverter menuIndexConverter;
+    private final ApplicationDestructor applicationDestructor;
+    private final ApplicationPageDestructor applicationPageDestructor;
+    private final ApplicationMenuDestructor applicationMenuDestructor;
 
-    private IndexManager indexManager;
-    private MenuIndexConverter menuIndexConverter;
-    private ApplicationDestructor applicationDestructor;
-    private ApplicationPageDestructor applicationPageDestructor;
-    private ApplicationMenuDestructor applicationMenuDestructor;
-
-    public ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
+    @Autowired
+    public ApplicationServiceImpl(Recorder recorder, ReadPersistenceService persistenceService,
             final QueriableLoggerService queriableLoggerService) {
-        this(recorder, persistenceService, queriableLoggerService, null, null, null, null, null);
+        this.recorder = recorder;
+        this.persistenceService = persistenceService;
+        this.queriableLoggerService = queriableLoggerService;
         indexManager = new IndexManager(new IndexUpdater(this, MAX_RESULTS), new MenuIndexValidator());
         menuIndexConverter = new MenuIndexConverter(this);
         final ApplicationMenuCleaner applicationMenuCleaner = new ApplicationMenuCleaner(this);
@@ -88,24 +79,26 @@ public class ApplicationServiceImpl implements ApplicationService {
         applicationMenuDestructor = new ApplicationMenuDestructor(applicationMenuCleaner);
     }
 
-    ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-            final QueriableLoggerService queriableLoggerService, final IndexManager indexManager,
-            final MenuIndexConverter menuIndexConverter,
-            final ApplicationDestructor applicationDestructor,
-            final ApplicationPageDestructor applicationPageDestructor,
-            final ApplicationMenuDestructor applicationMenuDestructor) {
+    //Visible for tests only
+    ApplicationServiceImpl(Recorder recorder, ReadPersistenceService persistenceService,
+            QueriableLoggerService queriableLoggerService,
+            IndexManager indexManager,
+            MenuIndexConverter menuIndexConverter,
+            ApplicationDestructor applicationDestructor,
+            ApplicationPageDestructor applicationPageDestructor,
+            ApplicationMenuDestructor applicationMenuDestructor) {
+        this.recorder = recorder;
+        this.persistenceService = persistenceService;
+        this.queriableLoggerService = queriableLoggerService;
         this.indexManager = indexManager;
         this.menuIndexConverter = menuIndexConverter;
         this.applicationDestructor = applicationDestructor;
         this.applicationPageDestructor = applicationPageDestructor;
         this.applicationMenuDestructor = applicationMenuDestructor;
-        this.recorder = recorder;
-        this.persistenceService = persistenceService;
-        this.queriableLoggerService = queriableLoggerService;
     }
 
     @Override
-    public SApplication createApplication(final SApplication application)
+    public SApplicationWithIcon createApplication(final SApplicationWithIcon application)
             throws SObjectCreationException, SObjectAlreadyExistsException {
         final String methodName = "createApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED,
@@ -122,7 +115,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         return application;
     }
 
-    private void validateApplication(final SApplication application)
+    private void validateApplication(final SApplicationWithIcon application)
             throws SBonitaReadException, SObjectAlreadyExistsException {
         validateApplicationToken(application.getToken());
 
@@ -200,9 +193,21 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplication getApplication(final long applicationId) throws SBonitaReadException, SObjectNotFoundException {
-        final SApplication application = persistenceService
+    public SApplication getApplication(final long applicationId)
+            throws SBonitaReadException, SObjectNotFoundException {
+        SApplication application = persistenceService
                 .selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId));
+        if (application == null) {
+            throw new SObjectNotFoundException("No application found with id '" + applicationId + "'.");
+        }
+        return application;
+    }
+
+    @Override
+    public SApplicationWithIcon getApplicationWithIcon(long applicationId)
+            throws SBonitaReadException, SObjectNotFoundException {
+        SApplicationWithIcon application = persistenceService
+                .selectById(new SelectByIdDescriptor<>(SApplicationWithIcon.class, applicationId));
         if (application == null) {
             throw new SObjectNotFoundException("No application found with id '" + applicationId + "'.");
         }
@@ -229,7 +234,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor)
+    public SApplicationWithIcon updateApplication(final long applicationId,
+            final EntityUpdateDescriptor updateDescriptor)
             throws SObjectModificationException, SObjectAlreadyExistsException, SObjectNotFoundException {
         final String methodName = "updateApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED,
@@ -237,7 +243,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         try {
             handleHomePageUpdate(updateDescriptor);
-            final SApplication application = getApplication(applicationId);
+            final SApplicationWithIcon application = getApplicationWithIcon(applicationId);
             return updateApplication(application, updateDescriptor);
         } catch (final SObjectNotFoundException | SObjectAlreadyExistsException | SObjectModificationException e) {
             throw e;
@@ -249,7 +255,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private void handleHomePageUpdate(final EntityUpdateDescriptor updateDescriptor)
             throws SBonitaReadException, SObjectModificationException {
-        final Long homePageId = (Long) updateDescriptor.getFields().get(SApplication.HOME_PAGE_ID);
+        final Long homePageId = (Long) updateDescriptor.getFields().get(AbstractSApplication.HOME_PAGE_ID);
         if (homePageId != null) {
             final SApplicationPage applicationPage = executeGetApplicationPageById(homePageId);
             if (applicationPage == null) {
@@ -260,16 +266,16 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplication updateApplication(final SApplication application, final EntityUpdateDescriptor updateDescriptor)
+    public SApplicationWithIcon updateApplication(final SApplicationWithIcon application,
+            final EntityUpdateDescriptor updateDescriptor)
             throws SObjectModificationException, SObjectAlreadyExistsException {
         final String methodName = "updateApplication";
         final long now = System.currentTimeMillis();
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED,
                 "Updating application with id " + application.getId());
-
         try {
             validateUpdatedFields(updateDescriptor, application);
-            updateDescriptor.addField(SApplication.LAST_UPDATE_DATE, now);
+            updateDescriptor.addField(AbstractSApplication.LAST_UPDATE_DATE, now);
 
             recorder.recordUpdate(UpdateRecord.buildSetFields(application,
                     updateDescriptor), APPLICATION);
@@ -291,12 +297,13 @@ public class ApplicationServiceImpl implements ApplicationService {
         throw e;
     }
 
-    private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor, final SApplication application)
+    private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor,
+            final SApplicationWithIcon application)
             throws SBonitaReadException,
             SObjectAlreadyExistsException {
-        if (updateDescriptor.getFields().containsKey(SApplication.TOKEN)
-                && !application.getToken().equals(updateDescriptor.getFields().get(SApplication.TOKEN))) {
-            validateApplicationToken((String) updateDescriptor.getFields().get(SApplication.TOKEN));
+        if (updateDescriptor.getFields().containsKey(AbstractSApplication.TOKEN)
+                && !application.getToken().equals(updateDescriptor.getFields().get(AbstractSApplication.TOKEN))) {
+            validateApplicationToken((String) updateDescriptor.getFields().get(AbstractSApplication.TOKEN));
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2021 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,29 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.importer;
+package org.bonitasoft.engine.business.application.impl;
 
-import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
+import org.bonitasoft.engine.business.application.Icon;
 
-/**
- * @author Elias Ricken de Medeiros
- */
-public class ImportResult {
+public class IconImpl implements Icon {
 
-    private final SApplicationWithIcon application;
-    private final ImportStatus importStatus;
+    private final String mimeType;
+    private final byte[] content;
 
-    public ImportResult(SApplicationWithIcon application, ImportStatus importStatus) {
-        this.application = application;
-        this.importStatus = importStatus;
+    public IconImpl(String mimeType, byte[] content) {
+        this.mimeType = mimeType;
+        this.content = content;
     }
 
-    public SApplicationWithIcon getApplication() {
-        return application;
+    @Override
+    public String getMimeType() {
+        return mimeType;
     }
 
-    public ImportStatus getImportStatus() {
-        return importStatus;
+    @Override
+    public byte[] getContent() {
+        return content;
     }
 }

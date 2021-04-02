@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.exception.NotFoundException;
@@ -297,6 +298,47 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);
+    }
+
+    @Test
+    public void should_create_update_replace_icon_of_application() throws Exception {
+        //Create application with icon
+        ApplicationCreator creator = new ApplicationCreator("appWithIcon", "An application having an icon", "1.0");
+        creator.setIcon("icon.png", "PNG\n\t some png content".getBytes());
+
+        Application applicationCreated = getLivingApplicationAPI().createApplication(creator);
+        assertThat(applicationCreated.hasIcon()).isTrue();
+        assertThat(getLivingApplicationAPI().getIconOfApplication(applicationCreated.getId())).satisfies(icon -> {
+            assertThat(new String(icon.getContent())).isEqualTo("PNG\n\t some png content");
+            assertThat(icon.getMimeType()).isEqualTo("image/png");
+        });
+
+        //replace icon of application
+        Thread.sleep(10);
+        Application applicationUpdated = getLivingApplicationAPI().updateApplication(applicationCreated.getId(),
+                new ApplicationUpdater().setIcon("toto.jpg", "jpeg content".getBytes()));
+
+        assertThat(applicationUpdated.hasIcon()).isTrue();
+        assertThat(applicationUpdated.getLastUpdateDate()).isAfter(applicationCreated.getLastUpdateDate());
+        assertThat(getLivingApplicationAPI().getIconOfApplication(applicationUpdated.getId())).satisfies(icon -> {
+            assertThat(new String(icon.getContent())).isEqualTo("jpeg content");
+            assertThat(icon.getMimeType()).isEqualTo("image/jpeg");
+        });
+
+        // remove icon
+        Thread.sleep(10);
+        Application applicationWithIconRemoved = getLivingApplicationAPI().updateApplication(applicationCreated.getId(),
+                new ApplicationUpdater().setIcon(null, null));
+
+        assertThat(applicationWithIconRemoved.hasIcon()).isFalse();
+        assertThat(applicationWithIconRemoved.getLastUpdateDate()).isAfter(applicationUpdated.getLastUpdateDate());
+        assertThat(getLivingApplicationAPI().getIconOfApplication(applicationWithIconRemoved.getId())).isNull();
+    }
+
+    @Test
+    public void should_throw_not_found_when_getting_icon_of_unknown_application() {
+        assertThatThrownBy(() -> getLivingApplicationAPI().getIconOfApplication(543256432L))
+                .isInstanceOf(ApplicationNotFoundException.class);
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {

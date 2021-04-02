@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
@@ -33,36 +34,41 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
 
     SearchApplicationDescriptor() {
         keys = new HashMap<>(13);
-        keys.put(ApplicationSearchDescriptor.ID, new FieldDescriptor(SApplication.class, SApplication.ID));
-        keys.put(ApplicationSearchDescriptor.TOKEN, new FieldDescriptor(SApplication.class, SApplication.TOKEN));
+        keys.put(ApplicationSearchDescriptor.ID,
+                new FieldDescriptor(SApplication.class, AbstractSApplication.ID));
+        keys.put(ApplicationSearchDescriptor.TOKEN,
+                new FieldDescriptor(SApplication.class, AbstractSApplication.TOKEN));
         keys.put(ApplicationSearchDescriptor.DISPLAY_NAME,
-                new FieldDescriptor(SApplication.class, SApplication.DISPLAY_NAME));
-        keys.put(ApplicationSearchDescriptor.VERSION, new FieldDescriptor(SApplication.class, SApplication.VERSION));
+                new FieldDescriptor(SApplication.class, AbstractSApplication.DISPLAY_NAME));
+        keys.put(ApplicationSearchDescriptor.VERSION,
+                new FieldDescriptor(SApplication.class, AbstractSApplication.VERSION));
         keys.put(ApplicationSearchDescriptor.ICON_PATH,
-                new FieldDescriptor(SApplication.class, SApplication.ICON_PATH));
+                new FieldDescriptor(SApplication.class, AbstractSApplication.ICON_PATH));
         keys.put(ApplicationSearchDescriptor.CREATION_DATE,
-                new FieldDescriptor(SApplication.class, SApplication.CREATION_DATE));
+                new FieldDescriptor(SApplication.class, AbstractSApplication.CREATION_DATE));
         keys.put(ApplicationSearchDescriptor.CREATED_BY,
-                new FieldDescriptor(SApplication.class, SApplication.CREATED_BY));
+                new FieldDescriptor(SApplication.class, AbstractSApplication.CREATED_BY));
         keys.put(ApplicationSearchDescriptor.LAST_UPDATE_DATE,
-                new FieldDescriptor(SApplication.class, SApplication.LAST_UPDATE_DATE));
+                new FieldDescriptor(SApplication.class, AbstractSApplication.LAST_UPDATE_DATE));
         keys.put(ApplicationSearchDescriptor.UPDATED_BY,
-                new FieldDescriptor(SApplication.class, SApplication.UPDATED_BY));
-        keys.put(ApplicationSearchDescriptor.STATE, new FieldDescriptor(SApplication.class, SApplication.STATE));
+                new FieldDescriptor(SApplication.class, AbstractSApplication.UPDATED_BY));
+        keys.put(ApplicationSearchDescriptor.STATE,
+                new FieldDescriptor(SApplication.class, AbstractSApplication.STATE));
         keys.put(ApplicationSearchDescriptor.PROFILE_ID,
-                new FieldDescriptor(SApplication.class, SApplication.PROFILE_ID));
+                new FieldDescriptor(SApplication.class, AbstractSApplication.PROFILE_ID));
         keys.put(ApplicationSearchDescriptor.LAYOUT_ID,
-                new FieldDescriptor(SApplication.class, SApplication.LAYOUT_ID));
-        keys.put(ApplicationSearchDescriptor.THEME_ID, new FieldDescriptor(SApplication.class, SApplication.THEME_ID));
+                new FieldDescriptor(SApplication.class, AbstractSApplication.LAYOUT_ID));
+        keys.put(ApplicationSearchDescriptor.THEME_ID,
+                new FieldDescriptor(SApplication.class, AbstractSApplication.THEME_ID));
 
         allFields = new HashMap<>(1);
 
         final Set<String> pageFields = new HashSet<>(5);
-        pageFields.add(SApplication.TOKEN);
-        pageFields.add(SApplication.DISPLAY_NAME);
-        pageFields.add(SApplication.VERSION);
-        pageFields.add(SApplication.ICON_PATH);
-        pageFields.add(SApplication.STATE);
+        pageFields.add(AbstractSApplication.TOKEN);
+        pageFields.add(AbstractSApplication.DISPLAY_NAME);
+        pageFields.add(AbstractSApplication.VERSION);
+        pageFields.add(AbstractSApplication.ICON_PATH);
+        pageFields.add(AbstractSApplication.STATE);
         allFields.put(SApplication.class, pageFields);
     }
 

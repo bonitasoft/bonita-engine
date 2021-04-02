@@ -22,7 +22,11 @@ import org.bonitasoft.engine.business.application.ApplicationField;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.Icon;
+import org.bonitasoft.engine.business.application.impl.IconImpl;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -56,12 +60,12 @@ public class LivingApplicationAPIDelegate {
     }
 
     public Application createApplication(final ApplicationCreator applicationCreator)
-            throws AlreadyExistsException, CreationException {
+            throws CreationException {
         try {
             validateCreator(applicationCreator);
-            final SApplication sApplication = applicationService
+            final SApplicationWithIcon sApplicationWithIcon = applicationService
                     .createApplication(converter.buildSApplication(applicationCreator, loggedUserId));
-            return converter.toApplication(sApplication);
+            return converter.toApplication(sApplicationWithIcon);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SBonitaException e) {
@@ -82,8 +86,21 @@ public class LivingApplicationAPIDelegate {
 
     public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
         try {
-            final SApplication sApplication = applicationService.getApplication(applicationId);
-            return converter.toApplication(sApplication);
+            return converter.toApplication(applicationService.getApplication(applicationId));
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationNotFoundException(applicationId);
+        }
+    }
+
+    public Icon getIconOfApplication(final long applicationId) throws ApplicationNotFoundException {
+        try {
+            SApplicationWithIcon application = applicationService.getApplicationWithIcon(applicationId);
+            if (application.hasIcon()) {
+                return new IconImpl(application.getIconMimeType(), application.getIconContent());
+            }
+            return null;
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (final SObjectNotFoundException e) {
@@ -115,14 +132,14 @@ public class LivingApplicationAPIDelegate {
             AlreadyExistsException, ApplicationNotFoundException {
         try {
             validateUpdater(updater);
-            SApplication sApplication;
+            AbstractSApplication application;
             if (!updater.getFields().isEmpty()) {
-                sApplication = applicationService.updateApplication(applicationId,
+                application = applicationService.updateApplication(applicationId,
                         converter.toApplicationUpdateDescriptor(updater, loggedUserId));
             } else {
-                sApplication = applicationService.getApplication(applicationId);
+                application = applicationService.getApplication(applicationId);
             }
-            return converter.toApplication(sApplication);
+            return converter.toApplication(application);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SObjectNotFoundException e) {

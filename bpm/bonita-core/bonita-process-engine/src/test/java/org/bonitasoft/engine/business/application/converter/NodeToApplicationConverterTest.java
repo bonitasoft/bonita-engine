@@ -23,7 +23,7 @@ import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
-import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -103,7 +103,7 @@ public class NodeToApplicationConverterTest {
         //then
         assertThat(importResult).isNotNull();
 
-        final SApplication application = importResult.getApplication();
+        final SApplicationWithIcon application = importResult.getApplication();
         assertThat(application.getDisplayName()).isEqualTo("My app");
         assertThat(application.getDescription()).isEqualTo("This is my app");
         assertThat(application.getHomePageId()).isNull();
@@ -140,7 +140,7 @@ public class NodeToApplicationConverterTest {
         //then
         assertThat(importResult).isNotNull();
 
-        final SApplication application = importResult.getApplication();
+        final SApplicationWithIcon application = importResult.getApplication();
         assertThat(application.getLayoutId()).isEqualTo(layoutId);
 
         final ImportStatus importStatus = importResult.getImportStatus();
@@ -169,7 +169,7 @@ public class NodeToApplicationConverterTest {
         //then
         assertThat(importResult).isNotNull();
 
-        final SApplication application = importResult.getApplication();
+        final SApplicationWithIcon application = importResult.getApplication();
         assertThat(application.getLayoutId()).isEqualTo(DEFAULT_LAYOUT_ID);
 
         final ImportStatus importStatus = importResult.getImportStatus();
@@ -220,7 +220,7 @@ public class NodeToApplicationConverterTest {
         //then
         assertThat(importResult).isNotNull();
 
-        final SApplication application = importResult.getApplication();
+        final SApplicationWithIcon application = importResult.getApplication();
         assertThat(application.getThemeId()).isEqualTo(themeId);
 
         final ImportStatus importStatus = importResult.getImportStatus();
@@ -242,7 +242,7 @@ public class NodeToApplicationConverterTest {
         //then
         assertThat(importResult).isNotNull();
 
-        final SApplication application = importResult.getApplication();
+        final SApplicationWithIcon application = importResult.getApplication();
         assertThat(application.getThemeId()).isEqualTo(DEFAULT_THEME_ID);
 
         final ImportStatus importStatus = importResult.getImportStatus();

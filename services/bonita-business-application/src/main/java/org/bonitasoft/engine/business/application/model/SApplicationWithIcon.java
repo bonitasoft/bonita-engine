@@ -13,32 +13,40 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Type;
 
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "business_app")
-public class SApplication extends AbstractSApplication {
+public class SApplicationWithIcon extends AbstractSApplication {
 
-    //    // FIXME: class must be present for the javadoc generation
-    //    public abstract static class SApplicationBuilder {
-    //    }
+    public static final String ICON_CONTENT = "iconContent";
 
-    public SApplication(final String token, final String displayName, final String version, final long creationDate,
+    @Type(type = "materialized_blob")
+    @Column
+    private byte[] iconContent;
+
+    public SApplicationWithIcon(final String token, final String displayName, final String version,
+            final long creationDate,
             final long createdBy,
-            final String state, final Long layoutId, final Long themeId, String iconMimeType) {
+            final String state, final Long layoutId, final Long themeId, String iconMimeType, byte[] iconContent) {
         super(token, displayName, version, creationDate, createdBy, state, layoutId, themeId, iconMimeType);
+        this.iconContent = iconContent;
     }
 
 }

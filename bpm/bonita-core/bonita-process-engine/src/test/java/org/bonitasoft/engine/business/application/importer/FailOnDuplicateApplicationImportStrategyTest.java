@@ -16,6 +16,7 @@ package org.bonitasoft.engine.business.application.importer;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +33,7 @@ public class FailOnDuplicateApplicationImportStrategyTest {
     public void whenApplicationExists_should_throw_AlreadyExistsException() throws Exception {
         //given
         SApplication existingApplication = mock(SApplication.class);
-        SApplication toBeImported = mock(SApplication.class);
+        SApplicationWithIcon toBeImported = mock(SApplicationWithIcon.class);
 
         //when
         strategy.whenApplicationExists(existingApplication, toBeImported);

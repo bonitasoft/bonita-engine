@@ -536,6 +536,8 @@ CREATE TABLE business_app (
   profileId INT8,
   layoutId INT8,
   themeId INT8,
+  iconMimeType VARCHAR(255),
+  iconContent BYTEA,
   displayName VARCHAR(255) NOT NULL
 );
 

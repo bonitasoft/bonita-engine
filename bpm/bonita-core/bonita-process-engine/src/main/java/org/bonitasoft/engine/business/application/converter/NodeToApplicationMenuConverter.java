@@ -16,9 +16,9 @@ package org.bonitasoft.engine.business.application.converter;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ApplicationMenuImportResult;
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -45,7 +45,7 @@ public class NodeToApplicationMenuConverter {
      * @throws SBonitaReadException
      */
     public ApplicationMenuImportResult toSApplicationMenu(ApplicationMenuNode applicationMenuNode,
-            SApplication application, SApplicationMenu parentMenu)
+            SApplicationWithIcon application, SApplicationMenu parentMenu)
             throws SBonitaReadException {
         Long appPageId = null;
         ImportError error = null;
@@ -75,7 +75,7 @@ public class NodeToApplicationMenuConverter {
     }
 
     private SApplicationMenu buildApplicationMenu(final ApplicationMenuNode applicationMenuNode,
-            final SApplication application,
+            final SApplicationWithIcon application,
             final SApplicationMenu parentMenu, final Long appPageId, final int index) {
         SApplicationMenu.SApplicationMenuBuilder builder = SApplicationMenu.builder()
                 .displayName(applicationMenuNode.getDisplayName()).applicationId(application.getId())

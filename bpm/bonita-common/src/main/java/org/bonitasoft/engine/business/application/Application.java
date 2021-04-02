@@ -143,4 +143,14 @@ public interface Application extends BaseElement {
      */
     Long getThemeId();
 
+    /**
+     * Indicate the presence or absence of an {@link Icon} for the Application that can be retrieved using
+     * {@link org.bonitasoft.engine.api.ApplicationAPI#getIconOfApplication(long applicationId)}
+     *
+     * @see Icon
+     * @return true if there is an icon for this application
+     * @since 7.13.0
+     */
+    boolean hasIcon();
+
 }

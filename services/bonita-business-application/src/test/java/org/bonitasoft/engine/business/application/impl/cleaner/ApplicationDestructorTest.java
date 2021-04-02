@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.business.application.impl.cleaner;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -21,7 +20,6 @@ import org.bonitasoft.engine.business.application.impl.ApplicationServiceImpl;
 import org.bonitasoft.engine.business.application.impl.filter.ApplicationRelatedMenusFilterBuilder;
 import org.bonitasoft.engine.business.application.impl.filter.SelectRange;
 import org.bonitasoft.engine.business.application.model.SApplication;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -39,17 +37,11 @@ public class ApplicationDestructorTest {
     @InjectMocks
     private ApplicationDestructor applicationDestructor;
 
-    @Mock
-    private SApplication application;
-
-    @Before
-    public void setUp() throws Exception {
-        given(application.getId()).willReturn(APPLICATION_ID);
-    }
-
     @Test
     public void onDeleteApplication_should_call_applicationMenuCleaner() throws Exception {
         //when
+        SApplication application = new SApplication();
+        application.setId(APPLICATION_ID);
         applicationDestructor.onDeleteApplication(application);
 
         //then

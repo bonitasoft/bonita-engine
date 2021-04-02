@@ -17,7 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,8 +31,10 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
@@ -72,7 +79,7 @@ public class ApplicationImporterTest {
             throws Exception {
         //given
         long createdBy = 5L;
-        SApplication app = mock(SApplication.class);
+        SApplicationWithIcon app = mock(SApplicationWithIcon.class);
 
         ImportResult importResult = mock(ImportResult.class);
         given(importResult.getApplication()).willReturn(app);
@@ -130,14 +137,14 @@ public class ApplicationImporterTest {
         ArgumentCaptor<EntityUpdateDescriptor> updateCaptor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
         verify(applicationService, times(1)).updateApplication(eq(app), updateCaptor.capture());
         EntityUpdateDescriptor updateDescriptor = updateCaptor.getValue();
-        assertThat(updateDescriptor.getFields().get(SApplication.HOME_PAGE_ID)).isEqualTo(homePageId);
+        assertThat(updateDescriptor.getFields().get(AbstractSApplication.HOME_PAGE_ID)).isEqualTo(homePageId);
     }
 
     @Test
     public void importApplication_should_not_add_error_when_error_already_exists() throws Exception {
         //given
         long createdBy = 5L;
-        SApplication app = mock(SApplication.class);
+        SApplicationWithIcon app = mock(SApplicationWithIcon.class);
 
         ImportResult importResult = mock(ImportResult.class);
         given(importResult.getApplication()).willReturn(app);
@@ -171,7 +178,7 @@ public class ApplicationImporterTest {
             throws Exception {
         //given
         long createdBy = 5L;
-        SApplication app = mock(SApplication.class);
+        SApplicationWithIcon app = mock(SApplicationWithIcon.class);
 
         ImportResult importResult = mock(ImportResult.class);
         given(importResult.getApplication()).willReturn(app);
@@ -188,7 +195,7 @@ public class ApplicationImporterTest {
 
         //then
         //set home page
-        verify(applicationService, never()).updateApplication(any(SApplication.class),
+        verify(applicationService, never()).updateApplication(any(SApplicationWithIcon.class),
                 any(EntityUpdateDescriptor.class));
     }
 
@@ -196,7 +203,7 @@ public class ApplicationImporterTest {
     public void importApplication_should_add_error_when_home_page_is_not_found() throws Exception {
         //given
         long createdBy = 5L;
-        SApplication app = mock(SApplication.class);
+        SApplicationWithIcon app = mock(SApplicationWithIcon.class);
 
         ImportResult importResult = mock(ImportResult.class);
         given(importResult.getApplication()).willReturn(app);
@@ -217,7 +224,7 @@ public class ApplicationImporterTest {
 
         //then
         //set home page
-        verify(applicationService, never()).updateApplication(any(SApplication.class),
+        verify(applicationService, never()).updateApplication(any(SApplicationWithIcon.class),
                 any(EntityUpdateDescriptor.class));
         verify(importStatus, times(1)).addError(new ImportError("home", ImportError.Type.APPLICATION_PAGE));
     }
@@ -226,7 +233,7 @@ public class ApplicationImporterTest {
     public void importApplication_should_call_importStrategy_when_application_already_exists() throws Exception {
         //given
         long createdBy = 5L;
-        SApplication appToBeImported = mock(SApplication.class);
+        SApplicationWithIcon appToBeImported = mock(SApplicationWithIcon.class);
         given(appToBeImported.getToken()).willReturn("application");
 
         ImportResult importResult = new ImportResult(appToBeImported, new ImportStatus("name"));
@@ -250,7 +257,7 @@ public class ApplicationImporterTest {
             throws Exception {
         //given
         long createdBy = 5L;
-        SApplication appToBeImported = mock(SApplication.class);
+        SApplicationWithIcon appToBeImported = mock(SApplicationWithIcon.class);
         given(appToBeImported.getToken()).willReturn("application");
 
         ImportResult importResult = mock(ImportResult.class);
@@ -275,7 +282,7 @@ public class ApplicationImporterTest {
             throws Exception {
         //given
         long createdBy = 5L;
-        SApplication app1 = mock(SApplication.class);
+        SApplicationWithIcon app1 = mock(SApplicationWithIcon.class);
 
         ImportResult importResult = mock(ImportResult.class);
         given(importResult.getApplication()).willReturn(app1);

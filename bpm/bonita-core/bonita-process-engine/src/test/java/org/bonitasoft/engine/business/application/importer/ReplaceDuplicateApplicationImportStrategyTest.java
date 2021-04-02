@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -42,7 +43,7 @@ public class ReplaceDuplicateApplicationImportStrategyTest {
         final SApplication existingApplication = new SApplication();
         existingApplication.setId(applicationId);
 
-        final SApplication applicationToImport = new SApplication();
+        final SApplicationWithIcon applicationToImport = new SApplicationWithIcon();
         applicationToImport.setId(98745L);
 
         // when:

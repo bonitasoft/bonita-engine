@@ -17,6 +17,7 @@ import static java.lang.String.format;
 
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -35,7 +36,8 @@ public class ReplaceDuplicateApplicationImportStrategy implements ApplicationImp
     }
 
     @Override
-    public void whenApplicationExists(SApplication existing, SApplication toBeImported) throws SBonitaException {
+    public void whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported)
+            throws SBonitaException {
         try {
             applicationService.deleteApplication(existing.getId());
         } catch (SObjectModificationException | SObjectNotFoundException e) {
