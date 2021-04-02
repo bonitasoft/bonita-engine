@@ -391,6 +391,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(instance, "step1");
 
+        Thread.sleep(100); // this is a small wait in order to avoid issue on sql server when transaction has more than one XA resource
         final String employeeToString = getEmployeeToString("myEmployee", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=BPM]");
 
