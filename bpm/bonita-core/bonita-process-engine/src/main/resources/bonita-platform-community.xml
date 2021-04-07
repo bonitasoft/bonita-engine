@@ -294,7 +294,7 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.26:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.services.icon.SIcon" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.SIcon" />
         <constructor-arg name="sequenceId" value="27" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.27:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
@@ -858,7 +858,7 @@
                 <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="custom_usr_inf_val" />
                 <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="user_membership" />
                 <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="contactinfo" />
-                <entry key="org.bonitasoft.engine.services.icon.SIcon" value="icon" />
+                <entry key="org.bonitasoft.engine.identity.SIcon" value="icon" />
                 <!-- external identity -->
                 <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="ext_ident_mapping" />
                 <!-- document -->
@@ -908,7 +908,7 @@
                 <value>org.bonitasoft.engine.identity.model.SCustomUserInfoValue</value>
                 <value>org.bonitasoft.engine.identity.model.SGroup</value>
                 <value>org.bonitasoft.engine.identity.model.SHavingIcon</value>
-                <value>org.bonitasoft.engine.services.icon.SIcon</value>
+                <value>org.bonitasoft.engine.identity.SIcon</value>
                 <value>org.bonitasoft.engine.identity.model.SRole</value>
                 <value>org.bonitasoft.engine.identity.model.SUser</value>
                 <value>org.bonitasoft.engine.identity.model.SUserLogin</value>

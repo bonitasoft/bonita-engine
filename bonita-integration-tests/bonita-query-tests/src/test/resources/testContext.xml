@@ -32,7 +32,7 @@
                 <value>org.bonitasoft.engine.identity.model.SCustomUserInfoValue</value>
                 <value>org.bonitasoft.engine.identity.model.SGroup</value>
                 <value>org.bonitasoft.engine.identity.model.SHavingIcon</value>
-                <value>org.bonitasoft.engine.services.icon.SIcon</value>
+                <value>org.bonitasoft.engine.identity.SIcon</value>
                 <value>org.bonitasoft.engine.identity.model.SRole</value>
                 <value>org.bonitasoft.engine.identity.model.SUser</value>
                 <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
