@@ -14,10 +14,9 @@
 package org.bonitasoft.engine.identity.impl;
 
 import org.bonitasoft.engine.digest.DigestUtils;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Matthieu Chaffotte
- */
+@Component
 public class MD5CredentialsEncrypter implements CredentialsEncrypter {
 
     @Override

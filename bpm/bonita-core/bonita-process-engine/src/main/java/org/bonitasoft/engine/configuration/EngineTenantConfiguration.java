@@ -19,8 +19,8 @@ import org.bonitasoft.engine.cache.CacheServiceConfiguration;
 import org.bonitasoft.engine.core.operation.OperationServiceConfiguration;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.impl.EventServiceImpl;
+import org.bonitasoft.engine.identity.IdentityConfiguration;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.services.icon.ServicesConfiguration;
 import org.bonitasoft.engine.session.SessionServiceConfiguration;
 import org.bonitasoft.engine.work.WorkServiceConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -40,7 +40,7 @@ import org.springframework.context.annotation.Import;
         OperationServiceConfiguration.class,
         SessionServiceConfiguration.class,
         AuthenticationConfiguration.class,
-        ServicesConfiguration.class,
+        IdentityConfiguration.class,
         CacheServiceConfiguration.class,
         ApplicationConfiguration.class,
 })

@@ -91,6 +91,7 @@ import org.bonitasoft.engine.identity.RoleUpdater;
 import org.bonitasoft.engine.identity.RoleUpdater.RoleField;
 import org.bonitasoft.engine.identity.SGroupCreationException;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
+import org.bonitasoft.engine.identity.SIcon;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
@@ -136,7 +137,6 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.services.icon.SIcon;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**

@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.identity.IconService;
+import org.bonitasoft.engine.identity.SIcon;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -45,8 +47,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.services.icon.IconService;
-import org.bonitasoft.engine.services.icon.SIcon;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

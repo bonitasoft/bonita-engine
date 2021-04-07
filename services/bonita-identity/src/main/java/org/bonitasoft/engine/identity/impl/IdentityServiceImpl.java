@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.identity.IconService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionCreationException;
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.identity.SCustomUserInfoValueReadException;
 import org.bonitasoft.engine.identity.SGroupCreationException;
 import org.bonitasoft.engine.identity.SGroupDeletionException;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
+import org.bonitasoft.engine.identity.SIcon;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SMembershipDeletionException;
 import org.bonitasoft.engine.identity.SRoleDeletionException;
@@ -83,8 +85,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.services.icon.IconService;
-import org.bonitasoft.engine.services.icon.SIcon;
+import org.springframework.stereotype.Service;
 
 /**
  * Default implementation of the Identity service
@@ -95,6 +96,7 @@ import org.bonitasoft.engine.services.icon.SIcon;
  * @author Hongwen Zang
  * @author Celine Souchet
  */
+@Service("identityService")
 public class IdentityServiceImpl implements IdentityService {
 
     private final ReadPersistenceService persistenceService;

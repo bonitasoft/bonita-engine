@@ -11,23 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.services.icon;
+package org.bonitasoft.engine.identity;
 
-import java.util.Optional;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.recorder.SRecorderException;
+@Configuration
+@ComponentScan
+public class IdentityConfiguration {
 
-public interface IconService {
-
-    String EVENT_NAME = "ICON";
-
-    Optional<Long> replaceIcon(String iconFilename, byte[] iconContent, Long iconIdToReplace)
-            throws SBonitaReadException, SRecorderException;
-
-    SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException;
-
-    SIcon getIcon(Long id) throws SBonitaReadException;
-
-    void deleteIcon(Long iconId) throws SBonitaReadException, SRecorderException;
 }

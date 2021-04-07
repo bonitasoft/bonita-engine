@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.services.icon;
+package org.bonitasoft.engine.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,16 +29,16 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.Record;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
-class IconServiceImplTest {
+@RunWith(MockitoJUnitRunner.class)
+public class IconServiceImplTest {
 
     @Mock
     Recorder recorder;
@@ -50,7 +50,7 @@ class IconServiceImplTest {
     IconServiceImpl iconService;
 
     @Test
-    void should_create_icon_with_specific_mimetype() throws Exception {
+    public void should_create_icon_with_specific_mimetype() throws Exception {
         iconService.createIcon("myAvatar12.png", new byte[] { 1, 2, 3 });
 
         //the file name is not kept, do not verify it
@@ -63,7 +63,7 @@ class IconServiceImplTest {
     }
 
     @Test
-    void should_replace_existing_icon() throws Exception {
+    public void should_replace_existing_icon() throws Exception {
         SIcon previousIcon = new SIcon(1L, 42L, "image/jpeg", new byte[] { 1, 2, 3 });
         doReturn(previousIcon).when(persistenceService)
                 .selectById(new SelectByIdDescriptor<>(SIcon.class, 42L));
@@ -81,7 +81,7 @@ class IconServiceImplTest {
     }
 
     @Test
-    void should_replace_non_existing_icon() throws Exception {
+    public void should_replace_non_existing_icon() throws Exception {
         Optional<Long> newIconId = iconService.replaceIcon("myAvatar12.png", "contents".getBytes(), null);
 
         verify(recorder).recordInsert((any()), eq("ICON"));
@@ -90,7 +90,7 @@ class IconServiceImplTest {
     }
 
     @Test
-    void should_remove_existing_icon() throws Exception {
+    public void should_remove_existing_icon() throws Exception {
         SIcon previousIcon = new SIcon(1L, 42L, "image/jpeg", new byte[] { 1, 2, 3 });
         doReturn(previousIcon).when(persistenceService)
                 .selectById(new SelectByIdDescriptor<>(SIcon.class, 42L));
@@ -103,7 +103,7 @@ class IconServiceImplTest {
     }
 
     @Test
-    void should_delete_icon_when_it_exists() throws Exception {
+    public void should_delete_icon_when_it_exists() throws Exception {
         doReturn(new SIcon(1L, 42L, "image/jpeg", new byte[] { 1, 2, 3 })).when(persistenceService)
                 .selectById(new SelectByIdDescriptor<>(SIcon.class, 42L));
 
@@ -113,7 +113,7 @@ class IconServiceImplTest {
     }
 
     @Test
-    void should_not_delete_icon_when_it_does_not_exists() throws Exception {
+    public void should_not_delete_icon_when_it_does_not_exists() throws Exception {
         iconService.deleteIcon(42L);
 
         verifyNoInteractions(recorder);
