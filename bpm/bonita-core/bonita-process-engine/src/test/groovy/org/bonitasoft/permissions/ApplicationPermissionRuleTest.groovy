@@ -86,6 +86,22 @@ public class ApplicationPermissionRuleTest {
         Assertions.assertThat(isAuthorized).isTrue()
     }
 
+
+    @Test
+    public void should_check_verify_get_with_token_filter_user_is_in_profile() {
+        doReturn(true).when(apiCallContext).isGET()
+        doReturn(null).when(apiCallContext).getResourceId()
+        doReturn([token: "appToken"]).when(apiCallContext).getFilters()
+        def application = mock(Application.class)
+        doReturn(4l).when(application).getProfileId()
+        doReturn(application).when(applicationAPI).getApplicationByToken("appToken")
+        doReturn([profile(1), profile(2), profile(3), profile(4)]).when(profileAPI).getProfilesForUser(currentUserId, 0, 100, ProfileCriterion.ID_ASC)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        Assertions.assertThat(isAuthorized).isTrue()
+    }
+
     @Test
     public void should_check_verify_get_with_resource_user_is_in_profile_with_more_than_100_elements() {
         doReturn(true).when(apiCallContext).isGET()
