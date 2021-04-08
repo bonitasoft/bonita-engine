@@ -21,6 +21,7 @@ import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
+import org.bonitasoft.engine.business.application.Application
 import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.profile.ProfileCriterion
 import org.bonitasoft.engine.session.APISession
@@ -41,12 +42,10 @@ class ApplicationPermissionRule implements PermissionRule {
     boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         try {
             if (apiCallContext.isGET()) {
-                if (apiCallContext.getResourceId() != null) {
-                    def applicationId = Long.valueOf(apiCallContext.getResourceId())
-                    def profileAPI = apiAccessor.getProfileAPI()
-                    def applicationAPI = apiAccessor.getLivingApplicationAPI()
-                    def application = applicationAPI.getApplication(applicationId)
+                def application =  getApplicationFromIdOrToken(apiCallContext, apiAccessor)
+                if (application != null) {
                     def profileId = application.getProfileId()
+                    def profileAPI = apiAccessor.getProfileAPI()
                     def index = 0
                     def profile
                     def list = []
@@ -64,5 +63,17 @@ class ApplicationPermissionRule implements PermissionRule {
             //let the API handle the 404
             return true
         }
+    }
+
+    private Application getApplicationFromIdOrToken(APICallContext apiCallContext, APIAccessor apiAccessor) {
+        def application
+        def applicationAPI = apiAccessor.getLivingApplicationAPI()
+        if (apiCallContext.getResourceId() != null) {
+            def applicationId = Long.valueOf(apiCallContext.getResourceId())
+            application = applicationAPI.getApplication(applicationId)
+        } else if (apiCallContext.getFilters().get("token") != null) {
+            application = applicationAPI.getApplicationByToken(apiCallContext.getFilters().get("token"))
+        }
+        return application
     }
 }
