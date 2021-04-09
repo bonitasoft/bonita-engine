@@ -94,6 +94,18 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
+    public Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
+        try {
+            SApplication applicationByToken = applicationService.getApplicationByToken(applicationToken);
+            if (applicationByToken == null) {
+                throw new ApplicationNotFoundException(applicationToken);
+            }
+            return converter.toApplication(applicationByToken);
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
     public Icon getIconOfApplication(final long applicationId) throws ApplicationNotFoundException {
         try {
             SApplicationWithIcon application = applicationService.getApplicationWithIcon(applicationId);

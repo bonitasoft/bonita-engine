@@ -161,6 +161,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
+    public Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException {
+        return getLivingApplicationAPIDelegate().getApplicationByToken(applicationToken);
+    }
+
+    @Override
     public void deleteApplication(final long applicationId) throws DeletionException {
         getLivingApplicationAPIDelegate().deleteApplication(applicationId);
     }
