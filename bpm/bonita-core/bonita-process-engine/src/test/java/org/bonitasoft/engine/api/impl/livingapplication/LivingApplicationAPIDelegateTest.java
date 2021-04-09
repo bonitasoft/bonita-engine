@@ -281,6 +281,46 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
+    public void getApplicationByToken_should_return_the_application_returned_by_applicationService_converted()
+            throws Exception {
+        SApplication sApp = buildDefaultApplication();
+        final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, null);
+        given(applicationService.getApplicationByToken(APP_TOKEN)).willReturn(sApp);
+        given(converter.toApplication(sApp)).willReturn(application);
+
+        //when
+        final Application retriedApp = delegate.getApplicationByToken(APP_TOKEN);
+
+        //then
+        assertThat(retriedApp).isEqualTo(application);
+
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getApplicationByToken_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException()
+            throws Exception {
+        //given
+        given(applicationService.getApplicationByToken(APP_TOKEN)).willThrow(new SBonitaReadException(""));
+
+        //when
+        delegate.getApplicationByToken(APP_TOKEN);
+
+        //then exception
+    }
+
+    @Test(expected = ApplicationNotFoundException.class)
+    public void getApplicationByToken_should_throw_ApplicationNotFoundException_when_applicationService_returns_null()
+            throws Exception {
+        //given
+        given(applicationService.getApplicationByToken(APP_TOKEN)).willReturn(null);
+
+        //when
+        delegate.getApplicationByToken(APP_TOKEN);
+
+        //then exception
+    }
+
+    @Test
     public void updateApplication_should_return_result_of_applicationservice_updateApplication() throws Exception {
         //given
         final SApplicationWithIcon sApplicationWithIcon = mock(SApplicationWithIcon.class);

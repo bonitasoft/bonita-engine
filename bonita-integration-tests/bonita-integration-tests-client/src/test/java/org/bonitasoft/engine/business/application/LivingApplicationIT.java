@@ -128,6 +128,21 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     }
 
     @Test
+    public void getApplicationByToken_returns_application_with_the_given_token() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name",
+                "1.0");
+        final Application createdApp = getLivingApplicationAPI().createApplication(creator);
+        assertThat(createdApp).isNotNull();
+
+        //when
+        final Application retrievedApp = getLivingApplicationAPI().getApplicationByToken(createdApp.getToken());
+
+        //then
+        assertThat(retrievedApp).isEqualTo(createdApp);
+    }
+
+    @Test
     public void deleteApplication_should_delete_application_with_the_given_id() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name",

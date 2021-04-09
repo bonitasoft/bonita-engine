@@ -70,6 +70,16 @@ public interface ApplicationAPI {
     Application getApplication(final long applicationId) throws ApplicationNotFoundException;
 
     /**
+     * Retrieves an {@link Application} from its token.
+     *
+     * @param applicationToken the application token used in the URL
+     * @return an <code>Application</code> from its token.
+     * @throws ApplicationNotFoundException if no application is found for the given token
+     * @see Application
+     */
+    Application getApplicationByToken(final String applicationToken) throws ApplicationNotFoundException;
+
+    /**
      * Deletes an {@link Application} by its identifier. All related
      * {@link org.bonitasoft.engine.business.application.ApplicationPage}s and
      * {@link org.bonitasoft.engine.business.application.ApplicationMenu}s will be automatically deleted.

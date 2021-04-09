@@ -26,4 +26,8 @@ public class ApplicationNotFoundException extends NotFoundException {
         super("Unable to find the application with id '" + applicationId + "'");
     }
 
+    public ApplicationNotFoundException(final String applicationToken) {
+        super("Unable to find the application with token '" + applicationToken + "'");
+    }
+
 }
