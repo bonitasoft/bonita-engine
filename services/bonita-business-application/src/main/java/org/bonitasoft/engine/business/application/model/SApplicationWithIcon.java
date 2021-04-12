@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -33,6 +34,7 @@ import org.hibernate.annotations.Type;
 @NoArgsConstructor
 @Entity
 @Table(name = "business_app")
+@Cacheable(false)
 public class SApplicationWithIcon extends AbstractSApplication {
 
     public static final String ICON_CONTENT = "iconContent";
