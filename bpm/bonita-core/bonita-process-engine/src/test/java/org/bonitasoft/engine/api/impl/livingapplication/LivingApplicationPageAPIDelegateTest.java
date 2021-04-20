@@ -23,12 +23,12 @@ import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
-import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.business.application.importer.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;

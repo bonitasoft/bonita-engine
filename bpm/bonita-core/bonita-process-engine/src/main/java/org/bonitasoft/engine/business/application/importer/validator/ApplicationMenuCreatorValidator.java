@@ -11,35 +11,30 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.validator;
+package org.bonitasoft.engine.business.application.importer.validator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuField;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Component
 public class ApplicationMenuCreatorValidator {
 
-    protected final List<String> problems = new ArrayList<String>(2);
-
-    public boolean isValid(final ApplicationMenuCreator creator) {
-        problems.clear();
+    public List<String> isValid(final ApplicationMenuCreator creator) {
+        List<String> problems = new ArrayList<>();
         final Map<ApplicationMenuField, Serializable> fields = creator.getFields();
         if (fields.get(ApplicationMenuField.APPLICATION_ID) == null) {
             problems.add("The applicationId cannot be null");
-            return false;
         }
-        return true;
+        return problems;
     }
 
-    public List<String> getProblems() {
-        return Collections.unmodifiableList(problems);
-    }
 }

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.api.ImportError;
@@ -27,38 +29,41 @@ import org.bonitasoft.engine.business.application.model.builder.SApplicationUpda
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
+import org.bonitasoft.engine.io.IOUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Component
 public class ApplicationImporter {
 
     private final ApplicationService applicationService;
-    private final ApplicationImportStrategy strategy;
     private NodeToApplicationConverter nodeToApplicationConverter;
     private ApplicationPageImporter applicationPageImporter;
     private ApplicationMenuImporter applicationMenuImporter;
 
-    public ApplicationImporter(ApplicationService applicationService, ApplicationImportStrategy strategy,
+    public ApplicationImporter(ApplicationService applicationService,
             NodeToApplicationConverter nodeToApplicationConverter,
             ApplicationPageImporter applicationPageImporter, ApplicationMenuImporter applicationMenuImporter) {
         this.applicationService = applicationService;
-        this.strategy = strategy;
         this.nodeToApplicationConverter = nodeToApplicationConverter;
         this.applicationPageImporter = applicationPageImporter;
         this.applicationMenuImporter = applicationMenuImporter;
     }
 
-    public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy)
+    public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy,
+            ApplicationImportStrategy strategy)
             throws ImportException, AlreadyExistsException {
         try {
             ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, createdBy);
-            SApplicationWithIcon application = importApplication(importResult.getApplication(), importResult);
+            SApplicationWithIcon application = importApplication(importResult.getApplication(), importResult, strategy);
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);
             updateHomePage(application, applicationNode, createdBy, importResult);
@@ -114,7 +119,7 @@ public class ApplicationImporter {
     }
 
     private SApplicationWithIcon importApplication(SApplicationWithIcon applicationToBeImported,
-            ImportResult importResult)
+            ImportResult importResult, ApplicationImportStrategy strategy)
             throws SBonitaException, AlreadyExistsException {
         SApplication conflictingApplication = applicationService
                 .getApplicationByToken(applicationToBeImported.getToken());
@@ -126,4 +131,25 @@ public class ApplicationImporter {
         return applicationService.createApplication(applicationToBeImported);
     }
 
+    public List<ImportStatus> importApplications(final byte[] xmlContent, long createdBy,
+            ApplicationImportStrategy strategy)
+            throws ImportException, AlreadyExistsException {
+        ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
+        ArrayList<ImportStatus> importStatus = new ArrayList<>();
+        for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
+            importStatus.add(importApplication(applicationNode, createdBy, strategy));
+        }
+        return importStatus;
+    }
+
+    private ApplicationNodeContainer getApplicationNodeContainer(byte[] xmlContent) throws ImportException {
+        ApplicationNodeContainer result;
+        final URL resource = ApplicationNodeContainer.class.getResource("/application.xsd");
+        try {
+            result = IOUtils.unmarshallXMLtoObject(xmlContent, ApplicationNodeContainer.class, resource);
+        } catch (final Exception e) {
+            throw new ImportException(e);
+        }
+        return result;
+    }
 }
