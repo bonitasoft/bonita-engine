@@ -11,9 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.validator;
+package org.bonitasoft.engine.business.application.importer.validator;
 
-import static org.bonitasoft.engine.api.impl.validator.ValidationStatusAssert.assertThat;
+import static org.bonitasoft.engine.business.application.importer.validator.ValidationStatusAssert.assertThat;
 
 import org.junit.Test;
 

@@ -20,15 +20,17 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import java.util.Collections;
+
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
-import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -79,7 +81,7 @@ public class LivingApplicationMenuAPIDelegateTest {
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
         delegate = new LivingApplicationMenuAPIDelegate(accessor, convertor, creatorValidator, 911L);
-        given(creatorValidator.isValid(any(ApplicationMenuCreator.class))).willReturn(true);
+        given(creatorValidator.isValid(any(ApplicationMenuCreator.class))).willReturn(Collections.emptyList());
     }
 
     @Test
@@ -170,7 +172,7 @@ public class LivingApplicationMenuAPIDelegateTest {
     public void createApplicationMenu_should_throw_CreationException_when_creator_is_not_valid() throws Exception {
         //given
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
-        given(creatorValidator.isValid(creator)).willReturn(false);
+        given(creatorValidator.isValid(creator)).willReturn(Collections.singletonList("An error"));
 
         //when
         delegate.createApplicationMenu(creator);

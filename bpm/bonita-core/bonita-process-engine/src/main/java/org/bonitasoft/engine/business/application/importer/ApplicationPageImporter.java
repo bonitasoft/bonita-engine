@@ -20,10 +20,12 @@ import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.ImportException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Component
 public class ApplicationPageImporter {
 
     private final ApplicationService applicationService;

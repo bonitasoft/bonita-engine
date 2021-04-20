@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import org.bonitasoft.engine.api.ImportError;
-import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
@@ -23,10 +23,12 @@ import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Component
 public class NodeToApplicationPageConverter {
 
     private final PageService pageService;

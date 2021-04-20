@@ -33,7 +33,8 @@ import org.springframework.context.annotation.Import;
 @ComponentScan({
         "org.bonitasoft.engine.tenant",
         "org.bonitasoft.engine.execution",
-        "org.bonitasoft.engine.operation"
+        "org.bonitasoft.engine.operation",
+        "org.bonitasoft.engine.business.application"
 })
 @Import({
         WorkServiceConfiguration.class,

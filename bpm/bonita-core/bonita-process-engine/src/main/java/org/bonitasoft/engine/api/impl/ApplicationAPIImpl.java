@@ -30,9 +30,6 @@ import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationM
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationsOfUser;
-import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
-import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
-import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
@@ -51,24 +48,14 @@ import org.bonitasoft.engine.business.application.converter.ApplicationPageToNod
 import org.bonitasoft.engine.business.application.converter.ApplicationToNodeConverter;
 import org.bonitasoft.engine.business.application.converter.ApplicationsToNodeContainerConverter;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
-import org.bonitasoft.engine.business.application.converter.NodeToApplicationMenuConverter;
-import org.bonitasoft.engine.business.application.converter.NodeToApplicationPageConverter;
 import org.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
 import org.bonitasoft.engine.business.application.exporter.ApplicationExporter;
-import org.bonitasoft.engine.business.application.importer.ApplicationContainerImporter;
 import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
-import org.bonitasoft.engine.business.application.importer.ApplicationMenuImporter;
-import org.bonitasoft.engine.business.application.importer.ApplicationPageImporter;
-import org.bonitasoft.engine.business.application.importer.ApplicationsImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExportException;
-import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationMenuCreatorValidator;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -135,24 +122,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     protected NodeToApplicationConverter getNodeToApplicationConverter(final PageService pageService,
             final ProfileService profileService, final ApplicationImportValidator importValidator) {
         return new NodeToApplicationConverter(profileService, pageService, importValidator);
-    }
 
-    private ApplicationsImporter getApplicationImporter(final ApplicationImportPolicy policy) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        PageService pageService = tenantAccessor.getPageService();
-        ApplicationImportValidator importValidator = new ApplicationImportValidator(new ApplicationTokenValidator());
-        final ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(
-                tenantAccessor.getApplicationService(),
-                new NodeToApplicationPageConverter(pageService, importValidator));
-        final ApplicationMenuImporter applicationMenuImporter = new ApplicationMenuImporter(
-                tenantAccessor.getApplicationService(),
-                new NodeToApplicationMenuConverter(applicationService));
-        final ApplicationImporter applicationImporter = new ApplicationImporter(applicationService,
-                new StrategySelector(applicationService).selectStrategy(policy),
-                getNodeToApplicationConverter(pageService, tenantAccessor.getProfileService(), importValidator),
-                applicationPageImporter, applicationMenuImporter);
-        return new ApplicationsImporter(new ApplicationContainerImporter(), applicationImporter);
     }
 
     @Override
@@ -312,7 +282,16 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException {
-        return getApplicationImporter(policy).importApplications(xmlContent, SessionInfos.getUserIdFromSession());
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        ApplicationImporter applicationImporter = null;
+        try {
+            applicationImporter = tenantAccessor.lookup(ApplicationImporter.class);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+        return applicationImporter.importApplications(xmlContent, SessionInfos.getUserIdFromSession(),
+                new StrategySelector(applicationService).selectStrategy(policy));
     }
 
     @Override

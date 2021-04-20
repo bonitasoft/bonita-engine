@@ -11,25 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.importer;
+package org.bonitasoft.engine.business.application.importer.validator;
 
-import java.net.URL;
-
-import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.io.IOUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationContainerImporter {
+@Component
+public class ApplicationImportValidator {
 
-    public ApplicationNodeContainer importXML(final byte[] xmlContent) throws ImportException {
-        final URL resource = ApplicationNodeContainer.class.getResource("/application.xsd");
-        try {
-            return IOUtils.unmarshallXMLtoObject(xmlContent, ApplicationNodeContainer.class, resource);
-        } catch (final Exception e) {
-            throw new ImportException(e);
+    private final ApplicationTokenValidator tokenValidator;
+
+    public ApplicationImportValidator(ApplicationTokenValidator tokenValidator) {
+        this.tokenValidator = tokenValidator;
+    }
+
+    public void validate(String token) throws ImportException {
+        ValidationStatus validationStatus = tokenValidator.validate(token);
+        if (!validationStatus.isValid()) {
+            throw new ImportException(validationStatus.getMessage());
         }
     }
 

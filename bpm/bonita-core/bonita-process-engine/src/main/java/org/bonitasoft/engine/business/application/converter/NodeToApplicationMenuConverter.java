@@ -22,10 +22,12 @@ import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Component
 public class NodeToApplicationMenuConverter {
 
     private final ApplicationService applicationService;

@@ -35,10 +35,7 @@ import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
-import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
-import org.bonitasoft.engine.business.application.xml.ApplicationNode;
-import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
-import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
+import org.bonitasoft.engine.business.application.xml.*;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -114,7 +111,7 @@ public class ApplicationImporterTest {
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
-        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, createdBy);
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, createdBy, strategy);
 
         //then
         //create application
@@ -165,7 +162,7 @@ public class ApplicationImporterTest {
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
-        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, createdBy);
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, createdBy, strategy);
 
         //then
         assertThat(retrievedStatus).isEqualTo(importResult.getImportStatus());
@@ -191,7 +188,7 @@ public class ApplicationImporterTest {
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
-        applicationImporter.importApplication(applicationNode, createdBy);
+        applicationImporter.importApplication(applicationNode, createdBy, strategy);
 
         //then
         //set home page
@@ -220,7 +217,7 @@ public class ApplicationImporterTest {
         given(applicationService.getApplicationPage("app", "home")).willThrow(new SObjectNotFoundException(""));
 
         //when
-        applicationImporter.importApplication(applicationNode, createdBy);
+        applicationImporter.importApplication(applicationNode, createdBy, strategy);
 
         //then
         //set home page
@@ -245,7 +242,7 @@ public class ApplicationImporterTest {
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
 
         //when
-        applicationImporter.importApplication(applicationNode, createdBy);
+        applicationImporter.importApplication(applicationNode, createdBy, strategy);
 
         //then
         verify(applicationService, times(1)).createApplication(appToBeImported);
@@ -272,7 +269,7 @@ public class ApplicationImporterTest {
                 appToBeImported);
 
         //when
-        applicationImporter.importApplication(applicationNode, createdBy);
+        applicationImporter.importApplication(applicationNode, createdBy, strategy);
 
         //then exception
     }
@@ -293,7 +290,7 @@ public class ApplicationImporterTest {
         given(applicationService.createApplication(app1)).willThrow(new SObjectCreationException(""));
 
         //when
-        applicationImporter.importApplication(applicationNode, createdBy);
+        applicationImporter.importApplication(applicationNode, createdBy, strategy);
 
         //then exception
     }

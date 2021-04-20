@@ -22,14 +22,14 @@ import java.nio.charset.StandardCharsets;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
-import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.business.application.importer.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;

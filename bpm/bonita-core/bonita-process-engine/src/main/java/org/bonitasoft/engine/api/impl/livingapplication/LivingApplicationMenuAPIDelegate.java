@@ -13,15 +13,17 @@
  **/
 package org.bonitasoft.engine.api.impl.livingapplication;
 
+import java.util.List;
+
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
-import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -58,9 +60,10 @@ public class LivingApplicationMenuAPIDelegate {
     public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator)
             throws CreationException {
         try {
-            if (!creatorValidator.isValid(applicationMenuCreator)) {
+            List<String> errors = creatorValidator.isValid(applicationMenuCreator);
+            if (!errors.isEmpty()) {
                 throw new CreationException(
-                        "The ApplicationMenuCreator is invalid. Problems: " + creatorValidator.getProblems());
+                        "The ApplicationMenuCreator is invalid. Problems: " + errors);
             }
             final int index = applicationService.getNextAvailableIndex(applicationMenuCreator.getParentId());
             final SApplicationMenu sApplicationMenu = applicationService

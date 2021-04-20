@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
-import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationField;
@@ -24,6 +22,8 @@ import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.Icon;
 import org.bonitasoft.engine.business.application.impl.IconImpl;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.business.application.importer.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;

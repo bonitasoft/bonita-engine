@@ -11,26 +11,31 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.validator;
-
-import org.bonitasoft.engine.exception.ImportException;
+package org.bonitasoft.engine.business.application.importer.validator;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationImportValidator {
+public class ValidationStatus {
 
-    private final ApplicationTokenValidator tokenValidator;
+    boolean valid;
 
-    public ApplicationImportValidator(ApplicationTokenValidator tokenValidator) {
-        this.tokenValidator = tokenValidator;
+    private String message;
+
+    public ValidationStatus(final boolean valid) {
+        this.valid = valid;
     }
 
-    public void validate(String token) throws ImportException {
-        ValidationStatus validationStatus = tokenValidator.validate(token);
-        if (!validationStatus.isValid()) {
-            throw new ImportException(validationStatus.getMessage());
-        }
+    public ValidationStatus(boolean valid, final String message) {
+        this.valid = valid;
+        this.message = message;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
 }

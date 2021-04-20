@@ -11,14 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.validator;
+package org.bonitasoft.engine.business.application.importer.validator;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 /**
  * @author Elias Ricken de Medeiros
  */
+@Component
 public class ApplicationTokenValidator {
 
     public ValidationStatus validate(String token) {
