@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.work;
+package org.bonitasoft.engine.commons;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +21,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 public class ExceptionUtils {
+
+    public static String printLightWeightStacktrace(Throwable exception) {
+        return printLightWeightStacktrace(exception, 5);
+    }
 
     public static String printLightWeightStacktrace(Throwable exception, int numberOfFrames) {
         List<Throwable> throwableList = org.apache.commons.lang3.exception.ExceptionUtils.getThrowableList(exception);

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+    <application state="ACTIVATED" token="default_app_1" version="2.0" layout="custompage_layoutBonita" theme="custompage_bootstrapdefaulttheme">
+        <displayName>Default application 1</displayName>
+        <applicationPages/>
+        <applicationMenus/>
+    </application>
+</applications>

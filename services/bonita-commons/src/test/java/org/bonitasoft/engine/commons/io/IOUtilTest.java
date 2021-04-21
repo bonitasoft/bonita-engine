@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -135,5 +136,19 @@ public class IOUtilTest {
         final Properties updatedProperties = PropertiesManager.getProperties(file);
         Assert.assertEquals(updatedValue2, updatedProperties.get("key2"));
 
+    }
+
+    @Test
+    public void getFileContent_should_return_content_of_file() throws Exception {
+        Optional<byte[]> fileContent = IOUtil.getFileContent("myFile.txt");
+
+        assertThat(fileContent).get().isEqualTo("some content".getBytes());
+    }
+
+    @Test
+    public void getFileContent_should_return_empty_when_file_does_not_exists() throws Exception {
+        Optional<byte[]> fileContent = IOUtil.getFileContent("myFile2.txt");
+
+        assertThat(fileContent).isNotPresent();
     }
 }

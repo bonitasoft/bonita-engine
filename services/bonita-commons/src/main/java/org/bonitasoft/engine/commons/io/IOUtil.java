@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.jar.JarEntry;
@@ -646,5 +647,22 @@ public class IOUtil {
             return "image/png";
         }
         return MIMETYPES_FILE_TYPE_MAP.getContentType(iconFilename);
+    }
+
+    /**
+     * return the content of the file from the classpath, the file must be at the root of the classpath
+     *
+     * @param fileName name of the file
+     * @return the optional, or empty if there is no file with that name
+     * @throws IOException when we are unable to read the file from the classpath
+     */
+    public static Optional<byte[]> getFileContent(final String fileName) throws IOException {
+        try (final InputStream inputStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(fileName)) {
+            if (inputStream == null) {
+                return Optional.empty();
+            }
+            return Optional.of(getAllContentFrom(inputStream));
+        }
     }
 }

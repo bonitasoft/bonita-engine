@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.work;
 
 import static java.lang.String.format;
-import static org.bonitasoft.engine.work.ExceptionUtils.printLightWeightStacktrace;
-import static org.bonitasoft.engine.work.ExceptionUtils.printRootCauseOnly;
+import static org.bonitasoft.engine.commons.ExceptionUtils.printLightWeightStacktrace;
+import static org.bonitasoft.engine.commons.ExceptionUtils.printRootCauseOnly;
 
 import java.time.Instant;
 import java.util.Map;

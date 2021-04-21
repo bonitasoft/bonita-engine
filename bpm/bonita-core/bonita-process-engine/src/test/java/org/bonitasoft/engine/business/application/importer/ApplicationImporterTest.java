@@ -15,6 +15,8 @@ package org.bonitasoft.engine.business.application.importer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,12 +38,16 @@ import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
-import org.bonitasoft.engine.business.application.xml.*;
+import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
+import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -55,21 +62,21 @@ public class ApplicationImporterTest {
 
     @Mock
     private ApplicationService applicationService;
-
     @Mock
     private ApplicationImportStrategy strategy;
-
     @Mock
     private NodeToApplicationConverter nodeToApplicationConverter;
-
     @Mock
     private ApplicationPageImporter applicationPageImporter;
-
     @Mock
     private ApplicationMenuImporter applicationMenuImporter;
 
     @InjectMocks
     private ApplicationImporter applicationImporter;
+
+    @Before
+    public void before() {
+    }
 
     @Test
     public void importApplication_should_create_application_import_pages_and_menus_and_return_status()
@@ -294,4 +301,25 @@ public class ApplicationImporterTest {
 
         //then exception
     }
+
+    @Test
+    public void should_import_default_applications_on_init() throws Exception {
+        SApplicationWithIcon app1 = new SApplicationWithIcon();
+        app1.setId(1);
+        SApplicationWithIcon app2 = new SApplicationWithIcon();
+        app2.setId(2);
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
+                anyLong()))
+                        .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_2".equals(a.getToken())),
+                anyLong()))
+                        .thenReturn(new ImportResult(app2, new ImportStatus("ok")));
+
+        applicationImporter.init();
+
+        verify(applicationService).createApplication(app1);
+        verify(applicationService).createApplication(app2);
+    }
+
+    //TODO: create test that validate the default import strategy when we have decided what strategy it should be
 }

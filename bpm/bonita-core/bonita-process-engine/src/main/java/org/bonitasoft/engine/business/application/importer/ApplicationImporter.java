@@ -13,10 +13,13 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -31,23 +34,33 @@ import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
+import org.bonitasoft.engine.commons.ExceptionUtils;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.io.IOUtils;
+import org.bonitasoft.engine.session.SessionService;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 @Component
-public class ApplicationImporter {
+@Slf4j
+public class ApplicationImporter implements TenantLifecycleService {
 
+    public static final String PROVIDED_APPLICATIONS_PATH = "org/bonitasoft/web/application";
     private final ApplicationService applicationService;
-    private NodeToApplicationConverter nodeToApplicationConverter;
-    private ApplicationPageImporter applicationPageImporter;
-    private ApplicationMenuImporter applicationMenuImporter;
+    private final NodeToApplicationConverter nodeToApplicationConverter;
+    private final ApplicationPageImporter applicationPageImporter;
+    private final ApplicationMenuImporter applicationMenuImporter;
+    private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
+            ApplicationImporter.class.getClassLoader());
 
     public ApplicationImporter(ApplicationService applicationService,
             NodeToApplicationConverter nodeToApplicationConverter,
@@ -152,4 +165,44 @@ public class ApplicationImporter {
         }
         return result;
     }
+
+    @Override
+    public void init() throws SBonitaException {
+        try {
+            importProvidedApplicationsFromClasspath();
+        } catch (IOException e) {
+            log.error("Cannot load provided applications at startup. Root cause: {}",
+                    ExceptionUtils.printRootCauseOnly(e));
+            log.debug("Full stack : ", e);
+        }
+    }
+
+    private void importProvidedApplicationsFromClasspath() throws IOException {
+        Resource[] resources = cpResourceResolver
+                .getResources(
+                        ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + PROVIDED_APPLICATIONS_PATH + "/*.xml");
+        for (Resource resource : resources) {
+            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
+                importProvidedApplicationFromResource(resource);
+            } else {
+                log.warn("A resource {} could not be read when loading default applications",
+                        resource.getDescription());
+            }
+        }
+    }
+
+    private void importProvidedApplicationFromResource(Resource resource) {
+        String resourceName = resource.getFilename();
+        log.debug("Found provided applications '{}' in classpath", resourceName);
+        try (InputStream resourceAsStream = resource.getInputStream()) {
+            final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
+            importApplications(content, SessionService.SYSTEM_ID,
+                    new ReplaceDuplicateApplicationImportStrategy(applicationService));
+        } catch (IOException | ImportException | AlreadyExistsException e) {
+            log.error("Unable to import the application {} because: {}", resourceName,
+                    ExceptionUtils.printLightWeightStacktrace(e));
+            log.debug("Stacktrace of the import issue is:", e);
+        }
+    }
+
 }
