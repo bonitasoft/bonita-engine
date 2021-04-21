@@ -25,19 +25,27 @@ public interface LifecycleService {
      *
      * @throws SBonitaException
      */
-    void start() throws SBonitaException;
+    default void start() throws SBonitaException {
 
-    void stop() throws SBonitaException;
+    }
+
+    default void stop() throws SBonitaException {
+
+    }
 
     /**
      * Temporary halt the execution of this service.
      */
-    void pause() throws SBonitaException;
+    default void pause() throws SBonitaException {
+
+    }
 
     /**
      * resume the execution the service
      */
 
-    void resume() throws SBonitaException;
+    default void resume() throws SBonitaException {
+
+    }
 
 }

@@ -15,13 +15,13 @@ package org.bonitasoft.engine.page.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -663,10 +663,13 @@ public class PageServiceImpl implements PageService {
     private void importProvidedPage(final ImportPageDescriptor pageDesc) throws SBonitaException {
         try {
             // check if the s are here or not up to date and import them from class path if needed
-            final byte[] providedPageContent = getZipContent(pageDesc.getZipName());
-            if (providedPageContent.length > 0) {
-                final Properties pageProperties = readPageZip(providedPageContent, true);
-                importProvidedPage(pageDesc, providedPageContent, pageProperties);
+            Optional<byte[]> providedPageContent = IOUtil.getFileContent(pageDesc.getZipName());
+            if (providedPageContent.isPresent()) {
+                final Properties pageProperties = readPageZip(providedPageContent.get(), true);
+                importProvidedPage(pageDesc, providedPageContent.get(), pageProperties);
+            } else {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                        "No provided " + pageDesc.getZipName() + " found in the classpath, nothing will be imported");
             }
         } catch (final IOException e) {
             logger.log(getClass(), TechnicalLogSeverity.WARNING,
@@ -706,19 +709,6 @@ public class PageServiceImpl implements PageService {
                 pageDescriptor.isHidden(),
                 pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         insertPage(page, providedPageContent);
-    }
-
-    private byte[] getZipContent(final String zipName) throws IOException {
-        try (final InputStream inputStream = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream(zipName)) {
-            if (inputStream == null) {
-                // no provided page
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                        "No provided " + zipName + " found in the classpath, nothing will be imported");
-                return new byte[0];
-            }
-            return IOUtil.getAllContentFrom(inputStream);
-        }
     }
 
     public List<PageServiceListener> getPageServiceListeners() {

@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.work;
+package org.bonitasoft.engine.commons;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +50,7 @@ public class ExceptionUtilsTest {
                 "org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException: This is the root cause\n" +
                         "\twrapped by java.lang.Exception: intermediate exception\n" +
                         "\twrapped by java.lang.Exception: Wrap all other exceptions\n" +
-                        " exception was generated here:\tat org.bonitasoft.engine.work.ExceptionUtilsTest.methodThatCauseRootException(ExceptionUtilsTest.java:");
+                        " exception was generated here:\tat org.bonitasoft.engine.commons.ExceptionUtilsTest.methodThatCauseRootException(ExceptionUtilsTest.java:");
 
     }
 
