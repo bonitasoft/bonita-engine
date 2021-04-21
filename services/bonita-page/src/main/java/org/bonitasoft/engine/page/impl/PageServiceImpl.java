@@ -15,17 +15,19 @@ package org.bonitasoft.engine.page.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -33,8 +35,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.PageServiceListener;
 import org.bonitasoft.engine.page.SContentType;
@@ -77,12 +77,15 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class PageServiceImpl implements PageService {
 
     private static final String QUERY_GET_PAGE_BY_NAME = "getPageByName";
@@ -115,30 +118,33 @@ public class PageServiceImpl implements PageService {
 
     private static final String THEME_CSS = "resources/theme.css";
 
+    private static final String RESOURCES_PATH = "org/bonitasoft/web/page";
+
+    private static final String TENANT_STATUS_PAGE_NAME = "custompage_tenantStatusBonita";
+
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
-
-    private final TechnicalLoggerService logger;
 
     private final QueriableLoggerService queriableLoggerService;
 
     private final ProfileService profileService;
 
-    private List<PageServiceListener> pageServiceListeners;
+    private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
+            PageServiceImpl.class.getClassLoader());
 
     private final SPageContentHelper helper;
 
-    private List<ImportPageDescriptor> providedPages = Collections.EMPTY_LIST;
+    private List<PageServiceListener> pageServiceListeners;
 
+    // Used only in tests
     private boolean initialized = false;
 
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            final QueriableLoggerService queriableLoggerService,
             final ProfileService profileService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         this.profileService = profileService;
         helper = new SPageContentHelper();
@@ -629,24 +635,84 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public void init() throws SBonitaException {
-        for (final ImportPageDescriptor page : getProvidedPages()) {
-            importProvidedPage(page);
+        try {
+            importProvidedPagesFromClasspath();
+        } catch (IOException e) {
+            log.error("Cannot load provided pages at startup. Root cause: {}", ExceptionUtils.printRootCauseOnly(e));
+            log.debug("Full stack : ", e);
         }
         initialized = true;
     }
 
+    private void importProvidedPagesFromClasspath() throws IOException {
+        Resource[] resources = cpResourceResolver
+                .getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + RESOURCES_PATH + "/*.zip");
+        for (Resource resource : resources) {
+            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
+                importProvidedPagesFromResource(resource);
+            } else {
+                log.warn("A resource {} could not be read when loading default pages", resource.getDescription());
+            }
+        }
+    }
+
+    private void importProvidedPagesFromResource(Resource resource) {
+        String resourceName = resource.getFilename();
+        log.debug("Found provided applications '{}' in classpath", resourceName);
+        try (InputStream resourceAsStream = resource.getInputStream()) {
+            final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
+            final Properties pageProperties = readPageZip(content, true);
+            importProvidedPage(resourceName, content, pageProperties);
+
+        } catch (IOException | SBonitaException e) {
+            log.error("Unable to import the page {} because: {}", resourceName,
+                    ExceptionUtils.printLightWeightStacktrace(e));
+            log.debug("Stacktrace of the import issue is:", e);
+        }
+    }
+
+    private void importProvidedPage(String pageZipName, final byte[] providedPageContent,
+            final Properties pageProperties) throws SBonitaException {
+        final SPage pageByName = getPageByName(pageProperties.getProperty(PROPERTIES_NAME));
+        if (pageByName == null) {
+            log.debug("Provided page {} does not exist yet, importing it.", pageZipName);
+            createPage(pageZipName, providedPageContent, pageProperties);
+        } else {
+            final byte[] pageContent = getPageContent(pageByName.getId());
+            // think of a better way to check the content are the same or not, it will almost always be the same so....
+            if (pageContent.length != providedPageContent.length) {
+                log.debug("Provided page {} exists but the content is not up to date, updating it.", pageZipName);
+                updatePageContent(pageByName.getId(), providedPageContent, pageZipName);
+            } else {
+                log.debug("Provided page exists and is up to date, nothing to do");
+            }
+        }
+    }
+
+    protected void createPage(String pageZipName, final byte[] providedPageContent,
+            final Properties pageProperties) throws SObjectAlreadyExistsException,
+            SObjectCreationException {
+        boolean hidden = pageProperties.getProperty("name").equals(TENANT_STATUS_PAGE_NAME);
+        final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME),
+                pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
+                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), pageZipName, -1, true,
+                hidden,
+                pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
+        insertPage(page, providedPageContent);
+    }
+
+    @Override
+    public void stop() throws SBonitaException {
+        // nothing to do
+    }
+
     @Override
     public void start() throws SBonitaException {
-        // nothing to do
+        // nohing to do
     }
 
     @Override
-    public void stop() {
-        // nothing to do
-    }
-
-    @Override
-    public void pause() {
+    public void pause() throws SBonitaException {
         // nothing to do
     }
 
@@ -657,58 +723,8 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public boolean initialized() {
+        // Used only in tests
         return initialized;
-    }
-
-    private void importProvidedPage(final ImportPageDescriptor pageDesc) throws SBonitaException {
-        try {
-            // check if the s are here or not up to date and import them from class path if needed
-            Optional<byte[]> providedPageContent = IOUtil.getFileContent(pageDesc.getZipName());
-            if (providedPageContent.isPresent()) {
-                final Properties pageProperties = readPageZip(providedPageContent.get(), true);
-                importProvidedPage(pageDesc, providedPageContent.get(), pageProperties);
-            } else {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                        "No provided " + pageDesc.getZipName() + " found in the classpath, nothing will be imported");
-            }
-        } catch (final IOException e) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "Provided page " + pageDesc.getZipName() + "can't be imported");
-        }
-    }
-
-    private void importProvidedPage(final ImportPageDescriptor pageDescriptor, final byte[] providedPageContent,
-            final Properties pageProperties) throws SBonitaException {
-        final SPage pageByName = getPageByName(pageProperties.getProperty(PROPERTIES_NAME));
-        final String pageZipName = pageDescriptor.getZipName();
-        if (pageByName == null) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                    String.format("Provided page %s (hidden: %s) does not exist yet, importing it.", pageZipName,
-                            pageDescriptor.isHidden()));
-            createPage(pageDescriptor, providedPageContent, pageProperties);
-        } else {
-            final byte[] pageContent = getPageContent(pageByName.getId());
-            // think of a better way to check the content are the same or not, it will almost always be the same so....
-            if (pageContent.length != providedPageContent.length) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, String.format(
-                        "Provided page %s exists but the content is not up to date, updating it.", pageZipName));
-                updatePageContent(pageByName.getId(), providedPageContent, pageZipName);
-            } else {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                        "Provided page exists and is up to date, nothing to do");
-            }
-        }
-    }
-
-    protected void createPage(final ImportPageDescriptor pageDescriptor, final byte[] providedPageContent,
-            final Properties pageProperties) throws SObjectAlreadyExistsException,
-            SObjectCreationException {
-        final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME),
-                pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
-                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), pageDescriptor.getZipName(), -1, true,
-                pageDescriptor.isHidden(),
-                pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
-        insertPage(page, providedPageContent);
     }
 
     public List<PageServiceListener> getPageServiceListeners() {
@@ -719,12 +735,4 @@ public class PageServiceImpl implements PageService {
         this.pageServiceListeners = pageServiceListeners;
     }
 
-    public List<ImportPageDescriptor> getProvidedPages() {
-        return providedPages;
-    }
-
-    @Autowired
-    public void setProvidedPages(List<ImportPageDescriptor> providedPages) {
-        this.providedPages = providedPages;
-    }
 }
