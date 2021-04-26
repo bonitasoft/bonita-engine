@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationField;
@@ -32,7 +31,6 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.page.PageService;
@@ -58,20 +56,24 @@ public class ApplicationModelConverter {
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
         final long now = System.currentTimeMillis();
-        return SApplicationWithIcon.builder().token((String) fields.get(ApplicationField.TOKEN))
-                .displayName((String) fields.get(ApplicationField.DISPLAY_NAME))
-                .version((String) fields.get(ApplicationField.VERSION))
-                .creationDate(now)
-                .lastUpdateDate(now)
-                .createdBy(creatorUserId)
-                .state(SApplicationState.ACTIVATED.name())
-                .layoutId(getLayoutId(creator))
-                .themeId(getThemeId(creator))
-                .updatedBy(creatorUserId)
-                .iconContent((byte[]) fields.get(ApplicationField.ICON_CONTENT))
-                .iconMimeType(fields.get(ApplicationField.ICON_FILE_NAME) == null ? null
-                        : IOUtil.getContentType((String) fields.get(ApplicationField.ICON_FILE_NAME)))
-                .description(description).iconPath(iconPath).profileId(profileId).build();
+        SApplicationWithIcon application = new SApplicationWithIcon();
+        application.setToken((String) fields.get(ApplicationField.TOKEN));
+        application.setDisplayName((String) fields.get(ApplicationField.DISPLAY_NAME));
+        application.setVersion((String) fields.get(ApplicationField.VERSION));
+        application.setCreationDate(now);
+        application.setLastUpdateDate(now);
+        application.setCreatedBy(creatorUserId);
+        application.setState(SApplicationState.ACTIVATED.name());
+        application.setLayoutId(getLayoutId(creator));
+        application.setThemeId(getThemeId(creator));
+        application.setUpdatedBy(creatorUserId);
+        application.setIconContent((byte[]) fields.get(ApplicationField.ICON_CONTENT));
+        application.setIconMimeType(fields.get(ApplicationField.ICON_FILE_NAME) == null ? null
+                : IOUtil.getContentType((String) fields.get(ApplicationField.ICON_FILE_NAME)));
+        application.setDescription(description);
+        application.setIconPath(iconPath);
+        application.setProfileId(profileId);
+        return application;
     }
 
     protected Long getLayoutId(final ApplicationCreator creator) throws CreationException {
@@ -135,8 +137,7 @@ public class ApplicationModelConverter {
 
     public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater,
             final long updaterUserId) {
-        final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
-                .createNewInstance(updaterUserId);
+        final SApplicationUpdateBuilder builder = new SApplicationUpdateBuilder(updaterUserId);
         updateFields(updater, builder);
 
         return builder.done();

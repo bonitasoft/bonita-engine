@@ -20,13 +20,11 @@ import javax.persistence.MappedSuperclass;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @MappedSuperclass
 @IdClass(PersistentObjectId.class)
@@ -86,10 +84,8 @@ public abstract class AbstractSApplication implements PersistentObject {
     @Column
     private String iconMimeType;
 
-    public AbstractSApplication(final String token, final String displayName, final String version,
-            final long creationDate,
-            final long createdBy,
-            final String state, final Long layoutId, final Long themeId, String iconMimeType) {
+    public AbstractSApplication(String token, String displayName, String version, long creationDate,
+            long createdBy, String state) {
         this.token = token;
         this.displayName = displayName;
         this.version = version;
@@ -98,9 +94,6 @@ public abstract class AbstractSApplication implements PersistentObject {
         this.createdBy = createdBy;
         updatedBy = createdBy;
         this.state = state;
-        this.layoutId = layoutId;
-        this.themeId = themeId;
-        this.iconMimeType = iconMimeType;
     }
 
     public boolean hasIcon() {

@@ -33,9 +33,10 @@ public class SApplicationWithIconTest {
 
         //when
         SApplicationWithIcon application = new SApplicationWithIcon("token", "Name to display", "1.0",
-                creationDate, createdBy, state,
-                layoutId, themeId, null, null);
+                creationDate, createdBy, state);
         application.setDescription("This is my application");
+        application.setLayoutId(layoutId);
+        application.setThemeId(themeId);
         application.setHomePageId(homePageId);
         application.setIconPath("/icon.jpg");
         application.setLastUpdateDate(creationDate + 1);

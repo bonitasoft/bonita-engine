@@ -40,9 +40,6 @@ import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderFactoryImpl;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderFactoryImpl;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -123,10 +120,17 @@ public class ApplicationServiceImplTest {
 
     private SApplicationWithIcon buildApplication(final String applicationName, final String applicationDisplayName) {
         final long currentDate = System.currentTimeMillis();
-        return SApplicationWithIcon.builder().token(applicationName).displayName(applicationDisplayName).version("1.0")
-                .creationDate(currentDate).lastUpdateDate(currentDate)
-                .createdBy((long) CREATED_BY).state(SApplicationState.ACTIVATED.name()).layoutId(LAYOUT_ID)
-                .themeId(THEME_ID).build();
+        SApplicationWithIcon application = new SApplicationWithIcon();
+        application.setToken(applicationName);
+        application.setDisplayName(applicationDisplayName);
+        application.setVersion("1.0");
+        application.setCreationDate(currentDate);
+        application.setLastUpdateDate(currentDate);
+        application.setCreatedBy((long) CREATED_BY);
+        application.setState(SApplicationState.ACTIVATED.name());
+        application.setLayoutId(LAYOUT_ID);
+        application.setThemeId(THEME_ID);
+        return application;
     }
 
     @Test
@@ -526,10 +530,8 @@ public class ApplicationServiceImplTest {
     @Test
     public void updateApplication_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
         //given
-        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl()
-                .createNewInstance(0L);
-        updateBuilder.updateDisplayName("new display name");
-        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+        EntityUpdateDescriptor updateDescriptor = new SApplicationUpdateBuilder(0L)
+                .updateDisplayName("new display name").done();
 
         long applicationId = 17;
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationWithIcon.class, applicationId)))
@@ -551,8 +553,7 @@ public class ApplicationServiceImplTest {
     public void updateApplication_should_throw_SObjectModificationException_if_set_homepage_references_invalid_page()
             throws Exception {
         //given
-        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl()
-                .createNewInstance(0L);
+        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilder(0L);
         final long homePageId = 150L;
         updateBuilder.updateHomePageId(homePageId);
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
@@ -586,9 +587,8 @@ public class ApplicationServiceImplTest {
     public void updateApplication_should_throw_SObjectAlreadyExistsException_when_another_application_exists_with_the_same_name()
             throws Exception {
         //given
-        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl()
-                .createNewInstance(0L);
-        final EntityUpdateDescriptor updateDescriptor = updateBuilder.updateToken("newToken").done();
+        final EntityUpdateDescriptor updateDescriptor = new SApplicationUpdateBuilder(0L).updateToken("newToken")
+                .done();
 
         SApplicationWithIcon applicationToUpdate = new SApplicationWithIcon();
         applicationToUpdate.setToken("oldToken");
@@ -719,9 +719,8 @@ public class ApplicationServiceImplTest {
     @Test
     public void updateApplicationMenu_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
         //given
-        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
-        updateBuilder.updateDisplayName("new display name");
-        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+        final EntityUpdateDescriptor updateDescriptor = new SApplicationMenuUpdateBuilder()
+                .updateDisplayName("new display name").done();
 
         final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1, 12);
         appMenu.setId(17);
@@ -748,9 +747,8 @@ public class ApplicationServiceImplTest {
         final ApplicationServiceImpl applicationService = spy(applicationServiceImpl);
         final int newIndexValue = 1;
         final int oldIndexValue = 5;
-        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
-        updateBuilder.updateIndex(newIndexValue);
-        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+        final EntityUpdateDescriptor updateDescriptor = new SApplicationMenuUpdateBuilder().updateIndex(newIndexValue)
+                .done();
 
         final int applicationMenuId = 17;
         final SApplicationMenu appMenu = buildApplicationMenu("main", 5, oldIndexValue, 12);
@@ -774,9 +772,7 @@ public class ApplicationServiceImplTest {
     public void updateApplicationMenu_should_force_update_index_when_field_parent_is_updated() throws Exception {
         //given
         final ApplicationServiceImpl applicationService = spy(applicationServiceImpl);
-        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
-        updateBuilder.updateParentId(28L);
-        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+        final EntityUpdateDescriptor updateDescriptor = new SApplicationMenuUpdateBuilder().updateParentId(28L).done();
 
         final int applicationMenuId = 17;
         final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 4, 12);
@@ -804,9 +800,8 @@ public class ApplicationServiceImplTest {
     @Test
     public void updateApplicationMenu_should_not_organize_indexes_when_field_index_is_not_updated() throws Exception {
         //given
-        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
-        updateBuilder.updateDisplayName("new display name");
-        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+        final EntityUpdateDescriptor updateDescriptor = new SApplicationMenuUpdateBuilder()
+                .updateDisplayName("new display name").done();
 
         final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1, 12);
         appMenu.setId(17);
@@ -827,9 +822,8 @@ public class ApplicationServiceImplTest {
     public void updateApplicationMenu_should_throw_SObjectNotFoundException_when_recorder_returns_null()
             throws Exception {
         //given
-        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
-        updateBuilder.updateDisplayName("new display name");
-        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+        final EntityUpdateDescriptor updateDescriptor = new SApplicationMenuUpdateBuilder()
+                .updateDisplayName("new display name").done();
 
         final int applicationMenuId = 17;
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationMenu.class, applicationMenuId)))
@@ -846,10 +840,8 @@ public class ApplicationServiceImplTest {
     public void updateApplicationMenu_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException()
             throws Exception {
         //given
-        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderFactoryImpl()
-                .createNewInstance();
-        updateBuilder.updateDisplayName("new display name");
-        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+        final EntityUpdateDescriptor updateDescriptor = new SApplicationMenuUpdateBuilder()
+                .updateDisplayName("new display name").done();
 
         final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1, 12);
         appMenu.setId(17);

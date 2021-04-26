@@ -22,14 +22,12 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
@@ -93,8 +91,7 @@ public class ApplicationImporter implements TenantLifecycleService {
             try {
                 SApplicationPage homePage = applicationService.getApplicationPage(applicationNode.getToken(),
                         applicationNode.getHomePage());
-                SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
-                        .createNewInstance(createdBy);
+                SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilder(createdBy);
                 updateBuilder.updateHomePageId(homePage.getId());
                 applicationService.updateApplication(application, updateBuilder.done());
             } catch (SObjectNotFoundException e) {

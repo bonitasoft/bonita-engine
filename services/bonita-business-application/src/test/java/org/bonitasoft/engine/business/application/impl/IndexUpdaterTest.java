@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -102,9 +102,7 @@ public class IndexUpdaterTest {
     }
 
     private EntityUpdateDescriptor getUpdateDescriptorForIndex(int newIndex) {
-        SApplicationMenuUpdateBuilderImpl builder = new SApplicationMenuUpdateBuilderImpl();
-        builder.updateIndex(newIndex);
-        return builder.done();
+        return new SApplicationMenuUpdateBuilder().updateIndex(newIndex).done();
     }
 
     @Test

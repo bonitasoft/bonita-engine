@@ -19,7 +19,7 @@ import static org.mockito.BDDMockito.given;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.MenuIndex;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -62,11 +62,8 @@ public class MenuIndexConverterTest {
 
         given(applicationService.getLastUsedIndex(appMenu.getParentId())).willReturn(11);
 
-        SApplicationMenuUpdateBuilderImpl builder = new SApplicationMenuUpdateBuilderImpl();
-        builder.updateIndex(5);
-
         //when
-        MenuIndex menuIndex = convertor.toMenuIndex(appMenu, builder.done());
+        MenuIndex menuIndex = convertor.toMenuIndex(appMenu, new SApplicationMenuUpdateBuilder().updateIndex(5).done());
 
         //then
         assertThat(menuIndex).isNotNull();
@@ -81,14 +78,11 @@ public class MenuIndexConverterTest {
         SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);
 
-        SApplicationMenuUpdateBuilderImpl builder = new SApplicationMenuUpdateBuilderImpl();
-        builder.updateIndex(5);
-        builder.updateParentId(7L);
-
         given(applicationService.getLastUsedIndex(7L)).willReturn(11);
 
         //when
-        MenuIndex menuIndex = convertor.toMenuIndex(appMenu, builder.done());
+        MenuIndex menuIndex = convertor.toMenuIndex(appMenu,
+                new SApplicationMenuUpdateBuilder().updateIndex(5).updateParentId(7L).done());
 
         //then
         assertThat(menuIndex).isNotNull();
@@ -104,13 +98,11 @@ public class MenuIndexConverterTest {
         SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);
 
-        SApplicationMenuUpdateBuilderImpl builder = new SApplicationMenuUpdateBuilderImpl();
-        builder.updateParentId(4L);
-
         given(applicationService.getLastUsedIndex(4L)).willReturn(11);
 
         //when
-        MenuIndex menuIndex = convertor.toMenuIndex(appMenu, builder.done());
+        MenuIndex menuIndex = convertor.toMenuIndex(appMenu,
+                new SApplicationMenuUpdateBuilder().updateParentId(4L).done());
 
         //then
         assertThat(menuIndex).isNotNull();

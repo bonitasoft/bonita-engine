@@ -13,21 +13,42 @@
  **/
 package org.bonitasoft.engine.business.application.model.builder;
 
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SApplicationMenuUpdateBuilder {
+public class SApplicationMenuUpdateBuilder {
 
-    EntityUpdateDescriptor done();
+    protected EntityUpdateDescriptor descriptor;
 
-    SApplicationMenuUpdateBuilder updateDisplayName(String displayName);
+    public SApplicationMenuUpdateBuilder() {
+        descriptor = new EntityUpdateDescriptor();
+    }
 
-    SApplicationMenuUpdateBuilder updateApplicationPageId(Long applicationPageId);
+    public EntityUpdateDescriptor done() {
+        return descriptor;
+    }
 
-    SApplicationMenuUpdateBuilder updateIndex(int index);
+    public SApplicationMenuUpdateBuilder updateDisplayName(String displayName) {
+        descriptor.addField(SApplicationMenu.DISPLAY_NAME, displayName);
+        return this;
+    }
 
-    SApplicationMenuUpdateBuilder updateParentId(Long parentId);
+    public SApplicationMenuUpdateBuilder updateApplicationPageId(Long applicationPageId) {
+        descriptor.addField(SApplicationMenu.APPLICATION_PAGE_ID, applicationPageId);
+        return this;
+    }
+
+    public SApplicationMenuUpdateBuilder updateIndex(int index) {
+        descriptor.addField(SApplicationMenu.INDEX, index);
+        return this;
+    }
+
+    public SApplicationMenuUpdateBuilder updateParentId(Long parentId) {
+        descriptor.addField(SApplicationMenu.PARENT_ID, parentId);
+        return this;
+    }
 
 }
