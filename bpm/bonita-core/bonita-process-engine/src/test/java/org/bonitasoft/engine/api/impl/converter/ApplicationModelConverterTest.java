@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -147,14 +148,16 @@ public class ApplicationModelConverterTest {
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
         final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION,
-                currentDate, CREATOR_ID,
-                state, LAYOUT_ID, THEME_ID, ICON_MIME_TYPE);
+                currentDate, CREATOR_ID, state);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
         sApp.setIconPath(ICON_PATH);
         sApp.setHomePageId(HOME_PAGE_ID);
         sApp.setProfileId(PROFILE_ID);
+        sApp.setThemeId(THEME_ID);
+        sApp.setLayoutId(LAYOUT_ID);
+        sApp.setIconMimeType(ICON_MIME_TYPE);
 
         //when
         final Application application = converter.toApplication(sApp);
@@ -185,9 +188,8 @@ public class ApplicationModelConverterTest {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
-        final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION,
-                currentDate, CREATOR_ID,
-                state, LAYOUT_ID, THEME_ID, null);
+        final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID,
+                state);
 
         //when
         final Application application = converter.toApplication(sApp);
@@ -202,11 +204,9 @@ public class ApplicationModelConverterTest {
             throws Exception {
         //given
         final SApplication sApp1 = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(),
-                CREATOR_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID, null);
+                CREATOR_ID, SApplicationState.DEACTIVATED.name());
         final SApplication sApp2 = new SApplication(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(),
-                CREATOR_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID, null);
+                CREATOR_ID, SApplicationState.DEACTIVATED.name());
 
         //when
         final List<Application> applications = converter.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));
@@ -236,15 +236,16 @@ public class ApplicationModelConverterTest {
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
         assertThat(fields).hasSize(10); // field lastUpdateDate cannot be checked:
-        assertThat(fields.get(AbstractSApplication.TOKEN)).isEqualTo("My-updated-app");
-        assertThat(fields.get(AbstractSApplication.DISPLAY_NAME)).isEqualTo("Updated display name");
-        assertThat(fields.get(AbstractSApplication.VERSION)).isEqualTo("1.1");
-        assertThat(fields.get(AbstractSApplication.DESCRIPTION)).isEqualTo("Up description");
-        assertThat(fields.get(AbstractSApplication.ICON_PATH)).isEqualTo("/newIcon.jpg");
-        assertThat(fields.get(AbstractSApplication.PROFILE_ID)).isEqualTo(10L);
-        assertThat(fields.get(AbstractSApplication.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
-        assertThat(fields.get(AbstractSApplication.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
-        assertThat(fields.get(AbstractSApplication.HOME_PAGE_ID)).isEqualTo(11L);
+        assertThat(fields).contains(
+                entry(AbstractSApplication.TOKEN, "My-updated-app"),
+                entry(AbstractSApplication.DISPLAY_NAME, "Updated display name"),
+                entry(AbstractSApplication.VERSION, "1.1"),
+                entry(AbstractSApplication.DESCRIPTION, "Up description"),
+                entry(AbstractSApplication.ICON_PATH, "/newIcon.jpg"),
+                entry(AbstractSApplication.PROFILE_ID, 10L),
+                entry(AbstractSApplication.STATE, ApplicationState.ACTIVATED.name()),
+                entry(AbstractSApplication.UPDATED_BY, LOGGED_USER_ID),
+                entry(AbstractSApplication.HOME_PAGE_ID, 11L));
     }
 
     @Test

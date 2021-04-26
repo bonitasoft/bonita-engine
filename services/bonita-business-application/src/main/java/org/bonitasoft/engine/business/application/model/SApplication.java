@@ -21,26 +21,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
 @AllArgsConstructor
 @Entity
 @Table(name = "business_app")
 @Cacheable(false)
 public class SApplication extends AbstractSApplication {
 
-    //    // FIXME: class must be present for the javadoc generation
-    //    public abstract static class SApplicationBuilder {
-    //    }
-
     public SApplication(final String token, final String displayName, final String version, final long creationDate,
             final long createdBy,
-            final String state, final Long layoutId, final Long themeId, String iconMimeType) {
-        super(token, displayName, version, creationDate, createdBy, state, layoutId, themeId, iconMimeType);
+            final String state) {
+        super(token, displayName, version, creationDate, createdBy, state);
     }
 
 }

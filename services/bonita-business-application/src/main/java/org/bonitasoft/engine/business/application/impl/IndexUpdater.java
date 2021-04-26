@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -76,9 +76,8 @@ public class IndexUpdater {
 
     private void updateIndexes(List<SApplicationMenu> menusToUpdate, int offSet) throws SObjectModificationException {
         for (SApplicationMenu menuToUpdate : menusToUpdate) {
-            SApplicationMenuUpdateBuilderImpl builder = new SApplicationMenuUpdateBuilderImpl();
-            builder.updateIndex(menuToUpdate.getIndex() + offSet);
-            applicationService.updateApplicationMenu(menuToUpdate, builder.done(), false);
+            applicationService.updateApplicationMenu(menuToUpdate,
+                    new SApplicationMenuUpdateBuilder().updateIndex(menuToUpdate.getIndex() + offSet).done(), false);
         }
     }
 

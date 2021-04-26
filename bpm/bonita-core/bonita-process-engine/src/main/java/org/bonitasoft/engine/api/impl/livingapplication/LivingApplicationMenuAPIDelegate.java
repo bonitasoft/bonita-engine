@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
@@ -25,7 +24,7 @@ import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -69,8 +68,7 @@ public class LivingApplicationMenuAPIDelegate {
             final SApplicationMenu sApplicationMenu = applicationService
                     .createApplicationMenu(converter.buildSApplicationMenu(applicationMenuCreator, index));
             applicationService.updateApplication(sApplicationMenu.getApplicationId(),
-                    BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
-                            .createNewInstance(loggedUserId).done());
+                    new SApplicationUpdateBuilder(loggedUserId).done());
             return converter.toApplicationMenu(sApplicationMenu);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
@@ -85,8 +83,7 @@ public class LivingApplicationMenuAPIDelegate {
             final SApplicationMenu sApplicationMenu = applicationService.updateApplicationMenu(applicationMenuId,
                     updateDescriptor);
             applicationService.updateApplication(sApplicationMenu.getApplicationId(),
-                    BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
-                            .createNewInstance(loggedUserId).done());
+                    new SApplicationUpdateBuilder(loggedUserId).done());
             return converter.toApplicationMenu(sApplicationMenu);
         } catch (final SObjectModificationException e) {
             throw new UpdateException(e);
@@ -112,8 +109,7 @@ public class LivingApplicationMenuAPIDelegate {
         try {
             final SApplicationMenu deletedApplicationMenu = applicationService.deleteApplicationMenu(applicationMenuId);
             applicationService.updateApplication(deletedApplicationMenu.getApplicationId(),
-                    BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
-                            .createNewInstance(loggedUserId).done());
+                    new SApplicationUpdateBuilder(loggedUserId).done());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.model.builder.impl;
+package org.bonitasoft.engine.business.application.model.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +22,7 @@ import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
-public class SApplicationUpdateBuilderImplTest {
+public class SApplicationUpdateBuilderTest {
 
     @Test
     public void constructorShouldUpdateUpdatedByAndLastUpdateDateFields() throws Exception {
@@ -34,7 +34,7 @@ public class SApplicationUpdateBuilderImplTest {
         long themeId = 26L;
 
         //when
-        SApplicationUpdateBuilderImpl builder = new SApplicationUpdateBuilderImpl(updaterUserId);
+        SApplicationUpdateBuilder builder = new SApplicationUpdateBuilder(updaterUserId);
         builder.updateDescription("new desc");
         builder.updateHomePageId(homePageId);
         builder.updateDisplayName("new display name");

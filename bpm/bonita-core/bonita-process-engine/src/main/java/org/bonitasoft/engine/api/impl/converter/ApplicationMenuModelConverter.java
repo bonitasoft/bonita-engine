@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuField;
@@ -26,7 +25,6 @@ import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -70,8 +68,7 @@ public class ApplicationMenuModelConverter {
     }
 
     public EntityUpdateDescriptor toApplicationMenuUpdateDescriptor(final ApplicationMenuUpdater updater) {
-        SApplicationMenuUpdateBuilder builder = BuilderFactory.get(SApplicationMenuUpdateBuilderFactory.class)
-                .createNewInstance();
+        SApplicationMenuUpdateBuilder builder = new SApplicationMenuUpdateBuilder();
 
         for (Map.Entry<ApplicationMenuField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {

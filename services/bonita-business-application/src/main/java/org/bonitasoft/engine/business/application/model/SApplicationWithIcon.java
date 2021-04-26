@@ -23,13 +23,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Type;
 
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -43,12 +41,9 @@ public class SApplicationWithIcon extends AbstractSApplication {
     @Column
     private byte[] iconContent;
 
-    public SApplicationWithIcon(final String token, final String displayName, final String version,
-            final long creationDate,
-            final long createdBy,
-            final String state, final Long layoutId, final Long themeId, String iconMimeType, byte[] iconContent) {
-        super(token, displayName, version, creationDate, createdBy, state, layoutId, themeId, iconMimeType);
-        this.iconContent = iconContent;
+    public SApplicationWithIcon(String token, String displayName, String version,
+            long creationDate, long createdBy, String state) {
+        super(token, displayName, version, creationDate, createdBy, state);
     }
 
 }

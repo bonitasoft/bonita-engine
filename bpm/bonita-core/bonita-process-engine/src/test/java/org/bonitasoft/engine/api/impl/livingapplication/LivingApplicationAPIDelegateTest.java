@@ -130,13 +130,12 @@ public class LivingApplicationAPIDelegateTest {
 
     private SApplication buildDefaultApplication() {
         return new SApplication(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID, null);
+                SApplicationState.DEACTIVATED.name());
     }
 
     private SApplicationWithIcon buildDefaultApplicationWithMetadata() {
         return new SApplicationWithIcon(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(),
-                LOGGED_USER_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID, ICON_MIME_TYPE, ICON_CONTENT);
+                LOGGED_USER_ID, SApplicationState.DEACTIVATED.name());
     }
 
     @Test(expected = AlreadyExistsException.class)

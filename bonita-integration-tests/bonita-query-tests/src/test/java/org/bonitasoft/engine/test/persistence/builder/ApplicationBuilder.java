@@ -38,9 +38,11 @@ public class ApplicationBuilder extends PersistentObjectBuilder<AbstractSApplica
     SApplicationWithIcon _build() {
         SApplicationWithIcon application = new SApplicationWithIcon(name, displayName, version,
                 System.currentTimeMillis(), 21,
-                SApplicationState.DEACTIVATED.name(), layoutId, themeId, null, null);
+                SApplicationState.DEACTIVATED.name());
         application.setIconPath(path);
         application.setProfileId(profileId);
+        application.setThemeId(themeId);
+        application.setLayoutId(layoutId);
         return application;
     }
 
