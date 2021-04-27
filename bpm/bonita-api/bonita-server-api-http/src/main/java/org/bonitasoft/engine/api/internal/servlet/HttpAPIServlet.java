@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.internal.servlet;
 
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -24,14 +26,43 @@ import org.apache.commons.fileupload.FileUploadException;
 
 /**
  * @author Julien Mege
+ * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
 public class HttpAPIServlet extends HttpServlet {
 
+    public static final String PROPERTY_TO_ENABLE_HTTP_API = "http.api";
+
     private static final long serialVersionUID = 4936475894513095747L;
+    private boolean enabled;
+
+    @Override
+    public void init() throws ServletException {
+        enabled = Boolean.parseBoolean(
+                System.getProperty(PROPERTY_TO_ENABLE_HTTP_API,
+                        System.getenv().getOrDefault(envProperty(),
+                                "true")));
+
+        log("Http api is " + (enabled ? "enabled" : "disabled") + ", " + (enabled ? "disable" : "enable")
+                + " it using env property " + envProperty() + " or System property " + PROPERTY_TO_ENABLE_HTTP_API
+                + " [=true/false]");
+    }
+
+    private String envProperty() {
+        return PROPERTY_TO_ENABLE_HTTP_API.toUpperCase().replace(".", "_");
+    }
 
     @Override
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
+        if (!enabled) {
+            resp.sendError(SC_FORBIDDEN);
+            return;
+        }
+        callHttpApi(req, resp);
+    }
+
+    void callHttpApi(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         try {
             new HttpAPIServletCall(req, resp).doPost();
         } catch (final FileUploadException e) {
