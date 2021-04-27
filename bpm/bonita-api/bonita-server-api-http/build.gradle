@@ -11,6 +11,7 @@ dependencies {
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testRuntimeOnly "org.springframework:spring-webmvc:${Deps.springVersion}"
     compileOnly "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
     testCompile "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
