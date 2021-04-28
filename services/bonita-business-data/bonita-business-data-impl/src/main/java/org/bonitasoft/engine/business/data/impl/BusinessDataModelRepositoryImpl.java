@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import static org.apache.commons.lang3.StringUtils.strip;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -22,11 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -181,8 +185,22 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     protected void update(final Set<String> annotatedClassNames) throws SBusinessDataRepositoryDeploymentException {
         final List<Exception> exceptions = schemaManager.update(annotatedClassNames);
         if (!exceptions.isEmpty()) {
-            throw new SBusinessDataRepositoryDeploymentException("Updating schema fails due to: " + exceptions);
+            throw new SBusinessDataRepositoryDeploymentException(
+                    "Updating schema failed.\n" + convertExceptions(exceptions));
         }
+    }
+
+    String convertExceptions(List<Exception> exceptions) {
+        StringBuilder exceptionMessage = new StringBuilder("Error(s) encountered:");
+        int counter = 1;
+        for (Throwable exception : exceptions) {
+            exceptionMessage.append("\n").append(counter++).append(": ")
+                    .append(
+                            ExceptionUtils.getThrowableList(exception).stream()
+                                    .map(throwable -> strip(throwable.toString(), "\n")) // to filter out empty lines
+                                    .collect(Collectors.joining("\ncaused by ")));
+        }
+        return exceptionMessage.toString();
     }
 
     void createAndDeployClientBDMZip(final BusinessObjectModel model, long userId)
