@@ -40,7 +40,7 @@ public interface ApplicationService {
 
     String DEFAULT_LAYOUT_NAME = "custompage_layoutBonita";
 
-    String DEFAULT_THEME_NAME = "custompage_themeBonita";
+    String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
 
     SApplicationWithIcon createApplication(SApplicationWithIcon application)
             throws SObjectCreationException, SObjectAlreadyExistsException;
