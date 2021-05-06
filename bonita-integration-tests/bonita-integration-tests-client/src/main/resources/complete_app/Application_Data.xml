@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
     <application profile="UnknownProfile" state="ACTIVATED" token="LoanApp" version="2.0" homePage="loan-index"
-                 layout="custompage_layoutBonita" theme="custompage_bootstrapdefaulttheme">
+                 layout="custompage_layoutBonita" theme="custompage_themeBonita">
         <displayName>Loan request</displayName>
         <description>This is were we ask a loan.</description>
         <iconPath>/icon.jpg</iconPath>
