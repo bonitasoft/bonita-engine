@@ -97,7 +97,7 @@ public class PageServiceImplTest {
 
     public static final long USER_ID = 98989L;
 
-    public static final String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
+    public static final String DEFAULT_THEME_NAME = "custompage_themeBonita";
     public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
 
     @Mock

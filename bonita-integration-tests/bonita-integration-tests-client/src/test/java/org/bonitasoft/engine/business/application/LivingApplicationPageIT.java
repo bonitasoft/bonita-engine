@@ -366,15 +366,15 @@ public class LivingApplicationPageIT extends TestWithCustomPage {
         List<String> allPagesForProfile2 = getLivingApplicationAPI().getAllPagesForProfile(profile2.getId());
 
         //then
-        assertThat(allPagesForProfile1).containsExactly("custompage_bootstrapdefaulttheme", "custompage_layoutBonita",
+        assertThat(allPagesForProfile1).containsExactlyInAnyOrder("custompage_themeBonita", "custompage_layoutBonita",
                 "custompage_page1", "custompage_page2", "custompage_page3");
-        assertThat(getLivingApplicationAPI().getAllPagesForProfile(profile1.getName())).containsExactly(
-                "custompage_bootstrapdefaulttheme", "custompage_layoutBonita", "custompage_page1", "custompage_page2",
+        assertThat(getLivingApplicationAPI().getAllPagesForProfile(profile1.getName())).containsExactlyInAnyOrder(
+                "custompage_themeBonita", "custompage_layoutBonita", "custompage_page1", "custompage_page2",
                 "custompage_page3");
-        assertThat(allPagesForProfile2).containsExactly("custompage_bootstrapdefaulttheme", "custompage_layoutBonita",
+        assertThat(allPagesForProfile2).containsExactlyInAnyOrder("custompage_themeBonita", "custompage_layoutBonita",
                 "custompage_page4");
         assertThat(getLivingApplicationAPI().getAllPagesForProfile(profile2.getName()))
-                .containsExactly("custompage_bootstrapdefaulttheme", "custompage_layoutBonita", "custompage_page4");
+                .containsExactlyInAnyOrder("custompage_themeBonita", "custompage_layoutBonita", "custompage_page4");
 
         //clean
         getLivingApplicationAPI().deleteApplication(app1.getId());

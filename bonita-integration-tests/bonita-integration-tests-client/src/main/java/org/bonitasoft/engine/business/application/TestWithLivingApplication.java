@@ -41,7 +41,7 @@ import org.junit.Before;
 public class TestWithLivingApplication extends CommonAPIIT {
 
     static final String DEFAULT_LAYOUT_NAME = "custompage_layoutBonita";
-    static final String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
+    static final String DEFAULT_THEME_NAME = "custompage_themeBonita";
     private User user;
 
     @Before
