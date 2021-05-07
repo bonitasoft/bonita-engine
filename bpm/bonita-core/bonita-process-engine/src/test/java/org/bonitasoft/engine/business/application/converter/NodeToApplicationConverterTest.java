@@ -90,6 +90,7 @@ public class NodeToApplicationConverterTest {
         node.setIconPath("/icon.jpg");
         node.setProfile("admin");
         node.setState("ENABLED");
+        node.setInternalProfile("ALL");
 
         long profileId = 8L;
         final SProfile profile = mock(SProfile.class);
@@ -113,6 +114,7 @@ public class NodeToApplicationConverterTest {
         assertThat(application.getProfileId()).isEqualTo(profileId);
         assertThat(application.getState()).isEqualTo("ENABLED");
         assertThat(application.getCreatedBy()).isEqualTo(createdBy);
+        assertThat(application.getInternalProfile()).isEqualTo("ALL");
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");

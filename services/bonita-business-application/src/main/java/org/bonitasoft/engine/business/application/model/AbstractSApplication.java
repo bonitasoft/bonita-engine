@@ -83,6 +83,8 @@ public abstract class AbstractSApplication implements PersistentObject {
     private Long themeId;
     @Column
     private String iconMimeType;
+    @Column
+    private String internalProfile;
 
     public AbstractSApplication(String token, String displayName, String version, long creationDate,
             long createdBy, String state) {

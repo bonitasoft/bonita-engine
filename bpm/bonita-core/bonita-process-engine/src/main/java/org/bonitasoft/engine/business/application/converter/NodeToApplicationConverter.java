@@ -66,6 +66,7 @@ public class NodeToApplicationConverter {
         application.setIconPath(applicationNode.getIconPath());
         application.setDescription(applicationNode.getDescription());
         application.setState(applicationNode.getState());
+        application.setInternalProfile(applicationNode.getInternalProfile());
 
         final ImportError importError = setProfile(applicationNode, application);
         if (importError != null) {

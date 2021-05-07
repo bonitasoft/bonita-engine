@@ -76,6 +76,7 @@ public class ApplicationToNodeConverterTest {
                 "enabled");
         application.setDescription("this is my app");
         application.setIconPath("/icon.jpg");
+        application.setInternalProfile("ALL");
 
         //when
         final ApplicationNode applicationNode = converter.toNode(application);
@@ -90,6 +91,7 @@ public class ApplicationToNodeConverterTest {
         assertThat(applicationNode.getState()).isEqualTo("enabled");
         assertThat(applicationNode.getProfile()).isNull();
         assertThat(applicationNode.getHomePage()).isNull();
+        assertThat(applicationNode.getInternalProfile()).isNull(); // We never export an internal profile
 
     }
 
