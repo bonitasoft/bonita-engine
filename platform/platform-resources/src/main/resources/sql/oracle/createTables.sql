@@ -532,7 +532,8 @@ CREATE TABLE business_app (
   themeId NUMBER(19, 0),
   iconMimeType VARCHAR2(255),
   iconContent BLOB,
-  displayName VARCHAR2(255 CHAR) NOT NULL
+  displayName VARCHAR2(255 CHAR) NOT NULL,
+  internalProfile VARCHAR2(255 CHAR)
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);

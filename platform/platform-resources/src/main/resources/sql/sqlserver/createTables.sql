@@ -607,7 +607,8 @@ CREATE TABLE business_app (
   themeId NUMERIC(19, 0),
   iconMimeType NVARCHAR(255),
   iconContent VARBINARY(MAX),
-  displayName NVARCHAR(255) NOT NULL
+  displayName NVARCHAR(255) NOT NULL,
+  internalProfile NVARCHAR(255)
 )
 GO
 

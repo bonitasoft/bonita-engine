@@ -36,6 +36,9 @@ public class ApplicationNode {
     @XmlAttribute(required = true)
     private String version;
 
+    @XmlAttribute
+    private String internalProfile;
+
     @XmlElement(required = true)
     private String displayName;
 
@@ -172,28 +175,31 @@ public class ApplicationNode {
         applicationMenus.add(applicationMenu);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ApplicationNode) {
-            ApplicationNode applicationNode = (ApplicationNode) obj;
-
-            return new EqualsBuilder()
-                    .append(version, applicationNode.getVersion())
-                    .append(theme, applicationNode.getTheme())
-                    .append(token, applicationNode.getToken())
-                    .append(state, applicationNode.getState())
-                    .append(profile, applicationNode.getProfile())
-                    .append(layout, applicationNode.getLayout())
-                    .append(iconPath, applicationNode.getIconPath())
-                    .append(homePage, applicationNode.getHomePage())
-                    .append(displayName, applicationNode.getDisplayName())
-                    .append(description, applicationNode.getDescription())
-                    .isEquals()
-                    && getApplicationMenus().stream()
-                            .allMatch(menu -> applicationNode.getApplicationMenus().stream().anyMatch(menu::equals))
-                    && getApplicationPages().stream()
-                            .allMatch(page -> applicationNode.getApplicationPages().stream().anyMatch(page::equals));
-        }
-        return false;
+    public String getInternalProfile() {
+        return internalProfile;
     }
+
+    public void setInternalProfile(String internalProfile) {
+        this.internalProfile = internalProfile;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ApplicationNode that = (ApplicationNode) o;
+
+        return new EqualsBuilder().append(getToken(), that.getToken()).append(getVersion(), that.getVersion())
+                .append(getDisplayName(), that.getDisplayName()).append(getInternalProfile(), that.getInternalProfile())
+                .append(getDescription(), that.getDescription()).append(getProfile(), that.getProfile())
+                .append(getHomePage(), that.getHomePage()).append(getState(), that.getState())
+                .append(getLayout(), that.getLayout()).append(getTheme(), that.getTheme())
+                .append(getIconPath(), that.getIconPath()).append(getApplicationPages(), that.getApplicationPages())
+                .append(getApplicationMenus(), that.getApplicationMenus()).isEquals();
+    }
+
 }

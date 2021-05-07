@@ -537,7 +537,8 @@ CREATE TABLE business_app (
   themeId BIGINT,
   iconMimeType VARCHAR(255),
   iconContent LONGBLOB,
-  displayName VARCHAR(255) NOT NULL
+  displayName VARCHAR(255) NOT NULL,
+  internalProfile VARCHAR(255)
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
