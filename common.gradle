@@ -2,14 +2,16 @@ allprojects {
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
     apply plugin: 'idea'
+    apply plugin: 'com.bonitasoft.gradle.maven-settings'
     group = 'org.bonitasoft.engine'
 
     publishing {
         repositories {
             if (project.hasProperty("altDeploymentRepository")) {
-                def mavenUrl = project.getProperties()."altDeploymentRepository".split("::").last()
+                def repoProperties = project.getProperties()."altDeploymentRepository".split("::")
                 maven {
-                    url = mavenUrl
+                    name = repoProperties.first()
+                    url = repoProperties.last()
                 }
             }
         }
