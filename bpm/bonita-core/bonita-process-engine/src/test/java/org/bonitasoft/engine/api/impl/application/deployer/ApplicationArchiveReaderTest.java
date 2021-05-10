@@ -34,14 +34,14 @@ public class ApplicationArchiveReaderTest {
     public void should_read_application_archive_with_a_live_application() throws Exception {
         byte[] zip = zip(
                 file("apps/MyApp.xml",
-                        "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>"));
+                        "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.1\"></applications>"));
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
         assertThat(applicationArchive.getApplications()).hasOnlyOneElementSatisfying(a -> {
             assertThat(a.getFileName()).isEqualTo("MyApp.xml");
             assertThat(new String(a.getContent())).contains(
-                    "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>");
+                    "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.1\"></applications>");
         });
     }
 

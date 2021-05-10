@@ -15,8 +15,8 @@
  * @author Elias Ricken de Medeiros
  */
 
-@XmlSchema(namespace = "http://documentation.bonitasoft.com/application-xml-schema/1.0", elementFormDefault = XmlNsForm.QUALIFIED, xmlns = {
-        @XmlNs(prefix = "", namespaceURI = "http://documentation.bonitasoft.com/application-xml-schema/1.0") })
+@XmlSchema(namespace = "http://documentation.bonitasoft.com/application-xml-schema/1.1", elementFormDefault = XmlNsForm.QUALIFIED, xmlns = {
+        @XmlNs(prefix = "", namespaceURI = "http://documentation.bonitasoft.com/application-xml-schema/1.1") })
 package org.bonitasoft.engine.business.application.xml;
 
 import javax.xml.bind.annotation.XmlNs;
