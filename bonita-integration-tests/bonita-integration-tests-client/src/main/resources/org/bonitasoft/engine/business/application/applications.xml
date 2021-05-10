@@ -13,7 +13,7 @@
   ~ Floor, Boston, MA 02110-1301, USA.
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.1">
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
     <application profile="User" state="ACTIVATED" token="HR-dashboard" version="2.0" homePage="my-new-custom-page" layout="custompage_layoutBonita" theme="custompage_themeBonita">
         <displayName>My HR dashboard</displayName>
         <description>This is the HR dashboard.</description>

@@ -26,7 +26,7 @@ public class ArtifactTypeDetector {
 
     private static final Logger logger = LoggerFactory.getLogger(ArtifactTypeDetector.class);
 
-    private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.1";
+    private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.0";
     private static final String REST_API_EXTENSION_CONTENT_TYPE = "apiExtension";
 
     private final XmlDetector xmlDetector;
