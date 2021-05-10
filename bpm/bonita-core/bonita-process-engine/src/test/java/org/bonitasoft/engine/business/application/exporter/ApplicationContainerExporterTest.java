@@ -29,6 +29,6 @@ public class ApplicationContainerExporterTest {
 
         //then
         assertThat(new String(bytes)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.1\"/>\n");
+                "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"/>\n");
     }
 }
