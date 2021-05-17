@@ -40,6 +40,11 @@ processResources {
 
 configurations { distributionZip }
 
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
 distTar.enabled = false
 distributions {
     main {
@@ -54,6 +59,7 @@ publishing {
         mavenJava(MavenPublication) {
             from project.components.java
             artifact distZip
+            artifact project.sourcesJar
             pom { pom ->
                 name = "Bonita Platform Resources"
                 description = "Bonita Platform Resources serves to setup Bonita platform"
