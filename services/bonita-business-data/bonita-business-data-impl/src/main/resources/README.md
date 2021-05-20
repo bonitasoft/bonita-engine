@@ -8,7 +8,7 @@ To do that:
 
 * Create a new maven project using `example-pom.xml`
 * Extract the two jars `bdm-dao.jar` and `bdm-model.jar` from the zip file, next to your `pom.xml`
-* Make sure the engine is accessible using the HTTP API (See https://documentation.bonitasoft.com/bonita/current/configure-client-of-bonita-bpm-engine#toc5 for details)
+* Make sure the engine is accessible using [the HTTP API](https://documentation.bonitasoft.com/bonita/latest/configure-client-of-bonita-bpm-engine#_server_configuration_to_accept_http_connection).
 
 Here  is an example on how to retrieve the DAO to find your objects
 ```java
