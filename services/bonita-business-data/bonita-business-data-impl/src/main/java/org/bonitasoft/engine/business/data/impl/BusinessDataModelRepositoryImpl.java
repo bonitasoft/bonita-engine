@@ -173,7 +173,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                     BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
-            classLoaderService.refreshClassLoaderImmediately(ScopeType.TENANT, tenantId);
+            classLoaderService.refreshClassLoaderImmediatelyWithRollback(ScopeType.TENANT, tenantId);
             classLoaderService.refreshClassLoaderOnOtherNodes(ScopeType.TENANT, tenantId);
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();

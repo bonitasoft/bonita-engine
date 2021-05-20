@@ -107,6 +107,17 @@ public interface ClassLoaderService extends PlatformLifecycleService {
 
     void refreshClassLoaderOnOtherNodes(ScopeType type, long id) throws SClassLoaderException;
 
+    /**
+     * This method refreshes in the current thread/transaction the classLoader with the given identifier.
+     * Contrary to refreshClassLoaderImmediately, it creates a synchronization that triggers a reload of the classloader
+     * in case the transaction was rolled back, insuring there is no new loaded class in the classloader after the
+     * rollback.
+     *
+     * @param type scope in wich the classloader should be refreshed
+     * @param id identifier of the classloader
+     */
+    void refreshClassLoaderImmediatelyWithRollback(ScopeType type, long id) throws SClassLoaderException;
+
     void refreshClassLoaderImmediately(ScopeType type, long id) throws SClassLoaderException;
 
     void removeRefreshClassLoaderSynchronization();
