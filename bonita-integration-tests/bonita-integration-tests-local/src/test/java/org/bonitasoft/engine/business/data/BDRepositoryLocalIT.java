@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.business.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.BDMTestUtil.buildSimpleBom;
+import static org.bonitasoft.engine.test.BDMTestUtil.getZip;
 
 import java.io.File;
 import java.io.Serializable;
@@ -45,8 +47,12 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BDRepositoryLocalIT extends CommonAPIIT {
+
+    private static final Logger log = LoggerFactory.getLogger(BDRepositoryLocalIT.class);
 
     private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
 
@@ -511,6 +517,22 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
                         .contains("bigint identity", "persistenceId");
                 break;
         }
+    }
+
+    @Test
+    @Ignore("RUNTIME-27")
+    public void deploying_bdm_while_restarting_services_fails_gracefully() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        final BusinessObjectModel bom = buildSimpleBom("com.company.test.Bo");
+        final byte[] zip = getZip(bom);
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance();
+        //mimic the restarting of the services after a short timeout
+        tenantServiceAccessor.getBusinessDataRepository().start();
+        getTenantAdministrationAPI().installBusinessDataModel(zip);
+        Thread.sleep(5000);
+        getTenantAdministrationAPI().resume();
     }
 
     private List execute_native_sql(String query) throws Exception {

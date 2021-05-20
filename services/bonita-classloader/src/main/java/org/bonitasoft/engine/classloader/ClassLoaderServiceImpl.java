@@ -15,11 +15,7 @@ package org.bonitasoft.engine.classloader;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
@@ -30,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.classloader.listeners.ClassReflectorClearer;
 import org.bonitasoft.engine.classloader.listeners.JacksonCacheClearer;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
@@ -331,6 +328,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
+    public void refreshClassLoaderImmediatelyWithRollback(final ScopeType type, final long id)
+            throws SClassLoaderException {
+        refreshClassLoaderImmediately(type, id);
+        registerAfterCommitClassloaderUpdate(type, id);
+    }
+
+    @Override
     public void refreshClassLoaderImmediately(final ScopeType type, final long id) throws SClassLoaderException {
         final Stream<BonitaResource> resources;
         resources = getDependencies(type, id);
@@ -338,6 +342,28 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             refreshGlobalClassLoader(resources);
         } else {
             refreshLocalClassLoader(type.name(), id, resources);
+        }
+    }
+
+    private void registerAfterCommitClassloaderUpdate(ScopeType type, long id) throws SClassLoaderException {
+        try {
+            userTransactionService.registerBonitaSynchronization((BonitaTransactionSynchronization) i -> {
+                if (i != Status.STATUS_COMMITTED) {
+                    try {
+                        log.warn("The transaction was not commited. Refreshing classloader on tenantId "
+                                + sessionAccessor.getTenantId() + " to return to a clean state.");
+                        classLoaderUpdater.refreshClassloaders(this, sessionAccessor.getTenantId(),
+                                Collections.singleton(new Pair<>(type, id)));
+                    } catch (STenantIdNotSetException e) {
+                        //sessionAccessor.getTenantId() is called by getDependencies in refreshClassLoaderImmediately
+                        // In other words this should never happen
+                        log.error("Cannot find the tenantID to refresh classloader on. This should not happen.");
+                        throw new BonitaRuntimeException(e);
+                    }
+                }
+            });
+        } catch (STransactionNotFoundException e) {
+            throw new SClassLoaderException(e);
         }
     }
 

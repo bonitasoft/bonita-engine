@@ -17,9 +17,8 @@ import static java.util.Collections.singletonList;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
+import static org.bonitasoft.engine.test.BDMTestUtil.*;
 import static org.bonitasoft.engine.test.BuildTestUtil.generateConnectorImplementation;
 
 import java.io.ByteArrayInputStream;
@@ -30,14 +29,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -104,10 +97,7 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
@@ -162,6 +152,55 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     @Test
+    @Ignore("Fix Runtime-34")
+    public void deploying_bdm_with_invalid_query_generates_should_throw_an_invalid_BDM_exception() throws Exception {
+
+        final BusinessObjectModel bom = buildBOMWithInvalidQuery();
+        final byte[] zip = getZip(bom);
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        assertThatThrownBy(() -> getTenantAdministrationAPI().installBusinessDataModel(zip))
+                .isInstanceOf(InvalidBusinessDataModelException.class);
+        getTenantAdministrationAPI().resume();
+        assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion())
+                .as("should not have deployed a new version of BDM")
+                .isNull();
+    }
+
+    @Test
+    public void deploying_a_bdm_with_unique_constraint_on_multiple_field_should_fail_and_allow_to_deploy_a_clean_bdm_afterwards()
+            throws Exception {
+        // create bom - invalid
+        final SimpleField name = new SimpleField();
+        name.setName("name");
+        name.setCollection(true);
+        name.setType(FieldType.STRING);
+
+        final BusinessObject countryBO = new BusinessObject();
+        countryBO.setQualifiedName(COUNTRY_QUALIFIED_NAME);
+        countryBO.addField(name);
+        countryBO.addUniqueConstraint("uk_name", "name");
+
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(countryBO);
+
+        //test sequence - install should fail (Invalid BDM)
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        // the exception should be InvalidBusinessDataModelException
+        assertThatThrownBy(() -> getTenantAdministrationAPI().installBusinessDataModel(getZip(bom)))
+                .isInstanceOf(BonitaRuntimeException.class)
+                .hasMessageContaining("Unable to create unique key constraint");
+        assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNull();
+
+        // remove unique constraint & try to re-install - should work
+        countryBO.setUniqueConstraints(Collections.emptyList());
+        getTenantAdministrationAPI().installBusinessDataModel(getZip(bom));
+        assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNotNull();
+        getTenantAdministrationAPI().resume();
+    }
+
+    @Test
     public void deploying_bdm_after_process_should_put_process_in_resolved_state() throws Exception {
         final String qualifiedName = "com.company.test.Bo";
         final BusinessObjectModel bom = buildSimpleBom(qualifiedName);
@@ -181,8 +220,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     private void installBusinessDataModel(final BusinessObjectModel bom) throws Exception {
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(bom);
+        final byte[] zip = getZip(bom);
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         final String businessDataModelVersion = getTenantAdministrationAPI().installBusinessDataModel(zip);
@@ -212,34 +250,6 @@ public class BDRepositoryIT extends CommonAPIIT {
                         .setProcessDefinition(processDefinitionBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, testUser.getId());
         return processDefinition;
-    }
-
-    private BusinessObjectModel buildSimpleBom(final String boQualifiedName) {
-        return businessObjectModel(bom -> {
-            bom.addBusinessObject(businessObject(boQualifiedName, (businessObject) -> {
-                businessObject.addField(stringField("aField"));
-            }));
-        });
-    }
-
-    private BusinessObjectModel businessObjectModel(Consumer<BusinessObjectModel> apply) {
-        BusinessObjectModel businessObjectModel = new BusinessObjectModel();
-        apply.accept(businessObjectModel);
-        return businessObjectModel;
-    }
-
-    private BusinessObject businessObject(String boQualifiedName, Consumer<BusinessObject> apply) {
-        final BusinessObject bo = new BusinessObject();
-        bo.setQualifiedName(boQualifiedName);
-        apply.accept(bo);
-        return bo;
-    }
-
-    private SimpleField stringField(String name) {
-        final SimpleField field = new SimpleField();
-        field.setName(name);
-        field.setType(FieldType.STRING);
-        return field;
     }
 
     @Test
@@ -2662,5 +2672,18 @@ public class BDRepositoryIT extends CommonAPIIT {
                     .setRightOperand(addressExpression).done();
         }
 
+    }
+
+    private BusinessObjectModel buildBOMWithInvalidQuery() {
+
+        return businessObjectModel(
+                bom -> bom.addBusinessObject(businessObject("com.acme.Cat",
+                        bo -> {
+                            bo.addField(stringField("name"));
+                            bo.addField(stringField("color"));
+                            bo.addField(stringField("furType"));
+                            bo.addQuery("findCatByColor", "SELECT c from com.acme.Cat \" c WHERE c.color = :color",
+                                    "com.acme.Cat");
+                        })));
     }
 }
