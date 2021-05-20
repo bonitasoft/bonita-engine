@@ -16,6 +16,7 @@ package org.bonitasoft.engine.classloader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
@@ -25,7 +26,6 @@ import javax.transaction.Status;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;

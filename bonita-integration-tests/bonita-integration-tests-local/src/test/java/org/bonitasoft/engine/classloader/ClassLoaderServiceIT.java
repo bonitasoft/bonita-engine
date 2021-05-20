@@ -577,21 +577,21 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         getTransactionService().begin();
         dependencyService.createMappedDependency("myResource.jar",
                 IOUtil.generateJar(Collections.singletonMap("test.xml", "<node>content</mode>".getBytes())),
-                "myResource.jar", ID1, TYPE1);
-        classLoaderService.refreshClassLoaderAfterUpdate(TYPE1, ID1);
+                "myResource.jar", ID1, PROCESS);
+        classLoaderService.refreshClassLoaderAfterUpdate(identifier(PROCESS, ID1));
         getTransactionService().complete();
-        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test.xml")).isNotNull();
+        assertThat(classLoaderService.getClassLoader(identifier(PROCESS, ID1)).getResource("test.xml")).isNotNull();
 
         getTransactionService().begin();
         dependencyService.createMappedDependency("myResource2.jar",
                 IOUtil.generateJar(Collections.singletonMap("test2.xml", "<node>content</mode>".getBytes())),
-                "myResource2.jar", ID1, TYPE1);
-        classLoaderService.refreshClassLoaderImmediatelyWithRollback(TYPE1, ID1);
-        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test2.xml")).isNotNull();
+                "myResource2.jar", ID1, PROCESS);
+        classLoaderService.refreshClassLoaderImmediatelyWithRollback(identifier(PROCESS, ID1));
+        assertThat(classLoaderService.getClassLoader(identifier(PROCESS, ID1)).getResource("test2.xml")).isNotNull();
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
-        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test.xml")).isNotNull();
-        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test2.xml")).isNull();
+        assertThat(classLoaderService.getClassLoader(identifier(PROCESS, ID1)).getResource("test.xml")).isNotNull();
+        assertThat(classLoaderService.getClassLoader(identifier(PROCESS, ID1)).getResource("test2.xml")).isNull();
 
     }
 
@@ -601,20 +601,20 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         getTransactionService().begin();
         dependencyService.createMappedDependency("myResource.jar",
                 IOUtil.generateJar(Collections.singletonMap("test.xml", "<node>content</mode>".getBytes())),
-                "myResource.jar", ID1, TYPE1);
-        classLoaderService.refreshClassLoaderAfterUpdate(TYPE1, ID1);
+                "myResource.jar", ID1, PROCESS);
+        classLoaderService.refreshClassLoaderAfterUpdate(identifier(PROCESS, ID1));
         getTransactionService().complete();
-        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test.xml")).isNotNull();
+        assertThat(classLoaderService.getClassLoader(identifier(PROCESS, ID1)).getResource("test.xml")).isNotNull();
 
         getTransactionService().begin();
         dependencyService.createMappedDependency("myResource2.jar",
                 IOUtil.generateJar(Collections.singletonMap("test2.xml", "<node>content</mode>".getBytes())),
-                "myResource2.jar", ID1, TYPE1);
-        classLoaderService.refreshClassLoaderImmediatelyWithRollback(TYPE1, ID1);
-        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test2.xml")).isNotNull();
+                "myResource2.jar", ID1, PROCESS);
+        classLoaderService.refreshClassLoaderImmediatelyWithRollback(identifier(PROCESS, ID1));
+        assertThat(classLoaderService.getClassLoader(identifier(PROCESS, ID1)).getResource("test2.xml")).isNotNull();
         getTransactionService().complete();
-        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test.xml")).isNotNull();
-        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test2.xml")).isNotNull();
+        assertThat(classLoaderService.getClassLoader(identifier(PROCESS, ID1)).getResource("test.xml")).isNotNull();
+        assertThat(classLoaderService.getClassLoader(identifier(PROCESS, ID1)).getResource("test2.xml")).isNotNull();
 
     }
 
