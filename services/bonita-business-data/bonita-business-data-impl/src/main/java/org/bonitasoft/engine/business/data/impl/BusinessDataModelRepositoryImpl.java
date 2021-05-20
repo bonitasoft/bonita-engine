@@ -176,7 +176,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                     ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
             ClassLoaderIdentifier tenantClassLoader = identifier(ScopeType.TENANT, tenantId);
-            classLoaderService.refreshClassLoaderImmediately(tenantClassLoader);
+            classLoaderService.refreshClassLoaderImmediatelyWithRollback(tenantClassLoader);
             classLoaderService.refreshClassLoaderOnOtherNodes(tenantClassLoader);
             //replace the tenant classloader by the one that was just refreshed
             Thread.currentThread().setContextClassLoader(classLoaderService.getClassLoader(tenantClassLoader));

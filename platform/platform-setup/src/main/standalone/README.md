@@ -24,5 +24,5 @@ To run the tool:
 
 More details
 ---
-See [the dedicated page](https://documentation.bonitasoft.com/bonita/current/BonitaBPM_platform_setup) for more info
+See [the dedicated page](https://documentation.bonitasoft.com/bonita/latest/BonitaBPM_platform_setup) for more info
 about the Bonita Platform Setup tool.
