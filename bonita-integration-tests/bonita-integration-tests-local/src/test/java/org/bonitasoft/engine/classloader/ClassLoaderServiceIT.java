@@ -571,6 +571,53 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
 
     }
 
+    @Test
+    public void in_case_of_rollback_classloader_should_end_in_same_state_after_calling_refreshClassloaderImmediatelyWithRollback()
+            throws Exception {
+        getTransactionService().begin();
+        dependencyService.createMappedDependency("myResource.jar",
+                IOUtil.generateJar(Collections.singletonMap("test.xml", "<node>content</mode>".getBytes())),
+                "myResource.jar", ID1, TYPE1);
+        classLoaderService.refreshClassLoaderAfterUpdate(TYPE1, ID1);
+        getTransactionService().complete();
+        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test.xml")).isNotNull();
+
+        getTransactionService().begin();
+        dependencyService.createMappedDependency("myResource2.jar",
+                IOUtil.generateJar(Collections.singletonMap("test2.xml", "<node>content</mode>".getBytes())),
+                "myResource2.jar", ID1, TYPE1);
+        classLoaderService.refreshClassLoaderImmediatelyWithRollback(TYPE1, ID1);
+        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test2.xml")).isNotNull();
+        getTransactionService().setRollbackOnly();
+        getTransactionService().complete();
+        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test.xml")).isNotNull();
+        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test2.xml")).isNull();
+
+    }
+
+    @Test
+    public void refreshClassloaderImmediatelyWithRollback_should_update_classloader_if_transaction_is_committed()
+            throws Exception {
+        getTransactionService().begin();
+        dependencyService.createMappedDependency("myResource.jar",
+                IOUtil.generateJar(Collections.singletonMap("test.xml", "<node>content</mode>".getBytes())),
+                "myResource.jar", ID1, TYPE1);
+        classLoaderService.refreshClassLoaderAfterUpdate(TYPE1, ID1);
+        getTransactionService().complete();
+        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test.xml")).isNotNull();
+
+        getTransactionService().begin();
+        dependencyService.createMappedDependency("myResource2.jar",
+                IOUtil.generateJar(Collections.singletonMap("test2.xml", "<node>content</mode>".getBytes())),
+                "myResource2.jar", ID1, TYPE1);
+        classLoaderService.refreshClassLoaderImmediatelyWithRollback(TYPE1, ID1);
+        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test2.xml")).isNotNull();
+        getTransactionService().complete();
+        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test.xml")).isNotNull();
+        assertThat(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).getResource("test2.xml")).isNotNull();
+
+    }
+
     private String readUrl(URL resource) throws IOException {
         URLConnection urlConnection = resource.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
