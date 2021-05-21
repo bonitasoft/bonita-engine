@@ -125,6 +125,22 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
+    public void onUpdate_should_not_throw_NPE_if_entity_manager_factory_is_null_but_still_recreate_the_factory() {
+        //given
+        EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
+        doReturn(entityManagerFactory).when(repository).createEntityManagerFactory();
+        //when
+        repository.onUpdate(null);
+        //then
+        verifyNoInteractions(entityManagerFactory);
+        verify(repository, times(1)).createEntityManagerFactory();
+        verify(loggerService.asLogger(JPABusinessDataRepositoryImpl.class))
+                .warn("There is no active entity manager factory! A new one will be created");
+        verify(loggerService.asLogger(JPABusinessDataRepositoryImpl.class))
+                .warn("It usually means that tenant operations were resumed while a BDM was installing");
+    }
+
+    @Test
     public void findById_should_not_detach_entities() throws Exception {
         final Address address1 = new Address(PRIMARY_KEY_1);
         when(manager.find(Address.class, PRIMARY_KEY_1)).thenReturn(address1);
