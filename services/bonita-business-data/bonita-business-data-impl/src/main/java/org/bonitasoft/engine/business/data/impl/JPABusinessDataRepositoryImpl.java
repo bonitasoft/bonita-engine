@@ -120,7 +120,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
             final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(newClassLoader);
-                entityManagerFactory.close();
+                if (entityManagerFactory != null) {
+                    entityManagerFactory.close();
+                } else {
+                    log.warn("There is no active entity manager factory! A new one will be created");
+                    log.warn("It usually means that tenant operations were resumed while a BDM was installing");
+                }
                 entityManagerFactory = createEntityManagerFactory();
             } finally {
                 Thread.currentThread().setContextClassLoader(currentClassLoader);
