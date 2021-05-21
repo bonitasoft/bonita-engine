@@ -31,6 +31,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -59,34 +62,15 @@ import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
-import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
-import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.process.impl.*;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.ExpressionConstants;
-import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.expression.ExpressionType;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.expression.*;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -219,6 +203,30 @@ public class BDRepositoryIT extends CommonAPIIT {
         deleteProcess(processDefinition);
     }
 
+    @Test
+    public void should_not_fail_when_resuming_tenant_during_install_of_bdm() throws Exception {
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        Future<?> installOfTheBDM = Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                getTenantAdministrationAPI().installBusinessDataModel(getZip(businessObjectModel(bom -> {
+                    bom.addBusinessObject(businessObject("com.compagny.ExampleBusinessObject", (businessObject) -> {
+                        businessObject.addField(stringField("aField"));
+                        businessObject.addQuery("findExampleByAField", "SELECT e FROM ExampleBusinessObject e",
+                                "com.compagny.ExampleBusinessObject");
+                    }));
+                })));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Thread.sleep(50);
+        getTenantAdministrationAPI().resume();
+        installOfTheBDM.get(10, TimeUnit.SECONDS);
+        assertThatNoException().isThrownBy(() -> getBusinessDataByQuery(Collections.emptyMap(), 0, 10,
+                "findExampleByAField", "com.compagny.ExampleBusinessObject"));
+    }
+
     private void installBusinessDataModel(final BusinessObjectModel bom) throws Exception {
         final byte[] zip = getZip(bom);
         getTenantAdministrationAPI().pause();
@@ -231,11 +239,11 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     private void verifyBdmIsWellDeployed() throws Exception {
         final String businessDataModelVersion = getTenantAdministrationAPI().getBusinessDataModelVersion();
-        APITestUtil.LOGGER.warn("previous businessDataModelVersion:" + this.bdmDeployedVersion);
+        APITestUtil.LOGGER.warn("previous businessDataModelVersion:" + bdmDeployedVersion);
         APITestUtil.LOGGER.warn("new businessDataModelVersion     :" + businessDataModelVersion);
         assertThat(businessDataModelVersion).as("should have deployed a new version of BDM")
-                .isNotEqualTo(this.bdmDeployedVersion);
-        this.bdmDeployedVersion = businessDataModelVersion;
+                .isNotEqualTo(bdmDeployedVersion);
+        bdmDeployedVersion = businessDataModelVersion;
     }
 
     private ProcessDefinition deploySimpleProcessWithBusinessData(final String aQualifiedName) throws Exception {
@@ -292,7 +300,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
                 ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(definition.getId(),
-                Collections.singletonMap(processContractInputName, (Serializable) initialLastNameValue));
+                Collections.singletonMap(processContractInputName, initialLastNameValue));
 
         final long step0 = waitForUserTask(processInstance, "step0");
 
@@ -1103,7 +1111,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         expressions.put(
                 new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee",
                         Long.class.getName()),
-                Collections.<String, Serializable> emptyMap());
+                Collections.emptyMap());
 
         final long processInstanceId = processInstance.getId();
         Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId,
@@ -1123,7 +1131,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         expressions.put(
                 new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee",
                         Long.class.getName()),
-                Collections.<String, Serializable> emptyMap());
+                Collections.emptyMap());
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId,
                 expressions);
@@ -1476,7 +1484,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                 String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression("employee", EMPLOYEE_QUALIFIED_NAME));
         final Serializable employeeResult = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id,
-                Collections.<Expression, Map<String, Serializable>> singletonMap(employee, null)).get("script");
+                Collections.singletonMap(employee, null)).get("script");
         assertThat(employeeResult).isEqualTo("theValue");
         getProcessAPI().assignUserTask(step1Id, testUser.getId());
         getProcessAPI().executeFlowNode(step1Id);
@@ -1549,7 +1557,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(
                 instance.getId(),
                 Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"),
-                        Collections.<String, Serializable> emptyMap()));
+                        Collections.emptyMap()));
         assertThat(employee).hasSize(1);
         assertThat(employee.get("myEmployees")).isInstanceOf(MultipleBusinessDataReference.class);
         final MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
@@ -1735,21 +1743,10 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     private void verifyCommandGetQuery_findByFirstNameFetchAddresses() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<>();
-        final Map<String, Serializable> queryParameters = new HashMap<>();
 
-        queryParameters.put("firstName", "Alphonse");
-
-        parameters.put("queryName", FIND_BY_FIRST_NAME_FETCH_ADDRESSES);
-        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIFIED_NAME);
-        parameters.put("startIndex", 0);
-        parameters.put("maxResults", 10);
-        parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
-        parameters.put("queryParameters", (Serializable) queryParameters);
-
-        // when
-        final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI()
-                .execute("getBusinessDataByQueryCommand", parameters);
+        final BusinessDataQueryResult businessDataQueryResult = getBusinessDataByQuery(
+                Collections.singletonMap("firstName", "Alphonse"),
+                0, 10, FIND_BY_FIRST_NAME_FETCH_ADDRESSES, EMPLOYEE_QUALIFIED_NAME);
 
         // then
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata())
@@ -1757,6 +1754,22 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee")
                 .hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
 
+    }
+
+    private BusinessDataQueryResult getBusinessDataByQuery(Map<String, Serializable> queryParameters,
+            int startIndex, int maxResult, String queryName, String entityClassName)
+            throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
+        Map<String, Serializable> parameters = new HashMap<>();
+        parameters.put("queryName", queryName);
+        parameters.put(ENTITY_CLASS_NAME, entityClassName);
+        parameters.put("startIndex", startIndex);
+        parameters.put("maxResults", maxResult);
+        parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
+        parameters.put("queryParameters", (Serializable) queryParameters);
+
+        // when
+        return (BusinessDataQueryResult) getCommandAPI()
+                .execute("getBusinessDataByQueryCommand", parameters);
     }
 
     private void verifyCommandGetQuery_countEmployee() throws Exception {
@@ -1779,21 +1792,12 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     private void verifyCommandGetQuery_findByHireDate() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<>();
         final Map<String, Serializable> queryParameters = new HashMap<>();
         queryParameters.put("date1", "1930-01-15");
         queryParameters.put("date2", "2050-12-31");
 
-        parameters.put("queryName", FIND_BY_HIRE_DATE_RANGE);
-        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIFIED_NAME);
-        parameters.put("startIndex", 0);
-        parameters.put("maxResults", 10);
-        parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
-        parameters.put("queryParameters", (Serializable) queryParameters);
-
-        // when
-        final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI()
-                .execute("getBusinessDataByQueryCommand", parameters);
+        final BusinessDataQueryResult businessDataQueryResult = getBusinessDataByQuery(queryParameters, 0, 10,
+                FIND_BY_HIRE_DATE_RANGE, EMPLOYEE_QUALIFIED_NAME);
 
         // then
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee")
@@ -2225,7 +2229,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         expressions.put(
                 new ExpressionBuilder().createQueryBusinessDataExpression("countAddresses", "Address.countAddress",
                         Long.class.getName()),
-                Collections.<String, Serializable> emptyMap());
+                Collections.emptyMap());
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId,
                 expressions);
@@ -2392,7 +2396,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME,
                 testUser);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
-                Collections.<String, Serializable> singletonMap("employeeName", "Doe"));
+                Collections.singletonMap("employeeName", "Doe"));
         //when
         waitForUserTask("userTask");
         assertThat(new String(getProcessAPI().getDocumentContent(
@@ -2455,7 +2459,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME,
                 testUser);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
-                Collections.<String, Serializable> singletonMap("employeeName", "Doe"));
+                Collections.singletonMap("employeeName", "Doe"));
         waitForUserTask("userTask");
         assertThatJson(
                 getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(

@@ -40,6 +40,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.tenant.TenantResourceType;
+import org.bonitasoft.engine.tenant.TenantStateManager;
 
 /**
  * @author Matthieu Chaffotte
@@ -153,9 +154,16 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            return bdmRepository.install(zip, tenantAccessor.getTenantId(), userId);
+            TenantStateManager tenantStateManager = tenantAccessor.getTenantStateManager();
+            return tenantStateManager.executeTenantManagementOperation("BDM Installation", () -> {
+                return bdmRepository.install(zip, tenantAccessor.getTenantId(), userId);
+            });
         } catch (final SBusinessDataRepositoryDeploymentException e) {
             throw new BusinessDataRepositoryDeploymentException(e);
+        } catch (final InvalidBusinessDataModelException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
         }
     }
 
@@ -165,9 +173,15 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            bdmRepository.uninstall(tenantAccessor.getTenantId());
+            TenantStateManager tenantStateManager = tenantAccessor.getTenantStateManager();
+            tenantStateManager.executeTenantManagementOperation("BDM Uninstallation", () -> {
+                bdmRepository.uninstall(tenantAccessor.getTenantId());
+                return null;
+            });
         } catch (final SBusinessDataRepositoryException sbdre) {
             throw new BusinessDataRepositoryDeploymentException(sbdre);
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
         }
     }
 
@@ -177,9 +191,15 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            bdmRepository.dropAndUninstall(tenantAccessor.getTenantId());
+            TenantStateManager tenantStateManager = tenantAccessor.getTenantStateManager();
+            tenantStateManager.executeTenantManagementOperation("BDM Cleanup and uninstallation", () -> {
+                bdmRepository.dropAndUninstall(tenantAccessor.getTenantId());
+                return null;
+            });
         } catch (final SBusinessDataRepositoryException sbdre) {
             throw new BusinessDataRepositoryDeploymentException(sbdre);
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
         }
     }
 

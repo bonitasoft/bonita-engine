@@ -151,6 +151,11 @@ public class TenantAdministrationAPIImplTest {
         // Given
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         when(tenantServiceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
+        when(tenantStateManager.executeTenantManagementOperation(anyString(), any(Callable.class)))
+                .thenAnswer(invocation -> {
+                    Object[] args = invocation.getArguments();
+                    return ((Callable) args[1]).call();
+                });
 
         // When
         tenantManagementAPI.uninstallBusinessDataModel();
@@ -164,6 +169,11 @@ public class TenantAdministrationAPIImplTest {
         // Given
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         when(tenantServiceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
+        when(tenantStateManager.executeTenantManagementOperation(anyString(), any(Callable.class)))
+                .thenAnswer(invocation -> {
+                    Object[] args = invocation.getArguments();
+                    return ((Callable) args[1]).call();
+                });
         doThrow(new SBusinessDataRepositoryException("error")).when(repository).uninstall(anyLong());
 
         // When

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.tenant;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 
 /**
@@ -33,22 +34,26 @@ class ChangesServicesStateCallable implements Callable<Void>, Serializable {
 
     @Override
     public Void call() throws Exception {
-        TenantServicesManager tenantServicesManager = TenantServiceSingleton.getInstance(tenantId)
-                .getTenantServicesManager();
-        switch (action) {
-            case START:
-                tenantServicesManager.start();
-                break;
-            case STOP:
-                tenantServicesManager.stop();
-                break;
-            case PAUSE:
-                tenantServicesManager.pause();
-                break;
-            case RESUME:
-                tenantServicesManager.resume();
-                break;
-        }
-        return null;
+        TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance(tenantId);
+        TenantServicesManager tenantServicesManager = tenantServiceAccessor.getTenantServicesManager();
+        TenantStateManager tenantStateManager = tenantServiceAccessor.getTenantStateManager();
+        return tenantStateManager.executeTenantManagementOperation(
+                "Executing received " + action.name().toLowerCase() + " operation", () -> {
+                    switch (action) {
+                        case START:
+                            tenantServicesManager.start();
+                            break;
+                        case STOP:
+                            tenantServicesManager.stop();
+                            break;
+                        case PAUSE:
+                            tenantServicesManager.pause();
+                            break;
+                        case RESUME:
+                            tenantServicesManager.resume();
+                            break;
+                    }
+                    return null;
+                });
     }
 }
