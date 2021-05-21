@@ -17,6 +17,7 @@ import static org.bonitasoft.engine.tenant.TenantServicesManager.ServiceAction.*
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -79,7 +80,7 @@ public class TenantStateManager {
      * - delete session if its the only node
      * **Called outside of a transaction in a platform-level session**
      */
-    public void stop() throws Exception {
+    public synchronized void stop() throws Exception {
         if (nodeConfiguration.shouldClearSessions()) {
             sessionService.deleteSessions();
         }
@@ -92,7 +93,7 @@ public class TenantStateManager {
      * - resume elements if its the only node
      * **Called outside of a transaction in a platform-level session**
      */
-    public void start() throws Exception {
+    public synchronized void start() throws Exception {
         STenant tenant = getTenantInTransaction();
         tenantServicesManager.initServices();
         if (!tenant.isActivated()) {
@@ -119,7 +120,7 @@ public class TenantStateManager {
      * - other nodes pause the services
      * **Called outside a transaction with a tenant-level session**
      */
-    public void pause() throws Exception {
+    public synchronized void pause() throws Exception {
         LOGGER.info("Pausing tenant {}", tenantId);
         STenant tenant = getTenantInTransaction();
         if (!tenant.isActivated()) {
@@ -140,7 +141,7 @@ public class TenantStateManager {
      * - other nodes resume the services
      * **Called outside a transaction with a tenant-level session**
      */
-    public void resume() throws Exception {
+    public synchronized void resume() throws Exception {
         LOGGER.info("Resuming tenant {}", tenantId);
         STenant tenant = getTenantInTransaction();
         if (!tenant.isPaused()) {
@@ -202,7 +203,7 @@ public class TenantStateManager {
      * - services are started on other nodes
      * **Called outside a transaction in a platform-level session**
      */
-    public void activate() throws Exception {
+    public synchronized void activate() throws Exception {
         LOGGER.info("Activating tenant {}", tenantId);
         STenant tenant = getTenantInTransaction();
         if (!tenant.isDeactivated()) {
@@ -255,7 +256,7 @@ public class TenantStateManager {
      * - services are stopped on other nodes
      * **Called outside a transaction with a platform-level session**
      */
-    public void deactivate() throws Exception {
+    public synchronized void deactivate() throws Exception {
         LOGGER.info("Deactivating tenant {}", tenantId);
         STenant tenant = getTenantInTransaction();
         String previousStatus = tenant.getStatus();
@@ -272,4 +273,11 @@ public class TenantStateManager {
         LOGGER.info("Deactivated tenant {}", tenantId);
     }
 
+    public synchronized <T> T executeTenantManagementOperation(String operationName, Callable<T> operation)
+            throws Exception {
+        LOGGER.info("Executing synchronized tenant maintenance operation {} for tenant {}", operationName, tenantId);
+        T operationReturn = operation.call();
+        LOGGER.info("Successful synchronized tenant maintenance operation {} for tenant {}", operationName, tenantId);
+        return operationReturn;
+    }
 }
