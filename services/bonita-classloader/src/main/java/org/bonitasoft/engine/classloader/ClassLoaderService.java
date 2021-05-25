@@ -65,6 +65,14 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      * Contrary to refreshClassLoaderImmediately, it creates a synchronization that triggers a reload of the classloader
      * in case the transaction was rolled back, insuring there is no new loaded class in the classloader after the
      * rollback.
+     * <p>
+     * e.g. If the classloader was set as the current context classloader, it should be reset like this
+     *
+     * <pre>
+     *  {@code
+     * Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader(identifier));
+     * }
+     * </pre>
      *
      * @param identifier of the classloader to refresh
      */

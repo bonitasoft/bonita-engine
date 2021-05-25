@@ -187,6 +187,14 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     @Override
     @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
+    public String updateBusinessDataModel(final byte[] zip)
+            throws BusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException {
+        uninstallBusinessDataModel();
+        return installBusinessDataModel(zip);
+    }
+
+    @Override
+    @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     public void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {

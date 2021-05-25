@@ -76,6 +76,20 @@ public interface TenantAdministrationAPI {
     void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException;
 
     /**
+     * Update the business data model.
+     *
+     * @param zip
+     *        the binary content of the business object model.
+     * @return the version of the Business Data Model just deployed.
+     * @throws InvalidBusinessDataModelException
+     *         if the Business Data Model content passed as parameter is invalid.
+     * @throws BusinessDataRepositoryDeploymentException
+     *         if the deployment cannot be fulfilled completely.
+     */
+    String updateBusinessDataModel(final byte[] zip)
+            throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
+
+    /**
      * Deletes all business data and uninstalls the business data model.
      *
      * @throws BusinessDataRepositoryDeploymentException
