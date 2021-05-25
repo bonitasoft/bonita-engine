@@ -290,7 +290,9 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     public void uninstall(final long tenantId) throws SBusinessDataRepositoryException {
         try {
             dependencyService.deleteDependency(BDR_DEPENDENCY_NAME);
-            classLoaderService.refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, tenantId));
+            classLoaderService.refreshClassLoaderImmediatelyWithRollback(identifier(ScopeType.TENANT, tenantId));
+            Thread.currentThread()
+                    .setContextClassLoader(classLoaderService.getClassLoader(identifier(ScopeType.TENANT, tenantId)));
         } catch (final SDependencyNotFoundException sde) {
             // do nothing
         } catch (final SDependencyException | SClassLoaderException e) {

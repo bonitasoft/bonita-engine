@@ -48,6 +48,7 @@ import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -101,6 +102,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     private User testUser;
     private File clientFolder;
     private long tenantId;
+    private BusinessObjectModel model;
 
     @Before
     public void setUp() throws Exception {
@@ -110,7 +112,9 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
 
-        installBusinessDataModel(buildBOM());
+        model = buildBOM();
+
+        installBusinessDataModel(model);
 
         assertThat(getTenantAdministrationAPI().isPaused())
                 .as("should have resume tenant after installing Business Object Model").isFalse();
@@ -201,6 +205,94 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
 
         deleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_keep_old_bdm_in_case_of_update_bdm_error() throws Exception {
+        final AddressRef ref1 = new AddressRef("newYorkAddr", "33, corner street", "NY");
+        final AddressRef ref2 = new AddressRef("romeAddr", "2, plaza del popolo", "Roma");
+        addEmployee("Marcel", "Pagnol", ref1, ref2);
+
+        final BusinessObjectModelConverter businessObjectConverter = new BusinessObjectModelConverter();
+
+        final String processContractInputName = "name_input";
+
+        final Expression countryExpression = new ExpressionBuilder().createGroovyScriptExpression(
+                "createNewCountry",
+                new StringBuilder("import ")
+                        .append(COUNTRY_QUALIFIED_NAME)
+                        .append("; Country c = new Country(); c.name = " + processContractInputName + "; return c;")
+                        .toString(),
+                COUNTRY_QUALIFIED_NAME,
+                new ExpressionBuilder().createContractInputExpression(processContractInputName,
+                        String.class.getName()));
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
+                "shouldKeepOldBdmInCaseOfUpdateBdmError", "6.3-beta");
+        final String businessDataName = "countryName";
+        final String newCountryName = "France";
+        processDefinitionBuilder.addBusinessData(businessDataName, COUNTRY_QUALIFIED_NAME, countryExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addStartEvent("start");
+        processDefinitionBuilder.addUserTask("step0", ACTOR_NAME);
+        processDefinitionBuilder.addEndEvent("end");
+        processDefinitionBuilder.addTransition("start", "step0");
+        processDefinitionBuilder.addTransition("step0", "end");
+
+        processDefinitionBuilder.addContract().addInput(processContractInputName, Type.TEXT, null);
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                ACTOR_NAME, testUser);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(definition.getId(),
+                Collections.singletonMap(processContractInputName, newCountryName));
+
+        waitForUserTask("step0");
+
+        Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(1);
+
+        getTenantAdministrationAPI().pause();
+
+        final String modelVersionInDatabase = getTenantAdministrationAPI().getBusinessDataModelVersion();
+
+        final BusinessObject countryBO = model.getBusinessObjects().stream()
+                .filter(bo -> bo.getQualifiedName().equals(COUNTRY_QUALIFIED_NAME)).findFirst().get();
+
+        final SimpleField population = new SimpleField();
+        population.setName("population");
+        population.setType(FieldType.STRING);
+        countryBO.addField(population);
+
+        final BusinessObject employeeBO = model.getBusinessObjects().stream()
+                .filter(bo -> bo.getQualifiedName().equals(EMPLOYEE_QUALIFIED_NAME)).findFirst().get();
+
+        ((RelationField) employeeBO.getField("addresses")).setType(RelationField.Type.COMPOSITION);
+
+        try {
+            getTenantAdministrationAPI().updateBusinessDataModel(businessObjectConverter.zip(model));
+            fail("should not be able to update the bdm");
+        } catch (BusinessDataRepositoryDeploymentException ignored) {
+            log.error("ignored ", ignored);
+        }
+
+        assertThat(modelVersionInDatabase).isEqualTo(getTenantAdministrationAPI().getBusinessDataModelVersion());
+
+        getTenantAdministrationAPI().resume();
+
+        final String expressionPopulation = "bizDataExprName";
+        expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionPopulation,
+                businessDataName + ".population", String.class.getName(),
+                new ExpressionBuilder().createBusinessDataExpression(businessDataName, COUNTRY_QUALIFIED_NAME)), null);
+
+        try {
+            getProcessAPI()
+                    .evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
+            fail("population field should not exist");
+        } catch (ExpressionEvaluationException ignored) {
+            log.error("ignored population field", ignored);
+        }
+
+        disableAndDeleteProcess(definition.getId());
     }
 
     @Test
