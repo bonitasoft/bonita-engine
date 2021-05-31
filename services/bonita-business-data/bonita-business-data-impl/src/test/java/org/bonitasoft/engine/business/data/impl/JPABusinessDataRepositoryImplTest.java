@@ -74,12 +74,16 @@ public class JPABusinessDataRepositoryImplTest {
     @Mock
     private TechnicalLoggerService loggerService;
 
+    private JPABusinessDataRepositoryImpl realJPABusinessDataRepository;
+
     @Before
     public void setUp() {
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
+        realJPABusinessDataRepository = new JPABusinessDataRepositoryImpl(transactionService,
+                businessDataModelRepository, loggerService,
+                configuration, classLoaderService, 1L);
         repository = spy(
-                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepository, loggerService,
-                        configuration, classLoaderService, 1L));
+                realJPABusinessDataRepository);
         doReturn(manager).when(repository).getEntityManager();
         doReturn(true).when(businessDataModelRepository).isBDMDeployed();
         CriteriaBuilder criteriaBuilder = mock(CriteriaBuilder.class);
@@ -93,26 +97,24 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_start_add_listener_on_classloader() throws Exception {
-        //given
-        doReturn(true).when(businessDataModelRepository).isBDMDeployed();
-        doReturn(mock(EntityManagerFactory.class)).when(repository).createEntityManagerFactory();
-        //when
-        repository.start();
+    public void should_constructor_add_listener_on_classloader() {
         //then
-        verify(classLoaderService).addListener(identifier(ScopeType.TENANT, 1L), repository);
+        verify(classLoaderService).addListener(identifier(ScopeType.TENANT, 1L), realJPABusinessDataRepository);
     }
 
     @Test
-    public void should_stop_remove_listener_on_classloader() throws Exception {
+    public void should_stop_close_entityManagerFactory() {
+        // given
+        EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
+        doReturn(entityManagerFactory).when(repository).getEntityManagerFactory();
         //when
         repository.stop();
         //then
-        verify(classLoaderService).removeListener(identifier(ScopeType.TENANT, 1L), repository);
+        verify(entityManagerFactory).close();
     }
 
     @Test
-    public void should_onUpdate_recreate_the_entity_manager_factory() throws Exception {
+    public void should_onUpdate_recreate_the_entity_manager_factory() {
         //given
         EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
         doReturn(entityManagerFactory).when(repository).createEntityManagerFactory();
@@ -130,14 +132,11 @@ public class JPABusinessDataRepositoryImplTest {
         EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
         doReturn(entityManagerFactory).when(repository).createEntityManagerFactory();
         //when
-        repository.onUpdate(null);
+        // entityManagerFactory == null here
+        repository.onUpdate(mock(ClassLoader.class));
         //then
         verifyNoInteractions(entityManagerFactory);
         verify(repository, times(1)).createEntityManagerFactory();
-        verify(loggerService.asLogger(JPABusinessDataRepositoryImpl.class))
-                .warn("There is no active entity manager factory! A new one will be created");
-        verify(loggerService.asLogger(JPABusinessDataRepositoryImpl.class))
-                .warn("It usually means that tenant operations were resumed while a BDM was installing");
     }
 
     @Test
@@ -173,7 +172,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test(expected = SRetryableException.class)
-    public void should_findByIds_throw_retryable_when_persistenceException() throws Exception {
+    public void should_findByIds_throw_retryable_when_persistenceException() {
         //given
         doThrow(PersistenceException.class).when(manager).createQuery(any(CriteriaQuery.class));
         //when
@@ -182,7 +181,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test(expected = SRetryableException.class)
-    public void should_findByIdentifiers_throw_retryable_when_persistenceException() throws Exception {
+    public void should_findByIdentifiers_throw_retryable_when_persistenceException() {
         //given
         doThrow(PersistenceException.class).when(manager).find(Address.class, PRIMARY_KEY_1);
         //when
@@ -202,7 +201,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test(expected = SRetryableException.class)
-    public void should_findListByNamedQuery_throw_retryable_when_persistenceException() throws Exception {
+    public void should_findListByNamedQuery_throw_retryable_when_persistenceException() {
         //given
         TypedQuery typedQuery = mock(TypedQuery.class);
         doThrow(PersistenceException.class).when(typedQuery).getResultList();
@@ -225,7 +224,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test(expected = SRetryableException.class)
-    public void should_findList_throw_retryable_when_persistenceException() throws Exception {
+    public void should_findList_throw_retryable_when_persistenceException() {
         //given
         TypedQuery typedQuery = mock(TypedQuery.class);
         doThrow(PersistenceException.class).when(typedQuery).getResultList();
@@ -236,7 +235,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test(expected = SRetryableException.class)
-    public void should_persist_throw_retryable_exception_in_case_of_persistenceException() throws Exception {
+    public void should_persist_throw_retryable_exception_in_case_of_persistenceException() {
         //given
         doThrow(PersistenceException.class).when(manager).persist(any(Address.class));
         //when
@@ -245,7 +244,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test(expected = SRetryableException.class)
-    public void should_merge_throw_retryable_exception_in_case_of_persistenceException() throws Exception {
+    public void should_merge_throw_retryable_exception_in_case_of_persistenceException() {
         //given
         doThrow(PersistenceException.class).when(manager).merge(any(Address.class));
         //when
@@ -254,7 +253,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test(expected = SRetryableException.class)
-    public void should_remove_throw_retryable_exception_in_case_of_persistenceException() throws Exception {
+    public void should_remove_throw_retryable_exception_in_case_of_persistenceException() {
         //given
         doThrow(PersistenceException.class).when(manager).remove(any(Address.class));
         //when
@@ -263,7 +262,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_string_array_to_collection() throws Exception {
+    public void should_transform_query_parameter_values_from_string_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new String[] { "v1", "v2" });
 
@@ -271,7 +270,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_int_array_to_collection() throws Exception {
+    public void should_transform_query_parameter_values_from_int_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new Integer[] { 1, 2 });
 
@@ -279,7 +278,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_float_array_to_collection() throws Exception {
+    public void should_transform_query_parameter_values_from_float_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new Float[] { 1.2f, 2.0f });
 
@@ -287,7 +286,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_double_array_to_collection() throws Exception {
+    public void should_transform_query_parameter_values_from_double_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new Double[] { 1.2d, 2.0d });
 
@@ -295,7 +294,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test
-    public void should_transform_query_parameter_values_from_long_array_to_collection() throws Exception {
+    public void should_transform_query_parameter_values_from_long_array_to_collection() {
         Object collection = repository
                 .checkParameterValue(new Long[] { 12l, 23456l });
 
@@ -303,7 +302,7 @@ public class JPABusinessDataRepositoryImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void should_check_supported_query_parameter_types() throws Exception {
+    public void should_check_supported_query_parameter_types() {
         repository
                 .checkParameterValue(new Byte[] { 0x1, 0x2 });
     }

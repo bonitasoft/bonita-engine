@@ -89,16 +89,15 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
         this.tenantId = tenantId;
         this.configuration = new HashMap<>(configuration);
         this.configuration.put("hibernate.archive.scanner", DisabledScanner.class.getName());
+        classLoaderService.addListener(identifier(ScopeType.TENANT, tenantId), this);
     }
 
     @Override
     public void start() {
-        if (businessDataModelRepository.isBDMDeployed()) {
-            log.debug("Creating entity factory on tenant {}", tenantId);
-            entityManagerFactory = createEntityManagerFactory();
-            log.debug("Entity factory created");
+        if (entityManagerFactory == null && businessDataModelRepository.isBDMDeployed()) {
+            log.debug("Creating Entity Manager Factory on tenant {}", tenantId);
+            recreateEntityManagerFactoryEvenIfExisting();
         }
-        classLoaderService.addListener(identifier(ScopeType.TENANT, tenantId), this);
     }
 
     EntityManagerFactory createEntityManagerFactory() {
@@ -108,32 +107,36 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
     @Override
     public void stop() {
         if (getEntityManagerFactory() != null) {
-            log.debug("Closing entity factory because service is stopping on tenant {}", tenantId);
+            log.debug("Closing Entity Manager Factory because service is stopping on tenant {}", tenantId);
             getEntityManagerFactory().close();
             entityManagerFactory = null;
-            log.debug("Entity factory closed");
+            log.debug("Entity Manager Factory closed");
         }
-        classLoaderService.removeListener(identifier(ScopeType.TENANT, tenantId), this);
     }
 
-    private synchronized void recreateEntityManagerFactory(ClassLoader newClassLoader) {
+    private synchronized void recreateEntityManagerFactoryOnClassLoaderChange(ClassLoader newClassLoader) {
         if (businessDataModelRepository.isBDMDeployed()) {
-            log.debug("Recreating entity factory for classloader {} on tenant {}", newClassLoader, tenantId);
+            log.debug("Recreating Entity Manager Factory for classloader {} on tenant {}", newClassLoader, tenantId);
             final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(newClassLoader);
-                if (entityManagerFactory != null) {
-                    entityManagerFactory.close();
-                } else {
-                    log.warn("There is no active entity manager factory! A new one will be created");
-                    log.warn("It usually means that tenant operations were resumed while a BDM was installing");
-                }
-                entityManagerFactory = createEntityManagerFactory();
+                recreateEntityManagerFactoryEvenIfExisting();
             } finally {
                 Thread.currentThread().setContextClassLoader(currentClassLoader);
             }
-            log.debug("Entity factory recreated");
+            log.debug("Entity Manager Factory recreated");
+        } else {
+            log.debug("No BDM deployed. No Entity Manager Factory to recreate.");
         }
+    }
+
+    private void recreateEntityManagerFactoryEvenIfExisting() {
+        if (entityManagerFactory != null) {
+            log.warn("Entity Manager Factory should be null. Closing it and recreating a new one.");
+            entityManagerFactory.close();
+        }
+        entityManagerFactory = createEntityManagerFactory();
+        log.debug("Recreated Entity Manager Factory: " + entityManagerFactory);
     }
 
     public EntityManagerFactory getEntityManagerFactory() {
@@ -407,7 +410,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
     @Override
     public void onUpdate(ClassLoader newClassLoader) {
         clearProxyFactoryCache();
-        recreateEntityManagerFactory(newClassLoader);
+        recreateEntityManagerFactoryOnClassLoaderChange(newClassLoader);
     }
 
     private void clearProxyFactoryCache() {
