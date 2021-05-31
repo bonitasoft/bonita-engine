@@ -19,11 +19,11 @@ import static org.mockito.Mockito.when;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.MockitoExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * @author Baptiste Mesta
