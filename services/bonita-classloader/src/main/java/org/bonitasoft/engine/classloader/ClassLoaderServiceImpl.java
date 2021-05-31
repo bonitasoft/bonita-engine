@@ -286,8 +286,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void refreshClassLoaderImmediatelyWithRollback(ClassLoaderIdentifier identifier)
             throws SClassLoaderException {
-        refreshClassLoaderImmediately(identifier);
+        // Register the rollback before refreshing classloader in case refreshClassLoaderImmediately() fails:
         registerAfterCommitClassloaderUpdate(identifier);
+        refreshClassLoaderImmediately(identifier);
     }
 
     @Override
@@ -315,7 +316,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             final SEvent event = new SEvent("ClassLoaderRefreshed");
             event.setObject(identifier);
             eventService.fireEvent(event);
-
         } catch (Exception e) {
             throw new SClassLoaderException(e);
         }
@@ -326,7 +326,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             userTransactionService.registerBonitaSynchronization((BonitaTransactionSynchronization) i -> {
                 if (i != Status.STATUS_COMMITTED) {
                     try {
-                        log.warn("The transaction was not commited. Refreshing classloader on tenantId "
+                        log.warn("The transaction was not committed. Refreshing classloader on tenantId "
                                 + sessionAccessor.getTenantId() + " to return to a clean state.");
                         classLoaderUpdater.refreshClassloaders(this, sessionAccessor.getTenantId(),
                                 Collections.singleton(identifier));

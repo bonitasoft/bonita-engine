@@ -155,12 +155,12 @@ public class TenantStateManager {
             throw e;
         }
         resumeServicesOnOtherNodes();
-        resumeSchedulerJobsinTransaction(tenantId);
+        resumeSchedulerJobsInTransaction(tenantId);
 
         LOGGER.info("Resumed tenant {}", tenantId);
     }
 
-    private void resumeSchedulerJobsinTransaction(long tenantId) throws Exception {
+    private void resumeSchedulerJobsInTransaction(long tenantId) throws Exception {
         transactionService.executeInTransaction(() -> {
             schedulerService.resumeJobs(tenantId);
             return null;
@@ -213,7 +213,7 @@ public class TenantStateManager {
         activateTenantInTransaction();
         tenantServicesManager.start();
         startServicesOnOtherNodes();
-        resumeSchedulerJobsinTransaction(tenantId);
+        resumeSchedulerJobsInTransaction(tenantId);
         LOGGER.info("Activated tenant {}", tenantId);
     }
 

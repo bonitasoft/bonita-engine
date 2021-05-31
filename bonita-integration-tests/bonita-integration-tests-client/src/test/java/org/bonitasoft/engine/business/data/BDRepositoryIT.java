@@ -29,8 +29,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -63,15 +68,33 @@ import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.process.*;
-import org.bonitasoft.engine.bpm.process.impl.*;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
+import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.expression.*;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionConstants;
+import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.ExpressionType;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -82,7 +105,10 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
@@ -131,28 +157,21 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
         if (!getTenantAdministrationAPI().isPaused()) {
             getTenantAdministrationAPI().pause();
-            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-            getTenantAdministrationAPI().resume();
         }
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        getTenantAdministrationAPI().resume();
 
         deleteUser(testUser);
         logoutOnTenant();
     }
 
     @Test
-    @Ignore("Fix Runtime-34")
-    public void deploying_bdm_with_invalid_query_generates_should_throw_an_invalid_BDM_exception() throws Exception {
-
-        final BusinessObjectModel bom = buildBOMWithInvalidQuery();
-        final byte[] zip = getZip(bom);
+    public void deploying_bdm_with_invalid_query_should_throw_a_BDM_deployment_exception() throws Exception {
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        assertThatThrownBy(() -> getTenantAdministrationAPI().installBusinessDataModel(zip))
-                .isInstanceOf(InvalidBusinessDataModelException.class);
-        getTenantAdministrationAPI().resume();
-        assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion())
-                .as("should not have deployed a new version of BDM")
-                .isNull();
+        assertThatThrownBy(
+                () -> getTenantAdministrationAPI().installBusinessDataModel(getZip(buildBOMWithInvalidQuery())))
+                        .isInstanceOf(BusinessDataRepositoryDeploymentException.class);
     }
 
     @Test
@@ -177,7 +196,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         // the exception should be InvalidBusinessDataModelException
         assertThatThrownBy(() -> getTenantAdministrationAPI().installBusinessDataModel(getZip(bom)))
-                .isInstanceOf(BonitaRuntimeException.class)
+                .isInstanceOf(BusinessDataRepositoryDeploymentException.class)
                 .hasMessageContaining("Unable to create unique key constraint");
         assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNull();
 
@@ -299,24 +318,25 @@ public class BDRepositoryIT extends CommonAPIIT {
     public void should_not_fail_when_resuming_tenant_during_install_of_bdm() throws Exception {
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        Future<?> installOfTheBDM = Executors.newSingleThreadExecutor().submit(() -> {
+        Future<String> installOfTheBDM = Executors.newSingleThreadExecutor().submit(() -> {
             try {
-                getTenantAdministrationAPI().installBusinessDataModel(getZip(businessObjectModel(bom -> {
-                    bom.addBusinessObject(businessObject("com.compagny.ExampleBusinessObject", (businessObject) -> {
+                return getTenantAdministrationAPI().installBusinessDataModel(getZip(businessObjectModel(bom -> {
+                    bom.addBusinessObject(businessObject("com.company.ExampleBusinessObject", (businessObject) -> {
                         businessObject.addField(stringField("aField"));
                         businessObject.addQuery("findExampleByAField", "SELECT e FROM ExampleBusinessObject e",
-                                "com.compagny.ExampleBusinessObject");
+                                "com.company.ExampleBusinessObject");
                     }));
                 })));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
-        Thread.sleep(50);
+        log.info("Sleeping 80 ms to let installBusinessDataModel() begin before trying to resume tenant");
+        Thread.sleep(80);
         getTenantAdministrationAPI().resume();
         installOfTheBDM.get(10, TimeUnit.SECONDS);
         assertThatNoException().isThrownBy(() -> getBusinessDataByQuery(Collections.emptyMap(), 0, 10,
-                "findExampleByAField", "com.compagny.ExampleBusinessObject"));
+                "findExampleByAField", "com.company.ExampleBusinessObject"));
     }
 
     private void installBusinessDataModel(final BusinessObjectModel bom) throws Exception {
@@ -2171,32 +2191,8 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_be_able_to_redeploy_invalid_custom_query() throws Exception {
-        BusinessObjectModel businessObjectModel = businessObjectModel(
-                bom -> bom.addBusinessObject(businessObject("com.acme.Cat",
-                        bo -> {
-                            bo.addField(stringField("name"));
-                            bo.addField(stringField("color"));
-                            bo.addField(stringField("furType"));
-                            bo.addQuery("findCatByColor", "SELECT c from cat c WHERE c.color = :color",
-                                    "com.acme.Cat");// there is an error: it should be "from com.acme.Cat"
-                        })));
+    public void should_install_bdm_reevaluate_process_resolutions() throws Exception {
         getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI()
-                .installBusinessDataModel(new BusinessObjectModelConverter().zip(businessObjectModel));
-        try {
-            getTenantAdministrationAPI().resume();
-            fail("Resume of service with invalid bdm should fail because of invalid query");
-        } catch (UpdateException e) {
-            //TODO add a better message in the exception of the JTATransactionServiceImpl#start
-            assertThat(e).hasMessageContaining(
-                    "Error while executing the RESUME of the service org.bonitasoft.engine.transaction.JTATransactionServiceImpl")
-                    .hasMessageContaining("PersistenceUnit: BDR");
-            //                    .hasMessageContaining("Errors in named queries")
-            //                    .hasMessageContaining("cat is not mapped");
-        }
-        //uninstall bdm and restart services
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         getTenantAdministrationAPI().resume();
 
