@@ -13,6 +13,7 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: Deps.junit5Version
     testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: Deps.junit5Version
