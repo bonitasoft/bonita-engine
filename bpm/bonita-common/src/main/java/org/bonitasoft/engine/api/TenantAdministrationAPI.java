@@ -59,11 +59,14 @@ public interface TenantAdministrationAPI {
      * @param zip
      *        the binary content of the business object model.
      * @return the version of the Business Data Model just deployed.
+     * @deprecated since 7.13, as updateBusinessDataModel does the same operation
+     *             and should be used instead
      * @throws InvalidBusinessDataModelException
      *         if the Business Data Model content passed as parameter is invalid.
      * @throws BusinessDataRepositoryDeploymentException
      *         if the deployment cannot be fulfilled completely.
      */
+    @Deprecated
     String installBusinessDataModel(final byte[] zip)
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
