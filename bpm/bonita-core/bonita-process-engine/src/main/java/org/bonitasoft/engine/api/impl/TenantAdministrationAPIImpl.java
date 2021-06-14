@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -47,6 +48,7 @@ import org.bonitasoft.engine.tenant.TenantStateManager;
  * @author Baptiste Mesta
  */
 
+@Slf4j
 public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     protected PlatformServiceAccessor getPlatformAccessorNoException() {
@@ -146,6 +148,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     public String installBusinessDataModel(final byte[] zip)
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
+        log.info("Starting the installation of the BDM.");
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final long userId;
         try {
@@ -156,8 +159,10 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
             TenantStateManager tenantStateManager = tenantAccessor.getTenantStateManager();
-            return tenantStateManager.executeTenantManagementOperation("BDM Installation",
+            String bdm_version = tenantStateManager.executeTenantManagementOperation("BDM Installation",
                     () -> bdmRepository.install(zip, tenantAccessor.getTenantId(), userId));
+            log.info("Installation of the BDM completed.");
+            return bdm_version;
         } catch (final SBusinessDataRepositoryDeploymentException e) {
             throw new BusinessDataRepositoryDeploymentException(e);
         } catch (final InvalidBusinessDataModelException e) {
@@ -170,6 +175,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @Override
     @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     public void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
+        log.info("Uninstalling the currently deployed BDM");
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
@@ -178,6 +184,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
                 bdmRepository.uninstall(tenantAccessor.getTenantId());
                 return null;
             });
+            log.info("BDM successfully uninstalled");
         } catch (final SBusinessDataRepositoryException sbdre) {
             throw new BusinessDataRepositoryDeploymentException(sbdre);
         } catch (final Exception e) {
@@ -189,8 +196,17 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     public String updateBusinessDataModel(final byte[] zip)
             throws BusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException {
-        uninstallBusinessDataModel();
-        return installBusinessDataModel(zip);
+        String bdmVersion;
+        try {
+            uninstallBusinessDataModel();
+            bdmVersion = installBusinessDataModel(zip);
+        } catch (Exception e) {
+            log.warn(
+                    "Caught an error when installing/updating the BDM, the transaction will be reverted and the previous BDM restored.");
+            throw e;
+        }
+        log.info("Update operation completed, the BDM was successfully updated");
+        return bdmVersion;
     }
 
     @Override
