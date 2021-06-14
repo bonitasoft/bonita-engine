@@ -23,9 +23,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.*;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.STenantResourceState;
@@ -37,7 +35,9 @@ import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -50,6 +50,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TenantAdministrationAPIImplTest {
 
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
     @Mock
     private TenantResourcesService tenantResourcesService;
     @Mock
@@ -218,5 +220,24 @@ public class TenantAdministrationAPIImplTest {
 
         // then:
         verify(tenantManagementAPI).getTenantResource(BDM);
+    }
+
+    @Test
+    public void updateBDM_should_warn_when_update_fails()
+            throws BusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException {
+        //given
+        doThrow(new BusinessDataRepositoryDeploymentException(" an exception ")).when(tenantManagementAPI)
+                .uninstallBusinessDataModel();
+        systemOutRule.clearLog();
+
+        //when
+        try {
+            tenantManagementAPI.updateBusinessDataModel("toto".getBytes());
+        } catch (Exception e) {
+            // normal
+        }
+        //then
+        assertThat(systemOutRule.getLog()).contains(
+                "Caught an error when installing/updating the BDM, the transaction will be reverted and the previous BDM restored");
     }
 }
