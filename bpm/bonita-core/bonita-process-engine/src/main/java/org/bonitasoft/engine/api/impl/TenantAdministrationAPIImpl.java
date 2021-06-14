@@ -142,6 +142,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
+    @Deprecated
     @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     public String installBusinessDataModel(final byte[] zip)
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
