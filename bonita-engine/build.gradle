@@ -6,38 +6,31 @@ plugins {
 }
 dependencyManagement {
     dependencies {
-        dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
-            entry 'slf4j-api'
-            entry 'slf4j-simple'
-        }
+        dependency("org.slf4j:slf4j-api:$Deps.slf4jVersion")
         dependency "com.h2database:h2:${Deps.h2Version}"
         dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
 
         dependencySet(group: 'org.springframework', version: Deps.springVersion) {
             entry 'spring-context'
             entry 'spring-core'
-            entry 'spring-test'
             entry 'spring-web'
+        }
+        dependencySet(group: "org.springframework.boot", version: Deps.springBootVersion) {
+            entry "spring-boot-starter-jdbc"
+            entry "spring-boot-autoconfigure"
         }
         dependency("org.hibernate:hibernate-core:${Deps.hibernateVersion}") {
             exclude 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec'
         }
+        dependency "org.hibernate:hibernate-ehcache:${Deps.hibernateVersion}"
         dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
         dependency "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
         dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
+        dependency("commons-cli:commons-cli:${Deps.commonsCLIVersion}")
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
+        dependency("org.apache.commons:commons-text:${Deps.commonsTextVersion}")
         dependency "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
-        dependency "junit:junit:${Deps.junit4Version}"
-        dependency "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
-        dependency "org.awaitility:awaitility:${Deps.awaitilityVersion}"
-        dependency "org.assertj:assertj-core:${Deps.assertjVersion}"
-        dependency "xmlunit:xmlunit:${Deps.xmlunitVersion}"
-        dependency "org.mockito:mockito-core:${Deps.mockitoVersion}"
-        dependencySet(group: 'ch.qos.logback', version: Deps.logbackVersion) {
-            entry 'logback-classic'
-            entry 'logback-core'
-        }
         dependency "javax.transaction:jta:${Deps.javaxJtaVersion}"
         dependency "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
@@ -53,24 +46,34 @@ dependencyManagement {
         dependency "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-test:${Deps.groovyVersion}"
-        dependency "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
         dependency "org.javassist:javassist:${Deps.javassistVersion}"
-        dependency "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
         dependency "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
         dependencySet(group: 'org.apache.httpcomponents', version: Deps.httpComponentsVersion) {
             entry 'httpclient'
             entry 'httpmime'
         }
         dependency "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
-        dependency "mysql:mysql-connector-java:${Deps.mysqlVersion}"
-        dependency "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-        dependency "net.jodah:concurrentunit:${Deps.concurrentUnitVersion}"
-        dependency "org.projectlombok:lombok:${Deps.lombokVersion}"
         dependency "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
         dependency "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
-        dependency "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
         dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+        dependency "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
+        dependency("org.quartz-scheduler:quartz:${Deps.quartzVersion}")
+        dependency "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
+        dependency("javax.annotation:javax.annotation-api:$Deps.javaxAnnotationsVersion")
+        dependencySet(group: "io.micrometer", version: Deps.micrometerVersion) {
+            entry "micrometer-core"
+            entry "micrometer-registry-jmx"
+            entry "micrometer-registry-prometheus"
+        }
+        dependencySet(group: 'com.hazelcast', version: Deps.hazelcastVersion) {
+            entry 'hazelcast'
+            entry 'hazelcast-spring'
+        }
+        dependency "com.hazelcast:hazelcast-aws:${Deps.hazelcastAWSVersion}"
+        dependency "com.hazelcast:hazelcast-kubernetes:${Deps.hazelcastKubernetesVersion}"
+        dependency "com.hazelcast:hazelcast-hibernate53:${Deps.hazelcastHibernateVersion}"
+        // servlet-api: not specified here, the engine depends on it in `compile only`, it is the distrib (==tomcat) that declare the version of that dependency
     }
 }
 publishing {

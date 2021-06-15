@@ -10,14 +10,13 @@ class Deps {
     public static String commonsLangVersion = "3.11"
     public static String commonsTextVersion = "1.9"
     public static String commonsDbcp2Version = "2.5.0"
-    public static String commonsExecVersion = "1.3"
     public static String commonsCLIVersion = "1.4"
     public static String slf4jVersion = "1.7.30"
     public static String h2Version = "1.4.199"
     public static String hibernateVersion = "5.4.10.Final"
     public static String jacksonDataBindingVersion = "2.11.2"
     public static String javaxJtaVersion = "1.1"
-    public static String javaxServletVersion = "3.0.1"
+    public static String javaxServletVersion = "3.1.0"
     public static String groovyVersion = "3.0.7"
     public static String javassistVersion = "3.18.1-GA"
     public static String httpComponentsVersion = "4.5.12"
@@ -36,11 +35,19 @@ class Deps {
     public static String lombokVersion = "1.18.12"
 
     public static String narayanaVersion = "5.10.6.Final"
-    public static String jbossLoggingVersion = "3.1.3.GA"
     public static String jaxbVersion = "2.3.1"
     public static String logbackVersion = "1.2.3"
     public static String xbeanClassloaderVersion = "3.7"
+    public static String javaxAnnotationsVersion = "1.3.2"
 
+    // extensions versions
+    public static String hazelcastVersion = "3.12.5"
+    //Last version compatible with hibernate 5
+    public static String hazelcastHibernateVersion = "1.3.2"
+    public static String hazelcastAWSVersion = "2.4"
+    public static String hazelcastKubernetesVersion = "1.5"
+
+    // Test dependency versions:
     public static String junit4Version = "4.13.1"
     public static String junit5Version = "5.6.3"
     public static String awaitilityVersion = "4.0.3"
@@ -52,6 +59,7 @@ class Deps {
     public static String concurrentUnitVersion = "0.4.6"
     public static String junitQuickCheck = "0.9.1"
     public static String jettyVersion = "9.4.9.v20180320"
-    public static String javaxAnnotationsVersion = "1.3.2"
+    public static String jbossLoggingVersion = "3.1.3.GA"
+    public static String commonsExecVersion = "1.3"
 
 }

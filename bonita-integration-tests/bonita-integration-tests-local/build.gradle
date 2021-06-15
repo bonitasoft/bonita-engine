@@ -14,6 +14,7 @@ dependencies {
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     testCompile "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
 }
 
 task testsJar(type: Jar) {
