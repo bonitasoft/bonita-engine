@@ -538,6 +538,7 @@ CREATE TABLE business_app (
   iconMimeType VARCHAR(255),
   iconContent LONGBLOB,
   displayName VARCHAR(255) NOT NULL,
+  editable BOOLEAN,
   internalProfile VARCHAR(255)
 );
 

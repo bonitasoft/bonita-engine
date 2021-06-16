@@ -273,7 +273,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             new DefaultProfilesUpdater(tenantServiceAccessor).execute();
             // Create custom page examples: done by page service start
             // Create default themes: done by theme service start
-
+            // Import default applications
+            tenantServiceAccessor.getApplicationImporter().init();
             sessionService.deleteSession(session.getId());
         } catch (final STenantCreationException e) {
             if (tenantId != -1L) {

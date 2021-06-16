@@ -153,4 +153,22 @@ public interface Application extends BaseElement {
      */
     boolean hasIcon();
 
+    /**
+     * Retrieves the visibility of the Application. Possible values are:
+     * ALL - everyone can use the application
+     * TECHNICAL_USER - Only the technical user can use the application
+     * RESTRICTED - Access to the application is determined by the user profile
+     * These value are purely indicative, changing them in the application object won't change the accessibility to the
+     * the actual application
+     *
+     * @return the enum ApplicationVisibility of the application
+     */
+    ApplicationVisibility getApplicationVisibility();
+
+    /**
+     * Indicates whether the application can be modified
+     *
+     * @return Whether the application can be modified
+     */
+    boolean isEditable();
 }

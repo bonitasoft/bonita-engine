@@ -14,11 +14,13 @@
 package org.bonitasoft.engine.business.application.impl;
 
 import java.util.Date;
-import java.util.Objects;
 import java.util.StringJoiner;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.business.application.Application;
+import org.bonitasoft.engine.business.application.ApplicationVisibility;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -41,6 +43,8 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
     private final String description;
     private final String token;
     private boolean hasIcon;
+    private boolean editable;
+    private ApplicationVisibility applicationVisibility;
 
     public ApplicationImpl(final String token, final String version, final String description) {
         this.token = token;
@@ -53,6 +57,15 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         this(token, version, description);
         this.layoutId = layoutId;
         this.themeId = themeId;
+    }
+
+    @Override
+    public ApplicationVisibility getApplicationVisibility() {
+        return applicationVisibility;
+    }
+
+    public void setApplicationVisibility(ApplicationVisibility applicationVisibility) {
+        this.applicationVisibility = applicationVisibility;
     }
 
     @Override
@@ -171,34 +184,48 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
     }
 
     @Override
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
+
         if (o == null || getClass() != o.getClass())
             return false;
-        if (!super.equals(o))
-            return false;
+
         ApplicationImpl that = (ApplicationImpl) o;
-        return createdBy == that.createdBy && updatedBy == that.updatedBy && Objects.equals(version, that.version)
-                && Objects.equals(layoutId, that.layoutId) && Objects.equals(iconPath, that.iconPath)
-                && Objects.equals(creationDate, that.creationDate)
-                && Objects.equals(lastUpdateDate, that.lastUpdateDate) && Objects.equals(state, that.state)
-                && Objects.equals(homePageId, that.homePageId) && Objects.equals(displayName, that.displayName)
-                && Objects.equals(profileId, that.profileId) && Objects.equals(themeId, that.themeId)
-                && Objects.equals(description, that.description) && Objects.equals(token, that.token)
-                && Objects.equals(hasIcon, that.hasIcon);
+
+        return new EqualsBuilder().appendSuper(super.equals(o)).append(getCreatedBy(), that.getCreatedBy())
+                .append(getUpdatedBy(), that.getUpdatedBy()).append(hasIcon, that.hasIcon)
+                .append(isEditable(), that.isEditable()).append(getVersion(), that.getVersion())
+                .append(getLayoutId(), that.getLayoutId()).append(getIconPath(), that.getIconPath())
+                .append(getCreationDate(), that.getCreationDate()).append(getLastUpdateDate(), that.getLastUpdateDate())
+                .append(getState(), that.getState()).append(getHomePageId(), that.getHomePageId())
+                .append(getDisplayName(), that.getDisplayName()).append(getProfileId(), that.getProfileId())
+                .append(getThemeId(), that.getThemeId()).append(getDescription(), that.getDescription())
+                .append(getToken(), that.getToken()).append(getApplicationVisibility(), that.getApplicationVisibility())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), version, layoutId, iconPath, creationDate, createdBy, lastUpdateDate,
-                updatedBy, state, homePageId, displayName, profileId, themeId, description, token, hasIcon);
+        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(getVersion()).append(getLayoutId())
+                .append(getIconPath()).append(getCreationDate()).append(getCreatedBy()).append(getLastUpdateDate())
+                .append(getUpdatedBy()).append(getState()).append(getHomePageId()).append(getDisplayName())
+                .append(getProfileId()).append(getThemeId()).append(getDescription()).append(getToken()).append(hasIcon)
+                .append(isEditable()).append(getApplicationVisibility()).toHashCode();
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", ApplicationImpl.class.getSimpleName() + "[", "]")
-                .add("id='" + getId() + "'")
                 .add("version='" + version + "'")
                 .add("layoutId=" + layoutId)
                 .add("iconPath='" + iconPath + "'")
@@ -214,6 +241,8 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
                 .add("description='" + description + "'")
                 .add("token='" + token + "'")
                 .add("hasIcon=" + hasIcon)
+                .add("editable=" + editable)
+                .add("applicationVisibility=" + applicationVisibility)
                 .toString();
     }
 }

@@ -14,6 +14,10 @@
 
 package org.bonitasoft.permissions
 
+import org.bonitasoft.engine.business.application.ApplicationVisibility
+import org.bonitasoft.engine.business.application.impl.ApplicationImpl
+import org.bonitasoft.engine.business.application.InternalProfiles
+
 import static org.mockito.Mockito.doReturn
 import static org.mockito.Mockito.mock
 
@@ -60,6 +64,59 @@ public class ApplicationMenuPermissionRuleTest {
         doReturn(profileAPI).when(apiAccessor).getProfileAPI()
         doReturn(applicationAPI).when(apiAccessor).getLivingApplicationAPI()
         doReturn(currentUserId).when(apiSession).getUserId()
+    }
+
+    @Test
+    void should_return_true_when_internal_profile_ALL(){
+        doReturn(true).when(apiCallContext).isGET()
+        doReturn("2").when(apiCallContext).getResourceId()
+        def applicationMenu = mock(ApplicationMenu.class)
+        doReturn(4l).when(applicationMenu).getApplicationId()
+        doReturn(applicationMenu).when(applicationAPI).getApplicationMenu(2l)
+        def application = new ApplicationImpl("appToken", "1.0", "dtc")
+        application.setProfileId(-1L)
+        application.setApplicationVisibility(ApplicationVisibility.ALL)
+        doReturn(application).when(applicationAPI).getApplication(4l)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        Assertions.assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    void should_return_false_when_internal_profile_SuperAdmin_and_user_not_technical_user(){
+        doReturn(true).when(apiCallContext).isGET()
+        doReturn("2").when(apiCallContext).getResourceId()
+        def applicationMenu = mock(ApplicationMenu.class)
+        doReturn(4l).when(applicationMenu).getApplicationId()
+        doReturn(applicationMenu).when(applicationAPI).getApplicationMenu(2l)
+        def application = new ApplicationImpl("appToken", "1.0", "dtc")
+        application.setProfileId(-1L)
+        application.setApplicationVisibility(ApplicationVisibility.TECHNICAL_USER)
+        doReturn(application).when(applicationAPI).getApplication(4l)
+        doReturn(false).when(apiSession).isTechnicalUser()
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        Assertions.assertThat(isAuthorized).isFalse()
+    }
+
+    @Test
+    void should_return_true_when_internal_profile_SuperAdmin_and_user_technical_user(){
+        doReturn(true).when(apiCallContext).isGET()
+        doReturn("2").when(apiCallContext).getResourceId()
+        def applicationMenu = mock(ApplicationMenu.class)
+        doReturn(4l).when(applicationMenu).getApplicationId()
+        doReturn(applicationMenu).when(applicationAPI).getApplicationMenu(2l)
+        def application = new ApplicationImpl("appToken", "1.0", "dtc")
+        application.setProfileId(-1L)
+        application.setApplicationVisibility(ApplicationVisibility.TECHNICAL_USER)
+        doReturn(application).when(applicationAPI).getApplication(4l)
+        doReturn(true).when(apiSession).isTechnicalUser()
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test

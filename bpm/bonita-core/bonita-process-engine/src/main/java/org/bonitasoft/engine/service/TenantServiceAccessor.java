@@ -20,6 +20,7 @@ import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
@@ -275,4 +276,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     TenantServicesManager getTenantServicesManager();
 
     BPMArchiverService getBPMArchiverService();
+
+    ApplicationImporter getApplicationImporter();
 }

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.business.application.converter;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.InternalProfiles;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
@@ -48,7 +49,15 @@ public class NodeToApplicationConverter {
 
     public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy)
             throws SBonitaReadException, ImportException {
+        return toSApplication(applicationNode, null, "", createdBy);
+    }
+
+    public ImportResult toSApplication(final ApplicationNode applicationNode, byte[] iconContent, String iconMimeType,
+            final long createdBy)
+            throws SBonitaReadException, ImportException {
         String token = applicationNode.getToken();
+        InternalProfiles internalProfileByApplicationNodeProfile = InternalProfiles
+                .getInternalProfileByProfileName(applicationNode.getProfile());
         validator.validate(token);
         final ImportStatus importStatus = new ImportStatus(token);
         Long layoutId = getLayoutId(getLayoutName(applicationNode), token, importStatus);
@@ -64,13 +73,19 @@ public class NodeToApplicationConverter {
         application.setLayoutId(layoutId);
         application.setThemeId(themeId);
         application.setIconPath(applicationNode.getIconPath());
+        application.setIconContent(iconContent);
+        application.setIconMimeType(iconMimeType);
         application.setDescription(applicationNode.getDescription());
         application.setState(applicationNode.getState());
-        application.setInternalProfile(applicationNode.getInternalProfile());
 
-        final ImportError importError = setProfile(applicationNode, application);
-        if (importError != null) {
-            importStatus.addError(importError);
+        if (internalProfileByApplicationNodeProfile == null) {
+            final ImportError importError = setProfile(applicationNode, application);
+            if (importError != null) {
+                importStatus.addError(importError);
+            }
+        } else {
+            application.setInternalProfile(internalProfileByApplicationNodeProfile.getProfileName());
+            application.setProfileId(null);
         }
 
         return new ImportResult(application, importStatus);

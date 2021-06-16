@@ -71,7 +71,6 @@ public class ApplicationToNodeConverter {
             setHomePage(application, applicationNode);
             setPages(application.getId(), applicationNode);
             applicationMenuToNodeConverter.addMenusToApplicationNode(application.getId(), null, applicationNode, null);
-            // We never add internalProfile
             return applicationNode;
         } catch (SBonitaException e) {
             throw new ExportException(e);

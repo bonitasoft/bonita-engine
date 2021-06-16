@@ -21,6 +21,7 @@ import org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor
 import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
@@ -551,4 +552,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return beanAccessor.getService(BPMArchiverService.class);
     }
 
+    @Override
+    public ApplicationImporter getApplicationImporter() {
+        return beanAccessor.getService(ApplicationImporter.class);
+    }
 }

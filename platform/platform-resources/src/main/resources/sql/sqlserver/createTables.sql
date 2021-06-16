@@ -608,6 +608,7 @@ CREATE TABLE business_app (
   iconMimeType NVARCHAR(255),
   iconContent VARBINARY(MAX),
   displayName NVARCHAR(255) NOT NULL,
+  editable BIT,
   internalProfile NVARCHAR(255)
 )
 GO

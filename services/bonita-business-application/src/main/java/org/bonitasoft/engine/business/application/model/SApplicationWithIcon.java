@@ -42,8 +42,13 @@ public class SApplicationWithIcon extends AbstractSApplication {
     private byte[] iconContent;
 
     public SApplicationWithIcon(String token, String displayName, String version,
+            long creationDate, long createdBy, String state, boolean editable) {
+        super(token, displayName, version, creationDate, createdBy, state, editable);
+    }
+
+    public SApplicationWithIcon(String token, String displayName, String version,
             long creationDate, long createdBy, String state) {
-        super(token, displayName, version, creationDate, createdBy, state);
+        super(token, displayName, version, creationDate, createdBy, state, true);
     }
 
 }
