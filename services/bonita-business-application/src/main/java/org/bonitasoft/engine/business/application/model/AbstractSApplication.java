@@ -47,6 +47,7 @@ public abstract class AbstractSApplication implements PersistentObject {
     public static final String LAYOUT_ID = "layoutId";
     public static final String THEME_ID = "themeId";
     public static final String ICON_MIME_TYPE = "iconMimeType";
+    public static final String EDITABLE = "editable";
 
     @Id
     private long tenantId;
@@ -84,10 +85,12 @@ public abstract class AbstractSApplication implements PersistentObject {
     @Column
     private String iconMimeType;
     @Column
+    private boolean editable = true;
+    @Column
     private String internalProfile;
 
     public AbstractSApplication(String token, String displayName, String version, long creationDate,
-            long createdBy, String state) {
+            long createdBy, String state, boolean editable) {
         this.token = token;
         this.displayName = displayName;
         this.version = version;
@@ -96,6 +99,7 @@ public abstract class AbstractSApplication implements PersistentObject {
         this.createdBy = createdBy;
         updatedBy = createdBy;
         this.state = state;
+        this.editable = editable;
     }
 
     public boolean hasIcon() {

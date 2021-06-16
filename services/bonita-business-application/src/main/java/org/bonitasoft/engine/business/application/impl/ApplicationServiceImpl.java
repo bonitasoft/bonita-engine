@@ -222,6 +222,10 @@ public class ApplicationServiceImpl implements ApplicationService {
                 "Deleting application with id " + applicationId);
         try {
             final SApplication application = getApplication(applicationId);
+            if (!application.isEditable()) {
+                throw new SObjectModificationException(
+                        " The application is set as non modifiable. It cannot be deleted ");
+            }
             applicationDestructor.onDeleteApplication(application);
             recorder.recordDelete(new DeleteRecord(application), APPLICATION);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
@@ -244,6 +248,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         try {
             handleHomePageUpdate(updateDescriptor);
             final SApplicationWithIcon application = getApplicationWithIcon(applicationId);
+            if (!application.isEditable()) {
+                throw new SObjectModificationException(
+                        " The application is set as non modifiable. It cannot be modified ");
+            }
             return updateApplication(application, updateDescriptor);
         } catch (final SObjectNotFoundException | SObjectAlreadyExistsException | SObjectModificationException e) {
             throw e;

@@ -20,11 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.business.application.Application;
-import org.bonitasoft.engine.business.application.ApplicationCreator;
-import org.bonitasoft.engine.business.application.ApplicationField;
-import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.*;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -124,6 +120,9 @@ public class ApplicationModelConverter {
         application.setHomePageId(abstractSApplication.getHomePageId());
         application.setProfileId(abstractSApplication.getProfileId());
         application.setHasIcon(abstractSApplication.hasIcon());
+        application.setEditable(abstractSApplication.isEditable());
+        application.setApplicationVisibility(
+                InternalProfiles.getApplicationVisibilityByProfileName(abstractSApplication.getInternalProfile()));
         return application;
     }
 

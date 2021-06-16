@@ -290,7 +290,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         } catch (NotFoundException e) {
             throw new IllegalStateException(e);
         }
-        return applicationImporter.importApplications(xmlContent, SessionInfos.getUserIdFromSession(),
+        return applicationImporter.importApplications(xmlContent, null, "", SessionInfos.getUserIdFromSession(),
                 new StrategySelector(applicationService).selectStrategy(policy));
     }
 

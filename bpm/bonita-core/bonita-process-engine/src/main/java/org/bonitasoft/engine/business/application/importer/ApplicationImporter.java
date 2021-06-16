@@ -13,11 +13,15 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
+import static org.bonitasoft.engine.commons.io.IOUtil.unzip;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
@@ -33,7 +37,6 @@ import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.ExceptionUtils;
-import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -50,9 +53,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class ApplicationImporter implements TenantLifecycleService {
+public class ApplicationImporter {
 
-    public static final String PROVIDED_APPLICATIONS_PATH = "org/bonitasoft/web/application";
+    public static final String PROVIDED_FINAL_APPLICATIONS_PATH = "org/bonitasoft/web/application/final";
+    public static final String PROVIDED_APPLICATIONS_PATH = "org/bonitasoft/web/application/";
     private final ApplicationService applicationService;
     private final NodeToApplicationConverter nodeToApplicationConverter;
     private final ApplicationPageImporter applicationPageImporter;
@@ -69,11 +73,21 @@ public class ApplicationImporter implements TenantLifecycleService {
         this.applicationMenuImporter = applicationMenuImporter;
     }
 
-    public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy,
+    public ImportStatus importApplication(ApplicationNode applicationNode, byte[] iconContent, String iconMimeType,
+            long createdBy,
             ApplicationImportStrategy strategy)
             throws ImportException, AlreadyExistsException {
+        return importApplicationSetEditable(applicationNode, iconContent, iconMimeType, createdBy, strategy, true);
+    }
+
+    ImportStatus importApplicationSetEditable(ApplicationNode applicationNode, byte[] iconContent, String iconMimeType,
+            long createdBy,
+            ApplicationImportStrategy strategy, boolean editable)
+            throws ImportException, AlreadyExistsException {
         try {
-            ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, createdBy);
+            ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, iconContent,
+                    iconMimeType, createdBy);
+            importResult.getApplication().setEditable(editable);
             SApplicationWithIcon application = importApplication(importResult.getApplication(), importResult, strategy);
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);
@@ -141,13 +155,28 @@ public class ApplicationImporter implements TenantLifecycleService {
         return applicationService.createApplication(applicationToBeImported);
     }
 
-    public List<ImportStatus> importApplications(final byte[] xmlContent, long createdBy,
+    public List<ImportStatus> importApplications(final byte[] xmlContent, byte[] iconContent, String iconMimeType,
+            long createdBy,
             ApplicationImportStrategy strategy)
             throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
         ArrayList<ImportStatus> importStatus = new ArrayList<>();
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
-            importStatus.add(importApplication(applicationNode, createdBy, strategy));
+            importStatus.add(importApplication(applicationNode, iconContent, iconMimeType, createdBy, strategy));
+        }
+        return importStatus;
+    }
+
+    private List<ImportStatus> importDefaultApplications(final byte[] xmlContent, byte[] iconContent,
+            String iconMimeType,
+            long createdBy,
+            ApplicationImportStrategy strategy, boolean editable)
+            throws ImportException, AlreadyExistsException {
+        ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
+        ArrayList<ImportStatus> importStatus = new ArrayList<>();
+        for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
+            importStatus.add(importApplicationSetEditable(applicationNode, iconContent, iconMimeType, createdBy,
+                    strategy, editable));
         }
         return importStatus;
     }
@@ -163,10 +192,10 @@ public class ApplicationImporter implements TenantLifecycleService {
         return result;
     }
 
-    @Override
     public void init() throws SBonitaException {
         try {
-            importProvidedApplicationsFromClasspath();
+            importProvidedApplicationsFromClasspath(PROVIDED_APPLICATIONS_PATH, true);
+            importProvidedApplicationsFromClasspath(PROVIDED_FINAL_APPLICATIONS_PATH, false);
         } catch (IOException e) {
             log.error("Cannot load provided applications at startup. Root cause: {}",
                     ExceptionUtils.printRootCauseOnly(e));
@@ -174,13 +203,13 @@ public class ApplicationImporter implements TenantLifecycleService {
         }
     }
 
-    private void importProvidedApplicationsFromClasspath() throws IOException {
+    private void importProvidedApplicationsFromClasspath(String path, boolean editable) throws IOException {
         Resource[] resources = cpResourceResolver
                 .getResources(
-                        ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + PROVIDED_APPLICATIONS_PATH + "/*.xml");
+                        ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + path + "/*.zip");
         for (Resource resource : resources) {
             if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                importProvidedApplicationFromResource(resource);
+                importProvidedApplicationFromResource(resource, editable);
             } else {
                 log.warn("A resource {} could not be read when loading default applications",
                         resource.getDescription());
@@ -188,18 +217,33 @@ public class ApplicationImporter implements TenantLifecycleService {
         }
     }
 
-    private void importProvidedApplicationFromResource(Resource resource) {
+    private void importProvidedApplicationFromResource(Resource resource, boolean editable) {
         String resourceName = resource.getFilename();
         log.debug("Found provided applications '{}' in classpath", resourceName);
         try (InputStream resourceAsStream = resource.getInputStream()) {
             final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
-            importApplications(content, SessionService.SYSTEM_ID,
-                    new ReplaceDuplicateApplicationImportStrategy(applicationService));
+            Map<String, byte[]> zipContent = unzip(content);
+            List<String> pngFileNamesList = zipContent.keySet().stream().filter(l -> l.endsWith(".png"))
+                    .collect(Collectors.toList());
+            List<String> xmlFileNamesList = zipContent.keySet().stream().filter(l -> l.endsWith(".xml"))
+                    .collect(Collectors.toList());
+            if (xmlFileNamesList.size() > 1) {
+                throw new ImportException("The application zip " + resourceName
+                        + " contains more than one xml descriptor, and therefore has an invalid format");
+            } else if (pngFileNamesList.size() > 1) {
+                throw new ImportException("The application zip " + resourceName
+                        + " contains more than one icon file, and therefore has an invalid format");
+            }
+            String pngName = pngFileNamesList.get(0);
+            String xmlName = xmlFileNamesList.get(0);
+            byte[] iconRaw = zipContent.get(pngName);
+            byte[] xmlRaw = zipContent.get(xmlName);
+            importDefaultApplications(xmlRaw, iconRaw, pngName, SessionService.SYSTEM_ID,
+                    new ReplaceDuplicateApplicationImportStrategy(applicationService), editable);
         } catch (IOException | ImportException | AlreadyExistsException e) {
             log.error("Unable to import the application {} because: {}", resourceName,
                     ExceptionUtils.printLightWeightStacktrace(e));
             log.debug("Stacktrace of the import issue is:", e);
         }
     }
-
 }

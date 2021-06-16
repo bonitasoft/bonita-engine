@@ -533,6 +533,7 @@ CREATE TABLE business_app (
   iconMimeType VARCHAR2(255),
   iconContent BLOB,
   displayName VARCHAR2(255 CHAR) NOT NULL,
+  editable NUMBER(1),
   internalProfile VARCHAR2(255 CHAR)
 );
 

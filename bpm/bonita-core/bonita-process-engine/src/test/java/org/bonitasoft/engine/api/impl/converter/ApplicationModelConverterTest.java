@@ -24,11 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.business.application.Application;
-import org.bonitasoft.engine.business.application.ApplicationCreator;
-import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.ApplicationState;
-import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.*;
 import org.bonitasoft.engine.business.application.model.AbstractSApplication;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
@@ -158,6 +154,9 @@ public class ApplicationModelConverterTest {
         sApp.setThemeId(THEME_ID);
         sApp.setLayoutId(LAYOUT_ID);
         sApp.setIconMimeType(ICON_MIME_TYPE);
+        sApp.setEditable(false);
+        InternalProfiles internalProfileAll = InternalProfiles.INTERNAL_PROFILE_ALL;
+        sApp.setInternalProfile(internalProfileAll.getProfileName());
 
         //when
         final Application application = converter.toApplication(sApp);
@@ -179,6 +178,8 @@ public class ApplicationModelConverterTest {
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
         assertThat(application.getThemeId()).isEqualTo(THEME_ID);
+        assertThat(application.isEditable()).isFalse();
+        assertThat(application.getApplicationVisibility()).isEqualTo(internalProfileAll.getApplicationVisibility());
         assertThat(application.hasIcon()).isTrue();
 
     }

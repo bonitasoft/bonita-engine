@@ -23,7 +23,6 @@ import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.business.application.Application
 import org.bonitasoft.engine.exception.NotFoundException
-import org.bonitasoft.engine.profile.ProfileCriterion
 import org.bonitasoft.engine.session.APISession
 
 /**
@@ -36,7 +35,7 @@ import org.bonitasoft.engine.session.APISession
  * </ul>
  * @author Anthony Birembaut
  */
-class ApplicationPermissionRule implements PermissionRule {
+class ApplicationPermissionRule extends ApplicationPermissionCommon implements PermissionRule {
 
     @Override
     boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
@@ -44,15 +43,7 @@ class ApplicationPermissionRule implements PermissionRule {
             if (apiCallContext.isGET()) {
                 def application =  getApplicationFromIdOrToken(apiCallContext, apiAccessor)
                 if (application != null) {
-                    def profileId = application.getProfileId()
-                    def profileAPI = apiAccessor.getProfileAPI()
-                    def index = 0
-                    def profile
-                    def list = []
-                    while ((list = profileAPI.getProfilesForUser(apiSession.getUserId(),index,100,ProfileCriterion.ID_ASC)).size() == 100 && (profile = list.find{it.getId() == profileId}) == null) {
-                        index += 100
-                    }
-                    return profile != null || list.find{it.getId() == profileId} != null
+                    return isAppAllowed(application, apiAccessor, apiSession)
                 } else {
                     return apiSession.getUserId().toString().equals(apiCallContext.getFilters().get("userId"))
                 }

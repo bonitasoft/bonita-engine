@@ -16,11 +16,7 @@ package org.bonitasoft.engine.business.application.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.*;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
@@ -35,9 +31,6 @@ public class ApplicationNode {
 
     @XmlAttribute(required = true)
     private String version;
-
-    @XmlAttribute
-    private String internalProfile;
 
     @XmlElement(required = true)
     private String displayName;
@@ -175,14 +168,6 @@ public class ApplicationNode {
         applicationMenus.add(applicationMenu);
     }
 
-    public String getInternalProfile() {
-        return internalProfile;
-    }
-
-    public void setInternalProfile(String internalProfile) {
-        this.internalProfile = internalProfile;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -194,12 +179,11 @@ public class ApplicationNode {
         ApplicationNode that = (ApplicationNode) o;
 
         return new EqualsBuilder().append(getToken(), that.getToken()).append(getVersion(), that.getVersion())
-                .append(getDisplayName(), that.getDisplayName()).append(getInternalProfile(), that.getInternalProfile())
-                .append(getDescription(), that.getDescription()).append(getProfile(), that.getProfile())
-                .append(getHomePage(), that.getHomePage()).append(getState(), that.getState())
-                .append(getLayout(), that.getLayout()).append(getTheme(), that.getTheme())
-                .append(getIconPath(), that.getIconPath()).append(getApplicationPages(), that.getApplicationPages())
+                .append(getDisplayName(), that.getDisplayName()).append(getDescription(), that.getDescription())
+                .append(getProfile(), that.getProfile()).append(getHomePage(), that.getHomePage())
+                .append(getState(), that.getState()).append(getLayout(), that.getLayout())
+                .append(getTheme(), that.getTheme()).append(getIconPath(), that.getIconPath())
+                .append(getApplicationPages(), that.getApplicationPages())
                 .append(getApplicationMenus(), that.getApplicationMenus()).isEquals();
     }
-
 }

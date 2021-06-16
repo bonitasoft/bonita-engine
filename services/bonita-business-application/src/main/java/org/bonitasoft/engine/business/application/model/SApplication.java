@@ -33,8 +33,13 @@ public class SApplication extends AbstractSApplication {
 
     public SApplication(final String token, final String displayName, final String version, final long creationDate,
             final long createdBy,
-            final String state) {
-        super(token, displayName, version, creationDate, createdBy, state);
+            final String state, boolean editable) {
+        super(token, displayName, version, creationDate, createdBy, state, editable);
     }
 
+    public SApplication(final String token, final String displayName, final String version, final long creationDate,
+            final long createdBy,
+            final String state) {
+        super(token, displayName, version, creationDate, createdBy, state, true);
+    }
 }

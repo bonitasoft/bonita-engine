@@ -14,9 +14,12 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.business.application.InternalProfiles.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+
+import java.nio.charset.StandardCharsets;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
@@ -28,6 +31,7 @@ import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -59,6 +63,10 @@ public class NodeToApplicationConverterTest {
 
     public static final long DEFAULT_THEME_ID = 102;
 
+    private static String ICON_MIME_TYPE = "iconMimeType";
+
+    private static final byte[] ICON_CONTENT = "iconContent".getBytes(StandardCharsets.UTF_8);
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -78,6 +86,28 @@ public class NodeToApplicationConverterTest {
     }
 
     @Test
+    public void toSApplication_should_set_internalField_when_applicable() throws ImportException, SBonitaReadException {
+        //given
+        final ApplicationNode node1 = new ApplicationNode();
+        final ApplicationNode node2 = new ApplicationNode();
+        node1.setProfile(INTERNAL_PROFILE_ALL.getProfileName());
+        node2.setProfile(INTERNAL_PROFILE_SUPER_ADMIN.getProfileName());
+        long createdBy = 1L;
+
+        //when
+        final ImportResult importResult1 = converter.toSApplication(node1, ICON_CONTENT, ICON_MIME_TYPE, createdBy);
+        final ImportResult importResult2 = converter.toSApplication(node2, ICON_CONTENT, ICON_MIME_TYPE, createdBy);
+
+        final SApplicationWithIcon application1 = importResult1.getApplication();
+        final SApplicationWithIcon application2 = importResult2.getApplication();
+
+        assertThat(application1.getInternalProfile()).isEqualTo(INTERNAL_PROFILE_ALL.getProfileName());
+        assertThat(application2.getInternalProfile()).isEqualTo(INTERNAL_PROFILE_SUPER_ADMIN.getProfileName());
+        assertThat(application1.getProfileId()).isNull();
+        assertThat(application2.getProfileId()).isNull();
+    }
+
+    @Test
     public void toSApplication_should_return_ImportResult_with_no_errors_and_application_with_all_fields_except_home_page()
             throws Exception {
         //given
@@ -90,7 +120,6 @@ public class NodeToApplicationConverterTest {
         node.setIconPath("/icon.jpg");
         node.setProfile("admin");
         node.setState("ENABLED");
-        node.setInternalProfile("ALL");
 
         long profileId = 8L;
         final SProfile profile = mock(SProfile.class);
@@ -99,7 +128,7 @@ public class NodeToApplicationConverterTest {
 
         //when
         long createdBy = 1L;
-        final ImportResult importResult = converter.toSApplication(node, createdBy);
+        final ImportResult importResult = converter.toSApplication(node, ICON_CONTENT, ICON_MIME_TYPE, createdBy);
 
         //then
         assertThat(importResult).isNotNull();
@@ -114,8 +143,9 @@ public class NodeToApplicationConverterTest {
         assertThat(application.getProfileId()).isEqualTo(profileId);
         assertThat(application.getState()).isEqualTo("ENABLED");
         assertThat(application.getCreatedBy()).isEqualTo(createdBy);
-        assertThat(application.getInternalProfile()).isEqualTo("ALL");
-
+        assertThat(application.getIconContent()).isEqualTo(ICON_CONTENT);
+        assertThat(application.getIconMimeType()).isEqualTo(ICON_MIME_TYPE);
+        assertThat(application.getInternalProfile()).isNull();
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
