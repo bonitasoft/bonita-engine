@@ -33,6 +33,8 @@ dependencyManagement {
         dependency "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
         dependency "javax.transaction:jta:${Deps.javaxJtaVersion}"
         dependency "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
+        //groovy-all is not pulled by the engine but we declare it in case a client app depends on groovy-all directly
+        dependency "org.codehaus.groovy:groovy-all:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-json:${Deps.groovyVersion}"
