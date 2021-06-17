@@ -3,7 +3,6 @@ package org.bonitasoft.permissions
 import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.business.application.Application
 import org.bonitasoft.engine.business.application.ApplicationVisibility
-import org.bonitasoft.engine.business.application.InternalProfiles
 import org.bonitasoft.engine.profile.ProfileCriterion
 import org.bonitasoft.engine.session.APISession
 
@@ -12,7 +11,7 @@ class ApplicationPermissionCommon {
     boolean isAppAllowed(Application application, APIAccessor apiAccessor, APISession apiSession) {
         def profileId = application.getProfileId()
         def profileAPI = apiAccessor.getProfileAPI()
-        def applicationVisibility = application.getApplicationVisibility()
+        def applicationVisibility = application.getVisibility()
         if (applicationVisibility != null) {
             if (applicationVisibility == ApplicationVisibility.ALL) {
                 return true

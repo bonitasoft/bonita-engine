@@ -13,6 +13,20 @@
  **/
 package org.bonitasoft.engine.business.application;
 
+/**
+ * Describe how an Application can be accessed
+ */
 public enum ApplicationVisibility {
-    ALL, TECHNICAL_USER, RESTRICTED
+    /**
+     * everyone can use the application
+     */
+    ALL,
+    /**
+     * Only the technical user can use the application
+     */
+    TECHNICAL_USER,
+    /**
+     * Access to the application is determined by the user profile
+     */
+    RESTRICTED
 }

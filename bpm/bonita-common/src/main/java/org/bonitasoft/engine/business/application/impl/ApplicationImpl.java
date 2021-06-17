@@ -44,7 +44,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
     private final String token;
     private boolean hasIcon;
     private boolean editable;
-    private ApplicationVisibility applicationVisibility;
+    private ApplicationVisibility visibility;
 
     public ApplicationImpl(final String token, final String version, final String description) {
         this.token = token;
@@ -60,12 +60,12 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
     }
 
     @Override
-    public ApplicationVisibility getApplicationVisibility() {
-        return applicationVisibility;
+    public ApplicationVisibility getVisibility() {
+        return visibility;
     }
 
-    public void setApplicationVisibility(ApplicationVisibility applicationVisibility) {
-        this.applicationVisibility = applicationVisibility;
+    public void setVisibility(ApplicationVisibility visibility) {
+        this.visibility = visibility;
     }
 
     @Override
@@ -210,7 +210,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
                 .append(getState(), that.getState()).append(getHomePageId(), that.getHomePageId())
                 .append(getDisplayName(), that.getDisplayName()).append(getProfileId(), that.getProfileId())
                 .append(getThemeId(), that.getThemeId()).append(getDescription(), that.getDescription())
-                .append(getToken(), that.getToken()).append(getApplicationVisibility(), that.getApplicationVisibility())
+                .append(getToken(), that.getToken()).append(getVisibility(), that.getVisibility())
                 .isEquals();
     }
 
@@ -220,7 +220,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
                 .append(getIconPath()).append(getCreationDate()).append(getCreatedBy()).append(getLastUpdateDate())
                 .append(getUpdatedBy()).append(getState()).append(getHomePageId()).append(getDisplayName())
                 .append(getProfileId()).append(getThemeId()).append(getDescription()).append(getToken()).append(hasIcon)
-                .append(isEditable()).append(getApplicationVisibility()).toHashCode();
+                .append(isEditable()).append(getVisibility()).toHashCode();
     }
 
     @Override
@@ -242,7 +242,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
                 .add("token='" + token + "'")
                 .add("hasIcon=" + hasIcon)
                 .add("editable=" + editable)
-                .add("applicationVisibility=" + applicationVisibility)
+                .add("visibility=" + visibility)
                 .toString();
     }
 }

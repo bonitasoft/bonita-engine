@@ -179,7 +179,7 @@ public class ApplicationModelConverterTest {
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
         assertThat(application.getThemeId()).isEqualTo(THEME_ID);
         assertThat(application.isEditable()).isFalse();
-        assertThat(application.getApplicationVisibility()).isEqualTo(internalProfileAll.getApplicationVisibility());
+        assertThat(application.getVisibility()).isEqualTo(internalProfileAll.getApplicationVisibility());
         assertThat(application.hasIcon()).isTrue();
 
     }

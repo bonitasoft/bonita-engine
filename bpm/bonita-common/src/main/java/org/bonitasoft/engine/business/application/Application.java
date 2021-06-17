@@ -163,7 +163,7 @@ public interface Application extends BaseElement {
      *
      * @return the enum ApplicationVisibility of the application
      */
-    ApplicationVisibility getApplicationVisibility();
+    ApplicationVisibility getVisibility();
 
     /**
      * Indicates whether the application can be modified

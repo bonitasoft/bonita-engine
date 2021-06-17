@@ -121,7 +121,7 @@ public class ApplicationModelConverter {
         application.setProfileId(abstractSApplication.getProfileId());
         application.setHasIcon(abstractSApplication.hasIcon());
         application.setEditable(abstractSApplication.isEditable());
-        application.setApplicationVisibility(
+        application.setVisibility(
                 InternalProfiles.getApplicationVisibilityByProfileName(abstractSApplication.getInternalProfile()));
         return application;
     }

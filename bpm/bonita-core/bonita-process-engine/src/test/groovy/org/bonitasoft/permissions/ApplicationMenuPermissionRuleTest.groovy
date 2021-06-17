@@ -16,7 +16,6 @@ package org.bonitasoft.permissions
 
 import org.bonitasoft.engine.business.application.ApplicationVisibility
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl
-import org.bonitasoft.engine.business.application.InternalProfiles
 
 import static org.mockito.Mockito.doReturn
 import static org.mockito.Mockito.mock
@@ -75,7 +74,7 @@ public class ApplicationMenuPermissionRuleTest {
         doReturn(applicationMenu).when(applicationAPI).getApplicationMenu(2l)
         def application = new ApplicationImpl("appToken", "1.0", "dtc")
         application.setProfileId(-1L)
-        application.setApplicationVisibility(ApplicationVisibility.ALL)
+        application.setVisibility(ApplicationVisibility.ALL)
         doReturn(application).when(applicationAPI).getApplication(4l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
@@ -92,7 +91,7 @@ public class ApplicationMenuPermissionRuleTest {
         doReturn(applicationMenu).when(applicationAPI).getApplicationMenu(2l)
         def application = new ApplicationImpl("appToken", "1.0", "dtc")
         application.setProfileId(-1L)
-        application.setApplicationVisibility(ApplicationVisibility.TECHNICAL_USER)
+        application.setVisibility(ApplicationVisibility.TECHNICAL_USER)
         doReturn(application).when(applicationAPI).getApplication(4l)
         doReturn(false).when(apiSession).isTechnicalUser()
         //when
@@ -110,7 +109,7 @@ public class ApplicationMenuPermissionRuleTest {
         doReturn(applicationMenu).when(applicationAPI).getApplicationMenu(2l)
         def application = new ApplicationImpl("appToken", "1.0", "dtc")
         application.setProfileId(-1L)
-        application.setApplicationVisibility(ApplicationVisibility.TECHNICAL_USER)
+        application.setVisibility(ApplicationVisibility.TECHNICAL_USER)
         doReturn(application).when(applicationAPI).getApplication(4l)
         doReturn(true).when(apiSession).isTechnicalUser()
         //when

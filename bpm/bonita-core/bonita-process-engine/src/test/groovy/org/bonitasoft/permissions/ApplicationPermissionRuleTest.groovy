@@ -16,7 +16,6 @@ package org.bonitasoft.permissions
 
 import org.bonitasoft.engine.business.application.ApplicationVisibility
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl
-import org.bonitasoft.engine.business.application.InternalProfiles
 
 import static org.mockito.Mockito.doReturn
 import static org.mockito.Mockito.mock
@@ -72,7 +71,7 @@ public class ApplicationPermissionRuleTest {
         doReturn([token: "appToken"]).when(apiCallContext).getFilters()
         def application = new ApplicationImpl("appToken", "1.0", "dtc")
         application.setProfileId(-1L)
-        application.setApplicationVisibility(ApplicationVisibility.ALL)
+        application.setVisibility(ApplicationVisibility.ALL)
         doReturn(application).when(applicationAPI).getApplicationByToken("appToken")
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
@@ -87,7 +86,7 @@ public class ApplicationPermissionRuleTest {
         doReturn([token: "appToken"]).when(apiCallContext).getFilters()
         def application = new ApplicationImpl("appToken", "1.0", "dtc")
         application.setProfileId(-1L)
-        application.setApplicationVisibility(ApplicationVisibility.TECHNICAL_USER)
+        application.setVisibility(ApplicationVisibility.TECHNICAL_USER)
         doReturn(application).when(applicationAPI).getApplicationByToken("appToken")
         doReturn(false).when(apiSession).isTechnicalUser()
         //when
@@ -103,7 +102,7 @@ public class ApplicationPermissionRuleTest {
         doReturn([token: "appToken"]).when(apiCallContext).getFilters()
         def application = new ApplicationImpl("appToken", "1.0", "dtc")
         application.setProfileId(-1L)
-        application.setApplicationVisibility(ApplicationVisibility.TECHNICAL_USER)
+        application.setVisibility(ApplicationVisibility.TECHNICAL_USER)
         doReturn(application).when(applicationAPI).getApplicationByToken("appToken")
         doReturn(true).when(apiSession).isTechnicalUser()
         //when
