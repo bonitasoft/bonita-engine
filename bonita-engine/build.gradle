@@ -5,10 +5,6 @@ plugins {
     id "io.spring.dependency-management" version "1.0.6.RELEASE"
 }
 dependencyManagement {
-    imports {
-        //groovy-all POM declares version on all groovy-* dependencies:
-        mavenBom "org.codehaus.groovy:groovy-all:${Deps.groovyVersion}"
-    }
     dependencies {
         dependency("org.slf4j:slf4j-api:$Deps.slf4jVersion")
         dependency "com.h2database:h2:${Deps.h2Version}"
@@ -36,6 +32,22 @@ dependencyManagement {
         dependency("org.apache.commons:commons-text:${Deps.commonsTextVersion}")
         dependency "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
         dependency "javax.transaction:jta:${Deps.javaxJtaVersion}"
+        dependency "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
+        // groovy-all is not pulled by the engine but we declare it in case a client app depends on groovy-all directly
+        // dependency "org.codehaus.groovy:groovy-all:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-json:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-jmx:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-nio:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-groovysh:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-datetime:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-dateutil:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-docgenerator:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-jsr223:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-test:${Deps.groovyVersion}"
         dependency "org.javassist:javassist:${Deps.javassistVersion}"
         dependency "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
         dependencySet(group: 'org.apache.httpcomponents', version: Deps.httpComponentsVersion) {
