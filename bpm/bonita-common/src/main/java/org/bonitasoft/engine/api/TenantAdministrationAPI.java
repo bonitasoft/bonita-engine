@@ -84,6 +84,16 @@ public interface TenantAdministrationAPI {
     void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException;
 
     /**
+     * Returns the generated BDM zip.
+     * This zip contains the jars with BDM Pojos and DAOs.
+     * usage:
+     * byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
+     * clientBDMZip will typically contain : "README.md", "example-pom.xml", "bdm-dao.jar", "bdm-model.jar", "bom.zip".
+     * See online <a
+     * href="https://documentation.bonitasoft.com/bonita/latest/how-a-bdm-is-deployed#_bdm_classes_generation">a Java
+     * code example</a>
+     * on how to extract those artefacts from the Zip file.
+     *
      * @return zip content of the deployed client Business data model, null if no Business data model has been deployed
      * @throws BusinessDataRepositoryException
      *         if the Business Data Model cannot be retrieved.
