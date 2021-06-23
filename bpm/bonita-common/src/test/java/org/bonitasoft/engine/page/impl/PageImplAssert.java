@@ -356,6 +356,48 @@ public class PageImplAssert extends AbstractAssert<PageImplAssert, PageImpl> {
     }
 
     /**
+     * Verifies that the actual PageImpl is editable.
+     *
+     * @return this assertion object.
+     * @throws AssertionError - if the actual PageImpl is not provided.
+     */
+    public PageImplAssert isEditable() {
+        // check that actual PageImpl we want to make assertions on is not null.
+        isNotNull();
+
+        // we overrides the default error message with a more explicit one
+        String errorMessage = format("Expected actual PageImpl to be editable but was not.", actual);
+
+        // check
+        if (!actual.isEditable())
+            throw new AssertionError(errorMessage);
+
+        // return the current assertion for method chaining
+        return this;
+    }
+
+    /**
+     * Verifies that the actual PageImpl is removable.
+     *
+     * @return this assertion object.
+     * @throws AssertionError - if the actual PageImpl is not provided.
+     */
+    public PageImplAssert isRemovable() {
+        // check that actual PageImpl we want to make assertions on is not null.
+        isNotNull();
+
+        // we overrides the default error message with a more explicit one
+        String errorMessage = format("Expected actual PageImpl to be removable but was not.", actual);
+
+        // check
+        if (!actual.isRemovable())
+            throw new AssertionError(errorMessage);
+
+        // return the current assertion for method chaining
+        return this;
+    }
+
+    /**
      * Verifies that the actual PageImpl is hidden.
      *
      * @return this assertion object.

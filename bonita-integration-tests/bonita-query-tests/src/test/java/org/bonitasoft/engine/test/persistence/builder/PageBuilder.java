@@ -44,6 +44,7 @@ public class PageBuilder extends PersistentObjectBuilder<AbstractSPage, PageBuil
     private long processDefinitionId;
 
     private byte[] content;
+    private boolean editable;
 
     public static PageBuilder aPage() {
         return new PageBuilder();
@@ -51,7 +52,8 @@ public class PageBuilder extends PersistentObjectBuilder<AbstractSPage, PageBuil
 
     @Override
     public SPageWithContent _build() {
-        final SPage sPage = new SPage(name, description, displayName, installationDate, installedBy, provided, hidden,
+        final SPage sPage = new SPage(name, description, displayName, installationDate, installedBy, provided, editable,
+                hidden,
                 lastModificationDate, lastUpdatedBy,
                 contentName);
         sPage.setProcessDefinitionId(processDefinitionId);
@@ -116,6 +118,11 @@ public class PageBuilder extends PersistentObjectBuilder<AbstractSPage, PageBuil
 
     public PageBuilder withProcessDefinitionId(final Long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    public PageBuilder makeEditable(Boolean editable) {
+        this.editable = editable;
         return this;
     }
 

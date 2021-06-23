@@ -111,4 +111,18 @@ public interface Page extends BaseElement {
      */
     Long getProcessDefinitionId();
 
+    /**
+     * Whether this page is editable
+     *
+     * @return Whether this page is editable
+     */
+    boolean isEditable();
+
+    /**
+     * Whether this page is removable
+     *
+     * @return Whether this page is removable
+     */
+    boolean isRemovable();
+
 }

@@ -983,6 +983,8 @@ CREATE TABLE page (
   installationDate NUMERIC(19, 0) NOT NULL,
   installedBy NUMERIC(19, 0) NOT NULL,
   provided BIT,
+  editable BIT,
+  removable BIT,
   hidden BIT NOT NULL,
   lastModificationDate NUMERIC(19, 0) NOT NULL,
   lastUpdatedBy NUMERIC(19, 0) NOT NULL,

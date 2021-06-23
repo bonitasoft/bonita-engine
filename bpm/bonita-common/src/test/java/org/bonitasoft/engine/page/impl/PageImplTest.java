@@ -22,13 +22,17 @@ import org.junit.Test;
 
 public class PageImplTest {
 
-    private static final long USER_ID = 1l;
+    private static final long USER_ID = 1L;
 
     private static final String DESCRIPTION = "description";
 
     private static final boolean PROVIDED = true;
 
     private static final boolean HIDDEN = true;
+
+    private static final boolean EDITABLE = true;
+
+    private static final boolean REMOVABLE = true;
 
     private static final String NAME = "name";
 
@@ -44,13 +48,16 @@ public class PageImplTest {
 
         PageImplAssert
                 .assertThat(
-                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, DESCRIPTION, date.getTime(), USER_ID,
+                        new PageImpl(-1L, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, EDITABLE, REMOVABLE, DESCRIPTION,
+                                date.getTime(), USER_ID,
                                 modificationDate.getTime(), USER_ID,
                                 "content.zip", ContentType.PAGE, null))
-                .hasId(-1l)
+                .hasId(-1L)
                 .hasName(NAME)
                 .hasDisplayName(DISPLAY_NAME)
                 .isProvided()
+                .isEditable()
+                .isRemovable()
                 .isHidden()
                 .hasDescription(DESCRIPTION).hasInstallationDate(date)
                 .hasLastModificationDate(modificationDate)
@@ -66,14 +73,17 @@ public class PageImplTest {
 
         PageImplAssert
                 .assertThat(
-                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, DESCRIPTION, date.getTime(), USER_ID,
+                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, EDITABLE, REMOVABLE, DESCRIPTION,
+                                date.getTime(), USER_ID,
                                 modificationDate.getTime(), USER_ID,
                                 "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID))
                 .hasId(-1l)
                 .hasName(NAME)
                 .hasDisplayName(DISPLAY_NAME)
                 .isProvided()
+                .isRemovable()
                 .isHidden()
+                .isEditable()
                 .hasDescription(DESCRIPTION).hasInstallationDate(date)
                 .hasLastModificationDate(modificationDate)
                 .hasProcessDefinitionId(PROCESS_DEFINITION_ID)
@@ -88,7 +98,8 @@ public class PageImplTest {
         Date modificationDate = new Date(2);
 
         assertThat(
-                new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, DESCRIPTION, date.getTime(), USER_ID,
+                new PageImpl(-1L, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, EDITABLE, REMOVABLE, DESCRIPTION,
+                        date.getTime(), USER_ID,
                         modificationDate.getTime(), USER_ID,
                         "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID).toString())
                                 .contains(String.valueOf(PROCESS_DEFINITION_ID)).contains(
