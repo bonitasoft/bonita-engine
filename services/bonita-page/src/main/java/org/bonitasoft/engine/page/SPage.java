@@ -61,7 +61,8 @@ public class SPage extends AbstractSPage {
 
     public SPage(final String name, final String description, final String displayName, final long installationDate,
             final long installedBy,
-            final boolean provided, boolean hidden, final long lastModificationDate, final long lastUpdatedBy,
+            final boolean provided, boolean editable, boolean hidden, final long lastModificationDate,
+            final long lastUpdatedBy,
             final String contentName) {
         this(name, installationDate, installedBy, provided, contentName);
         setDescription(description);
@@ -70,11 +71,12 @@ public class SPage extends AbstractSPage {
         setLastModificationDate(lastModificationDate);
         setLastUpdatedBy(lastUpdatedBy);
         setHidden(hidden);
+        setEditable(editable);
     }
 
     public SPage(final SPage sPage) {
         this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(),
-                sPage.getInstalledBy(), sPage.isProvided(), sPage.isHidden(), sPage
+                sPage.getInstalledBy(), sPage.isProvided(), sPage.isEditable(), sPage.isHidden(), sPage
                         .getLastModificationDate(),
                 sPage.getLastUpdatedBy(), sPage.getContentName());
         setContentType(sPage.getContentType());

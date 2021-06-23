@@ -976,7 +976,6 @@ public class PageServiceImplTest {
         final Long pageDate = pageAfterAddition.getLastModificationDate();
         final SPage sPage = new SPage("custompage_mypage", "mypage description", "mypage display name",
                 pageDate, 45, false, pageDate, 45, CONTENT_NAME);
-
         assertEquals(pageAfterAddition, sPage);
         assertThat(pageAfterAddition.getLastModificationDate()).isGreaterThan(0);
     }
@@ -1154,6 +1153,38 @@ public class PageServiceImplTest {
         pageServiceImpl.deletePage(1983L);
 
         verify(apiExtensionPageServiceListener).pageDeleted(page);
+    }
+
+    @Test
+    public void deletePage_on_non_removable_page_should_raise_exception() throws Exception {
+        //given
+        final SPage page = new SPage("a page name", 10201983L, 2005L, false, "contentName");
+        page.setRemovable(false);
+        when(readPersistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(page);
+
+        //when
+        String exceptionMessage = assertThrows("Not the right exception", SObjectModificationException.class,
+                () -> pageServiceImpl.deletePage(1983L)).getMessage();
+
+        //then
+        assertThat(exceptionMessage)
+                .contains("The page a page name cannot be deleted because it is set as non-removable");
+    }
+
+    @Test
+    public void updatePage_on_non_editable_page_should_raise_exception() throws Exception {
+        //given
+        final SPage page = new SPage("a page name", 10201983L, 2005L, false, "contentName");
+        page.setEditable(false);
+        when(readPersistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(page);
+
+        //when
+        String exceptionMessage = assertThrows("Not the right exception", SObjectModificationException.class,
+                () -> pageServiceImpl.updatePage(page.getId(), entityUpdateDescriptor)).getMessage();
+
+        //then
+        assertThat(exceptionMessage)
+                .contains("The page a page name cannot be modified because it is set as not modifiable");
     }
 
 }

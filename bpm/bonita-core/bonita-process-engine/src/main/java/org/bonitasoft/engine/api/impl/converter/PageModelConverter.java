@@ -70,6 +70,8 @@ public class PageModelConverter {
                 .provided(false).hidden(hidden)
                 .contentName(contentName)
                 .contentType(contentType)
+                .editable(true)
+                .removable(true)
                 .processDefinitionId(processDefinitionId != null ? processDefinitionId : 0)
                 .build();
     }
@@ -77,7 +79,7 @@ public class PageModelConverter {
     public Page toPage(final SPage sPage) {
         Long processDefinitionId = sPage.getProcessDefinitionId() > 0 ? sPage.getProcessDefinitionId() : null;
         return new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(),
-                sPage.isHidden(), sPage.getDescription(),
+                sPage.isHidden(), sPage.isEditable(), sPage.isRemovable(), sPage.getDescription(),
                 sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.getLastModificationDate(),
                 sPage.getLastUpdatedBy(), sPage.getContentName(),
                 sPage.getContentType(), processDefinitionId);

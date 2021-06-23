@@ -43,7 +43,9 @@ public class AbstractSPage implements PersistentObject {
     private long installationDate;
     private long installedBy;
     private boolean provided;
+    private boolean editable = true;
     private boolean hidden;
+    private boolean removable = true;
     private long lastModificationDate;
     private long lastUpdatedBy;
     private String contentName;
@@ -63,6 +65,8 @@ public class AbstractSPage implements PersistentObject {
         contentName = sPage.getContentName();
         contentType = sPage.getContentType();
         processDefinitionId = sPage.getProcessDefinitionId();
+        editable = sPage.isEditable();
+        removable = sPage.isRemovable();
     }
 
     public AbstractSPage(final String name, final long installationDate, final long installedBy, final boolean provided,

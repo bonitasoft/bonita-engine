@@ -207,6 +207,7 @@ public class PageServiceImpl implements PageService {
         final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided, hidden,
+                true, true,
                 pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         return insertPage(page, content);
     }
@@ -350,12 +351,14 @@ public class PageServiceImpl implements PageService {
 
     private SPage buildPage(final String name, final String displayName, final String description,
             final String contentName, final long creatorUserId,
-            final boolean provided, boolean hidden, final String contentType) {
+            final boolean provided, boolean hidden, boolean removable, boolean editable, final String contentType) {
         Long currentTime = System.currentTimeMillis();
         return SPage.builder().name(name).description(description).displayName(displayName)
                 .installationDate(currentTime).installedBy(creatorUserId).provided(provided)
                 .lastModificationDate(currentTime).lastUpdatedBy(creatorUserId)
                 .hidden(hidden)
+                .removable(removable)
+                .editable(editable)
                 .contentName(contentName)
                 .contentType(contentType)
                 .build();
@@ -407,6 +410,10 @@ public class PageServiceImpl implements PageService {
     private void deletePage(final SPage sPage) throws SObjectModificationException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.DELETED, "Deleting page named: " + sPage.getName());
         try {
+            if (!sPage.isRemovable()) {
+                throw new SObjectModificationException(
+                        "The page " + sPage.getName() + " cannot be deleted because it is set as non-removable");
+            }
             deleteProfileEntry(sPage);
             for (final PageServiceListener pageServiceListener : pageServiceListeners) {
                 pageServiceListener.pageDeleted(sPage);
@@ -518,6 +525,10 @@ public class PageServiceImpl implements PageService {
         try {
 
             final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId));
+            if (!sPage.isEditable()) {
+                throw new SObjectModificationException(
+                        "The page " + sPage.getName() + " cannot be modified because it is set as not modifiable");
+            }
             checkPageDuplicate(sPage, entityUpdateDescriptor, logBuilder, logMethodName);
             final String oldPageName = sPage.getName();
             recorder.recordUpdate(UpdateRecord.buildSetFields(sPage, entityUpdateDescriptor), PAGE);
@@ -676,7 +687,7 @@ public class PageServiceImpl implements PageService {
         final SPage pageByName = getPageByName(pageProperties.getProperty(PROPERTIES_NAME));
         if (pageByName == null) {
             log.debug("Provided page {} does not exist yet, importing it.", pageZipName);
-            createPage(pageZipName, providedPageContent, pageProperties);
+            createProvidedPage(pageZipName, providedPageContent, pageProperties, false, false);
         } else {
             final byte[] pageContent = getPageContent(pageByName.getId());
             // think of a better way to check the content are the same or not, it will almost always be the same so....
@@ -689,14 +700,14 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    protected void createPage(String pageZipName, final byte[] providedPageContent,
-            final Properties pageProperties) throws SObjectAlreadyExistsException,
+    protected void createProvidedPage(String pageZipName, final byte[] providedPageContent,
+            final Properties pageProperties, boolean editable, boolean removable) throws SObjectAlreadyExistsException,
             SObjectCreationException {
         boolean hidden = pageProperties.getProperty("name").equals(TENANT_STATUS_PAGE_NAME);
         final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), pageZipName, -1, true,
-                hidden,
+                hidden, removable, editable,
                 pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         insertPage(page, providedPageContent);
     }
