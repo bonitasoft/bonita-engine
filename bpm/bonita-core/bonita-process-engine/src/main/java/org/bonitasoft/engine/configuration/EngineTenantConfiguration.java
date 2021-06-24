@@ -21,6 +21,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.impl.EventServiceImpl;
 import org.bonitasoft.engine.identity.IdentityConfiguration;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.PageConfiguration;
 import org.bonitasoft.engine.session.SessionServiceConfiguration;
 import org.bonitasoft.engine.work.WorkServiceConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -44,6 +45,7 @@ import org.springframework.context.annotation.Import;
         IdentityConfiguration.class,
         CacheServiceConfiguration.class,
         ApplicationConfiguration.class,
+        PageConfiguration.class
 })
 public class EngineTenantConfiguration {
 

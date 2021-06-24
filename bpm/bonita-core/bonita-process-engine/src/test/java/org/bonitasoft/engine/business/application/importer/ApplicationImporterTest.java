@@ -342,6 +342,7 @@ public class ApplicationImporterTest {
         app2.setId(2);
         SApplicationWithIcon app3 = new SApplicationWithIcon();
         app2.setId(3);
+
         when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
                 any(), anyString(), anyLong()))
                         .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
@@ -359,8 +360,123 @@ public class ApplicationImporterTest {
 
         verify(applicationService, times(2)).createApplication(argThat(app -> !app.isEditable()));
         verify(applicationService, times(1)).createApplication(argThat(AbstractSApplication::isEditable));
+
     }
 
-    //TODO: create test that validate the default import strategy when we have decided what strategy it should be
+    @Test
+    public void should_overwrite_default_applications_when_is_not_editable_and_version_is_not_same() throws Exception {
+        //given
+        SApplicationWithIcon app1 = new SApplicationWithIcon();
+        app1.setId(1);
+        app1.setVersion("2");
+        app1.setToken("default_app_1");
+        app1.setEditable(false);
+        SApplicationWithIcon app2 = new SApplicationWithIcon();
+        app2.setId(2);
+        app2.setVersion("1");
+        SApplicationWithIcon app3 = new SApplicationWithIcon();
+        app2.setId(3);
+        app2.setVersion("1");
+
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_2".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app2, new ImportStatus("ok")));
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_3".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app3, new ImportStatus("ok")));
+
+        SApplication conflictingApplication = new SApplication();
+        conflictingApplication.setToken("default_app_1");
+        conflictingApplication.setEditable(false);
+        conflictingApplication.setVersion("version");
+
+        when(applicationService.getApplicationByToken("default_app_1")).thenReturn(conflictingApplication);
+
+        applicationImporter.init();
+        verify(applicationService).forceDeleteApplication(argThat(app -> app1.getToken().equals("default_app_1")));
+        verify(applicationService).createApplication(app1);
+        verify(applicationService).createApplication(app2);
+        verify(applicationService).createApplication(app3);
+
+    }
+
+    @Test
+    public void should_not_overwrite_default_applications_when_is_not_editable_and_version_is_the_same()
+            throws Exception {
+        //given
+        SApplicationWithIcon app1 = new SApplicationWithIcon();
+        app1.setId(1);
+        app1.setVersion("2");
+        app1.setToken("default_app_1");
+        app1.setEditable(false);
+        SApplicationWithIcon app2 = new SApplicationWithIcon();
+        app2.setId(2);
+        app2.setVersion("1");
+        SApplicationWithIcon app3 = new SApplicationWithIcon();
+        app2.setId(3);
+        app2.setVersion("1");
+
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_2".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app2, new ImportStatus("ok")));
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_3".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app3, new ImportStatus("ok")));
+
+        SApplication conflictingApplication = new SApplication();
+        conflictingApplication.setToken("default_app_1");
+        conflictingApplication.setEditable(false);
+        conflictingApplication.setVersion("2");
+
+        when(applicationService.getApplicationByToken("default_app_1")).thenReturn(conflictingApplication);
+
+        applicationImporter.init();
+        verify(applicationService, never()).forceDeleteApplication(any());
+        verify(applicationService, never()).createApplication(app1);
+        verify(applicationService).createApplication(app2);
+        verify(applicationService).createApplication(app3);
+
+    }
+
+    @Test
+    public void should_not_overwrite_default_applications_when_is_editable() throws Exception {
+        //given
+        SApplicationWithIcon app1 = new SApplicationWithIcon();
+        app1.setId(1);
+        app1.setToken("default_app_1");
+        SApplicationWithIcon app2 = new SApplicationWithIcon();
+        app2.setId(2);
+        SApplicationWithIcon app3 = new SApplicationWithIcon();
+        app2.setId(3);
+
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_2".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app2, new ImportStatus("ok")));
+        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_3".equals(a.getToken())),
+                any(), anyString(), anyLong()))
+                        .thenReturn(new ImportResult(app3, new ImportStatus("ok")));
+
+        SApplication conflictingApplication = new SApplication();
+        conflictingApplication.setToken("default_app_1");
+        conflictingApplication.setEditable(true);
+
+        when(applicationService.getApplicationByToken("default_app_1")).thenReturn(conflictingApplication);
+
+        applicationImporter.init();
+
+        verify(applicationService, never()).forceDeleteApplication(any());
+        verify(applicationService, never()).createApplication(app1);
+        verify(applicationService).createApplication(app2);
+        verify(applicationService).createApplication(app3);
+    }
 
 }

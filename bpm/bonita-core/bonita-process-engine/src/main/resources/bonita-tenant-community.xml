@@ -1140,17 +1140,6 @@
         <constructor-arg name="pageMappingService" ref="pageMappingService" />
     </bean>
 
-    <bean id="pageService" class="org.bonitasoft.engine.page.impl.PageServiceImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-        <constructor-arg name="profileService" ref="profileService" />
-        <property name="pageServiceListeners">
-            <list>
-                <ref bean="apiExtensionPageServiceListener" />
-            </list>
-        </property>
-    </bean>
 
     <bean id="technicalUser" class="org.bonitasoft.engine.core.login.TechnicalUser">
         <constructor-arg name="userName" value="${userName}" />

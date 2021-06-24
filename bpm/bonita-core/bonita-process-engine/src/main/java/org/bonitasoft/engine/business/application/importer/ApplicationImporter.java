@@ -37,12 +37,14 @@ import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.ExceptionUtils;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.session.SessionService;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -53,7 +55,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class ApplicationImporter {
+//must be initialized after PageService
+@Order(5)
+public class ApplicationImporter implements TenantLifecycleService {
 
     public static final String PROVIDED_FINAL_APPLICATIONS_PATH = "org/bonitasoft/web/application/final";
     public static final String PROVIDED_APPLICATIONS_PATH = "org/bonitasoft/web/application/";
@@ -65,8 +69,8 @@ public class ApplicationImporter {
             ApplicationImporter.class.getClassLoader());
 
     public ApplicationImporter(ApplicationService applicationService,
-            NodeToApplicationConverter nodeToApplicationConverter,
-            ApplicationPageImporter applicationPageImporter, ApplicationMenuImporter applicationMenuImporter) {
+            NodeToApplicationConverter nodeToApplicationConverter, ApplicationPageImporter applicationPageImporter,
+            ApplicationMenuImporter applicationMenuImporter) {
         this.applicationService = applicationService;
         this.nodeToApplicationConverter = nodeToApplicationConverter;
         this.applicationPageImporter = applicationPageImporter;
@@ -74,21 +78,19 @@ public class ApplicationImporter {
     }
 
     public ImportStatus importApplication(ApplicationNode applicationNode, byte[] iconContent, String iconMimeType,
-            long createdBy,
-            ApplicationImportStrategy strategy)
-            throws ImportException, AlreadyExistsException {
+            long createdBy, ApplicationImportStrategy strategy) throws ImportException, AlreadyExistsException {
         return importApplicationSetEditable(applicationNode, iconContent, iconMimeType, createdBy, strategy, true);
     }
 
     ImportStatus importApplicationSetEditable(ApplicationNode applicationNode, byte[] iconContent, String iconMimeType,
-            long createdBy,
-            ApplicationImportStrategy strategy, boolean editable)
+            long createdBy, ApplicationImportStrategy strategy, boolean editable)
             throws ImportException, AlreadyExistsException {
         try {
             ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, iconContent,
                     iconMimeType, createdBy);
-            importResult.getApplication().setEditable(editable);
-            SApplicationWithIcon application = importApplication(importResult.getApplication(), importResult, strategy);
+            SApplicationWithIcon application = importResult.getApplication();
+            application.setEditable(editable);
+            application = importApplication(application, importResult, strategy);
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);
             updateHomePage(application, applicationNode, createdBy, importResult);
@@ -99,8 +101,7 @@ public class ApplicationImporter {
     }
 
     private void updateHomePage(final SApplicationWithIcon application, final ApplicationNode applicationNode,
-            final long createdBy, final ImportResult importResult)
-            throws SBonitaException {
+            final long createdBy, final ImportResult importResult) throws SBonitaException {
         if (applicationNode.getHomePage() != null) {
             try {
                 SApplicationPage homePage = applicationService.getApplicationPage(applicationNode.getToken(),
@@ -116,8 +117,7 @@ public class ApplicationImporter {
     }
 
     private void importApplicationMenus(final ApplicationNode applicationNode, final ImportResult importResult,
-            final SApplicationWithIcon application)
-            throws ImportException {
+            final SApplicationWithIcon application) throws ImportException {
         for (ApplicationMenuNode applicationMenuNode : applicationNode.getApplicationMenus()) {
             List<ImportError> importErrors = applicationMenuImporter.importApplicationMenu(applicationMenuNode,
                     application, null);
@@ -128,8 +128,7 @@ public class ApplicationImporter {
     }
 
     private void importApplicationPages(final ApplicationNode applicationNode, final ImportResult importResult,
-            final SApplicationWithIcon application)
-            throws ImportException {
+            final SApplicationWithIcon application) throws ImportException {
         for (ApplicationPageNode applicationPageNode : applicationNode.getApplicationPages()) {
             ImportError importError = applicationPageImporter.importApplicationPage(applicationPageNode, application);
             addError(importResult.getImportStatus(), importError);
@@ -156,9 +155,7 @@ public class ApplicationImporter {
     }
 
     public List<ImportStatus> importApplications(final byte[] xmlContent, byte[] iconContent, String iconMimeType,
-            long createdBy,
-            ApplicationImportStrategy strategy)
-            throws ImportException, AlreadyExistsException {
+            long createdBy, ApplicationImportStrategy strategy) throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
         ArrayList<ImportStatus> importStatus = new ArrayList<>();
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
@@ -167,18 +164,13 @@ public class ApplicationImporter {
         return importStatus;
     }
 
-    private List<ImportStatus> importDefaultApplications(final byte[] xmlContent, byte[] iconContent,
-            String iconMimeType,
-            long createdBy,
-            ApplicationImportStrategy strategy, boolean editable)
-            throws ImportException, AlreadyExistsException {
+    private void importDefaultApplications(final byte[] xmlContent, byte[] iconContent, String iconMimeType,
+            boolean editable) throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
-        ArrayList<ImportStatus> importStatus = new ArrayList<>();
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
-            importStatus.add(importApplicationSetEditable(applicationNode, iconContent, iconMimeType, createdBy,
-                    strategy, editable));
+            importApplicationSetEditable(applicationNode, iconContent, iconMimeType, SessionService.SYSTEM_ID,
+                    new UpdateNewerNonEditableApplicationStrategy(applicationService), editable);
         }
-        return importStatus;
     }
 
     private ApplicationNodeContainer getApplicationNodeContainer(byte[] xmlContent) throws ImportException {
@@ -192,6 +184,7 @@ public class ApplicationImporter {
         return result;
     }
 
+    @Override
     public void init() throws SBonitaException {
         try {
             importProvidedApplicationsFromClasspath(PROVIDED_APPLICATIONS_PATH, true);
@@ -238,12 +231,12 @@ public class ApplicationImporter {
             String xmlName = xmlFileNamesList.get(0);
             byte[] iconRaw = zipContent.get(pngName);
             byte[] xmlRaw = zipContent.get(xmlName);
-            importDefaultApplications(xmlRaw, iconRaw, pngName, SessionService.SYSTEM_ID,
-                    new ReplaceDuplicateApplicationImportStrategy(applicationService), editable);
+            importDefaultApplications(xmlRaw, iconRaw, pngName, editable);
         } catch (IOException | ImportException | AlreadyExistsException e) {
             log.error("Unable to import the application {} because: {}", resourceName,
                     ExceptionUtils.printLightWeightStacktrace(e));
             log.debug("Stacktrace of the import issue is:", e);
         }
     }
+
 }

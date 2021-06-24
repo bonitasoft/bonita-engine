@@ -137,13 +137,6 @@ public class ApplicationServiceImpl implements ApplicationService {
         throw new SObjectCreationException(e);
     }
 
-    private void throwModificationException(final long persitentObjectId, final SPersistenceLogBuilder logBuilder,
-            final String methodName, final Exception e)
-            throws SObjectModificationException {
-        log(persitentObjectId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-        throw new SObjectModificationException(e);
-    }
-
     public boolean hasApplicationWithToken(final String name) throws SBonitaReadException {
         final SApplication application = getApplicationByToken(name);
         return application != null;
@@ -152,9 +145,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public SApplication getApplicationByToken(final String token) throws SBonitaReadException {
         return persistenceService.selectOne(new SelectOneDescriptor<>("getApplicationByToken", Collections
-                .singletonMap("token",
-                        token),
-                SApplication.class));
+                .singletonMap("token", token), SApplication.class));
     }
 
     private <T extends SLogBuilder & HasCRUDEAction> void initializeLogBuilder(final T logBuilder, final String message,
@@ -215,26 +206,36 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public void forceDeleteApplication(SApplication application) throws SObjectModificationException {
+        try {
+            deleteApplication(application);
+        } catch (final SBonitaException e) {
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    @Override
     public void deleteApplication(final long applicationId)
             throws SObjectModificationException, SObjectNotFoundException {
-        final String methodName = "deleteApplication";
-        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.DELETED,
-                "Deleting application with id " + applicationId);
         try {
             final SApplication application = getApplication(applicationId);
             if (!application.isEditable()) {
                 throw new SObjectModificationException(
-                        " The application is set as non modifiable. It cannot be deleted ");
+                        " The application is set as non modifiable. It cannot be deleted.");
             }
-            applicationDestructor.onDeleteApplication(application);
-            recorder.recordDelete(new DeleteRecord(application), APPLICATION);
-            log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            deleteApplication(application);
         } catch (final SObjectNotFoundException e) {
-            logAndRetrowException(applicationId, methodName, logBuilder, e);
+            throw e;
         } catch (final SBonitaException e) {
-            throwModificationException(applicationId, logBuilder, methodName, e);
+            throw new SObjectModificationException(e);
         }
+    }
 
+    private void deleteApplication(SApplication application) throws SBonitaException {
+        applicationDestructor.onDeleteApplication(application);
+        recorder.recordDelete(new DeleteRecord(application), APPLICATION);
+        log(application.getId(), SQueriableLog.STATUS_OK, getApplicationLogBuilder(ActionType.DELETED,
+                "Deleting application with id " + application.getId()), "deleteApplication");
     }
 
     @Override
@@ -289,7 +290,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                     updateDescriptor), APPLICATION);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             return application;
-
         } catch (final SObjectAlreadyExistsException e) {
             return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
@@ -299,16 +299,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     private <T, E extends SBonitaException> T logAndRetrowException(final long objectId, final String methodName,
-            final SPersistenceLogBuilder logBuilder,
-            final E e) throws E {
+            final SPersistenceLogBuilder logBuilder, final E e) throws E {
         log(objectId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         throw e;
     }
 
     private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor,
-            final SApplicationWithIcon application)
-            throws SBonitaReadException,
-            SObjectAlreadyExistsException {
+            final SApplicationWithIcon application) throws SBonitaReadException, SObjectAlreadyExistsException {
         if (updateDescriptor.getFields().containsKey(AbstractSApplication.TOKEN)
                 && !application.getToken().equals(updateDescriptor.getFields().get(AbstractSApplication.TOKEN))) {
             validateApplicationToken((String) updateDescriptor.getFields().get(AbstractSApplication.TOKEN));
@@ -322,8 +319,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public long getNumberOfApplicationsOfUser(long userId, QueryOptions options) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId",
-                (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return persistenceService.getNumberOfEntities(SApplication.class, "OfUser", options, parameters);
     }
 
@@ -334,8 +330,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<SApplication> searchApplicationsOfUser(long userId, QueryOptions options) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId",
-                (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return persistenceService.searchEntity(SApplication.class, "OfUser", options, parameters);
     }
 
@@ -368,8 +363,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     private boolean hasApplicationPage(final long applicationId, final String name) throws SBonitaReadException {
-        final SApplicationPage applicationPage = getApplicationPage(applicationId, name);
-        return applicationPage != null;
+        return getApplicationPage(applicationId, name) != null;
     }
 
     public SApplicationPage getApplicationPage(final long applicationId, final String applicationPageToken)
@@ -383,8 +377,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplicationPage getApplicationPage(final String applicationToken, final String applicationPageToken)
-            throws SBonitaReadException,
-            SObjectNotFoundException {
+            throws SBonitaReadException, SObjectNotFoundException {
         final Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("applicationToken", applicationToken);
         inputParameters.put("applicationPageToken", applicationPageToken);
@@ -429,18 +422,16 @@ public class ApplicationServiceImpl implements ApplicationService {
         } catch (final SObjectModificationException e) {
             throw e;
         } catch (final SBonitaException e) {
-            throwModificationException(applicationPageId, logBuilder, methodName, e);
+            throw new SObjectModificationException(e);
         }
         return applicationPage;
-
     }
 
     @Override
     public void deleteApplicationPage(final SApplicationPage applicationPage) throws SObjectModificationException {
         final String methodName = "deleteApplicationPage";
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.DELETED,
-                "Deleting application page with id "
-                        + applicationPage.getId());
+                "Deleting application page with id " + applicationPage.getId());
         try {
             applicationPageDestructor.onDeleteApplicationPage(applicationPage);
             recorder.recordDelete(new DeleteRecord(applicationPage), APPLICATION_PAGE);
@@ -448,9 +439,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         } catch (final SObjectModificationException e) {
             logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
-            throwModificationException(applicationPage.getId(), logBuilder, methodName, e);
+            throw new SObjectModificationException(e);
         }
-
     }
 
     @Override
@@ -495,42 +485,34 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public SApplicationMenu updateApplicationMenu(final long applicationMenuId,
             final EntityUpdateDescriptor updateDescriptor)
-            throws SObjectModificationException,
-            SObjectNotFoundException {
+            throws SObjectModificationException, SObjectNotFoundException {
         final String methodName = "updateApplicationMenu";
         final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.UPDATED,
                 "Updating application menu with id " + applicationMenuId);
-
         try {
             final SApplicationMenu applicationMenu = getApplicationMenu(applicationMenuId);
-
             updateApplicationMenu(applicationMenu, updateDescriptor, true);
             return applicationMenu;
         } catch (final SObjectNotFoundException e) {
             return logAndRetrowException(applicationMenuId, methodName, logBuilder, e);
         } catch (final SBonitaReadException e) {
-            log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
         }
     }
 
     @Override
     public SApplicationMenu updateApplicationMenu(final SApplicationMenu applicationMenu,
-            final EntityUpdateDescriptor updateDescriptor,
-            final boolean organizeIndexes)
+            final EntityUpdateDescriptor updateDescriptor, final boolean organizeIndexes)
             throws SObjectModificationException {
-        final String methodName = "updateApplicationMenu";
-        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.UPDATED,
-                "Updating application menu with id " + applicationMenu.getId());
-
         try {
             organizeIndexesOnUpdate(applicationMenu, updateDescriptor, organizeIndexes);
-            recorder.recordUpdate(UpdateRecord.buildSetFields(applicationMenu,
-                    updateDescriptor), APPLICATION_MENU);
-            log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(applicationMenu, updateDescriptor), APPLICATION_MENU);
+
+            log(applicationMenu.getId(), SQueriableLog.STATUS_OK, getApplicationMenuLogBuilder(ActionType.UPDATED,
+                    "Updating application menu with id " + applicationMenu.getId()), "updateApplicationMenu");
+
             return applicationMenu;
         } catch (final SBonitaException e) {
-            log(applicationMenu.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
         }
     }
@@ -576,16 +558,13 @@ public class ApplicationServiceImpl implements ApplicationService {
         } catch (final SObjectNotFoundException e) {
             logAndRetrowException(applicationMenuId, methodName, logBuilder, e);
         } catch (final SBonitaReadException e) {
-            throwModificationException(applicationMenuId, logBuilder, methodName, e);
+            throw new SObjectModificationException(e);
         }
         return applicationMenu;
     }
 
     @Override
     public void deleteApplicationMenu(final SApplicationMenu applicationMenu) throws SObjectModificationException {
-        final String methodName = "deleteApplicationMenu";
-        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.DELETED,
-                "Deleting application menu with id " + applicationMenu.getId());
         try {
             applicationMenuDestructor.onDeleteApplicationMenu(applicationMenu);
             final int lastUsedIndex = getLastUsedIndex(applicationMenu.getParentId());
@@ -593,7 +572,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     new MenuIndex(applicationMenu.getParentId(), applicationMenu.getIndex(), lastUsedIndex));
             recorder.recordDelete(new DeleteRecord(applicationMenu), APPLICATION_MENU);
         } catch (final SBonitaException e) {
-            throwModificationException(applicationMenu.getId(), logBuilder, methodName, e);
+            throw new SObjectModificationException(e);
         }
     }
 
@@ -616,8 +595,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public List<String> getAllPagesForProfile(final long profileId) throws SBonitaReadException {
         final SelectListDescriptor<String> selectList = new SelectListDescriptor<>("getAllPagesForProfile",
-                Collections.singletonMap(
-                        "profileId", profileId),
+                Collections.singletonMap("profileId", profileId),
                 SApplicationPage.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
         return persistenceService.selectList(selectList);
     }
@@ -625,8 +603,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public List<String> getAllPagesForProfile(String profile) throws SBonitaReadException {
         final SelectListDescriptor<String> selectList = new SelectListDescriptor<>("getAllPagesForProfileName",
-                Collections.singletonMap(
-                        "profileName", profile),
+                Collections.singletonMap("profileName", profile),
                 SApplicationPage.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
         return persistenceService.selectList(selectList);
     }
