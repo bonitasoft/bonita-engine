@@ -19,10 +19,8 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
-import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
+import org.bonitasoft.engine.commons.exceptions.*;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -30,7 +28,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface ApplicationService {
+public interface ApplicationService extends TenantLifecycleService {
 
     String APPLICATION = "APPLICATION";
 
@@ -53,6 +51,8 @@ public interface ApplicationService {
     SApplication getApplicationByToken(String token) throws SBonitaReadException;
 
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
+
+    void forceDeleteApplication(SApplication application) throws SObjectModificationException;
 
     SApplicationWithIcon updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor)
             throws SObjectModificationException,

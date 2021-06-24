@@ -77,15 +77,21 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
 @Slf4j
+@Service("pageService")
+//must be initialized before ApplicationImporter
+@Order(4)
 public class PageServiceImpl implements PageService {
 
     private static final String QUERY_GET_PAGE_BY_NAME = "getPageByName";
@@ -760,6 +766,7 @@ public class PageServiceImpl implements PageService {
         return pageServiceListeners;
     }
 
+    @Autowired
     public void setPageServiceListeners(final List<PageServiceListener> pageServiceListeners) {
         this.pageServiceListeners = pageServiceListeners;
     }

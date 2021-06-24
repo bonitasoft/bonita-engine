@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2021 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,24 +13,32 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 
-/**
- * @author Elias Ricken de Medeiros
- */
-public interface ApplicationImportStrategy {
+public class UpdateNewerNonEditableApplicationStrategy implements ApplicationImportStrategy {
 
-    /**
-     * Determine what to do when the application already exists.
-     * Eg: Delete application so that the import will replace with newer version.
-     * If the method returns normally, the execute goes on and the application is imported.
-     * If the method throws an exception, the application is not imported and a error log is issued; then
-     * the next application is treated likewise.
-     */
-    void whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported)
-            throws AlreadyExistsException, SBonitaException;
+    private final ApplicationService applicationService;
+
+    UpdateNewerNonEditableApplicationStrategy(ApplicationService applicationService) {
+        this.applicationService = applicationService;
+    }
+
+    @Override
+    public void whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported)
+            throws AlreadyExistsException, SBonitaException {
+        if (existing != null) {
+            if (!existing.isEditable() && !existing.getVersion().equals(toBeImported.getVersion())) {
+                applicationService.forceDeleteApplication(existing);
+            } else {
+                throw new AlreadyExistsException(
+                        "An application with token '" + existing.getToken() + "' already exists",
+                        existing.getToken());
+            }
+        }
+    }
 
 }
