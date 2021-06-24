@@ -20,7 +20,7 @@ class Deps {
     public static String groovyAllVersion = "2.4.20"
     public static String javassistVersion = "3.18.1-GA"
     public static String httpComponentsVersion = "4.5.12"
-    public static String xstreamVersion = "1.4.15"
+    public static String xstreamVersion = "1.4.17"
     public static String ehcacheVersion = "2.10.6"
     public static String eclipseCompilerVersion = "3.20.0"
     public static String jbcryptVersion = "0.4"
