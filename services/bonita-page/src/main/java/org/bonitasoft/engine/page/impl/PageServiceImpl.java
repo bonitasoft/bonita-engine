@@ -118,7 +118,11 @@ public class PageServiceImpl implements PageService {
 
     private static final String THEME_CSS = "resources/theme.css";
 
-    private static final String RESOURCES_PATH = "org/bonitasoft/web/page";
+    private static final String EDITABLE_REMOVABLE_RESOURCES_PATH = "org/bonitasoft/web/page";
+
+    private static final String NON_EDITABLE_NON_REMOVABLE_RESOURCES_PATH = "org/bonitasoft/web/page/final";
+
+    private static final String EDITABLE_NON_REMOVABLE_RESOURCES_PATH = "org/bonitasoft/web/page/editonly";
 
     private static final String TENANT_STATUS_PAGE_NAME = "custompage_tenantStatusBonita";
 
@@ -647,6 +651,8 @@ public class PageServiceImpl implements PageService {
     @Override
     public void init() throws SBonitaException {
         try {
+            importProvidedNonRemovableNonEditablePagesFromClasspath();
+            importProvidedNonRemovableEditablePagesFromClasspath();
             importProvidedPagesFromClasspath();
         } catch (IOException e) {
             log.error("Cannot load provided pages at startup. Root cause: {}", ExceptionUtils.printRootCauseOnly(e));
@@ -655,26 +661,38 @@ public class PageServiceImpl implements PageService {
         initialized = true;
     }
 
+    private void importProvidedNonRemovableNonEditablePagesFromClasspath() throws IOException {
+        importProvidedPagesFromResourcePattern(false, false, NON_EDITABLE_NON_REMOVABLE_RESOURCES_PATH);
+    }
+
+    private void importProvidedNonRemovableEditablePagesFromClasspath() throws IOException {
+        importProvidedPagesFromResourcePattern(false, true, EDITABLE_NON_REMOVABLE_RESOURCES_PATH);
+    }
+
     private void importProvidedPagesFromClasspath() throws IOException {
+        importProvidedPagesFromResourcePattern(true, true, EDITABLE_REMOVABLE_RESOURCES_PATH);
+    }
+
+    private void importProvidedPagesFromResourcePattern(boolean removable, boolean editable, String resourcesPath)
+            throws IOException {
         Resource[] resources = cpResourceResolver
-                .getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + RESOURCES_PATH + "/*.zip");
+                .getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + resourcesPath + "/*.zip");
         for (Resource resource : resources) {
             if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                importProvidedPagesFromResource(resource);
+                importProvidedPagesFromResource(resource, removable, editable);
             } else {
                 log.warn("A resource {} could not be read when loading default pages", resource.getDescription());
             }
         }
     }
 
-    private void importProvidedPagesFromResource(Resource resource) {
+    private void importProvidedPagesFromResource(Resource resource, boolean removable, boolean editable) {
         String resourceName = resource.getFilename();
         log.debug("Found provided applications '{}' in classpath", resourceName);
         try (InputStream resourceAsStream = resource.getInputStream()) {
             final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
             final Properties pageProperties = readPageZip(content, true);
-            importProvidedPage(resourceName, content, pageProperties);
-
+            importProvidedPage(resourceName, content, pageProperties, removable, editable);
         } catch (IOException | SBonitaException e) {
             log.error("Unable to import the page {} because: {}", resourceName,
                     ExceptionUtils.printLightWeightStacktrace(e));
@@ -683,11 +701,11 @@ public class PageServiceImpl implements PageService {
     }
 
     private void importProvidedPage(String pageZipName, final byte[] providedPageContent,
-            final Properties pageProperties) throws SBonitaException {
+            final Properties pageProperties, boolean removable, boolean editable) throws SBonitaException {
         final SPage pageByName = getPageByName(pageProperties.getProperty(PROPERTIES_NAME));
         if (pageByName == null) {
             log.debug("Provided page {} does not exist yet, importing it.", pageZipName);
-            createProvidedPage(pageZipName, providedPageContent, pageProperties, false, false);
+            createProvidedPage(pageZipName, providedPageContent, pageProperties, removable, editable);
         } else {
             final byte[] pageContent = getPageContent(pageByName.getId());
             // think of a better way to check the content are the same or not, it will almost always be the same so....
@@ -701,7 +719,7 @@ public class PageServiceImpl implements PageService {
     }
 
     protected void createProvidedPage(String pageZipName, final byte[] providedPageContent,
-            final Properties pageProperties, boolean editable, boolean removable) throws SObjectAlreadyExistsException,
+            final Properties pageProperties, boolean removable, boolean editable) throws SObjectAlreadyExistsException,
             SObjectCreationException {
         boolean hidden = pageProperties.getProperty("name").equals(TENANT_STATUS_PAGE_NAME);
         final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME),

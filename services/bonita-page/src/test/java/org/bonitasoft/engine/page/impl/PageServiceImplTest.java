@@ -311,6 +311,8 @@ public class PageServiceImplTest {
             final Map<String, String> map = new HashMap<>();
             map.put(DEFAULT_LAYOUT_NAME, "layout");
             map.put("custompage_htmlexample", "page");
+            map.put("custompage_htmlexample_editonly", "page");
+            map.put("custompage_htmlexample_final", "page");
             map.put("custompage_groovyexample", "page");
             map.put("custompage_home", "page");
             map.put("custompage_tenantStatusBonita", "page");
@@ -325,13 +327,13 @@ public class PageServiceImplTest {
         pageServiceImpl.init();
 
         // then
-        verify(pageServiceImpl, times(6)).insertPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(8)).insertPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
     }
 
     @Test
-    public void importing_provided_pages_should_respect_declared_visibility() throws SBonitaException {
+    public void importing_provided_pages_should_respect_declared_visibility_and_rights() throws SBonitaException {
         // given
 
         // when
@@ -339,9 +341,21 @@ public class PageServiceImplTest {
 
         // then
         verify(pageServiceImpl).insertPage(
-                argThat(sPage -> sPage.getName().equals("custompage_tenantStatusBonita") && sPage.isHidden()), any());
+                argThat(sPage -> sPage.getName().equals("custompage_tenantStatusBonita") && sPage.isHidden()
+                        && sPage.isRemovable() && sPage.isEditable()),
+                any());
         verify(pageServiceImpl).insertPage(
-                argThat(sPage -> sPage.getName().equals("custompage_htmlexample") && !sPage.isHidden()), any());
+                argThat(sPage -> sPage.getName().equals("custompage_htmlexample") && !sPage.isHidden()
+                        && sPage.isRemovable() && sPage.isEditable()),
+                any());
+        verify(pageServiceImpl).insertPage(
+                argThat(sPage -> sPage.getName().equals("custompage_htmlexample_final") && !sPage.isHidden()
+                        && !sPage.isRemovable() && !sPage.isEditable()),
+                any());
+        verify(pageServiceImpl).insertPage(
+                argThat(sPage -> sPage.getName().equals("custompage_htmlexample_editonly") && !sPage.isHidden()
+                        && !sPage.isRemovable() && sPage.isEditable()),
+                any());
     }
 
     @Test
