@@ -1,7 +1,7 @@
 class Deps {
 
-    public static String springVersion = "5.2.9.RELEASE"
-    public static String springBootVersion = "2.3.4.RELEASE"
+    public static String springVersion = "5.2.15.RELEASE"
+    public static String springBootVersion = "2.3.12.RELEASE"
     public static String commonsIOVersion = "2.8.0"
     //fileupload 1.4 does not work on web-side.
     public static String commonsFileupload = "1.3.3"
@@ -19,9 +19,9 @@ class Deps {
     public static String javaxServletVersion = "3.1.0"
     // The groovy version must be in synch with the runtime-bom artifact
     public static String groovyVersion = "3.0.8"
-    public static String javassistVersion = "3.18.1-GA"
+    public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
     public static String httpComponentsVersion = "4.5.12"
-    public static String xstreamVersion = "1.4.15"
+    public static String xstreamVersion = "1.4.17"
     public static String ehcacheVersion = "2.10.6"
     public static String eclipseCompilerVersion = "3.20.0"
     public static String jbcryptVersion = "0.4"
