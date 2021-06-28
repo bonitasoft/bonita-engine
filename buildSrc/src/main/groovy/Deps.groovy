@@ -17,7 +17,8 @@ class Deps {
     public static String jacksonDataBindingVersion = "2.11.2"
     public static String javaxJtaVersion = "1.1"
     public static String javaxServletVersion = "3.1.0"
-    public static String groovyVersion = "3.0.7"
+    // The groovy version must be in synch with the runtime-bom artifact
+    public static String groovyVersion = "3.0.8"
     public static String javassistVersion = "3.18.1-GA"
     public static String httpComponentsVersion = "4.5.12"
     public static String xstreamVersion = "1.4.15"
