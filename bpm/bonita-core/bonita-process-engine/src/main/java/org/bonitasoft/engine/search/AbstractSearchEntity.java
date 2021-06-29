@@ -161,12 +161,8 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
     }
 
     protected SearchFilter getSearchFilter(final SearchOptions searchOptions, final String searchedKey) {
-        for (final SearchFilter searchFilter : searchOptions.getFilters()) {
-            if (searchedKey.equals(searchFilter.getField())) {
-                return searchFilter;
-            }
-        }
-        return null;
+        return searchOptions.getFilters().stream().filter(searchFilter -> searchedKey.equals(searchFilter.getField()))
+                .findFirst().orElse(null);
     }
 
     public static <C extends Serializable, S extends PersistentObject> SearchResult<C> search(

@@ -15,9 +15,9 @@ package org.bonitasoft.engine.business.application;
 
 public enum InternalProfiles {
 
-    INTERNAL_PROFILE_SUPER_ADMIN("_BONITA_INTERNAL_PROFILE_SUPER_ADMIN",
-            ApplicationVisibility.TECHNICAL_USER), INTERNAL_PROFILE_ALL("_BONITA_INTERNAL_PROFILE_ALL",
-                    ApplicationVisibility.ALL);
+    INTERNAL_PROFILE_SUPER_ADMIN("_BONITA_INTERNAL_PROFILE_SUPER_ADMIN", ApplicationVisibility.TECHNICAL_USER),
+
+    INTERNAL_PROFILE_ALL("_BONITA_INTERNAL_PROFILE_ALL", ApplicationVisibility.ALL);
 
     InternalProfiles(String profileName, ApplicationVisibility applicationVisibility) {
         this.profileName = profileName;
