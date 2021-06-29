@@ -28,6 +28,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public class SearchApplicationDescriptor extends SearchEntityDescriptor {
 
+    public static final String APPLICATION_VISIBILITY = "visibility";
     private final Map<String, FieldDescriptor> keys;
 
     private final Map<Class<? extends PersistentObject>, Set<String>> allFields;
@@ -60,6 +61,9 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SApplication.class, AbstractSApplication.LAYOUT_ID));
         keys.put(ApplicationSearchDescriptor.THEME_ID,
                 new FieldDescriptor(SApplication.class, AbstractSApplication.THEME_ID));
+        // internal usage only for now (as it would require a conversion of the Visibility enum):
+        keys.put(APPLICATION_VISIBILITY,
+                new FieldDescriptor(SApplication.class, AbstractSApplication.INTERNAL_PROFILE));
 
         allFields = new HashMap<>(1);
 

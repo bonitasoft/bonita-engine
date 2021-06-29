@@ -21,13 +21,16 @@ import static org.bonitasoft.engine.io.FileOperations.resource;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.TestWithTechnicalUser;
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.page.ContentType;
@@ -176,6 +179,20 @@ public class ApplicationIT extends TestWithTechnicalUser {
         builderUser4.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
         final SearchResult<Application> applicationsUser4 = getApplicationAPI().searchApplications(builderUser4.done());
         assertThat(applicationsUser4.getResult()).isEmpty();
+
+        // Let's check SAM (=tenant admin), has access to applications mapped to "_BONITA_INTERNAL_PROFILE_SUPER_ADMIN":
+        final List<ImportStatus> importStatus = getLivingApplicationAPI().importApplications(
+                IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("superAdminApp.xml")),
+                ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        assertThat(importStatus).allMatch(status -> status.getStatus().equals(ImportStatus.Status.ADDED));
+        final SearchOptionsBuilder soSystemAdmin = new SearchOptionsBuilder(0, 10);
+        soSystemAdmin.filter(ApplicationSearchDescriptor.USER_ID, "-1"); // -1 is userId for SAM (= tenant admin)
+        final SearchResult<Application> samApplications = getApplicationAPI().searchApplications(soSystemAdmin.done());
+        final List<Application> applications = samApplications.getResult();
+        assertThat(applications).hasSize(1);
+        assertThat(applications.get(0).getToken()).isEqualTo("superAdminAppBonita");
+
+        getApplicationAPI().deleteApplication(applications.get(0).getId());
     }
 
     @Test

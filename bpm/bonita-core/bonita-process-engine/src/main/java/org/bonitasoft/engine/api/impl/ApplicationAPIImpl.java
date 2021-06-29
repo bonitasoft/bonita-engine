@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.business.application.ApplicationSearchDescriptor.USER_ID;
+import static org.bonitasoft.engine.business.application.InternalProfiles.INTERNAL_PROFILE_SUPER_ADMIN;
+import static org.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor.APPLICATION_VISIBILITY;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,7 +59,15 @@ import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExportException;
+import org.bonitasoft.engine.exception.ImportException;
+import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -68,6 +80,7 @@ import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
@@ -165,17 +178,24 @@ public class ApplicationAPIImpl implements ApplicationAPI {
                 .getSearchApplicationDescriptor();
         final ApplicationModelConverter converter = getApplicationModelConverter(tenantAccessor.getPageService());
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final Optional<SearchFilter> searchFilter = searchOptions.getFilters().stream()
-                .filter(s -> s.getField().equals("userId")).findFirst();
-        if (searchFilter.isPresent()) {
-            final SearchOptions newSearchOptions = new SearchOptionsBuilder(searchOptions)
-                    .setFilters(searchOptions.getFilters().stream().filter(s -> !s.getField().equals("userId"))
-                            .collect(Collectors.toList()))
-                    .done();
-            return getLivingApplicationAPIDelegate().searchApplications(new SearchApplicationsOfUser(
-                    Long.parseLong(String.valueOf(searchFilter.get().getValue())), applicationService,
-                    appSearchDescriptor,
-                    newSearchOptions, converter));
+        final Optional<SearchFilter> filterOnUserId = searchOptions.getFilters().stream()
+                .filter(s -> s.getField().equals(USER_ID)).findFirst();
+        if (filterOnUserId.isPresent()) {
+            final SearchOptionsBuilder searchOptionsWithoutUserId = new SearchOptionsBuilder(searchOptions)
+                    .setFilters(searchOptions.getFilters().stream().filter(s -> !s.getField().equals(USER_ID))
+                            .collect(Collectors.toList()));
+            final String userId = String.valueOf(filterOnUserId.get().getValue());
+            if (String.valueOf(SessionService.SYSTEM_ID).equals(userId)) { // It's the tenant admin user
+                return getLivingApplicationAPIDelegate().searchApplications(new SearchApplications(
+                        applicationService, appSearchDescriptor,
+                        searchOptionsWithoutUserId
+                                .filter(APPLICATION_VISIBILITY, INTERNAL_PROFILE_SUPER_ADMIN.getProfileName()).done(),
+                        converter));
+            } else {
+                return getLivingApplicationAPIDelegate().searchApplications(new SearchApplicationsOfUser(
+                        Long.parseLong(userId), applicationService, appSearchDescriptor,
+                        searchOptionsWithoutUserId.done(), converter));
+            }
         }
         return getLivingApplicationAPIDelegate()
                 .searchApplications(new SearchApplications(applicationService, appSearchDescriptor,

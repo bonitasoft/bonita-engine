@@ -1351,7 +1351,9 @@ public class APITestUtil extends PlatformTestUtil {
         final SearchResult<Application> applications = getApplicationAPI()
                 .searchApplications(new SearchOptionsBuilder(0, 100).done());
         for (Application application : applications.getResult()) {
-            getApplicationAPI().deleteApplication(application.getId());
+            if (application.isEditable()) {
+                getApplicationAPI().deleteApplication(application.getId());
+            }
         }
     }
 
