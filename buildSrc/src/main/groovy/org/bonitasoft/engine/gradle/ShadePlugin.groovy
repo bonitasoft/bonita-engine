@@ -9,6 +9,8 @@ import org.gradle.jvm.tasks.Jar
 
 class ShadePlugin implements Plugin<Project> {
 
+    private static final String PLATFORM_CONFIGURATION_NAME = "platform-runtime"
+
     @Override
     void apply(Project project) {
         project.plugins.apply("com.github.johnrengelman.shadow")
@@ -174,15 +176,16 @@ class ShadePlugin implements Plugin<Project> {
      * get the Project (object) from the ResolvedDependency (object)
      */
     private Project getAssociatedProjectFromDependency(Project project, ResolvedDependency dependency) {
-        if(dependency.getModuleArtifacts()) {
-            def identifier = dependency.getModuleArtifacts().first().id.componentIdentifier
-            if (!(identifier instanceof ProjectComponentIdentifier)) {
-                return null
-            }
-            project.project(identifier.projectPath)
-        }else {
+        def artifacts = dependency.getModuleArtifacts()
+        if (artifacts.isEmpty()) {
+            //it happens when a dependency is a bom pulled from gradle's artifacts metadata (variant)
             return null
         }
+        def identifier = artifacts.first().id.componentIdentifier
+        if (!(identifier instanceof ProjectComponentIdentifier)) {
+            return null
+        }
+        return project.project(identifier.projectPath)
     }
 
     private boolean isAShadeProject(Project it) {
@@ -221,7 +224,7 @@ class ShadePlugin implements Plugin<Project> {
     }
 
     private Set<ResolvedDependency> getPomDependencies(Project project, ShadeExtension extension, Set<Project> allProjectsAlreadyShaded, boolean isRootProject) {
-        Set allDependencies = []
+        Set<ResolvedDependency> allDependencies = []
         // We include compile + runtime dependencies (like hazelcast-aws), to be complete:
         def allScopes = project.configurations.compile.resolvedConfiguration.firstLevelModuleDependencies + project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies
         allScopes.forEach {
@@ -250,7 +253,9 @@ class ShadePlugin implements Plugin<Project> {
                 allDependencies.addAll(getTransitiveThirdPartyDependencies(it, "", project, extension))
             }
         }
-        allDependencies
+        // remove all dependencies that are in the configuration "platform-runtime". it's used by gradle to resolve versions (like a bom)
+        // those dependencies should be imported in the dependency management instead. It is manually done right now (see `bonita-engine` bom)
+        allDependencies.findAll { it.configuration != PLATFORM_CONFIGURATION_NAME }
     }
 
     /**

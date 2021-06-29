@@ -14,7 +14,7 @@ class Deps {
     public static String slf4jVersion = "1.7.30"
     public static String h2Version = "1.4.199"
     public static String hibernateVersion = "5.4.32.Final"
-    public static String jacksonDataBindingVersion = "2.11.2"
+    public static String jacksonDataBindingVersion = "2.12.3"
     public static String javaxJtaVersion = "1.1"
     public static String javaxServletVersion = "3.1.0"
     // The groovy version must be in synch with the runtime-bom artifact
@@ -49,7 +49,7 @@ class Deps {
     public static String hazelcastKubernetesVersion = "1.5"
 
     // Test dependency versions:
-    public static String junit4Version = "4.13.1"
+    public static String junit4Version = "4.13.2"
     public static String junit5Version = "5.6.3"
     public static String awaitilityVersion = "4.0.3"
     public static String assertjVersion = "3.17.2"
