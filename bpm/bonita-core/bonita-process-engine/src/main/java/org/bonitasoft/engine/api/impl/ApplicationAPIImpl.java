@@ -73,11 +73,12 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Elias Ricken de Medeiros
  */
+@AvailableWhenTenantIsPaused
 public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application createApplication(final ApplicationCreator applicationCreator)
-            throws AlreadyExistsException, CreationException {
+            throws CreationException {
         return getLivingApplicationAPIDelegate().createApplication(applicationCreator);
     }
 
@@ -183,8 +184,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token)
-            throws AlreadyExistsException,
-            CreationException {
+            throws CreationException {
         return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pageId, token);
     }
 
@@ -284,7 +284,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
             throws ImportException, AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        ApplicationImporter applicationImporter = null;
+        ApplicationImporter applicationImporter;
         try {
             applicationImporter = tenantAccessor.lookup(ApplicationImporter.class);
         } catch (NotFoundException e) {
