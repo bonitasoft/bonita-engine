@@ -6,6 +6,9 @@ plugins {
 }
 dependencyManagement {
     dependencies {
+        imports {
+            mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonDataBindingVersion}"
+        }
         dependency("org.slf4j:slf4j-api:$Deps.slf4jVersion")
         dependency "com.h2database:h2:${Deps.h2Version}"
         dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"

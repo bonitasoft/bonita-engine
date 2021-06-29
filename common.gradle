@@ -36,9 +36,7 @@ subprojects {
     apply plugin: 'com.adarshr.test-logger'
 
     repositories {
-        mavenLocal()
         mavenCentral()
-        jcenter()
 
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
