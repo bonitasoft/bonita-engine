@@ -59,7 +59,7 @@ public class ApplicationQueriesTest {
     private ApplicationRepository repository;
 
     @Test
-    public void getApplicationByToken_returns_the_application_with_the_given_token() throws Exception {
+    public void getApplicationByToken_returns_the_application_with_the_given_token() {
         //given
         repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
                 .withVersion("1.0").withPath("app1").build());
@@ -79,7 +79,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplication_returns_the_application_with_the_given_id() throws Exception {
+    public void getApplication_returns_the_application_with_the_given_id() {
         //given
         repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
                 .withVersion("1.0").withPath("app1").build());
@@ -98,7 +98,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationPageById_should_return_the_applicationPage_identified_by_the_given_id() throws Exception {
+    public void getApplicationPageById_should_return_the_applicationPage_identified_by_the_given_id() {
         //given
         final AbstractSApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
@@ -121,8 +121,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationPageByNameAnApplicationName_should_return_the_applicationPage_with_the_given_name_in_the_given_application()
-            throws Exception {
+    public void getApplicationPageByNameAnApplicationName_should_return_the_applicationPage_with_the_given_name_in_the_given_application() {
         //given
         final AbstractSApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
@@ -153,8 +152,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationPageByTokenAndApplicationId_should_return_the_applicationPage_with_the_given_name_in_the_given_application()
-            throws Exception {
+    public void getApplicationPageByTokenAndApplicationId_should_return_the_applicationPage_with_the_given_name_in_the_given_application() {
         //given
         final AbstractSApplication application1 = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
@@ -185,7 +183,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getAllPagesForProfile_should_return_layouts_and_all_pages_related_to_application() throws Exception {
+    public void getAllPagesForProfile_should_return_layouts_and_all_pages_related_to_application() {
         //given
         //used by app1 and app2
         SProfile firstProfile = repository.add(aProfile().withName("firstProfile").build());
@@ -265,13 +263,14 @@ public class ApplicationQueriesTest {
         List<String> pagesForProfile = repository.getAllPagesForProfile(firstProfile.getId());
 
         //then
-        assertThat(pagesForProfile).containsExactly("layoutApp1", "page1", "page2", "page3", "page4", "themeApp2");
+        assertThat(pagesForProfile).containsExactlyInAnyOrder("layoutApp1", "page1", "page2", "page3", "page4",
+                "themeApp2");
 
         //when
         pagesForProfile = repository.getAllPagesForProfile(secondProfile.getId());
 
         //then
-        assertThat(pagesForProfile).containsExactly("page4", "page5");
+        assertThat(pagesForProfile).containsExactlyInAnyOrder("page4", "page5");
 
         //when
         pagesForProfile = repository.getAllPagesForProfile(thirdProfile.getId());
@@ -281,8 +280,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationHomePage_should_return_the_applicationPage_set_as_home_page_for_the_given_application()
-            throws Exception {
+    public void getApplicationHomePage_should_return_the_applicationPage_set_as_home_page_for_the_given_application() {
         //given
         final AbstractSApplication application = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
@@ -307,8 +305,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationMenu_by_id_should_return_the_application_menu_identified_by_the_given_id()
-            throws Exception {
+    public void getApplicationMenu_by_id_should_return_the_application_menu_identified_by_the_given_id() {
         //given
         final AbstractSApplication application = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
@@ -332,7 +329,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getLastIndexForRootMenu_should_return_last_used_index() throws Exception {
+    public void getLastIndexForRootMenu_should_return_last_used_index() {
         //given
         final AbstractSApplication application = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
@@ -356,8 +353,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getLastIndexForChildMenu_should_return_last_used_index_by_children_of_a_given_parent()
-            throws Exception {
+    public void getLastIndexForChildMenu_should_return_last_used_index_by_children_of_a_given_parent() {
         //given
         final AbstractSApplication application = repository
                 .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
@@ -385,7 +381,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationOfUser_returns_the_application_for_the_given_user() throws Exception {
+    public void getApplicationOfUser_returns_the_application_for_the_given_user() {
         //given
         SUser user1 = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
         SUser user2 = repository.add(aUser().withId(2L).withUserName("helen.kelly").build());
@@ -422,10 +418,12 @@ public class ApplicationQueriesTest {
         assertThat(repository.getNumberOfApplicationOfUser(user3.getId())).isEqualTo(3);
         assertThat(repository.getNumberOfApplicationOfUser(user4.getId())).isEqualTo(0);
         assertThat(repository.getNumberOfApplicationOfUser(5L)).isEqualTo(0);
-        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactly(application1,
+        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactlyInAnyOrder(
+                application1,
                 application2);
         assertThat(repository.searchApplicationOfUser(user2.getId())).extracting("id").containsExactly(application3);
-        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactly(application1,
+        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactlyInAnyOrder(
+                application1,
                 application2,
                 application3);
         assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
@@ -434,8 +432,32 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void searchApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_group()
-            throws Exception {
+    public void getApplicationOfUser_returns_the_application_only_once_even_if_mapped_twice() {
+        //given
+        SUser user = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
+        SGroup group = repository.add(aGroup().forGroupId(20L).forGroupName("Group1").build());
+        repository.add(aUserMembership().forUser(user.getId()).memberOf(group.getId(), -1L).build());
+        final SProfile profile1 = repository.add(aProfile().withName("firstProfile").build());
+        repository.add(aProfileMember().withUserId(user.getId()).withProfileId(profile1.getId()).build());
+
+        repository.add(aProfileMember().withGroupId(group.getId()).withProfileId(profile1.getId()).build());
+
+        long applicationId = repository
+                .add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
+                        .withVersion("1.0").withPath("app1").withProfile(profile1.getId()).build())
+                .getId();
+
+        repository.flush();
+
+        //then
+        assertThat(repository.getNumberOfApplicationOfUser(user.getId())).isEqualTo(1);
+        final List<SApplication> applicationList = repository.searchApplicationOfUser(user.getId());
+        assertThat(applicationList).hasSize(1);
+        assertThat(applicationList.get(0).getId()).isEqualTo(applicationId);
+    }
+
+    @Test
+    public void searchApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_group() {
         //given
         SUser user1 = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
         SUser user2 = repository.add(aUser().withId(2L).withUserName("helen.kelly").build());
@@ -474,11 +496,11 @@ public class ApplicationQueriesTest {
 
         //then
         assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id")
-                .containsExactly(application1.getId(), application2.getId());
+                .containsExactlyInAnyOrder(application1.getId(), application2.getId());
         assertThat(repository.searchApplicationOfUser(user2.getId())).extracting("id")
                 .containsExactly(application3.getId());
         assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id")
-                .containsExactly(application1.getId(), application2.getId(), application3.getId());
+                .containsExactlyInAnyOrder(application1.getId(), application2.getId(), application3.getId());
         assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
         assertThat(repository.searchApplicationOfUser(user5.getId())).isEmpty();
         assertThat(repository.searchApplicationOfUser(6L)).isEmpty();
@@ -491,7 +513,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_role() throws Exception {
+    public void getApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_role() {
         //given
         SUser user1 = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
         SUser user2 = repository.add(aUser().withId(2L).withUserName("helen.kelly").build());
@@ -531,10 +553,12 @@ public class ApplicationQueriesTest {
         repository.flush();
 
         //then
-        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactly(application1,
+        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactlyInAnyOrder(
+                application1,
                 application2);
         assertThat(repository.searchApplicationOfUser(user2.getId())).extracting("id").containsExactly(application3);
-        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactly(application1,
+        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactlyInAnyOrder(
+                application1,
                 application2,
                 application3);
         assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
@@ -551,8 +575,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_group_and_role()
-            throws Exception {
+    public void getApplicationOfUser_returns_the_application_for_the_given_user_mapped_through_group_and_role() {
         //given
         SUser user1 = repository.add(aUser().withId(1L).withUserName("walter.bates").build());
         SUser user2 = repository.add(aUser().withId(2L).withUserName("helen.kelly").build());
@@ -598,10 +621,12 @@ public class ApplicationQueriesTest {
         repository.flush();
 
         //then
-        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactly(application1,
+        assertThat(repository.searchApplicationOfUser(user1.getId())).extracting("id").containsExactlyInAnyOrder(
+                application1,
                 application2);
         assertThat(repository.searchApplicationOfUser(user2.getId())).extracting("id").containsExactly(application3);
-        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactly(application1,
+        assertThat(repository.searchApplicationOfUser(user3.getId())).extracting("id").containsExactlyInAnyOrder(
+                application1,
                 application2,
                 application3);
         assertThat(repository.searchApplicationOfUser(user4.getId())).isEmpty();
