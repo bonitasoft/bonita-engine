@@ -359,7 +359,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void init_should_update_provided_page_if_different() throws SBonitaException {
+    public void init_should_update_provided_page_if_non_editable_non_removable_and_different() throws SBonitaException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
         final SPage currentGroovyPage = new SPage("custompage_groovyexample", "example", "example",
@@ -368,9 +368,10 @@ public class PageServiceImplTest {
                 -1,
                 CONTENT_NAME);
         currentGroovyPage.setId(12);
+        currentGroovyPage.setRemovable(false);
+        currentGroovyPage.setEditable(false);
 
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
         doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
 
         // when
@@ -475,16 +476,21 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void init_should_do_nothing_if_already_here_and_the_same() throws SBonitaException, IOException {
+    public void init_should_do_nothing_if_non_editable_non_removable_and_already_here_and_the_same()
+            throws SBonitaException, IOException {
         final SPage currentHomePage = new SPage("custompage_home", "example", "example", System.currentTimeMillis(), -1,
                 true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
+        byte[] toBeReturned = this.getClass().getResourceAsStream("/org/bonitasoft/web/page/bonita-home-page.zip")
+                .readAllBytes();
         currentHomePage.setId(14);
+        currentHomePage.setEditable(false);
+        currentHomePage.setRemovable(false);
+        currentHomePage.setPageHash(Arrays.hashCode(toBeReturned));
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
-        doReturn(this.getClass().getResourceAsStream("/org/bonitasoft/web/page/bonita-home-page.zip").readAllBytes())
-                .when(pageServiceImpl).getPageContent(14L);
+
         // when
         pageServiceImpl.init();
         // then
@@ -990,6 +996,7 @@ public class PageServiceImplTest {
         final Long pageDate = pageAfterAddition.getLastModificationDate();
         final SPage sPage = new SPage("custompage_mypage", "mypage description", "mypage display name",
                 pageDate, 45, false, pageDate, 45, CONTENT_NAME);
+        sPage.setPageHash(Arrays.hashCode(content));
         assertEquals(pageAfterAddition, sPage);
         assertThat(pageAfterAddition.getLastModificationDate()).isGreaterThan(0);
     }

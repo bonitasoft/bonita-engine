@@ -16,14 +16,7 @@ package org.bonitasoft.engine.page.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -218,7 +211,7 @@ public class PageServiceImpl implements PageService {
                 pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided, hidden,
                 true, true,
-                pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
+                pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE), Arrays.hashCode(content));
         return insertPage(page, content);
     }
 
@@ -361,7 +354,8 @@ public class PageServiceImpl implements PageService {
 
     private SPage buildPage(final String name, final String displayName, final String description,
             final String contentName, final long creatorUserId,
-            final boolean provided, boolean hidden, boolean removable, boolean editable, final String contentType) {
+            final boolean provided, boolean hidden, boolean removable, boolean editable, final String contentType,
+            int hash) {
         Long currentTime = System.currentTimeMillis();
         return SPage.builder().name(name).description(description).displayName(displayName)
                 .installationDate(currentTime).installedBy(creatorUserId).provided(provided)
@@ -371,6 +365,7 @@ public class PageServiceImpl implements PageService {
                 .editable(editable)
                 .contentName(contentName)
                 .contentType(contentType)
+                .pageHash(hash)
                 .build();
     }
 
@@ -411,19 +406,24 @@ public class PageServiceImpl implements PageService {
     public void deletePage(final long pageId) throws SObjectModificationException, SObjectNotFoundException {
         try {
             final SPage page = getPage(pageId);
-            deletePage(page);
+            deletePageIfRemovable(page);
         } catch (final SBonitaReadException sbe) {
             throw new SObjectModificationException(sbe);
+        }
+    }
+
+    private void deletePageIfRemovable(final SPage sPage) throws SObjectModificationException {
+        if (!sPage.isRemovable()) {
+            throw new SObjectModificationException(
+                    "The page " + sPage.getName() + " cannot be deleted because it is set as non-removable");
+        } else {
+            deletePage(sPage);
         }
     }
 
     private void deletePage(final SPage sPage) throws SObjectModificationException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.DELETED, "Deleting page named: " + sPage.getName());
         try {
-            if (!sPage.isRemovable()) {
-                throw new SObjectModificationException(
-                        "The page " + sPage.getName() + " cannot be deleted because it is set as non-removable");
-            }
             deleteProfileEntry(sPage);
             for (final PageServiceListener pageServiceListener : pageServiceListeners) {
                 pageServiceListener.pageDeleted(sPage);
@@ -648,6 +648,7 @@ public class PageServiceImpl implements PageService {
         pageBuilder.updateDisplayName(pageProperties.getProperty(PROPERTIES_DISPLAY_NAME));
         pageBuilder.updateName(pageProperties.getProperty(PROPERTIES_NAME));
         pageBuilder.updateContentType(pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
+        pageBuilder.updatePageHash(Arrays.hashCode(content));
         final SPage sPage = updatePage(pageId, pageBuilder.done());
         for (final PageServiceListener pageServiceListener : pageServiceListeners) {
             pageServiceListener.pageUpdated(sPage, content);
@@ -713,13 +714,16 @@ public class PageServiceImpl implements PageService {
             log.debug("Provided page {} does not exist yet, importing it.", pageZipName);
             createProvidedPage(pageZipName, providedPageContent, pageProperties, removable, editable);
         } else {
-            final byte[] pageContent = getPageContent(pageByName.getId());
-            // think of a better way to check the content are the same or not, it will almost always be the same so....
-            if (pageContent.length != providedPageContent.length) {
-                log.debug("Provided page {} exists but the content is not up to date, updating it.", pageZipName);
-                updatePageContent(pageByName.getId(), providedPageContent, pageZipName);
+            if (!pageByName.isEditable()) {
+                int newHash = Arrays.hashCode(providedPageContent);
+                if (pageByName.getPageHash() == newHash) {
+                    log.debug("Provided page exists and is up to date, nothing to do");
+                } else {
+                    log.info("Provided page {} exists but the content is not up to date, updating it.", pageZipName);
+                    updatePageContent(pageByName.getId(), providedPageContent, pageZipName);
+                }
             } else {
-                log.debug("Provided page exists and is up to date, nothing to do");
+                log.debug("Provided page exists, and will not be updated");
             }
         }
     }
@@ -732,7 +736,8 @@ public class PageServiceImpl implements PageService {
                 pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), pageZipName, -1, true,
                 hidden, removable, editable,
-                pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
+                pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE),
+                Arrays.hashCode(providedPageContent));
         insertPage(page, providedPageContent);
     }
 

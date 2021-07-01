@@ -74,6 +74,12 @@ public class SPageUpdateBuilderImpl implements SPageUpdateBuilder {
     }
 
     @Override
+    public SPageUpdateBuilder updatePageHash(int hash) {
+        descriptor.addField(SPageFields.PAGE_HASH, hash);
+        return this;
+    }
+
+    @Override
     public EntityUpdateDescriptor done() {
         return descriptor;
     }

@@ -51,6 +51,7 @@ public class AbstractSPage implements PersistentObject {
     private String contentName;
     private String contentType;
     private long processDefinitionId;
+    private int pageHash;
 
     public AbstractSPage(final AbstractSPage sPage) {
         name = sPage.getName();
@@ -67,6 +68,7 @@ public class AbstractSPage implements PersistentObject {
         processDefinitionId = sPage.getProcessDefinitionId();
         editable = sPage.isEditable();
         removable = sPage.isRemovable();
+        pageHash = sPage.getPageHash();
     }
 
     public AbstractSPage(final String name, final long installationDate, final long installedBy, final boolean provided,
