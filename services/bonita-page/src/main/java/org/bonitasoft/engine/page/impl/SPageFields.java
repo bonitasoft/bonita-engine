@@ -33,4 +33,6 @@ public interface SPageFields {
 
     String PAGE_PROCESS_DEFINITION_ID = "processDefinitionId";
 
+    String PAGE_HASH = "pageHash";
+
 }

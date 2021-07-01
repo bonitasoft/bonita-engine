@@ -859,7 +859,8 @@ CREATE TABLE page (
   contentName VARCHAR2(280 CHAR) NOT NULL,
   content BLOB,
   contentType VARCHAR2(50 CHAR),
-  processDefinitionId NUMBER(19, 0) NOT NULL
+  processDefinitionId NUMBER(19, 0) NOT NULL,
+  pageHash NUMERIC(19, 0)
 );
 
 ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);

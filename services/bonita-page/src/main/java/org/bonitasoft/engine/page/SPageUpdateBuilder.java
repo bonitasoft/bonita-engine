@@ -35,4 +35,6 @@ public interface SPageUpdateBuilder {
 
     SPageUpdateBuilder updateProcessDefinitionId(Long processDedfinitionId);
 
+    SPageUpdateBuilder updatePageHash(int hash);
+
 }
