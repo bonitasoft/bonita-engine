@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileUploadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Julien Mege
@@ -32,6 +34,7 @@ import org.apache.commons.fileupload.FileUploadException;
 public class HttpAPIServlet extends HttpServlet {
 
     public static final String PROPERTY_TO_ENABLE_HTTP_API = "http.api";
+    private static final Logger logger = LoggerFactory.getLogger(HttpAPIServlet.class);
 
     private static final long serialVersionUID = 4936475894513095747L;
     private boolean enabled;
@@ -39,13 +42,10 @@ public class HttpAPIServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         enabled = Boolean.parseBoolean(
-                System.getProperty(PROPERTY_TO_ENABLE_HTTP_API,
-                        System.getenv().getOrDefault(envProperty(),
-                                "true")));
-
-        log("Http api is " + (enabled ? "enabled" : "disabled") + ", " + (enabled ? "disable" : "enable")
-                + " it using env property " + envProperty() + " or System property " + PROPERTY_TO_ENABLE_HTTP_API
-                + " [=true/false]");
+                System.getProperty(PROPERTY_TO_ENABLE_HTTP_API, System.getenv().getOrDefault(envProperty(), "true")));
+        logger.info("Http api is {}, {} it using env property {} or System property {} [=true/false]",
+                enabled ? "enabled" : "disabled", enabled ? "disable" : "enable", envProperty(),
+                PROPERTY_TO_ENABLE_HTTP_API);
     }
 
     private String envProperty() {
