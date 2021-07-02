@@ -14,7 +14,7 @@
     </query>
 
     <query name="getNumberOfSApplicationOfUser">
-        SELECT count(DISTINCT application)
+        SELECT count(DISTINCT application.id)
         FROM org.bonitasoft.engine.business.application.model.SApplication AS application, org.bonitasoft.engine.profile.model.SProfileMember as profileMember
         WHERE application.profileId = profileMember.profileId
         AND (
