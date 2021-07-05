@@ -695,7 +695,7 @@ public class PageServiceImpl implements PageService {
 
     private void importProvidedPagesFromResource(Resource resource, boolean removable, boolean editable) {
         String resourceName = resource.getFilename();
-        log.debug("Found provided applications '{}' in classpath", resourceName);
+        log.debug("Found provided page '{}' in classpath", resourceName);
         try (InputStream resourceAsStream = resource.getInputStream()) {
             final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
             final Properties pageProperties = readPageZip(content, true);
