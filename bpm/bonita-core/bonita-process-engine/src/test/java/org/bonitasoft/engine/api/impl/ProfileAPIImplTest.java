@@ -18,12 +18,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 import org.bonitasoft.engine.api.impl.transaction.profile.CreateProfileMember;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -90,7 +96,31 @@ public class ProfileAPIImplTest {
     }
 
     @Test
-    public void should_deleteProfileMember_update_profilemetadata() throws Exception {
+    public void getProfilesForUser_should_return_empty_list_for_system_user() throws SBonitaReadException {
+        // when:
+        final List<Profile> profilesForUser = profileAPIImpl.getProfilesForUser(-1, 0, 10, ProfileCriterion.ID_ASC);
+
+        // then:
+        assertThat(profilesForUser).isEmpty();
+        verify(profileService, never()).searchProfilesOfUser(anyLong(), anyInt(), anyInt(), anyString(),
+                any(OrderByType.class));
+    }
+
+    @Test
+    public void searchProfilesWithNavigationOfUser_should_return_empty_list_for_system_user()
+            throws SBonitaReadException {
+        // when:
+        final List<Profile> profilesForUser = profileAPIImpl.getProfilesWithNavigationForUser(-1, 0, 10,
+                ProfileCriterion.ID_ASC);
+
+        // then:
+        assertThat(profilesForUser).isEmpty();
+        verify(profileService, never()).searchProfilesWithNavigationOfUser(anyLong(), anyInt(), anyInt(), anyString(),
+                any(OrderByType.class));
+    }
+
+    @Test
+    public void should_deleteProfileMember_update_profile_metadata() throws Exception {
         // when
         profileAPIImpl.deleteProfileMember(1L);
 

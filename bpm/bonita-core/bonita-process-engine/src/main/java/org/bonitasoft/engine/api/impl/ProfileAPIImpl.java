@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
@@ -106,6 +108,9 @@ public class ProfileAPIImpl implements ProfileAPI {
     @Override
     public List<Profile> getProfilesForUser(final long userId, final int startIndex, final int maxResults,
             final ProfileCriterion criterion) {
+        if (SessionService.SYSTEM_ID == userId) { // It's the tenant admin user
+            return Collections.emptyList();
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
@@ -120,6 +125,9 @@ public class ProfileAPIImpl implements ProfileAPI {
     @Override
     public List<Profile> getProfilesWithNavigationForUser(final long userId, final int startIndex, final int maxResults,
             final ProfileCriterion criterion) {
+        if (SessionService.SYSTEM_ID == userId) { // It's the tenant admin user
+            return Collections.emptyList();
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {

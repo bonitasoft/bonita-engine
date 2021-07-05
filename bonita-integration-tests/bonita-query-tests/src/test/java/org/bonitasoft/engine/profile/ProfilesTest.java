@@ -56,7 +56,7 @@ public class ProfilesTest {
     private UserMembershipRepository userMembershipRepository;
 
     @Test
-    public void profile_with_user_mapped_and_profile_entry_should_be_retrieved() throws Exception {
+    public void profile_with_user_mapped_and_profile_entry_should_be_retrieved() {
         // given:
         final SUser user = aUser().build();
         repository.add(user);
@@ -74,7 +74,7 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_with_role_mapped_and_profile_entry_should_be_retrieved() throws Exception {
+    public void profile_with_role_mapped_and_profile_entry_should_be_retrieved() {
         // given:
         final SRole role = aRole().build();
         final SUser user = aUser().build();
@@ -95,7 +95,23 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_with_group_mapped_and_profile_entry_should_be_retrieved() throws Exception {
+    public void no_profileWithNavigation_should_be_retrieved_for_system_user() {
+        // given:
+        final SRole role = aRole().build();
+        repository.add(role);
+        final SProfile profile = aProfile().withName("not retrieved").build();
+        repository.add(profile);
+        repository.add(aProfileMember().withProfileId(profile.getId()).withRoleId(role.getId()).build());
+
+        // when:
+        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(-1);
+
+        // then:
+        assertThat(profiles).hasSize(0);
+    }
+
+    @Test
+    public void profile_with_group_mapped_and_profile_entry_should_be_retrieved() {
         // given:
         final SGroup group = aGroup().build();
         final SUser user = aUser().build();
@@ -116,7 +132,7 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_with_membership_mapped_and_profile_entry_should_be_retrieved() throws Exception {
+    public void profile_with_membership_mapped_and_profile_entry_should_be_retrieved() {
         // given:
         final SGroup group = aGroup().build();
         final SRole role = aRole().build();
@@ -140,7 +156,7 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_without_user_mapped_should_not_be_retrieved() throws Exception {
+    public void profile_without_user_mapped_should_not_be_retrieved() {
         // given:
         final SUser user = aUser().build();
         repository.add(user);
@@ -157,7 +173,7 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_with_user_mapped_but_without_navigation_should_not_be_retrieved() throws Exception {
+    public void profile_with_user_mapped_but_without_navigation_should_not_be_retrieved() {
         // given:
         final SUser user = aUser().build();
         repository.add(user);
@@ -174,7 +190,7 @@ public class ProfilesTest {
     }
 
     @Test
-    public void profile_without_given_user_mapped_should_not_be_retrieved() throws Exception {
+    public void profile_without_given_user_mapped_should_not_be_retrieved() {
         // given:
         final SUser userMapped = aUser().build();
         final SUser userAsked = aUser().build();
@@ -187,6 +203,22 @@ public class ProfilesTest {
 
         // when:
         final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(userAsked.getId());
+
+        // then:
+        assertThat(profiles).hasSize(0);
+    }
+
+    @Test
+    public void no_profile_should_be_retrieved_for_system_user() {
+        // given:
+        final SRole role = aRole().build();
+        repository.add(role);
+        final SProfile profile = aProfile().withName("not retrieved").build();
+        repository.add(profile);
+        repository.add(aProfileMember().withProfileId(profile.getId()).withRoleId(role.getId()).build());
+
+        // when:
+        final List<SProfile> profiles = repository.getProfilesOfUser(-1);
 
         // then:
         assertThat(profiles).hasSize(0);

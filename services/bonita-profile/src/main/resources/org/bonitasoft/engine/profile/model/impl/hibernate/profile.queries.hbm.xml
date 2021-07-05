@@ -2,7 +2,6 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false">
 
-
    <query name="getProfileByName">
 		SELECT profile
 		FROM org.bonitasoft.engine.profile.model.SProfile AS profile
@@ -66,7 +65,6 @@
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm
 		WHERE pm.roleId = :roleId
 	</query>
-
 
 	<query name="getSProfileMembersWithoutDisplayName">
 		SELECT pm 
@@ -245,15 +243,15 @@
 		     org.bonitasoft.engine.profile.model.SProfileMember AS pm
 		WHERE pm.profileId = profile.id
 		AND (
-			pm.userId = :userId
+			(pm.userId = :userId AND pm.roleId = -1 AND pm.groupId = -1)
 			OR pm.id IN (
 				SELECT pm.id
 				FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm,
 				     org.bonitasoft.engine.identity.model.SUserMembership AS um
 				WHERE um.userId = :userId 
 				AND (
-					(pm.groupId = um.groupId AND pm.roleId &lt;= 0)
-					OR (pm.roleId = um.roleId AND pm.groupId &lt;= 0)
+					(pm.groupId = um.groupId AND pm.roleId = -1)
+					OR (pm.roleId = um.roleId AND pm.groupId = -1)
 					OR (pm.groupId = um.groupId AND pm.roleId = um.roleId)
 				)
 			)
@@ -268,15 +266,15 @@
 		WHERE pm.profileId = profile.id
 		AND profile.id = profileentry.profileId
 		AND (
-			pm.userId = :userId
+			(pm.userId = :userId AND pm.roleId = -1 AND pm.groupId = -1)
 			OR pm.id IN (
 				SELECT pm.id
 				FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm,
 				     org.bonitasoft.engine.identity.model.SUserMembership AS um
 				WHERE um.userId = :userId 
 				AND (
-					(pm.groupId = um.groupId AND pm.roleId &lt;= 0)
-					OR (pm.roleId = um.roleId AND pm.groupId &lt;= 0)
+					(pm.groupId = um.groupId AND pm.roleId = -1)
+					OR (pm.roleId = um.roleId AND pm.groupId = -1)
 					OR (pm.groupId = um.groupId AND pm.roleId = um.roleId)
 				)
 			)
