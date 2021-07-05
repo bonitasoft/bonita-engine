@@ -17,12 +17,10 @@ package org.bonitasoft.engine.exception;
  * Thrown when we try to access on a paused tenant an API method that cannot be called on a paused tenant, or when we
  * try to access on a running tenant an API
  * method that cannot be called on a running tenant.
- * <p>This class extends deprecated {@link com.bonitasoft.engine.api.TenantStatusException} to avoid an API break of
- * Bonita Engine Subscription version. This inheritance will be removed in next releases</p>
  *
  * @author Emmanuel Duchastenier
  */
-public class TenantStatusException extends com.bonitasoft.engine.api.TenantStatusException {
+public class TenantStatusException extends BonitaRuntimeException {
 
     private static final long serialVersionUID = 1L;
 

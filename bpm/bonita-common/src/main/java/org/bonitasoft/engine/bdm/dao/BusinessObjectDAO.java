@@ -15,12 +15,10 @@ package org.bonitasoft.engine.bdm.dao;
 
 /**
  * Common interface for business object DAOs.
- * <p>This class extends deprecated {@link com.bonitasoft.engine.bdm.dao.BusinessObjectDAO} to avoid an API break of
- * Bonita Engine Subscription version. This inheritance will be removed in next releases</p>
  *
  * @author Romain Bioteau
  * @since 7.0
  */
-public interface BusinessObjectDAO extends com.bonitasoft.engine.bdm.dao.BusinessObjectDAO {
+public interface BusinessObjectDAO {
 
 }

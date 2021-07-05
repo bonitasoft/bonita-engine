@@ -28,7 +28,7 @@ public class PersonEntity implements Entity {
 
     /*
      * (non-Javadoc)
-     * @see com.bonitasoft.engine.bdm.Entity#getPersistenceId()
+     * @see org.bonitasoft.engine.bdm.Entity#getPersistenceId()
      */
     @Override
     public Long getPersistenceId() {
@@ -37,7 +37,7 @@ public class PersonEntity implements Entity {
 
     /*
      * (non-Javadoc)
-     * @see com.bonitasoft.engine.bdm.Entity#getPersistenceVersion()
+     * @see org.bonitasoft.engine.bdm.Entity#getPersistenceVersion()
      */
     @Override
     public Long getPersistenceVersion() {
