@@ -35,4 +35,10 @@ public class ProfileRepository extends TestRepository {
         namedQuery.setParameter("userId", userId);
         return namedQuery.list();
     }
+
+    public List<SProfile> getProfilesOfUser(long userId) {
+        final Query namedQuery = getNamedQuery("getProfilesOfUser");
+        namedQuery.setParameter("userId", userId);
+        return namedQuery.list();
+    }
 }
