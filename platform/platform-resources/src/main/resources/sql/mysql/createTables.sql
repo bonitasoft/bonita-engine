@@ -870,7 +870,7 @@ CREATE TABLE page (
   content LONGBLOB,
   contentType VARCHAR(50) NOT NULL,
   processDefinitionId BIGINT NOT NULL,
-  pageHash NUMERIC(19, 0)
+  pageHash VARCHAR(32)
 ) ENGINE = INNODB;
 
 ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
