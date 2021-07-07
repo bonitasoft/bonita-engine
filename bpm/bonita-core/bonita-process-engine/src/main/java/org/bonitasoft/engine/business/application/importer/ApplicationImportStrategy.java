@@ -15,22 +15,19 @@ package org.bonitasoft.engine.business.application.importer;
 
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public interface ApplicationImportStrategy {
 
+    enum ImportStrategy {
+        FAIL, SKIP, REPLACE
+    }
+
     /**
      * Determine what to do when the application already exists.
-     * Eg: Delete application so that the import will replace with newer version.
-     * If the method returns normally, the execute goes on and the application is imported.
-     * If the method throws an exception, the application is not imported and a error log is issued; then
-     * the next application is treated likewise.
      */
-    void whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported)
-            throws AlreadyExistsException, SBonitaException;
+    ImportStrategy whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported);
 
 }

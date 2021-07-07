@@ -13,32 +13,22 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
-import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 
 public class UpdateNewerNonEditableApplicationStrategy implements ApplicationImportStrategy {
 
-    private final ApplicationService applicationService;
-
-    UpdateNewerNonEditableApplicationStrategy(ApplicationService applicationService) {
-        this.applicationService = applicationService;
+    UpdateNewerNonEditableApplicationStrategy() {
     }
 
     @Override
-    public void whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported)
-            throws AlreadyExistsException, SBonitaException {
+    public ImportStrategy whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported) {
         if (existing != null) {
             if (!existing.isEditable() && !existing.getVersion().equals(toBeImported.getVersion())) {
-                applicationService.forceDeleteApplication(existing);
-            } else {
-                throw new AlreadyExistsException(
-                        "An application with token '" + existing.getToken() + "' already exists",
-                        existing.getToken());
+                return ImportStrategy.REPLACE;
             }
         }
+        return ImportStrategy.SKIP;
     }
 
 }

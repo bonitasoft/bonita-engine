@@ -13,31 +13,27 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class FailOnDuplicateApplicationImportStrategyTest {
 
-    @InjectMocks
-    private FailOnDuplicateApplicationImportStrategy strategy;
+    private FailOnDuplicateApplicationImportStrategy strategy = new FailOnDuplicateApplicationImportStrategy();
 
-    @Test(expected = AlreadyExistsException.class)
-    public void whenApplicationExists_should_throw_AlreadyExistsException() throws Exception {
+    @Test
+    public void whenApplicationExists_should_return_fail() throws Exception {
         //given
         SApplication existingApplication = mock(SApplication.class);
         SApplicationWithIcon toBeImported = mock(SApplicationWithIcon.class);
 
         //when
-        strategy.whenApplicationExists(existingApplication, toBeImported);
+        ApplicationImportStrategy.ImportStrategy importStrategy = strategy.whenApplicationExists(existingApplication,
+                toBeImported);
 
-        //then exception
+        assertThat(importStrategy).isEqualTo(ApplicationImportStrategy.ImportStrategy.FAIL);
     }
 }

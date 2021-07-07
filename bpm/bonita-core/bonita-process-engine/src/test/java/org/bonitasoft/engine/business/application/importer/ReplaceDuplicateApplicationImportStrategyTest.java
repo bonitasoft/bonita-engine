@@ -13,31 +13,22 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Emmanuel Duchastenier
  */
-@RunWith(MockitoJUnitRunner.class)
+
 public class ReplaceDuplicateApplicationImportStrategyTest {
 
-    @Mock
-    private ApplicationService applicationService;
-
-    @InjectMocks
-    private ReplaceDuplicateApplicationImportStrategy strategy;
+    private ReplaceDuplicateApplicationImportStrategy strategy = new ReplaceDuplicateApplicationImportStrategy();
 
     @Test
-    public void whenApplicationExists_should_call_deleteApplication_method() throws Exception {
+    public void whenApplicationExists_should_return_replace() throws Exception {
         // given:
         final long applicationId = 123L;
         final SApplication existingApplication = new SApplication();
@@ -47,9 +38,10 @@ public class ReplaceDuplicateApplicationImportStrategyTest {
         applicationToImport.setId(98745L);
 
         // when:
-        strategy.whenApplicationExists(existingApplication, applicationToImport);
+        ApplicationImportStrategy.ImportStrategy importStrategy = strategy.whenApplicationExists(existingApplication,
+                applicationToImport);
 
         // then:
-        verify(applicationService).deleteApplication(applicationId);
+        assertThat(importStrategy).isEqualTo(ApplicationImportStrategy.ImportStrategy.REPLACE);
     }
 }

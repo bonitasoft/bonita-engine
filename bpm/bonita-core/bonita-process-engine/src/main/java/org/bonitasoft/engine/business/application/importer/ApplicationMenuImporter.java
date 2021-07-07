@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
@@ -62,4 +61,14 @@ public class ApplicationMenuImporter {
             throw new ImportException(e);
         }
     }
+
+    public List<ImportError> importApplicationMenus(List<ApplicationMenuNode> applicationMenus,
+            SApplicationWithIcon application) throws ImportException {
+        List<ImportError> importErrors = new ArrayList<>();
+        for (ApplicationMenuNode applicationMenuNode : applicationMenus) {
+            importErrors.addAll(importApplicationMenu(applicationMenuNode, application, null));
+        }
+        return importErrors;
+    }
+
 }

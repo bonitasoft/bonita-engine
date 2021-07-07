@@ -47,4 +47,11 @@ public class ImportStatus implements Serializable {
         this.errors.addAll(errors);
     }
 
+    public void addErrorsIfNotExists(final List<ImportError> errors) {
+        for (ImportError importError : errors) {
+            if (importError != null && !getErrors().contains(importError)) {
+                addError(importError);
+            }
+        }
+    }
 }

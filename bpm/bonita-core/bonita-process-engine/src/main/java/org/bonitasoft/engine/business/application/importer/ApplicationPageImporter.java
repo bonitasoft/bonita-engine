@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationPageConverter;
@@ -51,4 +54,17 @@ public class ApplicationPageImporter {
             throw new ImportException(e);
         }
     }
+
+    public List<ImportError> importApplicationPages(final List<ApplicationPageNode> applicationPageNodes,
+            final SApplicationWithIcon application) throws ImportException {
+        List<ImportError> importErrors = new ArrayList<>();
+        for (ApplicationPageNode applicationPageNode : applicationPageNodes) {
+            ImportError importError = importApplicationPage(applicationPageNode, application);
+            if (importError != null) {
+                importErrors.add(importError);
+            }
+        }
+        return importErrors;
+    }
+
 }

@@ -18,6 +18,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationPageConverter;
@@ -97,6 +100,32 @@ public class ApplicationPageImporterTest {
         importer.importApplicationPage(applicationPageNode, application);
 
         //then exception
+    }
+
+    @Test
+    public void importApplicationPages_should_invoke_import_application_page() throws Exception {
+        importer = spy(new ApplicationPageImporter(applicationService, converter));
+        //given
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
+
+        ApplicationPageNode applicationPageNode = new ApplicationPageNode();
+        applicationPageNode.setToken("appNode1");
+        ApplicationPageNode applicationPageNode1 = new ApplicationPageNode();
+        applicationPageNode1.setToken("appNode2");
+        ImportError error1 = new ImportError("page1", ImportError.Type.APPLICATION_PAGE);
+        ImportError error2 = new ImportError("page2", ImportError.Type.APPLICATION_PAGE);
+
+        doReturn(error1).when(importer).importApplicationPage(eq(applicationPageNode), any());
+        doReturn(error2).when(importer).importApplicationPage(eq(applicationPageNode1), any());
+
+        //when
+        List<ImportError> importErrors = importer
+                .importApplicationPages(Arrays.asList(applicationPageNode, applicationPageNode1), application);
+
+        //then
+        verify(importer, times(1)).importApplicationPage(eq(applicationPageNode), any());
+        verify(importer, times(1)).importApplicationPage(eq(applicationPageNode1), any());
+        assertThat(importErrors).containsExactlyInAnyOrder(error1, error2);
     }
 
 }

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.business.application.importer;
 
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -23,10 +22,8 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 public class FailOnDuplicateApplicationImportStrategy implements ApplicationImportStrategy {
 
     @Override
-    public void whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported)
-            throws AlreadyExistsException {
-        throw new AlreadyExistsException("An application with token '" + existing.getToken() + "' already exists",
-                existing.getToken());
+    public ImportStrategy whenApplicationExists(SApplication existing, SApplicationWithIcon toBeImported) {
+        return ImportStrategy.FAIL;
     }
 
 }
