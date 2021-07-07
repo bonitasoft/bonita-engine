@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,10 +33,8 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
-import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
-import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -77,29 +76,6 @@ public class ApplicationImporter implements TenantLifecycleService {
         this.applicationMenuImporter = applicationMenuImporter;
     }
 
-    public ImportStatus importApplication(ApplicationNode applicationNode, byte[] iconContent, String iconMimeType,
-            long createdBy, ApplicationImportStrategy strategy) throws ImportException, AlreadyExistsException {
-        return importApplicationSetEditable(applicationNode, iconContent, iconMimeType, createdBy, strategy, true);
-    }
-
-    ImportStatus importApplicationSetEditable(ApplicationNode applicationNode, byte[] iconContent, String iconMimeType,
-            long createdBy, ApplicationImportStrategy strategy, boolean editable)
-            throws ImportException, AlreadyExistsException {
-        try {
-            ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, iconContent,
-                    iconMimeType, createdBy);
-            SApplicationWithIcon application = importResult.getApplication();
-            application.setEditable(editable);
-            application = importApplication(application, importResult, strategy);
-            importApplicationPages(applicationNode, importResult, application);
-            importApplicationMenus(applicationNode, importResult, application);
-            updateHomePage(application, applicationNode, createdBy, importResult);
-            return importResult.getImportStatus();
-        } catch (SBonitaException e) {
-            throw new ImportException(e);
-        }
-    }
-
     private void updateHomePage(final SApplicationWithIcon application, final ApplicationNode applicationNode,
             final long createdBy, final ImportResult importResult) throws SBonitaException {
         if (applicationNode.getHomePage() != null) {
@@ -110,48 +86,56 @@ public class ApplicationImporter implements TenantLifecycleService {
                 updateBuilder.updateHomePageId(homePage.getId());
                 applicationService.updateApplication(application, updateBuilder.done());
             } catch (SObjectNotFoundException e) {
-                addError(importResult.getImportStatus(),
-                        new ImportError(applicationNode.getHomePage(), ImportError.Type.APPLICATION_PAGE));
+                importResult.getImportStatus()
+                        .addErrorsIfNotExists(Arrays.asList(
+                                new ImportError(applicationNode.getHomePage(), ImportError.Type.APPLICATION_PAGE)));
             }
         }
     }
 
-    private void importApplicationMenus(final ApplicationNode applicationNode, final ImportResult importResult,
-            final SApplicationWithIcon application) throws ImportException {
-        for (ApplicationMenuNode applicationMenuNode : applicationNode.getApplicationMenus()) {
-            List<ImportError> importErrors = applicationMenuImporter.importApplicationMenu(applicationMenuNode,
-                    application, null);
-            for (ImportError importError : importErrors) {
-                addError(importResult.getImportStatus(), importError);
+    ImportStatus importApplication(ApplicationNode applicationNode, boolean editable,
+            long createdBy, byte[] iconContent,
+            String iconMimeType, ApplicationImportStrategy strategy)
+            throws ImportException, AlreadyExistsException {
+        try {
+            ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, iconContent,
+                    iconMimeType, createdBy);
+            SApplicationWithIcon applicationToBeImported = importResult.getApplication();
+            applicationToBeImported.setEditable(editable);
+            ImportStatus importStatus = importResult.getImportStatus();
+            SApplication conflictingApplication = applicationService
+                    .getApplicationByToken(applicationToBeImported.getToken());
+            importStatus.setStatus(ImportStatus.Status.ADDED);
+            if (conflictingApplication != null) {
+                switch (strategy.whenApplicationExists(conflictingApplication, applicationToBeImported)) {
+                    case FAIL:
+                        throw new AlreadyExistsException(
+                                "An application with token '" + conflictingApplication.getToken() + "' already exists",
+                                conflictingApplication.getToken());
+                    case REPLACE:
+                        importStatus.setStatus(ImportStatus.Status.REPLACED);
+                        applicationService.forceDeleteApplication(conflictingApplication);
+                        break;
+                    case SKIP:
+                        importStatus.setStatus(ImportStatus.Status.SKIPPED);
+                        break;
+                }
             }
-        }
-    }
 
-    private void importApplicationPages(final ApplicationNode applicationNode, final ImportResult importResult,
-            final SApplicationWithIcon application) throws ImportException {
-        for (ApplicationPageNode applicationPageNode : applicationNode.getApplicationPages()) {
-            ImportError importError = applicationPageImporter.importApplicationPage(applicationPageNode, application);
-            addError(importResult.getImportStatus(), importError);
+            if (importStatus.getStatus() != ImportStatus.Status.SKIPPED) {
+                applicationService.createApplication(applicationToBeImported);
+                importStatus.addErrorsIfNotExists(applicationPageImporter
+                        .importApplicationPages(applicationNode.getApplicationPages(), applicationToBeImported));
+                importStatus
+                        .addErrorsIfNotExists(
+                                applicationMenuImporter.importApplicationMenus(applicationNode.getApplicationMenus(),
+                                        applicationToBeImported));
+                updateHomePage(applicationToBeImported, applicationNode, createdBy, importResult);
+            }
+            return importStatus;
+        } catch (SBonitaException e) {
+            throw new ImportException(e);
         }
-    }
-
-    private void addError(final ImportStatus importStatus, final ImportError importError) {
-        if (importError != null && !importStatus.getErrors().contains(importError)) {
-            importStatus.addError(importError);
-        }
-    }
-
-    private SApplicationWithIcon importApplication(SApplicationWithIcon applicationToBeImported,
-            ImportResult importResult, ApplicationImportStrategy strategy)
-            throws SBonitaException, AlreadyExistsException {
-        SApplication conflictingApplication = applicationService
-                .getApplicationByToken(applicationToBeImported.getToken());
-        if (conflictingApplication != null) {
-            strategy.whenApplicationExists(conflictingApplication, applicationToBeImported);
-            // if no exception is thrown, this is a replacement:
-            importResult.getImportStatus().setStatus(ImportStatus.Status.REPLACED);
-        }
-        return applicationService.createApplication(applicationToBeImported);
     }
 
     public List<ImportStatus> importApplications(final byte[] xmlContent, byte[] iconContent, String iconMimeType,
@@ -159,7 +143,7 @@ public class ApplicationImporter implements TenantLifecycleService {
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
         ArrayList<ImportStatus> importStatus = new ArrayList<>();
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
-            importStatus.add(importApplication(applicationNode, iconContent, iconMimeType, createdBy, strategy));
+            importStatus.add(importApplication(applicationNode, true, createdBy, iconContent, iconMimeType, strategy));
         }
         return importStatus;
     }
@@ -168,8 +152,8 @@ public class ApplicationImporter implements TenantLifecycleService {
             boolean editable) throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
-            importApplicationSetEditable(applicationNode, iconContent, iconMimeType, SessionService.SYSTEM_ID,
-                    new UpdateNewerNonEditableApplicationStrategy(applicationService), editable);
+            importApplication(applicationNode, editable, SessionService.SYSTEM_ID, iconContent, iconMimeType,
+                    new UpdateNewerNonEditableApplicationStrategy());
         }
     }
 

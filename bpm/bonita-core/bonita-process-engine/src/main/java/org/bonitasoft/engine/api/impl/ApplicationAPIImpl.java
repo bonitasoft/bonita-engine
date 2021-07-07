@@ -303,7 +303,6 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
         ApplicationImporter applicationImporter;
         try {
             applicationImporter = tenantAccessor.lookup(ApplicationImporter.class);
@@ -311,7 +310,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
             throw new IllegalStateException(e);
         }
         return applicationImporter.importApplications(xmlContent, null, "", SessionInfos.getUserIdFromSession(),
-                new StrategySelector(applicationService).selectStrategy(policy));
+                new StrategySelector().selectStrategy(policy));
     }
 
     @Override

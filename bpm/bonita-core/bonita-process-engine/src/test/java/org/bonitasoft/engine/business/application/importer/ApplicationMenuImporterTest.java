@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.api.ImportError;
@@ -156,6 +157,42 @@ public class ApplicationMenuImporterTest {
         verify(applicationService, never()).createApplicationMenu(subMenu1);
         verify(applicationService, never()).createApplicationMenu(subMenu2);
 
+    }
+
+    @Test
+    public void importApplicationMenus_should_invoke_application_menu() throws Exception {
+
+        SApplicationWithIcon application = mock(SApplicationWithIcon.class);
+        ApplicationMenuNode subMenuNode1 = ApplicationNodeBuilder.newMenu("subMenuNode1", "").create();
+        ApplicationMenuNode subMenuNode2 = ApplicationNodeBuilder.newMenu("subMenuNode2", "").create();
+
+        ApplicationMenuNode subMenuNode3 = ApplicationNodeBuilder.newMenu("subMenuNode3", "").create();
+        ApplicationMenuNode subMenuNode4 = ApplicationNodeBuilder.newMenu("subMenuNode4", "").create();
+
+        ApplicationMenuNode menuNode = new ApplicationMenuNode();
+        menuNode.addApplicationMenu(subMenuNode1);
+        menuNode.addApplicationMenu(subMenuNode2);
+
+        ImportError error1 = new ImportError("page1", ImportError.Type.APPLICATION_PAGE);
+        ImportError error2 = new ImportError("page2", ImportError.Type.APPLICATION_PAGE);
+
+        ApplicationMenuNode menuNode2 = new ApplicationMenuNode();
+        menuNode2.addApplicationMenu(subMenuNode3);
+        menuNode2.addApplicationMenu(subMenuNode4);
+
+        importer = spy(new ApplicationMenuImporter(applicationService, converter));
+
+        doReturn(Arrays.asList(error1, error1)).when(importer).importApplicationMenu(eq(menuNode), any(), any());
+        doReturn(Arrays.asList(error2, error2)).when(importer).importApplicationMenu(eq(menuNode2), any(), any());
+
+        //when
+        List<ImportError> importErrors = importer.importApplicationMenus(Arrays.asList(menuNode, menuNode2),
+                application);
+
+        //then
+        verify(importer, times(1)).importApplicationMenu(eq(menuNode), any(), eq(null));
+        verify(importer, times(1)).importApplicationMenu(eq(menuNode2), any(), eq(null));
+        assertThat(importErrors).containsExactlyInAnyOrder(error1, error1, error2, error2);
     }
 
 }
