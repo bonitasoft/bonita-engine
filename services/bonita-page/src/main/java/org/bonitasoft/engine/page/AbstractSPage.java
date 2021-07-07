@@ -51,7 +51,13 @@ public class AbstractSPage implements PersistentObject {
     private String contentName;
     private String contentType;
     private long processDefinitionId;
-    private int pageHash;
+
+    /**
+     * A MD5 sum hash of the content of the page.
+     * It is used only for verifying if a provided page has change or not.
+     * It is not used (and not filled) for user pages
+     */
+    private String pageHash;
 
     public AbstractSPage(final AbstractSPage sPage) {
         name = sPage.getName();

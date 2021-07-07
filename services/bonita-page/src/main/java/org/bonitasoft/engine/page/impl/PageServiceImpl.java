@@ -76,6 +76,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 /**
  * @author Baptiste Mesta
@@ -211,7 +212,7 @@ public class PageServiceImpl implements PageService {
                 pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided, hidden,
                 true, true,
-                pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE), Arrays.hashCode(content));
+                pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         return insertPage(page, content);
     }
 
@@ -354,9 +355,8 @@ public class PageServiceImpl implements PageService {
 
     private SPage buildPage(final String name, final String displayName, final String description,
             final String contentName, final long creatorUserId,
-            final boolean provided, boolean hidden, boolean removable, boolean editable, final String contentType,
-            int hash) {
-        Long currentTime = System.currentTimeMillis();
+            final boolean provided, boolean hidden, boolean removable, boolean editable, final String contentType) {
+        long currentTime = System.currentTimeMillis();
         return SPage.builder().name(name).description(description).displayName(displayName)
                 .installationDate(currentTime).installedBy(creatorUserId).provided(provided)
                 .lastModificationDate(currentTime).lastUpdatedBy(creatorUserId)
@@ -365,7 +365,6 @@ public class PageServiceImpl implements PageService {
                 .editable(editable)
                 .contentName(contentName)
                 .contentType(contentType)
-                .pageHash(hash)
                 .build();
     }
 
@@ -626,8 +625,9 @@ public class PageServiceImpl implements PageService {
             SInvalidPageZipException, SInvalidPageTokenException, SObjectAlreadyExistsException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with name " + pageId);
         final Properties pageProperties = readPageZip(content, false);
+        final SPageWithContent sPageContent;
         try {
-            final SPageWithContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
+            sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
                     SPageWithContent.class, pageId));
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("content", content);
@@ -648,7 +648,10 @@ public class PageServiceImpl implements PageService {
         pageBuilder.updateDisplayName(pageProperties.getProperty(PROPERTIES_DISPLAY_NAME));
         pageBuilder.updateName(pageProperties.getProperty(PROPERTIES_NAME));
         pageBuilder.updateContentType(pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
-        pageBuilder.updatePageHash(Arrays.hashCode(content));
+        if (sPageContent.isProvided()) {
+            //update the md5 sum of the page only if it is provided
+            pageBuilder.updatePageHash(DigestUtils.md5DigestAsHex(content));
+        }
         final SPage sPage = updatePage(pageId, pageBuilder.done());
         for (final PageServiceListener pageServiceListener : pageServiceListeners) {
             pageServiceListener.pageUpdated(sPage, content);
@@ -715,8 +718,8 @@ public class PageServiceImpl implements PageService {
             createProvidedPage(pageZipName, providedPageContent, pageProperties, removable, editable);
         } else {
             if (!pageByName.isEditable()) {
-                int newHash = Arrays.hashCode(providedPageContent);
-                if (pageByName.getPageHash() == newHash) {
+                String md5Sum = DigestUtils.md5DigestAsHex(providedPageContent);
+                if (Objects.equals(pageByName.getPageHash(), md5Sum)) {
                     log.debug("Provided page exists and is up to date, nothing to do");
                 } else {
                     log.info("Provided page {} exists but the content is not up to date, updating it.", pageZipName);
@@ -736,8 +739,8 @@ public class PageServiceImpl implements PageService {
                 pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), pageZipName, -1, true,
                 hidden, removable, editable,
-                pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE),
-                Arrays.hashCode(providedPageContent));
+                pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
+        page.setPageHash(DigestUtils.md5DigestAsHex(providedPageContent));
         insertPage(page, providedPageContent);
     }
 

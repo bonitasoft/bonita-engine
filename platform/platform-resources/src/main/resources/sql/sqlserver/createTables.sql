@@ -992,7 +992,7 @@ CREATE TABLE page (
   content VARBINARY(MAX),
   contentType NVARCHAR(50) NOT NULL,
   processDefinitionId NUMERIC(19,0) NOT NULL,
-  pageHash NUMERIC(19, 0)
+  pageHash NVARCHAR(32)
 )
 GO
 
