@@ -9,7 +9,10 @@ dependencyManagement {
         imports {
             mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonDataBindingVersion}"
         }
-        dependency("org.slf4j:slf4j-api:$Deps.slf4jVersion")
+        dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
+            entry 'slf4j-api'
+            entry 'slf4j-jdk14'
+        }
         dependency "com.h2database:h2:${Deps.h2Version}"
         dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
 
