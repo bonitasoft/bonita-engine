@@ -48,7 +48,10 @@ public class IconServiceImpl implements IconService {
 
     @Override
     public SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException {
-        SIcon entity = new SIcon(IOUtil.getContentType(iconFilename), iconContent);
+        if (iconFilename == null || iconFilename.isBlank() || iconContent == null || iconContent.length == 0) {
+            throw new IllegalArgumentException("Unable to create an icon without filename or content");
+        }
+        SIcon entity = new SIcon(IOUtil.getContentTypeForIcon(iconFilename), iconContent);
         recorder.recordInsert(new InsertRecord(entity), EVENT_NAME);
         return entity;
     }

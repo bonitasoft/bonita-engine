@@ -642,11 +642,12 @@ public class IOUtil {
         }
     }
 
-    public static String getContentType(String iconFilename) {
-        if (iconFilename == null) {
-            return "image/png";
+    public static String getContentTypeForIcon(String iconFilename) {
+        String contentType = MIMETYPES_FILE_TYPE_MAP.getContentType(iconFilename);
+        if (!contentType.startsWith("image")) {
+            throw new IllegalArgumentException("An icon can't have mimetype " + contentType);
         }
-        return MIMETYPES_FILE_TYPE_MAP.getContentType(iconFilename);
+        return contentType;
     }
 
     /**

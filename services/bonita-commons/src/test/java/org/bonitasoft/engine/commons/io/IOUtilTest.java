@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.commons.io;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -151,4 +152,19 @@ public class IOUtilTest {
 
         assertThat(fileContent).isNotPresent();
     }
+
+    @Test
+    public void getContentTypeForIcon_should_throw_exception_when_not_an_image() {
+        assertThat(IOUtil.getContentTypeForIcon("a.png")).isEqualTo("image/png");
+        assertThat(IOUtil.getContentTypeForIcon("a.jpg")).isEqualTo("image/jpeg");
+    }
+
+    @Test
+    public void getContentTypeForIcon_should_return_the_image_content() {
+        assertThatThrownBy(() -> IOUtil.getContentTypeForIcon("")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> IOUtil.getContentTypeForIcon("a.b")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> IOUtil.getContentTypeForIcon("a.exe")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> IOUtil.getContentTypeForIcon("a")).isInstanceOf(IllegalArgumentException.class);
+    }
+
 }
