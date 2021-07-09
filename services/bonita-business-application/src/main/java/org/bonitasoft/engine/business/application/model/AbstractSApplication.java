@@ -104,7 +104,7 @@ public abstract class AbstractSApplication implements PersistentObject {
     }
 
     public boolean hasIcon() {
-        return iconMimeType != null;
+        return iconMimeType != null && !iconMimeType.isBlank();
     }
 
 }

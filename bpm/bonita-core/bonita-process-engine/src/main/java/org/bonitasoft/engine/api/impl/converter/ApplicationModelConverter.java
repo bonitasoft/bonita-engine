@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.business.application.*;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.business.application.model.AbstractSApplication;
@@ -37,6 +38,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Elias Ricken de Medeiros
  */
+@Slf4j
 public class ApplicationModelConverter {
 
     private final PageService pageService;
@@ -63,9 +65,17 @@ public class ApplicationModelConverter {
         application.setLayoutId(getLayoutId(creator));
         application.setThemeId(getThemeId(creator));
         application.setUpdatedBy(creatorUserId);
-        application.setIconContent((byte[]) fields.get(ApplicationField.ICON_CONTENT));
-        application.setIconMimeType(fields.get(ApplicationField.ICON_FILE_NAME) == null ? null
-                : IOUtil.getContentType((String) fields.get(ApplicationField.ICON_FILE_NAME)));
+        byte[] iconContent = (byte[]) fields.get(ApplicationField.ICON_CONTENT);
+        String iconFileName = (String) fields.get(ApplicationField.ICON_FILE_NAME);
+        if (iconContent != null && iconContent.length > 0) {
+            if (iconFileName != null && !iconFileName.isBlank()) {
+                application.setIconContent(iconContent);
+                application.setIconMimeType(IOUtil.getContentTypeForIcon(iconFileName));
+            } else {
+                log.warn("Constructing application {} with {} set but without {} set. Icon is ignored.",
+                        application.getToken(), ApplicationField.ICON_CONTENT, ApplicationField.ICON_FILE_NAME);
+            }
+        }
         application.setDescription(description);
         application.setIconPath(iconPath);
         application.setProfileId(profileId);
@@ -159,7 +169,8 @@ public class ApplicationModelConverter {
                     break;
                 case ICON_FILE_NAME:
                     builder.updateIconMimeType(
-                            entry.getValue() == null ? null : IOUtil.getContentType((String) entry.getValue()));
+                            entry.getValue() == null || ((String) entry.getValue()).isBlank() ? null
+                                    : IOUtil.getContentTypeForIcon((String) entry.getValue()));
                     break;
                 case ICON_CONTENT:
                     builder.updateIconContent((byte[]) entry.getValue());

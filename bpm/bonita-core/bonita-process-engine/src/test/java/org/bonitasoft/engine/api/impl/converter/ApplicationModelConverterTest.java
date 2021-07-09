@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -61,9 +63,21 @@ public class ApplicationModelConverterTest {
 
     @Mock
     private PageService pageService;
+    @Mock
+    private SPage defaultLayout;
+    @Mock
+    private SPage defaultTheme;
 
     @InjectMocks
     private ApplicationModelConverter converter;
+
+    @Before
+    public void before() throws Exception {
+        given(defaultLayout.getId()).willReturn(LAYOUT_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
+        given(defaultTheme.getId()).willReturn(THEME_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
+    }
 
     @Test
     public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields()
@@ -73,16 +87,9 @@ public class ApplicationModelConverterTest {
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
         creator.setProfileId(PROFILE_ID);
+        creator.setIcon("myIcon.jpg", ICON_CONTENT);
         final long userId = 10;
         final long before = System.currentTimeMillis();
-
-        SPage layout = mock(SPage.class);
-        given(layout.getId()).willReturn(LAYOUT_ID);
-        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(layout);
-
-        SPage theme = mock(SPage.class);
-        given(theme.getId()).willReturn(THEME_ID);
-        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(theme);
 
         //when
         final SApplicationWithIcon application = converter.buildSApplication(creator, userId);
@@ -102,6 +109,55 @@ public class ApplicationModelConverterTest {
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
         assertThat(application.getThemeId()).isEqualTo(THEME_ID);
+        assertThat(application.getIconContent()).isEqualTo(ICON_CONTENT);
+        assertThat(application.getIconMimeType()).isEqualTo("image/jpeg");
+        assertThat(application.hasIcon()).isTrue();
+    }
+
+    @Test
+    public void should_not_have_icon_when_filename_is_empty() throws Exception {
+        ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
+        creator.setIcon("", ICON_CONTENT);
+
+        SApplicationWithIcon application = converter.buildSApplication(creator, 10);
+
+        assertThat(application.getIconContent()).isNull();
+        assertThat(application.getIconMimeType()).isNull();
+        assertThat(application.hasIcon()).isFalse();
+    }
+
+    @Test
+    public void should_not_have_icon_when_filename_is_null_but_content_is_set() throws Exception {
+        ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
+        creator.setIcon(null, ICON_CONTENT);
+
+        SApplicationWithIcon application = converter.buildSApplication(creator, 10);
+
+        assertThat(application.getIconContent()).isNull();
+        assertThat(application.getIconMimeType()).isNull();
+        assertThat(application.hasIcon()).isFalse();
+    }
+
+    @Test
+    public void should_not_have_icon_when_content_is_empty() throws Exception {
+        ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
+        creator.setIcon("someIcon.png", new byte[] {});
+
+        SApplicationWithIcon application = converter.buildSApplication(creator, 10);
+
+        assertThat(application.getIconContent()).isNull();
+        assertThat(application.getIconMimeType()).isNull();
+        assertThat(application.hasIcon()).isFalse();
+    }
+
+    @Test
+    public void should_have_correct_mime_type_when_filename_is_invalid() throws Exception {
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
+        creator.setIcon("nodotfile", ICON_CONTENT);
+
+        assertThatThrownBy(() -> converter.buildSApplication(creator, 10)).isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("An icon can't have mimetype application/octet-stream");
+
     }
 
     @Test(expected = CreationException.class)
@@ -247,6 +303,27 @@ public class ApplicationModelConverterTest {
                 entry(AbstractSApplication.STATE, ApplicationState.ACTIVATED.name()),
                 entry(AbstractSApplication.UPDATED_BY, LOGGED_USER_ID),
                 entry(AbstractSApplication.HOME_PAGE_ID, 11L));
+    }
+
+    @Test
+    public void toApplicationUpdateDescriptor_should_set_iconFileName_to_null_when_empty() throws Exception {
+        ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setIcon("", null);
+
+        EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater,
+                LOGGED_USER_ID);
+
+        assertThat(updateDescriptor.getFields()).contains(entry("iconMimeType", null));
+    }
+
+    @Test
+    public void toApplicationUpdateDescriptor_should_fail_to_update_icon_filename_when_invalid() throws Exception {
+        ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setIcon("someFile.exe", "content".getBytes(StandardCharsets.UTF_8));
+
+        assertThatThrownBy(() -> converter.toApplicationUpdateDescriptor(updater,
+                LOGGED_USER_ID)).isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("An icon can't have mimetype");
     }
 
     @Test
