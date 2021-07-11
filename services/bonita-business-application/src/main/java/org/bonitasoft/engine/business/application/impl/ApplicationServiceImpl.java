@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.application.impl;
 
+import static org.bonitasoft.engine.business.application.model.SApplicationWithIcon.ALWAYS_MODIFIABLE_FIELDS;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -221,7 +223,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             final SApplication application = getApplication(applicationId);
             if (!application.isEditable()) {
                 throw new SObjectModificationException(
-                        " The application is set as non modifiable. It cannot be deleted.");
+                        "The application is set as non modifiable. It cannot be deleted.");
             }
             deleteApplication(application);
         } catch (final SObjectNotFoundException e) {
@@ -247,12 +249,16 @@ public class ApplicationServiceImpl implements ApplicationService {
                 "Updating application with id " + applicationId);
 
         try {
-            handleHomePageUpdate(updateDescriptor);
             final SApplicationWithIcon application = getApplicationWithIcon(applicationId);
             if (!application.isEditable()) {
-                throw new SObjectModificationException(
-                        " The application is set as non modifiable. It cannot be modified ");
+                for (String field : updateDescriptor.getFields().keySet()) {
+                    if (!ALWAYS_MODIFIABLE_FIELDS.contains(field)) {
+                        throw new SObjectModificationException("The application is provided." +
+                                " Only the theme, the layout, and the icon can be updated.");
+                    }
+                }
             }
+            verifyNewHomePageExists(updateDescriptor);
             return updateApplication(application, updateDescriptor);
         } catch (final SObjectNotFoundException | SObjectAlreadyExistsException | SObjectModificationException e) {
             throw e;
@@ -262,14 +268,14 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
-    private void handleHomePageUpdate(final EntityUpdateDescriptor updateDescriptor)
+    private void verifyNewHomePageExists(final EntityUpdateDescriptor updateDescriptor)
             throws SBonitaReadException, SObjectModificationException {
         final Long homePageId = (Long) updateDescriptor.getFields().get(AbstractSApplication.HOME_PAGE_ID);
         if (homePageId != null) {
             final SApplicationPage applicationPage = executeGetApplicationPageById(homePageId);
             if (applicationPage == null) {
                 throw new SObjectModificationException(
-                        "Invalid home page id: No application page found with id '" + homePageId + "'");
+                        "Invalid home page id: no application page found with id '" + homePageId + "'");
             }
         }
     }

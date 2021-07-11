@@ -15,6 +15,7 @@ package org.bonitasoft.engine.business.application.impl;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.business.application.ApplicationService.APPLICATION;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,9 +70,7 @@ public class ApplicationServiceImplTest {
 
     private static final String APPLICATION_TOKEN = "app";
 
-    private static final String APPLICATION_DISP_NAME = "My app";
-
-    public static final int MAX_RESULTS = 2;
+    private static final String APPLICATION_DISPLAY_NAME = "My app";
 
     public static final long LAYOUT_ID = 15L;
 
@@ -106,12 +105,12 @@ public class ApplicationServiceImplTest {
     private ApplicationServiceImpl applicationServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         applicationServiceImpl = new ApplicationServiceImpl(recorder, persistenceService, queriableLogService,
                 indexManager, convertor, applicationDestructor, applicationPageDestructor, applicationMenuDestructor);
 
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
-        application = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
+        application = buildApplication(APPLICATION_TOKEN, APPLICATION_DISPLAY_NAME);
         application.setId(10L);
     }
 
@@ -123,7 +122,7 @@ public class ApplicationServiceImplTest {
         application.setVersion("1.0");
         application.setCreationDate(currentDate);
         application.setLastUpdateDate(currentDate);
-        application.setCreatedBy((long) CREATED_BY);
+        application.setCreatedBy(CREATED_BY);
         application.setState(SApplicationState.ACTIVATED.name());
         application.setLayoutId(LAYOUT_ID);
         application.setThemeId(THEME_ID);
@@ -140,7 +139,7 @@ public class ApplicationServiceImplTest {
 
         //then
         assertThat(createdApplication).isEqualTo(application);
-        verify(recorder, times(1)).recordInsert(record, ApplicationService.APPLICATION);
+        verify(recorder, times(1)).recordInsert(record, APPLICATION);
     }
 
     @Test(expected = SObjectCreationException.class)
@@ -162,11 +161,11 @@ public class ApplicationServiceImplTest {
         SApplication app = new SApplication();
         app.setId(125);
         given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken",
-                Collections.<String, Object> singletonMap("name",
+                Collections.singletonMap("name",
                         APPLICATION_TOKEN),
                 SApplication.class))).willReturn(app);
 
-        final SApplicationWithIcon newApp = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
+        final SApplicationWithIcon newApp = buildApplication(APPLICATION_TOKEN, APPLICATION_DISPLAY_NAME);
 
         //when
         try {
@@ -245,7 +244,7 @@ public class ApplicationServiceImplTest {
         applicationServiceImpl.deleteApplication(applicationId);
 
         //then
-        verify(recorder, times(1)).recordDelete(new DeleteRecord(app), ApplicationService.APPLICATION);
+        verify(recorder, times(1)).recordDelete(new DeleteRecord(app), APPLICATION);
     }
 
     @Test
@@ -561,12 +560,13 @@ public class ApplicationServiceImplTest {
         //then
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
                 updateDescriptor);
-        verify(recorder, times(1)).recordUpdate(updateRecord, ApplicationService.APPLICATION);
+        verify(recorder, times(1)).recordUpdate(updateRecord, APPLICATION);
         assertThat(updatedApplication).isEqualTo(application);
     }
 
     @Test
-    public void updateApplication_should_throw_exception_called_on_non_editable_application() throws Exception {
+    public void update_application_display_name_should_throw_exception_called_on_non_editable_application()
+            throws Exception {
         //given
         application.setEditable(false);
         EntityUpdateDescriptor updateDescriptor = new SApplicationUpdateBuilder(0L)
@@ -574,12 +574,33 @@ public class ApplicationServiceImplTest {
 
         long applicationId = 17;
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationWithIcon.class, applicationId)))
-                .willReturn(
-                        application);
+                .willReturn(application);
         //when
         String exceptionMessage = assertThrows("Not the right exception", SObjectModificationException.class,
                 () -> applicationServiceImpl.updateApplication(applicationId, updateDescriptor)).getMessage();
-        assertThat(exceptionMessage).contains("The application is set as non modifiable. It cannot be modified");
+        assertThat(exceptionMessage)
+                .contains("The application is provided. Only the theme, the layout, and the icon can be updated");
+
+        //cleanup
+        application.setEditable(true);
+    }
+
+    @Test
+    public void update_non_editable_application_should_allow_to_change_icon_theme_and_layout() throws Exception {
+        //given
+        application.setEditable(false);
+        EntityUpdateDescriptor updateDescriptor = new SApplicationUpdateBuilder(0L)
+                .updateThemeId(1L).updateLayoutId(2L).updateIconMimeType("image/jpg")
+                .updateIconContent("toto".getBytes()).done();
+
+        long applicationId = 17;
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationWithIcon.class, applicationId)))
+                .willReturn(application);
+        //when
+        applicationServiceImpl.updateApplication(applicationId, updateDescriptor);
+
+        //then:
+        verify(recorder).recordUpdate(UpdateRecord.buildSetFields(application, updateDescriptor), APPLICATION);
 
         //cleanup
         application.setEditable(true);
@@ -596,9 +617,13 @@ public class ApplicationServiceImplTest {
 
         final int applicationId = 17;
 
+        final SApplicationWithIcon applicationWithIcon = mock(SApplicationWithIcon.class);
+        doReturn(true).when(applicationWithIcon).isEditable();
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationWithIcon.class, applicationId)))
+                .willReturn(applicationWithIcon);
+
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationPage.class, homePageId)))
-                .willReturn(
-                        null);
+                .willReturn(null);
 
         //when
         applicationServiceImpl.updateApplication(applicationId, updateDescriptor);
@@ -934,7 +959,7 @@ public class ApplicationServiceImplTest {
                 SApplicationMenu.class, applicationMenuId);
         given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForRootMenu",
-                Collections.<String, Object> emptyMap(),
+                Collections.emptyMap(),
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(2);
 
@@ -976,7 +1001,7 @@ public class ApplicationServiceImplTest {
         given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
 
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForRootMenu",
-                Collections.<String, Object> emptyMap(),
+                Collections.emptyMap(),
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(lastUsedIndex);
 
@@ -1011,7 +1036,7 @@ public class ApplicationServiceImplTest {
                 .willReturn(applicationMenu);
 
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForRootMenu",
-                Collections.<String, Object> emptyMap(),
+                Collections.emptyMap(),
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(2);
 
@@ -1084,7 +1109,7 @@ public class ApplicationServiceImplTest {
             throws Exception {
         //given
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForRootMenu",
-                Collections.<String, Object> emptyMap(),
+                Collections.emptyMap(),
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(1);
 
@@ -1101,7 +1126,7 @@ public class ApplicationServiceImplTest {
         //given
         final long parentId = 10;
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForChildOf",
-                Collections.<String, Object> singletonMap(
+                Collections.singletonMap(
                         SApplicationMenu.PARENT_ID, parentId),
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(1);
@@ -1144,7 +1169,7 @@ public class ApplicationServiceImplTest {
             throws Exception {
         //given
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForRootMenu",
-                Collections.<String, Object> emptyMap(),
+                Collections.emptyMap(),
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(null);
 
@@ -1161,7 +1186,7 @@ public class ApplicationServiceImplTest {
         //given
         final long parentId = 10;
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForChildOf",
-                Collections.<String, Object> singletonMap(
+                Collections.singletonMap(
                         SApplicationMenu.PARENT_ID, parentId),
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(null);

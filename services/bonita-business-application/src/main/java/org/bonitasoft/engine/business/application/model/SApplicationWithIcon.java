@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,6 +39,9 @@ import org.hibernate.annotations.Type;
 public class SApplicationWithIcon extends AbstractSApplication {
 
     public static final String ICON_CONTENT = "iconContent";
+    public static List<String> ALWAYS_MODIFIABLE_FIELDS = Arrays.asList(LAYOUT_ID, THEME_ID, ICON_MIME_TYPE,
+            ICON_CONTENT,
+            UPDATED_BY, LAST_UPDATE_DATE);
 
     @Type(type = "materialized_blob")
     @Column
