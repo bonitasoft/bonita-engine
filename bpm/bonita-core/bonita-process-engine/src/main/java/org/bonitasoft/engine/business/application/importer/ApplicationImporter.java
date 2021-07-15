@@ -141,20 +141,24 @@ public class ApplicationImporter implements TenantLifecycleService {
     public List<ImportStatus> importApplications(final byte[] xmlContent, byte[] iconContent, String iconMimeType,
             long createdBy, ApplicationImportStrategy strategy) throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
-        ArrayList<ImportStatus> importStatus = new ArrayList<>();
+        List<ImportStatus> importStatus = new ArrayList<>();
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
             importStatus.add(importApplication(applicationNode, true, createdBy, iconContent, iconMimeType, strategy));
         }
         return importStatus;
     }
 
-    private void importDefaultApplications(final byte[] xmlContent, byte[] iconContent, String iconMimeType,
+    private List<ImportStatus> importDefaultApplications(final byte[] xmlContent, byte[] iconContent,
+            String iconMimeType,
             boolean editable) throws ImportException, AlreadyExistsException {
+        List<ImportStatus> importStatuses = new ArrayList<>();
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
-            importApplication(applicationNode, editable, SessionService.SYSTEM_ID, iconContent, iconMimeType,
-                    new UpdateNewerNonEditableApplicationStrategy());
+            importStatuses.add(
+                    importApplication(applicationNode, editable, SessionService.SYSTEM_ID, iconContent, iconMimeType,
+                            new UpdateNewerNonEditableApplicationStrategy()));
         }
+        return importStatuses;
     }
 
     private ApplicationNodeContainer getApplicationNodeContainer(byte[] xmlContent) throws ImportException {
@@ -171,56 +175,84 @@ public class ApplicationImporter implements TenantLifecycleService {
     @Override
     public void init() throws SBonitaException {
         try {
-            importProvidedApplicationsFromClasspath(PROVIDED_APPLICATIONS_PATH, true);
-            importProvidedApplicationsFromClasspath(PROVIDED_FINAL_APPLICATIONS_PATH, false);
-        } catch (IOException e) {
+            List<ImportStatus> importStatuses = importProvidedApplicationsFromClasspath(
+                    PROVIDED_FINAL_APPLICATIONS_PATH, false);
+            if (importStatuses.stream().map(ImportStatus::getStatus)
+                    .allMatch(status -> status == ImportStatus.Status.ADDED)) {
+                log.info("First run detected, importing default applications");
+                importStatuses.addAll(importProvidedApplicationsFromClasspath(PROVIDED_APPLICATIONS_PATH, true));
+            }
+            List<String> createdOrReplaced = importStatuses.stream()
+                    .filter(importStatus -> importStatus.getStatus() != ImportStatus.Status.SKIPPED)
+                    .map(importStatus -> importStatus.getName() + " " + importStatus.getStatus())
+                    .collect(Collectors.toList());
+            if (createdOrReplaced.isEmpty()) {
+                log.info("No applications updated");
+            } else {
+                log.info("Application updated or created : {}", createdOrReplaced);
+            }
+        } catch (Exception e) {
             log.error("Cannot load provided applications at startup. Root cause: {}",
                     ExceptionUtils.printRootCauseOnly(e));
             log.debug("Full stack : ", e);
         }
     }
 
-    private void importProvidedApplicationsFromClasspath(String path, boolean editable) throws IOException {
+    private List<ImportStatus> importProvidedApplicationsFromClasspath(String path, boolean editable)
+            throws IOException, ImportException {
+        List<ImportStatus> importStatuses = new ArrayList<>();
         Resource[] resources = cpResourceResolver
                 .getResources(
                         ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + path + "/*.zip");
         for (Resource resource : resources) {
             if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                importProvidedApplicationFromResource(resource, editable);
+                String resourceName = resource.getFilename();
+                log.debug("Found provided applications '{}' in classpath", resourceName);
+                try (InputStream resourceAsStream = resource.getInputStream()) {
+                    ZipContent zipContent = getZipContent(resourceName, resourceAsStream);
+                    importStatuses.addAll(importDefaultApplications(zipContent.xmlRaw, zipContent.iconRaw,
+                            zipContent.pngName, editable));
+                } catch (IOException | ImportException | AlreadyExistsException e) {
+                    throw new ImportException(e);
+                }
             } else {
-                log.warn("A resource {} could not be read when loading default applications",
-                        resource.getDescription());
+                throw new ImportException(
+                        "A resource " + resource + "could not be read when loading default applications");
             }
         }
+        return importStatuses;
     }
 
-    private void importProvidedApplicationFromResource(Resource resource, boolean editable) {
-        String resourceName = resource.getFilename();
-        log.debug("Found provided applications '{}' in classpath", resourceName);
-        try (InputStream resourceAsStream = resource.getInputStream()) {
-            final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
-            Map<String, byte[]> zipContent = unzip(content);
-            List<String> pngFileNamesList = zipContent.keySet().stream().filter(l -> l.endsWith(".png"))
-                    .collect(Collectors.toList());
-            List<String> xmlFileNamesList = zipContent.keySet().stream().filter(l -> l.endsWith(".xml"))
-                    .collect(Collectors.toList());
-            if (xmlFileNamesList.size() > 1) {
-                throw new ImportException("The application zip " + resourceName
-                        + " contains more than one xml descriptor, and therefore has an invalid format");
-            } else if (pngFileNamesList.size() > 1) {
-                throw new ImportException("The application zip " + resourceName
-                        + " contains more than one icon file, and therefore has an invalid format");
-            }
-            String pngName = pngFileNamesList.get(0);
-            String xmlName = xmlFileNamesList.get(0);
-            byte[] iconRaw = zipContent.get(pngName);
-            byte[] xmlRaw = zipContent.get(xmlName);
-            importDefaultApplications(xmlRaw, iconRaw, pngName, editable);
-        } catch (IOException | ImportException | AlreadyExistsException e) {
-            log.error("Unable to import the application {} because: {}", resourceName,
-                    ExceptionUtils.printLightWeightStacktrace(e));
-            log.debug("Stacktrace of the import issue is:", e);
+    private ZipContent getZipContent(String resourceName, InputStream resourceAsStream)
+            throws IOException, ImportException {
+        final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
+        Map<String, byte[]> zipContent = unzip(content);
+        List<String> pngFileNamesList = zipContent.keySet().stream().filter(l -> l.endsWith(".png"))
+                .collect(Collectors.toList());
+        List<String> xmlFileNamesList = zipContent.keySet().stream().filter(l -> l.endsWith(".xml"))
+                .collect(Collectors.toList());
+        if (xmlFileNamesList.size() > 1) {
+            throw new ImportException("The application zip " + resourceName
+                    + " contains more than one xml descriptor, and therefore has an invalid format");
+        } else if (pngFileNamesList.size() > 1) {
+            throw new ImportException("The application zip " + resourceName
+                    + " contains more than one icon file, and therefore has an invalid format");
+        }
+        String pngName = pngFileNamesList.get(0);
+        String xmlName = xmlFileNamesList.get(0);
+        return new ZipContent(zipContent.get(pngName), zipContent.get(xmlName), pngName);
+    }
+
+    private class ZipContent {
+
+        public final byte[] iconRaw;
+        public final byte[] xmlRaw;
+        public final String pngName;
+
+        ZipContent(byte[] iconRaw, byte[] xmlRaw, String pngName) {
+            this.iconRaw = iconRaw;
+            this.xmlRaw = xmlRaw;
+            this.pngName = pngName;
         }
     }
-
 }
