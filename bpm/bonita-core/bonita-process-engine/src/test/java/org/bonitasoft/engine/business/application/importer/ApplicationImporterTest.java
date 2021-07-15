@@ -239,6 +239,32 @@ public class ApplicationImporterTest {
     }
 
     @Test
+    public void importApplication_should_skip_when_strategy_return_skip() throws Exception {
+        //given
+        long createdBy = 5L;
+        SApplicationWithIcon appToBeImported = mock(SApplicationWithIcon.class);
+        given(appToBeImported.getToken()).willReturn("application");
+
+        ImportResult importResult = new ImportResult(appToBeImported, new ImportStatus("name"));
+
+        SApplication appInConflict = mock(SApplication.class);
+
+        ApplicationNode applicationNode = mock(ApplicationNode.class);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
+                .willReturn(importResult);
+        given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
+        given(strategy.whenApplicationExists(any(), any())).willReturn(ApplicationImportStrategy.ImportStrategy.SKIP);
+        //when
+        ImportStatus importStatus = applicationImporter.importApplication(applicationNode, true, createdBy,
+                ICON_CONTENT, ICON_MIME_TYPE, strategy);
+
+        //then
+        verify(applicationService, never()).forceDeleteApplication(any());
+        verify(applicationService, never()).createApplication(any());
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.SKIPPED);
+    }
+
+    @Test
     public void importApplication_replace_application_when_strategy_is_replace_duplicate() throws Exception {
         //given
         long createdBy = 5L;
@@ -321,149 +347,171 @@ public class ApplicationImporterTest {
     }
 
     @Test
-    public void should_import_default_applications_on_init_and_correctly_set_final_fields() throws Exception {
+    public void should_import_all_default_applications_on_first_run() throws Exception {
         //given
-        SApplicationWithIcon app1 = new SApplicationWithIcon();
-        app1.setId(1);
-        SApplicationWithIcon app2 = new SApplicationWithIcon();
-        app2.setId(2);
-        SApplicationWithIcon app3 = new SApplicationWithIcon();
-        app2.setId(3);
+        SApplicationWithIcon finalApp1 = new SApplicationWithIcon();
+        finalApp1.setId(1);
+        finalApp1.setToken("default_app_1");
+        SApplicationWithIcon finalApp2 = new SApplicationWithIcon();
+        finalApp2.setId(2);
+        finalApp2.setToken("default_app_2");
+        SApplicationWithIcon editableApp = new SApplicationWithIcon();
+        editableApp.setId(3);
+        editableApp.setToken("default_app_3");
 
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_2".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app2, new ImportStatus("ok")));
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_3".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app3, new ImportStatus("ok")));
+        ImportStatus app1ImportStatus = new ImportStatus(finalApp1.getToken());
+        app1ImportStatus.setStatus(ImportStatus.Status.ADDED);
+        ImportStatus app2ImportStatus = new ImportStatus(finalApp2.getToken());
+        app2ImportStatus.setStatus(ImportStatus.Status.ADDED);
+        ImportStatus app3ImportStatus = new ImportStatus(editableApp.getToken());
+        app3ImportStatus.setStatus(ImportStatus.Status.ADDED);
+
+        doReturn(app1ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), any());
+        doReturn(app2ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), any());
+        doReturn(app3ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(editableApp.getToken())), eq(true), anyLong(),
+                        any(byte[].class), any(), any());
+        //when
+        applicationImporter.init();
+
+        //then
+
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), any());
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), any());
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(editableApp.getToken())),
+                eq(true), anyLong(), any(byte[].class), any(), any());
+
+    }
+
+    @Test
+    public void should_not_import_editable_default_applications_if_not_first_run() throws Exception {
+        //given
+        SApplicationWithIcon finalApp1 = new SApplicationWithIcon();
+        finalApp1.setId(1);
+        finalApp1.setToken("default_app_1");
+        SApplicationWithIcon finalApp2 = new SApplicationWithIcon();
+        finalApp2.setId(2);
+        finalApp2.setToken("default_app_2");
+        SApplicationWithIcon editableApp = new SApplicationWithIcon();
+        editableApp.setId(3);
+        editableApp.setToken("default_app_3");
+
+        ImportStatus app1ImportStatus = new ImportStatus(finalApp1.getToken());
+        app1ImportStatus.setStatus(ImportStatus.Status.SKIPPED);
+        ImportStatus app2ImportStatus = new ImportStatus(finalApp2.getToken());
+        app2ImportStatus.setStatus(ImportStatus.Status.REPLACED);
+        ImportStatus app3ImportStatus = new ImportStatus(editableApp.getToken());
+        app3ImportStatus.setStatus(ImportStatus.Status.ADDED);
+
+        doReturn(app1ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), any());
+        doReturn(app2ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), any());
 
         //when
         applicationImporter.init();
 
         //then
 
-        verify(applicationService, times(2)).createApplication(argThat(app -> !app.isEditable()));
-        verify(applicationService, times(1)).createApplication(argThat(AbstractSApplication::isEditable));
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), any());
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), any());
+        verify(applicationImporter, never()).importApplication(
+                argThat(node -> node.getToken().equals(editableApp.getToken())),
+                eq(true), anyLong(), any(byte[].class), any(), any());
 
     }
 
     @Test
-    public void should_overwrite_default_applications_when_is_not_editable_and_version_is_not_same() throws Exception {
+    public void should_not_import_editable_default_applications_if_only_one_final_app_added() throws Exception {
         //given
-        SApplicationWithIcon app1 = new SApplicationWithIcon();
-        app1.setId(1);
-        app1.setVersion("2");
-        app1.setToken("default_app_1");
-        app1.setEditable(false);
-        SApplicationWithIcon app2 = new SApplicationWithIcon();
-        app2.setId(2);
-        app2.setVersion("1");
-        SApplicationWithIcon app3 = new SApplicationWithIcon();
-        app2.setId(3);
-        app2.setVersion("1");
+        SApplicationWithIcon finalApp1 = new SApplicationWithIcon();
+        finalApp1.setId(1);
+        finalApp1.setToken("default_app_1");
+        SApplicationWithIcon finalApp2 = new SApplicationWithIcon();
+        finalApp2.setId(2);
+        finalApp2.setToken("default_app_2");
+        SApplicationWithIcon editableApp = new SApplicationWithIcon();
+        editableApp.setId(3);
+        editableApp.setToken("default_app_3");
 
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_2".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app2, new ImportStatus("ok")));
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_3".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app3, new ImportStatus("ok")));
+        ImportStatus app1ImportStatus = new ImportStatus(finalApp1.getToken());
+        app1ImportStatus.setStatus(ImportStatus.Status.ADDED);
+        ImportStatus app2ImportStatus = new ImportStatus(finalApp2.getToken());
+        app2ImportStatus.setStatus(ImportStatus.Status.REPLACED);
+        ImportStatus app3ImportStatus = new ImportStatus(editableApp.getToken());
+        app3ImportStatus.setStatus(ImportStatus.Status.ADDED);
 
-        SApplication conflictingApplication = new SApplication();
-        conflictingApplication.setToken("default_app_1");
-        conflictingApplication.setEditable(false);
-        conflictingApplication.setVersion("version");
+        doReturn(app1ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), any());
+        doReturn(app2ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), any());
 
-        when(applicationService.getApplicationByToken("default_app_1")).thenReturn(conflictingApplication);
-
+        //when
         applicationImporter.init();
-        verify(applicationService).forceDeleteApplication(argThat(app -> app1.getToken().equals("default_app_1")));
-        verify(applicationService).createApplication(app1);
-        verify(applicationService).createApplication(app2);
-        verify(applicationService).createApplication(app3);
+
+        //then
+
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), any());
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), any());
+        verify(applicationImporter, never()).importApplication(
+                argThat(node -> node.getToken().equals(editableApp.getToken())),
+                eq(true), anyLong(), any(byte[].class), any(), any());
 
     }
 
     @Test
-    public void should_not_overwrite_default_applications_when_is_not_editable_and_version_is_the_same()
-            throws Exception {
+    public void should_not_import_default_app_when_classpath_when_importApplication_throw_exception() throws Exception {
         //given
-        SApplicationWithIcon app1 = new SApplicationWithIcon();
-        app1.setId(1);
-        app1.setVersion("2");
-        app1.setToken("default_app_1");
-        app1.setEditable(false);
-        SApplicationWithIcon app2 = new SApplicationWithIcon();
-        app2.setId(2);
-        app2.setVersion("1");
-        SApplicationWithIcon app3 = new SApplicationWithIcon();
-        app2.setId(3);
-        app2.setVersion("1");
+        SApplicationWithIcon finalApp1 = new SApplicationWithIcon();
+        finalApp1.setId(1);
+        finalApp1.setToken("default_app_1");
+        SApplicationWithIcon finalApp2 = new SApplicationWithIcon();
+        finalApp2.setId(2);
+        finalApp2.setToken("default_app_2");
+        SApplicationWithIcon editableApp = new SApplicationWithIcon();
+        editableApp.setId(3);
+        editableApp.setToken("default_app_3");
 
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_2".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app2, new ImportStatus("ok")));
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_3".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app3, new ImportStatus("ok")));
+        ImportStatus app1ImportStatus = new ImportStatus(finalApp1.getToken());
+        app1ImportStatus.setStatus(ImportStatus.Status.ADDED);
+        ImportStatus app2ImportStatus = new ImportStatus(finalApp2.getToken());
+        app2ImportStatus.setStatus(ImportStatus.Status.REPLACED);
+        ImportStatus app3ImportStatus = new ImportStatus(editableApp.getToken());
+        app3ImportStatus.setStatus(ImportStatus.Status.ADDED);
 
-        SApplication conflictingApplication = new SApplication();
-        conflictingApplication.setToken("default_app_1");
-        conflictingApplication.setEditable(false);
-        conflictingApplication.setVersion("2");
+        doReturn(app1ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), any());
+        doThrow(new ImportException("import ex")).when(applicationImporter).importApplication(
+                argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(), any(byte[].class),
+                any(), any());
 
-        when(applicationService.getApplicationByToken("default_app_1")).thenReturn(conflictingApplication);
-
-        applicationImporter.init();
-        verify(applicationService, never()).forceDeleteApplication(any());
-        verify(applicationService, never()).createApplication(app1);
-        verify(applicationService).createApplication(app2);
-        verify(applicationService).createApplication(app3);
-
-    }
-
-    @Test
-    public void should_not_overwrite_default_applications_when_is_editable() throws Exception {
-        //given
-        SApplicationWithIcon app1 = new SApplicationWithIcon();
-        app1.setId(1);
-        app1.setToken("default_app_1");
-        SApplicationWithIcon app2 = new SApplicationWithIcon();
-        app2.setId(2);
-        SApplicationWithIcon app3 = new SApplicationWithIcon();
-        app2.setId(3);
-
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_1".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app1, new ImportStatus("ok")));
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_2".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app2, new ImportStatus("ok")));
-        when(nodeToApplicationConverter.toSApplication(argThat(a -> a != null && "default_app_3".equals(a.getToken())),
-                any(), anyString(), anyLong()))
-                        .thenReturn(new ImportResult(app3, new ImportStatus("ok")));
-
-        SApplication conflictingApplication = new SApplication();
-        conflictingApplication.setToken("default_app_1");
-        conflictingApplication.setEditable(true);
-
-        when(applicationService.getApplicationByToken("default_app_1")).thenReturn(conflictingApplication);
-
+        //when
         applicationImporter.init();
 
-        verify(applicationService, never()).forceDeleteApplication(any());
-        verify(applicationService, never()).createApplication(app1);
-        verify(applicationService).createApplication(app2);
-        verify(applicationService).createApplication(app3);
-    }
+        //then
 
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), any());
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), any());
+        verify(applicationImporter, never()).importApplication(
+                argThat(node -> node.getToken().equals(editableApp.getToken())),
+                eq(true), anyLong(), any(byte[].class), any(), any());
+
+    }
 }
