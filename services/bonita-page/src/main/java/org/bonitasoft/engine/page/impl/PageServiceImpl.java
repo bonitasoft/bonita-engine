@@ -70,6 +70,8 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
@@ -133,6 +135,8 @@ public class PageServiceImpl implements PageService {
     private final QueriableLoggerService queriableLoggerService;
 
     private final ProfileService profileService;
+    private ReadSessionAccessor sessionAccessor;
+    private SessionService sessionService;
 
     private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
             PageServiceImpl.class.getClassLoader());
@@ -146,11 +150,15 @@ public class PageServiceImpl implements PageService {
 
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final QueriableLoggerService queriableLoggerService,
-            final ProfileService profileService) {
+            final ProfileService profileService,
+            ReadSessionAccessor sessionAccessor,
+            SessionService sessionService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.queriableLoggerService = queriableLoggerService;
         this.profileService = profileService;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
         helper = new SPageContentHelper();
     }
 
@@ -387,7 +395,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public SPage getPageByName(final String pageName) throws SBonitaReadException {
         return persistenceService
-                .selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
+                .selectOne(new SelectOneDescriptor<>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
                         pageName), SPage.class));
     }
 
@@ -414,7 +422,7 @@ public class PageServiceImpl implements PageService {
     private void deletePageIfRemovable(final SPage sPage) throws SObjectModificationException {
         if (!sPage.isRemovable()) {
             throw new SObjectModificationException(
-                    "The page " + sPage.getName() + " cannot be deleted because it is set as non-removable");
+                    "The page '" + sPage.getName() + "' cannot be deleted because it is non-removable");
         } else {
             deletePage(sPage);
         }
@@ -534,9 +542,9 @@ public class PageServiceImpl implements PageService {
         try {
 
             final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId));
-            if (!sPage.isEditable()) {
+            if (!sPage.isEditable() && !isSystemSession()) { // Only non-editable pages can be updated (by the system)
                 throw new SObjectModificationException(
-                        "The page " + sPage.getName() + " cannot be modified because it is set as not modifiable");
+                        "The page '" + sPage.getName() + "' cannot be modified because it is not modifiable");
             }
             checkPageDuplicate(sPage, entityUpdateDescriptor, logBuilder, logMethodName);
             final String oldPageName = sPage.getName();
@@ -550,6 +558,11 @@ public class PageServiceImpl implements PageService {
             throw new SObjectModificationException(e);
         }
 
+    }
+
+    // @VisibleForTesting
+    protected boolean isSystemSession() {
+        return sessionService.getLoggedUserFromSession(sessionAccessor) == SessionService.SYSTEM_ID;
     }
 
     protected void updatePageNameInProfileEntry(final EntityUpdateDescriptor entityUpdateDescriptor,
