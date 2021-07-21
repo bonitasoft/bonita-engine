@@ -95,9 +95,6 @@ public interface PageService extends TenantLifecycleService {
 
     void updatePageContent(long pageId, byte[] content, String contentName) throws SBonitaException;
 
-    @Override
-    void start() throws SBonitaException;
-
     /**
      * add a page using the zip in parameters, it get all informations from the page.properties file contain inside the
      * zip
