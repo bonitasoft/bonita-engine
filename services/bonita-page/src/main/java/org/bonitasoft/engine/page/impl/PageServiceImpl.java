@@ -668,14 +668,19 @@ public class PageServiceImpl implements PageService {
     @Override
     public void init() throws SBonitaException {
         try {
-            List<ImportStatus> importStatuses = importProvidedNonRemovableNonEditablePagesFromClasspath();
+            List<ImportStatus> importFinalPagesStatuses = importProvidedNonRemovableNonEditablePagesFromClasspath();
+
+            List<ImportStatus> importStatuses = new ArrayList<>(importFinalPagesStatuses);
             importStatuses.addAll(importProvidedNonRemovableEditablePagesFromClasspath());
-            if (importStatuses.stream().map(ImportStatus::getStatus)
-                    .allMatch(importStatus -> importStatus == ImportStatus.Status.ADDED)) {
+
+            boolean addRemovableIfMissing = importFinalPagesStatuses.stream().map(ImportStatus::getStatus)
+                    .allMatch(importStatus -> importStatus == ImportStatus.Status.ADDED);
+            if (addRemovableIfMissing) {
                 log.info(
                         "Detected a first run since a Bonita update, a tenant creation or an installation from scratch, importing provided removable pages");
-                importStatuses.addAll(importProvidedPagesFromClasspath());
             }
+            importStatuses.addAll(importProvidedRemovablePagesFromClasspath(addRemovableIfMissing));
+
             List<String> createdOrReplaced = importStatuses.stream()
                     .filter(importStatus -> importStatus.getStatus() != ImportStatus.Status.SKIPPED)
                     .map(importStatus -> importStatus.getName() + " " + importStatus.getStatus())
@@ -695,19 +700,21 @@ public class PageServiceImpl implements PageService {
 
     private List<ImportStatus> importProvidedNonRemovableNonEditablePagesFromClasspath()
             throws BonitaException, IOException {
-        return importProvidedPagesFromResourcePattern(false, false, NON_EDITABLE_NON_REMOVABLE_RESOURCES_PATH);
+        return importProvidedPagesFromResourcePattern(true, false, false, NON_EDITABLE_NON_REMOVABLE_RESOURCES_PATH);
     }
 
     private List<ImportStatus> importProvidedNonRemovableEditablePagesFromClasspath()
             throws IOException, BonitaException {
-        return importProvidedPagesFromResourcePattern(false, true, EDITABLE_NON_REMOVABLE_RESOURCES_PATH);
+        return importProvidedPagesFromResourcePattern(true, false, true, EDITABLE_NON_REMOVABLE_RESOURCES_PATH);
     }
 
-    private List<ImportStatus> importProvidedPagesFromClasspath() throws IOException, BonitaException {
-        return importProvidedPagesFromResourcePattern(true, true, EDITABLE_REMOVABLE_RESOURCES_PATH);
+    private List<ImportStatus> importProvidedRemovablePagesFromClasspath(boolean addIfMissing)
+            throws IOException, BonitaException {
+        return importProvidedPagesFromResourcePattern(addIfMissing, true, true, EDITABLE_REMOVABLE_RESOURCES_PATH);
     }
 
-    private List<ImportStatus> importProvidedPagesFromResourcePattern(boolean removable, boolean editable,
+    private List<ImportStatus> importProvidedPagesFromResourcePattern(boolean addIfMissing, boolean removable,
+            boolean editable,
             String resourcesPath)
             throws IOException, BonitaException {
         List<ImportStatus> importStatuses = new ArrayList<>();
@@ -719,7 +726,7 @@ public class PageServiceImpl implements PageService {
                 try (InputStream resourceAsStream = resource.getInputStream()) {
                     log.debug("Found provided page '{}' in classpath", resourceName);
                     final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
-                    importStatuses.add(importProvidedPage(resourceName, content, removable, editable));
+                    importStatuses.add(importProvidedPage(resourceName, content, removable, editable, addIfMissing));
                 } catch (IOException | SBonitaException e) {
                     throw new BonitaException("Unable to import the page " + resourceName, e);
                 }
@@ -732,30 +739,31 @@ public class PageServiceImpl implements PageService {
     }
 
     ImportStatus importProvidedPage(String pageZipName, final byte[] providedPageContent,
-            boolean removable, boolean editable) throws SBonitaException {
+            boolean removable, boolean editable, boolean addIfMissing) throws SBonitaException {
 
         SPage page = buildPage(providedPageContent, pageZipName, -1, true, removable, editable);
         ImportStatus importStatus = new ImportStatus(page.getName());
         SPage sPageInDb = checkIfPageAlreadyExists(page);
-        if (sPageInDb == null) {
+        if (sPageInDb == null && addIfMissing) {
             log.debug("Provided page {} does not exist yet, importing it.", page.getName());
             page.setPageHash(DigestUtils.md5DigestAsHex(providedPageContent));
             insertPage(page, providedPageContent);
-        } else {
-            if (!editable) {
-                String md5Sum = DigestUtils.md5DigestAsHex(providedPageContent);
-                if (Objects.equals(sPageInDb.getPageHash(), md5Sum)) {
-                    log.debug("Provided page exists and is up to date, nothing to do");
-                    importStatus.setStatus(ImportStatus.Status.SKIPPED);
-                } else {
-                    log.info("Provided page {} exists but the content is not up to date, updating it.", page.getName());
-                    updatePageContent(sPageInDb.getId(), providedPageContent, pageZipName);
-                    importStatus.setStatus(ImportStatus.Status.REPLACED);
-                }
-            } else {
-                log.debug("Provided page exists, and will not be updated");
+        } else if (sPageInDb == null) {
+            log.debug("Provided page {} has been deleted by the user, and will not be imported", page.getName());
+            importStatus.setStatus(ImportStatus.Status.SKIPPED);
+        } else if (sPageInDb.isProvided()) {
+            String md5Sum = DigestUtils.md5DigestAsHex(providedPageContent);
+            if (Objects.equals(sPageInDb.getPageHash(), md5Sum)) {
+                log.debug("Provided page exists and is up to date, nothing to do");
                 importStatus.setStatus(ImportStatus.Status.SKIPPED);
+            } else {
+                log.info("Provided page {} exists but the content is not up to date, updating it.", page.getName());
+                updatePageContent(sPageInDb.getId(), providedPageContent, pageZipName);
+                importStatus.setStatus(ImportStatus.Status.REPLACED);
             }
+        } else {
+            log.debug("Page {} was updated by the user, and will not be updated", page.getName());
+            importStatus.setStatus(ImportStatus.Status.SKIPPED);
         }
         return importStatus;
     }
