@@ -95,7 +95,7 @@ public class ApplicationImporter implements TenantLifecycleService {
 
     ImportStatus importApplication(ApplicationNode applicationNode, boolean editable,
             long createdBy, byte[] iconContent,
-            String iconMimeType, ApplicationImportStrategy strategy)
+            String iconMimeType, boolean addIfMissing, ApplicationImportStrategy strategy)
             throws ImportException, AlreadyExistsException {
         try {
             ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, iconContent,
@@ -122,6 +122,10 @@ public class ApplicationImporter implements TenantLifecycleService {
                 }
             }
 
+            if (!addIfMissing) {
+                importStatus.setStatus(ImportStatus.Status.SKIPPED);
+            }
+
             if (importStatus.getStatus() != ImportStatus.Status.SKIPPED) {
                 applicationService.createApplication(applicationToBeImported);
                 importStatus.addErrorsIfNotExists(applicationPageImporter
@@ -143,19 +147,21 @@ public class ApplicationImporter implements TenantLifecycleService {
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
         List<ImportStatus> importStatus = new ArrayList<>();
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
-            importStatus.add(importApplication(applicationNode, true, createdBy, iconContent, iconMimeType, strategy));
+            importStatus.add(
+                    importApplication(applicationNode, true, createdBy, iconContent, iconMimeType, true, strategy));
         }
         return importStatus;
     }
 
     private List<ImportStatus> importDefaultApplications(final byte[] xmlContent, byte[] iconContent,
             String iconMimeType,
-            boolean editable) throws ImportException, AlreadyExistsException {
+            boolean editable, boolean addIfMissing) throws ImportException, AlreadyExistsException {
         List<ImportStatus> importStatuses = new ArrayList<>();
         ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
             importStatuses.add(
                     importApplication(applicationNode, editable, SessionService.SYSTEM_ID, iconContent, iconMimeType,
+                            addIfMissing,
                             new UpdateNewerNonEditableApplicationStrategy()));
         }
         return importStatuses;
@@ -176,12 +182,16 @@ public class ApplicationImporter implements TenantLifecycleService {
     public void init() throws SBonitaException {
         try {
             List<ImportStatus> importStatuses = importProvidedApplicationsFromClasspath(
-                    PROVIDED_FINAL_APPLICATIONS_PATH, false);
-            if (importStatuses.stream().map(ImportStatus::getStatus)
-                    .allMatch(status -> status == ImportStatus.Status.ADDED)) {
-                log.info("First run detected, importing default applications");
-                importStatuses.addAll(importProvidedApplicationsFromClasspath(PROVIDED_APPLICATIONS_PATH, true));
+                    PROVIDED_FINAL_APPLICATIONS_PATH, false, true);
+            boolean addIfMissing = importStatuses.stream().map(ImportStatus::getStatus)
+                    .allMatch(status -> status != ImportStatus.Status.SKIPPED);
+            if (addIfMissing) {
+                log.info("Detected a first run since a Bonita update, Bonita upgrade, " +
+                        "a tenant creation or an installation from scratch  importing default applications");
             }
+            importStatuses
+                    .addAll(importProvidedApplicationsFromClasspath(PROVIDED_APPLICATIONS_PATH, true, addIfMissing));
+
             List<String> createdOrReplaced = importStatuses.stream()
                     .filter(importStatus -> importStatus.getStatus() != ImportStatus.Status.SKIPPED)
                     .map(importStatus -> importStatus.getName() + " " + importStatus.getStatus())
@@ -198,7 +208,8 @@ public class ApplicationImporter implements TenantLifecycleService {
         }
     }
 
-    private List<ImportStatus> importProvidedApplicationsFromClasspath(String path, boolean editable)
+    private List<ImportStatus> importProvidedApplicationsFromClasspath(String path, boolean editable,
+            boolean addIfMissing)
             throws IOException, ImportException {
         List<ImportStatus> importStatuses = new ArrayList<>();
         Resource[] resources = cpResourceResolver
@@ -211,7 +222,7 @@ public class ApplicationImporter implements TenantLifecycleService {
                 try (InputStream resourceAsStream = resource.getInputStream()) {
                     ZipContent zipContent = getZipContent(resourceName, resourceAsStream);
                     importStatuses.addAll(importDefaultApplications(zipContent.xmlRaw, zipContent.iconRaw,
-                            zipContent.pngName, editable));
+                            zipContent.pngName, editable, addIfMissing));
                 } catch (IOException | ImportException | AlreadyExistsException e) {
                     throw new ImportException(e);
                 }

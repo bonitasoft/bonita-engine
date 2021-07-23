@@ -76,7 +76,7 @@ public class ApplicationImporterTest {
     }
 
     @Test
-    public void importApplication_should_create_application_import_pages_and_menus_and_return_status_when_no_application_existing()
+    public void importApplication_should_create_application_import_pages_and_menus_and_return_status_when_no_application_existing_and_add_if_missing_is_true()
             throws Exception {
         //given
         long createdBy = 5L;
@@ -122,7 +122,7 @@ public class ApplicationImporterTest {
         //when
         ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, false, createdBy,
                 ICON_CONTENT,
-                ICON_MIME_TYPE, strategy);
+                ICON_MIME_TYPE, true, strategy);
 
         //then
         //create application
@@ -139,6 +139,60 @@ public class ApplicationImporterTest {
 
         //set home page
         verify(applicationService).updateApplication(eq(app),
+                argThat(desc -> desc.getFields().get(AbstractSApplication.HOME_PAGE_ID).equals(homePageId)));
+
+    }
+
+    @Test
+    public void importApplication_should_not_create_application_when_no_application_existing_and_add_if_missing_is_false()
+            throws Exception {
+        //given
+        long createdBy = 5L;
+        SApplicationWithIcon app = new SApplicationWithIcon("app", "app", "1.0", 1L, createdBy, "state", true);
+        app.setId(1);
+        given(importResult.getApplication()).willReturn(app);
+        given(importResult.getImportStatus()).willReturn(new ImportStatus(app.getToken()));
+
+        ApplicationPageNode homePage = ApplicationNodeBuilder.newApplicationPage("home", "home").create();
+        ApplicationPageNode pageNode2 = ApplicationNodeBuilder.newApplicationPage("page", "page").create();
+
+        ApplicationMenuNode menu1 = ApplicationNodeBuilder.newMenu("menu1", UNUSED_PAGE).create();
+        ApplicationMenuNode menu2 = ApplicationNodeBuilder.newMenu("menu2", UNUSED_PAGE).create();
+
+        ApplicationNode applicationNode = new ApplicationNode();
+        applicationNode.addApplicationPage(homePage);
+        applicationNode.addApplicationPage(pageNode2);
+        applicationNode.addApplicationMenu(menu1);
+        applicationNode.addApplicationMenu(menu2);
+        applicationNode.setHomePage(homePage.getToken());
+        applicationNode.setToken("app");
+
+        given(nodeToApplicationConverter.toSApplication(applicationNode, ICON_CONTENT, ICON_MIME_TYPE, createdBy))
+                .willReturn(importResult);
+
+        long homePageId = 222L;
+        SApplicationPage applicationPage = new SApplicationPage(app.getId(), homePageId, "home");
+        applicationPage.setId(homePageId);
+
+        //when
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, false, createdBy,
+                ICON_CONTENT,
+                ICON_MIME_TYPE, false, strategy);
+
+        //then
+        //create application
+        assertThat(retrievedStatus.getStatus()).isEqualTo(ImportStatus.Status.SKIPPED);
+        verify(applicationService, never()).createApplication(app);
+        assertThat(app.isEditable()).isEqualTo(false);
+        verifyNoInteractions(strategy);
+
+        //add pages
+        verify(applicationPageImporter, never()).importApplicationPages(any(), eq(app));
+        //add menus
+        verify(applicationMenuImporter, never()).importApplicationMenus(any(), eq(app));
+
+        //set home page
+        verify(applicationService, never()).updateApplication(eq(app),
                 argThat(desc -> desc.getFields().get(AbstractSApplication.HOME_PAGE_ID).equals(homePageId)));
 
     }
@@ -169,7 +223,7 @@ public class ApplicationImporterTest {
         //when
         ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, true, createdBy,
                 ICON_CONTENT,
-                ICON_MIME_TYPE, strategy);
+                ICON_MIME_TYPE, true, strategy);
 
         //then
         assertThat(retrievedStatus).isEqualTo(importResult.getImportStatus());
@@ -197,7 +251,7 @@ public class ApplicationImporterTest {
 
         //when
         applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT,
-                ICON_MIME_TYPE, strategy);
+                ICON_MIME_TYPE, true, strategy);
 
         //then
         //set home page
@@ -228,7 +282,7 @@ public class ApplicationImporterTest {
 
         //when
         applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT,
-                ICON_MIME_TYPE, strategy);
+                ICON_MIME_TYPE, true, strategy);
 
         //then
         //set home page
@@ -256,7 +310,7 @@ public class ApplicationImporterTest {
         given(strategy.whenApplicationExists(any(), any())).willReturn(ApplicationImportStrategy.ImportStrategy.SKIP);
         //when
         ImportStatus importStatus = applicationImporter.importApplication(applicationNode, true, createdBy,
-                ICON_CONTENT, ICON_MIME_TYPE, strategy);
+                ICON_CONTENT, ICON_MIME_TYPE, true, strategy);
 
         //then
         verify(applicationService, never()).forceDeleteApplication(any());
@@ -282,7 +336,7 @@ public class ApplicationImporterTest {
 
         //when
         ImportStatus importStatus = applicationImporter.importApplication(applicationNode, true, createdBy,
-                ICON_CONTENT, ICON_MIME_TYPE, new ReplaceDuplicateApplicationImportStrategy());
+                ICON_CONTENT, ICON_MIME_TYPE, true, new ReplaceDuplicateApplicationImportStrategy());
 
         //then
         verify(applicationService, times(1)).forceDeleteApplication(appInConflict);
@@ -315,7 +369,7 @@ public class ApplicationImporterTest {
 
         //when
         applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT, ICON_MIME_TYPE,
-                new FailOnDuplicateApplicationImportStrategy());
+                true, new FailOnDuplicateApplicationImportStrategy());
 
         //then exception
     }
@@ -341,7 +395,8 @@ public class ApplicationImporterTest {
         given(applicationService.createApplication(app1)).willThrow(new SObjectCreationException(""));
 
         //when
-        applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT, ICON_MIME_TYPE, strategy);
+        applicationImporter.importApplication(applicationNode, true, createdBy, ICON_CONTENT, ICON_MIME_TYPE, true,
+                strategy);
 
         //then exception
     }
@@ -368,24 +423,24 @@ public class ApplicationImporterTest {
 
         doReturn(app1ImportStatus).when(applicationImporter)
                 .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
-                        any(byte[].class), any(), any());
+                        any(byte[].class), any(), eq(true), any());
         doReturn(app2ImportStatus).when(applicationImporter)
                 .importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(),
-                        any(byte[].class), any(), any());
+                        any(byte[].class), any(), eq(true), any());
         doReturn(app3ImportStatus).when(applicationImporter)
                 .importApplication(argThat(node -> node.getToken().equals(editableApp.getToken())), eq(true), anyLong(),
-                        any(byte[].class), any(), any());
+                        any(byte[].class), any(), eq(true), any());
         //when
         applicationImporter.init();
 
         //then
 
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
-                eq(false), anyLong(), any(byte[].class), any(), any());
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
-                eq(false), anyLong(), any(byte[].class), any(), any());
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(editableApp.getToken())),
-                eq(true), anyLong(), any(byte[].class), any(), any());
+                eq(true), anyLong(), any(byte[].class), any(), eq(true), any());
 
     }
 
@@ -411,10 +466,10 @@ public class ApplicationImporterTest {
 
         doReturn(app1ImportStatus).when(applicationImporter)
                 .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
-                        any(byte[].class), any(), any());
+                        any(byte[].class), any(), eq(true), any());
         doReturn(app2ImportStatus).when(applicationImporter)
                 .importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(),
-                        any(byte[].class), any(), any());
+                        any(byte[].class), any(), eq(true), any());
 
         //when
         applicationImporter.init();
@@ -422,17 +477,17 @@ public class ApplicationImporterTest {
         //then
 
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
-                eq(false), anyLong(), any(byte[].class), any(), any());
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
-                eq(false), anyLong(), any(byte[].class), any(), any());
-        verify(applicationImporter, never()).importApplication(
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
+        verify(applicationImporter).importApplication(
                 argThat(node -> node.getToken().equals(editableApp.getToken())),
-                eq(true), anyLong(), any(byte[].class), any(), any());
+                eq(true), anyLong(), any(byte[].class), any(), eq(false), any());
 
     }
 
     @Test
-    public void should_not_import_editable_default_applications_if_only_one_final_app_added() throws Exception {
+    public void should_not_import_editable_default_applications_if_all_final_are_skipped() throws Exception {
         //given
         SApplicationWithIcon finalApp1 = new SApplicationWithIcon();
         finalApp1.setId(1);
@@ -445,60 +500,18 @@ public class ApplicationImporterTest {
         editableApp.setToken("default_app_3");
 
         ImportStatus app1ImportStatus = new ImportStatus(finalApp1.getToken());
-        app1ImportStatus.setStatus(ImportStatus.Status.ADDED);
+        app1ImportStatus.setStatus(ImportStatus.Status.SKIPPED);
         ImportStatus app2ImportStatus = new ImportStatus(finalApp2.getToken());
-        app2ImportStatus.setStatus(ImportStatus.Status.REPLACED);
+        app2ImportStatus.setStatus(ImportStatus.Status.SKIPPED);
         ImportStatus app3ImportStatus = new ImportStatus(editableApp.getToken());
-        app3ImportStatus.setStatus(ImportStatus.Status.ADDED);
+        app3ImportStatus.setStatus(ImportStatus.Status.SKIPPED);
 
         doReturn(app1ImportStatus).when(applicationImporter)
                 .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
-                        any(byte[].class), any(), any());
-        doReturn(app2ImportStatus).when(applicationImporter)
-                .importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(),
-                        any(byte[].class), any(), any());
-
-        //when
-        applicationImporter.init();
-
-        //then
-
-        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
-                eq(false), anyLong(), any(byte[].class), any(), any());
-        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
-                eq(false), anyLong(), any(byte[].class), any(), any());
-        verify(applicationImporter, never()).importApplication(
-                argThat(node -> node.getToken().equals(editableApp.getToken())),
-                eq(true), anyLong(), any(byte[].class), any(), any());
-
-    }
-
-    @Test
-    public void should_not_import_default_app_when_classpath_when_importApplication_throw_exception() throws Exception {
-        //given
-        SApplicationWithIcon finalApp1 = new SApplicationWithIcon();
-        finalApp1.setId(1);
-        finalApp1.setToken("default_app_1");
-        SApplicationWithIcon finalApp2 = new SApplicationWithIcon();
-        finalApp2.setId(2);
-        finalApp2.setToken("default_app_2");
-        SApplicationWithIcon editableApp = new SApplicationWithIcon();
-        editableApp.setId(3);
-        editableApp.setToken("default_app_3");
-
-        ImportStatus app1ImportStatus = new ImportStatus(finalApp1.getToken());
-        app1ImportStatus.setStatus(ImportStatus.Status.ADDED);
-        ImportStatus app2ImportStatus = new ImportStatus(finalApp2.getToken());
-        app2ImportStatus.setStatus(ImportStatus.Status.REPLACED);
-        ImportStatus app3ImportStatus = new ImportStatus(editableApp.getToken());
-        app3ImportStatus.setStatus(ImportStatus.Status.ADDED);
-
-        doReturn(app1ImportStatus).when(applicationImporter)
-                .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
-                        any(byte[].class), any(), any());
+                        any(byte[].class), any(), eq(true), any());
         doThrow(new ImportException("import ex")).when(applicationImporter).importApplication(
                 argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(), any(byte[].class),
-                any(), any());
+                any(), eq(true), any());
 
         //when
         applicationImporter.init();
@@ -506,12 +519,96 @@ public class ApplicationImporterTest {
         //then
 
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
-                eq(false), anyLong(), any(byte[].class), any(), any());
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
-                eq(false), anyLong(), any(byte[].class), any(), any());
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
         verify(applicationImporter, never()).importApplication(
                 argThat(node -> node.getToken().equals(editableApp.getToken())),
-                eq(true), anyLong(), any(byte[].class), any(), any());
+                eq(true), anyLong(), any(byte[].class), any(), eq(false), any());
+
+    }
+
+    @Test
+    public void should_import_editable_default_applications_if_final_apps_are_added_or_updated() throws Exception {
+        //given
+        SApplicationWithIcon finalApp1 = new SApplicationWithIcon();
+        finalApp1.setId(1);
+        finalApp1.setToken("default_app_1");
+        SApplicationWithIcon finalApp2 = new SApplicationWithIcon();
+        finalApp2.setId(2);
+        finalApp2.setToken("default_app_2");
+        SApplicationWithIcon editableApp = new SApplicationWithIcon();
+        editableApp.setId(3);
+        editableApp.setToken("default_app_3");
+
+        ImportStatus app1ImportStatus = new ImportStatus(finalApp1.getToken());
+        app1ImportStatus.setStatus(ImportStatus.Status.ADDED);
+        ImportStatus app2ImportStatus = new ImportStatus(finalApp2.getToken());
+        app2ImportStatus.setStatus(ImportStatus.Status.REPLACED);
+        ImportStatus app3ImportStatus = new ImportStatus(editableApp.getToken());
+        app3ImportStatus.setStatus(ImportStatus.Status.ADDED);
+
+        doReturn(app1ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), eq(true), any());
+        doReturn(app2ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), eq(true), any());
+
+        //when
+        applicationImporter.init();
+
+        //then
+
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
+        verify(applicationImporter).importApplication(
+                argThat(node -> node.getToken().equals(editableApp.getToken())),
+                eq(true), anyLong(), any(byte[].class), any(), eq(true), any());
+
+    }
+
+    @Test
+    public void should_not_import_default_app_when_importApplication_throw_exception() throws Exception {
+        //given
+        SApplicationWithIcon finalApp1 = new SApplicationWithIcon();
+        finalApp1.setId(1);
+        finalApp1.setToken("default_app_1");
+        SApplicationWithIcon finalApp2 = new SApplicationWithIcon();
+        finalApp2.setId(2);
+        finalApp2.setToken("default_app_2");
+        SApplicationWithIcon editableApp = new SApplicationWithIcon();
+        editableApp.setId(3);
+        editableApp.setToken("default_app_3");
+
+        ImportStatus app1ImportStatus = new ImportStatus(finalApp1.getToken());
+        app1ImportStatus.setStatus(ImportStatus.Status.ADDED);
+        ImportStatus app2ImportStatus = new ImportStatus(finalApp2.getToken());
+        app2ImportStatus.setStatus(ImportStatus.Status.REPLACED);
+        ImportStatus app3ImportStatus = new ImportStatus(editableApp.getToken());
+        app3ImportStatus.setStatus(ImportStatus.Status.ADDED);
+
+        doReturn(app1ImportStatus).when(applicationImporter)
+                .importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())), eq(false), anyLong(),
+                        any(byte[].class), any(), eq(true), any());
+        doThrow(new ImportException("import ex")).when(applicationImporter).importApplication(
+                argThat(node -> node.getToken().equals(finalApp2.getToken())), eq(false), anyLong(), any(byte[].class),
+                any(), eq(true), any());
+
+        //when
+        applicationImporter.init();
+
+        //then
+
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp1.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
+        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(finalApp2.getToken())),
+                eq(false), anyLong(), any(byte[].class), any(), eq(true), any());
+        verify(applicationImporter, never()).importApplication(
+                argThat(node -> node.getToken().equals(editableApp.getToken())),
+                eq(true), anyLong(), any(byte[].class), any(), anyBoolean(), any());
 
     }
 }
