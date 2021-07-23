@@ -260,7 +260,7 @@ public class PageAPIDelegate {
         }
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
         pageUpdateBuilder.updateLastUpdatedBy(userIdFromSession);
-
+        pageUpdateBuilder.markNonProvided();
         SPage updatedPage;
         try {
             updatedPage = pageService.updatePage(pageId, pageUpdateBuilder.done());
@@ -280,6 +280,7 @@ public class PageAPIDelegate {
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
         pageUpdateBuilder.updateLastUpdatedBy(userIdFromSession);
+        pageUpdateBuilder.markNonProvided();
         try {
             pageService.updatePageContent(pageId, content, null, pageUpdateBuilder);
         } catch (final SInvalidPageTokenException e) {

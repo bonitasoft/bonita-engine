@@ -103,6 +103,28 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
+    public void updatePage_should_set_provided_field_to_false_if_provided_pages_are_modified() throws Exception {
+        // The provided pages have ids 1 & 2
+
+        final User jack = createUser("jack", "bpm");
+        loginOnDefaultTenantWith("jack", "bpm");
+        // when
+        final PageUpdater pageUpdater = new PageUpdater();
+        final String newDisplayName = "new display name";
+        pageUpdater.setDisplayName(newDisplayName);
+
+        final Page returnedPage = getPageAPI().updatePage(2L, pageUpdater);
+
+        //then
+        assertThat(returnedPage.isProvided()).isFalse();
+
+        //cleanup
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        deleteUser(jack);
+    }
+
+    @Test
     public void updatePage_should_return_the_modified_page() throws Exception {
         // given
         final User john = createUser("john", "bpm");
@@ -192,6 +214,22 @@ public class PageAPIIT extends CommonAPIIT {
 
         // then
         // exception
+
+    }
+
+    @Test
+    public void updatePage_should_set_provided_to_false() throws Exception {
+        // The provided pages have ids 1 & 2
+        // when
+        final String newDescription = "new description";
+        final String newDisplayName = "new display name";
+        final byte[] updatedPageContent = CommonTestUtil.createTestPageContent(PAGE_NAME2, newDisplayName,
+                newDescription);
+        getPageAPI().updatePageContent(1L, updatedPageContent);
+
+        // then
+        final Page pageAfter = getPageAPI().getPage(1L);
+        assertThat(pageAfter.isProvided()).isFalse();
 
     }
 
