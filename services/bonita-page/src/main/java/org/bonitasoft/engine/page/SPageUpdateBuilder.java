@@ -42,4 +42,6 @@ public interface SPageUpdateBuilder {
 
     SPageUpdateBuilder updatePageHash(String hash);
 
+    SPageUpdateBuilder markNonProvided();
+
 }

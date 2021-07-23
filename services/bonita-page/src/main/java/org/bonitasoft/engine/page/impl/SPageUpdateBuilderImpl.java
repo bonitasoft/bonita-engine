@@ -80,6 +80,12 @@ public class SPageUpdateBuilderImpl implements SPageUpdateBuilder {
     }
 
     @Override
+    public SPageUpdateBuilder markNonProvided() {
+        descriptor.addField(SPageFields.IS_PROVIDED, false);
+        return this;
+    }
+
+    @Override
     public EntityUpdateDescriptor done() {
         return descriptor;
     }

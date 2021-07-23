@@ -35,4 +35,6 @@ public interface SPageFields {
 
     String PAGE_HASH = "pageHash";
 
+    String IS_PROVIDED = "provided";
+
 }

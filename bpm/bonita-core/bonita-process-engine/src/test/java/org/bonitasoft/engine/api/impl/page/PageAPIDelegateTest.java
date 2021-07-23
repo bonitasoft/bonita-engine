@@ -257,7 +257,7 @@ public class PageAPIDelegateTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void testUpdatePageWithEmplyUpdateFileShouldThrowExceptions() throws Exception {
+    public void testUpdatePageWithEmptyUpdateFileShouldThrowExceptions() throws Exception {
         // given
         final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
         doReturn(map).when(pageUpdater).getFields();
