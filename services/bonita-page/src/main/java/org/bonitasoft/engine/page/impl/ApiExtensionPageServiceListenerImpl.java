@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.page.AbstractSPage;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageServiceListener;
 import org.bonitasoft.engine.page.SContentType;
@@ -100,7 +101,7 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
     }
 
     @Override
-    public void pageUpdated(final SPage page, final byte[] content) throws SObjectModificationException {
+    public void pageUpdated(final AbstractSPage page, final byte[] content) throws SObjectModificationException {
         if (SContentType.API_EXTENSION.equals(page.getContentType())) {
             try {
                 updateMappings(page, helper.loadPageProperties(content));
@@ -111,7 +112,7 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
         }
     }
 
-    private void updateMappings(final SPage page, final Properties apiProperties)
+    private void updateMappings(final AbstractSPage page, final Properties apiProperties)
             throws SObjectCreationException, SBonitaReadException, SDeletionException {
         final List<String> keys = getKeysOfPageMappings(apiProperties);
         final List<String> existingKeys = new ArrayList<>();

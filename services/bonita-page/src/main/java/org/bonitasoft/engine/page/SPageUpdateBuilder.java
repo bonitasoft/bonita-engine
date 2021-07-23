@@ -19,6 +19,11 @@ public interface SPageUpdateBuilder {
 
     EntityUpdateDescriptor done();
 
+    /**
+     * @deprecated since bonita 7.13 the update of name is no more supported, it will not be take into account on the
+     *             page update
+     */
+    @Deprecated
     SPageUpdateBuilder updateName(String value);
 
     SPageUpdateBuilder updateDescription(String value);

@@ -29,6 +29,6 @@ public interface PageServiceListener {
 
     void pageDeleted(SPage page) throws SDeletionException, SBonitaReadException;
 
-    void pageUpdated(SPage page, byte[] content) throws SObjectModificationException;
+    void pageUpdated(AbstractSPage page, byte[] content) throws SObjectModificationException;
 
 }
