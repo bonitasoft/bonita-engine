@@ -138,4 +138,8 @@ public interface PageService extends TenantLifecycleService {
      * @return true if the service has been started again since it was last paused/stopped
      */
     boolean initialized();
+
+    void updatePageContent(long pageId, byte[] content, String contentName, SPageUpdateBuilder pageUpdateBuilder)
+            throws SObjectAlreadyExistsException, SObjectModificationException, SInvalidPageZipException,
+            SInvalidPageTokenException;
 }

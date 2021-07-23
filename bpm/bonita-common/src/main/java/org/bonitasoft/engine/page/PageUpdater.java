@@ -25,6 +25,12 @@ public class PageUpdater implements Serializable {
     private static final long serialVersionUID = 4295108162470507415L;
 
     public enum PageUpdateField {
+
+        /**
+         * @deprecated since bonita 7.13 the update of name is no more supported, it will not be taken into account on
+         *             the page update
+         **/
+        @Deprecated
         NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID, HIDDEN
     }
 
@@ -34,13 +40,18 @@ public class PageUpdater implements Serializable {
         fields = new HashMap<>();
     }
 
-    public PageUpdater setName(final String name) {
-        fields.put(PageUpdateField.NAME, name);
+    public PageUpdater setDescription(final String description) {
+        fields.put(PageUpdateField.DESCRIPTION, description);
         return this;
     }
 
-    public PageUpdater setDescription(final String description) {
-        fields.put(PageUpdateField.DESCRIPTION, description);
+    /**
+     * @deprecated since bonita 7.13 the update of name is no more supported, it will not be taken into account on the
+     *             page update
+     */
+    @Deprecated
+    public PageUpdater setName(final String name) {
+        fields.put(PageUpdateField.NAME, name);
         return this;
     }
 

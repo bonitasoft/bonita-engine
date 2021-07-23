@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.api.impl.transaction.page.SearchPages;
@@ -78,6 +79,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Emmanuel Duchastenier
  */
+@Slf4j
 public class PageAPIDelegate {
 
     private final TenantServiceAccessor tenantAccessor;
@@ -235,7 +237,7 @@ public class PageAPIDelegate {
         for (final Entry<PageUpdater.PageUpdateField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
                 case NAME:
-                    pageUpdateBuilder.updateName(sPage.getName());
+                    log.warn("Since 7.13 updating the name of a page is no more possible, the update will ignore it.");
                     break;
                 case DISPLAY_NAME:
                     pageUpdateBuilder.updateDisplayName(sPage.getDisplayName());
@@ -279,9 +281,7 @@ public class PageAPIDelegate {
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
         pageUpdateBuilder.updateLastUpdatedBy(userIdFromSession);
         try {
-            final SPage page = pageService.getPage(pageId);
-            pageService.updatePageContent(pageId, content, page.getContentName());
-            pageService.updatePage(pageId, pageUpdateBuilder.done());
+            pageService.updatePageContent(pageId, content, null, pageUpdateBuilder);
         } catch (final SInvalidPageTokenException e) {
             throw new UpdatingWithInvalidPageTokenException(e.getMessage(), e);
         } catch (final SInvalidPageZipException e) {

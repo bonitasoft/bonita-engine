@@ -33,7 +33,6 @@ import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
-import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -128,6 +127,7 @@ public class PageAPIIT extends CommonAPIIT {
         final String newContentName = "new_content.zip";
         pageUpdater.setDescription(newDescription);
         pageUpdater.setDisplayName(newDisplayName);
+        pageUpdater.setName("newName");
         pageUpdater.setContentName(newContentName);
         pageUpdater.setContentType(ContentType.FORM);
         pageUpdater.setProcessDefinitionId(5L);
@@ -139,7 +139,7 @@ public class PageAPIIT extends CommonAPIIT {
                 .hasInstalledBy(john.getId())
                 .hasInstalledBy(pageBeforeUpdate.getInstalledBy())
                 .hasLastUpdatedBy(jack.getId())
-                .hasName(pageName)
+                .hasName(pageBeforeUpdate.getName())
                 .hasInstallationDate(pageBeforeUpdate.getInstallationDate())
                 .hasDisplayName(newDisplayName)
                 .hasContentName(newContentName)
@@ -154,50 +154,6 @@ public class PageAPIIT extends CommonAPIIT {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         deleteUser(john);
         deleteUser(jack);
-
-    }
-
-    @Test(expected = AlreadyExistsException.class)
-    public void updatePage_with_existing_name_should_fail() throws Exception {
-        final PageUpdater pageUpdater = new PageUpdater();
-
-        // given
-        getPageAPI().createPage(
-                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
-        final Page page2 = getPageAPI().createPage(
-                new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                CommonTestUtil.createTestPageContent(PAGE_NAME2, DISPLAY_NAME, PAGE_DESCRIPTION));
-
-        // when
-        pageUpdater.setName(PAGE_NAME1);
-        getPageAPI().updatePage(page2.getId(), pageUpdater);
-
-        // then
-        // exception
-
-    }
-
-    @Test(expected = AlreadyExistsException.class)
-    public void updateForm_with_existing_name_should_fail() throws Exception {
-        final PageUpdater pageUpdater = new PageUpdater();
-
-        // given
-        getPageAPI().createPage(
-                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
-                        .setProcessDefinitionId(PROCESS_DEFINITION_ID),
-                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
-        final Page page2 = getPageAPI().createPage(
-                new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
-                        .setProcessDefinitionId(PROCESS_DEFINITION_ID),
-                CommonTestUtil.createTestPageContent(PAGE_NAME2, DISPLAY_NAME, PAGE_DESCRIPTION));
-
-        // when
-        pageUpdater.setName(PAGE_NAME1);
-        getPageAPI().updatePage(page2.getId(), pageUpdater);
-
-        // then
-        // exception
 
     }
 
@@ -239,26 +195,8 @@ public class PageAPIIT extends CommonAPIIT {
 
     }
 
-    @Test(expected = UpdatingWithInvalidPageTokenException.class)
-    public void updatePage_with_bad_token_should_fail() throws Exception {
-        final PageUpdater pageUpdater = new PageUpdater();
-
-        // given
-        final Page createPage = getPageAPI().createPage(
-                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
-
-        // when
-        pageUpdater.setName("invalid token");
-        getPageAPI().updatePage(createPage.getId(), pageUpdater);
-
-        // then
-        // exception
-
-    }
-
     @Test
-    public void updatePage_contents_should_updates_page() throws Exception {
+    public void updatePageContent_should_update_page_from_properties_except_name() throws Exception {
         // given
         final Page pageBefore = getPageAPI().createPage(
                 new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
@@ -273,7 +211,7 @@ public class PageAPIIT extends CommonAPIIT {
 
         // then
         final Page pageAfter = getPageAPI().getPage(pageBefore.getId());
-        assertThat(pageAfter.getName()).as("should update page name").isEqualTo(PAGE_NAME2);
+        assertThat(pageAfter.getName()).as("should not update page name").isEqualTo(PAGE_NAME1);
         assertThat(pageAfter.getDisplayName()).as("should update page display name").isEqualTo(newDisplayName);
         assertThat(pageAfter.getDescription()).as("should update page name").isEqualTo(newDescription);
 

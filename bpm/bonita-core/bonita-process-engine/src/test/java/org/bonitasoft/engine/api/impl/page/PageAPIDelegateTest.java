@@ -272,7 +272,6 @@ public class PageAPIDelegateTest {
     @Test
     public void testUpdatePageContent() throws Exception {
         doReturn(sPageUpdateBuilder).when(pageAPIDelegate).getPageUpdateBuilder();
-        doReturn(mock(SPage.class)).when(pageService).getPage(1);
 
         // given
         @SuppressWarnings("unchecked")
@@ -285,7 +284,8 @@ public class PageAPIDelegateTest {
         pageAPIDelegate.updatePageContent(pageId, content);
 
         // then
-        verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), nullable(String.class));
+        verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), nullable(String.class),
+                eq(sPageUpdateBuilder));
     }
 
     @Test

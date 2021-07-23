@@ -38,6 +38,7 @@ import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.*;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.page.AbstractSPage;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.PageServiceListener;
 import org.bonitasoft.engine.page.SContentType;
@@ -753,39 +754,6 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void updatePageWithExistingName() throws Exception {
-        final long pageId1 = 15L;
-        final long pageId2 = 20L;
-
-        final SPage page1 = new SPage("page1", 123456, 45, true, CONTENT_NAME);
-        page1.setDisplayName("displayName1");
-        final SPage page2 = new SPage("page2", 123456, 45, true, CONTENT_NAME);
-        page2.setDisplayName("displayName2");
-
-        final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
-        final Map<String, Object> fields = new HashMap<>();
-
-        // given
-        pageServiceImpl.addPage(page1, content);
-        page1.setId(pageId1);
-
-        pageServiceImpl.addPage(page2, content);
-        page2.setId(pageId2);
-
-        // try to update page2 with page1 name:
-        fields.put(SPageFields.PAGE_NAME, page1.getName());
-        fields.put(SPageFields.PAGE_ID, page1.getId());
-        doReturn(fields).when(entityUpdateDescriptor).getFields();
-
-        doReturn(page1).when(pageServiceImpl).getPageByName(page1.getName());
-        when(readPersistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(page2);
-
-        // when then:
-        assertThrows(SObjectAlreadyExistsException.class,
-                () -> pageServiceImpl.updatePage(page2.getId(), entityUpdateDescriptor));
-    }
-
-    @Test
     public void addPage_should_check_zip_content() {
         // given
         final SPage sPage = new SPage("page1", 123456, 45, false, CONTENT_NAME);
@@ -1230,16 +1198,16 @@ public class PageServiceImplTest {
     public void updatePage_should_execute_listener() throws Exception {
         final SPage page = new SPage("name", 10201983L, 2005L, false, "contentName");
         page.setId(45L);
-        final SPageWithContent pageContent = new SPageWithContent();
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, page.getId())))
-                .thenReturn(pageContent);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, page.getId()))).thenReturn(page);
         final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
                 getPagePropertiesContentPair("contentType=" + SContentType.PAGE));
+        final SPageWithContent pageContent = new SPageWithContent(page, content);
+
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, page.getId())))
+                .thenReturn(pageContent);
 
         pageServiceImpl.updatePageContent(page.getId(), content, "contentName");
 
-        verify(apiExtensionPageServiceListener).pageUpdated(page, content);
+        verify(apiExtensionPageServiceListener).pageUpdated(pageContent, content);
     }
 
     @Test
@@ -1266,15 +1234,14 @@ public class PageServiceImplTest {
         doAnswer((Answer<Object>) invocation -> {
 
             final EntityUpdateDescriptor entityUpdateDescriptor = (EntityUpdateDescriptor) invocation
-                    .getArguments()[1];
-            assertThat(entityUpdateDescriptor.getFields()).contains(
+                    .getArguments()[0];
+            assertThat(entityUpdateDescriptor.getFields()).containsOnly(
                     entry("description", "mypage description"),
-                    entry("name", "custompage_mypage"),
                     entry("contentName", "contentName"),
                     entry("displayName", "mypage display name"),
                     entry("contentType", expectedContentType));
             return null;
-        }).when(pageServiceImpl).updatePage(eq(45L), any(EntityUpdateDescriptor.class));
+        }).when(pageServiceImpl).updatePage(any(EntityUpdateDescriptor.class), any(AbstractSPage.class));
 
         //when
         pageServiceImpl.updatePageContent(sPage.getId(), content, "contentName");
@@ -1285,14 +1252,17 @@ public class PageServiceImplTest {
         SPage page = new SPage("userPage", 10201983L, 2005L, false, "contentName");
         page.setId(55L);
         page.setProvided(true);
-        SPageWithContent value = new SPageWithContent();
-        value.setProvided(true);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, page.getId())))
-                .thenReturn(value);
-        doReturn(page).when(pageServiceImpl).updatePage(anyLong(), entityUpdateDescriptorCaptor.capture());
 
         byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
                 getPagePropertiesContentPair("contentType=" + SContentType.PAGE));
+        SPageWithContent pageWithContent = new SPageWithContent(page, content);
+        pageWithContent.setProvided(true);
+
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, page.getId())))
+                .thenReturn(pageWithContent);
+        doReturn(pageWithContent).when(pageServiceImpl).updatePage(entityUpdateDescriptorCaptor.capture(),
+                eq(pageWithContent));
+
         pageServiceImpl.updatePageContent(page.getId(), content, "contentName");
 
         assertThat(entityUpdateDescriptorCaptor.getValue().getFields())
@@ -1305,7 +1275,7 @@ public class PageServiceImplTest {
         page.setId(55L);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, page.getId())))
                 .thenReturn(new SPageWithContent());
-        doReturn(page).when(pageServiceImpl).updatePage(anyLong(), entityUpdateDescriptorCaptor.capture());
+        doReturn(page).when(pageServiceImpl).updatePage(entityUpdateDescriptorCaptor.capture(), any());
 
         pageServiceImpl.updatePageContent(page.getId(), IOUtil.zip(getIndexGroovyContentPair(),
                 getPagePropertiesContentPair("contentType=" + SContentType.PAGE)), "contentName");
