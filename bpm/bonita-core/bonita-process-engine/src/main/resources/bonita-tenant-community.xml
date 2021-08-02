@@ -989,19 +989,6 @@
         <constructor-arg name="maxSize" value="${bonita.tenant.timetracker.memory.maxSize}" />
     </bean>
 
-    <bean id="themeRetriever" class="org.bonitasoft.engine.theme.impl.ThemeRetrieverImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-    </bean>
-
-    <bean id="themeService" class="org.bonitasoft.engine.theme.impl.ThemeServiceImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-        <constructor-arg name="themeRetriever" ref="themeRetriever" />
-    </bean>
-
     <task:scheduled-tasks scheduler="internalTasksScheduler">
         <task:scheduled ref="sessionService" method="cleanInvalidSessions" cron="${org.bonitasoft.engine.clean.invalid.sessions.cron:0 0 */2 * * ?}" />
     </task:scheduled-tasks>

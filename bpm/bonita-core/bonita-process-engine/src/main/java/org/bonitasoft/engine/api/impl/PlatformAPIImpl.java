@@ -272,7 +272,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             // Create default profiles: they will be updated by the tenant profile update handler in a separate thread but we create them here synchronously
             new DefaultProfilesUpdater(tenantServiceAccessor).execute();
             // Create custom page examples: done by page service start
-            // Create default themes: done by theme service start
             // Import default applications done in ApplicationImporter.init()
             sessionService.deleteSession(session.getId());
         } catch (final STenantCreationException e) {

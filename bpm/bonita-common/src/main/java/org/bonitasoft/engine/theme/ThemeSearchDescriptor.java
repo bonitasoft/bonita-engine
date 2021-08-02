@@ -15,7 +15,9 @@ package org.bonitasoft.engine.theme;
 
 /**
  * @author Celine Souchet
+ * @deprecated since 7.13.0, ThemeAPI does nothing. There is no replacement, as it used to serve old removed feature.
  */
+@Deprecated(since = "7.13.0")
 public final class ThemeSearchDescriptor {
 
     public static final String ID = "id";

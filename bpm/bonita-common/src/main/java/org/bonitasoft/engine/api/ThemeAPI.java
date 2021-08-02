@@ -22,7 +22,10 @@ import org.bonitasoft.engine.theme.ThemeType;
  * Manage mobile and portal theme. A Theme is a look &amp; feel in Bonita Portal.
  *
  * @author Celine Souchet
+ * @deprecated since 7.13.0, this API does nothing. There is no replacement, as it used to serve old removed feature.
+ *             This API will be removed in a future version.
  */
+@Deprecated(since = "7.13.0")
 public interface ThemeAPI {
 
     /**
@@ -36,6 +39,7 @@ public interface ThemeAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.2
+     * @deprecated now does nothing and returns null
      */
     Theme getCurrentTheme(ThemeType type);
 
@@ -50,6 +54,7 @@ public interface ThemeAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.2
+     * @deprecated now does nothing and returns null
      */
     Theme getDefaultTheme(ThemeType type);
 
@@ -62,6 +67,7 @@ public interface ThemeAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.2
+     * @deprecated now does nothing and returns null
      */
     Date getLastUpdateDate(ThemeType type);
 

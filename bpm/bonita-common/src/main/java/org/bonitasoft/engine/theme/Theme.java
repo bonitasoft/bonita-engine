@@ -19,7 +19,9 @@ import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
  * @author Celine Souchet
+ * @deprecated since 7.13.0, ThemeAPI does nothing. There is no replacement, as it used to serve old removed feature.
  */
+@Deprecated(since = "7.13.0")
 public interface Theme extends BaseElement {
 
     /**

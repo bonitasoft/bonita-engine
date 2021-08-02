@@ -73,8 +73,6 @@ ALTER TABLE ref_biz_data_inst DROP CONSTRAINT fk_ref_biz_data_inst_tenantId
 GO
 ALTER TABLE role DROP CONSTRAINT fk_role_tenantId
 GO
-ALTER TABLE theme DROP CONSTRAINT fk_theme_tenantId
-GO
 ALTER TABLE user_ DROP CONSTRAINT fk_user__tenantId
 GO
 ALTER TABLE user_membership DROP CONSTRAINT fk_user_membership_tenantId

@@ -10,7 +10,6 @@ ALTER TABLE pending_mapping DROP CONSTRAINT fk_pMap_flnId;
 ALTER TABLE processcategorymapping DROP CONSTRAINT fk_procCatMap_tenId;
 ALTER TABLE multi_biz_data DROP CONSTRAINT fk_multi_biz_data_tenantId;
 ALTER TABLE ref_biz_data_inst DROP CONSTRAINT fk_ref_biz_data_inst_tenantId;
-ALTER TABLE theme DROP CONSTRAINT fk_theme_tenantId;
 ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_content;
 
 

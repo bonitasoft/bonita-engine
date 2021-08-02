@@ -16,77 +16,32 @@ package org.bonitasoft.engine.api.impl;
 import java.util.Date;
 
 import org.bonitasoft.engine.api.ThemeAPI;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.theme.Theme;
-import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.theme.ThemeType;
-import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
-import org.bonitasoft.engine.theme.model.SThemeType;
 
 /**
  * @author Celine Souchet
  * @author Laurent Leseigneur
+ * @deprecated since 7.13.0, this API does nothing. There is no replacement, as it used to serve old removed feature.
+ *             This API will be removed in a future version.
  */
+@Deprecated(since = "7.13.0")
 @AvailableWhenTenantIsPaused
 public class ThemeAPIImpl implements ThemeAPI {
 
-    public TenantServiceAccessor getTenantAccessor() {
-        try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-    }
-
     @Override
     public Theme getCurrentTheme(final ThemeType type) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ThemeService themeService = tenantAccessor.getThemeService();
-        try {
-            return ModelConvertor.toTheme(themeService.getLastModifiedTheme(SThemeType.valueOf(type.name())));
-        } catch (SThemeNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
+        return null;
     }
 
     @Override
     public Theme getDefaultTheme(final ThemeType type) {
-        return getThemeByType(type, true);
-    }
-
-    private Theme getThemeByType(final ThemeType type, final boolean isDefault) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ThemeService themeService = tenantAccessor.getThemeService();
-        try {
-            return ModelConvertor.toTheme(themeService.getTheme(SThemeType.valueOf(type.name()), isDefault));
-        } catch (SThemeNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
+        return null;
     }
 
     @Override
     public Date getLastUpdateDate(final ThemeType type) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ThemeService themeService = tenantAccessor.getThemeService();
-        try {
-            return new Date(themeService.getLastUpdateDate(SThemeType.valueOf(type.name())));
-        } catch (SBonitaReadException e) {
-            throw new RetrieveException(e);
-        }
+        return null;
     }
 
 }

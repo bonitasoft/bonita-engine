@@ -48,7 +48,6 @@ import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
-import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.Query;
@@ -1447,10 +1446,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProfileAPI getProfileAPI() {
         return getApiClient().getProfileAPI();
-    }
-
-    public ThemeAPI getThemeAPI() {
-        return getApiClient().getThemeAPI();
     }
 
     public PermissionAPI getPermissionAPI() {

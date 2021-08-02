@@ -30,7 +30,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
-import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
@@ -85,8 +84,6 @@ public class EngineCommander {
 
     private ProfileAPI profileAPI;
 
-    private ThemeAPI themeAPI;
-
     private PermissionAPI permissionAPI;
 
     private PageAPI pageAPI;
@@ -112,7 +109,6 @@ public class EngineCommander {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
         setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
         setApplicationAPI(TenantAPIAccessor.getLivingApplicationAPI(getSession()));
@@ -132,7 +128,6 @@ public class EngineCommander {
         setProcessAPI(null);
         setCommandAPI(null);
         setProfileAPI(null);
-        setThemeAPI(null);
         setPermissionAPI(null);
         setApplicationAPI(null);
         setTenantManagementCommunityAPI(null);
@@ -178,14 +173,6 @@ public class EngineCommander {
 
     public void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
-    }
-
-    public ThemeAPI getThemeAPI() {
-        return themeAPI;
-    }
-
-    public void setThemeAPI(final ThemeAPI themeAPI) {
-        this.themeAPI = themeAPI;
     }
 
     public PermissionAPI getPermissionAPI() {

@@ -56,7 +56,10 @@ public interface APIAccessor extends Serializable {
      * Gives access to the <code>ThemeAPI</code>
      *
      * @return an <code>ThemeAPI</code>
+     * @deprecated since 7.13.0, ThemeAPI does nothing. There is no replacement, as it used to serve old removed
+     *             feature.
      */
+    @Deprecated(since = "7.13.0")
     ThemeAPI getThemeAPI();
 
     /**

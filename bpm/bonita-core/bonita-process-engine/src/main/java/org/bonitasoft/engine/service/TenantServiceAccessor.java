@@ -89,7 +89,6 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.bonitasoft.engine.tenant.TenantStateManager;
-import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkExecutorService;
@@ -216,8 +215,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     SchedulerService getSchedulerService();
 
     JobService getJobService();
-
-    ThemeService getThemeService();
 
     <T> T lookup(String serviceName) throws NotFoundException;
 
