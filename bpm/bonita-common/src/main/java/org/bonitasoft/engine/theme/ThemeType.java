@@ -16,6 +16,7 @@ package org.bonitasoft.engine.theme;
 /**
  * @author Celine Souchet
  */
+@Deprecated(since = "7.13.0")
 public enum ThemeType {
-    PORTAL, MOBILE;
+    PORTAL, MOBILE
 }

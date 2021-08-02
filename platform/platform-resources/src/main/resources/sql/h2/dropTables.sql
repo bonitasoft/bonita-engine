@@ -49,7 +49,6 @@ DROP TABLE group_;
 DROP TABLE queriablelog_p;
 DROP TABLE queriable_log;
 DROP TABLE page;
-DROP TABLE theme;
 DROP TABLE blob_;
 DROP TABLE profilemember;
 DROP TABLE profileentry;

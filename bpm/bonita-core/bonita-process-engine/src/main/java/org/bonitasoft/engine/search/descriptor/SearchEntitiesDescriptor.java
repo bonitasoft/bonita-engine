@@ -77,8 +77,6 @@ public class SearchEntitiesDescriptor {
 
     private final SearchProfileMemberRoleAndGroupDescriptor searchProfileMemberRoleAndGroupDescriptor;
 
-    private final SearchThemeDescriptor searchThemeDescriptor;
-
     private final SearchEventTriggerInstanceDescriptor searchEventTriggerInstanceDescriptor;
 
     private final SearchPageDescriptor searchPageDescriptor;
@@ -119,7 +117,6 @@ public class SearchEntitiesDescriptor {
         searchProfileMemberGroupDescriptor = new SearchProfileMemberGroupDescriptor();
         searchProfileMemberRoleDescriptor = new SearchProfileMemberRoleDescriptor();
         searchProfileMemberRoleAndGroupDescriptor = new SearchProfileMemberRoleAndGroupDescriptor();
-        searchThemeDescriptor = new SearchThemeDescriptor();
         searchEventTriggerInstanceDescriptor = new SearchEventTriggerInstanceDescriptor();
         searchPageDescriptor = new SearchPageDescriptor();
         searchApplicationDescriptor = new SearchApplicationDescriptor();
@@ -239,10 +236,6 @@ public class SearchEntitiesDescriptor {
 
     public SearchProfileMemberRoleAndGroupDescriptor getSearchProfileMemberRoleAndGroupDescriptor() {
         return searchProfileMemberRoleAndGroupDescriptor;
-    }
-
-    public SearchThemeDescriptor getSearchThemeDescriptor() {
-        return searchThemeDescriptor;
     }
 
     public SearchEventTriggerInstanceDescriptor getSearchEventTriggerInstanceDescriptor() {

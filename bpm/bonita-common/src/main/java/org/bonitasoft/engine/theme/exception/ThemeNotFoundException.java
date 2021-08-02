@@ -17,7 +17,9 @@ import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
  * @author Celine Souchet
+ * @deprecated since 7.13.0, ThemeAPI does nothing. There is no replacement, as it used to serve old removed feature.
  */
+@Deprecated(since = "7.13.0")
 public class ThemeNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = 1692118270602416856L;

@@ -43,7 +43,6 @@ dependencies {
     compile project(':services:bonita-profile')
     compile project(':services:bonita-scheduler')
     compile project(':services:bonita-session')
-    compile project(':services:bonita-theme')
     compile project(':services:bonita-time-tracker')
     compile project(':services:bonita-transaction')
     compile project(':services:bonita-work')

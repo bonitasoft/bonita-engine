@@ -47,7 +47,6 @@
                 <value>org.bonitasoft.engine.platform.model.SPlatform</value>
                 <value>org.bonitasoft.engine.platform.model.STenant</value>
                 <value>org.bonitasoft.engine.platform.command.model.SPlatformCommand</value>
-                <value>org.bonitasoft.engine.theme.model.STheme</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
                 <value>org.bonitasoft.engine.core.contract.data.SContractData</value>
@@ -223,7 +222,6 @@
 
                 <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
                 <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>
-                <value>/org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
 

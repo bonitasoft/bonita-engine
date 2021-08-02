@@ -100,8 +100,6 @@ DROP TABLE queriable_log
 GO
 DROP TABLE page
 GO
-DROP TABLE theme
-GO
 DROP TABLE blob_
 GO
 DROP TABLE profilemember

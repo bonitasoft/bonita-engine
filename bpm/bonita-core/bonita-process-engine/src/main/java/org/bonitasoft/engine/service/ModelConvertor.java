@@ -299,10 +299,6 @@ import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.tenant.TenantResourceState;
-import org.bonitasoft.engine.theme.Theme;
-import org.bonitasoft.engine.theme.ThemeType;
-import org.bonitasoft.engine.theme.impl.ThemeImpl;
-import org.bonitasoft.engine.theme.model.STheme;
 
 /**
  * @author Matthieu Chaffotte
@@ -2239,21 +2235,6 @@ public class ModelConvertor {
         failedJob.setNumberOfFailures(sFailedJob.getNumberOfFailures());
         failedJob.setLastUpdateDate(new Date(sFailedJob.getLastUpdateDate()));
         return failedJob;
-    }
-
-    public static List<Theme> toThemes(final List<STheme> sThemes) {
-        final List<Theme> themes = new ArrayList<>(sThemes.size());
-        for (final STheme sTheme : sThemes) {
-            final Theme theme = toTheme(sTheme);
-            themes.add(theme);
-        }
-        return themes;
-    }
-
-    public static Theme toTheme(final STheme sTheme) {
-        final ThemeType type = ThemeType.valueOf(sTheme.getType().name());
-        final Date lastUpdateDate = new Date(sTheme.getLastUpdateDate());
-        return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
     }
 
     public static CustomUserInfoDefinitionImpl convert(final SCustomUserInfoDefinition sDefinition) {

@@ -108,8 +108,6 @@ DELETE FROM job_param
 GO
 DELETE FROM job_desc
 GO
-DELETE FROM theme
-GO
 DELETE FROM tenant
 GO
 DELETE FROM platformCommand

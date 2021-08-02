@@ -1131,18 +1131,6 @@ ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, j
 GO
 ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE
 GO
-CREATE TABLE theme (
-  tenantId NUMERIC(19, 0) NOT NULL,
-  id NUMERIC(19, 0) NOT NULL,
-  isDefault BIT NOT NULL,
-  content VARBINARY(MAX) NOT NULL,
-  cssContent VARBINARY(MAX),
-  type NVARCHAR(50) NOT NULL,
-  lastUpdateDate NUMERIC(19, 0) NOT NULL,
-  CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
-  PRIMARY KEY (tenantId, id)
-)
-GO
 CREATE TABLE form_mapping (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,

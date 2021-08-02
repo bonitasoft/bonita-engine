@@ -994,17 +994,6 @@ CREATE TABLE job_log (
 CREATE INDEX fk_job_log_jobId_idx ON job_log(jobDescriptorId ASC, tenantid ASC);
 
 ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
-CREATE TABLE theme (
-  tenantId BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  isDefault BOOLEAN NOT NULL,
-  content LONGBLOB NOT NULL,
-  cssContent LONGBLOB,
-  type VARCHAR(50) NOT NULL,
-  lastUpdateDate BIGINT NOT NULL,
-  CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
-  PRIMARY KEY (tenantId, id)
-) ENGINE = INNODB;
 
 CREATE TABLE form_mapping (
   tenantId BIGINT NOT NULL,

@@ -329,11 +329,6 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.90:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.theme.model.STheme" />
-        <constructor-arg name="sequenceId" value="9890" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9890:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.SProfile" />
         <constructor-arg name="sequenceId" value="9990" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9990:${bonita.platform.sequence.defaultRangeSize}}" />
@@ -707,8 +702,6 @@
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
                 <!-- bar/tenant resources -->
                 <value>org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
-                <!-- theme -->
-                <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
                 <!-- supervisor -->
                 <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
                 <!-- scheduler -->
@@ -768,8 +761,6 @@
                 <!-- actor -->
                 <entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="actor" />
                 <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
-                <!-- theme -->
-                <entry key="org.bonitasoft.engine.theme.model.STheme" value="theme" />
                 <!-- supervisor -->
                 <entry key="org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor" value="processsupervisor" />
                 <!-- scheduler -->
@@ -923,7 +914,6 @@
                 <value>org.bonitasoft.engine.platform.model.SPlatform</value>
                 <value>org.bonitasoft.engine.platform.model.STenant</value>
                 <value>org.bonitasoft.engine.platform.command.model.SPlatformCommand</value>
-                <value>org.bonitasoft.engine.theme.model.STheme</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
                 <value>org.bonitasoft.engine.scheduler.model.SJobDescriptor</value>
