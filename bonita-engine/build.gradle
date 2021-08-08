@@ -53,7 +53,7 @@ dependencyManagement {
         dependency "org.codehaus.groovy:groovy-jsr223:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-test:${Deps.groovyVersion}"
+        dependency "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
         dependency "org.javassist:javassist:${Deps.javassistVersion}"
         dependency "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
         dependencySet(group: 'org.apache.httpcomponents', version: Deps.httpComponentsVersion) {
