@@ -646,7 +646,7 @@ public class PageServiceImpl implements PageService {
                     .allMatch(importStatus -> importStatus == ImportStatus.Status.ADDED);
             if (addRemovableIfMissing) {
                 log.info(
-                        "Detected a first run since a Bonita update, a tenant creation or an installation from scratch, importing provided removable pages");
+                        "Detected a first run (a tenant creation or an installation from scratch), importing provided removable pages");
             }
             importStatuses.addAll(importProvidedRemovablePagesFromClasspath(addRemovableIfMissing));
 
