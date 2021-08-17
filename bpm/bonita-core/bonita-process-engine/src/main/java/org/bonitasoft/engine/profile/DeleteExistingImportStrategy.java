@@ -66,10 +66,4 @@ public class DeleteExistingImportStrategy extends ProfileImportStrategy {
     public boolean canCreateProfileIfNotExists(final ProfileNode profile) {
         return true;
     }
-
-    @Override
-    public boolean shouldUpdateProfileEntries(ProfileNode profile, SProfile existingProfile) {
-        return false;
-    }
-
 }

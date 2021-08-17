@@ -21,7 +21,6 @@ import java.util.Set;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 
 /**
  * @author Zhang Bole
@@ -37,8 +36,6 @@ public class SearchProfileDescriptor extends SearchEntityDescriptor {
     public SearchProfileDescriptor() {
         searchEntityKeys.put(ProfileSearchDescriptor.ID, new FieldDescriptor(SProfile.class, SProfile.ID));
         searchEntityKeys.put(ProfileSearchDescriptor.NAME, new FieldDescriptor(SProfile.class, SProfile.NAME));
-        searchEntityKeys.put(ProfileSearchDescriptor.PROFILE_ENTRY_NAME,
-                new FieldDescriptor(SProfileEntry.class, SProfileEntry.NAME));
 
         final Set<String> fields = new HashSet<>();
         fields.add(SProfile.NAME);

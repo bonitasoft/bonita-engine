@@ -334,11 +334,6 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9990:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.SProfileEntry" />
-        <constructor-arg name="sequenceId" value="9991" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9991:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.SProfileMember" />
         <constructor-arg name="sequenceId" value="9992" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9992:${bonita.platform.sequence.defaultRangeSize}}" />
@@ -769,7 +764,6 @@
                 <entry key="org.bonitasoft.engine.scheduler.model.SJobLog" value="jl" />
                 <!-- profile -->
                 <entry key="org.bonitasoft.engine.profile.model.SProfile" value="profile" />
-                <entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="profileentry" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="pm" />
                 <!-- process instance -->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="p" />
@@ -968,7 +962,6 @@
                 <value>org.bonitasoft.engine.page.SPageWithContent</value>
                 <value>org.bonitasoft.engine.page.SPageMapping</value>
                 <value>org.bonitasoft.engine.profile.model.SProfile</value>
-                <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
                 <value>org.bonitasoft.engine.parameter.SParameter</value>
                 <value>org.bonitasoft.engine.resources.SBARResourceLight</value>

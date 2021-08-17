@@ -281,15 +281,12 @@ import org.bonitasoft.engine.platform.impl.PlatformImpl;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberCreator;
 import org.bonitasoft.engine.profile.ProfileMemberCreator.ProfileMemberField;
-import org.bonitasoft.engine.profile.impl.ProfileEntryImpl;
 import org.bonitasoft.engine.profile.impl.ProfileImpl;
 import org.bonitasoft.engine.profile.impl.ProfileMemberImpl;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
@@ -2155,28 +2152,6 @@ public class ModelConvertor {
         profileImpl.setLastUpdateDate(new Date(sProfile.getLastUpdateDate()));
         profileImpl.setLastUpdatedBy(sProfile.getLastUpdatedBy());
         return profileImpl;
-    }
-
-    public static List<ProfileEntry> toProfileEntries(final List<SProfileEntry> sProfileEntries) {
-        final List<ProfileEntry> profiles = new ArrayList<>(sProfileEntries.size());
-        for (final SProfileEntry sProfileEntry : sProfileEntries) {
-            final ProfileEntry profile = toProfileEntry(sProfileEntry);
-            profiles.add(profile);
-        }
-        return profiles;
-    }
-
-    public static ProfileEntry toProfileEntry(final SProfileEntry sProfileEntry) {
-        final ProfileEntryImpl profileEntryImpl = new ProfileEntryImpl(sProfileEntry.getName(),
-                sProfileEntry.getProfileId());
-        profileEntryImpl.setId(sProfileEntry.getId());
-        profileEntryImpl.setDescription(sProfileEntry.getDescription());
-        profileEntryImpl.setIndex(sProfileEntry.getIndex());
-        profileEntryImpl.setPage(sProfileEntry.getPage());
-        profileEntryImpl.setParentId(sProfileEntry.getParentId());
-        profileEntryImpl.setType(sProfileEntry.getType());
-        profileEntryImpl.setCustom(sProfileEntry.isCustom());
-        return profileEntryImpl;
     }
 
     public static List<ProfileMember> toProfileMembers(final List<SProfileMember> sProfileMembers) {

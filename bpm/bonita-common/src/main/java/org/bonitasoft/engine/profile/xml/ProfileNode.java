@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.profile.xml;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,20 +38,24 @@ public class ProfileNode {
     private boolean isDefault;
     @XmlElement
     private String description;
+
+    /**
+     * @deprecated since 7.13.0 the profile entries are not imported by the engine
+     */
     @XmlElementWrapper(name = "profileEntries")
     @XmlElement(name = "parentProfileEntry")
+    @Deprecated(since = "7.13.0")
     private List<ParentProfileEntryNode> parentProfileEntries;
     @XmlElement(name = "profileMapping")
     private ProfileMappingNode profileMapping;
 
     public ProfileNode() {
-        parentProfileEntries = new ArrayList<>();
+
     }
 
     public ProfileNode(final String name, final boolean isDefault) {
         this.name = name;
         this.isDefault = isDefault;
-        parentProfileEntries = new ArrayList<>();
         profileMapping = new ProfileMappingNode();
     }
 
@@ -71,12 +75,13 @@ public class ProfileNode {
         this.description = description;
     }
 
+    @Deprecated(since = "7.13.0")
     public List<ParentProfileEntryNode> getParentProfileEntries() {
-        return parentProfileEntries;
+        return Collections.emptyList();
     }
 
+    @Deprecated(since = "7.13.0")
     public void setParentProfileEntries(final List<ParentProfileEntryNode> parentProfileEntries) {
-        this.parentProfileEntries = parentProfileEntries;
     }
 
     public ProfileMappingNode getProfileMapping() {

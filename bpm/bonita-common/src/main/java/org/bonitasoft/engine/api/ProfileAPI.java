@@ -117,7 +117,9 @@ public interface ProfileAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 7.6.1
+     * @deprecated since 7.13.0 use getProfilesForUser instead
      */
+    @Deprecated(forRemoval = true)
     List<Profile> getProfilesWithNavigationForUser(long userId, int startIndex, int maxResults,
             ProfileCriterion criterion);
 
@@ -195,7 +197,9 @@ public interface ProfileAPI {
      * @see ProfileEntry
      * @see ProfileEntrySearchDescriptor
      * @see SearchResult
+     * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
      */
+    @Deprecated(since = "7.13.0", forRemoval = true)
     SearchResult<ProfileEntry> searchProfileEntries(SearchOptions options) throws SearchException;
 
     /**
@@ -208,7 +212,9 @@ public interface ProfileAPI {
      * @param profileName name of the profile
      * @return the list of profile entries linked to this profile
      * @since 7.8
+     * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
      */
+    @Deprecated(since = "7.13.0", forRemoval = true)
     @Experimental
     List<ProfileEntry> getProfileEntries(String profileName) throws ProfileNotFoundException;
 
@@ -236,7 +242,9 @@ public interface ProfileAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
+     * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
      */
+    @Deprecated(since = "7.13.0", forRemoval = true)
     ProfileEntry getProfileEntry(long id) throws ProfileEntryNotFoundException;
 
     /**

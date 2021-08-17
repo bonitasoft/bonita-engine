@@ -63,8 +63,6 @@ ALTER TABLE processsupervisor DROP CONSTRAINT fk_processsupervisor_tenantId
 GO
 ALTER TABLE profile DROP CONSTRAINT fk_profile_tenantId
 GO
-ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_tenantId
-GO
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId
 GO
 ALTER TABLE multi_biz_data DROP CONSTRAINT fk_multi_biz_data_tenantId
@@ -81,8 +79,6 @@ ALTER TABLE waiting_event DROP CONSTRAINT fk_waiting_event_tenantId
 GO
 
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileId
-GO
-ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_profileId
 GO
 -- ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_process_instanceId
 GO

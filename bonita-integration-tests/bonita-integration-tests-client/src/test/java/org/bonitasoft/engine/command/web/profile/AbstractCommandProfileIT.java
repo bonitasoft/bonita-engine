@@ -45,10 +45,6 @@ public abstract class AbstractCommandProfileIT extends TestWithTechnicalUser {
 
     protected static final String EXPORT_DEFAULT_PROFILES_CMD = "exportDefaultProfilesCommand";
 
-    protected static final long ADMIN_PROFILE_ENTRY_COUNT = 24;
-
-    protected static final long USER_PROFILE_ENTRY_COUNT = 17;
-
     protected Long adminProfileId;
 
     protected Long userProfileId;

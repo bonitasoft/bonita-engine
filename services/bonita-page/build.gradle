@@ -6,7 +6,8 @@ dependencies {
     compile project(':services:bonita-events')
     compile project(':services:bonita-persistence')
     compile project(':services:bonita-commons')
-    compile project(':services:bonita-profile')
+    compile project(':bpm:bonita-common')
+
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"

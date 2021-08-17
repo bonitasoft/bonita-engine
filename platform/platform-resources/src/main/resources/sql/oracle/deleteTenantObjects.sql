@@ -48,7 +48,6 @@ DELETE FROM queriable_log WHERE tenantid = ${tenantid};
 DELETE FROM page WHERE tenantid = ${tenantid};
 DELETE FROM sequence WHERE tenantid = ${tenantid};
 DELETE FROM profilemember WHERE tenantid = ${tenantid};
-DELETE FROM profileentry WHERE tenantid = ${tenantid};
 DELETE FROM profile WHERE tenantid = ${tenantid};
 DELETE FROM job_log WHERE tenantid = ${tenantid};
 DELETE FROM job_param WHERE tenantid = ${tenantid};

@@ -17,36 +17,6 @@
 		SELECT profile
 		FROM org.bonitasoft.engine.profile.model.SProfile AS profile
 	</query>
-	
-	<query name="searchSProfilewithSProfileEntry">
-		SELECT DISTINCT profile
-		FROM org.bonitasoft.engine.profile.model.SProfile AS profile ,
-		org.bonitasoft.engine.profile.model.SProfileEntry AS profileentry
-		WHERE profile.id = profileentry.profileId
-	</query>
-	
-	<query name="getNumberOfSProfilewithSProfileEntry">
-		SELECT COUNT(DISTINCT profile.id)
-		FROM org.bonitasoft.engine.profile.model.SProfile AS profile ,
-		org.bonitasoft.engine.profile.model.SProfileEntry AS profileentry
-		WHERE profile.id = profileentry.profileId
-	</query>
-
-	<query name="getNumberOfSProfileEntry">
-		SELECT COUNT(profileentry.id)
-		FROM org.bonitasoft.engine.profile.model.SProfileEntry AS profileentry
-	</query>
-
-	<query name="searchSProfileEntry">
-		SELECT profileentry
-		FROM org.bonitasoft.engine.profile.model.SProfileEntry AS profileentry
-	</query>
-	
-	<query name="getEntriesOfProfile">
-		SELECT profileentry
-		FROM org.bonitasoft.engine.profile.model.SProfileEntry AS profileentry
-		WHERE profileentry.profileId = :profileId
-	</query>
 
 	<query name="getDirectProfileMembersOfUser">
 		SELECT pm
@@ -242,29 +212,6 @@
 		FROM org.bonitasoft.engine.profile.model.SProfile AS profile,
 		     org.bonitasoft.engine.profile.model.SProfileMember AS pm
 		WHERE pm.profileId = profile.id
-		AND (
-			(pm.userId = :userId AND pm.roleId = -1 AND pm.groupId = -1)
-			OR pm.id IN (
-				SELECT pm.id
-				FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm,
-				     org.bonitasoft.engine.identity.model.SUserMembership AS um
-				WHERE um.userId = :userId 
-				AND (
-					(pm.groupId = um.groupId AND pm.roleId = -1)
-					OR (pm.roleId = um.roleId AND pm.groupId = -1)
-					OR (pm.groupId = um.groupId AND pm.roleId = um.roleId)
-				)
-			)
-		)
-	</query>
-	
-	<query name="getProfilesWithNavigationOfUser">
-		SELECT DISTINCT profile
-		FROM org.bonitasoft.engine.profile.model.SProfile AS profile,
-		     org.bonitasoft.engine.profile.model.SProfileEntry AS profileentry,
-		     org.bonitasoft.engine.profile.model.SProfileMember AS pm
-		WHERE pm.profileId = profile.id
-		AND profile.id = profileentry.profileId
 		AND (
 			(pm.userId = :userId AND pm.roleId = -1 AND pm.groupId = -1)
 			OR pm.id IN (

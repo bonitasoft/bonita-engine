@@ -15,7 +15,13 @@ package org.bonitasoft.engine.profile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,7 +40,6 @@ import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
 import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
@@ -42,7 +47,6 @@ import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.session.SessionService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,7 +80,6 @@ public class ProfilesImporterTest {
     @Before
     public void before() throws Exception {
         doReturn(mock(SProfile.class)).when(profileService).createProfile(any(SProfile.class));
-        doReturn(mock(SProfileEntry.class)).when(profileService).createProfileEntry(any(SProfileEntry.class));
         doReturn(mock(SProfile.class)).when(profileService).updateProfile(any(SProfile.class),
                 any(EntityUpdateDescriptor.class));
     }
@@ -86,8 +89,6 @@ public class ProfilesImporterTest {
         // given
         final ProfileNode exportedProfile = new ProfileNode("Mine", false);
 
-        addTwoProfileEntries(exportedProfile);
-
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
 
         // when
@@ -96,7 +97,6 @@ public class ProfilesImporterTest {
 
         // then: all entries and mappings are replaced
         verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
-        verify(profileService, times(1)).deleteAllProfileEntriesOfProfile(any(SProfile.class));
         assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
     }
 
@@ -105,8 +105,6 @@ public class ProfilesImporterTest {
         // given
         final ProfileNode exportedProfile = new ProfileNode("Mine", true);
 
-        addTwoProfileEntries(exportedProfile);
-
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
 
         // when
@@ -115,7 +113,6 @@ public class ProfilesImporterTest {
 
         // then: all entries and mappings are replaced
         verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
-        verify(profileService, times(0)).deleteAllProfileEntriesOfProfile(any(SProfile.class));
         assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
     }
 
@@ -123,78 +120,10 @@ public class ProfilesImporterTest {
         return new ProfilesNode(Arrays.asList(exportedProfile));
     }
 
-    private void addTwoProfileEntries(final ProfileNode exportedProfile) {
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
-    }
-
-    @Test
-    public void should_importProfiles_with_replace_do_not_delete_profile_entries() throws Exception {
-        // given
-        final ProfileNode exportedProfile = new ProfileNode("Mine", true);
-
-        addTwoProfileEntries(exportedProfile);
-        doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
-        // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
-                ImportPolicy.REPLACE_DUPLICATES, -1);
-
-        // then
-        verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
-        verify(profileService, never()).deleteAllProfileEntriesOfProfile(any(SProfile.class));
-        assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
-    }
-
-    @Test
-    public void should_importProfiles_on_default_with_replace_do_not_delete_profile_entries() throws Exception {
-        // given
-        final ProfileNode exportedProfile = new ProfileNode("Mine", false);
-
-        addTwoProfileEntries(exportedProfile);
-
-        final SProfile existingProfile = mock(SProfile.class);
-
-        doReturn(true).when(existingProfile).isDefault();
-        doReturn(existingProfile).when(profileService).getProfileByName(exportedProfile.getName());
-        // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
-                ImportPolicy.REPLACE_DUPLICATES, -1);
-
-        // then
-        verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
-        verify(profileService, never()).deleteAllProfileEntriesOfProfile(any(SProfile.class));
-        assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
-    }
-
-    @Test
-    public void should_importProfiles_with_ReplaceDuplicate_do_not_insert_default_profile() throws Exception {
-        // given
-        final ProfileNode exportedProfile = new ProfileNode("Mine", true);
-        addTwoProfileEntries(exportedProfile);
-
-        final SProfile existingProfile = mock(SProfile.class);
-
-        doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("Mine");
-
-        // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
-                ImportPolicy.REPLACE_DUPLICATES,
-                SessionService.SYSTEM_ID);
-
-        // then
-        assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.SKIPPED));
-        verify(profileService, never()).createProfile(any(SProfile.class));
-    }
-
     @Test
     public void should_importProfiles_add_profile() throws Exception {
         // given
         final ProfileNode exportedProfile = new ProfileNode("MineNotDefault", false);
-        addTwoProfileEntries(exportedProfile);
         // profile do not exists
         doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("MineNotDefault");
         doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("MineDefault");
@@ -212,7 +141,6 @@ public class ProfilesImporterTest {
     public void should_importProfiles_skip_profile_when_strategy_tells_it() throws Exception {
         // given
         final ProfileNode exportedProfile = new ProfileNode("Mine", false);
-        addTwoProfileEntries(exportedProfile);
         // profile exists
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
 
@@ -250,7 +178,6 @@ public class ProfilesImporterTest {
         // given
         final ProfileNode exportedProfile = new ProfileNode("Mine", true);
 
-        addTwoProfileEntries(exportedProfile);
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
         // when
         final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
@@ -258,7 +185,6 @@ public class ProfilesImporterTest {
 
         // then
         verify(profileService, never()).deleteAllProfileMembersOfProfile(any(SProfile.class));
-        verify(profileService, never()).deleteAllProfileEntriesOfProfile(any(SProfile.class));
         assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.SKIPPED));
     }
 

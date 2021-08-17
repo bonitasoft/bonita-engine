@@ -107,19 +107,6 @@ public class ProfileAPIImplTest {
     }
 
     @Test
-    public void searchProfilesWithNavigationOfUser_should_return_empty_list_for_system_user()
-            throws SBonitaReadException {
-        // when:
-        final List<Profile> profilesForUser = profileAPIImpl.getProfilesWithNavigationForUser(-1, 0, 10,
-                ProfileCriterion.ID_ASC);
-
-        // then:
-        assertThat(profilesForUser).isEmpty();
-        verify(profileService, never()).searchProfilesWithNavigationOfUser(anyLong(), anyInt(), anyInt(), anyString(),
-                any(OrderByType.class));
-    }
-
-    @Test
     public void should_deleteProfileMember_update_profile_metadata() throws Exception {
         // when
         profileAPIImpl.deleteProfileMember(1L);

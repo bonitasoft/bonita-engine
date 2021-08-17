@@ -38,15 +38,10 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberCreationException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
@@ -116,18 +111,6 @@ public class ProfilesImporter {
                 final long profileId = newProfile.getId();
 
                 /*
-                 * Import mapping with pages
-                 */
-                if (existingProfile == null || importStrategy.shouldUpdateProfileEntries(profile, existingProfile)) {
-                    // update entries only if it's a custom profile
-                    if (existingProfile != null) {
-                        profileService.deleteAllProfileEntriesOfProfile(existingProfile);
-                    }
-                    currentStatus.getErrors()
-                            .addAll(importProfileEntries(profileService, profile.getParentProfileEntries(), profileId));
-                }
-
-                /*
                  * Import mapping with organization
                  */
                 ProfileMappingNode profileMapping = profile.getProfileMapping();
@@ -141,34 +124,6 @@ public class ProfilesImporter {
         } catch (final SBonitaException e) {
             throw new ExecutionException(e);
         }
-    }
-
-    protected List<ImportError> importProfileEntries(final ProfileService profileService,
-            final List<ParentProfileEntryNode> parentProfileEntries,
-            final long profileId)
-            throws SProfileEntryCreationException {
-        final ArrayList<ImportError> errors = new ArrayList<>();
-        for (final ParentProfileEntryNode parentProfileEntry : parentProfileEntries) {
-            if (parentProfileEntry.hasErrors()) {
-                errors.addAll(parentProfileEntry.getErrors());
-                continue;
-            }
-            final SProfileEntry parentEntry = profileService
-                    .createProfileEntry(createProfileEntry(parentProfileEntry, profileId, 0));
-            final long parentProfileEntryId = parentEntry.getId();
-            final List<ProfileEntryNode> childrenProfileEntry = parentProfileEntry.getChildProfileEntries();
-            if (childrenProfileEntry != null && childrenProfileEntry.size() > 0) {
-                for (final ProfileEntryNode childProfileEntry : childrenProfileEntry) {
-                    if (childProfileEntry.hasError()) {
-                        errors.add(childProfileEntry.getError());
-                        continue;
-                    }
-                    profileService
-                            .createProfileEntry(createProfileEntry(childProfileEntry, profileId, parentProfileEntryId));
-                }
-            }
-        }
-        return errors;
     }
 
     List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService,
@@ -232,7 +187,7 @@ public class ProfilesImporter {
 
     protected SProfile importTheProfile(final long importerId, final ProfileNode profile,
             final SProfile existingProfile, ProfileImportStrategy importStrategy)
-            throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException,
+            throws ExecutionException, SProfileMemberDeletionException,
             SProfileUpdateException, SProfileCreationException {
         final SProfile newProfile;
         if (existingProfile != null) {
@@ -255,21 +210,6 @@ public class ProfilesImporter {
                 .createdBy(importerId)
                 .lastUpdateDate(creationDate)
                 .lastUpdatedBy(importerId).description(profileNode.getDescription()).build();
-    }
-
-    protected SProfileEntry createProfileEntry(final ParentProfileEntryNode parentEntry, final long profileId,
-            final long parentId) {
-        return SProfileEntry.builder().name(parentEntry.getName()).profileId(profileId)
-                .description(parentEntry.getDescription()).index(parentEntry.getIndex()).page(parentEntry.getPage())
-                .parentId(parentId).type(parentEntry.getType()).custom(parentEntry.isCustom()).build();
-    }
-
-    protected SProfileEntry createProfileEntry(final ProfileEntryNode childEntry, final long profileId,
-            final long parentId) {
-        return SProfileEntry.builder().name(childEntry.getName()).profileId(profileId)
-                .description(childEntry.getDescription()).index(childEntry.getIndex())
-                .page(childEntry.getPage()).parentId(parentId).type(childEntry.getType()).custom(childEntry.isCustom())
-                .build();
     }
 
     public List<String> toWarnings(final List<ImportStatus> importProfiles) {

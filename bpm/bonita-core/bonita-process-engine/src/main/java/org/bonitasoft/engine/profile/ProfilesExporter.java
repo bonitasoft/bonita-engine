@@ -31,11 +31,8 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
@@ -108,59 +105,8 @@ public class ProfilesExporter {
             throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
         ProfileNode profile = new ProfileNode(sProfile.getName(), sProfile.isDefault());
         profile.setDescription(sProfile.getDescription());
-        profile.setParentProfileEntries(getProfilesEntries(sProfile));
         profile.setProfileMapping(getProfileMapping(sProfile));
         return profile;
-    }
-
-    private List<ParentProfileEntryNode> getProfilesEntries(SProfile profile) throws SBonitaReadException {
-        ArrayList<ParentProfileEntryNode> parentProfileEntries = new ArrayList<>();
-        List<SProfileEntry> sProfileEntries = searchProfileEntries(profile.getId(), 0);
-        for (SProfileEntry sProfileEntry : sProfileEntries) {
-            parentProfileEntries.add(toParentProfileEntry(sProfileEntry));
-        }
-        return parentProfileEntries;
-    }
-
-    private ParentProfileEntryNode toParentProfileEntry(SProfileEntry sProfileEntry) throws SBonitaReadException {
-        ParentProfileEntryNode parentProfileEntry = new ParentProfileEntryNode(sProfileEntry.getName());
-        parentProfileEntry.setCustom(sProfileEntry.isCustom());
-        parentProfileEntry.setIndex(sProfileEntry.getIndex());
-        parentProfileEntry.setDescription(sProfileEntry.getDescription());
-        parentProfileEntry.setType(sProfileEntry.getType());
-        parentProfileEntry.setPage(sProfileEntry.getPage());
-        parentProfileEntry.setChildProfileEntries(getChildrenProfilesEntries(sProfileEntry));
-        return parentProfileEntry;
-    }
-
-    private List<ProfileEntryNode> getChildrenProfilesEntries(SProfileEntry sProfileEntry) throws SBonitaReadException {
-        ArrayList<ProfileEntryNode> profileEntries = new ArrayList<>();
-        List<SProfileEntry> sProfileEntries = searchProfileEntries(sProfileEntry.getProfileId(), sProfileEntry.getId());
-        for (SProfileEntry profileEntry : sProfileEntries) {
-            profileEntries.add(toProfileEntry(profileEntry, sProfileEntry.getName()));
-        }
-        return profileEntries;
-    }
-
-    private ProfileEntryNode toProfileEntry(SProfileEntry sProfileEntry, String parentName) {
-        ProfileEntryNode profileEntry = new ProfileEntryNode(sProfileEntry.getName());
-        profileEntry.setCustom(sProfileEntry.isCustom());
-        profileEntry.setIndex(sProfileEntry.getIndex());
-        profileEntry.setDescription(sProfileEntry.getDescription());
-        profileEntry.setType(sProfileEntry.getType());
-        profileEntry.setPage(sProfileEntry.getPage());
-        return profileEntry;
-    }
-
-    protected List<SProfileEntry> searchProfileEntries(final long profileId, final long parentId)
-            throws SBonitaReadException {
-        final List<OrderByOption> orderByOptions = Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
-        final List<FilterOption> filters = new ArrayList<>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PROFILE_ID, profileId));
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PARENT_ID, parentId));
-        final QueryOptions queryOptions = new QueryOptions(0, Integer.MAX_VALUE, orderByOptions, filters, null);//profiles entry of a profile will not have a lot of elements
-        return profileService.searchProfileEntries(queryOptions);
     }
 
     private ProfileMappingNode getProfileMapping(SProfile sProfile)
@@ -237,7 +183,7 @@ public class ProfilesExporter {
                 Collections.singletonList(new OrderByOption(
                         SProfileMember.class, SProfileMember.ID, OrderByType.ASC)),
                 Collections.singletonList(new FilterOption(SProfileMember.class,
-                        SProfileEntry.PROFILE_ID, profileId)),
+                        SProfileMember.PROFILE_ID, profileId)),
                 null);
         return profileService.searchProfileMembers(querySuffix, queryOptions);
     }

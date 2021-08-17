@@ -52,7 +52,9 @@ public final class ProfileSearchDescriptor {
      * Used to filter or order by the flag {@link ProfileEntry#getName()}
      *
      * @see ProfileEntry
+     * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
      */
+    @Deprecated(since = "7.13.0", forRemoval = true)
     public static final String PROFILE_ENTRY_NAME = "profileentry.name";
 
 }

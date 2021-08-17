@@ -14,13 +14,31 @@
 package org.bonitasoft.engine.page.impl;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,7 +54,10 @@ import java.util.Properties;
 
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.commons.exceptions.*;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.page.AbstractSPage;
 import org.bonitasoft.engine.page.PageService;
@@ -56,7 +77,6 @@ import org.bonitasoft.engine.persistence.ReadOnlySelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -129,9 +149,6 @@ public class PageServiceImplTest {
     @Captor
     private ArgumentCaptor<EntityUpdateDescriptor> entityUpdateDescriptorCaptor;
 
-    @Mock
-    ProfileService profileService;
-
     private PageServiceImpl pageServiceImpl;
 
     @Mock
@@ -142,8 +159,8 @@ public class PageServiceImplTest {
     @Before
     public void before() {
         pageServiceImpl = spy(
-                new PageServiceImpl(readPersistenceService, recorder, queriableLoggerService,
-                        profileService, sessionAccessor, sessionService));
+                new PageServiceImpl(readPersistenceService, recorder, queriableLoggerService, sessionAccessor,
+                        sessionService));
         doReturn(pageLogBuilder).when(pageServiceImpl).getPageLog(any(ActionType.class), anyString());
         doNothing().when(pageServiceImpl).initiateLogBuilder(anyLong(), anyInt(), any(SPersistenceLogBuilder.class),
                 anyString());

@@ -64,7 +64,6 @@
                 <value>org.bonitasoft.engine.dependency.model.SPlatformDependency</value>
                 <value>org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping</value>
                 <value>org.bonitasoft.engine.profile.model.SProfile</value>
-                <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
                 <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
                 <value>org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance</value>

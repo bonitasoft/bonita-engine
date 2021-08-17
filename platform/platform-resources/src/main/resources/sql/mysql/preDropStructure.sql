@@ -30,7 +30,6 @@ ALTER TABLE process_definition DROP FOREIGN KEY fk_process_definition_content;
 ALTER TABLE process_instance DROP FOREIGN KEY fk_process_instance_tenantId;
 ALTER TABLE processsupervisor DROP FOREIGN KEY fk_processsupervisor_tenantId;
 ALTER TABLE profile DROP FOREIGN KEY fk_profile_tenantId;
-ALTER TABLE profileentry DROP FOREIGN KEY fk_profileentry_tenantId;
 ALTER TABLE profilemember DROP FOREIGN KEY fk_profilemember_tenantId;
 ALTER TABLE multi_biz_data DROP FOREIGN KEY fk_multi_biz_data_tenantId;
 ALTER TABLE ref_biz_data_inst DROP FOREIGN KEY fk_ref_biz_data_inst_tenantId;
@@ -40,7 +39,6 @@ ALTER TABLE user_membership DROP FOREIGN KEY fk_user_membership_tenantId;
 ALTER TABLE waiting_event DROP FOREIGN KEY fk_waiting_event_tenantId;
 
 ALTER TABLE profilemember DROP FOREIGN KEY fk_profilemember_profileId;
-ALTER TABLE profileentry DROP FOREIGN KEY fk_profileentry_profileId;
 -- ALTER TABLE process_comment DROP FOREIGN KEY fk_process_comment_process_instanceId;
 
 -- business application

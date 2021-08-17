@@ -28,7 +28,6 @@ import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
@@ -84,16 +83,6 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         assertEquals("User", searchedProfiles.get(3).getName());
         assertEquals("User profile", searchedProfiles.get(3).getDescription());
 
-        // check profile entries and their attributes
-        for (final long i : Arrays.asList(olderid1, olderid2, olderid3, olderid4)) {
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
-                    .filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
-                    .sort(ProfileEntrySearchDescriptor.PROFILE_ID, Order.ASC).done();
-            final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI()
-                    .searchProfileEntries(searchOptions);
-            assertNotNull(searchedProfileEntries);
-        }
-
         final InputStream xmlStream = ProfileImportCommandIT.class.getResourceAsStream("deleteExistingProfile.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
         xmlStream.close();
@@ -115,30 +104,8 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         assertEquals("Team Manager", searchedProfilesRes.get(0).getName());
         assertEquals("TM profile", searchedProfilesRes.get(0).getDescription());
 
-        // check profileEntries
-        for (final long i : Arrays.asList(olderid1, olderid2, olderid3, olderid4)) {
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
-                    .filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
-                    .sort(ProfileEntrySearchDescriptor.NAME, Order.ASC).done();
-            final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI()
-                    .searchProfileEntries(searchOptions);
-
-            assertTrue(searchedProfileEntries.getResult().size() == 0);
-        }
-
-        SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
-                .filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1)
-                .sort(ProfileEntrySearchDescriptor.NAME, Order.ASC).done();
-        final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(searchOptions);
-        final List<ProfileEntry> searchedProfileEntriesRes2 = searchedProfileEntries.getResult();
-        assertNotNull(searchedProfileEntriesRes2);
-        assertEquals(1, searchedProfileEntriesRes2.size());
-        assertEquals("Home", searchedProfileEntriesRes2.get(0).getName());
-        assertEquals("My team activitys dashboard", searchedProfileEntriesRes2.get(0).getDescription());
-        assertEquals("CurrentUserTeamTasksDashboard", searchedProfileEntriesRes2.get(0).getType());
-
         // check profile mapping
-        searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+        SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
                 .filter(ProfileMemberSearchDescriptor.PROFILE_ID, newId1)
                 .sort(ProfileMemberSearchDescriptor.ID, Order.ASC).done();
         final SearchResult<ProfileMember> searchpms = getProfileAPI().searchProfileMembers("user", searchOptions);
@@ -177,18 +144,9 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileEntrySearchDescriptor.NAME, Order.DESC);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, adminProfileId);
-        final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done());
-        assertEquals(ADMIN_PROFILE_ENTRY_COUNT, searchedProfileEntries.getCount());
 
         getProfileResult = getProfileAPI().getProfile(userProfileId);
         assertEquals("User", getProfileResult.getName());
-
-        final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 10);
-        builder2.sort(ProfileEntrySearchDescriptor.NAME, Order.DESC);
-        builder2.filter(ProfileEntrySearchDescriptor.PROFILE_ID, userProfileId);
-        final SearchResult<ProfileEntry> searchedProfileEntries2 = getProfileAPI()
-                .searchProfileEntries(builder2.done());
-        assertEquals(USER_PROFILE_ENTRY_COUNT, searchedProfileEntries2.getCount());
     }
 
 }

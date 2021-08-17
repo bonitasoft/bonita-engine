@@ -16,7 +16,14 @@ package org.bonitasoft.engine.page.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +38,21 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.page.*;
-import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.page.AbstractSPage;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.PageServiceListener;
+import org.bonitasoft.engine.page.SContentType;
+import org.bonitasoft.engine.page.SInvalidPageTokenException;
+import org.bonitasoft.engine.page.SInvalidPageZipException;
+import org.bonitasoft.engine.page.SInvalidPageZipInconsistentException;
+import org.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
+import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
+import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
+import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.SPageLogBuilder;
+import org.bonitasoft.engine.page.SPageUpdateBuilder;
+import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
+import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -42,10 +62,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -123,7 +139,6 @@ public class PageServiceImpl implements PageService {
 
     private final QueriableLoggerService queriableLoggerService;
 
-    private final ProfileService profileService;
     private ReadSessionAccessor sessionAccessor;
     private SessionService sessionService;
 
@@ -139,13 +154,11 @@ public class PageServiceImpl implements PageService {
 
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final QueriableLoggerService queriableLoggerService,
-            final ProfileService profileService,
             ReadSessionAccessor sessionAccessor,
             SessionService sessionService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.queriableLoggerService = queriableLoggerService;
-        this.profileService = profileService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         helper = new SPageContentHelper();
@@ -411,57 +424,15 @@ public class PageServiceImpl implements PageService {
     private void deletePage(final SPage sPage) throws SObjectModificationException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.DELETED, "Deleting page named: " + sPage.getName());
         try {
-            deleteProfileEntry(sPage);
             for (final PageServiceListener pageServiceListener : pageServiceListeners) {
                 pageServiceListener.pageDeleted(sPage);
             }
             recorder.recordDelete(new DeleteRecord(sPage), PAGE);
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
-        } catch (SRecorderException | SBonitaReadException | SProfileEntryNotFoundException
-                | SProfileEntryDeletionException | SDeletionException re) {
+        } catch (SRecorderException | SBonitaReadException | SDeletionException re) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(re);
         }
-    }
-
-    private void deleteProfileEntry(final SPage sPage)
-            throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
-        final List<OrderByOption> orderByOptions = Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
-        final List<FilterOption> filters = new ArrayList<>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PAGE, sPage.getName()));
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.CUSTOM, new Boolean(true)));
-
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions,
-                filters, null);
-
-        final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
-        for (final SProfileEntry sProfileEntry : searchProfileEntries) {
-            profileService.deleteProfileEntry(sProfileEntry.getId());
-            if (sProfileEntry.getParentId() > 0) {
-                deleteParentIfNoMoreChildren(sProfileEntry);
-            }
-        }
-    }
-
-    private void deleteParentIfNoMoreChildren(final SProfileEntry sProfileEntry)
-            throws SBonitaReadException, SProfileEntryNotFoundException,
-            SProfileEntryDeletionException {
-        final List<OrderByOption> orderByOptions = Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
-        final List<FilterOption> filters = new ArrayList<>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PROFILE_ID, sProfileEntry.getProfileId()));
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PARENT_ID, sProfileEntry.getParentId()));
-
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions,
-                filters, null);
-
-        final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
-        if (null == searchProfileEntries || searchProfileEntries.isEmpty()) {
-            // no more children
-            profileService.deleteProfileEntry(sProfileEntry.getParentId());
-        }
-
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
@@ -741,10 +712,6 @@ public class PageServiceImpl implements PageService {
     public boolean initialized() {
         // Used only in tests
         return initialized;
-    }
-
-    public List<PageServiceListener> getPageServiceListeners() {
-        return pageServiceListeners;
     }
 
     @Autowired
