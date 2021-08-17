@@ -20,8 +20,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
-import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -41,7 +39,7 @@ public class UpdateDefaultsImportStrategyTest {
 
     @Test
     public void should_whenProfileExists_update_if_default()
-            throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+            throws SProfileUpdateException {
         //when
         SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(false);
@@ -52,7 +50,7 @@ public class UpdateDefaultsImportStrategyTest {
 
     @Test
     public void should_whenProfileExists_update_if_default2()
-            throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+            throws SProfileUpdateException {
         //when
         SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(true);
@@ -63,22 +61,13 @@ public class UpdateDefaultsImportStrategyTest {
 
     @Test
     public void should_whenProfileExists_not_update_if_custom()
-            throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+            throws SProfileUpdateException {
         //when
         SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(false);
         updateDefaultsImportStrategy.whenProfileExists(-1, new ProfileNode("plop", false), sProfile);
 
         verify(profileService, times(0)).updateProfile(any(SProfile.class), any(EntityUpdateDescriptor.class));
-    }
-
-    @Test
-    public void should_shouldUpdateProfileEntries_return_true()
-            throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
-        //when
-        boolean shouldUpdateProfileEntries = updateDefaultsImportStrategy.shouldUpdateProfileEntries(null, null);
-
-        assertThat(shouldUpdateProfileEntries).isTrue();
     }
 
     @Test

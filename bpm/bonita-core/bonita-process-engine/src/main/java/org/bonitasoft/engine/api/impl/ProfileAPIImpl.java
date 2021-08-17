@@ -46,14 +46,13 @@ import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
-import org.bonitasoft.engine.search.profile.SearchProfileEntries;
+import org.bonitasoft.engine.search.impl.SearchResultImpl;
 import org.bonitasoft.engine.search.profile.SearchProfileMembersForProfile;
 import org.bonitasoft.engine.search.profile.SearchProfiles;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -125,18 +124,7 @@ public class ProfileAPIImpl implements ProfileAPI {
     @Override
     public List<Profile> getProfilesWithNavigationForUser(final long userId, final int startIndex, final int maxResults,
             final ProfileCriterion criterion) {
-        if (SessionService.SYSTEM_ID == userId) { // It's the tenant admin user
-            return Collections.emptyList();
-        }
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProfileService profileService = tenantAccessor.getProfileService();
-        try {
-            return ModelConvertor.toProfiles(profileService.searchProfilesWithNavigationOfUser(userId, startIndex,
-                    maxResults, criterion.getField(),
-                    OrderByType.valueOf(criterion.getOrder().name())));
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -231,45 +219,17 @@ public class ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public SearchResult<ProfileEntry> searchProfileEntries(final SearchOptions options) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProfileService profileService = tenantAccessor.getProfileService();
-
-        final SearchProfileEntries searchProfileEntries = new SearchProfileEntries(profileService,
-                tenantAccessor.getSearchEntitiesDescriptor()
-                        .getSearchProfileEntryDescriptor(),
-                options);
-        try {
-            searchProfileEntries.execute();
-            return searchProfileEntries.getResult();
-        } catch (final SBonitaException e) {
-            throw new SearchException(e);
-        }
+        return new SearchResultImpl<>(0, Collections.emptyList());
     }
 
     @Override
     public List<ProfileEntry> getProfileEntries(String profileName) throws ProfileNotFoundException {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ProfileService profileService = tenantAccessor.getProfileService();
-        try {
-            return ModelConvertor.toProfileEntries(profileService.getEntriesOfProfile(profileName));
-        } catch (SBonitaReadException e) {
-            throw new RetrieveException(e);
-        } catch (SProfileNotFoundException e) {
-            throw new ProfileNotFoundException(e);
-        }
+        return Collections.emptyList();
     }
 
     @Override
     public ProfileEntry getProfileEntry(final long id) throws ProfileEntryNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProfileService profileService = tenantAccessor.getProfileService();
-
-        try {
-            return ModelConvertor.toProfileEntry(profileService.getProfileEntry(id));
-        } catch (final SProfileEntryNotFoundException e) {
-            throw new ProfileEntryNotFoundException(e);
-        }
-
+        return null;
     }
 
     @Override

@@ -98,8 +98,6 @@ DELETE FROM sequence WHERE tenantid = ${tenantid}
 GO
 DELETE FROM profilemember WHERE tenantid = ${tenantid}
 GO
-DELETE FROM profileentry WHERE tenantid = ${tenantid}
-GO
 DELETE FROM profile WHERE tenantid = ${tenantid}
 GO
 DELETE FROM job_log WHERE tenantid = ${tenantid}

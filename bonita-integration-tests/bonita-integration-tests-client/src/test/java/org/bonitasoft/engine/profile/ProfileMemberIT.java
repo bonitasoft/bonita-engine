@@ -142,13 +142,6 @@ public class ProfileMemberIT extends AbstractProfileIT {
     }
 
     @Test
-    public void getProfileWithNavigationForUser() throws BonitaException {
-        final List<Profile> profiles = getProfileAPI().getProfilesWithNavigationForUser(user1.getId(), 0, 10,
-                ProfileCriterion.NAME_ASC);
-        assertThat(profiles).hasSize(2).extracting("name").containsExactlyInAnyOrder("Administrator", "User");
-    }
-
-    @Test
     public void getProfileForUserReturnDisctinctProfiles() throws BonitaException {
         // user 1 is mapped to profile "Administrator" through direct "userName1" mapping + through "role1" mapping:
         getIdentityAPI().addUserMembership(user1.getId(), group2.getId(), role1.getId());

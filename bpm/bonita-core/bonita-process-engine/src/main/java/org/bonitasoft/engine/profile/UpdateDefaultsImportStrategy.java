@@ -17,8 +17,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
-import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -39,7 +37,7 @@ public class UpdateDefaultsImportStrategy extends ProfileImportStrategy {
 
     @Override
     public SProfile whenProfileExists(final long importerId, final ProfileNode profile, final SProfile existingProfile)
-            throws SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
+            throws SProfileUpdateException {
         // update profile
         if (profile.isDefault() || existingProfile.isDefault()) {
             // only update LastUpdatedBy and LastUpdateDate
@@ -53,11 +51,6 @@ public class UpdateDefaultsImportStrategy extends ProfileImportStrategy {
     @Override
     public boolean canCreateProfileIfNotExists(final ProfileNode profile) {
         return profile.isDefault();
-    }
-
-    @Override
-    public boolean shouldUpdateProfileEntries(ProfileNode profile, SProfile existingProfile) {
-        return true;
     }
 
     EntityUpdateDescriptor getProfileUpdateDescriptor(final ProfileNode profile, final long importerId,

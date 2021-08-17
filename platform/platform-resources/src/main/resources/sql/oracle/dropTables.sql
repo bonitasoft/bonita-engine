@@ -51,7 +51,6 @@ DROP TABLE queriable_log cascade constraints purge;
 DROP TABLE page cascade constraints purge;
 DROP TABLE blob_ cascade constraints purge;
 DROP TABLE profilemember cascade constraints purge;
-DROP TABLE profileentry cascade constraints purge;
 DROP TABLE profile cascade constraints purge;
 DROP TABLE job_log cascade constraints purge;
 DROP TABLE job_param cascade constraints purge;

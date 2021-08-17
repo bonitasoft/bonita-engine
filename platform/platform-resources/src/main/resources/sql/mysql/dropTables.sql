@@ -51,7 +51,6 @@ DROP TABLE queriable_log;
 DROP TABLE page;
 DROP TABLE blob_;
 DROP TABLE profilemember;
-DROP TABLE profileentry;
 DROP TABLE profile;
 DROP TABLE job_log;
 DROP TABLE job_param;

@@ -49,7 +49,6 @@ DELETE FROM queriable_log;
 DELETE FROM page;
 DELETE FROM sequence WHERE tenantId <> -1;
 DELETE FROM profilemember;
-DELETE FROM profileentry;
 DELETE FROM profile;
 DELETE FROM job_log;
 DELETE FROM job_param;

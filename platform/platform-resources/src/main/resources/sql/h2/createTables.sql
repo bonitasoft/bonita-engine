@@ -930,22 +930,6 @@ CREATE TABLE profile (
   PRIMARY KEY (tenantId, id)
 );
 
-CREATE TABLE profileentry (
-  tenantId BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  profileId BIGINT NOT NULL,
-  name VARCHAR(50),
-  description LONGVARCHAR,
-  parentId BIGINT,
-  index_ BIGINT,
-  type VARCHAR(50),
-  page VARCHAR(255),
-  custom BOOLEAN DEFAULT FALSE,
-  PRIMARY KEY (tenantId, id)
-);
-
-CREATE INDEX indexProfileEntry ON profileentry(tenantId, parentId, profileId);
-
 CREATE TABLE profilemember (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,

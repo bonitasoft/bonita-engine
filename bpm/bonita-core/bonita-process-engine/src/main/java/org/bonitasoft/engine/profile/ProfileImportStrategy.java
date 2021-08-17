@@ -15,7 +15,6 @@ package org.bonitasoft.engine.profile;
 
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
@@ -41,8 +40,8 @@ public abstract class ProfileImportStrategy {
      */
     public abstract SProfile whenProfileExists(final long importerId,
             final ProfileNode profile,
-            final SProfile existingProfile) throws ExecutionException, SProfileEntryDeletionException,
-            SProfileMemberDeletionException, SProfileUpdateException;
+            final SProfile existingProfile)
+            throws ExecutionException, SProfileMemberDeletionException, SProfileUpdateException;
 
     /**
      * return whether the profile can be created if it does not exist
@@ -59,5 +58,4 @@ public abstract class ProfileImportStrategy {
         return profileService;
     }
 
-    public abstract boolean shouldUpdateProfileEntries(ProfileNode profile, SProfile existingProfile);
 }

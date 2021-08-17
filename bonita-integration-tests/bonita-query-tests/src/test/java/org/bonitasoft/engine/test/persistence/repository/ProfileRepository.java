@@ -30,12 +30,6 @@ public class ProfileRepository extends TestRepository {
         super(sessionFactory);
     }
 
-    public List<SProfile> getProfilesWithNavigationOfUser(long userId) {
-        final Query namedQuery = getNamedQuery("getProfilesWithNavigationOfUser");
-        namedQuery.setParameter("userId", userId);
-        return namedQuery.list();
-    }
-
     public List<SProfile> getProfilesOfUser(long userId) {
         final Query namedQuery = getNamedQuery("getProfilesOfUser");
         namedQuery.setParameter("userId", userId);

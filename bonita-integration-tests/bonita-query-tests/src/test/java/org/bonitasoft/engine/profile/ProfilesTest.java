@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.test.persistence.builder.GroupBuilder.aGroup;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileBuilder.aProfile;
-import static org.bonitasoft.engine.test.persistence.builder.ProfileEntryBuilder.aProfileEntry;
 import static org.bonitasoft.engine.test.persistence.builder.ProfileMemberBuilder.aProfileMember;
 import static org.bonitasoft.engine.test.persistence.builder.RoleBuilder.aRole;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
@@ -64,10 +63,9 @@ public class ProfilesTest {
         final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(user.getId()).build());
-        repository.add(aProfileEntry().withProfileId(profile.getId()).build());
 
         // when:
-        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(user.getId());
+        final List<SProfile> profiles = repository.getProfilesOfUser(user.getId());
 
         // then:
         assertThat(profiles).hasSize(1).extracting("id", "name").containsExactly(tuple(profile.getId(), profileName));
@@ -85,10 +83,9 @@ public class ProfilesTest {
         final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withRoleId(role.getId()).build());
-        repository.add(aProfileEntry().withProfileId(profile.getId()).build());
 
         // when:
-        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(user.getId());
+        final List<SProfile> profiles = repository.getProfilesOfUser(user.getId());
 
         // then:
         assertThat(profiles).hasSize(1).extracting("id", "name").containsExactly(tuple(profile.getId(), profileName));
@@ -104,7 +101,7 @@ public class ProfilesTest {
         repository.add(aProfileMember().withProfileId(profile.getId()).withRoleId(role.getId()).build());
 
         // when:
-        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(-1);
+        final List<SProfile> profiles = repository.getProfilesOfUser(-1);
 
         // then:
         assertThat(profiles).hasSize(0);
@@ -122,10 +119,9 @@ public class ProfilesTest {
         final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withGroupId(group.getId()).build());
-        repository.add(aProfileEntry().withProfileId(profile.getId()).build());
 
         // when:
-        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(user.getId());
+        final List<SProfile> profiles = repository.getProfilesOfUser(user.getId());
 
         // then:
         assertThat(profiles).hasSize(1).extracting("id", "name").containsExactly(tuple(profile.getId(), profileName));
@@ -146,10 +142,9 @@ public class ProfilesTest {
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withGroupId(group.getId())
                 .withRoleId(role.getId()).build());
-        repository.add(aProfileEntry().withProfileId(profile.getId()).build());
 
         // when:
-        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(user.getId());
+        final List<SProfile> profiles = repository.getProfilesOfUser(user.getId());
 
         // then:
         assertThat(profiles).hasSize(1).extracting("id", "name").containsExactly(tuple(profile.getId(), profileName));
@@ -163,27 +158,9 @@ public class ProfilesTest {
         final String profileName = "should not be retrieved";
         final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
-        repository.add(aProfileEntry().withProfileId(profile.getId()).build());
 
         // when:
-        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(user.getId());
-
-        // then:
-        assertThat(profiles).hasSize(0);
-    }
-
-    @Test
-    public void profile_with_user_mapped_but_without_navigation_should_not_be_retrieved() {
-        // given:
-        final SUser user = aUser().build();
-        repository.add(user);
-        final String profileName = "should not be retrieved";
-        final SProfile profile = aProfile().withName(profileName).build();
-        repository.add(profile);
-        repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(user.getId()).build());
-
-        // when:
-        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(user.getId());
+        final List<SProfile> profiles = repository.getProfilesOfUser(user.getId());
 
         // then:
         assertThat(profiles).hasSize(0);
@@ -199,10 +176,9 @@ public class ProfilesTest {
         final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(userMapped.getId()).build());
-        repository.add(aProfileEntry().withProfileId(profile.getId()).build());
 
         // when:
-        final List<SProfile> profiles = repository.getProfilesWithNavigationOfUser(userAsked.getId());
+        final List<SProfile> profiles = repository.getProfilesOfUser(userAsked.getId());
 
         // then:
         assertThat(profiles).hasSize(0);

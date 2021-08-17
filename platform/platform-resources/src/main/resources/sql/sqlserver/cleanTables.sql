@@ -98,8 +98,6 @@ DELETE FROM sequence WHERE tenantId <> -1
 GO
 DELETE FROM profilemember
 GO
-DELETE FROM profileentry
-GO
 DELETE FROM profile
 GO
 DELETE FROM job_log

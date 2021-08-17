@@ -42,9 +42,4 @@ public class FailOnDuplicateImportStrategy extends ProfileImportStrategy {
         return true;
     }
 
-    @Override
-    public boolean shouldUpdateProfileEntries(ProfileNode profile, SProfile existingProfile) {
-        return false;
-    }
-
 }

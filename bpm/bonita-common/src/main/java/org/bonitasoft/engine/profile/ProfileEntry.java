@@ -27,7 +27,9 @@ import org.bonitasoft.engine.page.Page;
  * @author Emmanuel Duchastenier
  * @author Julien Mege
  * @author Anthony Birembaut
+ * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
  */
+@Deprecated(since = "7.13.0", forRemoval = true)
 public interface ProfileEntry extends NamedElement, BaseElement {
 
     /**

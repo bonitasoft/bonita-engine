@@ -14,17 +14,11 @@
 package org.bonitasoft.engine.profile;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.junit.Test;
@@ -60,27 +54,6 @@ public class ProfilesExporterTest {
         //then
         assertThat(exportedProfiles.getProfiles()).containsOnly(new ProfileNode("MyProfile1", false),
                 new ProfileNode("MyProfile2", false));
-    }
-
-    @Test
-    public void should_convert_profile_having_profile_entry_to_exported_version() throws Exception {
-        //given
-        SProfile profile1 = SProfile.builder().build();
-        profile1.setName("MyProfile1");
-        profile1.setId(12L);
-        SProfileEntry sProfileEntry1 = SProfileEntry.builder().build();
-        sProfileEntry1.setName("p1");
-        SProfileEntry sProfileEntry2 = SProfileEntry.builder().build();
-        sProfileEntry2.setName("p2");
-        doReturn(Arrays.asList(sProfileEntry1, sProfileEntry2)).doReturn(Collections.emptyList()).when(profileService)
-                .searchProfileEntries(any(QueryOptions.class));
-        //when
-        ProfilesNode exportedProfiles = profilesExporter.toProfiles(Collections.singletonList((SProfile) profile1));
-        //then
-        ProfileNode myProfile1 = new ProfileNode("MyProfile1", false);
-        myProfile1.setParentProfileEntries(
-                Arrays.asList(new ParentProfileEntryNode("p1"), new ParentProfileEntryNode("p2")));
-        assertThat(exportedProfiles.getProfiles()).containsOnly(myProfile1);
     }
 
 }
