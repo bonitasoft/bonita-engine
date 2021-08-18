@@ -36,4 +36,13 @@ public class ProfilesParser extends AbstractParser<ProfilesNode> {
         return ProfilesParser.class.getResource("/profiles.xsd");
     }
 
+    @Override
+    public String convert(ProfilesNode model) throws JAXBException {
+        // Do a clone by serializing of the original object to avoid modifying it
+        // we could have used org.apache.commons.lang3.SerializationUtils but it does the same thing using java serialization
+        ProfilesNode clone = convert(super.convert(model));
+        // Unset all profile entries before export
+        clone.getProfiles().forEach(p -> p.setParentProfileEntries(null));
+        return super.convert(clone);
+    }
 }
