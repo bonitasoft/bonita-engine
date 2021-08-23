@@ -271,8 +271,6 @@
         <property name="sourceList">
             <list>
                 <ref bean="canStartProcessDefinition" />
-                <ref bean="importProfiles" />
-                <ref bean="exportDefaultProfiles" />
                 <ref bean="isAllowedToStartProcess" />
                 <ref bean="isAllowedToSeeOverviewForm" />
                 <ref bean="searchSCommentSupervisedBy" />
@@ -332,30 +330,6 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.command.ExecuteBDMQueryCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="importProfiles" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>importProfilesCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Import profiles, profileEntries and profile mappings</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.web.profile.command.ImportProfilesCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="exportDefaultProfiles" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>exportDefaultProfilesCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Export default profiles</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.web.profile.command.ExportDefaultProfilesCommand</value>
         </constructor-arg>
     </bean>
 

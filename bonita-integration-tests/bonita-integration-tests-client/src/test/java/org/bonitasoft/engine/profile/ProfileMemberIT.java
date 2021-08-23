@@ -134,7 +134,7 @@ public class ProfileMemberIT extends AbstractProfileIT {
     }
 
     @Test
-    public void getProfileForUser() throws BonitaException {
+    public void getProfileForUser() {
         // Get Profile For User
         final List<Profile> profiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10,
                 ProfileCriterion.NAME_ASC);
@@ -180,28 +180,20 @@ public class ProfileMemberIT extends AbstractProfileIT {
 
     @Test
     public void getProfileForUserFromRoleAndGroup() throws BonitaException {
-        getIdentityAPI().addUserMembership(user5.getId(), group3.getId(), role3.getId());
-        getIdentityAPI().addUserMembership(user2.getId(), group2.getId(), role3.getId());
-        getIdentityAPI().addUserMembership(user3.getId(), group3.getId(), role2.getId());
+        getIdentityAPI().addUserMembership(user5.getId(), group1.getId(), role2.getId());
+        getIdentityAPI().addUserMembership(user2.getId(), group1.getId(), role3.getId());
 
-        // Get Profile For User
-        List<Profile> userProfiles = getProfileAPI().getProfilesForUser(user5.getId(), 0, 10,
-                ProfileCriterion.NAME_ASC);
-        assertEquals(1, userProfiles.size());
-        assertEquals("Process owner", userProfiles.get(0).getName());
+        // User2 have membership group1 + role3 and does not match a profile member of administrator profile:
+        assertThat(getProfileAPI().getProfilesForUser(user2.getId(), 0, 10, ProfileCriterion.NAME_ASC))
+                .noneMatch(p -> p.getName().equals("Administrator"));
 
-        // For profile "Process owner", good group, but bad role:
-        userProfiles = getProfileAPI().getProfilesForUser(user2.getId(), 0, 10, ProfileCriterion.NAME_ASC);
-        assertEquals(0, userProfiles.size());
-
-        // For profile "Process owner", good role, but bad group:
-        userProfiles = getProfileAPI().getProfilesForUser(user3.getId(), 0, 10, ProfileCriterion.NAME_ASC);
-        assertEquals(1, userProfiles.size());
-        assertEquals("Administrator", userProfiles.get(0).getName());
+        // User5 have membership group1 + role2 and matches a profile member of administrator profile:
+        assertThat(getProfileAPI().getProfilesForUser(user5.getId(), 0, 10, ProfileCriterion.NAME_ASC))
+                .anyMatch(p -> p.getName().equals("Administrator"));
     }
 
     @Test
-    public void getProfilesForUserWithWrongParameter() throws Exception {
+    public void getProfilesForUserWithWrongParameter() {
         final List<Profile> profilesForUser = getProfileAPI().getProfilesForUser(564162L, 0, 10,
                 ProfileCriterion.NAME_ASC);
         assertEquals(0, profilesForUser.size());
@@ -341,13 +333,13 @@ public class ProfileMemberIT extends AbstractProfileIT {
     @Test
     public void searchUserProfileMembersOfRoleAndGroup() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(ProfileMemberSearchDescriptor.ROLE_ID, role3.getId());
-        builder.filter(ProfileMemberSearchDescriptor.GROUP_ID, group3.getId());
+        builder.filter(ProfileMemberSearchDescriptor.ROLE_ID, role2.getId());
+        builder.filter(ProfileMemberSearchDescriptor.GROUP_ID, group2.getId());
         final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("roleAndGroup",
                 builder.done());
         assertEquals(1, searchedProfileMember.getResult().size());
-        assertEquals("role3", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
-        assertEquals("group3", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
+        assertEquals("role2", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
+        assertEquals("group2", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
     }
 
 }

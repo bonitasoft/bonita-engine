@@ -44,11 +44,11 @@ public class ProfileIT extends AbstractProfileIT {
         List<String> profilesOfUser5 = getProfilesFromSession(this.user5, "User5Pwd");
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
-        //Theses profiles are the one mapped in the AllProfiles.xml test file
+        //Theses profiles are the one mapped in the AbstractProfileIT's before
         assertThat(profilesOfUser1).containsExactlyInAnyOrder("Administrator", "User");
         assertThat(profilesOfUser2).isEmpty();
         assertThat(profilesOfUser3).isEmpty();
-        assertThat(profilesOfUser4).containsExactlyInAnyOrder("Team manager");
+        assertThat(profilesOfUser4).isEmpty();
         assertThat(profilesOfUser5).isEmpty();
     }
 
@@ -65,7 +65,7 @@ public class ProfileIT extends AbstractProfileIT {
         builder.sort(ProfileSearchDescriptor.NAME, Order.DESC);
 
         final SearchResult<Profile> searchedProfiles = getProfileAPI().searchProfiles(builder.done());
-        assertEquals(4, searchedProfiles.getCount());
+        assertEquals(2, searchedProfiles.getCount());
         assertEquals("User", searchedProfiles.getResult().get(0).getName());
     }
 
