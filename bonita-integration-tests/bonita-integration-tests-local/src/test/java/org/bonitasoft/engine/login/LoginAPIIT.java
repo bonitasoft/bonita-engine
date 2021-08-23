@@ -13,32 +13,23 @@
  **/
 package org.bonitasoft.engine.login;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
+import lombok.SneakyThrows;
 import org.bonitasoft.engine.CommonAPIIT;
-import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.command.CommandExecutionException;
-import org.bonitasoft.engine.command.CommandNotFoundException;
-import org.bonitasoft.engine.command.CommandParameterizationException;
-import org.bonitasoft.engine.command.DependencyNotFoundException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.platform.LoginException;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
@@ -50,8 +41,6 @@ import org.junit.Test;
  * @author Elias Ricken de Medeiros
  */
 public class LoginAPIIT extends CommonAPIIT {
-
-    private static final String DELETE_SESSION_COMMAND = "deleteSessionCommand";
 
     private static PlatformSession platformSession;
 
@@ -78,16 +67,12 @@ public class LoginAPIIT extends CommonAPIIT {
         getLoginAPI().logout(getSession());
     }
 
-    private void deleteSession(final long sessionId)
-            throws IOException, AlreadyExistsException, CreationException, CreationException,
-            CommandNotFoundException, CommandParameterizationException, CommandExecutionException, DeletionException,
-            DependencyNotFoundException,
-            BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        // execute a command to delete a session
-        final Map<String, Serializable> parameters = new HashMap<>();
-        parameters.put("sessionId", sessionId);
-        final CommandAPI commandAPI = getCommandAPI();
-        commandAPI.execute(DELETE_SESSION_COMMAND, parameters);
+    @SneakyThrows
+    private void deleteSession(final long sessionId) {
+        long tenantId = getApiClient().getSession().getTenantId();
+        ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId)
+                .getSessionService()
+                .deleteSession(sessionId);
     }
 
     @Test(expected = LoginException.class)

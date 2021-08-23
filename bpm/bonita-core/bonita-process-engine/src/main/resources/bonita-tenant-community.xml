@@ -271,20 +271,10 @@
         <property name="sourceList">
             <list>
                 <ref bean="canStartProcessDefinition" />
-                <ref bean="isInvolvedInHumanTask" />
                 <ref bean="importProfiles" />
                 <ref bean="exportDefaultProfiles" />
-                <ref bean="isUserProcessSupervisor" />
-                <ref bean="createSupervisor" />
-                <ref bean="getSupervisor" />
-                <ref bean="deleteSupervisor" />
-                <ref bean="searchProcessSupervisors" />
                 <ref bean="isAllowedToStartProcess" />
                 <ref bean="isAllowedToSeeOverviewForm" />
-                <ref bean="isAllowedToSeeInstanciationForm" />
-                <ref bean="searchAssignedTasksSupervisedBy" />
-                <ref bean="searchArchivedTasksSupervisedBy" />
-                <ref bean="searchProcessDefinitionsSupervisedBy" />
                 <ref bean="searchSCommentSupervisedBy" />
                 <ref bean="isAllowedToStartProcesses" />
                 <ref bean="addEntityMemberCommand" />
@@ -299,7 +289,6 @@
                 <ref bean="getBusinessDataByIdsCommand" />
                 <ref bean="getBusinessDataByQueryCommand" />
                 <ref bean="multipleStartPointsProcessCommand" />
-                <ref bean="deleteSessionCommand" />
             </list>
         </property>
     </bean>
@@ -312,17 +301,6 @@
         </property>
     </bean>
 
-    <bean id="deleteSessionCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>deleteSessionCommand</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Deletes a tenant session based on its sessionId</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.command.DeleteSessionCommand</value>
-        </constructor-arg>
-    </bean>
 
     <bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.api.impl.CommandProvider">
         <property name="defaultCommands" ref="commandsToDeployAtStartup" />
@@ -342,20 +320,6 @@
         </constructor-arg>
     </bean>
 
-    <bean id="isInvolvedInHumanTask" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>isInvolvedInHumanTask</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Return true if a user is involved in a specific human task, false otherwise. Use parameter key
-                USER_ID_KEY and HUMAN_TASK_INSTANCE_ID_KEY
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.permission.IsInvolvedInHumanTask</value>
-        </constructor-arg>
-    </bean>
-
     <bean id="executeBDMQuery" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>executeBDMQuery</value>
@@ -368,68 +332,6 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.command.ExecuteBDMQueryCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="isUserProcessSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>isUserProcessSupervisor</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Get if the user a supervisor of processDefinition. Use parameter keys USER_ID_KEY,
-                PROCESS_DEFINITION_ID_KEY
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.process.IsUserProcessSupervisor</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="createSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>createSupervisor</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Create process supervisor.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.process.CreateSupervisor</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="getSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>getSupervisor</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Get process supervisor. Use parameter key SUPERVISOR_ID_KEY</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.process.GetSupervisor</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="deleteSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>deleteSupervisor</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Delete process supervisor. Use parameter key SUPERVISOR_ID_KEY</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.process.DeleteSupervisor</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="searchProcessSupervisors" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>searchProcessSupervisors</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Search process supervisor for process definition.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.process.SearchProcessSupervisors</value>
         </constructor-arg>
     </bean>
 
@@ -481,57 +383,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="isAllowedToSeeInstanciationForm" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>isAllowedToSeeInstanciationForm</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Check if one of many actors can be allowed to read Instanciation form.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.permission.IsAllowedToSeeInstanciationForm</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="searchAssignedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>searchAssignedTasksSupervisedBy</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Returns the list of assigned user tasks of process definition supervised by a user.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.task.supervisor.SearchAssignedTasksSupervisedBy</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="searchArchivedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>searchArchivedTasksSupervisedBy</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Returns the list of archived user tasks of process definition supervised by a user. Use parameter
-                keys SUPERVISOR_ID_KEY: id of the supervisor,
-                SEARCH_OPTIONS_KEY: the object containing all the search parameters
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.task.supervisor.SearchArchivedTasksSupervisedBy</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="searchProcessDefinitionsSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>searchProcessDefinitionsSupervisedBy</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Searching processeDefinitions whose supervisor is the specified user.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.supervisor.SearchProcessDefinitionsSupervisedBy</value>
-        </constructor-arg>
-    </bean>
-
+    <!-- Used in bonita-web org.bonitasoft.web.rest.server.datastore.bpm.cases.CommentDatastore#runSupervisorSearch -->
     <bean id="searchSCommentSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>searchSCommentSupervisedBy</value>
@@ -635,6 +487,7 @@
         </constructor-arg>
     </bean>
 
+    <!-- Used in tests only, TODO: Remove it-->
     <bean id="searchWaitingEventsCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>searchWaitingEventsCommand</value>
