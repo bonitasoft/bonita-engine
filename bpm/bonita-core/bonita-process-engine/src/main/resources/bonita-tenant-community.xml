@@ -270,11 +270,7 @@
     <bean id="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list>
-                <ref bean="canStartProcessDefinition" />
-                <ref bean="isAllowedToStartProcess" />
-                <ref bean="isAllowedToSeeOverviewForm" />
                 <ref bean="searchSCommentSupervisedBy" />
-                <ref bean="isAllowedToStartProcesses" />
                 <ref bean="addEntityMemberCommand" />
                 <ref bean="removeEntityMemberCommand" />
                 <ref bean="searchEntityMembersCommand" />
@@ -304,20 +300,6 @@
         <property name="defaultCommands" ref="commandsToDeployAtStartup" />
     </bean>
 
-    <bean id="canStartProcessDefinition" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>canStartProcessDefinition</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Return true if the user can start the process, false otherwise. Use parameter key USER_ID_KEY and
-                PROCESS_DEFINITION_ID_KEY
-            </value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.permission.CanStartProcessDefinition</value>
-        </constructor-arg>
-    </bean>
-
     <bean id="executeBDMQuery" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>executeBDMQuery</value>
@@ -330,30 +312,6 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.command.ExecuteBDMQueryCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="isAllowedToStartProcess" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>isAllowedToStartProcess</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Check if one of many actors can be allowed to start process.(who's the process Initiator)</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.permission.IsAllowedToStartProcess</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="isAllowedToSeeOverviewForm" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>isAllowedToSeeOverviewForm</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Check if one of many actors can be allowed to read overview form.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.permission.IsAllowedToSeeOverviewForm</value>
         </constructor-arg>
     </bean>
 
@@ -370,18 +328,6 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.external.comment.SearchCommentsSupervisedBy</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="isAllowedToStartProcesses" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>isAllowedToStartProcesses</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Check if the user can be allowed to start all of processes.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.external.permission.IsAllowedToStartProcesses</value>
         </constructor-arg>
     </bean>
 
