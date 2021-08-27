@@ -16,9 +16,11 @@ package org.bonitasoft.engine.classloader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 
 /**
@@ -40,10 +43,11 @@ import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
  * @author Matthieu Chaffotte
  */
 @Slf4j
-public class BonitaClassLoader extends MonoParentJarFileClassLoader {
+public class BonitaClassLoader extends URLClassLoader {
 
     private final ClassLoaderIdentifier id;
     protected Map<String, File> nonJarResources;
+    // that directory contains the jars and resources given in the constructor
     private final File temporaryDirectory;
     private boolean isActive = true;
     private final Instant creationTime = Instant.now();
@@ -55,6 +59,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         super(id.getType().name() + "__" + id.getId(), jars.stream().map(BonitaClassLoader::toURL).toArray(URL[]::new),
                 parent);
         this.id = id;
+        //TODO: These non-jar resources might be added along with jars without having to do special handling
         this.nonJarResources = new HashMap<>(nonJarResources);
         this.temporaryDirectory = temporaryDirectory;
         if (parent instanceof BonitaClassLoader) {
@@ -136,10 +141,21 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
             //The parent is not a BonitaClassloader when we are on the Global classloader
             ((BonitaClassLoader) parent).children.remove(this);
         }
-        super.destroy();
+        try {
+            super.close();
+        } catch (IOException e) {
+            log.warn("Unable to close the classloader {}. Some file might still be present in {}. Cause {}", id,
+                    temporaryDirectory.getAbsolutePath(),
+                    ExceptionUtils.printLightWeightStacktrace(e));
+            log.debug("Full cause:", e);
+        }
         FileUtils.deleteQuietly(temporaryDirectory);
         isActive = false;
         log.debug("Destroyed {}", this);
+    }
+
+    public boolean isDestroyed() {
+        return !isActive;
     }
 
     public ClassLoaderIdentifier getIdentifier() {

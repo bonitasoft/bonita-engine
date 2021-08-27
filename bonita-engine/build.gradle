@@ -55,7 +55,6 @@ dependencyManagement {
         dependency "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
         dependency "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
         dependency "org.javassist:javassist:${Deps.javassistVersion}"
-        dependency "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
         dependencySet(group: 'org.apache.httpcomponents', version: Deps.httpComponentsVersion) {
             entry 'httpclient'
             entry 'httpmime'
