@@ -62,7 +62,7 @@ subprojects {
     testlogger {
         showFullStackTraces false
         showCauses true
-        showPassed false
+        showPassed true
         showSkipped true
         showSummary false
     }
