@@ -38,6 +38,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
