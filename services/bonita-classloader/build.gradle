@@ -8,7 +8,6 @@ dependencies {
     compile project(':services:bonita-builder')
     compile project(':services:bonita-persistence')
     compile project(':services:bonita-log')
-    compile "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
     compile("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")

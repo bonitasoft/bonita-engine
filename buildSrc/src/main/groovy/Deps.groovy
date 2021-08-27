@@ -38,7 +38,6 @@ class Deps {
     public static String narayanaVersion = "5.10.6.Final"
     public static String jaxbVersion = "2.3.1"
     public static String logbackVersion = "1.2.3"
-    public static String xbeanClassloaderVersion = "3.7"
     public static String javaxAnnotationsVersion = "1.3.2"
 
     // extensions versions
