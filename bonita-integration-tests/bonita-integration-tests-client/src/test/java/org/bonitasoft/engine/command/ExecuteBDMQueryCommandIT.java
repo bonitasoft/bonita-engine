@@ -154,6 +154,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("Tenant is paused?").isFalse();
         getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         getTenantAdministrationAPI().installBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
         logoutOnTenant();
