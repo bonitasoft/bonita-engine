@@ -137,6 +137,7 @@ public class ClassLoaderIT extends TestWithUser {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildCustomBOM());
         getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         systemOutRule.clearLog();
         getTenantAdministrationAPI().installBusinessDataModel(zip);
         String deployBDMLog = systemOutRule.getLog();
