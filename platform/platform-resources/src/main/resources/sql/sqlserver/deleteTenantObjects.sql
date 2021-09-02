@@ -54,11 +54,13 @@ DELETE FROM report WHERE tenantid = ${tenantid}
 GO
 DELETE FROM processsupervisor WHERE tenantid = ${tenantid}
 GO
-DELETE FROM business_app WHERE tenantid = ${tenantid}
+DELETE FROM business_app_menu WHERE tenantid = ${tenantid} AND parentId IS NOT NULL
+GO
+DELETE FROM business_app_menu WHERE tenantid = ${tenantid}
 GO
 DELETE FROM business_app_page WHERE tenantid = ${tenantid}
 GO
-DELETE FROM business_app_menu WHERE tenantid = ${tenantid}
+DELETE FROM business_app WHERE tenantid = ${tenantid}
 GO
 DELETE FROM command WHERE tenantid = ${tenantid}
 GO

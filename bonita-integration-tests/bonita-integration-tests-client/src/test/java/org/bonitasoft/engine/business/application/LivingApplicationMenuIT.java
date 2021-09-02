@@ -238,7 +238,7 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Test(expected = ApplicationMenuNotFoundException.class)
+    @Test
     public void deleteApplicationMenu_should_remove_the_applicationMenu_identified_by_the_given_id() throws Exception {
         //given
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(application.getId(), "Main", appPage.getId());
@@ -248,7 +248,31 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
         getLivingApplicationAPI().deleteApplicationMenu(createdAppMenu.getId());
 
         //then
-        getLivingApplicationAPI().getApplicationMenu(createdAppMenu.getId()); //throws exception
+        verifyNotExists(createdAppMenu);
+    }
+
+    @Test
+    public void deleteApplicationMenu_should_remove_sub_menus() throws Exception {
+        //given
+        Application application = getLivingApplicationAPI()
+                .createApplication(new ApplicationCreator("app2", "My secpond app", "1.0"));
+        ApplicationPage appPage = getLivingApplicationAPI().createApplicationPage(application.getId(),
+                getPage().getId(), "myPage");
+        ApplicationMenu mainMenu = getLivingApplicationAPI()
+                .createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main"));
+        ApplicationMenu mainMenu2 = getLivingApplicationAPI()
+                .createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main2"));
+        ApplicationMenu subMenu = getLivingApplicationAPI().createApplicationMenu(
+                new ApplicationMenuCreator(application.getId(), "Main", appPage.getId()).setParentId(mainMenu.getId()));
+
+        //when
+        getLivingApplicationAPI().deleteApplicationMenu(mainMenu.getId());
+
+        //then
+        verifyNotExists(mainMenu);
+        verifyNotExists(subMenu);
+        verifyExists(mainMenu2);
+        verifyExists(appPage);
     }
 
     @Test
@@ -304,6 +328,11 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
     private void verifyExists(ApplicationMenu applicationMenu) throws ApplicationMenuNotFoundException {
         ApplicationMenu retrievedMenu = getLivingApplicationAPI().getApplicationMenu(applicationMenu.getId());
         assertThat(retrievedMenu).isNotNull();
+    }
+
+    private void verifyExists(ApplicationPage applicationPage) throws ApplicationPageNotFoundException {
+        ApplicationPage retrievedAppPage = getLivingApplicationAPI().getApplicationPage(applicationPage.getId());
+        assertThat(retrievedAppPage).isNotNull();
     }
 
     private void verifyNotExists(ApplicationMenu applicationMenu) {
