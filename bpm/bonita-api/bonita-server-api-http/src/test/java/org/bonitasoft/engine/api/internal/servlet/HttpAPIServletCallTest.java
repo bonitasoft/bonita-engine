@@ -80,7 +80,7 @@ public class HttpAPIServletCallTest {
         //then:
         assertThat(response.getStatus()).as("Response status").isEqualTo(200);
         assertThat(response.getContentType()).as("Response content type").isEqualTo("application/xml;charset=UTF-8");
-        assertThat(response.getContentAsString()).as("Response content").isXmlEqualTo("<object-stream>" +
+        assertThat(response.getContentAsString()).as("Response content").isEqualToIgnoringWhitespace("<object-stream>" +
                 "  <org.bonitasoft.engine.session.impl.APISessionImpl>" +
                 "    <id>-2241174137745053814</id>" +
                 "    <creationDate>2018-06-07 15:10:09.132 UTC</creationDate>" +
