@@ -20,7 +20,7 @@ class Deps {
     public static String groovyAllVersion = "2.4.20"
     public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
     public static String httpComponentsVersion = "4.5.12"
-    public static String xstreamVersion = "1.4.17"
+    public static String xstreamVersion = "1.4.18"
     public static String ehcacheVersion = "2.10.9.2"
     public static String eclipseCompilerVersion = "3.20.0"
     public static String jbcryptVersion = "0.4"
@@ -31,7 +31,7 @@ class Deps {
     public static String mysqlVersion = "8.0.14"
     public static String mssqlVersion = "8.4.1.jre8"
     public static String oracleVersion = "19.3.0.0"
-    public static String postgresqlVersion = "42.2.5"
+    public static String postgresqlVersion = "42.2.13"
     public static String lombokVersion = "1.18.12"
 
     public static String narayanaVersion = "5.10.6.Final"
