@@ -42,6 +42,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -70,7 +71,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private final ClassLoaderUpdater classLoaderUpdater;
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver,
-            final EventService eventService, PlatformDependencyService platformDependencyService,
+            @Qualifier("platformEventService") EventService eventService,
+            PlatformDependencyService platformDependencyService,
             SessionAccessor sessionAccessor,
             UserTransactionService userTransactionService, BroadcastService broadcastService,
             ClassLoaderUpdater classLoaderUpdater, List<PlatformClassLoaderListener> platformClassLoaderListeners) {
