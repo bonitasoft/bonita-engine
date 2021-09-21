@@ -1095,6 +1095,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         try {
             deleteGroup.execute();
             updateActorProcessDependencies(tenantAccessor, actorMappingService, deleteGroup.getRemovedActorIds());
+        } catch (final SGroupNotFoundException sgnfe) {
+            throw new DeletionException(new GroupNotFoundException(sgnfe));
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -1115,6 +1117,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                         groupIds);
                 deleteGroups.execute();
                 updateActorProcessDependencies(tenantAccessor, actorMappingService, deleteGroups.getRemovedActorIds());
+            } catch (final SGroupNotFoundException sgnfe) {
+                throw new DeletionException(new GroupNotFoundException(sgnfe));
             } catch (final SBonitaException e) {
                 throw new DeletionException(e);
             }

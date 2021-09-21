@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
+import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -32,6 +35,7 @@ import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -237,8 +241,13 @@ public class GroupIT extends TestWithTechnicalUser {
         assertEquals(numberOfGroups, getIdentityAPI().getNumberOfGroups());
     }
 
-    @Test(expected = DeletionException.class)
-    public void deleteGroupNotFoundException() throws BonitaException {
+    @Test
+    public void deleteGroupNotFoundException() throws Exception {
+        expectedException.expect(DeletionException.class);
+        //Exception causes are not serialized if API type is HTTP
+        if (ApiAccessType.LOCAL.equals(APITypeManager.getAPIType())) {
+            expectedException.expectCause(is(instanceOf(GroupNotFoundException.class)));
+        }
         getIdentityAPI().deleteGroup(0);
     }
 

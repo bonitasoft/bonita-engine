@@ -15,6 +15,7 @@ package org.bonitasoft.engine.process.instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.util.Lists;
+import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.comment.Comment;
@@ -54,6 +56,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
+import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -152,9 +155,14 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test(expected = DeletionException.class)
+    @Test
     public void deleteUnknownProcessInstance() throws Exception {
-        getProcessAPI().deleteProcessInstance(123456789123L);
+        Throwable exception = assertThrows(DeletionException.class,
+                () -> getProcessAPI().deleteProcessInstance(123456789123L));
+        //Exception causes are not serialized if API type is HTTP
+        if (ApiAccessType.LOCAL.equals(APITypeManager.getAPIType())) {
+            assertTrue(exception.getCause() instanceof ProcessInstanceNotFoundException);
+        }
     }
 
     @Test

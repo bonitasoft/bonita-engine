@@ -36,16 +36,9 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.profile.ProfileCriterion;
-import org.bonitasoft.engine.profile.ProfileEntry;
-import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
-import org.bonitasoft.engine.profile.ProfileMember;
-import org.bonitasoft.engine.profile.ProfileMemberCreator;
-import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
-import org.bonitasoft.engine.profile.ProfileNotFoundException;
-import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.*;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -371,6 +364,8 @@ public class ProfileAPIImpl implements ProfileAPI {
             final SProfileMember profileMember = profileService.getProfileMemberWithoutDisplayName(profileMemberId);
             profileService.updateProfileMetaData(profileMember.getProfileId());
             profileService.deleteProfileMember(profileMember.getId());
+        } catch (final SProfileMemberNotFoundException spmnfe) {
+            throw new DeletionException(new ProfileMemberNotFoundException(spmnfe));
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

@@ -110,6 +110,8 @@ public class LivingApplicationMenuAPIDelegate {
             final SApplicationMenu deletedApplicationMenu = applicationService.deleteApplicationMenu(applicationMenuId);
             applicationService.updateApplication(deletedApplicationMenu.getApplicationId(),
                     new SApplicationUpdateBuilder(loggedUserId).done());
+        } catch (final SObjectNotFoundException sonfe) {
+            throw new DeletionException(new ApplicationMenuNotFoundException(sonfe.getMessage()));
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
