@@ -177,6 +177,8 @@ public class PageAPIDelegate {
             for (final Long processDefinitionId : processDefinitionIds) {
                 updateProcessResolution(processDefinitionId);
             }
+        } catch (final SObjectNotFoundException sonfe) {
+            throw new DeletionException(new PageNotFoundException(sonfe));
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

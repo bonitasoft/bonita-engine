@@ -123,6 +123,8 @@ public class LivingApplicationAPIDelegate {
     public void deleteApplication(final long applicationId) throws DeletionException {
         try {
             applicationService.deleteApplication(applicationId);
+        } catch (final SObjectNotFoundException sonfe) {
+            throw new DeletionException(new ApplicationNotFoundException(applicationId));
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

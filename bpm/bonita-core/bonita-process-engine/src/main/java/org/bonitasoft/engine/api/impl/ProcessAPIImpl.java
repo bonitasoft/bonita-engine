@@ -198,6 +198,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
+import org.bonitasoft.engine.bpm.supervisor.SupervisorNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -503,6 +504,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
             checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasArchivedProcessInstances);
             processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
+        } catch (final SProcessDefinitionNotFoundException spdnfe) {
+            throw new DeletionException(new ProcessDefinitionNotFoundException(spdnfe));
         } catch (final Exception e) {
             throw new DeletionException(e);
         }
@@ -1924,6 +1927,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final DeleteSCategory deleteSCategory = new DeleteSCategory(categoryService, categoryId);
         try {
             deleteSCategory.execute();
+        } catch (final SCategoryNotFoundException scnfe) {
+            throw new DeletionException(new CategoryNotFoundException(scnfe));
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -3912,8 +3917,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             deleteProcessInstanceInTransaction(tenantAccessor, processInstanceId);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (final SProcessInstanceNotFoundException e) {
-            throw new DeletionException(e);
+        } catch (final SProcessInstanceNotFoundException spinfe) {
+            throw new DeletionException(new ProcessInstanceNotFoundException(spinfe));
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         } finally {
@@ -4320,8 +4325,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                 technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
                         "The process manager has been deleted with id = <" + supervisorId + ">.");
             }
-        } catch (final SSupervisorNotFoundException e) {
-            throw new DeletionException("The process manager was not found with id = <" + supervisorId + ">");
+        } catch (final SSupervisorNotFoundException spsnfe) {
+            throw new DeletionException(new SupervisorNotFoundException(
+                    "The process manager was not found with id = <" + supervisorId + ">"));
         } catch (final SSupervisorDeletionException e) {
             throw new DeletionException(e);
         }

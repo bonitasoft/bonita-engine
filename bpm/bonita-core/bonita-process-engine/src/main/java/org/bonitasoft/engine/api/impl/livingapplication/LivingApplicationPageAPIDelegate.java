@@ -129,6 +129,8 @@ public class LivingApplicationPageAPIDelegate {
             final SApplicationPage deletedApplicationPage = applicationService.deleteApplicationPage(applicationPageId);
             final SApplicationUpdateBuilder appBbuilder = new SApplicationUpdateBuilder(loggedUserId);
             applicationService.updateApplication(deletedApplicationPage.getApplicationId(), appBbuilder.done());
+        } catch (final SObjectNotFoundException sonfe) {
+            throw new DeletionException(new ApplicationPageNotFoundException(sonfe.getMessage()));
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
