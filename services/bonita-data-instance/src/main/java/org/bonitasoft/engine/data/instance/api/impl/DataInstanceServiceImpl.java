@@ -139,11 +139,14 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final List<SDataInstance> dataInstances = getSDatainstanceOfContainers(containerId, containerType,
                 parentContainerResolver, queryName, inputParameters);
 
-        //apply pagination
+        //apply pagination here because we could not do the request only in database cause of a post data's processing to remove duplicate variable
         final int startIndex = Math.max(0, fromIndex);
         final int toIndex = Math.min(dataInstances.size(), fromIndex + numberOfResults);
 
-        return dataInstances.subList(startIndex, toIndex);
+        if (toIndex > startIndex) {
+            return dataInstances.subList(startIndex, toIndex);
+        }
+        return Collections.emptyList();
     }
 
     private Map<String, List<Long>> buildContainersMap(final List<DataContainer> containerHierarchy,
@@ -176,7 +179,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
         final Map<String, List<Long>> containers = buildContainersMap(containerHierarchy, inputParameters);
 
-        //gte all data of any of th possible containers
+        //gte all data of any possible containers
         List<SDataInstance> dataInstances;
         try {
             dataInstances = persistenceService.selectList(
