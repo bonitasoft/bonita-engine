@@ -325,7 +325,7 @@ public class ApplicationQueriesTest {
         final SApplicationMenu retrievedMenu = repository.getApplicationMenu(menu.getId());
 
         //then
-        assertThat(retrievedMenu).isEqualTo(retrievedMenu);
+        assertThat(retrievedMenu).isEqualTo(menu);
     }
 
     @Test
