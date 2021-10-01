@@ -36,6 +36,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+/**
+ * Those tests fail because after installing the second BDM version, Hibernate is not aware of
+ * previous FK_ that stay in database, so it does not drop them, and then the 'drop table' fails on test cleanup.
+ * Those cases should be handled when we support more "BDM update" scenarios, leveraging Hibernate poor level of
+ * support on HBM2DDL.
+ */
 @Ignore("FIXME: Not working on mysql and sql server")
 public class BDMUpdateIT extends CommonAPIIT {
 
@@ -185,7 +191,7 @@ public class BDMUpdateIT extends CommonAPIIT {
             tenantAdministrationAPI.uninstallBusinessDataModel();
         }
         resumeTenant();
-        assertThat(tenantAdministrationAPI.getBusinessDataModelVersion()).as("should uninstall BusinessDataModel ")
+        assertThat(tenantAdministrationAPI.getBusinessDataModelVersion()).as("should uninstall BusinessDataModel")
                 .isNull();
 
     }
