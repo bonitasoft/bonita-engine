@@ -56,7 +56,7 @@ public abstract class SearchEntityDescriptor {
 
     public SearchFields getEntitySearchTerm(final String searchString) {
         final StringTokenizer tokens = new StringTokenizer(searchString, " ");
-        final ArrayList<String> terms = new ArrayList<String>(tokens.countTokens());
+        final ArrayList<String> terms = new ArrayList<>(tokens.countTokens());
         while (tokens.hasMoreTokens()) {
             final String term = tokens.nextToken();
             terms.add(term);

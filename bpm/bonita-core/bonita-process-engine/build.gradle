@@ -82,7 +82,8 @@ dependencies {
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"      // works with Junit4
+    testCompile "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"    // works with Junit5
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     compileOnly project(':bpm:bonita-common')
     testCompile project(':bpm:bonita-common')
@@ -122,7 +123,6 @@ processResources { from "$buildDir/schemas" }
 tasks.processResources.dependsOn tasks.schemagen
 
 tasks.schemagen.outputs.cacheIf { true }
-
 
 test {
     useJUnitPlatform()
