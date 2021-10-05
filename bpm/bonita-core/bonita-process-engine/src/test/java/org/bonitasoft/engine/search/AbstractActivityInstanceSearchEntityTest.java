@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -33,17 +34,12 @@ import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * author Emmanuel Duchastenier
  */
 public class AbstractActivityInstanceSearchEntityTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void getEntityClassShouldHandleAutoTaskType() throws Exception {
@@ -127,14 +123,11 @@ public class AbstractActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldThrowExceptionOnUnknownType() throws Exception {
-        //given
+    public void getEntityClassShouldThrowExceptionOnUnknownType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.START_EVENT);
-        expectedException.expect(SBonitaReadException.class);
-        //when
-        final AbstractActivityInstanceSearchEntity searcher = new MyAbstractActivityInstanceSearchEntity(searchOptions);
-        //then exception
+
+        assertThrows(SBonitaReadException.class, () -> new MyAbstractActivityInstanceSearchEntity(searchOptions));
     }
 
     @Test
@@ -153,12 +146,12 @@ public class AbstractActivityInstanceSearchEntityTest {
         }
 
         @Override
-        public long executeCount(QueryOptions queryOptions) throws SBonitaReadException {
+        public long executeCount(QueryOptions queryOptions) {
             return 0;
         }
 
         @Override
-        public List<SActivityInstance> executeSearch(QueryOptions queryOptions) throws SBonitaReadException {
+        public List<SActivityInstance> executeSearch(QueryOptions queryOptions) {
             return null;
         }
     }

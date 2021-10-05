@@ -68,7 +68,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     }
 
     @Test
-    public void getDataInstance_should_return_empty_list_when_start_index_is_greater_of_number_element_in_Db()
+    public void getDataInstance_should_return_empty_list_when_start_index_is_greater_than_number_of_elements_in_Db()
             throws Exception {
         final String className = String.class.getName();
         final ProcessDefinition processDefinition = operateProcess(user, "var1",
