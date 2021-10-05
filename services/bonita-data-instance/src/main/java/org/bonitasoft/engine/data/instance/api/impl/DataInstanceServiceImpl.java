@@ -179,7 +179,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
         final Map<String, List<Long>> containers = buildContainersMap(containerHierarchy, inputParameters);
 
-        //gte all data of any possible containers
+        //get all data of any possible containers
         List<SDataInstance> dataInstances;
         try {
             dataInstances = persistenceService.selectList(
