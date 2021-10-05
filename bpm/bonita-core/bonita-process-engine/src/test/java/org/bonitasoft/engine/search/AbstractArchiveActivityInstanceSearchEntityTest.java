@@ -31,7 +31,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.junit.Test;
 
@@ -41,7 +40,7 @@ import org.junit.Test;
 public class AbstractArchiveActivityInstanceSearchEntityTest {
 
     @Test
-    public void getEntityClassShouldHandleAutoTaskType() throws Exception {
+    public void getEntityClassShouldHandleAutoTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.AUTOMATIC_TASK);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -51,7 +50,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleManualTaskType() throws Exception {
+    public void getEntityClassShouldHandleManualTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MANUAL_TASK);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -61,7 +60,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleUserTaskType() throws Exception {
+    public void getEntityClassShouldHandleUserTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.USER_TASK);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -71,7 +70,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleHumanTaskType() throws Exception {
+    public void getEntityClassShouldHandleHumanTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.HUMAN_TASK);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -81,7 +80,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleReceiveTaskType() throws Exception {
+    public void getEntityClassShouldHandleReceiveTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.RECEIVE_TASK);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -91,7 +90,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleSendTaskType() throws Exception {
+    public void getEntityClassShouldHandleSendTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SEND_TASK);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -101,7 +100,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleCallActivityType() throws Exception {
+    public void getEntityClassShouldHandleCallActivityType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -111,7 +110,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleLoopTaskType() throws Exception {
+    public void getEntityClassShouldHandleLoopTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.LOOP_ACTIVITY);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -121,7 +120,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleMultiInstanceTaskType() throws Exception {
+    public void getEntityClassShouldHandleMultiInstanceTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE,
                 FlowNodeType.MULTI_INSTANCE_ACTIVITY);
@@ -132,7 +131,7 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     }
 
     @Test
-    public void getEntityClassShouldHandleSuProcessTaskType() throws Exception {
+    public void getEntityClassShouldHandleSuProcessTaskType() {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SUB_PROCESS);
         final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
@@ -149,12 +148,12 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
         }
 
         @Override
-        public long executeCount(QueryOptions queryOptions) throws SBonitaReadException {
+        public long executeCount(QueryOptions queryOptions) {
             return 0;
         }
 
         @Override
-        public List<SAActivityInstance> executeSearch(QueryOptions queryOptions) throws SBonitaReadException {
+        public List<SAActivityInstance> executeSearch(QueryOptions queryOptions) {
             return null;
         }
     }

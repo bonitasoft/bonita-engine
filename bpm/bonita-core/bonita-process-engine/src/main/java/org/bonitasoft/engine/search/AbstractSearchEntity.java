@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.exception.SearchException;
@@ -42,6 +43,7 @@ import org.bonitasoft.engine.search.impl.SearchResultImpl;
  * @param <S>
  *        The server object
  */
+@Slf4j
 public abstract class AbstractSearchEntity<C extends Serializable, S extends PersistentObject>
         implements TransactionContentWithResult<SearchResult<C>> {
 
@@ -106,10 +108,28 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
             final QueryOptions searchOptions = new QueryOptions(fromIndex, numberOfResults, orderOptions, filterOptions,
                     userSearchTerm);
             serverObjects = executeSearch(searchOptions);
+            detectPotentialTransactionIsolationIssue(serverObjects, numberOfResults, countOptions);
         } else {
             serverObjects = Collections.emptyList();
         }
         clientObjects = convertToClientObjects(serverObjects);
+    }
+
+    private void detectPotentialTransactionIsolationIssue(List<S> serverObjects, int numberOfResults,
+            QueryOptions countOptions) throws SBonitaReadException {
+        // If there are at most 1 page of result AND the count does not detect as many objects as the search:
+        if (count <= numberOfResults && count != serverObjects.size()) {
+            long doubleCheck = executeCount(countOptions);
+            if (count != doubleCheck) {
+                log.error("Double checking the same query within the same transaction did NOT bring the same"
+                        + " result. You DO have a database transaction isolation problem. Please fix it ASAP. See" +
+                        " https://documentation.bonitasoft.com/bonita/latest/database-configuration#_customize_rdbms_to_make_it_work_with_bonita"
+                        + " for details.");
+            } else {
+                log.warn("Within the same transaction, the Search count & page results are not consistent." +
+                        " Please contact Bonitasoft Support team to fix potential issue with a database query.");
+            }
+        }
     }
 
     /**
