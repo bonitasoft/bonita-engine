@@ -28,7 +28,6 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
-import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
@@ -38,8 +37,6 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
-import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageMappingService;
@@ -89,21 +86,13 @@ public class PageAPIImpl implements PageAPI {
     }
 
     @Override
-    public Page createPage(final PageCreator pageCreator, final byte[] content)
-            throws AlreadyExistsException, CreationException, InvalidPageTokenException,
-            InvalidPageZipContentException {
+    public Page createPage(final PageCreator pageCreator, final byte[] content) throws CreationException {
         return getPageAPIDelegate().createPage(pageCreator, content);
     }
 
     @Override
-    public Page createPage(final String contentName, final byte[] content)
-            throws AlreadyExistsException, CreationException, InvalidPageTokenException,
-            InvalidPageZipContentException {
+    public Page createPage(final String contentName, final byte[] content) throws CreationException {
         return getPageAPIDelegate().createPage(contentName, content);
-    }
-
-    protected long getUserIdFromSessionInfos() {
-        return SessionInfos.getUserIdFromSession();
     }
 
     @Override
@@ -129,15 +118,12 @@ public class PageAPIImpl implements PageAPI {
 
     @Override
     public Page updatePage(final long pageId, final PageUpdater pageUpdater)
-            throws UpdateException, AlreadyExistsException,
-            UpdatingWithInvalidPageTokenException, UpdatingWithInvalidPageZipContentException {
+            throws UpdateException, AlreadyExistsException {
         return getPageAPIDelegate().updatePage(pageId, pageUpdater);
     }
 
     @Override
-    public void updatePageContent(final long pageId, final byte[] content)
-            throws UpdateException, UpdatingWithInvalidPageTokenException,
-            UpdatingWithInvalidPageZipContentException {
+    public void updatePageContent(final long pageId, final byte[] content) throws UpdateException {
         getPageAPIDelegate().updatePageContent(pageId, content);
     }
 
