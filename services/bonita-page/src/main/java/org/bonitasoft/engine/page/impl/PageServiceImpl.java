@@ -340,8 +340,7 @@ public class PageServiceImpl implements PageService {
         return existingPage;
     }
 
-    private void checkPageDisplayNameIsValid(final String displayName) throws SInvalidPageZipMissingPropertiesException,
-            SInvalidPageZipMissingAPropertyException {
+    private void checkPageDisplayNameIsValid(final String displayName) throws SInvalidPageZipMissingAPropertyException {
         if (displayName == null || displayName.length() == 0) {
             throw new SInvalidPageZipMissingAPropertyException(PageService.PROPERTIES_DISPLAY_NAME);
         }
@@ -531,8 +530,7 @@ public class PageServiceImpl implements PageService {
 
     protected void checkPageDuplicateForProcessDefinition(final AbstractSPage sPage,
             final EntityUpdateDescriptor entityUpdateDescriptor,
-            final SPageLogBuilder logBuilder,
-            final String logMethodName, long sPageProcessDefinitionId)
+            final SPageLogBuilder logBuilder, final String logMethodName, long sPageProcessDefinitionId)
             throws SBonitaReadException, SObjectAlreadyExistsException {
 
         String sPageName = sPage.getName();
@@ -547,10 +545,7 @@ public class PageServiceImpl implements PageService {
     }
 
     private void throwAlreadyExistsException(final String pageName) throws SObjectAlreadyExistsException {
-        final StringBuilder stringBuilderException = new StringBuilder();
-        stringBuilderException.append("page with name ");
-        stringBuilderException.append(pageName);
-        throw new SObjectAlreadyExistsException(stringBuilderException.toString());
+        throw new SObjectAlreadyExistsException("page with name " + pageName);
     }
 
     @Override
