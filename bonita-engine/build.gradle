@@ -35,7 +35,6 @@ dependencyManagement {
         dependency("commons-cli:commons-cli:${Deps.commonsCLIVersion}")
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
-        dependency("org.apache.commons:commons-text:${Deps.commonsTextVersion}")
         dependency "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
         dependency "javax.transaction:jta:${Deps.javaxJtaVersion}"
         dependency "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
