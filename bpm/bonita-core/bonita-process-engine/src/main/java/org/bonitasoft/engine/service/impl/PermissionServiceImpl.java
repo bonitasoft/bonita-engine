@@ -17,6 +17,7 @@ import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import groovy.lang.GroovyClassLoader;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
@@ -32,9 +33,11 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * Permission service implementation
@@ -139,5 +142,12 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void resume() throws SBonitaException {
         start();
+    }
+
+    public boolean checkDynamicPermissionsWithUsername(Set<String> resourceAuthorizations)
+            throws SessionIdNotSetException, SSessionNotFoundException {
+        SSession session = sessionService.getSession(sessionAccessor.getSessionId());
+        return resourceAuthorizations
+                .contains(PermissionService.USER_TYPE_AUTHORIZATION_PREFIX + "|" + session.getUserName());
     }
 }

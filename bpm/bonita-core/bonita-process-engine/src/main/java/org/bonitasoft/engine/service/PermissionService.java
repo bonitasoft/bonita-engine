@@ -13,14 +13,22 @@
  **/
 package org.bonitasoft.engine.service;
 
+import java.util.Set;
+
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Baptiste Mesta
  */
 public interface PermissionService extends TenantLifecycleService {
+
+    String USER_TYPE_AUTHORIZATION_PREFIX = "user";
+    String PROFILE_TYPE_AUTHORIZATION_PREFIX = "profile";
+    String SCRIPT_TYPE_AUTHORIZATION_PREFIX = "check";
 
     /**
      * execute the {@link org.bonitasoft.engine.api.permission.PermissionRule} having the class name in parameter using
@@ -37,4 +45,7 @@ public interface PermissionService extends TenantLifecycleService {
      */
     boolean checkAPICallWithScript(String className, APICallContext context, boolean reload)
             throws SExecutionException, ClassNotFoundException;
+
+    boolean checkDynamicPermissionsWithUsername(Set<String> resourceAuthorizations)
+            throws SessionIdNotSetException, SSessionNotFoundException;
 }

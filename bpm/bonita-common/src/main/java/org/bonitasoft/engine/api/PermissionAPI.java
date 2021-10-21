@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.util.Set;
+
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
@@ -61,4 +63,7 @@ public interface PermissionAPI {
      */
     boolean checkAPICallWithScript(String className, APICallContext apiCallContext, boolean reload)
             throws ExecutionException, NotFoundException;
+
+    boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions,
+            Set<String> resourceAuthorizations);
 }
