@@ -115,9 +115,6 @@ class ShadePlugin implements Plugin<Project> {
                             }
                         }
                     }
-                }
-                mavenJava(MavenPublication) {
-                    from project.components.java
                     artifact project.sourcesJar
                     artifact project.javadocJar
                 }
