@@ -43,7 +43,7 @@ public class HttpAPIServlet extends HttpServlet {
     public void init() throws ServletException {
         enabled = Boolean.parseBoolean(
                 System.getProperty(PROPERTY_TO_ENABLE_HTTP_API, System.getenv().getOrDefault(envProperty(), "true")));
-        logger.info("Http api is {}, {} it using env property {} or System property {} [=true/false]",
+        logger.info("Http API is {}, you may {} it using env property {} or System property {} [=true/false]",
                 enabled ? "enabled" : "disabled", enabled ? "disable" : "enable", envProperty(),
                 PROPERTY_TO_ENABLE_HTTP_API);
     }
