@@ -22,12 +22,12 @@ import java.util.Map;
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.api.permission.APICallContext;
+import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
