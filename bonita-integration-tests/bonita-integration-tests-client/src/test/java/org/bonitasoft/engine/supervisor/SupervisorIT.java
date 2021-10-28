@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.supervisor;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
 
 import java.io.Serializable;
@@ -310,6 +311,25 @@ public class SupervisorIT extends TestWithTechnicalUser {
         supervisors.remove(6);
         result = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(9, result.getCount());
+    }
+
+    @Test
+    public void deleteSupervisor_should_throw_SupervisorNotFoundException_when_supervisor_does_not_exist()
+            throws BonitaException {
+        final ProcessDefinition myProcess1 = processDefinitions.get(0);
+        final Role role2 = roles.get(1);
+        final Group group2 = groups.get(1);
+
+        // Removed Supervisor
+        getProcessAPI().deleteSupervisor(myProcess1.getId(), null, role2.getId(), group2.getId());
+        this.supervisors.remove(10);
+
+        // Already deleted Supervisor
+        assertThatThrownBy(
+                () -> getProcessAPI().deleteSupervisor(myProcess1.getId(), null, role2.getId(), group2.getId()))
+                        .isInstanceOf(DeletionException.class)
+                        // Only check the name and not the cause, because in HTTP mode, the stacks are merged and the cause removed:
+                        .hasMessageContaining("SupervisorNotFoundException");
     }
 
     @Test
