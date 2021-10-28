@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.service.impl;
+package org.bonitasoft.engine.authorization;
 
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
@@ -29,21 +29,27 @@ import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.PermissionService;
+import org.bonitasoft.engine.service.impl.ServerLoggerWrapper;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
 /**
  * Permission service implementation
  *
  * @author Baptiste Mesta
  */
+@Component
+@ConditionalOnSingleCandidate(PermissionService.class)
 public class PermissionServiceImpl implements PermissionService {
 
     private final ClassLoaderService classLoaderService;
@@ -54,7 +60,8 @@ public class PermissionServiceImpl implements PermissionService {
     private GroovyClassLoader groovyClassLoader;
 
     public PermissionServiceImpl(final ClassLoaderService classLoaderService, final TechnicalLoggerService logger,
-            final SessionAccessor sessionAccessor, final SessionService sessionService, final long tenantId) {
+            final SessionAccessor sessionAccessor, final SessionService sessionService,
+            @Value("${tenantId}") final long tenantId) {
         this.classLoaderService = classLoaderService;
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
@@ -64,8 +71,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean checkAPICallWithScript(final String className, final APICallContext context, final boolean reload)
-            throws SExecutionException,
-            ClassNotFoundException {
+            throws SExecutionException, ClassNotFoundException {
         checkStarted();
         //groovy class loader load class from files and cache then when loaded, no need to do some lazy loading or load all class on start
         Class<?> aClass;
@@ -80,7 +86,7 @@ public class PermissionServiceImpl implements PermissionService {
                     + " does not implements org.bonitasoft.engine.api.permission.PermissionRule");
         }
         try {
-            SSession session = sessionService.getSession(sessionAccessor.getSessionId());
+            SSession session = getSession();
             final APISession apiSession = ModelConvertor.toAPISession(session, null);
             final PermissionRule permissionRule = (PermissionRule) aClass.newInstance();
             return permissionRule.isAllowed(apiSession, context, createAPIAccessorImpl(),
@@ -88,6 +94,10 @@ public class PermissionServiceImpl implements PermissionService {
         } catch (final Throwable e) {
             throw new SExecutionException("The permission rule " + aClass.getName() + " threw an exception", e);
         }
+    }
+
+    public SSession getSession() throws SSessionNotFoundException, SessionIdNotSetException {
+        return sessionService.getSession(sessionAccessor.getSessionId());
     }
 
     private void reload() throws SExecutionException {
@@ -144,10 +154,11 @@ public class PermissionServiceImpl implements PermissionService {
         start();
     }
 
-    public boolean checkDynamicPermissionsWithUsername(Set<String> resourceAuthorizations)
-            throws SessionIdNotSetException, SSessionNotFoundException {
-        SSession session = sessionService.getSession(sessionAccessor.getSessionId());
-        return resourceAuthorizations
-                .contains(PermissionService.USER_TYPE_AUTHORIZATION_PREFIX + "|" + session.getUserName());
+    @Override
+    public boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions,
+            Set<String> resourceDynamicPermissions) throws SExecutionException {
+        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Let it go from Community");
+        //FIXME implement static permission check
+        return true;
     }
 }

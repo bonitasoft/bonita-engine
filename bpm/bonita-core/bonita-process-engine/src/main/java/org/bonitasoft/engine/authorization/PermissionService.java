@@ -11,15 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.service;
+package org.bonitasoft.engine.authorization;
 
 import java.util.Set;
 
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -46,6 +44,7 @@ public interface PermissionService extends TenantLifecycleService {
     boolean checkAPICallWithScript(String className, APICallContext context, boolean reload)
             throws SExecutionException, ClassNotFoundException;
 
-    boolean checkDynamicPermissionsWithUsername(Set<String> resourceAuthorizations)
-            throws SessionIdNotSetException, SSessionNotFoundException;
+    boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions,
+            Set<String> resourceDynamicPermissions) throws SExecutionException;
+
 }

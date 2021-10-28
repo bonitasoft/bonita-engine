@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.configuration;
 
 import org.bonitasoft.engine.authentication.AuthenticationConfiguration;
+import org.bonitasoft.engine.authorization.AuthorizationConfiguration;
 import org.bonitasoft.engine.business.application.impl.ApplicationConfiguration;
 import org.bonitasoft.engine.cache.CacheServiceConfiguration;
 import org.bonitasoft.engine.core.operation.OperationServiceConfiguration;
@@ -45,7 +46,8 @@ import org.springframework.context.annotation.Import;
         IdentityConfiguration.class,
         CacheServiceConfiguration.class,
         ApplicationConfiguration.class,
-        PageConfiguration.class
+        PageConfiguration.class,
+        AuthorizationConfiguration.class
 })
 public class EngineTenantConfiguration {
 

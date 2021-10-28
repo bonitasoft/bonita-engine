@@ -17,6 +17,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
+import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;

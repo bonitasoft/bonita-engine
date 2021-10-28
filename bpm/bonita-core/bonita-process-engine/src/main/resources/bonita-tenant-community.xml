@@ -887,14 +887,6 @@
         </constructor-arg>
     </bean>
 
-
-    <bean id="permissionService" class="org.bonitasoft.engine.service.impl.PermissionServiceImpl">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
-    </bean>
-
     <bean id="apiExtensionPageServiceListener"
           class="org.bonitasoft.engine.page.impl.ApiExtensionPageServiceListenerImpl">
         <constructor-arg name="pageMappingService" ref="pageMappingService" />
