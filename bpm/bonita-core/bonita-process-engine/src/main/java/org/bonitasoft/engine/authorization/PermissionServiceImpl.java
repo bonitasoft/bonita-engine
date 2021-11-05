@@ -17,12 +17,16 @@ import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import groovy.lang.GroovyClassLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.permission.PermissionRule;
+import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
@@ -49,6 +53,7 @@ import org.springframework.stereotype.Component;
  * @author Baptiste Mesta
  */
 @Component
+@Slf4j
 @ConditionalOnSingleCandidate(PermissionService.class)
 public class PermissionServiceImpl implements PermissionService {
 
@@ -56,8 +61,9 @@ public class PermissionServiceImpl implements PermissionService {
     private final TechnicalLoggerService logger;
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
-    private final long tenantId;
     private GroovyClassLoader groovyClassLoader;
+
+    protected final long tenantId;
 
     public PermissionServiceImpl(final ClassLoaderService classLoaderService, final TechnicalLoggerService logger,
             final SessionAccessor sessionAccessor, final SessionService sessionService,
@@ -85,8 +91,8 @@ public class PermissionServiceImpl implements PermissionService {
             throw new SExecutionException("The class " + aClass.getName()
                     + " does not implements org.bonitasoft.engine.api.permission.PermissionRule");
         }
+        SSession session = getSession();
         try {
-            SSession session = getSession();
             final APISession apiSession = ModelConvertor.toAPISession(session, null);
             final PermissionRule permissionRule = (PermissionRule) aClass.newInstance();
             return permissionRule.isAllowed(apiSession, context, createAPIAccessorImpl(),
@@ -96,8 +102,12 @@ public class PermissionServiceImpl implements PermissionService {
         }
     }
 
-    public SSession getSession() throws SSessionNotFoundException, SessionIdNotSetException {
-        return sessionService.getSession(sessionAccessor.getSessionId());
+    public SSession getSession() throws SExecutionException {
+        try {
+            return sessionService.getSession(sessionAccessor.getSessionId());
+        } catch (SSessionNotFoundException | SessionIdNotSetException e) {
+            throw new SExecutionException("The session is not set.", e);
+        }
     }
 
     private void reload() throws SExecutionException {
@@ -155,10 +165,51 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions,
-            Set<String> resourceDynamicPermissions) throws SExecutionException {
-        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Let it go from Community");
-        //FIXME implement static permission check
-        return true;
+    public boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions)
+            throws SExecutionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Static REST API permissions check");
+        }
+        final ResourcesPermissionsMapping resourcesPermissionsMapping = getResourcesPermissionsMapping(tenantId);
+        final Set<String> resourcePermissions = getDeclaredPermissions(apiCallContext.getApiName(),
+                apiCallContext.getResourceName(), apiCallContext.getMethod(), apiCallContext.getResourceId(),
+                resourcesPermissionsMapping);
+        for (final String resourcePermission : resourcePermissions) {
+            if (userPermissions.contains(resourcePermission)) {
+                return true;
+            }
+        }
+        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                "Unauthorized access to " + apiCallContext.getMethod() + " " + apiCallContext.getApiName() + "/"
+                        + apiCallContext.getResourceName()
+                        + (apiCallContext.getResourceId() != null ? "/" + apiCallContext.getResourceId() : "")
+                        + " attempted by " + getSession().getUserName()
+                        + " required permissions: " + resourcePermissions);
+
+        return false;
+    }
+
+    protected ResourcesPermissionsMapping getResourcesPermissionsMapping(final long tenantId) {
+        return new ResourcesPermissionsMapping(tenantId);
+    }
+
+    protected Set<String> getDeclaredPermissions(final String apiName, final String resourceName, final String method,
+            final String resourceQualifiers,
+            final ResourcesPermissionsMapping resourcesPermissionsMapping) {
+        List<String> resourceQualifiersIds = null;
+        if (resourceQualifiers != null) {
+            resourceQualifiersIds = Arrays
+                    .asList(resourceQualifiers.split(ResourcesPermissionsMapping.RESOURCE_IDS_SEPARATOR));
+        }
+        Set<String> resourcePermissions = resourcesPermissionsMapping.getResourcePermissions(method, apiName,
+                resourceName, resourceQualifiersIds);
+        if (resourcePermissions.isEmpty()) {
+            resourcePermissions = resourcesPermissionsMapping.getResourcePermissionsWithWildCard(method, apiName,
+                    resourceName, resourceQualifiersIds);
+        }
+        if (resourcePermissions.isEmpty()) {
+            resourcePermissions = resourcesPermissionsMapping.getResourcePermissions(method, apiName, resourceName);
+        }
+        return resourcePermissions;
     }
 }

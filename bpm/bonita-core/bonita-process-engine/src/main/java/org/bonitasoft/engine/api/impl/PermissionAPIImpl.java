@@ -50,12 +50,12 @@ public class PermissionAPIImpl implements PermissionAPI {
     }
 
     @Override
-    public boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions,
-            Set<String> resourceDynamicPermissions) throws ExecutionException {
+    public boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions)
+            throws ExecutionException {
         TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         try {
             return serviceAccessor.getPermissionService()
-                    .isAuthorized(apiCallContext, reload, userPermissions, resourceDynamicPermissions);
+                    .isAuthorized(apiCallContext, reload, userPermissions);
         } catch (SExecutionException e) {
             throw new ExecutionException(e);
         }

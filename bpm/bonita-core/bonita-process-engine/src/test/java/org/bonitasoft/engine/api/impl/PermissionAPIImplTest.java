@@ -15,7 +15,9 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 import java.util.Set;
 
@@ -84,13 +86,11 @@ public class PermissionAPIImplTest {
     @Test
     public void should_isAuthorized_throw_execution_exception() throws Exception {
         //given
-        final Set<String> dynamicAuthorizations = Set.of("check|className");
         final Set<String> userPermissions = Set.of("organization_visualization");
         final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
-        doThrow(SExecutionException.class).when(permissionService).isAuthorized(apiCallContext, false, userPermissions,
-                dynamicAuthorizations);
+        doThrow(SExecutionException.class).when(permissionService).isAuthorized(apiCallContext, false, userPermissions);
 
         assertThrows(ExecutionException.class,
-                () -> permissionAPI.isAuthorized(apiCallContext, false, userPermissions, dynamicAuthorizations));
+                () -> permissionAPI.isAuthorized(apiCallContext, false, userPermissions));
     }
 }
