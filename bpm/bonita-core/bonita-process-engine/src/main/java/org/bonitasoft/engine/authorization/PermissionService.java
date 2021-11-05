@@ -44,7 +44,7 @@ public interface PermissionService extends TenantLifecycleService {
     boolean checkAPICallWithScript(String className, APICallContext context, boolean reload)
             throws SExecutionException, ClassNotFoundException;
 
-    boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions,
-            Set<String> resourceDynamicPermissions) throws SExecutionException;
+    boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions)
+            throws SExecutionException;
 
 }

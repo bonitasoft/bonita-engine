@@ -17,15 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.any;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
+import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -73,6 +76,9 @@ public class PermissionServiceImplTest {
     @Mock
     private BonitaHomeServer bonitaHomeServer;
 
+    @Mock
+    private ResourcesPermissionsMapping resourcesPermissionsMapping;
+
     private File securityFolder;
 
     @Before
@@ -89,6 +95,8 @@ public class PermissionServiceImplTest {
         doReturn(mock(SSession.class)).when(sessionService).getSession(anyLong());
 
         doReturn(securityFolder).when(bonitaHomeServer).getSecurityScriptsFolder(anyLong());
+
+        doReturn(resourcesPermissionsMapping).when(permissionService).getResourcesPermissionsMapping(TENANT_ID);
     }
 
     @Test
@@ -270,6 +278,111 @@ public class PermissionServiceImplTest {
 
         //when
         permissionService.checkAPICallWithScript("plop", new APICallContext(), false);
+    }
+
+    @Test
+    public void should_isAllowed_return_true_if_static_authorized() throws Exception {
+        //given
+        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
+        final List<String> resourcePermissions = List.of("CasePermission", "AnOtherPermission");
+        returnPermissionsFor("GET", "bpm", "case", null, resourcePermissions);
+
+        //when
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", null),
+                false, userPermissions);
+
+        //then
+        assertThat(isAuthorized).isTrue();
+    }
+
+    @Test
+    public void should_isAllowed_return_false_if_static_not_authorized() throws Exception {
+        //given
+        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
+        final List<String> resourcePermissions = List.of("CasePermission", "SecondPermission");
+        returnPermissionsFor("GET", "bpm", "case", null, resourcePermissions);
+
+        //when
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", null),
+                false, userPermissions);
+
+        //then
+        assertThat(isAuthorized).isFalse();
+    }
+
+    @Test
+    public void should_isAllowed_return_false_on_resource_with_id_even_if_permission_in_general_is_there()
+            throws Exception {
+        //given
+        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
+        returnPermissionsFor("GET", "bpm", "case", null, List.of("CasePermission", "AnOtherPermission"));
+        returnPermissionsFor("GET", "bpm", "case", List.of("12"), List.of("CasePermission", "SecondPermission"));
+
+        //when
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
+                false, userPermissions);
+
+        //then
+        assertThat(isAuthorized).isFalse();
+    }
+
+    @Test
+    public void should_isAllowed_return_true_on_resource_with_id() throws Exception {
+        //given
+        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
+        returnPermissionsFor("GET", "bpm", "case", List.of("12"), List.of("CasePermission", "MyPermission"));
+
+        //when
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
+                false, userPermissions);
+
+        //then
+        assertThat(isAuthorized).isTrue();
+    }
+
+    @Test
+    public void should_isAllowed_for_resource_with_id_check_parent_if_no_rule() throws Exception {
+        //given
+        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
+        final List<String> resourcePermissions = List.of("CasePermission", "MyPermission");
+        returnPermissionsFor("GET", "bpm", "case", null, resourcePermissions);
+
+        //when
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
+                false, userPermissions);
+
+        //then
+        assertThat(isAuthorized).isTrue();
+    }
+
+    @Test
+    public void should_isAllowed_work_on_resource_with_wildcard() throws Exception {
+        //given
+        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
+        final List<String> resourcePermissions = List.of("CasePermission", "MyPermission");
+        doReturn(new HashSet<>(resourcePermissions)).when(resourcesPermissionsMapping)
+                .getResourcePermissionsWithWildCard("GET", "bpm", "case",
+                        List.of("12", "instantiation"));
+
+        //when
+        final boolean isAuthorized = permissionService
+                .isAuthorized(new APICallContext("GET", "bpm", "case", "12/instantiation"), false, userPermissions);
+
+        //then
+        assertThat(isAuthorized).isTrue();
+    }
+
+    private void returnPermissionsFor(final String method, final String apiName, final String resourceName,
+            final List<String> resourceQualifiers,
+            final List<String> toBeReturned) {
+        if (resourceQualifiers != null) {
+            doReturn(new HashSet<>(toBeReturned)).when(resourcesPermissionsMapping).getResourcePermissions(method,
+                    apiName, resourceName,
+                    resourceQualifiers);
+        } else {
+            doReturn(new HashSet<>(toBeReturned)).when(resourcesPermissionsMapping).getResourcePermissions(method,
+                    apiName, resourceName);
+        }
     }
 
     private String getRuleContent(String methodBody) {

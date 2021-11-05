@@ -66,6 +66,6 @@ public interface PermissionAPI {
     boolean checkAPICallWithScript(String className, APICallContext apiCallContext, boolean reload)
             throws ExecutionException, NotFoundException;
 
-    boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions,
-            Set<String> resourceAuthorizations) throws ExecutionException;
+    boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions)
+            throws ExecutionException;
 }
