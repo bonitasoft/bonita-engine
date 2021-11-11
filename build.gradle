@@ -14,3 +14,10 @@ sonarqube {
 
 
 apply from: "common.gradle"
+
+allprojects {
+    tasks.withType(JavaCompile).configureEach {
+        options.fork = true
+    }
+
+}
