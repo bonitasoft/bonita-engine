@@ -16,7 +16,7 @@ package org.bonitasoft.engine.persistence;
 import org.hibernate.EmptyInterceptor;
 
 /**
- * @author Matthieu Chaffotte
+ * Make search case insensitive in postgres by using `ilike` instead of `like`
  */
 public class PostgresInterceptor extends EmptyInterceptor {
 
@@ -24,7 +24,11 @@ public class PostgresInterceptor extends EmptyInterceptor {
 
     @Override
     public String onPrepareStatement(final String sql) {
-        return sql.replaceAll("like '", "ilike '").replaceAll("LIKE '", "ilike '");
+        return sql
+                //replace like by ilike in sql generated without prepared statements
+                .replace("like '", "ilike '").replace("LIKE '", "ilike '")
+                //replace like by ilike in sql generated with prepared statements
+                .replace("like ?", "ilike ?").replace("LIKE ?", "ilike ?");
     }
 
 }
