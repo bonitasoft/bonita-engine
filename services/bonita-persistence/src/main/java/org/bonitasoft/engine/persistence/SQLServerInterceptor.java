@@ -24,6 +24,7 @@ public class SQLServerInterceptor extends EmptyInterceptor {
 
     @Override
     public String onPrepareStatement(final String sql) {
-        return sql.replaceAll("like '", "like N'").replaceAll("LIKE '", "like N'");
+        // this replace does not work with prepared statements
+        return sql.replace("like '", "like N'").replace("LIKE '", "like N'");
     }
 }
