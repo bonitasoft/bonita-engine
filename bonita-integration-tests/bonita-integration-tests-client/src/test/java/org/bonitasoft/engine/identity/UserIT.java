@@ -13,14 +13,15 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -35,10 +36,10 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.search.Order;
-import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -247,7 +248,7 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void cannotGetTechUserInList() {
-        final Map<Long, User> users = getIdentityAPI().getUsers(Arrays.asList(-1L));
+        final Map<Long, User> users = getIdentityAPI().getUsers(asList(-1L));
         assertNull(users.get(-1));
     }
 
@@ -739,6 +740,30 @@ public class UserIT extends TestWithTechnicalUser {
         deleteUsers(users);
     }
 
+    /*
+     * Relates to https://bonitasoft.atlassian.net/browse/RUNTIME-590
+     * All search should be insensitive
+     */
+    @Test
+    public void should_search_user_case_insensitively() throws BonitaException {
+        Assume.assumeTrue("Search is case sensitive on our docker oracle",
+                !System.getProperty("sysprop.bonita.bdm.db.vendor").equals("oracle"));
+        List<User> users = asList(
+                getIdentityAPI().createUser("Jean_Michel", "bpm", "Jean Michel", "Jarre"),
+                getIdentityAPI().createUser("michel.mimi", "bpm", "Michel", "Mimi"));
+
+        assertThat(getIdentityAPI().searchUsers(
+                new SearchOptionsBuilder(0, 10).searchTerm("jean").sort(UserSearchDescriptor.ID, Order.ASC).done())
+                .getResult())
+                        .hasSize(1).allMatch(user -> user.getUserName().equals("Jean_Michel"));
+        assertThat(getIdentityAPI().searchUsers(
+                new SearchOptionsBuilder(0, 10).searchTerm("Jean").sort(UserSearchDescriptor.ID, Order.ASC).done())
+                .getResult())
+                        .hasSize(1).allMatch(user -> user.getUserName().equals("Jean_Michel"));
+
+        deleteUsers(users);
+    }
+
     @Test
     public void searchEnabledDisabledUsers() throws BonitaException {
         // Create users
@@ -813,20 +838,19 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void searchTermWithSpecialChars() throws BonitaException {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.searchTerm("Séba");
-        final SearchOptions searchOptions = builder.done();
-        SearchResult<User> searchUsers = getIdentityAPI().searchUsers(searchOptions);
-        assertEquals(0, searchUsers.getCount());
 
-        final User friend = getIdentityAPI().createUser("Sébastien", "ENCRYPTED");
+        List<User> users = asList(
+                getIdentityAPI().createUser("Sébastien", "ENCRYPTED", "Sébation", "Martin"),
+                getIdentityAPI().createUser("房子", "ENCRYPTED", "\uD83D\uDC7A", "龜"));
 
-        searchUsers = getIdentityAPI().searchUsers(searchOptions);
-        assertEquals(1, searchUsers.getCount());
-        final List<User> users = searchUsers.getResult();
-        assertEquals(friend, users.get(0));
+        assertThat(getIdentityAPI().searchUsers(new SearchOptionsBuilder(0, 10).searchTerm("Séba").done()).getResult())
+                .hasSize(1)
+                .allMatch(user -> user.getUserName().equals("Sébastien"));
+        assertThat(getIdentityAPI().searchUsers(new SearchOptionsBuilder(0, 10).searchTerm("龜").done()).getResult())
+                .hasSize(1)
+                .allMatch(user -> user.getUserName().equals("房子"));
 
-        getIdentityAPI().deleteUser(friend.getId());
+        getIdentityAPI().deleteUsers(users.stream().map(User::getId).collect(Collectors.toList()));
     }
 
     @Test
@@ -838,7 +862,7 @@ public class UserIT extends TestWithTechnicalUser {
         final Group group = createGroup("group1");
         final Role role = createRole("manager");
 
-        getIdentityAPI().addUserMemberships(Arrays.asList(john1.getId(), jack.getId()), group.getId(), role.getId());
+        getIdentityAPI().addUserMemberships(asList(john1.getId(), jack.getId()), group.getId(), role.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(UserSearchDescriptor.GROUP_ID, (Long) (group.getId()));
@@ -864,7 +888,7 @@ public class UserIT extends TestWithTechnicalUser {
         final Group group = createGroup("group1");
         final Role role = createRole("manager");
 
-        getIdentityAPI().addUserMemberships(Arrays.asList(john1.getId(), jack.getId()), group.getId(), role.getId());
+        getIdentityAPI().addUserMemberships(asList(john1.getId(), jack.getId()), group.getId(), role.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(UserSearchDescriptor.ROLE_ID, (Long) (role.getId()));
@@ -892,9 +916,9 @@ public class UserIT extends TestWithTechnicalUser {
         final Role role1 = createRole("manager");
         final Role role2 = createRole("delivery");
 
-        getIdentityAPI().addUserMemberships(Arrays.asList(john1.getId(), jack.getId()), group1.getId(), role1.getId());
-        getIdentityAPI().addUserMemberships(Arrays.asList(john2.getId()), group2.getId(), role1.getId());
-        getIdentityAPI().addUserMemberships(Arrays.asList(john2.getId(), jack.getId()), group1.getId(), role2.getId());
+        getIdentityAPI().addUserMemberships(asList(john1.getId(), jack.getId()), group1.getId(), role1.getId());
+        getIdentityAPI().addUserMemberships(asList(john2.getId()), group2.getId(), role1.getId());
+        getIdentityAPI().addUserMemberships(asList(john2.getId(), jack.getId()), group1.getId(), role2.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(UserSearchDescriptor.GROUP_ID, group2.getId());
