@@ -18,7 +18,11 @@ import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import groovy.lang.GroovyClassLoader;
@@ -26,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.permission.PermissionRule;
+import org.bonitasoft.engine.authorization.properties.CompoundPermissionsMapping;
+import org.bonitasoft.engine.authorization.properties.PropertiesWithSet;
 import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -35,6 +41,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.impl.ServerLoggerWrapper;
 import org.bonitasoft.engine.session.APISession;
@@ -56,6 +63,16 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @ConditionalOnSingleCandidate(PermissionService.class)
 public class PermissionServiceImpl implements PermissionService {
+
+    public static final String RESOURCES_PROPERTY = "resources";
+    public static final String PROPERTY_CONTENT_TYPE = "contentType";
+    public static final String PROPERTY_API_EXTENSIONS = "apiExtensions";
+    public static final String PROPERTY_METHOD_MASK = "%s.method";
+    public static final String PROPERTY_PATH_TEMPLATE_MASK = "%s.pathTemplate";
+    public static final String PROPERTY_PERMISSIONS_MASK = "%s.permissions";
+    public static final String RESOURCE_PERMISSION_KEY_MASK = "%s|extension/%s";
+    public static final String RESOURCE_PERMISSION_VALUE = "[%s]";
+    public static final String EXTENSION_SEPARATOR = ",";
 
     private final ClassLoaderService classLoaderService;
     private final TechnicalLoggerService logger;
@@ -94,7 +111,7 @@ public class PermissionServiceImpl implements PermissionService {
         SSession session = getSession();
         try {
             final APISession apiSession = ModelConvertor.toAPISession(session, null);
-            final PermissionRule permissionRule = (PermissionRule) aClass.newInstance();
+            final PermissionRule permissionRule = (PermissionRule) aClass.getDeclaredConstructor().newInstance();
             return permissionRule.isAllowed(apiSession, context, createAPIAccessorImpl(),
                     new ServerLoggerWrapper(permissionRule.getClass(), logger));
         } catch (final Throwable e) {
@@ -170,10 +187,9 @@ public class PermissionServiceImpl implements PermissionService {
         if (log.isDebugEnabled()) {
             log.debug("Static REST API permissions check");
         }
-        final ResourcesPermissionsMapping resourcesPermissionsMapping = getResourcesPermissionsMapping(tenantId);
         final Set<String> resourcePermissions = getDeclaredPermissions(apiCallContext.getApiName(),
                 apiCallContext.getResourceName(), apiCallContext.getMethod(), apiCallContext.getResourceId(),
-                resourcesPermissionsMapping);
+                getResourcesPermissionsMapping());
         for (final String resourcePermission : resourcePermissions) {
             if (userPermissions.contains(resourcePermission)) {
                 return true;
@@ -189,7 +205,7 @@ public class PermissionServiceImpl implements PermissionService {
         return false;
     }
 
-    protected ResourcesPermissionsMapping getResourcesPermissionsMapping(final long tenantId) {
+    protected ResourcesPermissionsMapping getResourcesPermissionsMapping() {
         return new ResourcesPermissionsMapping(tenantId);
     }
 
@@ -212,4 +228,65 @@ public class PermissionServiceImpl implements PermissionService {
         }
         return resourcePermissions;
     }
+
+    @Override
+    public void addPermissions(final String pageName, final Properties pageProperties) {
+        ResourcesPermissionsMapping resourcesPermissionsMapping = getResourcesPermissionsMapping();
+        Set<String> customPagePermissions = getCustomPagePermissions(
+                pageProperties.getProperty(RESOURCES_PROPERTY),
+                resourcesPermissionsMapping);
+        addRestApiExtensionPermissions(resourcesPermissionsMapping, pageProperties);
+        getCompoundPermissionsMapping().setPropertyAsSet(pageName, customPagePermissions);
+    }
+
+    private CompoundPermissionsMapping getCompoundPermissionsMapping() {
+        return new CompoundPermissionsMapping(tenantId);
+    }
+
+    public Set<String> getCustomPagePermissions(final String declaredPageResources,
+            final ResourcesPermissionsMapping resourcesPermissionsMapping) {
+        final Set<String> pageRestResources = PropertiesWithSet.stringToSet(declaredPageResources);
+        final Set<String> permissions = new HashSet<>();
+        for (final String pageRestResource : pageRestResources) {
+            final Set<String> resourcePermissions = resourcesPermissionsMapping.getPropertyAsSet(pageRestResource);
+            if (resourcePermissions.isEmpty()) {
+                if (log.isWarnEnabled()) {
+                    log.warn("Error while getting resources permissions. Unknown resource: " + pageRestResource
+                            + " defined in page.properties");
+                }
+            }
+            permissions.addAll(resourcePermissions);
+        }
+        return permissions;
+    }
+
+    void addRestApiExtensionPermissions(final ResourcesPermissionsMapping resourcesPermissionsMapping,
+            final Properties pageProperties) {
+        final Map<String, String> permissionsMapping = getApiExtensionResourcesPermissionsMapping(
+                pageProperties);
+        for (final String key : permissionsMapping.keySet()) {
+            resourcesPermissionsMapping.setProperty(key, permissionsMapping.get(key));
+        }
+    }
+
+    private Map<String, String> getApiExtensionResourcesPermissionsMapping(Properties pageProperties) {
+        final Properties propertiesWithSet = new PropertiesWithSet(pageProperties);
+        final Map<String, String> permissionsMap = new HashMap<>();
+        if (ContentType.API_EXTENSION.equals(propertiesWithSet.getProperty(PROPERTY_CONTENT_TYPE))) {
+            final String apiExtensionList = propertiesWithSet.getProperty(PROPERTY_API_EXTENSIONS);
+            final String[] apiExtensions = apiExtensionList.split(EXTENSION_SEPARATOR);
+            for (final String apiExtension : apiExtensions) {
+                final String method = propertiesWithSet
+                        .getProperty(String.format(PROPERTY_METHOD_MASK, apiExtension.trim()));
+                final String pathTemplate = propertiesWithSet
+                        .getProperty(String.format(PROPERTY_PATH_TEMPLATE_MASK, apiExtension.trim()));
+                final String permissions = propertiesWithSet
+                        .getProperty(String.format(PROPERTY_PERMISSIONS_MASK, apiExtension.trim()));
+                permissionsMap.put(String.format(RESOURCE_PERMISSION_KEY_MASK, method, pathTemplate),
+                        String.format(RESOURCE_PERMISSION_VALUE, permissions));
+            }
+        }
+        return permissionsMap;
+    }
+
 }

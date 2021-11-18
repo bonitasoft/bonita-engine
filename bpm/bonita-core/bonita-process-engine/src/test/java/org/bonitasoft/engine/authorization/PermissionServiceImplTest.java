@@ -15,14 +15,19 @@ package org.bonitasoft.engine.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -37,6 +42,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
@@ -96,7 +102,7 @@ public class PermissionServiceImplTest {
 
         doReturn(securityFolder).when(bonitaHomeServer).getSecurityScriptsFolder(anyLong());
 
-        doReturn(resourcesPermissionsMapping).when(permissionService).getResourcesPermissionsMapping(TENANT_ID);
+        doReturn(resourcesPermissionsMapping).when(permissionService).getResourcesPermissionsMapping();
     }
 
     @Test
@@ -407,8 +413,61 @@ public class PermissionServiceImplTest {
                 .append("        logger.warning(\"Executing my custom rule\")\n")
                 .append(methodBody)
                 .append("    }\n")
-                .append("}")
-                .append("");
+                .append("}");
         return content.toString();
     }
+
+    @Test
+    public void should_not_return_resource_when_unknown_resource_is_declared_in_PageProperties() {
+        // Given
+        doReturn(Collections.emptySet()).when(resourcesPermissionsMapping).getPropertyAsSet("GET|unknown/resource");
+        doReturn(Set.of("Organization Visualization", "Organization Management"))
+                .when(resourcesPermissionsMapping).getPropertyAsSet("PUT|identity/user");
+
+        // When
+        final Set<String> customPagePermissions = permissionService.getCustomPagePermissions(
+                "[GET|unknown/resource, PUT|identity/user]", resourcesPermissionsMapping);
+
+        // Then
+        assertThat(customPagePermissions).containsOnly("Organization Visualization", "Organization Management");
+    }
+
+    @Test
+    public void should_add_api_extension_permissions() {
+        //given
+        Properties properties = new Properties();
+        properties.put(PermissionServiceImpl.PROPERTY_CONTENT_TYPE, ContentType.API_EXTENSION);
+        properties.put(PermissionServiceImpl.PROPERTY_API_EXTENSIONS, "restResource1,restResource2");
+        properties.put("restResource1.method", "GET");
+        properties.put("restResource1.pathTemplate", "restApiGet");
+        properties.put("restResource1.permissions", "permission1");
+        properties.put("restResource2.method", "POST");
+        properties.put("restResource2.pathTemplate", "restApiPost");
+        properties.put("restResource2.permissions", "permission2,permission3");
+
+        //when
+        permissionService.addRestApiExtensionPermissions(resourcesPermissionsMapping, properties);
+
+        //then
+        verify(resourcesPermissionsMapping).setProperty("GET|extension/restApiGet", "[permission1]");
+        verify(resourcesPermissionsMapping).setProperty("POST|extension/restApiPost", "[permission2,permission3]");
+    }
+
+    @Test
+    public void should_not_add_non_api_extension_permissions_to_resource_permission_mapping() {
+        //given
+        Properties properties = new Properties();
+        properties.put(PermissionServiceImpl.PROPERTY_CONTENT_TYPE, "page");
+        properties.put(PermissionServiceImpl.PROPERTY_API_EXTENSIONS, "restResource1");
+        properties.put("restResource1.method", "GET");
+        properties.put("restResource1.pathTemplate", "restApiGet");
+        properties.put("restResource1.permissions", "permission1");
+
+        //when
+        permissionService.addRestApiExtensionPermissions(resourcesPermissionsMapping, properties);
+
+        //then
+        verifyNoInteractions(resourcesPermissionsMapping);
+    }
+
 }

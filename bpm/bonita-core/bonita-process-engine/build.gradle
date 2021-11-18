@@ -20,6 +20,7 @@ dependencies {
     compile project(':services:bonita-commons')
     compile project(':services:bonita-archive')
     compile project(':services:bonita-authentication')
+    compile project(':services:bonita-authorization')
     compile project(':services:bonita-cache')
     compile project(':services:bonita-classloader')
     compile project(':services:bonita-command')

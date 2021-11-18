@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.authorization;
 
+import java.util.Properties;
 import java.util.Set;
 
 import org.bonitasoft.engine.api.permission.APICallContext;
@@ -24,9 +25,9 @@ import org.bonitasoft.engine.commons.exceptions.SExecutionException;
  */
 public interface PermissionService extends TenantLifecycleService {
 
-    String USER_TYPE_AUTHORIZATION_PREFIX = "user";
-    String PROFILE_TYPE_AUTHORIZATION_PREFIX = "profile";
-    String SCRIPT_TYPE_AUTHORIZATION_PREFIX = "check";
+    public String USER_TYPE_AUTHORIZATION_PREFIX = "user";
+    public String PROFILE_TYPE_AUTHORIZATION_PREFIX = "profile";
+    public String SCRIPT_TYPE_AUTHORIZATION_PREFIX = "check";
 
     /**
      * execute the {@link org.bonitasoft.engine.api.permission.PermissionRule} having the class name in parameter using
@@ -47,4 +48,5 @@ public interface PermissionService extends TenantLifecycleService {
     boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions)
             throws SExecutionException;
 
+    void addPermissions(String pageName, Properties pageProperties);
 }

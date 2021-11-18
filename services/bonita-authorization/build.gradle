@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':bpm:bonita-common')
+    compile project(':services:bonita-commons')
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
+}
+
+test {
+    useJUnitPlatform()
+}
