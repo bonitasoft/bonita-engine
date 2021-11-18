@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import javax.transaction.Status;
 
+import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.scheduler.trigger.CronTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -436,7 +438,17 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             final org.quartz.Trigger oldTrigger = scheduler.getTrigger(triggerKey);
             final org.quartz.Trigger newTrigger = oldTrigger.getTriggerBuilder().startAt(triggerStartTime).build();
-            return scheduler.rescheduleJob(triggerKey, newTrigger);
+            Date date = scheduler.rescheduleJob(triggerKey, newTrigger);
+            if (useOptimization) {
+                try {
+                    transactionService.registerBonitaSynchronization(
+                            new NotifyQuartzOfNewTrigger(triggerStartTime.getTime(), quartzScheduler));
+                } catch (STransactionNotFoundException e) {
+                    logger.error("Unable to register synchronization to optimize Quartz rescheduling, "
+                            + ExceptionUtils.printLightWeightStacktrace(e));
+                }
+            }
+            return date;
         } catch (final SchedulerException e) {
             throw new SSchedulerException("Can't get the trigger " + triggerKey, e);
         }

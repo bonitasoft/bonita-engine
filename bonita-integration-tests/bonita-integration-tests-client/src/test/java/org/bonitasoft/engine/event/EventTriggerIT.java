@@ -16,6 +16,9 @@ package org.bonitasoft.engine.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -99,9 +102,16 @@ public class EventTriggerIT extends AbstractEventIT {
 
             waitForUserTask(processInstance2, EXCEPTION_STEP);
 
+            // When using optimisation, we notify quartz of a change in triggers and help it trigger any change in triggers quickly.
+            // Without optimisations, it takes around 30 seconds
+            Assertions
+                    .assertThat(Duration.between(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()),
+                            LocalDateTime.now(ZoneId.systemDefault())))
+                    .isLessThanOrEqualTo(Duration.ofSeconds(10));
             Assertions.assertThat(
                     getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult())
                     .isEmpty();
+
         } finally {
             disableAndDeleteProcess(process2, process1);
         }
