@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -139,8 +140,9 @@ public class PageServiceImpl implements PageService {
 
     private final QueriableLoggerService queriableLoggerService;
 
-    private ReadSessionAccessor sessionAccessor;
-    private SessionService sessionService;
+    private final ReadSessionAccessor sessionAccessor;
+    private final SessionService sessionService;
+    private PermissionService permissionService;
 
     private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
             PageServiceImpl.class.getClassLoader());
@@ -153,14 +155,14 @@ public class PageServiceImpl implements PageService {
     private boolean initialized = false;
 
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final QueriableLoggerService queriableLoggerService,
-            ReadSessionAccessor sessionAccessor,
-            SessionService sessionService) {
+            final QueriableLoggerService queriableLoggerService, ReadSessionAccessor sessionAccessor,
+            SessionService sessionService, PermissionService permissionService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.queriableLoggerService = queriableLoggerService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
+        this.permissionService = permissionService;
         helper = new SPageContentHelper();
     }
 
@@ -169,7 +171,8 @@ public class PageServiceImpl implements PageService {
             throws SObjectCreationException, SObjectAlreadyExistsException,
             SInvalidPageZipException, SInvalidPageTokenException {
         try {
-            checkZipContainsRequiredEntries(unzip(content));
+            final Map<String, byte[]> zipContent = unzip(content);
+            checkZipContainsRequiredEntries(zipContent);
             checkPageNameIsValid(page.getName(), page.isProvided());
             checkPageDisplayNameIsValid(page.getDisplayName());
             return insertPage(page, content);
@@ -230,6 +233,10 @@ public class PageServiceImpl implements PageService {
                 .contentName(contentName)
                 .contentType(pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE)).build();
 
+    }
+
+    private void addPermissionsFromPageProperties(String pageName, Properties pageProperties) {
+        permissionService.addPermissions(pageName, pageProperties);
     }
 
     @Override
@@ -313,12 +320,12 @@ public class PageServiceImpl implements PageService {
                 throwAlreadyExistsException(pageByName.getName());
             }
             recorder.recordInsert(new InsertRecord(pageContent), PAGE);
+            addPermissionsFromPageProperties(page.getName(), helper.loadPageProperties(unzip(content)));
             page.setId(pageContent.getId());
             notifyPageInsert(page, content);
             return page;
-        } catch (final SObjectCreationException ce) {
-            throw ce;
-        } catch (SRecorderException | SBonitaReadException re) {
+        } catch (SRecorderException | SBonitaReadException | IOException
+                | SInvalidPageZipMissingPropertiesException re) {
             throw new SObjectCreationException(re);
         }
     }
@@ -463,7 +470,7 @@ public class PageServiceImpl implements PageService {
         final byte[] content = page.getContent();
         try {
             final Map<String, byte[]> contentAsMap = unzip(content);
-            final byte[] bytes = contentAsMap.get("page.properties");
+            final byte[] bytes = contentAsMap.get(PROPERTIES_FILE_NAME);
             final Properties pageProperties = new Properties();
             if (bytes != null) {
                 pageProperties.load(new ByteArrayInputStream(bytes));
@@ -473,14 +480,13 @@ public class PageServiceImpl implements PageService {
             if (page.getDescription() != null) {
                 pageProperties.put(PROPERTIES_DESCRIPTION, page.getDescription());
             }
-            contentAsMap.put("page.properties",
+            contentAsMap.put(PROPERTIES_FILE_NAME,
                     IOUtil.getPropertyAsString(pageProperties, "The name must start with 'custompage_'"));
 
             return IOUtil.zip(contentAsMap);
         } catch (final IOException e) {
             throw new SBonitaReadException("the page is not a valid zip file", e);
         }
-
     }
 
     @Override
@@ -494,7 +500,6 @@ public class PageServiceImpl implements PageService {
         } catch (SBonitaReadException e) {
             throw new SObjectModificationException(e);
         }
-
     }
 
     AbstractSPage updatePage(EntityUpdateDescriptor entityUpdateDescriptor, AbstractSPage sPage)
@@ -508,10 +513,8 @@ public class PageServiceImpl implements PageService {
                         "The page '" + sPage.getName() + "' cannot be modified because it is not modifiable");
             }
             if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_PROCESS_DEFINITION_ID)) {
-                checkPageDuplicateForProcessDefinition(sPage, entityUpdateDescriptor, logBuilder, logMethodName,
-                        Long.parseLong(
-                                entityUpdateDescriptor.getFields().get(SPageFields.PAGE_PROCESS_DEFINITION_ID)
-                                        .toString()));
+                checkPageDuplicateForProcessDefinition(sPage, logBuilder, Long.parseLong(
+                        entityUpdateDescriptor.getFields().get(SPageFields.PAGE_PROCESS_DEFINITION_ID).toString()));
             }
             recorder.recordUpdate(UpdateRecord.buildSetFields(sPage, entityUpdateDescriptor), PAGE);
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, logMethodName);
@@ -528,9 +531,8 @@ public class PageServiceImpl implements PageService {
         return sessionService.getLoggedUserFromSession(sessionAccessor) == SessionService.SYSTEM_ID;
     }
 
-    protected void checkPageDuplicateForProcessDefinition(final AbstractSPage sPage,
-            final EntityUpdateDescriptor entityUpdateDescriptor,
-            final SPageLogBuilder logBuilder, final String logMethodName, long sPageProcessDefinitionId)
+    protected void checkPageDuplicateForProcessDefinition(
+            final AbstractSPage sPage, final SPageLogBuilder logBuilder, long sPageProcessDefinitionId)
             throws SBonitaReadException, SObjectAlreadyExistsException {
 
         String sPageName = sPage.getName();
@@ -538,7 +540,7 @@ public class PageServiceImpl implements PageService {
             SPage page = getPageByNameAndProcessDefinitionId(sPageName, sPageProcessDefinitionId);
 
             if (page != null && page.getId() != sPage.getId()) {
-                initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+                initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
                 throwAlreadyExistsException(page.getName());
             }
         }
@@ -570,7 +572,7 @@ public class PageServiceImpl implements PageService {
             entityUpdateDescriptor.addField("content", content);
             recorder.recordUpdate(UpdateRecord.buildSetFields(sPageContent,
                     entityUpdateDescriptor), PAGE);
-
+            addPermissionsFromPageProperties(pageProperties.getProperty(PROPERTIES_NAME), pageProperties);
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
 
         } catch (SRecorderException | SBonitaReadException re) {

@@ -54,8 +54,7 @@ public class PermissionAPIImpl implements PermissionAPI {
             throws ExecutionException {
         TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         try {
-            return serviceAccessor.getPermissionService()
-                    .isAuthorized(apiCallContext, reload, userPermissions);
+            return serviceAccessor.getPermissionService().isAuthorized(apiCallContext, reload, userPermissions);
         } catch (SExecutionException e) {
             throw new ExecutionException(e);
         }

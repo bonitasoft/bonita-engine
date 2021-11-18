@@ -15,6 +15,7 @@ package org.bonitasoft.engine.test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -32,8 +33,7 @@ public class CommonTestUtil {
      * @throws IOException
      */
     public static byte[] createTestPageContent(final String pageName, final String displayName,
-            final String description, final String... extraProperties)
-            throws IOException {
+            final String description, final String... extraProperties) throws IOException {
         try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ZipOutputStream zos = new ZipOutputStream(baos)) {
             zos.putNextEntry(new ZipEntry("Index.groovy"));
@@ -53,10 +53,9 @@ public class CommonTestUtil {
             for (final String extraProperty : extraProperties) {
                 stringBuilder.append(extraProperty);
                 stringBuilder.append("\n");
-
             }
 
-            zos.write(stringBuilder.toString().getBytes("UTF-8"));
+            zos.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
 
             zos.closeEntry();
             return baos.toByteArray();

@@ -14,31 +14,14 @@
 package org.bonitasoft.engine.page.impl;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.engine.commons.Pair.pair;
+import static org.bonitasoft.engine.io.FileAndContentUtils.file;
+import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -53,6 +36,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -143,6 +127,8 @@ public class PageServiceImplTest {
     private ReadSessionAccessor sessionAccessor;
     @Mock
     private SessionService sessionService;
+    @Mock
+    private PermissionService permissionService;
 
     @Mock
     private EntityUpdateDescriptor entityUpdateDescriptor;
@@ -160,7 +146,7 @@ public class PageServiceImplTest {
     public void before() {
         pageServiceImpl = spy(
                 new PageServiceImpl(readPersistenceService, recorder, queriableLoggerService, sessionAccessor,
-                        sessionService));
+                        sessionService, permissionService));
         doReturn(pageLogBuilder).when(pageServiceImpl).getPageLog(any(ActionType.class), anyString());
         doNothing().when(pageServiceImpl).initiateLogBuilder(anyLong(), anyInt(), any(SPersistenceLogBuilder.class),
                 anyString());
@@ -1358,4 +1344,70 @@ public class PageServiceImplTest {
         verify(recorder).recordUpdate(any(), any());
     }
 
+    @Test
+    public void add_page_should_call_permission_service() throws Exception {
+        // given:
+        SPage page = new SPage();
+        page.setName("custompage_test");
+        page.setDisplayName("My Custom Page");
+        byte[] zip = zip(
+                file("page.properties", "name=custompage_test\ncontentType=page"),
+                file("resources/index.html", "someContent"));
+        Properties properties = new Properties();
+        properties.put("name", "custompage_test");
+        properties.put("contentType", "page");
+
+        // when:
+        pageServiceImpl.addPage(page, zip);
+
+        // then:
+        verify(permissionService).addPermissions(page.getName(), properties);
+    }
+
+    @Test
+    public void add_page_from_content_should_call_permission_service() throws Exception {
+        // given:
+        SPage page = new SPage();
+        page.setName("custompage_test");
+        page.setDisplayName("My Custom Page");
+        byte[] zip = zip(
+                file("page.properties", "name=custompage_test\ncontentType=page\ndisplayName=My Custom page"),
+                file("resources/index.html", "someContent"));
+        Properties properties = new Properties();
+        properties.put("name", "custompage_test");
+        properties.put("contentType", "page");
+        properties.put("displayName", "My Custom page");
+
+        // when:
+        pageServiceImpl.addPage(page, zip);
+
+        // then:
+        verify(permissionService).addPermissions(page.getName(), properties);
+    }
+
+    @Test
+    public void update_page_should_call_permission_service() throws Exception {
+        // given:
+        SPage page = new SPage();
+        page.setId(174L);
+        page.setName("custompage_test");
+        page.setDisplayName("My Custom Page");
+        SPageWithContent sPageContent = new SPageWithContent();
+        byte[] zip = zip(
+                file("page.properties", "name=custompage_test\ncontentType=page\ndisplayName=My Custom page"),
+                file("resources/index.html", "someContent"));
+        Properties properties = new Properties();
+        properties.put("name", "custompage_test");
+        properties.put("contentType", "page");
+        properties.put("displayName", "My Custom page");
+
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, 174L)))
+                .thenReturn(sPageContent);
+
+        // when:
+        pageServiceImpl.updatePageContent(174L, zip, "myNewContent.zip");
+
+        // then:
+        verify(permissionService).addPermissions(page.getName(), properties);
+    }
 }

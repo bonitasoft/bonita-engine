@@ -1,11 +1,10 @@
-
-
 dependencies {
     compile project(':services:bonita-log')
     compile project(':services:bonita-builder')
     compile project(':services:bonita-events')
     compile project(':services:bonita-persistence')
     compile project(':services:bonita-commons')
+    compile project(':services:bonita-authorization')
     compile project(':bpm:bonita-common')
 
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"

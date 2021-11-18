@@ -15,6 +15,7 @@ package org.bonitasoft.engine.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.bonitasoft.engine.page.PageAssert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,10 +27,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
@@ -96,8 +100,8 @@ public class PageAPIIT extends CommonAPIIT {
         final Page returnedPage = getPageAPI().getPage(page.getId());
 
         // then
-        assertThat(returnedPage).isEqualToComparingFieldByField(page);
-        PageAssert.assertThat(returnedPage)
+        Assertions.assertThat(returnedPage).usingRecursiveComparison().isEqualTo(page);
+        assertThat(returnedPage)
                 .hasProcessDefinitionId(PROCESS_DEFINITION_ID)
                 .hasContentType(ContentType.FORM);
     }
@@ -157,7 +161,7 @@ public class PageAPIIT extends CommonAPIIT {
         final Page returnedPage = getPageAPI().updatePage(pageBeforeUpdate.getId(), pageUpdater);
 
         // then
-        PageAssert.assertThat(returnedPage)
+        assertThat(returnedPage)
                 .hasInstalledBy(john.getId())
                 .hasInstalledBy(pageBeforeUpdate.getInstalledBy())
                 .hasLastUpdatedBy(jack.getId())
@@ -310,8 +314,13 @@ public class PageAPIIT extends CommonAPIIT {
         final Page pageWithContent = getPageAPI().createPage(pageName2, pageContent2);
 
         // then
-        PageAssert.assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
-        PageAssert.assertThat(pageWithCreator).hasContentType(ContentType.API_EXTENSION);
+        assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
+        assertThat(pageWithCreator).hasContentType(ContentType.API_EXTENSION);
+
+        // Check that permission has been written to file through user permission check:
+        APICallContext apiCallContext = new APICallContext("GET", "extension", "helloWorld", null);
+        final Set<String> userPermissions = Set.of("newPermission");
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isTrue();
     }
 
     @Test
@@ -335,7 +344,7 @@ public class PageAPIIT extends CommonAPIIT {
         pageWithContent = getPageAPI().createPage(pageName, pageContent);
 
         // then
-        PageAssert.assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
+        assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
     }
 
     @Test
@@ -351,7 +360,7 @@ public class PageAPIIT extends CommonAPIIT {
         final Page returnedPage = getPageAPI().getPageByName(page.getName());
 
         // then
-        assertThat(returnedPage).isEqualToComparingFieldByField(page);
+        Assertions.assertThat(returnedPage).isEqualToComparingFieldByField(page);
     }
 
     @Test(expected = AlreadyExistsException.class)
@@ -552,7 +561,7 @@ public class PageAPIIT extends CommonAPIIT {
         // then
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have only one matching page").isEqualTo(1);
-        assertThat(results.get(0)).as("should get the page with matching search term")
+        Assertions.assertThat(results.get(0)).as("should get the page with matching search term")
                 .isEqualToComparingFieldByField(pageWithMatchingSearchTerm);
     }
 
@@ -722,7 +731,7 @@ public class PageAPIIT extends CommonAPIIT {
 
         // then
         final List<Page> results = searchPages.getResult();
-        assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
+        Assertions.assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
 
     }
 
@@ -744,15 +753,23 @@ public class PageAPIIT extends CommonAPIIT {
                 "with content " + PAGE_DESCRIPTION, "contentType="
                         + ContentType.API_EXTENSION,
                 "apiExtensions=myGetResource, myPutResource", "myGetResource.method=GET",
-                "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.pathTemplate=helloWorld_v2",
                 "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
                 "myPutResource.method=PUT",
                 "myPutResource.pathTemplate=helloWorld", "myPutResource.classFileName=Index.groovy",
                 "myPutResource.permissions = newPermission");
 
+        // Check that we are not authorized before update of the page properties content:
+        APICallContext apiCallContext = new APICallContext("GET", "extension", "helloWorld_v2", null);
+        final Set<String> userPermissions = Set.of("newPermission");
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isFalse();
+
         // when
         final Page page = getPageAPI().createPage(pageName, pageContent1);
         getPageAPI().updatePageContent(page.getId(), pageContent2);
+
+        // Check that permission has been update to file through user permission check:
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isTrue();
     }
 
     @Test
