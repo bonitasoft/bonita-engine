@@ -239,6 +239,10 @@ public class PageServiceImpl implements PageService {
         permissionService.addPermissions(pageName, pageProperties);
     }
 
+    private void removePermissionsDeclaredInPageProperties(Properties pageProperties) {
+        permissionService.removePermissions(pageProperties);
+    }
+
     @Override
     public Properties readPageZip(final byte[] content)
             throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException,
@@ -256,8 +260,8 @@ public class PageServiceImpl implements PageService {
             throw new SInvalidPageZipInconsistentException("Content can't be null");
         }
         try {
+            pageProperties = getPreviousPageProperties(content);
             final Map<String, byte[]> zipContent = unzip(content);
-            pageProperties = helper.loadPageProperties(zipContent);
             if (isAnAPIExtension(pageProperties)) {
                 checkApiControllerExists(zipContent, pageProperties);
             } else {
@@ -320,7 +324,7 @@ public class PageServiceImpl implements PageService {
                 throwAlreadyExistsException(pageByName.getName());
             }
             recorder.recordInsert(new InsertRecord(pageContent), PAGE);
-            addPermissionsFromPageProperties(page.getName(), helper.loadPageProperties(unzip(content)));
+            addPermissionsFromPageProperties(page.getName(), getPreviousPageProperties(content));
             page.setId(pageContent.getId());
             notifyPageInsert(page, content);
             return page;
@@ -430,12 +434,18 @@ public class PageServiceImpl implements PageService {
     private void deletePage(final SPage sPage) throws SObjectModificationException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.DELETED, "Deleting page named: " + sPage.getName());
         try {
+            // Need to read previous version permissions from page properties before deleting the page:
+            Properties pageProperties = getPreviousPageProperties(sPage);
+
             for (final PageServiceListener pageServiceListener : pageServiceListeners) {
                 pageServiceListener.pageDeleted(sPage);
             }
             recorder.recordDelete(new DeleteRecord(sPage), PAGE);
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
-        } catch (SRecorderException | SBonitaReadException | SDeletionException re) {
+            removePermissionsDeclaredInPageProperties(pageProperties);
+            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder,
+                    METHOD_DELETE_PAGE);
+        } catch (SRecorderException | SBonitaReadException | SDeletionException | SObjectNotFoundException
+                | SInvalidPageZipMissingPropertiesException | IOException re) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(re);
         }
@@ -566,16 +576,21 @@ public class PageServiceImpl implements PageService {
         final Properties pageProperties = readPageZip(content, false);
         final SPageWithContent sPageContent;
         try {
-            sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
-                    SPageWithContent.class, pageId));
+            sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, pageId));
+
+            // Need to read previous version permissions from page properties before deleting the page:
+            Properties previousPageProperties = getPreviousPageProperties(sPageContent.getContent());
+
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("content", content);
-            recorder.recordUpdate(UpdateRecord.buildSetFields(sPageContent,
-                    entityUpdateDescriptor), PAGE);
-            addPermissionsFromPageProperties(pageProperties.getProperty(PROPERTIES_NAME), pageProperties);
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(sPageContent, entityUpdateDescriptor), PAGE);
 
-        } catch (SRecorderException | SBonitaReadException re) {
+            // remove previous permissions before adding the new ones:
+            removePermissionsDeclaredInPageProperties(previousPageProperties);
+            addPermissionsFromPageProperties(pageProperties.getProperty(PROPERTIES_NAME), pageProperties);
+
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
+        } catch (SRecorderException | SBonitaReadException | IOException re) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(re);
         }
@@ -600,6 +615,15 @@ public class PageServiceImpl implements PageService {
         for (final PageServiceListener pageServiceListener : pageServiceListeners) {
             pageServiceListener.pageUpdated(sPage, content);
         }
+    }
+
+    Properties getPreviousPageProperties(SPage sPage) throws IOException, SInvalidPageZipMissingPropertiesException,
+            SBonitaReadException, SObjectNotFoundException {
+        return getPreviousPageProperties(getPageContent(sPage.getId()));
+    }
+
+    Properties getPreviousPageProperties(byte[] content) throws IOException, SInvalidPageZipMissingPropertiesException {
+        return helper.loadPageProperties(content);
     }
 
     @Override

@@ -42,6 +42,7 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.ContentType;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.impl.ServerLoggerWrapper;
 import org.bonitasoft.engine.session.APISession;
@@ -239,7 +240,15 @@ public class PermissionServiceImpl implements PermissionService {
         getCompoundPermissionsMapping().setPropertyAsSet(pageName, customPagePermissions);
     }
 
-    private CompoundPermissionsMapping getCompoundPermissionsMapping() {
+    @Override
+    public void removePermissions(Properties pageProperties) {
+        for (String key : getApiExtensionResourcesPermissionsMapping(pageProperties).keySet()) {
+            getResourcesPermissionsMapping().removeProperty(key);
+        }
+        getCompoundPermissionsMapping().removeProperty(pageProperties.getProperty(PageService.PROPERTIES_NAME));
+    }
+
+    protected CompoundPermissionsMapping getCompoundPermissionsMapping() {
         return new CompoundPermissionsMapping(tenantId);
     }
 

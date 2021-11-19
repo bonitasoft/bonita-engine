@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
+import org.bonitasoft.engine.authorization.properties.CompoundPermissionsMapping;
 import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -470,4 +471,43 @@ public class PermissionServiceImplTest {
         verifyNoInteractions(resourcesPermissionsMapping);
     }
 
+    @Test
+    public void removePermissions_should_remove_all_rest_api_keys_from_properties() {
+        // given:
+        Properties properties = new Properties();
+        properties.put(PermissionServiceImpl.PROPERTY_CONTENT_TYPE, ContentType.API_EXTENSION);
+        properties.put(PermissionServiceImpl.PROPERTY_API_EXTENSIONS, "restResource");
+        properties.put("restResource.method", "GET");
+        properties.put("restResource.pathTemplate", "restApiGet");
+        properties.put("restResource.permissions", "permission");
+
+        doReturn(mock(CompoundPermissionsMapping.class)).when(permissionService).getCompoundPermissionsMapping();
+
+        // when:
+        permissionService.removePermissions(properties);
+
+        // then:
+        verify(resourcesPermissionsMapping).removeProperty("GET|extension/restApiGet");
+    }
+
+    @Test
+    public void removePermissions_should_remove_key_from_compound_permission_mappings() {
+        // given:
+        Properties properties = new Properties();
+        properties.put("name", "custompage_page44");
+        properties.put(PermissionServiceImpl.PROPERTY_CONTENT_TYPE, ContentType.API_EXTENSION);
+        properties.put(PermissionServiceImpl.PROPERTY_API_EXTENSIONS, "restResource");
+        properties.put("restResource.method", "GET");
+        properties.put("restResource.pathTemplate", "restApiGet");
+        properties.put("restResource.permissions", "permission");
+
+        final CompoundPermissionsMapping compoundPermissionsMapping = mock(CompoundPermissionsMapping.class);
+        doReturn(compoundPermissionsMapping).when(permissionService).getCompoundPermissionsMapping();
+
+        // when:
+        permissionService.removePermissions(properties);
+
+        // then:
+        verify(compoundPermissionsMapping).removeProperty("custompage_page44");
+    }
 }
