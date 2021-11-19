@@ -49,4 +49,6 @@ public interface PermissionService extends TenantLifecycleService {
             throws SExecutionException;
 
     void addPermissions(String pageName, Properties pageProperties);
+
+    void removePermissions(Properties pageProperties);
 }

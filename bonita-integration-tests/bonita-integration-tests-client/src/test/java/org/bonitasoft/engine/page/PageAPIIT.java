@@ -736,12 +736,11 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
-    public void updatePageContent_should_update_mappings() throws Exception {
+    public void updatePageContent_and_deletePage_should_update_mappings() throws Exception {
         // given
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME,
-                "with content " + PAGE_DESCRIPTION, "contentType="
-                        + ContentType.API_EXTENSION,
+                "with content " + PAGE_DESCRIPTION, "contentType=" + ContentType.API_EXTENSION,
                 "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET",
                 "myGetResource.pathTemplate=helloWorld",
                 "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
@@ -750,8 +749,7 @@ public class PageAPIIT extends CommonAPIIT {
                 "myPostResource.permissions = newPermission");
 
         final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME,
-                "with content " + PAGE_DESCRIPTION, "contentType="
-                        + ContentType.API_EXTENSION,
+                "with content " + PAGE_DESCRIPTION, "contentType=" + ContentType.API_EXTENSION,
                 "apiExtensions=myGetResource, myPutResource", "myGetResource.method=GET",
                 "myGetResource.pathTemplate=helloWorld_v2",
                 "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
@@ -770,6 +768,13 @@ public class PageAPIIT extends CommonAPIIT {
 
         // Check that permission has been update to file through user permission check:
         assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isTrue();
+        // Check that previous version has indeed been removed:
+        assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "extension", "helloWorld", null), false,
+                userPermissions)).isFalse();
+
+        getPageAPI().deletePage(page.getId());
+        // Check that permissions have been removed with the page deletion:
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isFalse();
     }
 
     @Test

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.page.impl;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.engine.commons.Pair.pair;
@@ -27,7 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
@@ -403,7 +403,7 @@ public class PageServiceImplTest {
         pageInDb.setDisplayName("mypage display name");
         pageInDb.setId(12);
         pageInDb.setProvided(true);
-        pageInDb.setPageHash(DigestUtils.md5DigestAsHex("some hash".getBytes(StandardCharsets.UTF_8)));
+        pageInDb.setPageHash(DigestUtils.md5DigestAsHex("some hash".getBytes(UTF_8)));
 
         doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
 
@@ -436,7 +436,7 @@ public class PageServiceImplTest {
         page.setId(12);
         page.setProvided(false);
 
-        page.setPageHash(DigestUtils.md5DigestAsHex("some hash".getBytes(StandardCharsets.UTF_8)));
+        page.setPageHash(DigestUtils.md5DigestAsHex("some hash".getBytes(UTF_8)));
 
         doReturn(page).when(pageServiceImpl).getPageByName("custompage_mypage");
 
@@ -723,10 +723,12 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void deletePage() throws SBonitaException {
+    public void deletePage_should_call_delete_on_recorder() throws Exception {
         final long pageId = 15;
         final SPage expected = new SPage("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
+
+        doReturn(new Properties()).when(pageServiceImpl).getPreviousPageProperties(expected);
 
         doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
         doReturn(expected).when(pageServiceImpl).getPage(pageId);
@@ -738,11 +740,12 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void deletePageThrowsPageNotFoundException() throws SBonitaException {
+    public void deletePageThrowsPageNotFoundException() throws Exception {
         final long pageId = 15L;
         final SPage expected = new SPage("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
 
+        doReturn(new Properties()).when(pageServiceImpl).getPreviousPageProperties(expected);
         doThrow(new SRecorderException("ouch !")).when(recorder).recordDelete(any(DeleteRecord.class),
                 nullable(String.class));
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId))).thenReturn(expected);
@@ -1228,10 +1231,11 @@ public class PageServiceImplTest {
         //given
         final SPage sPage = new SPage("name", 10201983L, 2005L, false, "contentName");
         sPage.setId(45L);
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), pagePropertiesContentPair);
         final SPageWithContent pageContent = new SPageWithContent();
+        pageContent.setContent(content);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, sPage.getId())))
                 .thenReturn(pageContent);
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), pagePropertiesContentPair);
 
         //then
         doAnswer((Answer<Object>) invocation -> {
@@ -1276,12 +1280,15 @@ public class PageServiceImplTest {
     public void should_not_update_page_content_hash_of_not_provided_pages() throws Exception {
         SPage page = new SPage("userPage", 10201983L, 2005L, false, "contentName");
         page.setId(55L);
+        final byte[] zip = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair("contentType=" + SContentType.PAGE));
+        final SPageWithContent pageWithContent = new SPageWithContent();
+        pageWithContent.setContent(zip);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, page.getId())))
-                .thenReturn(new SPageWithContent());
+                .thenReturn(pageWithContent);
         doReturn(page).when(pageServiceImpl).updatePage(entityUpdateDescriptorCaptor.capture(), any());
 
-        pageServiceImpl.updatePageContent(page.getId(), IOUtil.zip(getIndexGroovyContentPair(),
-                getPagePropertiesContentPair("contentType=" + SContentType.PAGE)), "contentName");
+        pageServiceImpl.updatePageContent(page.getId(), zip, "contentName");
 
         assertThat(entityUpdateDescriptorCaptor.getValue().getFields()).doesNotContainKey("pageHash");
     }
@@ -1289,7 +1296,9 @@ public class PageServiceImplTest {
     @Test
     public void deletePage_should_execute_listener() throws Exception {
         final SPage page = new SPage("name", 10201983L, 2005L, false, "contentName");
-        when(readPersistenceService.selectById(any())).thenReturn(page);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, 1983L)))
+                .thenReturn(page);
+        doReturn(new Properties()).when(pageServiceImpl).getPreviousPageProperties(page);
 
         pageServiceImpl.deletePage(1983L);
 
@@ -1308,8 +1317,7 @@ public class PageServiceImplTest {
                 () -> pageServiceImpl.deletePage(1983L)).getMessage();
 
         //then
-        assertThat(exceptionMessage)
-                .contains("The page 'a page name' cannot be deleted because it is non-removable");
+        assertThat(exceptionMessage).contains("The page 'a page name' cannot be deleted because it is non-removable");
     }
 
     @Test
@@ -1345,7 +1353,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void add_page_should_call_permission_service() throws Exception {
+    public void add_page_should_call_permission_service_with_the_parsed_properties() throws Exception {
         // given:
         SPage page = new SPage();
         page.setName("custompage_test");
@@ -1365,7 +1373,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void add_page_from_content_should_call_permission_service() throws Exception {
+    public void add_page_from_content_should_call_permission_service_with_the_parsed_properties() throws Exception {
         // given:
         SPage page = new SPage();
         page.setName("custompage_test");
@@ -1386,16 +1394,18 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void update_page_should_call_permission_service() throws Exception {
+    public void update_page_should_call_permission_service_with_the_parsed_properties() throws Exception {
         // given:
         SPage page = new SPage();
         page.setId(174L);
         page.setName("custompage_test");
         page.setDisplayName("My Custom Page");
-        SPageWithContent sPageContent = new SPageWithContent();
         byte[] zip = zip(
                 file("page.properties", "name=custompage_test\ncontentType=page\ndisplayName=My Custom page"),
                 file("resources/index.html", "someContent"));
+        SPageWithContent sPageContent = new SPageWithContent();
+        sPageContent.setContent(zip);
+
         Properties properties = new Properties();
         properties.put("name", "custompage_test");
         properties.put("contentType", "page");
