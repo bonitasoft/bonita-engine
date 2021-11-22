@@ -39,6 +39,17 @@ public class SessionProviderImplTest {
     }
 
     @Test(expected = SSessionNotFoundException.class)
+    public void removeSession_should_not_be_able_to_delete_sessions_of_other_tenants() throws Exception {
+        final SessionProvider sessionProvider1 = new SessionProviderImpl();
+        final SessionProvider sessionProvider2 = new SessionProviderImpl();
+
+        sessionProvider1.addSession(SSession.builder().id(19L).tenantId(1).userName("john").userId(12).build());
+        sessionProvider2.addSession(SSession.builder().id(20L).tenantId(2).userName("john").userId(12).build());
+
+        sessionProvider1.removeSession(20);
+    }
+
+    @Test(expected = SSessionNotFoundException.class)
     public void testRemoveSession() throws Exception {
         sessionProvider.addSession(SSession.builder().id(12L).tenantId(1).userName("john").userId(12).build());
         sessionProvider.removeSession(12);
