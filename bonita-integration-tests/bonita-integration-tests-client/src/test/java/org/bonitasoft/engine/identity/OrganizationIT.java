@@ -439,6 +439,44 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     @Test
+    public void should_not_update_existing_user_when_importing_orga_in_IGNORE_DUPLICATES() throws Exception {
+        User walter, oldManager, newManager;
+
+        // first upload of ACME orga
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream("ACME.xml")) {
+            getIdentityAPI().importOrganizationWithWarnings(new String(IOUtils.toByteArray(xmlStream)),
+                    ImportPolicy.IGNORE_DUPLICATES);
+        }
+
+        //change walter.bates manager
+        walter = getIdentityAPI().getUserByUserName("walter.bates");
+        //set new new manager
+        oldManager = getIdentityAPI().getUser(walter.getManagerUserId());
+        newManager = getIdentityAPI().getUserByUserName("william.jobs");
+
+        //set new manager
+        assertThat(oldManager.getId()).isNotEqualTo(newManager.getId());
+        getIdentityAPI().updateUser(walter.getId(), new UserUpdater()
+                .setLastName("Bates-Jobs")
+                .setManagerId(newManager.getId()));
+
+        //import again ACME orga
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream("ACME.xml")) {
+            getIdentityAPI().importOrganizationWithWarnings(new String(IOUtils.toByteArray(xmlStream)),
+                    ImportPolicy.IGNORE_DUPLICATES);
+        }
+
+        //check if user still have the newManager as Manager
+        assertThat(getIdentityAPI().getUserByUserName("walter.bates")).satisfies(u -> {
+            assertThat(u.getManagerUserId()).isEqualTo(newManager.getId());
+            assertThat(u.getLastName()).isEqualTo("Bates-Jobs");
+        });
+
+        // clean-up
+        getIdentityAPI().deleteOrganization();
+    }
+
+    @Test
     public void importACMEOrganizationTwiceButRemoveGroupsAndRole() throws Exception {
         // create XML file
 

@@ -53,4 +53,9 @@ public class ImportOrganizationIgnoreDuplicatesStrategy implements ImportOrganiz
             final ExportedCustomUserInfoDefinition newUserInfoDefinition) {
     }
 
+    @Override
+    public boolean shouldSkipUpdateManagerOfExistingUser() {
+        return true;
+    }
+
 }
