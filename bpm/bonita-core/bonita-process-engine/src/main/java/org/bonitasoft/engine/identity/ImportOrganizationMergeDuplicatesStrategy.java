@@ -215,6 +215,11 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         identityService.updateCustomUserInfoDefinition(existingUserInfoDefinition, updateDescriptor);
     }
 
+    @Override
+    public boolean shouldSkipUpdateManagerOfExistingUser() {
+        return false;
+    }
+
     private EntityUpdateDescriptor getUpdateDescriptor(final String newDescription) {
         final SCustomUserInfoDefinitionUpdateBuilder builder = BuilderFactory
                 .get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance();
