@@ -16,9 +16,7 @@ package org.bonitasoft.engine.authorization.properties;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.authorization.properties.ConfigurationFilesManager.getProperties;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -52,7 +50,7 @@ public class ConfigurationFilesManagerTest {
     private ArgumentCaptor<byte[]> contentCaptor;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         doReturn(bonitaHomeServer).when(configurationFilesManager).getConfigurationFilesUtils();
     }
 

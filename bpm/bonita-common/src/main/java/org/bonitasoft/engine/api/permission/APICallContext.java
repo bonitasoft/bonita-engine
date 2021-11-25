@@ -61,8 +61,8 @@ public class APICallContext implements Serializable {
      * body of the api call
      */
     private String body;
-    private Map<String, String> filters = new HashMap<String, String>();
-    private Map<String, String[]> parameters = new HashMap<String, String[]>();
+    private Map<String, String> filters = new HashMap<>();
+    private final Map<String, String[]> parameters = new HashMap<>();
     private String searchTerm;
 
     /**
@@ -105,7 +105,7 @@ public class APICallContext implements Serializable {
     }
 
     private void parseQueryString(String queryString) {
-        this.filters = new HashMap<String, String>();
+        this.filters = new HashMap<>();
         if (queryString == null) {
             return;
         }
@@ -113,7 +113,7 @@ public class APICallContext implements Serializable {
             int indexOfEquals = element.indexOf("=");
             if (indexOfEquals > 0 && indexOfEquals + 1 < element.length()) {
                 String key = element.substring(0, indexOfEquals);
-                String value = element.substring(indexOfEquals + 1, element.length());
+                String value = element.substring(indexOfEquals + 1);
                 if (FILTER_KEY.equals(key)) {
                     addFilter(value);
                 } else if (SEARCH_TERM_KEY.equals(key)) {
@@ -143,7 +143,7 @@ public class APICallContext implements Serializable {
     private void addFilterIfValueNotBlank(String value, int indexOfEquals, int separatorSize) {
         if (indexOfEquals + separatorSize < value.length()) {
             filters.put(value.substring(0, indexOfEquals),
-                    value.substring(indexOfEquals + separatorSize, value.length()));
+                    value.substring(indexOfEquals + separatorSize));
         }
     }
 
@@ -217,7 +217,7 @@ public class APICallContext implements Serializable {
      *         identifiers are separated with a / in the URL)
      */
     public List<String> getCompoundResourceId() {
-        return resourceId == null ? Collections.<String> emptyList() : Arrays.asList(resourceId.split("/"));
+        return resourceId == null ? Collections.emptyList() : Arrays.asList(resourceId.split("/"));
     }
 
     /**

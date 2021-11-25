@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application.impl;
 
+import static java.lang.String.format;
 import static org.bonitasoft.engine.business.application.model.SApplicationWithIcon.ALWAYS_MODIFIABLE_FIELDS;
 
 import java.util.Collections;
@@ -26,15 +27,29 @@ import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuCl
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationPageDestructor;
 import org.bonitasoft.engine.business.application.impl.converter.MenuIndexConverter;
-import org.bonitasoft.engine.business.application.model.*;
+import org.bonitasoft.engine.business.application.model.AbstractSApplication;
+import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
+import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuLogBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationPageLogBuilder;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationLogBuilderImpl;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuLogBuilderImpl;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageLogBuilderImpl;
-import org.bonitasoft.engine.commons.exceptions.*;
-import org.bonitasoft.engine.persistence.*;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -222,8 +237,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         try {
             final SApplication application = getApplication(applicationId);
             if (!application.isEditable()) {
-                throw new SObjectModificationException(
-                        "The application is set as non modifiable. It cannot be deleted.");
+                throw new SObjectModificationException(format(
+                        "The application '%s' is set as non modifiable. It cannot be deleted.",
+                        application.getDisplayName()));
             }
             deleteApplication(application);
         } catch (final SObjectNotFoundException e) {

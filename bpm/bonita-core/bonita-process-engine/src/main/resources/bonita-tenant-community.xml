@@ -892,20 +892,9 @@
         <constructor-arg name="pageMappingService" ref="pageMappingService" />
     </bean>
 
-
     <bean id="technicalUser" class="org.bonitasoft.engine.core.login.TechnicalUser">
         <constructor-arg name="userName" value="${userName}" />
         <constructor-arg name="password" value="${userPassword}" />
-    </bean>
-
-
-    <bean id="loginService" class="org.bonitasoft.engine.core.login.SecuredLoginServiceImpl">
-        <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
-        <constructor-arg ref="sessionService" />
-        <constructor-arg ref="identityService" />
-        <constructor-arg ref="tenantTechnicalLoggerService" />
-        <constructor-arg ref="technicalUser" />
-        <constructor-arg ref="profileService" />
     </bean>
 
     <bean id="genericAuthenticationServiceAccessor"
@@ -1292,19 +1281,21 @@
     <bean id="processInvolvementDelegate" class="org.bonitasoft.engine.api.impl.ProcessInvolvementDelegate" />
 
     <!-- Authorization rules to register -->
-    <bean id="isAdmin" class="org.bonitasoft.engine.page.IsAdminRule" />
+    <bean id="isAdmin" class="org.bonitasoft.engine.page.IsAdminRule">
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+    </bean>
+
     <bean id="isProcessOwner" class="org.bonitasoft.engine.page.IsProcessOwnerRule">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="formMappingService" ref="formMappingService" />
-        <constructor-arg name="supervisorMappingService"
-                         ref="supervisorMappingService" />
+        <constructor-arg name="supervisorMappingService" ref="supervisorMappingService" />
     </bean>
     <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="activityInstanceService"
-                         ref="activityInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
     </bean>
     <bean id="isActorInitiatorRule" class="org.bonitasoft.engine.page.IsActorInitiatorRule">
         <constructor-arg name="sessionService" ref="sessionService" />

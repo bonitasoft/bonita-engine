@@ -80,17 +80,23 @@ public class PermissionServiceImpl implements PermissionService {
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
     private GroovyClassLoader groovyClassLoader;
+    private final CompoundPermissionsMapping compoundPermissionsMapping;
+    private final ResourcesPermissionsMapping resourcesPermissionsMapping;
 
     protected final long tenantId;
 
     public PermissionServiceImpl(final ClassLoaderService classLoaderService, final TechnicalLoggerService logger,
             final SessionAccessor sessionAccessor, final SessionService sessionService,
-            @Value("${tenantId}") final long tenantId) {
+            @Value("${tenantId}") final long tenantId,
+            CompoundPermissionsMapping compoundPermissionsMapping,
+            ResourcesPermissionsMapping resourcesPermissionsMapping) {
         this.classLoaderService = classLoaderService;
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.tenantId = tenantId;
+        this.compoundPermissionsMapping = compoundPermissionsMapping;
+        this.resourcesPermissionsMapping = resourcesPermissionsMapping;
     }
 
     @Override
@@ -183,14 +189,14 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions)
-            throws SExecutionException {
+    public boolean isAuthorized(APICallContext apiCallContext, boolean reload) throws SExecutionException {
         if (log.isDebugEnabled()) {
             log.debug("Static REST API permissions check");
         }
         final Set<String> resourcePermissions = getDeclaredPermissions(apiCallContext.getApiName(),
                 apiCallContext.getResourceName(), apiCallContext.getMethod(), apiCallContext.getResourceId(),
-                getResourcesPermissionsMapping());
+                resourcesPermissionsMapping);
+        final Set<String> userPermissions = getSession().getUserPermissions();
         for (final String resourcePermission : resourcePermissions) {
             if (userPermissions.contains(resourcePermission)) {
                 return true;
@@ -206,13 +212,8 @@ public class PermissionServiceImpl implements PermissionService {
         return false;
     }
 
-    protected ResourcesPermissionsMapping getResourcesPermissionsMapping() {
-        return new ResourcesPermissionsMapping(tenantId);
-    }
-
     protected Set<String> getDeclaredPermissions(final String apiName, final String resourceName, final String method,
-            final String resourceQualifiers,
-            final ResourcesPermissionsMapping resourcesPermissionsMapping) {
+            final String resourceQualifiers, final ResourcesPermissionsMapping resourcesPermissionsMapping) {
         List<String> resourceQualifiersIds = null;
         if (resourceQualifiers != null) {
             resourceQualifiersIds = Arrays
@@ -232,24 +233,25 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void addPermissions(final String pageName, final Properties pageProperties) {
-        ResourcesPermissionsMapping resourcesPermissionsMapping = getResourcesPermissionsMapping();
         Set<String> customPagePermissions = getCustomPagePermissions(
                 pageProperties.getProperty(RESOURCES_PROPERTY),
                 resourcesPermissionsMapping);
         addRestApiExtensionPermissions(resourcesPermissionsMapping, pageProperties);
-        getCompoundPermissionsMapping().setPropertyAsSet(pageName, customPagePermissions);
+        addPagePermissions(pageName, pageProperties, customPagePermissions);
+    }
+
+    private void addPagePermissions(String pageName, Properties pageProperties, Set<String> customPagePermissions) {
+        if (ContentType.PAGE.equals(pageProperties.getProperty(PROPERTY_CONTENT_TYPE))) {
+            compoundPermissionsMapping.setPropertyAsSet(pageName, customPagePermissions);
+        }
     }
 
     @Override
     public void removePermissions(Properties pageProperties) {
         for (String key : getApiExtensionResourcesPermissionsMapping(pageProperties).keySet()) {
-            getResourcesPermissionsMapping().removeProperty(key);
+            resourcesPermissionsMapping.removeProperty(key);
         }
-        getCompoundPermissionsMapping().removeProperty(pageProperties.getProperty(PageService.PROPERTIES_NAME));
-    }
-
-    protected CompoundPermissionsMapping getCompoundPermissionsMapping() {
-        return new CompoundPermissionsMapping(tenantId);
+        compoundPermissionsMapping.removeProperty(pageProperties.getProperty(PageService.PROPERTIES_NAME));
     }
 
     public Set<String> getCustomPagePermissions(final String declaredPageResources,
@@ -296,6 +298,11 @@ public class PermissionServiceImpl implements PermissionService {
             }
         }
         return permissionsMap;
+    }
+
+    @Override
+    public Set<String> getResourcePermissions(final String resourceKey) {
+        return resourcesPermissionsMapping.getPropertyAsSet(resourceKey);
     }
 
 }

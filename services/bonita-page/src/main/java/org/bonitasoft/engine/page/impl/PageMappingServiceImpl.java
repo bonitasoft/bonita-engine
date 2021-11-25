@@ -85,7 +85,7 @@ public class PageMappingServiceImpl implements PageMappingService {
     @Override
     public SPageMapping create(final String key, final Long pageId, final List<String> authorizationRules)
             throws SObjectCreationException {
-        SPageMapping pageMapping = null;
+        SPageMapping pageMapping;
         try {
             pageMapping = findMapping(key);
         } catch (final SBonitaReadException e) {

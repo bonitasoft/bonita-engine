@@ -59,7 +59,7 @@ import org.springframework.stereotype.Component;
 public class ApplicationImporter implements TenantLifecycleService {
 
     public static final String PROVIDED_FINAL_APPLICATIONS_PATH = "org/bonitasoft/web/application/final";
-    public static final String PROVIDED_APPLICATIONS_PATH = "org/bonitasoft/web/application/";
+    public static final String PROVIDED_APPLICATIONS_PATH = "org/bonitasoft/web/application";
     private final ApplicationService applicationService;
     private final NodeToApplicationConverter nodeToApplicationConverter;
     private final ApplicationPageImporter applicationPageImporter;

@@ -16,19 +16,10 @@ package org.bonitasoft.engine.core.login;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -42,6 +33,7 @@ import java.util.stream.Collectors;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
+import org.bonitasoft.engine.authorization.PermissionsBuilder;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -74,11 +66,14 @@ public class SecuredLoginServiceImplTest {
     private TechnicalLoggerService logger;
     @Mock
     private ProfileService profileService;
+    @Mock
+    private PermissionsBuilder permissionsBuilder;
 
     @Before
     public void setUp() throws Exception {
         securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService,
-                identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS), profileService);
+                identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS), profileService,
+                permissionsBuilder);
         //return a session with given arguments
         when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean(), anyList()))
                 .thenAnswer(invok -> SSession.builder()

@@ -14,8 +14,10 @@
 package org.bonitasoft.engine.session.model;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Builder;
 import lombok.Data;
@@ -51,6 +53,8 @@ public class SSession implements Serializable {
      */
     private boolean technicalUser;
     private List<String> profiles;
+    @Builder.Default
+    private Set<String> userPermissions = Collections.emptySet();
 
     /**
      * @return the expiration date (GMT+0)

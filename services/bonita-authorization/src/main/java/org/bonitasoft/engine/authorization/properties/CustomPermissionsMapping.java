@@ -13,9 +13,13 @@
  **/
 package org.bonitasoft.engine.authorization.properties;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
  * @author Anthony Birembaut
  */
+@Component
 public class CustomPermissionsMapping extends ConfigurationFile {
 
     /**
@@ -23,7 +27,7 @@ public class CustomPermissionsMapping extends ConfigurationFile {
      */
     public static final String PROPERTIES_FILENAME = "custom-permissions-mapping.properties";
 
-    public CustomPermissionsMapping(long tenantId) {
+    public CustomPermissionsMapping(@Value("${tenantId}") long tenantId) {
         super(PROPERTIES_FILENAME, tenantId);
     }
 

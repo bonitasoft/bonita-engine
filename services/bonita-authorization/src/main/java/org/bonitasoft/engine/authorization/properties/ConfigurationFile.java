@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.authorization.properties;
 
-import static org.bonitasoft.engine.authorization.properties.PropertiesWithSet.stringToSet;
-
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Set;
@@ -24,7 +22,8 @@ import java.util.Set;
  */
 public class ConfigurationFile {
 
-    private final String propertiesFilename;
+    private String propertiesFilename;
+
     private final long tenantId;
 
     public ConfigurationFile(String propertiesFilename, long tenantId) {
@@ -32,18 +31,35 @@ public class ConfigurationFile {
         this.tenantId = tenantId;
     }
 
+    public Properties getTenantProperties() {
+        return ConfigurationFilesManager.getInstance().getTenantProperties(propertiesFilename, tenantId);
+    }
+
+    protected void setPropertiesFilename(String propertiesFilename) {
+        this.propertiesFilename = propertiesFilename;
+    }
+
     public String getProperty(final String propertyName) {
         final String propertyValue = getTenantProperties().getProperty(propertyName);
         return propertyValue != null ? propertyValue.trim() : null;
     }
 
-    public Properties getTenantProperties() {
-        return ConfigurationFilesManager.getInstance().getTenantProperties(propertiesFilename, tenantId);
+    public Set<String> getPropertyAsSet(final String propertyName) {
+        final String propertyAsString = getProperty(propertyName);
+        return PropertiesWithSet.stringToSet(propertyAsString);
     }
 
     public void removeProperty(final String propertyName) {
         try {
             ConfigurationFilesManager.getInstance().removeProperty(propertiesFilename, tenantId, propertyName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removeCustomProperty(final String propertyName) {
+        try {
+            ConfigurationFilesManager.getInstance().removeCustomProperty(propertiesFilename, tenantId, propertyName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -58,12 +74,20 @@ public class ConfigurationFile {
         }
     }
 
-    public Set<String> getPropertyAsSet(final String propertyName) {
-        final String propertyAsString = getProperty(propertyName);
-        return stringToSet(propertyAsString);
+    public void setCustomProperty(final String propertyName, final String propertyValue) {
+        try {
+            ConfigurationFilesManager.getInstance().setCustomProperty(propertiesFilename, tenantId, propertyName,
+                    propertyValue);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setPropertyAsSet(final String property, final Set<String> permissions) {
         setProperty(property, permissions.toString());
+    }
+
+    public void setCustomPropertyAsSet(final String property, final Set<String> permissions) {
+        setCustomProperty(property, permissions.toString());
     }
 }

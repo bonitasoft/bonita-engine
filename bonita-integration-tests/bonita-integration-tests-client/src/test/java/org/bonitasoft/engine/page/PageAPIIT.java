@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.engine.page;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.bonitasoft.engine.page.PageAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,35 +29,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.permission.APICallContext;
+import org.bonitasoft.engine.application.ApplicationIT;
+import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.CommonTestUtil;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-@SuppressWarnings("javadoc")
 public class PageAPIIT extends CommonAPIIT {
 
     public static final long PROCESS_DEFINITION_ID = 5846L;
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private static final String DISPLAY_NAME = "My P\u00e4ge";
 
@@ -66,7 +67,6 @@ public class PageAPIIT extends CommonAPIIT {
     private static final String PAGE_NAME2 = "custompage_page2";
 
     private static final String PAGE_NAME1 = "custompage_page1";
-    private static final String UTF8 = "UTF-8";
 
     @Before
     public void before() throws Exception {
@@ -101,31 +101,26 @@ public class PageAPIIT extends CommonAPIIT {
 
         // then
         Assertions.assertThat(returnedPage).usingRecursiveComparison().isEqualTo(page);
-        assertThat(returnedPage)
+        PageAssert.assertThat(returnedPage)
                 .hasProcessDefinitionId(PROCESS_DEFINITION_ID)
                 .hasContentType(ContentType.FORM);
     }
 
     @Test
     public void updatePage_should_set_provided_field_to_false_if_provided_pages_are_modified() throws Exception {
-        // The provided pages have ids 1 & 2
-
-        final User jack = createUser("jack", "bpm");
-        loginOnDefaultTenantWith("jack", "bpm");
         // when
         final PageUpdater pageUpdater = new PageUpdater();
         final String newDisplayName = "new display name";
         pageUpdater.setDisplayName(newDisplayName);
 
-        final Page returnedPage = getPageAPI().updatePage(2L, pageUpdater);
+        final Page providedPageToUpdate = getPageAPI()
+                .searchPages(new SearchOptionsBuilder(0, 1)
+                        .filter(PageSearchDescriptor.NAME, "custompage_providedpagetoupdate").done())
+                .getResult().get(0);
+        final Page returnedPage = getPageAPI().updatePage(providedPageToUpdate.getId(), pageUpdater);
 
         //then
         assertThat(returnedPage.isProvided()).isFalse();
-
-        //cleanup
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        deleteUser(jack);
     }
 
     @Test
@@ -222,22 +217,6 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
-    public void updatePage_should_set_provided_to_false() throws Exception {
-        // The provided pages have ids 1 & 2
-        // when
-        final String newDescription = "new description";
-        final String newDisplayName = "new display name";
-        final byte[] updatedPageContent = CommonTestUtil.createTestPageContent(PAGE_NAME2, newDisplayName,
-                newDescription);
-        getPageAPI().updatePageContent(1L, updatedPageContent);
-
-        // then
-        final Page pageAfter = getPageAPI().getPage(1L);
-        assertThat(pageAfter.isProvided()).isFalse();
-
-    }
-
-    @Test
     public void updatePageContent_should_update_page_from_properties_except_name() throws Exception {
         // given
         final Page pageBefore = getPageAPI().createPage(
@@ -297,14 +276,14 @@ public class PageAPIIT extends CommonAPIIT {
                 "with content " + PAGE_DESCRIPTION,
                 "contentType=WillBeIgnored", "apiExtensions=myGetResource", "myGetResource.method=POST",
                 "myGetResource.pathTemplate=helloWorld",
-                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission");
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=application_visualization");
 
         final String pageName2 = generateUniquePageName(1);
         final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName2, DISPLAY_NAME,
                 "with page creator " + PAGE_DESCRIPTION, "contentType="
                         + ContentType.API_EXTENSION,
                 "apiExtensions=myGetResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
-                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission");
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=application_visualization");
 
         // when
         final Page pageWithCreator = getPageAPI().createPage(
@@ -316,11 +295,6 @@ public class PageAPIIT extends CommonAPIIT {
         // then
         assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
         assertThat(pageWithCreator).hasContentType(ContentType.API_EXTENSION);
-
-        // Check that permission has been written to file through user permission check:
-        APICallContext apiCallContext = new APICallContext("GET", "extension", "helloWorld", null);
-        final Set<String> userPermissions = Set.of("newPermission");
-        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isTrue();
     }
 
     @Test
@@ -360,7 +334,7 @@ public class PageAPIIT extends CommonAPIIT {
         final Page returnedPage = getPageAPI().getPageByName(page.getName());
 
         // then
-        Assertions.assertThat(returnedPage).isEqualToComparingFieldByField(page);
+        Assertions.assertThat(returnedPage).usingRecursiveComparison().isEqualTo(page);
     }
 
     @Test(expected = AlreadyExistsException.class)
@@ -416,16 +390,14 @@ public class PageAPIIT extends CommonAPIIT {
 
     @Test
     public void should_createPage_with_invalid_content_InvalidPageZipContentException() throws Exception {
-        // , "content.zip"given
+        // given
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
 
-        expectedException.expect(InvalidPageZipMissingIndexException.class);
-
         // when
-        getPageAPI().createPage(
+        assertThrows(InvalidPageZipMissingIndexException.class, () -> getPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                pageContent);
+                pageContent));
 
         // then: expected exception
     }
@@ -452,16 +424,13 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_throw_an_exception_if_the_page_content_does_not_exist() throws Exception {
-        // given
-        expectedException.expect(PageNotFoundException.class);
-        expectedException.expectMessage("Page with id 995464654654 not found");
-
+    public void should_throw_an_exception_if_the_page_content_does_not_exist() {
         // when
-        getPageAPI().getPageContent(995464654654L);
+        final PageNotFoundException exception = assertThrows(PageNotFoundException.class,
+                () -> getPageAPI().getPageContent(995464654654L));
 
         // then
-        // expect exception
+        assertThat(exception.getMessage()).contains("Page with id 995464654654 not found");
     }
 
     private void checkPageContentContainsProperties(final byte[] content, final String displayName,
@@ -492,7 +461,7 @@ public class PageAPIIT extends CommonAPIIT {
                 while ((bytesRead = zipInputstream.read(buffer)) > -1) {
                     byteArrayOutputStream.write(buffer, 0, bytesRead);
                 }
-                zipMap.put(zipEntry.getName(), new String(byteArrayOutputStream.toByteArray(), UTF8));
+                zipMap.put(zipEntry.getName(), byteArrayOutputStream.toString(UTF_8));
             }
         }
         return zipMap;
@@ -535,7 +504,6 @@ public class PageAPIIT extends CommonAPIIT {
     @Test
     public void should_search_with_search_term() throws Exception {
         final String description = "description";
-        final String noneMatchingdisplayName = DISPLAY_NAME;
         final String matchingValue = "Cool";
         final String matchingDisplayName = matchingValue + " page!";
 
@@ -545,7 +513,7 @@ public class PageAPIIT extends CommonAPIIT {
             final String generateUniquePageName = generateUniquePageName(i) + i;
             getPageAPI().createPage(
                     new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description)
-                            .setDisplayName(noneMatchingdisplayName),
+                            .setDisplayName(DISPLAY_NAME),
                     CommonTestUtil.createTestPageContent(generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION));
         }
         final String generateUniquePageName = generateUniquePageName(9);
@@ -562,7 +530,7 @@ public class PageAPIIT extends CommonAPIIT {
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have only one matching page").isEqualTo(1);
         Assertions.assertThat(results.get(0)).as("should get the page with matching search term")
-                .isEqualToComparingFieldByField(pageWithMatchingSearchTerm);
+                .usingRecursiveComparison().isEqualTo(pageWithMatchingSearchTerm);
     }
 
     private String generateUniquePageName(final int i) {
@@ -624,14 +592,13 @@ public class PageAPIIT extends CommonAPIIT {
         // then
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have "
-                + +expectedMatchingResults + " results").isEqualTo(expectedMatchingResults);
+                + expectedMatchingResults + " results").isEqualTo(expectedMatchingResults);
 
     }
 
     @Test
     public void should_search_by_content_type() throws Exception {
         // given
-        final String description = PAGE_DESCRIPTION;
         final String matchingDisplayName = DISPLAY_NAME;
         final String noneMatchingDisplayName = "aaa";
 
@@ -639,7 +606,8 @@ public class PageAPIIT extends CommonAPIIT {
         final int expectedMatchingResults = 3;
         for (int i = 0; i < expectedMatchingResults; i++) {
             final String generateUniquePageName = generateUniquePageName(i);
-            final byte[] pageContent = createTestPageContent(generateUniquePageName, matchingDisplayName, description);
+            final byte[] pageContent = createTestPageContent(generateUniquePageName, matchingDisplayName,
+                    PAGE_DESCRIPTION);
             getPageAPI().createPage(
                     new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i)
                             .setDescription(
@@ -665,21 +633,21 @@ public class PageAPIIT extends CommonAPIIT {
         // then
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have "
-                + +expectedMatchingResults + " results").isEqualTo(expectedMatchingResults);
+                + expectedMatchingResults + " results").isEqualTo(expectedMatchingResults);
 
     }
 
     @Test
     public void should_search_by_hidden_param() throws Exception {
         // given
-        final String description = PAGE_DESCRIPTION;
         final String matchingDisplayName = DISPLAY_NAME;
 
         // given
         final int expectedMatchingResults = 3;
         for (int i = 0; i < expectedMatchingResults; i++) {
             final String generateUniquePageName = generateUniquePageName(i);
-            final byte[] pageContent = createTestPageContent(generateUniquePageName, matchingDisplayName, description);
+            final byte[] pageContent = createTestPageContent(generateUniquePageName, matchingDisplayName,
+                    PAGE_DESCRIPTION);
             getPageAPI().createPage(
                     new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i)
                             .setDescription(
@@ -731,50 +699,73 @@ public class PageAPIIT extends CommonAPIIT {
 
         // then
         final List<Page> results = searchPages.getResult();
-        Assertions.assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
-
+        Assertions.assertThat(results.get(0)).usingRecursiveComparison().isEqualTo(expectedMatchingPage);
     }
 
     @Test
-    public void updatePageContent_and_deletePage_should_update_mappings() throws Exception {
+    public void updatePageContent_and_deletePage_should_update_permissions() throws Exception {
+        // setup
+        final User jack = createUser("jack", "bpm");
+        Profile profile = getProfileAPI()
+                .searchProfiles(new SearchOptionsBuilder(0, 1).filter(ProfileSearchDescriptor.NAME, "User").done())
+                .getResult().get(0);
+        getProfileAPI().createProfileMember(profile.getId(), jack.getId(), null, null);
+
+        getLivingApplicationAPI().importApplications(
+                IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("testApp.xml")),
+                ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+
         // given
-        final String pageName = generateUniquePageName(0);
-        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME,
+        final String apiExtensionName = generateUniquePageName(0);
+        final byte[] apiExtensionContent1 = CommonTestUtil.createTestPageContent(apiExtensionName, DISPLAY_NAME,
                 "with content " + PAGE_DESCRIPTION, "contentType=" + ContentType.API_EXTENSION,
                 "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET",
                 "myGetResource.pathTemplate=helloWorld",
-                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=application_visualization",
                 "myPostResource.method=POST",
                 "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy",
-                "myPostResource.permissions = newPermission");
+                "myPostResource.permissions = application_visualization");
 
-        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME,
-                "with content " + PAGE_DESCRIPTION, "contentType=" + ContentType.API_EXTENSION,
-                "apiExtensions=myGetResource, myPutResource", "myGetResource.method=GET",
-                "myGetResource.pathTemplate=helloWorld_v2",
-                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
-                "myPutResource.method=PUT",
-                "myPutResource.pathTemplate=helloWorld", "myPutResource.classFileName=Index.groovy",
-                "myPutResource.permissions = newPermission");
+        // when
+        final Page apiExtension = getPageAPI().createPage(apiExtensionName, apiExtensionContent1);
+
+        // need to log back in to actualize permissions:
+        logoutOnTenant();
+        loginOnDefaultTenantWith("jack", "bpm");
 
         // Check that we are not authorized before update of the page properties content:
         APICallContext apiCallContext = new APICallContext("GET", "extension", "helloWorld_v2", null);
-        final Set<String> userPermissions = Set.of("newPermission");
-        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isFalse();
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false)).isFalse();
 
-        // when
-        final Page page = getPageAPI().createPage(pageName, pageContent1);
-        getPageAPI().updatePageContent(page.getId(), pageContent2);
+        final byte[] apiExtensionContent2 = CommonTestUtil.createTestPageContent(apiExtensionName, DISPLAY_NAME,
+                "with content " + PAGE_DESCRIPTION, "contentType=" + ContentType.API_EXTENSION,
+                "apiExtensions=myGetResource, myPutResource", "myGetResource.method=GET",
+                "myGetResource.pathTemplate=helloWorld_v2",
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=application_visualization",
+                "myPutResource.method=PUT",
+                "myPutResource.pathTemplate=helloWorld", "myPutResource.classFileName=Index.groovy",
+                "myPutResource.permissions = application_visualization");
+        getPageAPI().updatePageContent(apiExtension.getId(), apiExtensionContent2);
+
+        // Application testApp.xml references layout custompage_layoutBonita that declares resources bound to
+        // the 'application_visualization' permission. So this new apiExtension, accessible through 'GET|extension/helloWorld_v2', is accessible
+        // to anyone having 'application_visualization' permission.
 
         // Check that permission has been update to file through user permission check:
-        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isTrue();
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false)).isTrue();
         // Check that previous version has indeed been removed:
-        assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "extension", "helloWorld", null), false,
-                userPermissions)).isFalse();
+        assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "extension", "helloWorld", null), false))
+                .isFalse();
 
-        getPageAPI().deletePage(page.getId());
+        getPageAPI().deletePage(apiExtension.getId());
+
         // Check that permissions have been removed with the page deletion:
-        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false, userPermissions)).isFalse();
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false)).isFalse();
+
+        //cleanup
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        deleteUser(jack);
     }
 
     @Test

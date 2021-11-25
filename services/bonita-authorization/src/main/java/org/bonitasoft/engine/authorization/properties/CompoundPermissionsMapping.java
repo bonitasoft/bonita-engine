@@ -13,14 +13,18 @@
  **/
 package org.bonitasoft.engine.authorization.properties;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
  * @author Anthony Birembaut
  */
+@Component
 public class CompoundPermissionsMapping extends ConfigurationFile {
 
     public static final String PROPERTIES_FILENAME = "compound-permissions-mapping.properties";
 
-    public CompoundPermissionsMapping(final long tenantId) {
+    public CompoundPermissionsMapping(@Value("${tenantId}") final long tenantId) {
         super(PROPERTIES_FILENAME, tenantId);
     }
 
