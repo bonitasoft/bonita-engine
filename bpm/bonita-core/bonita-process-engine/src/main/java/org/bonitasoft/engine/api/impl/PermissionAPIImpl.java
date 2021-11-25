@@ -44,23 +44,28 @@ public class PermissionAPIImpl implements PermissionAPI {
                     "Unable to execute the security rule " + className + " for the api call " + context, e);
         } catch (ClassNotFoundException e) {
             throw new NotFoundException("Unable to execute the security rule " + className + " for the api call "
-                    + context + " because the class " + className
-                    + " is not found", e);
+                    + context + " because the class " + className + " is not found", e);
         }
     }
 
     @Override
-    public boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions)
-            throws ExecutionException {
+    public boolean isAuthorized(APICallContext apiCallContext, boolean reload) throws ExecutionException {
         TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         try {
-            return serviceAccessor.getPermissionService().isAuthorized(apiCallContext, reload, userPermissions);
+            return serviceAccessor.getPermissionService().isAuthorized(apiCallContext, reload);
         } catch (SExecutionException e) {
             throw new ExecutionException(e);
         }
     }
 
+    @Override
+    public Set<String> getResourcePermissions(String resourceKey) {
+        TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
+        return serviceAccessor.getPermissionService().getResourcePermissions(resourceKey);
+    }
+
     TenantServiceAccessor getTenantServiceAccessor() {
         return TenantServiceSingleton.getInstance();
     }
+
 }

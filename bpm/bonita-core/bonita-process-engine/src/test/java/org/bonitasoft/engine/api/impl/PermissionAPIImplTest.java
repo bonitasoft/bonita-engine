@@ -17,8 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
-import java.util.Set;
-
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
@@ -84,11 +82,10 @@ public class PermissionAPIImplTest {
     @Test
     public void should_isAuthorized_throw_execution_exception() throws Exception {
         //given
-        final Set<String> userPermissions = Set.of("organization_visualization");
         final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
-        doThrow(SExecutionException.class).when(permissionService).isAuthorized(apiCallContext, false, userPermissions);
+        doThrow(SExecutionException.class).when(permissionService).isAuthorized(apiCallContext, false);
 
         assertThrows(ExecutionException.class,
-                () -> permissionAPI.isAuthorized(apiCallContext, false, userPermissions));
+                () -> permissionAPI.isAuthorized(apiCallContext, false));
     }
 }

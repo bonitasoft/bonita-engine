@@ -26,6 +26,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
+import org.bonitasoft.engine.authorization.PermissionsBuilder;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.SUserUpdateException;
@@ -39,11 +40,13 @@ import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Matthieu Chaffotte
  * @author Anthony Birembaut
  */
+@Service
 public class SecuredLoginServiceImpl implements LoginService {
 
     private final GenericAuthenticationService authenticationService;
@@ -52,17 +55,19 @@ public class SecuredLoginServiceImpl implements LoginService {
     private final TechnicalLoggerService logger;
     private final TechnicalUser technicalUser;
     private final ProfileService profileService;
+    private final PermissionsBuilder permissionsBuilder;
 
     public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService,
             final SessionService sessionService,
             final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
-            TechnicalUser technicalUser, ProfileService profileService) {
+            TechnicalUser technicalUser, ProfileService profileService, PermissionsBuilder permissionsBuilder) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
         this.identityService = identityService;
         this.logger = tenantTechnicalLoggerService;
         this.technicalUser = technicalUser;
         this.profileService = profileService;
+        this.permissionsBuilder = permissionsBuilder;
     }
 
     @Override
@@ -81,6 +86,11 @@ public class SecuredLoginServiceImpl implements LoginService {
         checkIsEnabled(user);
         SSession session = createSession(tenantId, userName, user.getId(), false);
         updateLastConnectionDate(user);
+        try {
+            session.setUserPermissions(permissionsBuilder.getPermissions(session));
+        } catch (SBonitaReadException e) {
+            throw new SLoginException("Problem reading user permissions: " + e.getMessage());
+        }
         return session;
     }
 

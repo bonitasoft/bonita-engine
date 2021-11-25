@@ -16,17 +16,40 @@ package org.bonitasoft.engine.page;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+
 /**
  * @author Emmanuel Duchastenier, Anthony Birembaut
  */
 public class IsAdminRule implements AuthorizationRule {
 
+    SessionAccessor sessionAccessor;
+
+    SessionService sessionService;
+
+    protected static final String PROCESS_DEPLOY_PERMISSION = "process_deploy";
+
+    public IsAdminRule(SessionAccessor sessionAccessor, SessionService sessionService) {
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
+    }
+
     @Override
-    public boolean isAllowed(final String key, final Map<String, Serializable> context) {
-        if (context.containsKey(AuthorizationRuleConstants.IS_ADMIN)) {
-            return (Boolean) context.get(AuthorizationRuleConstants.IS_ADMIN);
+    public boolean isAllowed(final String key, final Map<String, Serializable> context) throws SExecutionException {
+        try {
+            return getSession().getUserPermissions().contains(PROCESS_DEPLOY_PERMISSION);
+        } catch (SSessionNotFoundException | SessionIdNotSetException e) {
+            throw new SExecutionException(e);
         }
-        return false;
+    }
+
+    protected SSession getSession() throws SSessionNotFoundException, SessionIdNotSetException {
+        return sessionService.getSession(sessionAccessor.getSessionId());
     }
 
     @Override

@@ -31,7 +31,6 @@ import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.page.AuthorizationRuleConstants;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.Order;
@@ -46,8 +45,7 @@ import org.junit.rules.ExpectedException;
  */
 public class FormMappingIT extends TestWithUser {
 
-    private final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN,
-            true);
+    private final Map<String, Serializable> context = Collections.emptyMap();
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -134,6 +132,9 @@ public class FormMappingIT extends TestWithUser {
                         .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START).done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
 
+        // to be allowed to access URL:
+        getProcessAPI().createProcessSupervisorForUser(p1.getId(), user.getId());
+
         //resolve urls:
         PageURL p1Instanciation = getPageAPI().resolvePageOrURL("process/P1/1.0", context, true);
         PageURL p1Overview = getPageAPI().resolvePageOrURL("processInstance/P1/1.0", context, true);
@@ -196,14 +197,17 @@ public class FormMappingIT extends TestWithUser {
 
     @Test
     public void resolvePageOrURL_should_return_null_mapping_for_NONE() throws Exception {
-        ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.0");
-        p1Builder.addActor("actor").addUserTask("step", "actor");
+        ProcessDefinitionBuilder pBuilder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.0");
+        pBuilder.addActor("actor").addUserTask("step", "actor");
         BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
-                .createNewBusinessArchive().setProcessDefinition(p1Builder.done())
+                .createNewBusinessArchive().setProcessDefinition(pBuilder.done())
                 .setFormMappings(FormMappingModelBuilder.buildFormMappingModel()
                         .addTaskForm(null, FormMappingTarget.NONE, "step").build());
 
         ProcessDefinition processDefinition = deployProcess(bar.done());
+
+        // to be allowed to access URL:
+        getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user.getId());
 
         // try to resolve url:
         PageURL pageURL = getPageAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", context, true);
@@ -243,6 +247,9 @@ public class FormMappingIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
+
+        // to be allowed to access URL:
+        getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user.getId());
 
         final PageURL pageURLStart = getPageAPI().resolvePageOrURL("process/CustomerSupport/1.12", context, true);
         final PageURL pageURLOverview = getPageAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", context,

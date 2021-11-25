@@ -142,7 +142,7 @@ public class PageServiceImpl implements PageService {
 
     private final ReadSessionAccessor sessionAccessor;
     private final SessionService sessionService;
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
     private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
             PageServiceImpl.class.getClassLoader());
@@ -675,9 +675,7 @@ public class PageServiceImpl implements PageService {
     }
 
     private List<ImportStatus> importProvidedPagesFromResourcePattern(boolean addIfMissing, boolean removable,
-            boolean editable,
-            String resourcesPath)
-            throws IOException, BonitaException {
+            boolean editable, String resourcesPath) throws IOException, BonitaException {
         List<ImportStatus> importStatuses = new ArrayList<>();
         Resource[] resources = cpResourceResolver
                 .getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + resourcesPath + "/*.zip");

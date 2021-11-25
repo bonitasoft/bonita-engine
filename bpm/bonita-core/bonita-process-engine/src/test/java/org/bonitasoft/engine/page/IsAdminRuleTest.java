@@ -13,43 +13,67 @@
  **/
 package org.bonitasoft.engine.page;
 
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
-import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class IsAdminRuleTest {
 
-    IsAdminRule isAdminRule = new IsAdminRule();
+    @Mock
+    private SessionAccessor sessionAccessor;
+
+    @Mock
+    private SessionService sessionService;
+
+    @Spy
+    @InjectMocks
+    IsAdminRule isAdminRule;
 
     @Test
-    public void isAllowed_should_return_true_if_admin_in_context() throws Exception {
-        Map<String, Serializable> context = new HashMap<String, Serializable>();
-        context.put(AuthorizationRuleConstants.IS_ADMIN, true);
+    public void isAllowed_should_return_true_if_user_has_process_deploy_permission() throws Exception {
+        // given
+        final SSession session = mock(SSession.class);
+        doReturn(session).when(isAdminRule).getSession();
+        doReturn(Set.of(IsAdminRule.PROCESS_DEPLOY_PERMISSION)).when(session).getUserPermissions();
 
-        assertThat(isAdminRule.isAllowed("key", context)).isTrue();
+        // when
+        final boolean allowed = isAdminRule.isAllowed("key", new HashMap<>());
+
+        // then
+        assertThat(allowed).isTrue();
     }
 
     @Test
-    public void isAllowed_should_return_false_if_not_admin_in_context() throws Exception {
-        Map<String, Serializable> context = new HashMap<String, Serializable>();
-        context.put(AuthorizationRuleConstants.IS_ADMIN, false);
+    public void isAllowed_should_return_false_if_no_permissions_in_session() throws Exception {
+        // given
+        final SSession session = mock(SSession.class);
+        doReturn(session).when(isAdminRule).getSession();
+        doReturn(emptySet()).when(session).getUserPermissions();
 
-        assertThat(isAdminRule.isAllowed("key", context)).isFalse();
+        // when
+        final boolean allowed = isAdminRule.isAllowed("key", new HashMap<>());
+
+        // then
+        assertThat(allowed).isFalse();
     }
 
     @Test
-    public void isAllowed_should_return_false_if_empty_context() throws Exception {
-        Map<String, Serializable> context = new HashMap<String, Serializable>();
-
-        assertThat(isAdminRule.isAllowed("key", context)).isFalse();
-    }
-
-    @Test
-    public void getIdShouldReturnIsAdmin() throws Exception {
+    public void getIdShouldReturnIsAdmin() {
         assertThat(isAdminRule.getId()).isEqualTo("IS_ADMIN");
     }
 }

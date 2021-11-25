@@ -46,12 +46,12 @@ public class ConfigurationFilesManager {
             if (propertiesByFilename.containsKey(propertiesFileName)) {
                 properties.putAll(propertiesByFilename.get(propertiesFileName));
                 // if -internal properties also exists, merge key/value pairs:
-                final String internalSuffixedVersion = getSuffixedPropertyFilename(propertiesFileName, "-internal");
+                final String internalSuffixedVersion = getInternalPropertiesFilename(propertiesFileName);
                 if (propertiesByFilename.containsKey(internalSuffixedVersion)) {
                     properties.putAll(propertiesByFilename.get(internalSuffixedVersion));
                 }
                 // if -custom properties also exists, merge key/value pairs (and overwrite previous values if same key name):
-                final String customSuffixedVersion = getSuffixedPropertyFilename(propertiesFileName, "-custom");
+                final String customSuffixedVersion = getCustomPropertiesFilename(propertiesFileName);
                 if (propertiesByFilename.containsKey(customSuffixedVersion)) {
                     properties.putAll(propertiesByFilename.get(customSuffixedVersion));
                 }
@@ -87,23 +87,38 @@ public class ConfigurationFilesManager {
     }
 
     public void removeProperty(String propertiesFilename, long tenantId, String propertyName) throws IOException {
-        // Now internal behavior stores and removes from -internal file:
-        final String internalFilename = getSuffixedPropertyFilename(propertiesFilename, "-internal");
+        removeProperty(propertiesFilename, tenantId, propertyName, false);
+    }
+
+    public void removeCustomProperty(String propertiesFilename, long tenantId, String propertyName) throws IOException {
+        removeProperty(propertiesFilename, tenantId, propertyName, true);
+    }
+
+    private void removeProperty(String propertiesFilename, long tenantId, String propertyName, boolean isCustom)
+            throws IOException {
+        final String suffixedFilename = isCustom ? getCustomPropertiesFilename(propertiesFilename)
+                : getInternalPropertiesFilename(propertiesFilename);
         Map<String, Properties> resources = getTenantConfigurations(tenantId);
-        Properties properties = resources.get(internalFilename);
+        Properties properties = resources.get(suffixedFilename);
         if (properties != null) {
             properties.remove(propertyName);
-            update(tenantId, internalFilename, properties);
+            update(tenantId, suffixedFilename, properties);
             updateAggregatedProperties(propertiesFilename, tenantId, propertyName, null, resources);
         } else {
             if (log.isTraceEnabled()) {
-                log.trace("File " + internalFilename + " not found. Cannot remove property '" + propertyName + "'.");
+                log.trace("File " + suffixedFilename + " not found. Cannot remove property '" + propertyName + "'.");
             }
         }
     }
 
-    protected String getSuffixedPropertyFilename(String propertiesFilename, String suffix) {
-        return propertiesFilename.replaceAll("\\.properties$", suffix + ".properties");
+    protected String getInternalPropertiesFilename(String propertiesFilename) {
+        // Internal behavior stores and removes from -internal file (for automatic updates when deploying/updating a page/API extension)
+        return propertiesFilename.replaceAll("\\.properties$", "-internal" + ".properties");
+    }
+
+    protected String getCustomPropertiesFilename(String propertiesFilename) {
+        // Custom behavior stores and removes from -custom files (for manual updates):
+        return propertiesFilename.replaceAll("\\.properties$", "-custom" + ".properties");
     }
 
     protected void update(long tenantId, String propertiesFilename, Properties properties) throws IOException {
@@ -130,17 +145,28 @@ public class ConfigurationFilesManager {
 
     public void setProperty(String propertiesFilename, long tenantId, String propertyName, String propertyValue)
             throws IOException {
+        setProperty(propertiesFilename, tenantId, propertyName, propertyValue, false);
+    }
+
+    public void setCustomProperty(String propertiesFilename, long tenantId, String propertyName, String propertyValue)
+            throws IOException {
+        setProperty(propertiesFilename, tenantId, propertyName, propertyValue, true);
+    }
+
+    private void setProperty(String propertiesFilename, long tenantId, String propertyName, String propertyValue,
+            boolean isCustom)
+            throws IOException {
         Map<String, Properties> resources = getTenantConfigurations(tenantId);
-        // Now internal behavior stores and removes from -internal file:
-        final String internalFilename = getSuffixedPropertyFilename(propertiesFilename, "-internal");
-        Properties properties = resources.get(internalFilename);
+        final String suffixedFilename = isCustom ? getCustomPropertiesFilename(propertiesFilename)
+                : getInternalPropertiesFilename(propertiesFilename);
+        Properties properties = resources.get(suffixedFilename);
         if (properties != null) {
             properties.setProperty(propertyName, propertyValue);
-            update(tenantId, internalFilename, properties);
+            update(tenantId, suffixedFilename, properties);
             updateAggregatedProperties(propertiesFilename, tenantId, propertyName, propertyValue, resources);
         } else {
             if (log.isTraceEnabled()) {
-                log.trace("File " + internalFilename + " not found. Cannot set property '" + propertyName + "'.");
+                log.trace("File " + suffixedFilename + " not found. Cannot set property '" + propertyName + "'.");
             }
         }
     }
@@ -152,10 +178,10 @@ public class ConfigurationFilesManager {
         if (aggregatedTenantConfigurations == null) {
             return;
         }
-        final String customFilename = getSuffixedPropertyFilename(propertiesFilename, "-custom");
+        final String customFilename = getCustomPropertiesFilename(propertiesFilename);
         Properties customResources = resources.get(customFilename);
         if (customResources == null || !customResources.containsKey(propertyName)) {
-            //only update the aggregated properties if there is not a custom property overriding the internal one
+            // only update the aggregated properties if there is not a custom property overriding the internal one
             Properties aggregatedTenantConfiguration = aggregatedTenantConfigurations.get(propertiesFilename);
             if (aggregatedTenantConfiguration != null) {
                 if (propertyValue != null) {

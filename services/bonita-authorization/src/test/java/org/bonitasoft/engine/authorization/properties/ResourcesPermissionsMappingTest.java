@@ -26,8 +26,6 @@ import org.junit.Test;
 
 public class ResourcesPermissionsMappingTest {
 
-    private static final String TEST_FILE_PROPERTIES = "TEST_FILE.properties";
-
     @Test
     public void testGetResourcePermission() {
         //given
@@ -89,7 +87,7 @@ public class ResourcesPermissionsMappingTest {
 
     public static ResourcesPermissionsMapping getResourcesPermissionsMapping(final String fileContent) {
         final ResourcesPermissionsMapping resourcesPermissionsMapping = spy(
-                new ResourcesPermissionsMapping(TEST_FILE_PROPERTIES, 423L));
+                new ResourcesPermissionsMapping(423L));
         doReturn(getProperties(fileContent.getBytes())).when(resourcesPermissionsMapping).getTenantProperties();
         return resourcesPermissionsMapping;
     }

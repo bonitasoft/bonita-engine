@@ -18,11 +18,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
+
 /**
  * @author Anthony Birembaut
  * @author Baptiste Mesta
  * @author Fabio Lombardi
  */
+@Component
+@ConditionalOnSingleCandidate(ResourcesPermissionsMapping.class)
 public class ResourcesPermissionsMapping extends ConfigurationFile {
 
     public static final String RESOURCE_IDS_SEPARATOR = "/";
@@ -36,12 +42,8 @@ public class ResourcesPermissionsMapping extends ConfigurationFile {
      */
     public static final String PROPERTIES_FILENAME = "resources-permissions-mapping.properties";
 
-    public ResourcesPermissionsMapping(long tenantId) {
+    public ResourcesPermissionsMapping(@Value("${tenantId}") long tenantId) {
         super(PROPERTIES_FILENAME, tenantId);
-    }
-
-    public ResourcesPermissionsMapping(String propertiesFilename, long tenantId) {
-        super(propertiesFilename, tenantId);
     }
 
     public Set<String> getResourcePermissions(final String method, final String apiName, final String resourceName,

@@ -1551,20 +1551,16 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public BarResource getBarResource(final String path, final String name, Class<?> clazz) throws IOException {
-        final InputStream stream = clazz.getResourceAsStream(path);
-        assertThat(stream).isNotNull();
-        try {
+        try (final InputStream stream = clazz.getResourceAsStream(path)) {
+            assertThat(stream).isNotNull();
             final byte[] byteArray = IOUtils.toByteArray(stream);
             return new BarResource(name, byteArray);
-        } finally {
-            stream.close();
         }
     }
 
     protected byte[] createTestPageContent(final String pageName, final String displayName, final String description)
             throws Exception {
-        try {
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             final ZipOutputStream zos = new ZipOutputStream(baos);
             zos.putNextEntry(new ZipEntry("Index.groovy"));
             zos.write("return \"\";".getBytes());
@@ -1575,8 +1571,6 @@ public class APITestUtil extends PlatformTestUtil {
 
             zos.closeEntry();
             return baos.toByteArray();
-        } catch (final IOException e) {
-            throw new BonitaException(e);
         }
     }
 

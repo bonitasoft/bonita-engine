@@ -1,11 +1,15 @@
 dependencies {
     compile project(':bpm:bonita-common')
+    compile project(':services:bonita-business-application')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-session')
+    compile project(':bpm:bonita-core:bonita-home-server')
     compile project(':services:bonita-commons')
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
-}
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 
-test {
-    useJUnitPlatform()
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 }

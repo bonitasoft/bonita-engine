@@ -60,12 +60,30 @@ public interface PermissionAPI {
      * @throws NotFoundException if the script cannot be found under name <quote>className</quote> neither in the
      *         classpath, nor in the custom script folder.
      * @since 6.4.0
-     * @deprecated From version 7.14.0, use {@link #isAuthorized(APICallContext, boolean, Set, Set)} instead
+     * @deprecated From version 7.14.0, use {@link #isAuthorized(APICallContext, boolean)} instead
      */
     @Deprecated(forRemoval = true, since = "7.14.0")
     boolean checkAPICallWithScript(String className, APICallContext apiCallContext, boolean reload)
             throws ExecutionException, NotFoundException;
 
-    boolean isAuthorized(APICallContext apiCallContext, boolean reload, Set<String> userPermissions)
-            throws ExecutionException;
+    /**
+     * Checks if the REST API request defined in the {@link APICallContext} is authorized for the logged in user
+     *
+     * @param apiCallContext contains all the attributes of the request
+     * @param reload if true, reloads the Groovy rules for dynamic permissions before each execution (for development
+     *        only). A setup push is still required.
+     * @return true or false depending if the user it authorized to make the call or not
+     * @throws ExecutionException if there was an error while executing the authorization checks
+     */
+    boolean isAuthorized(APICallContext apiCallContext, boolean reload) throws ExecutionException;
+
+    /**
+     * Returns the REST permissions required to access a REST resource (the expected format for the resource key is
+     * <HTTP method>|<API name>/<resource name> e.g. GET|identity/user)
+     *
+     * @param resourceKey the resource identifier. The expected format is <HTTP method>|<API name>/<resource name> (e.g.
+     *        GET|identity/user)
+     * @return a Set of permissions, as Strings. e.g. ["organization_visualization"]
+     */
+    Set<String> getResourcePermissions(String resourceKey);
 }

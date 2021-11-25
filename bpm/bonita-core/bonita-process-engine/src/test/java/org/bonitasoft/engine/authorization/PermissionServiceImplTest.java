@@ -84,7 +84,13 @@ public class PermissionServiceImplTest {
     private BonitaHomeServer bonitaHomeServer;
 
     @Mock
+    private SSession session;
+
+    @Mock
     private ResourcesPermissionsMapping resourcesPermissionsMapping;
+
+    @Mock
+    private CompoundPermissionsMapping compoundPermissionsMapping;
 
     private File securityFolder;
 
@@ -96,14 +102,13 @@ public class PermissionServiceImplTest {
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
                 .getClassLoader(any());
         permissionService = spy(
-                new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID));
+                new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID,
+                        compoundPermissionsMapping, resourcesPermissionsMapping));
         doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
-        doReturn(mock(SSession.class)).when(sessionService).getSession(anyLong());
+        doReturn(session).when(sessionService).getSession(anyLong());
 
         doReturn(securityFolder).when(bonitaHomeServer).getSecurityScriptsFolder(anyLong());
-
-        doReturn(resourcesPermissionsMapping).when(permissionService).getResourcesPermissionsMapping();
     }
 
     @Test
@@ -290,28 +295,32 @@ public class PermissionServiceImplTest {
     @Test
     public void should_isAllowed_return_true_if_static_authorized() throws Exception {
         //given
-        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
         final List<String> resourcePermissions = List.of("CasePermission", "AnOtherPermission");
         returnPermissionsFor("GET", "bpm", "case", null, resourcePermissions);
+        returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
         final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", null),
-                false, userPermissions);
+                false);
 
         //then
         assertThat(isAuthorized).isTrue();
     }
 
+    private void returnUserPermissionsFromSession(String... sessionUserPermissions) {
+        doReturn(Set.of(sessionUserPermissions)).when(session).getUserPermissions();
+    }
+
     @Test
     public void should_isAllowed_return_false_if_static_not_authorized() throws Exception {
         //given
-        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
         final List<String> resourcePermissions = List.of("CasePermission", "SecondPermission");
         returnPermissionsFor("GET", "bpm", "case", null, resourcePermissions);
+        returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
         final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", null),
-                false, userPermissions);
+                false);
 
         //then
         assertThat(isAuthorized).isFalse();
@@ -321,13 +330,13 @@ public class PermissionServiceImplTest {
     public void should_isAllowed_return_false_on_resource_with_id_even_if_permission_in_general_is_there()
             throws Exception {
         //given
-        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
         returnPermissionsFor("GET", "bpm", "case", null, List.of("CasePermission", "AnOtherPermission"));
         returnPermissionsFor("GET", "bpm", "case", List.of("12"), List.of("CasePermission", "SecondPermission"));
+        returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
         final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
-                false, userPermissions);
+                false);
 
         //then
         assertThat(isAuthorized).isFalse();
@@ -336,12 +345,12 @@ public class PermissionServiceImplTest {
     @Test
     public void should_isAllowed_return_true_on_resource_with_id() throws Exception {
         //given
-        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
         returnPermissionsFor("GET", "bpm", "case", List.of("12"), List.of("CasePermission", "MyPermission"));
+        returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
         final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
-                false, userPermissions);
+                false);
 
         //then
         assertThat(isAuthorized).isTrue();
@@ -350,13 +359,13 @@ public class PermissionServiceImplTest {
     @Test
     public void should_isAllowed_for_resource_with_id_check_parent_if_no_rule() throws Exception {
         //given
-        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
         final List<String> resourcePermissions = List.of("CasePermission", "MyPermission");
         returnPermissionsFor("GET", "bpm", "case", null, resourcePermissions);
+        returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
         final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
-                false, userPermissions);
+                false);
 
         //then
         assertThat(isAuthorized).isTrue();
@@ -365,15 +374,15 @@ public class PermissionServiceImplTest {
     @Test
     public void should_isAllowed_work_on_resource_with_wildcard() throws Exception {
         //given
-        final Set<String> userPermissions = new HashSet<>(List.of("MyPermission", "AnOtherPermission"));
         final List<String> resourcePermissions = List.of("CasePermission", "MyPermission");
         doReturn(new HashSet<>(resourcePermissions)).when(resourcesPermissionsMapping)
                 .getResourcePermissionsWithWildCard("GET", "bpm", "case",
                         List.of("12", "instantiation"));
+        returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
         final boolean isAuthorized = permissionService
-                .isAuthorized(new APICallContext("GET", "bpm", "case", "12/instantiation"), false, userPermissions);
+                .isAuthorized(new APICallContext("GET", "bpm", "case", "12/instantiation"), false);
 
         //then
         assertThat(isAuthorized).isTrue();
@@ -481,8 +490,6 @@ public class PermissionServiceImplTest {
         properties.put("restResource.pathTemplate", "restApiGet");
         properties.put("restResource.permissions", "permission");
 
-        doReturn(mock(CompoundPermissionsMapping.class)).when(permissionService).getCompoundPermissionsMapping();
-
         // when:
         permissionService.removePermissions(properties);
 
@@ -501,13 +508,52 @@ public class PermissionServiceImplTest {
         properties.put("restResource.pathTemplate", "restApiGet");
         properties.put("restResource.permissions", "permission");
 
-        final CompoundPermissionsMapping compoundPermissionsMapping = mock(CompoundPermissionsMapping.class);
-        doReturn(compoundPermissionsMapping).when(permissionService).getCompoundPermissionsMapping();
-
         // when:
         permissionService.removePermissions(properties);
 
         // then:
         verify(compoundPermissionsMapping).removeProperty("custompage_page44");
+    }
+
+    @Test
+    public void addPermissions_should_update_compound_permissions_for_pages() {
+        // given:
+        Properties properties = new Properties();
+        properties.put("name", "myPage");
+        properties.put(PermissionServiceImpl.PROPERTY_CONTENT_TYPE, ContentType.PAGE);
+        properties.put(PermissionServiceImpl.RESOURCES_PROPERTY, "[]");
+
+        // when:
+        permissionService.addPermissions("myPage", properties);
+
+        // then:
+        verify(compoundPermissionsMapping).setPropertyAsSet(eq("myPage"), anySet());
+    }
+
+    @Test
+    public void addPermissions_should_not_update_compound_permissions_for_forms() {
+        // given:
+        Properties properties = new Properties();
+        properties.put("name", "myForm");
+        properties.put(PermissionServiceImpl.PROPERTY_CONTENT_TYPE, ContentType.FORM);
+        properties.put(PermissionServiceImpl.RESOURCES_PROPERTY, "[]");
+
+        // when:
+        permissionService.addPermissions("myForm", properties);
+
+        // then:
+        verify(compoundPermissionsMapping, never()).setPropertyAsSet(eq("myForm"), anySet());
+    }
+
+    @Test
+    public void should_return_permissions_associated_with_the_resource() {
+        //given
+        final List<String> resourcePermissions = List.of("CasePermission", "MyPermission");
+        doReturn(new HashSet<>(resourcePermissions)).when(resourcesPermissionsMapping)
+                .getPropertyAsSet("GET|bpm/case");
+
+        //then
+        assertThat(permissionService.getResourcePermissions("GET|bpm/case")).containsExactlyInAnyOrder("CasePermission",
+                "MyPermission");
     }
 }
