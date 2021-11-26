@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Component;
  * @author Fabio Lombardi
  */
 @Component
-@ConditionalOnSingleCandidate(ResourcesPermissionsMapping.class)
 public class ResourcesPermissionsMapping extends ConfigurationFile {
 
     public static final String RESOURCE_IDS_SEPARATOR = "/";
@@ -94,4 +92,13 @@ public class ResourcesPermissionsMapping extends ConfigurationFile {
         return getResourcePermissions(method, apiName, resourceName, null);
     }
 
+    @Override
+    protected boolean hasCustomVersion() {
+        return true;
+    }
+
+    @Override
+    protected boolean hasInternalVersion() {
+        return true;
+    }
 }

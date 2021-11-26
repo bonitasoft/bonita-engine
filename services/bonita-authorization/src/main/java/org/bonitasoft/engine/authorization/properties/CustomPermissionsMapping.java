@@ -31,4 +31,13 @@ public class CustomPermissionsMapping extends ConfigurationFile {
         super(PROPERTIES_FILENAME, tenantId);
     }
 
+    @Override
+    protected boolean hasCustomVersion() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasInternalVersion() {
+        return false;
+    }
 }

@@ -28,4 +28,13 @@ public class CompoundPermissionsMapping extends ConfigurationFile {
         super(PROPERTIES_FILENAME, tenantId);
     }
 
+    @Override
+    protected boolean hasCustomVersion() {
+        return true;
+    }
+
+    @Override
+    protected boolean hasInternalVersion() {
+        return true;
+    }
 }

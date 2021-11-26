@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.authorization.properties;
 
+import static java.lang.String.format;
+import static org.bonitasoft.engine.authorization.properties.ConfigurationFilesManager.getCustomPropertiesFilename;
+import static org.bonitasoft.engine.authorization.properties.ConfigurationFilesManager.getInternalPropertiesFilename;
+
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Set;
@@ -20,7 +24,7 @@ import java.util.Set;
 /**
  * @author Anthony Birembaut
  */
-public class ConfigurationFile {
+public abstract class ConfigurationFile {
 
     private String propertiesFilename;
 
@@ -30,6 +34,10 @@ public class ConfigurationFile {
         this.propertiesFilename = propertiesFilename;
         this.tenantId = tenantId;
     }
+
+    abstract protected boolean hasCustomVersion();
+
+    abstract protected boolean hasInternalVersion();
 
     public Properties getTenantProperties() {
         return ConfigurationFilesManager.getInstance().getTenantProperties(propertiesFilename, tenantId);
@@ -45,12 +53,15 @@ public class ConfigurationFile {
     }
 
     public Set<String> getPropertyAsSet(final String propertyName) {
-        final String propertyAsString = getProperty(propertyName);
-        return PropertiesWithSet.stringToSet(propertyAsString);
+        return PropertiesWithSet.stringToSet(getProperty(propertyName));
     }
 
     public void removeProperty(final String propertyName) {
         try {
+            if (hasCustomVersion() || hasInternalVersion()) {
+                throw new IllegalArgumentException(
+                        format("File %s cannot be modified directly, as a writable version exists", propertyName));
+            }
             ConfigurationFilesManager.getInstance().removeProperty(propertiesFilename, tenantId, propertyName);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -59,7 +70,23 @@ public class ConfigurationFile {
 
     public void removeCustomProperty(final String propertyName) {
         try {
-            ConfigurationFilesManager.getInstance().removeCustomProperty(propertiesFilename, tenantId, propertyName);
+            if (!hasCustomVersion()) {
+                throw new IllegalArgumentException(format("File %s does not have a -custom version", propertyName));
+            }
+            ConfigurationFilesManager.getInstance().removeProperty(getCustomPropertiesFilename(propertiesFilename),
+                    tenantId, propertyName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removeInternalProperty(final String propertyName) {
+        try {
+            if (!hasInternalVersion()) {
+                throw new IllegalArgumentException(format("File %s does not have a -internal version", propertyName));
+            }
+            ConfigurationFilesManager.getInstance().removeProperty(getInternalPropertiesFilename(propertiesFilename),
+                    tenantId, propertyName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -67,6 +94,10 @@ public class ConfigurationFile {
 
     public void setProperty(final String propertyName, final String propertyValue) {
         try {
+            if (hasCustomVersion() || hasInternalVersion()) {
+                throw new IllegalArgumentException(
+                        format("File %s cannot be modified directly, as a writable version exists", propertyName));
+            }
             ConfigurationFilesManager.getInstance().setProperty(propertiesFilename, tenantId, propertyName,
                     propertyValue);
         } catch (IOException e) {
@@ -76,8 +107,23 @@ public class ConfigurationFile {
 
     public void setCustomProperty(final String propertyName, final String propertyValue) {
         try {
-            ConfigurationFilesManager.getInstance().setCustomProperty(propertiesFilename, tenantId, propertyName,
-                    propertyValue);
+            if (!hasCustomVersion()) {
+                throw new IllegalArgumentException(format("File %s does not have a -custom version", propertyName));
+            }
+            ConfigurationFilesManager.getInstance().setProperty(getCustomPropertiesFilename(propertiesFilename),
+                    tenantId, propertyName, propertyValue);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setInternalProperty(final String propertyName, final String propertyValue) {
+        try {
+            if (!hasInternalVersion()) {
+                throw new IllegalArgumentException(format("File %s does not have a -internal version", propertyName));
+            }
+            ConfigurationFilesManager.getInstance().setProperty(getInternalPropertiesFilename(propertiesFilename),
+                    tenantId, propertyName, propertyValue);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -89,5 +135,9 @@ public class ConfigurationFile {
 
     public void setCustomPropertyAsSet(final String property, final Set<String> permissions) {
         setCustomProperty(property, permissions.toString());
+    }
+
+    public void setInternalPropertyAsSet(final String property, final Set<String> permissions) {
+        setInternalProperty(property, permissions.toString());
     }
 }

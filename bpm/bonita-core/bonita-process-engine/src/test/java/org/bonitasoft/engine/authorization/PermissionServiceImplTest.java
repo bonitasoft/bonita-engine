@@ -34,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.authorization.properties.CompoundPermissionsMapping;
+import org.bonitasoft.engine.authorization.properties.CustomPermissionsMapping;
 import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -92,6 +93,9 @@ public class PermissionServiceImplTest {
     @Mock
     private CompoundPermissionsMapping compoundPermissionsMapping;
 
+    @Mock
+    private CustomPermissionsMapping customPermissionsMapping;
+
     private File securityFolder;
 
     @Before
@@ -103,7 +107,7 @@ public class PermissionServiceImplTest {
                 .getClassLoader(any());
         permissionService = spy(
                 new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID,
-                        compoundPermissionsMapping, resourcesPermissionsMapping));
+                        compoundPermissionsMapping, resourcesPermissionsMapping, customPermissionsMapping));
         doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
         doReturn(session).when(sessionService).getSession(anyLong());
@@ -459,8 +463,9 @@ public class PermissionServiceImplTest {
         permissionService.addRestApiExtensionPermissions(resourcesPermissionsMapping, properties);
 
         //then
-        verify(resourcesPermissionsMapping).setProperty("GET|extension/restApiGet", "[permission1]");
-        verify(resourcesPermissionsMapping).setProperty("POST|extension/restApiPost", "[permission2,permission3]");
+        verify(resourcesPermissionsMapping).setInternalProperty("GET|extension/restApiGet", "[permission1]");
+        verify(resourcesPermissionsMapping).setInternalProperty("POST|extension/restApiPost",
+                "[permission2,permission3]");
     }
 
     @Test
@@ -494,7 +499,7 @@ public class PermissionServiceImplTest {
         permissionService.removePermissions(properties);
 
         // then:
-        verify(resourcesPermissionsMapping).removeProperty("GET|extension/restApiGet");
+        verify(resourcesPermissionsMapping).removeInternalProperty("GET|extension/restApiGet");
     }
 
     @Test
@@ -512,7 +517,7 @@ public class PermissionServiceImplTest {
         permissionService.removePermissions(properties);
 
         // then:
-        verify(compoundPermissionsMapping).removeProperty("custompage_page44");
+        verify(compoundPermissionsMapping).removeInternalProperty("custompage_page44");
     }
 
     @Test
@@ -527,7 +532,7 @@ public class PermissionServiceImplTest {
         permissionService.addPermissions("myPage", properties);
 
         // then:
-        verify(compoundPermissionsMapping).setPropertyAsSet(eq("myPage"), anySet());
+        verify(compoundPermissionsMapping).setInternalPropertyAsSet(eq("myPage"), anySet());
     }
 
     @Test

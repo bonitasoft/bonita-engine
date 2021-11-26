@@ -16,7 +16,8 @@ package org.bonitasoft.engine.authorization.properties;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.authorization.properties.ConfigurationFilesManager.getProperties;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -40,7 +41,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ConfigurationFilesManagerTest {
 
     private static final long TENANT_ID = 543892L;
-    private static final String MY_PROP_PROPERTIES = "myProp.properties";
     private static final String MY_PROP_INTERNAL_PROPERTIES = "myProp-internal.properties";
     @Mock
     private BonitaHomeServer bonitaHomeServer;
@@ -63,7 +63,7 @@ public class ConfigurationFilesManagerTest {
                 getProperties("testProperty=testValue\npropToRemove=willBeRemoved".getBytes()));
         doReturn(configurationFiles).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
         //when
-        configurationFilesManager.removeProperty(MY_PROP_PROPERTIES, TENANT_ID, "propToRemove");
+        configurationFilesManager.removeProperty(MY_PROP_INTERNAL_PROPERTIES, TENANT_ID, "propToRemove");
         //then
         verify(bonitaHomeServer).updateTenantPortalConfigurationFile(eq(TENANT_ID), eq(MY_PROP_INTERNAL_PROPERTIES),
                 contentCaptor.capture());
@@ -80,7 +80,7 @@ public class ConfigurationFilesManagerTest {
                 getProperties("testProperty=testValue\npropToRemove=willBeRemoved".getBytes()));
         doReturn(configurationFiles).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
         //when
-        configurationFilesManager.setProperty(MY_PROP_PROPERTIES, TENANT_ID, "testProperty", "new Value");
+        configurationFilesManager.setProperty(MY_PROP_INTERNAL_PROPERTIES, TENANT_ID, "testProperty", "new Value");
         //then
         verify(bonitaHomeServer).updateTenantPortalConfigurationFile(eq(TENANT_ID), eq(MY_PROP_INTERNAL_PROPERTIES),
                 contentCaptor.capture());
@@ -177,20 +177,4 @@ public class ConfigurationFilesManagerTest {
                 expectedOverwrittenValue);
     }
 
-    @Test
-    public void removeProperty_should_remove_value_from_internal_file() throws Exception {
-        //given
-        Map<String, Properties> propertiesMap = spy(new HashMap<>(1));
-        final Properties internalProps = new Properties();
-        internalProps.put("internalKey", "internalValue");
-        propertiesMap.put("my_resources-internal.properties", internalProps);
-
-        doReturn(propertiesMap).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
-
-        //when
-        configurationFilesManager.removeProperty("my_resources.properties", TENANT_ID, "toBeRemoved");
-
-        //then
-        verify(propertiesMap).get("my_resources-internal.properties");
-    }
 }

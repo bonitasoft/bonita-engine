@@ -32,9 +32,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ConfigurationFileTest {
 
     public static final long TENANT_ID = 12L;
-    public static final String COMPOUND_PERMISSIONS_MAPPING_FILE = "compound.properties";
-    public static final String RESOURCES_PERMISSIONS_MAPPING_FILE = "resources.properties";
-    public static final String CUSTOM_PERMISSIONS_MAPPING_FILE = "custom.properties";
     private static Properties compoundProperties;
     private static Properties resourcesProperties;
     private static Properties customProperties;
@@ -51,8 +48,7 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getProperty_return_the_right_custom_permissions_with_special_characters() {
-        final ConfigurationFile tenantProperties = spy(
-                new ConfigurationFile(CUSTOM_PERMISSIONS_MAPPING_FILE, TENANT_ID));
+        final ConfigurationFile tenantProperties = spy(new CustomPermissionsMapping(TENANT_ID));
         doReturn(customProperties).when(tenantProperties).getTenantProperties();
 
         final String customValue = tenantProperties.getProperty("profile|HR manager");
@@ -62,8 +58,7 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getPropertyAsSet_return_the_right_permissions_with_trailing_spaces() {
-        final ConfigurationFile tenantProperties = spy(
-                new ConfigurationFile(COMPOUND_PERMISSIONS_MAPPING_FILE, TENANT_ID));
+        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
         doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
 
         final String value = tenantProperties.getProperty("caseListingPage");
@@ -75,8 +70,7 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getProperty_return_null_with_unknown_permissions() {
-        final ConfigurationFile tenantProperties = spy(
-                new ConfigurationFile(COMPOUND_PERMISSIONS_MAPPING_FILE, TENANT_ID));
+        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
         doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
 
         final String value = tenantProperties.getProperty("unknownListingPage");
@@ -86,8 +80,7 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getProperty_return_the_right_compound_permissions() {
-        final ConfigurationFile tenantProperties = spy(
-                new ConfigurationFile(COMPOUND_PERMISSIONS_MAPPING_FILE, TENANT_ID));
+        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
         doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
 
         final String compoundValue = tenantProperties.getProperty("taskListingPage");
@@ -97,8 +90,7 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getProperty_return_the_right_resource_permissions() {
-        final ConfigurationFile tenantProperties = spy(
-                new ConfigurationFile(RESOURCES_PERMISSIONS_MAPPING_FILE, TENANT_ID));
+        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
         doReturn(resourcesProperties).when(tenantProperties).getTenantProperties();
 
         final String resourcesValue = tenantProperties.getProperty("GET|bpm/identity");
@@ -108,8 +100,7 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getProperty_return_the_right_custom_permissions() {
-        final ConfigurationFile tenantProperties = spy(
-                new ConfigurationFile(CUSTOM_PERMISSIONS_MAPPING_FILE, TENANT_ID));
+        final ConfigurationFile tenantProperties = spy(new CustomPermissionsMapping(TENANT_ID));
         doReturn(customProperties).when(tenantProperties).getTenantProperties();
 
         final String customValue = tenantProperties.getProperty("profile|User");
@@ -119,8 +110,7 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getPropertyAsSet_return_the_right_permissions_list() {
-        final ConfigurationFile tenantProperties = spy(
-                new ConfigurationFile(COMPOUND_PERMISSIONS_MAPPING_FILE, TENANT_ID));
+        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
         doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
 
         final Set<String> compoundPermissionsList = tenantProperties.getPropertyAsSet("taskListingPage");
@@ -130,8 +120,7 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getPropertyAsSet_return_the_right_permissions_list_with_single_value() {
-        final ConfigurationFile tenantProperties = spy(
-                new ConfigurationFile(COMPOUND_PERMISSIONS_MAPPING_FILE, TENANT_ID));
+        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
         doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
 
         final Set<String> compoundPermissionsList = tenantProperties.getPropertyAsSet("processListingPage");

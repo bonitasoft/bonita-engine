@@ -87,36 +87,25 @@ public class ConfigurationFilesManager {
     }
 
     public void removeProperty(String propertiesFilename, long tenantId, String propertyName) throws IOException {
-        removeProperty(propertiesFilename, tenantId, propertyName, false);
-    }
-
-    public void removeCustomProperty(String propertiesFilename, long tenantId, String propertyName) throws IOException {
-        removeProperty(propertiesFilename, tenantId, propertyName, true);
-    }
-
-    private void removeProperty(String propertiesFilename, long tenantId, String propertyName, boolean isCustom)
-            throws IOException {
-        final String suffixedFilename = isCustom ? getCustomPropertiesFilename(propertiesFilename)
-                : getInternalPropertiesFilename(propertiesFilename);
         Map<String, Properties> resources = getTenantConfigurations(tenantId);
-        Properties properties = resources.get(suffixedFilename);
+        Properties properties = resources.get(propertiesFilename);
         if (properties != null) {
             properties.remove(propertyName);
-            update(tenantId, suffixedFilename, properties);
+            update(tenantId, propertiesFilename, properties);
             updateAggregatedProperties(propertiesFilename, tenantId, propertyName, null, resources);
         } else {
             if (log.isTraceEnabled()) {
-                log.trace("File " + suffixedFilename + " not found. Cannot remove property '" + propertyName + "'.");
+                log.trace("File " + propertiesFilename + " not found. Cannot remove property '" + propertyName + "'.");
             }
         }
     }
 
-    protected String getInternalPropertiesFilename(String propertiesFilename) {
+    public static String getInternalPropertiesFilename(String propertiesFilename) {
         // Internal behavior stores and removes from -internal file (for automatic updates when deploying/updating a page/API extension)
         return propertiesFilename.replaceAll("\\.properties$", "-internal" + ".properties");
     }
 
-    protected String getCustomPropertiesFilename(String propertiesFilename) {
+    public static String getCustomPropertiesFilename(String propertiesFilename) {
         // Custom behavior stores and removes from -custom files (for manual updates):
         return propertiesFilename.replaceAll("\\.properties$", "-custom" + ".properties");
     }
@@ -145,28 +134,15 @@ public class ConfigurationFilesManager {
 
     public void setProperty(String propertiesFilename, long tenantId, String propertyName, String propertyValue)
             throws IOException {
-        setProperty(propertiesFilename, tenantId, propertyName, propertyValue, false);
-    }
-
-    public void setCustomProperty(String propertiesFilename, long tenantId, String propertyName, String propertyValue)
-            throws IOException {
-        setProperty(propertiesFilename, tenantId, propertyName, propertyValue, true);
-    }
-
-    private void setProperty(String propertiesFilename, long tenantId, String propertyName, String propertyValue,
-            boolean isCustom)
-            throws IOException {
         Map<String, Properties> resources = getTenantConfigurations(tenantId);
-        final String suffixedFilename = isCustom ? getCustomPropertiesFilename(propertiesFilename)
-                : getInternalPropertiesFilename(propertiesFilename);
-        Properties properties = resources.get(suffixedFilename);
+        Properties properties = resources.get(propertiesFilename);
         if (properties != null) {
             properties.setProperty(propertyName, propertyValue);
-            update(tenantId, suffixedFilename, properties);
+            update(tenantId, propertiesFilename, properties);
             updateAggregatedProperties(propertiesFilename, tenantId, propertyName, propertyValue, resources);
         } else {
             if (log.isTraceEnabled()) {
-                log.trace("File " + suffixedFilename + " not found. Cannot set property '" + propertyName + "'.");
+                log.trace("File " + propertiesFilename + " not found. Cannot set property '" + propertyName + "'.");
             }
         }
     }
