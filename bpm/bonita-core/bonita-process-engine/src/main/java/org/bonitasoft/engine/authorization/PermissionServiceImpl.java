@@ -31,6 +31,7 @@ import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.permission.PermissionRule;
 import org.bonitasoft.engine.authorization.properties.CompoundPermissionsMapping;
+import org.bonitasoft.engine.authorization.properties.CustomPermissionsMapping;
 import org.bonitasoft.engine.authorization.properties.PropertiesWithSet;
 import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -82,6 +83,7 @@ public class PermissionServiceImpl implements PermissionService {
     private GroovyClassLoader groovyClassLoader;
     private final CompoundPermissionsMapping compoundPermissionsMapping;
     private final ResourcesPermissionsMapping resourcesPermissionsMapping;
+    private final CustomPermissionsMapping customPermissionsMapping;
 
     protected final long tenantId;
 
@@ -89,7 +91,8 @@ public class PermissionServiceImpl implements PermissionService {
             final SessionAccessor sessionAccessor, final SessionService sessionService,
             @Value("${tenantId}") final long tenantId,
             CompoundPermissionsMapping compoundPermissionsMapping,
-            ResourcesPermissionsMapping resourcesPermissionsMapping) {
+            ResourcesPermissionsMapping resourcesPermissionsMapping,
+            CustomPermissionsMapping customPermissionsMapping) {
         this.classLoaderService = classLoaderService;
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
@@ -97,6 +100,7 @@ public class PermissionServiceImpl implements PermissionService {
         this.tenantId = tenantId;
         this.compoundPermissionsMapping = compoundPermissionsMapping;
         this.resourcesPermissionsMapping = resourcesPermissionsMapping;
+        this.customPermissionsMapping = customPermissionsMapping;
     }
 
     @Override
@@ -207,7 +211,7 @@ public class PermissionServiceImpl implements PermissionService {
                         + apiCallContext.getResourceName()
                         + (apiCallContext.getResourceId() != null ? "/" + apiCallContext.getResourceId() : "")
                         + " attempted by " + getSession().getUserName()
-                        + " required permissions: " + resourcePermissions);
+                        + ", required permissions: " + resourcePermissions);
 
         return false;
     }
@@ -242,16 +246,16 @@ public class PermissionServiceImpl implements PermissionService {
 
     private void addPagePermissions(String pageName, Properties pageProperties, Set<String> customPagePermissions) {
         if (ContentType.PAGE.equals(pageProperties.getProperty(PROPERTY_CONTENT_TYPE))) {
-            compoundPermissionsMapping.setPropertyAsSet(pageName, customPagePermissions);
+            compoundPermissionsMapping.setInternalPropertyAsSet(pageName, customPagePermissions);
         }
     }
 
     @Override
     public void removePermissions(Properties pageProperties) {
         for (String key : getApiExtensionResourcesPermissionsMapping(pageProperties).keySet()) {
-            resourcesPermissionsMapping.removeProperty(key);
+            resourcesPermissionsMapping.removeInternalProperty(key);
         }
-        compoundPermissionsMapping.removeProperty(pageProperties.getProperty(PageService.PROPERTIES_NAME));
+        compoundPermissionsMapping.removeInternalProperty(pageProperties.getProperty(PageService.PROPERTIES_NAME));
     }
 
     public Set<String> getCustomPagePermissions(final String declaredPageResources,
@@ -276,7 +280,7 @@ public class PermissionServiceImpl implements PermissionService {
         final Map<String, String> permissionsMapping = getApiExtensionResourcesPermissionsMapping(
                 pageProperties);
         for (final String key : permissionsMapping.keySet()) {
-            resourcesPermissionsMapping.setProperty(key, permissionsMapping.get(key));
+            resourcesPermissionsMapping.setInternalProperty(key, permissionsMapping.get(key));
         }
     }
 
@@ -303,6 +307,14 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Set<String> getResourcePermissions(final String resourceKey) {
         return resourcesPermissionsMapping.getPropertyAsSet(resourceKey);
+    }
+
+    public void addCustomEntityPermissions(final String entity, final Set<String> resourcePermissions) {
+        customPermissionsMapping.setPropertyAsSet(entity, resourcePermissions);
+    }
+
+    public void removeCustomEntityPermissions(String entity) {
+        customPermissionsMapping.removeProperty(entity);
     }
 
 }
