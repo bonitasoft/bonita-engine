@@ -20,7 +20,7 @@ class Deps {
     // The groovy version must be in synch with the runtime-bom artifact
     public static String groovyVersion = "3.0.8"
     public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
-    public static String httpComponentsVersion = "4.5.12"
+    public static String httpComponentsVersion = "4.5.13"
     public static String xstreamVersion = "1.4.18"
     public static String ehcacheVersion = "2.10.9.2"
     public static String eclipseCompilerVersion = "3.20.0"
