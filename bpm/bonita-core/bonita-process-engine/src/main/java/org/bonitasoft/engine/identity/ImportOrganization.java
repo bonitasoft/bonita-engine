@@ -266,8 +266,10 @@ public class ImportOrganization {
             long importDate)
             throws SUserUpdateException {
         for (final ExportedUser user : users) {
+            //Skip the update of the manager if user was already present before the import
+            // and the strategy says to skip it in that case
             if (strategy.shouldSkipUpdateManagerOfExistingUser()
-                    && userNameToSUsers.get(user.getUserName()).getCreationDate() < importDate) {
+                    && wasUserAlreadyPresent(userNameToSUsers, importDate, user)) {
                 continue;
             }
 
@@ -285,6 +287,10 @@ public class ImportOrganization {
                 }
             }
         }
+    }
+
+    private boolean wasUserAlreadyPresent(Map<String, SUser> userNameToSUsers, long importDate, ExportedUser user) {
+        return userNameToSUsers.get(user.getUserName()).getCreationDate() < importDate;
     }
 
     private Map<String, SUser> importUsers(final List<ExportedUser> users,
