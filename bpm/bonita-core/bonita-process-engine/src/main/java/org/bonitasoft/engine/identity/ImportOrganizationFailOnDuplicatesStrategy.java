@@ -71,4 +71,9 @@ public class ImportOrganizationFailOnDuplicatesStrategy implements ImportOrganiz
                         + "'");
     }
 
+    @Override
+    public boolean shouldSkipUpdateManagerOfExistingUser() {
+        return false;
+    }
+
 }

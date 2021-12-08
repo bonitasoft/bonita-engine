@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -118,13 +119,14 @@ public class ImportOrganization {
             //checking if the Group names contain illegal characters
             excludeGroupsWithInvalidCharactersInName(groups);
             final List<ExportedUserMembership> memberships = organization.getMemberships();
+
+            long importDate = System.currentTimeMillis();
             // custom user info definitions
             final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(
-                    organization
-                            .getCustomUserInfoDefinition());
+                    organization.getCustomUserInfoDefinition());
             // Users
             final Map<String, SUser> userNameToSUsers = importUsers(users, customUserInfoDefinitions);
-            updateManagerId(users, userNameToSUsers);
+            updateManagerId(users, userNameToSUsers, importDate);
             // Roles
             final Map<String, Long> roleNameToIdMap = importRoles(roles);
             // Groups
@@ -260,12 +262,20 @@ public class ImportOrganization {
         return roleNameToIdMap;
     }
 
-    private void updateManagerId(final List<ExportedUser> users, final Map<String, SUser> userNameToSUsers)
+    private void updateManagerId(final List<ExportedUser> users, final Map<String, SUser> userNameToSUsers,
+            long importDate)
             throws SUserUpdateException {
         for (final ExportedUser user : users) {
-            final String managerUserName = user.getManagerUserName();
-            if (managerUserName != null && managerUserName.trim().length() > 0) {
-                SUser manager = userNameToSUsers.get(managerUserName.trim());
+            //Skip the update of the manager if user was already present before the import
+            // and the strategy says to skip it in that case
+            if (strategy.shouldSkipUpdateManagerOfExistingUser()
+                    && wasUserAlreadyPresent(userNameToSUsers, importDate, user)) {
+                continue;
+            }
+
+            if (StringUtils.isNotBlank(user.getManagerUserName())) {
+                final String managerUserName = user.getManagerUserName().trim();
+                SUser manager = userNameToSUsers.get(managerUserName);
                 if (manager != null) {
                     identityService.updateUser(userNameToSUsers.get(user.getUserName()),
                             BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance()
@@ -277,6 +287,10 @@ public class ImportOrganization {
                 }
             }
         }
+    }
+
+    private boolean wasUserAlreadyPresent(Map<String, SUser> userNameToSUsers, long importDate, ExportedUser user) {
+        return userNameToSUsers.get(user.getUserName()).getCreationDate() < importDate;
     }
 
     private Map<String, SUser> importUsers(final List<ExportedUser> users,

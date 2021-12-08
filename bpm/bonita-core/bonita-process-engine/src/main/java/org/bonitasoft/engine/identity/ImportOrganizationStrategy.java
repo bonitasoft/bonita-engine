@@ -46,4 +46,9 @@ public interface ImportOrganizationStrategy {
             ExportedCustomUserInfoDefinition newUserInfoDefinition)
             throws ImportDuplicateInOrganizationException, SIdentityException;
 
+    /**
+     * @return true if users that were already existing should have their manager set
+     */
+    boolean shouldSkipUpdateManagerOfExistingUser();
+
 }
