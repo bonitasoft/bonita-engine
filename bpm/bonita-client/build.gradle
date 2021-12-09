@@ -16,17 +16,17 @@ dependencies {
     testCompile 'org.eclipse.jetty:jetty-plus:8.1.14.v20131031'
 }
 
-task testsJar(type: Jar) {
+tasks.register("testsJar", Jar) {
     classifier = 'tests'
     from(sourceSets.test.output)
 }
 
-task sourcesJar(type: Jar) {
+tasks.register("sourcesJar", Jar) {
     from sourceSets.main.allJava
     archiveClassifier = 'sources'
 }
 
-task javadocJar(type: Jar) {
+tasks.register("javadocJar", Jar) {
     from javadoc
     archiveClassifier = 'javadoc'
 }

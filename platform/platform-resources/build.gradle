@@ -40,7 +40,7 @@ processResources {
 
 configurations { distributionZip }
 
-task sourcesJar(type: Jar) {
+tasks.register("sourcesJar", Jar) {
     from sourceSets.main.allJava
     archiveClassifier = 'sources'
 }

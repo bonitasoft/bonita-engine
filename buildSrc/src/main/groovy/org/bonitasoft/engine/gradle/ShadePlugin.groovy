@@ -71,7 +71,7 @@ class ShadePlugin implements Plugin<Project> {
                 options.addBooleanOption("author", true)
                 // FIXME update studio test org.bonitasoft.studio.tests.engine.TestJavaDoc.testHasJavaDoc
             }
-            project.tasks.create("sourcesJar", Jar) {
+            project.tasks.register("sourcesJar", Jar) {
                 from {
                     getShadedProjects(project, extension, getProjectsAlreadyShaded(project, extension)).collect {
                         it.sourceSets.main.allJava
@@ -79,7 +79,7 @@ class ShadePlugin implements Plugin<Project> {
                 }
                 classifier = 'sources'
             }
-            project.tasks.create("javadocJar", Jar) {
+            project.tasks.register("javadocJar", Jar) {
                 from project.javadoc
                 classifier = 'javadoc'
             }
