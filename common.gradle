@@ -1,7 +1,6 @@
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
-    apply plugin: 'idea'
     apply plugin: 'com.bonitasoft.gradle.maven-settings'
     group = 'org.bonitasoft.engine'
 
@@ -14,12 +13,6 @@ allprojects {
                     url = repoProperties.last()
                 }
             }
-        }
-    }
-    idea {
-        module {
-            outputDir file('build/classes/main')
-            testOutputDir file('build/classes/test')
         }
     }
     if (project.convention.findPlugin(JavaPluginConvention)) {
