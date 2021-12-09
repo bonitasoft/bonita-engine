@@ -54,7 +54,9 @@ class ShadePlugin implements Plugin<Project> {
                 }
             }
             // not mandatory. Only here to have the production jars built when running `gradle build`:
-            project.tasks.findByName("build").dependsOn project.tasks.findByName("shadowJar")
+            project.tasks.named("build") {
+                dependsOn project.tasks.named("shadowJar")
+            }
 
             project.javadoc {
                 source {

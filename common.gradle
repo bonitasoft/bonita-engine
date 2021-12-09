@@ -44,17 +44,17 @@ subprojects {
         configurations.all {
         }
         afterEvaluate {
-            tasks.withType(AbstractCompile) { options.encoding = 'UTF-8' }
+            tasks.withType(AbstractCompile).configureEach { options.encoding = 'UTF-8' }
         }
         tasks.withType(JavaCompile).configureEach {
             options.encoding = 'UTF-8'
             options.fork = true
         }
-        tasks.withType(Javadoc) {
+        tasks.withType(Javadoc).configureEach {
             options.addStringOption('Xdoclint:none', '-quiet')
             options.encoding = 'UTF-8'
         }
-        tasks.withType(DependencyReportTask) {
+        tasks.withType(DependencyReportTask).configureEach {
             group "Documentation"
             description "List runtime dependencies for a specified configuration"
             configurations = [project.configurations.runtimeClasspath]
