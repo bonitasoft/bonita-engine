@@ -1,6 +1,7 @@
 plugins {
     id("bonita-http-test")
     id("bonita-docker-database")
+    id("bonita-tests")
 }
 dependencies {
     compile project(':bonita-test-api')

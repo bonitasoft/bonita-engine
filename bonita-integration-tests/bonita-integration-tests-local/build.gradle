@@ -1,5 +1,6 @@
 plugins {
     id("bonita-docker-database")
+    id("bonita-tests")
 }
 dependencies {
     compile "junit:junit:${Deps.junit4Version}"
