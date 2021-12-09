@@ -22,7 +22,7 @@ allprojects {
             testOutputDir file('build/classes/test')
         }
     }
-    if(project.convention.findPlugin(JavaPluginConvention)) {
+    if (project.convention.findPlugin(JavaPluginConvention)) {
         // Change the output directory for the main and test source sets back to the old path
         sourceSets.main.output.classesDir = new File(buildDir, "classes/main")
         sourceSets.test.output.classesDir = new File(buildDir, "classes/test")
@@ -46,7 +46,10 @@ subprojects {
         afterEvaluate {
             tasks.withType(AbstractCompile) { options.encoding = 'UTF-8' }
         }
-        tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+        tasks.withType(JavaCompile).configureEach {
+            options.encoding = 'UTF-8'
+            options.fork = true
+        }
         tasks.withType(Javadoc) {
             options.addStringOption('Xdoclint:none', '-quiet')
             options.encoding = 'UTF-8'
@@ -56,7 +59,6 @@ subprojects {
             description "List runtime dependencies for a specified configuration"
             configurations = [project.configurations.runtimeClasspath]
         }
-
     }
 
     testlogger {
