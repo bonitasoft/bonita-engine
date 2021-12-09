@@ -26,6 +26,24 @@ gradlePlugin {
         bonitaTests {
             id = "bonita-tests"
             implementationClass = "org.bonitasoft.engine.gradle.TestsPlugin"
+            // Add this plugin to every module that has *IT.java
+            // Currently, there are ITs in the following modules:
+            // bonita-client
+            // platform-setup
+            // bonita-integration-tests-client
+            // bonita-integration-tests-local
+            // bonita-engine-spring-boot-starter
+            // bonita-persistence
+            // bonita-connector-executor
+            // bonita-integration-tests-sp/bonita-integration-cluster
+            // bonita-integration-tests-sp/bonita-integration-tests-bpm
+            // bonita-engine-spring-boot-starter-sp
+            // bonita-cluster-services
+            // bonita-prometheus-monitoring-plugin
+            // bonita-integration-tests-sp/bonita-integration-tests-local
+            // bonita-integration-tests-sp/bonita-integration-tests-client
+            // platform-setup-sp
+            // bonita-test-api-sp
         }
         bonitaHttpTests {
             id = "bonita-http-test"

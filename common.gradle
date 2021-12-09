@@ -32,7 +32,6 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
-    apply plugin: 'bonita-tests'
     apply plugin: 'com.adarshr.test-logger'
 
     repositories {

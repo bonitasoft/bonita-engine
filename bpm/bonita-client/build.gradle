@@ -1,5 +1,10 @@
 import org.bonitasoft.engine.gradle.PomUtils
 
+plugins {
+    id "java-library"
+    id "bonita-tests"
+}
+
 dependencies {
     compile project(':bpm:bonita-common')
     compile "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"

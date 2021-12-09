@@ -1,7 +1,10 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.bonitasoft.engine.gradle.PomUtils
 
-plugins { id 'distribution' }
+plugins {
+    id 'distribution'
+    id 'bonita-tests'
+}
 
 configurations {
     distributionZip

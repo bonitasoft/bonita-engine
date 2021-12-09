@@ -1,6 +1,9 @@
 import org.bonitasoft.engine.gradle.PomUtils
 
-plugins { id "java-library" }
+plugins {
+    id 'java-library'
+    id 'bonita-tests'
+}
 
 dependencies {
     api(project(":bpm:bonita-common"))

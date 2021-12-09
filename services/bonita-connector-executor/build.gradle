@@ -1,4 +1,6 @@
-
+plugins {
+    id('bonita-tests')
+}
 
 dependencies {
     compile project(':services:bonita-commons')
