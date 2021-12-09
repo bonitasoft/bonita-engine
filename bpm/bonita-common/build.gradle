@@ -51,17 +51,17 @@ sourceSets {
         }
     }
 }
-task testsJar(type: Jar) {
+tasks.register("testsJar", Jar) {
     classifier = 'tests'
     from(sourceSets.test.output)
 }
 
-task sourcesJar(type: Jar) {
+tasks.register("sourcesJar", Jar) {
     from sourceSets.main.allJava
     archiveClassifier = 'sources'
 }
 
-task javadocJar(type: Jar) {
+tasks.register("javadocJar", Jar) {
     from javadoc
     archiveClassifier = 'javadoc'
 }

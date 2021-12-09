@@ -4,7 +4,7 @@ plugins {
     id "java-library"
 }
 
-dependencies{
+dependencies {
 
     api(project(":bpm:bonita-client"))
 
@@ -20,7 +20,7 @@ dependencies{
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
-    
+
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
@@ -30,12 +30,12 @@ dependencies{
 
 }
 
-task sourcesJar(type: Jar) {
+tasks.register("sourcesJar", Jar) {
     from sourceSets.main.allJava
     archiveClassifier = 'sources'
 }
 
-task javadocJar(type: Jar) {
+tasks.register("javadocJar", Jar) {
     from javadoc
     archiveClassifier = 'javadoc'
 }

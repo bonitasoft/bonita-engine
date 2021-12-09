@@ -17,7 +17,7 @@ dependencies {
     testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
 }
 
-task testsJar(type: Jar) {
+tasks.register("testsJar", Jar) {
     classifier = 'tests'
     from(sourceSets.test.output)
 }
