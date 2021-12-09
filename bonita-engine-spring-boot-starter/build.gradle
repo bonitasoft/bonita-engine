@@ -28,8 +28,6 @@ task javadocJar(type: Jar) {
     archiveClassifier = 'javadoc'
 }
 
-task listDependencies(type: DependencyReportTask) {}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
