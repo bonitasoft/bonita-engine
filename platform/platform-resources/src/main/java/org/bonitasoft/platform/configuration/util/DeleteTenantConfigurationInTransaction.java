@@ -26,14 +26,12 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 public class DeleteTenantConfigurationInTransaction extends TransactionCallbackWithoutResult {
 
     private final JdbcTemplate jdbcTemplate;
-    private final String dbVendor;
     private final long tenantId;
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
-    public DeleteTenantConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor, long tenantId) {
+    public DeleteTenantConfigurationInTransaction(JdbcTemplate jdbcTemplate, long tenantId) {
         this.jdbcTemplate = jdbcTemplate;
-        this.dbVendor = dbVendor;
         this.tenantId = tenantId;
     }
 

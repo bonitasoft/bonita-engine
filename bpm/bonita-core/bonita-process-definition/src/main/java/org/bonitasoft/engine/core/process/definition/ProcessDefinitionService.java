@@ -58,7 +58,7 @@ public interface ProcessDefinitionService {
 
     String PROCESSDEFINITION_IS_UNRESOLVED = "PROCESSDEFINITION_IS_UNRESOLVED";
 
-    String PROCESS_CACHE_NAME = "_PROCESSDEF";
+    static String PROCESS_CACHE_NAME = "_PROCESSDEF";
 
     String UNCATEGORIZED_SUFFIX = "Uncategorized";
 
@@ -733,7 +733,7 @@ public interface ProcessDefinitionService {
      *
      * @param processDefinitionId
      *        Identifier of the process definition
-     * @param searchOptions
+     * @param queryOptions
      *        The QueryOptions object containing some query conditions
      * @return
      * @throws SBonitaReadException

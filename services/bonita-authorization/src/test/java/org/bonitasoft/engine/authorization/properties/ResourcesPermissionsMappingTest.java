@@ -19,19 +19,29 @@ import static org.bonitasoft.engine.authorization.properties.ConfigurationFilesM
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
+import org.bonitasoft.engine.cache.CacheService;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ResourcesPermissionsMappingTest {
+
+    @Mock
+    private CacheService cacheService;
+
+    @Mock
+    private ConfigurationFilesManager configurationFilesManager;
 
     @Test
     public void testGetResourcePermission() {
         //given
         final String fileContent = "GET|bpm/process [Process visualization, Process categories, Process actor mapping visualization, Connector visualization]\n"
-                +
-                "POST|bpm/process [Process Deploy]\n" +
+                + "POST|bpm/process [Process Deploy]\n" +
                 "POST|bpm/process/6 [Custom permission]\n" +
                 "PUT|bpm/process []";
         final ResourcesPermissionsMapping resourcesPermissionsMapping = getResourcesPermissionsMapping(fileContent);
@@ -66,17 +76,13 @@ public class ResourcesPermissionsMappingTest {
 
         //when
         final Set<String> getWithResourcesQualifier = resourcesPermissionsMapping.getResourcePermissionsWithWildCard(
-                "GET", "bpm", "process",
-                singletonList("6"));
+                "GET", "bpm", "process", List.of("6"));
         final Set<String> postWithResourcesQualifier = resourcesPermissionsMapping.getResourcePermissionsWithWildCard(
-                "POST", "bpm", "process",
-                singletonList("6"));
+                "POST", "bpm", "process", List.of("6"));
         final Set<String> postWithResourcesQualifiers = resourcesPermissionsMapping.getResourcePermissionsWithWildCard(
-                "POST", "bpm", "process",
-                Arrays.asList("6", "instantiation"));
+                "POST", "bpm", "process", List.of("6", "instantiation"));
         final Set<String> putWithResourcesQualifiers = resourcesPermissionsMapping.getResourcePermissionsWithWildCard(
-                "PUT", "bpm", "process",
-                Arrays.asList("6", "expression", "10"));
+                "PUT", "bpm", "process", List.of("6", "expression", "10"));
 
         //then
         assertThat(getWithResourcesQualifier).isEmpty();
@@ -85,9 +91,9 @@ public class ResourcesPermissionsMappingTest {
         assertThat(putWithResourcesQualifiers).containsOnly("Expression update");
     }
 
-    public static ResourcesPermissionsMapping getResourcesPermissionsMapping(final String fileContent) {
+    public ResourcesPermissionsMapping getResourcesPermissionsMapping(final String fileContent) {
         final ResourcesPermissionsMapping resourcesPermissionsMapping = spy(
-                new ResourcesPermissionsMapping(423L));
+                new ResourcesPermissionsMapping(423L, cacheService, configurationFilesManager));
         doReturn(getProperties(fileContent.getBytes())).when(resourcesPermissionsMapping).getTenantProperties();
         return resourcesPermissionsMapping;
     }

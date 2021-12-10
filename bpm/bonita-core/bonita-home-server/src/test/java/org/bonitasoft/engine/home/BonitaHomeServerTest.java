@@ -85,11 +85,8 @@ public class BonitaHomeServerTest {
     @Test
     public void should_updateTenantPortalConfigurationFile_update_the_files() throws Exception {
         //given
-        List<BonitaConfiguration> tenantTemplateConf = confs(
-                conf("myFile.properties", "previous content".getBytes()),
-                conf("file2", "file2Content".getBytes()));
-        doReturn(tenantTemplateConf)
-                .when(configurationService).getTenantPortalConf(TENANT_ID);
+        doReturn(conf("myFile.properties", "previous content".getBytes()))
+                .when(configurationService).getTenantPortalConfiguration(TENANT_ID, "myFile.properties");
 
         //when
         bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties",
@@ -102,10 +99,7 @@ public class BonitaHomeServerTest {
     @Test(expected = UpdateException.class)
     public void should_updateTenantPortalConfigurationFile_throws_UpdateException_if_not_found() throws Exception {
         //given
-        List<BonitaConfiguration> tenantTemplateConf = confs(
-                conf("file2", "file2Content".getBytes()));
-        doReturn(tenantTemplateConf)
-                .when(configurationService).getTenantPortalConf(TENANT_ID);
+        doReturn(null).when(configurationService).getTenantPortalConfiguration(TENANT_ID, "myFile.properties");
 
         //when
         bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties",

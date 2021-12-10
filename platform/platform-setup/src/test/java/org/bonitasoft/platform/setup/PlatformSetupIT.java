@@ -90,7 +90,7 @@ public class PlatformSetupIT {
     @Autowired
     VersionService versionService;
 
-    private ConfigurationFolderUtil configurationFolderUtil = new ConfigurationFolderUtil();
+    private final ConfigurationFolderUtil configurationFolderUtil = new ConfigurationFolderUtil();
 
     @After
     public void after() throws Exception {

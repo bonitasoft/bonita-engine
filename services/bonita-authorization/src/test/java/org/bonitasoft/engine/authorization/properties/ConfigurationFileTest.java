@@ -14,18 +14,21 @@
 package org.bonitasoft.engine.authorization.properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.authorization.properties.ConfigurationFile.CONFIGURATION_FILES_CACHE;
 import static org.bonitasoft.engine.authorization.properties.ConfigurationFilesManager.getProperties;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 import java.util.Properties;
 import java.util.Set;
 
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -35,6 +38,16 @@ public class ConfigurationFileTest {
     private static Properties compoundProperties;
     private static Properties resourcesProperties;
     private static Properties customProperties;
+
+    private ConfigurationFile resourcesPermissionsMapping;
+    private ConfigurationFile customPermissionsMapping;
+    private ConfigurationFile compoundPermissionsMapping;
+
+    @Mock
+    private CacheService cacheService;
+
+    @Mock
+    private ConfigurationFilesManager configurationFilesManager;
 
     @BeforeClass
     public static void init() throws Exception {
@@ -46,23 +59,31 @@ public class ConfigurationFileTest {
                 ConfigurationFileTest.class.getResourceAsStream("/custom-permissions-mapping.properties")));
     }
 
+    @Before
+    public void setupMocksAndSpies() {
+        resourcesPermissionsMapping = spy(
+                new ResourcesPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
+        doReturn(resourcesProperties).when(resourcesPermissionsMapping).getTenantProperties();
+
+        customPermissionsMapping = spy(
+                new CustomPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
+        doReturn(customProperties).when(customPermissionsMapping).getTenantProperties();
+
+        compoundPermissionsMapping = spy(
+                new CompoundPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
+        doReturn(compoundProperties).when(compoundPermissionsMapping).getTenantProperties();
+    }
+
     @Test
     public void should_getProperty_return_the_right_custom_permissions_with_special_characters() {
-        final ConfigurationFile tenantProperties = spy(new CustomPermissionsMapping(TENANT_ID));
-        doReturn(customProperties).when(tenantProperties).getTenantProperties();
-
-        final String customValue = tenantProperties.getProperty("profile|HR manager");
-
+        final String customValue = customPermissionsMapping.getProperty("profile|HR manager");
         assertEquals("[ManageProfiles]", customValue);
     }
 
     @Test
     public void should_getPropertyAsSet_return_the_right_permissions_with_trailing_spaces() {
-        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
-        doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
-
-        final String value = tenantProperties.getProperty("caseListingPage");
-        final Set<String> valueAsList = tenantProperties.getPropertyAsSet("caseListingPage");
+        final String value = compoundPermissionsMapping.getProperty("caseListingPage");
+        final Set<String> valueAsList = compoundPermissionsMapping.getPropertyAsSet("caseListingPage");
 
         assertEquals("caseVisualizationWithTrailingSpace", value);
         assertThat(valueAsList).containsOnly("caseVisualizationWithTrailingSpace");
@@ -70,62 +91,55 @@ public class ConfigurationFileTest {
 
     @Test
     public void should_getProperty_return_null_with_unknown_permissions() {
-        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
-        doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
-
-        final String value = tenantProperties.getProperty("unknownListingPage");
-
+        final String value = compoundPermissionsMapping.getProperty("unknownListingPage");
         assertThat(value).isNull();
     }
 
     @Test
     public void should_getProperty_return_the_right_compound_permissions() {
-        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
-        doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
-
-        final String compoundValue = tenantProperties.getProperty("taskListingPage");
-
+        final String compoundValue = compoundPermissionsMapping.getProperty("taskListingPage");
         assertEquals("[TaskVisualization, CaseVisualization]", compoundValue);
     }
 
     @Test
     public void should_getProperty_return_the_right_resource_permissions() {
-        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
-        doReturn(resourcesProperties).when(tenantProperties).getTenantProperties();
-
-        final String resourcesValue = tenantProperties.getProperty("GET|bpm/identity");
-
+        final String resourcesValue = resourcesPermissionsMapping.getProperty("GET|bpm/identity");
         assertEquals("[UserVisualization, groupVisualization]", resourcesValue);
     }
 
     @Test
     public void should_getProperty_return_the_right_custom_permissions() {
-        final ConfigurationFile tenantProperties = spy(new CustomPermissionsMapping(TENANT_ID));
-        doReturn(customProperties).when(tenantProperties).getTenantProperties();
-
-        final String customValue = tenantProperties.getProperty("profile|User");
-
+        final String customValue = customPermissionsMapping.getProperty("profile|User");
         assertEquals("[ManageLooknFeel, ManageProfiles]", customValue);
     }
 
     @Test
     public void should_getPropertyAsSet_return_the_right_permissions_list() {
-        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
-        doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
-
-        final Set<String> compoundPermissionsList = tenantProperties.getPropertyAsSet("taskListingPage");
-
+        final Set<String> compoundPermissionsList = compoundPermissionsMapping.getPropertyAsSet("taskListingPage");
         assertThat(compoundPermissionsList).containsOnly("TaskVisualization", "CaseVisualization");
     }
 
     @Test
     public void should_getPropertyAsSet_return_the_right_permissions_list_with_single_value() {
-        final ConfigurationFile tenantProperties = spy(new ResourcesPermissionsMapping(TENANT_ID));
-        doReturn(compoundProperties).when(tenantProperties).getTenantProperties();
-
-        final Set<String> compoundPermissionsList = tenantProperties.getPropertyAsSet("processListingPage");
-
+        final Set<String> compoundPermissionsList = compoundPermissionsMapping.getPropertyAsSet("processListingPage");
         assertThat(compoundPermissionsList).containsOnly("processVisualization");
     }
 
+    @Test
+    public void getTenantProperties_should_get_from_cache_and_store_to_cache_if_not_already_in() throws Exception {
+        // given:
+        final ResourcesPermissionsMapping configFile = spy(
+                new ResourcesPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
+        final Properties props = new Properties();
+        doReturn(props).when(configurationFilesManager).getTenantProperties("resources-permissions-mapping.properties",
+                TENANT_ID);
+
+        // when:
+        configFile.getTenantProperties();
+
+        // then:
+        verify(cacheService).get(CONFIGURATION_FILES_CACHE, TENANT_ID + "_resources-permissions-mapping.properties");
+        verify(cacheService).store(CONFIGURATION_FILES_CACHE, TENANT_ID + "_resources-permissions-mapping.properties",
+                props);
+    }
 }

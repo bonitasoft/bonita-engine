@@ -32,7 +32,7 @@ public class StoreConfigurationsIfNotExist extends TransactionCallbackWithoutRes
     public static final String SELECT_CONFIGURATION_EXISTS = "SELECT count(1) FROM configuration WHERE tenant_id = ? AND content_type = ? AND resource_name = ?";
 
     private final JdbcTemplate jdbcTemplate;
-    private String dbVendor;
+    private final String dbVendor;
     private final List<FullBonitaConfiguration> configurations;
 
     public StoreConfigurationsIfNotExist(JdbcTemplate jdbcTemplate, String dbVendor,
