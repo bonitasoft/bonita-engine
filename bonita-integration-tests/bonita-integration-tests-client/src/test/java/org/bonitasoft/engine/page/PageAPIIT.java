@@ -735,7 +735,7 @@ public class PageAPIIT extends CommonAPIIT {
 
         // Check that we are not authorized before update of the page properties content:
         APICallContext apiCallContext = new APICallContext("GET", "extension", "helloWorld_v2", null);
-        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false)).isFalse();
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext)).isFalse();
 
         final byte[] apiExtensionContent2 = CommonTestUtil.createTestPageContent(apiExtensionName, DISPLAY_NAME,
                 "with content " + PAGE_DESCRIPTION, "contentType=" + ContentType.API_EXTENSION,
@@ -752,15 +752,15 @@ public class PageAPIIT extends CommonAPIIT {
         // to anyone having 'application_visualization' permission.
 
         // Check that permission has been update to file through user permission check:
-        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false)).isTrue();
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext)).isTrue();
         // Check that previous version has indeed been removed:
-        assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "extension", "helloWorld", null), false))
+        assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "extension", "helloWorld", null)))
                 .isFalse();
 
         getPageAPI().deletePage(apiExtension.getId());
 
         // Check that permissions have been removed with the page deletion:
-        assertThat(getPermissionAPI().isAuthorized(apiCallContext, false)).isFalse();
+        assertThat(getPermissionAPI().isAuthorized(apiCallContext)).isFalse();
 
         //cleanup
         logoutOnTenant();
