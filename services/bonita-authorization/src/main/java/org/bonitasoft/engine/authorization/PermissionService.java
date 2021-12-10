@@ -45,7 +45,7 @@ public interface PermissionService extends TenantLifecycleService {
     boolean checkAPICallWithScript(String className, APICallContext context, boolean reload)
             throws SExecutionException, ClassNotFoundException;
 
-    boolean isAuthorized(APICallContext apiCallContext, boolean reload) throws SExecutionException;
+    boolean isAuthorized(APICallContext apiCallContext) throws SExecutionException;
 
     void addPermissions(String pageName, Properties pageProperties);
 

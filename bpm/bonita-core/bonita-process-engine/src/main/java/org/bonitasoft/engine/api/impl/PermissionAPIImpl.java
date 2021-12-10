@@ -49,10 +49,10 @@ public class PermissionAPIImpl implements PermissionAPI {
     }
 
     @Override
-    public boolean isAuthorized(APICallContext apiCallContext, boolean reload) throws ExecutionException {
+    public boolean isAuthorized(APICallContext apiCallContext) throws ExecutionException {
         TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         try {
-            return serviceAccessor.getPermissionService().isAuthorized(apiCallContext, reload);
+            return serviceAccessor.getPermissionService().isAuthorized(apiCallContext);
         } catch (SExecutionException e) {
             throw new ExecutionException(e);
         }

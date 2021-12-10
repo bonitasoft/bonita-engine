@@ -83,9 +83,9 @@ public class PermissionAPIImplTest {
     public void should_isAuthorized_throw_execution_exception() throws Exception {
         //given
         final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
-        doThrow(SExecutionException.class).when(permissionService).isAuthorized(apiCallContext, false);
+        doThrow(SExecutionException.class).when(permissionService).isAuthorized(apiCallContext);
 
         assertThrows(ExecutionException.class,
-                () -> permissionAPI.isAuthorized(apiCallContext, false));
+                () -> permissionAPI.isAuthorized(apiCallContext));
     }
 }

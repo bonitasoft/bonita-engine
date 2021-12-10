@@ -304,8 +304,7 @@ public class PermissionServiceImplTest {
         returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
-        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", null),
-                false);
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", null));
 
         //then
         assertThat(isAuthorized).isTrue();
@@ -323,8 +322,7 @@ public class PermissionServiceImplTest {
         returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
-        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", null),
-                false);
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", null));
 
         //then
         assertThat(isAuthorized).isFalse();
@@ -339,8 +337,7 @@ public class PermissionServiceImplTest {
         returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
-        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
-                false);
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"));
 
         //then
         assertThat(isAuthorized).isFalse();
@@ -353,8 +350,7 @@ public class PermissionServiceImplTest {
         returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
-        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
-                false);
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"));
 
         //then
         assertThat(isAuthorized).isTrue();
@@ -368,8 +364,7 @@ public class PermissionServiceImplTest {
         returnUserPermissionsFromSession("MyPermission", "AnOtherPermission");
 
         //when
-        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"),
-                false);
+        final boolean isAuthorized = permissionService.isAuthorized(new APICallContext("GET", "bpm", "case", "12"));
 
         //then
         assertThat(isAuthorized).isTrue();
@@ -386,7 +381,7 @@ public class PermissionServiceImplTest {
 
         //when
         final boolean isAuthorized = permissionService
-                .isAuthorized(new APICallContext("GET", "bpm", "case", "12/instantiation"), false);
+                .isAuthorized(new APICallContext("GET", "bpm", "case", "12/instantiation"));
 
         //then
         assertThat(isAuthorized).isTrue();

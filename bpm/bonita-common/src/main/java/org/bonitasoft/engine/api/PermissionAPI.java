@@ -69,19 +69,19 @@ public interface PermissionAPI {
     /**
      * Checks if the REST API request defined in the {@link APICallContext} is authorized for the logged in user
      *
-     * @param apiCallContext contains all the attributes of the request
-     * @param reload if true, reloads the Groovy rules for dynamic permissions before each execution (for development
-     *        only). A setup push is still required.
+     * @param apiCallContext
+     *        contains all the attributes of the request
      * @return true or false depending if the user it authorized to make the call or not
      * @throws ExecutionException if there was an error while executing the authorization checks
      */
-    boolean isAuthorized(APICallContext apiCallContext, boolean reload) throws ExecutionException;
+    boolean isAuthorized(APICallContext apiCallContext) throws ExecutionException;
 
     /**
      * Returns the REST permissions required to access a REST resource (the expected format for the resource key is
      * <HTTP method>|<API name>/<resource name> e.g. GET|identity/user)
      *
-     * @param resourceKey the resource identifier. The expected format is <HTTP method>|<API name>/<resource name> (e.g.
+     * @param resourceKey
+     *        the resource identifier. The expected format is <HTTP method>|<API name>/<resource name> (e.g.
      *        GET|identity/user)
      * @return a Set of permissions, as Strings. e.g. ["organization_visualization"]
      */

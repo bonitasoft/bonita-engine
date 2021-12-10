@@ -193,7 +193,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean isAuthorized(APICallContext apiCallContext, boolean reload) throws SExecutionException {
+    public boolean isAuthorized(APICallContext apiCallContext) throws SExecutionException {
         if (log.isDebugEnabled()) {
             log.debug("Static REST API permissions check");
         }
