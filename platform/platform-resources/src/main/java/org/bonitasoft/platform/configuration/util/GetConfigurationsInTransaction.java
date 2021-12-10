@@ -50,7 +50,7 @@ public class GetConfigurationsInTransaction implements TransactionCallback<List<
                 new Object[] { tenantId, type.name() },
                 new BonitaConfigurationRowMapper());
 
-        LOGGER.debug("configurations found:" + bonitaConfigurations.toString());
+        LOGGER.debug("configurations found:" + bonitaConfigurations);
 
         return bonitaConfigurations;
     }

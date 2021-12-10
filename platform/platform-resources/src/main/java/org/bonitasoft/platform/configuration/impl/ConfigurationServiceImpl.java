@@ -63,9 +63,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-    private TransactionTemplate transactionTemplate;
+    private final TransactionTemplate transactionTemplate;
 
     @Value("${db.vendor}")
     private String dbVendor;
@@ -139,14 +139,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         storeConfiguration(bonitaConfigurations, TENANT_SECURITY_SCRIPTS, tenantId);
     }
 
-    public List<BonitaConfiguration> getAllTenantsPortalConf() {
-        return getNonTenantResource(TENANT_PORTAL);
-    }
-
-    public List<BonitaConfiguration> getAllTenantsEngineConf() {
-        return getNonTenantResource(TENANT_ENGINE);
-    }
-
     @Override
     public void storeTenantConfiguration(File configurationRootFolder, long tenantId) throws PlatformException {
         storeConfiguration(configurationRootFolder, TENANT_PORTAL, tenantId);
@@ -208,7 +200,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public void storePlatformPortalConf(List<BonitaConfiguration> bonitaConfigurations) {
         storeConfiguration(bonitaConfigurations, PLATFORM_PORTAL, NON_TENANT_RESOURCE);
-
     }
 
     @Override
@@ -237,7 +228,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             writtenFiles.add(confFile);
             LOGGER.debug(String.format("writing file %s to folder %s", confFile.getName(),
                     confFile.getParentFile().getAbsolutePath()));
-            try (FileOutputStream output = new FileOutputStream(confFile);) {
+            try (FileOutputStream output = new FileOutputStream(confFile)) {
                 IOUtils.write(fullBonitaConfiguration.getResourceContent(), output);
             } catch (IOException e) {
                 throw new PlatformException(e);
@@ -270,10 +261,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 new StoreConfigurationInTransaction(jdbcTemplate, dbVendor, bonitaConfigurations, type, tenantId));
     }
 
-    private void cleanAndStoreConfiguration(List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type,
-            long tenantId) {
+    private void cleanAndStoreLicenseConfiguration(List<BonitaConfiguration> bonitaConfigurations) {
         transactionTemplate.execute(new CleanAndStoreConfigurationInTransaction(jdbcTemplate, dbVendor,
-                bonitaConfigurations, type, tenantId));
+                bonitaConfigurations, ConfigurationType.LICENSES, ConfigurationServiceImpl.NON_TENANT_RESOURCE));
     }
 
     List<BonitaConfiguration> getNonTenantResource(ConfigurationType configurationType) {
@@ -306,7 +296,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         LicensesResourceVisitor licensesResourceVisitor = new LicensesResourceVisitor(bonitaConfigurations);
         try {
             Files.walkFileTree(path, licensesResourceVisitor);
-            cleanAndStoreConfiguration(bonitaConfigurations, LICENSES, NON_TENANT_RESOURCE);
+            cleanAndStoreLicenseConfiguration(bonitaConfigurations);
         } catch (IOException e) {
             throw new PlatformException(e);
         }
@@ -322,7 +312,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         if (tenantId <= 0) {
             throw new IllegalArgumentException("tenantId value " + tenantId + " is not allowed");
         }
-        transactionTemplate.execute(new DeleteTenantConfigurationInTransaction(jdbcTemplate, dbVendor, tenantId));
+        transactionTemplate.execute(new DeleteTenantConfigurationInTransaction(jdbcTemplate, tenantId));
     }
 
     @Override

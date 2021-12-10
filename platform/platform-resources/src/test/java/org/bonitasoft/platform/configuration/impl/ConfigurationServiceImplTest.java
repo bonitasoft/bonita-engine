@@ -49,7 +49,7 @@ public class ConfigurationServiceImplTest {
     ConfigurationServiceImpl configurationService;
 
     @Test
-    public void getPlatformPortalConf_should_call_query_for_PLATFORM_PORTAL_type() throws Exception {
+    public void getPlatformPortalConf_should_call_query_for_PLATFORM_PORTAL_type() {
         Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
                 .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
 
@@ -59,33 +59,13 @@ public class ConfigurationServiceImplTest {
     }
 
     @Test
-    public void getPlatformEngineConf_should_call_query_for_PLATFORM_ENGINE_type() throws Exception {
+    public void getPlatformEngineConf_should_call_query_for_PLATFORM_ENGINE_type() {
         Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
                 .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getPlatformInitEngineConf();
 
         Mockito.verify(configurationService).getNonTenantResource(ConfigurationType.PLATFORM_INIT_ENGINE);
-    }
-
-    @Test
-    public void getAllTenantsPortalConf_should_call_query_for_TENANT_PORTAL_type() throws Exception {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
-                .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
-
-        configurationService.getAllTenantsPortalConf();
-
-        Mockito.verify(configurationService).getNonTenantResource(ConfigurationType.TENANT_PORTAL);
-    }
-
-    @Test
-    public void getAllTenantsEngineConf_should_call_query_for_TENANT_ENGINE_type() throws Exception {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
-                .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
-
-        configurationService.getAllTenantsEngineConf();
-
-        Mockito.verify(configurationService).getNonTenantResource(ConfigurationType.TENANT_ENGINE);
     }
 
     @Test
@@ -124,7 +104,7 @@ public class ConfigurationServiceImplTest {
     }
 
     @Test
-    public void should_prevent_from_deleting_non_tenant_conf() throws Exception {
+    public void should_prevent_from_deleting_non_tenant_conf() {
         //expects
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("tenantId value 0 is not allowed");

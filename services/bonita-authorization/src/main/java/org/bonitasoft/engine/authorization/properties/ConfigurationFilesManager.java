@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
@@ -31,12 +32,10 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
  * @author Anthony Birembaut
  */
 @Slf4j
+@Component
 public class ConfigurationFilesManager {
 
-    private static final ConfigurationFilesManager INSTANCE = new ConfigurationFilesManager();
-
-    public static ConfigurationFilesManager getInstance() {
-        return INSTANCE;
+    private ConfigurationFilesManager() {
     }
 
     protected Properties getAlsoCustomAndInternalPropertiesFromFilename(long tenantId, String propertiesFileName) {
@@ -92,10 +91,9 @@ public class ConfigurationFilesManager {
         if (properties != null) {
             properties.remove(propertyName);
             update(tenantId, propertiesFilename, properties);
-            updateAggregatedProperties(propertiesFilename, tenantId, propertyName, null, resources);
         } else {
-            if (log.isTraceEnabled()) {
-                log.trace("File " + propertiesFilename + " not found. Cannot remove property '" + propertyName + "'.");
+            if (log.isDebugEnabled()) {
+                log.debug("File " + propertiesFilename + " not found. Cannot remove property '" + propertyName + "'.");
             }
         }
     }
@@ -124,48 +122,29 @@ public class ConfigurationFilesManager {
         return BonitaHomeServer.getInstance();
     }
 
+    protected Properties getTenantPortalConfiguration(long tenantId, String propertiesFilename) {
+        return ConfigurationFilesManager
+                .getProperties(getConfigurationFilesUtils().getTenantPortalConfiguration(tenantId, propertiesFilename));
+    }
+
     protected Map<String, Properties> getTenantConfigurations(long tenantId) throws IOException {
         Map<String, byte[]> clientTenantConfigurations = getConfigurationFilesUtils()
-                .getClientTenantConfigurations(tenantId);
+                .getTenantPortalConfigurations(tenantId);
         return clientTenantConfigurations.entrySet().stream().collect(Collectors.toMap(
-                Entry::getKey,
-                v -> ConfigurationFilesManager.getProperties(v.getValue())));
+                Entry::getKey, v -> ConfigurationFilesManager.getProperties(v.getValue())));
     }
 
     public void setProperty(String propertiesFilename, long tenantId, String propertyName, String propertyValue)
             throws IOException {
-        Map<String, Properties> resources = getTenantConfigurations(tenantId);
-        Properties properties = resources.get(propertiesFilename);
+        Properties properties = getTenantPortalConfiguration(tenantId, propertiesFilename);
         if (properties != null) {
             properties.setProperty(propertyName, propertyValue);
-            update(tenantId, propertiesFilename, properties);
-            updateAggregatedProperties(propertiesFilename, tenantId, propertyName, propertyValue, resources);
+            update(tenantId, propertiesFilename, properties); // store them back in database
         } else {
-            if (log.isTraceEnabled()) {
-                log.trace("File " + propertiesFilename + " not found. Cannot set property '" + propertyName + "'.");
+            if (log.isDebugEnabled()) {
+                log.debug("File " + propertiesFilename + " not found. Cannot set property '" + propertyName + "'.");
             }
         }
     }
 
-    public void updateAggregatedProperties(String propertiesFilename, long tenantId, String propertyName,
-            String propertyValue,
-            Map<String, Properties> resources) throws IOException {
-        Map<String, Properties> aggregatedTenantConfigurations = getTenantConfigurations(tenantId);
-        if (aggregatedTenantConfigurations == null) {
-            return;
-        }
-        final String customFilename = getCustomPropertiesFilename(propertiesFilename);
-        Properties customResources = resources.get(customFilename);
-        if (customResources == null || !customResources.containsKey(propertyName)) {
-            // only update the aggregated properties if there is not a custom property overriding the internal one
-            Properties aggregatedTenantConfiguration = aggregatedTenantConfigurations.get(propertiesFilename);
-            if (aggregatedTenantConfiguration != null) {
-                if (propertyValue != null) {
-                    aggregatedTenantConfiguration.put(propertyName, propertyValue);
-                } else {
-                    aggregatedTenantConfiguration.remove(propertyName);
-                }
-            }
-        }
-    }
 }

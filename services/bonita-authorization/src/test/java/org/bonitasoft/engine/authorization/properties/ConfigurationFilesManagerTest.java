@@ -74,11 +74,8 @@ public class ConfigurationFilesManagerTest {
     @Test
     public void should_setProperty_call_update_with_new_content() throws Exception {
         //given
-        final HashMap<String, Properties> configurationFiles = new HashMap<>();
-        configurationFiles.put("configFile1.properties", getProperties("myProp1=authKey\nmyProp2=passHash".getBytes()));
-        configurationFiles.put(MY_PROP_INTERNAL_PROPERTIES,
-                getProperties("testProperty=testValue\npropToRemove=willBeRemoved".getBytes()));
-        doReturn(configurationFiles).when(configurationFilesManager).getTenantConfigurations(TENANT_ID);
+        doReturn(getProperties("testProperty=testValue\npropToRemove=willBeRemoved".getBytes()))
+                .when(configurationFilesManager).getTenantPortalConfiguration(TENANT_ID, MY_PROP_INTERNAL_PROPERTIES);
         //when
         configurationFilesManager.setProperty(MY_PROP_INTERNAL_PROPERTIES, TENANT_ID, "testProperty", "new Value");
         //then

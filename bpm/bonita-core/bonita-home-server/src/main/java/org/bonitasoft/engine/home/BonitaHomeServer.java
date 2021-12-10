@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.home;
 
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toMap;
 import static org.bonitasoft.engine.home.FolderMgr.getFolder;
 import static org.bonitasoft.engine.home.FolderMgr.getPlatformTempFolder;
 
@@ -23,8 +25,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -67,7 +67,7 @@ public class BonitaHomeServer {
     }
 
     private ConfigurationService getConfigurationService() {
-        if (configurationService == null) {//should be given by spring
+        if (configurationService == null) { //should be given by spring
             try {
                 configurationService = PlatformSetupAccessor.getConfigurationService();
             } catch (NamingException e) {
@@ -195,7 +195,7 @@ public class BonitaHomeServer {
      * =================================================
      */
 
-    public File getPlatformTempFile(final String fileName) throws BonitaHomeNotSetException, IOException {
+    public File getPlatformTempFile(final String fileName) throws IOException {
         final Folder tempFolder = getPlatformTempFolder();
         final File file = tempFolder.getFile(fileName);
         file.delete();
@@ -205,10 +205,6 @@ public class BonitaHomeServer {
 
     public File getLicensesFolder() throws IOException {
         return FolderMgr.getLicensesFolder().getFile();
-    }
-
-    public URI getGlobalTemporaryFolder() throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getPlatformGlobalClassLoaderFolder().toURI();
     }
 
     public URI getLocalTemporaryFolder(final String artifactType, final long artifactId) throws IOException {
@@ -229,8 +225,7 @@ public class BonitaHomeServer {
         getConfigurationService().deleteTenantConfiguration(tenantId);
     }
 
-    public void modifyTechnicalUser(long tenantId, String userName, String password)
-            throws IOException, BonitaHomeNotSetException {
+    public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException {
         List<BonitaConfiguration> tenantEngineConf = getConfigurationService().getTenantEngineConf(tenantId);
         for (BonitaConfiguration bonitaConfiguration : tenantEngineConf) {
             if (bonitaConfiguration.getResourceName().equals("bonita-tenant-community-custom.properties")) {
@@ -273,21 +268,13 @@ public class BonitaHomeServer {
     }
 
     public Map<String, byte[]> getClientPlatformConfigurations() {
-        List<BonitaConfiguration> platformPortalConf = getConfigurationService().getPlatformPortalConf();
-        HashMap<String, byte[]> map = new HashMap<>();
-        for (BonitaConfiguration bonitaConfiguration : platformPortalConf) {
-            map.put(bonitaConfiguration.getResourceName(), bonitaConfiguration.getResourceContent());
-        }
-        return map;
+        return getConfigurationService().getPlatformPortalConf().stream()
+                .collect(toMap(BonitaConfiguration::getResourceName, BonitaConfiguration::getResourceContent));
     }
 
-    public Map<String, byte[]> getClientTenantConfigurations(long tenantId) {
-        List<BonitaConfiguration> platformPortalConf = getConfigurationService().getTenantPortalConf(tenantId);
-        HashMap<String, byte[]> map = new HashMap<>();
-        for (BonitaConfiguration bonitaConfiguration : platformPortalConf) {
-            map.put(bonitaConfiguration.getResourceName(), bonitaConfiguration.getResourceContent());
-        }
-        return map;
+    public Map<String, byte[]> getTenantPortalConfigurations(long tenantId) {
+        return getConfigurationService().getTenantPortalConf(tenantId).stream()
+                .collect(toMap(BonitaConfiguration::getResourceName, BonitaConfiguration::getResourceContent));
     }
 
     public byte[] getTenantPortalConfiguration(long tenantId, String file) {
@@ -295,16 +282,13 @@ public class BonitaHomeServer {
     }
 
     public void updateTenantPortalConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
-        List<BonitaConfiguration> tenantPortalConf = getConfigurationService().getTenantPortalConf(tenantId);
-        for (BonitaConfiguration bonitaConfiguration : tenantPortalConf) {
-            if (bonitaConfiguration.getResourceName().equals(file)) {
-                bonitaConfiguration.setResourceContent(content);
-                getConfigurationService().storeTenantPortalConf(Collections.singletonList(bonitaConfiguration),
-                        tenantId);
-                return;
-            }
+        BonitaConfiguration configuration = getConfigurationService().getTenantPortalConfiguration(tenantId, file);
+        if (configuration != null) {
+            configuration.setResourceContent(content);
+            getConfigurationService().storeTenantPortalConf(singletonList(configuration), tenantId);
+        } else {
+            throw new UpdateException("Cannot update non-existing configuration file " + file);
         }
-        throw new UpdateException("unable to update the configuration file " + file + " because it does not exists");
     }
 
 }

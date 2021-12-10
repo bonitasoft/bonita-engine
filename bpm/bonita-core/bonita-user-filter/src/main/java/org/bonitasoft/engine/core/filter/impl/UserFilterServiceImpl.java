@@ -65,7 +65,7 @@ import org.bonitasoft.engine.resources.SBARResource;
  */
 public class UserFilterServiceImpl implements UserFilterService {
 
-    private static final String FILTER_CACHE_NAME = "USER_FILTER";
+    public static final String FILTER_CACHE_NAME = "USER_FILTER";
 
     private final ConnectorExecutor connectorExecutor;
     private final CacheService cacheService;

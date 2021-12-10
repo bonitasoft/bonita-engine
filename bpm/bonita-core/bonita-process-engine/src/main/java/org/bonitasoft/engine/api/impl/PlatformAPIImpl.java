@@ -417,8 +417,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             List<STenant> tenants = platformService.getTenants(QueryOptions.countQueryOptions());
             HashMap<Long, Map<String, byte[]>> conf = new HashMap<>();
             for (STenant tenant : tenants) {
-                conf.put(tenant.getId(),
-                        getBonitaHomeServer().getClientTenantConfigurations(tenant.getId()));
+                conf.put(tenant.getId(), getBonitaHomeServer().getTenantPortalConfigurations(tenant.getId()));
             }
             return conf;
         } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException

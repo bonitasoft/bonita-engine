@@ -54,7 +54,7 @@ public class GetConfigurationInTransaction implements TransactionCallback<Bonita
                 new Object[] { tenantId, type.name(), resourceName },
                 new BonitaConfigurationRowMapper());
 
-        LOGGER.debug("configurations found:" + bonitaConfigurations.toString());
+        LOGGER.debug("configurations found:" + bonitaConfigurations);
 
         if (bonitaConfigurations.size() == 1) {
             return bonitaConfigurations.get(0);
