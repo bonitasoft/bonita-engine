@@ -147,7 +147,7 @@ public class PlatformSetupIT {
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '"
                         + ConfigurationType.TENANT_TEMPLATE_PORTAL + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(11);
+        assertThat(rows).hasSize(9);
         int rowId = 0;
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping-custom.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME"))
@@ -155,8 +155,6 @@ public class PlatformSetupIT {
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("console-config.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("custom-permissions-mapping.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("dynamic-permissions-checks-custom.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("dynamic-permissions-checks.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("resources-permissions-mapping-custom.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME"))
                 .isEqualTo("resources-permissions-mapping-internal.properties");
@@ -249,8 +247,6 @@ public class PlatformSetupIT {
                 "compound-permissions-mapping-internal.properties",
                 "console-config.properties",
                 "custom-permissions-mapping.properties",
-                "dynamic-permissions-checks.properties",
-                "dynamic-permissions-checks-custom.properties",
                 "resources-permissions-mapping.properties",
                 "resources-permissions-mapping-custom.properties",
                 "resources-permissions-mapping-internal.properties",
