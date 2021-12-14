@@ -58,8 +58,7 @@ public class ResourcesPermissionsMapping extends ConfigurationFile {
     }
 
     public Set<String> getResourcePermissionsWithWildCard(final String method, final String apiName,
-            final String resourceName,
-            final List<String> resourceQualifiers) {
+            final String resourceName, final List<String> resourceQualifiers) {
         if (resourceQualifiers != null && resourceQualifiers.size() > 0) {
             for (int i = resourceQualifiers.size() - 1; i >= 0; i--) {
                 final List<String> resourceQualifiersWithWildCard = getResourceQualifiersWithWildCard(

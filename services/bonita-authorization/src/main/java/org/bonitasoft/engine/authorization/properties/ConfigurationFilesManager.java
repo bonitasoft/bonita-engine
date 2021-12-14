@@ -35,9 +35,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConfigurationFilesManager {
 
-    private ConfigurationFilesManager() {
-    }
-
     protected Properties getAlsoCustomAndInternalPropertiesFromFilename(long tenantId, String propertiesFileName) {
         Properties properties = new Properties();
         try {
