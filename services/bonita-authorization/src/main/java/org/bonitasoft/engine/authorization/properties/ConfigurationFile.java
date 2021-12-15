@@ -50,7 +50,6 @@ public abstract class ConfigurationFile {
         this.cacheKey = tenantId + "_" + propertiesFilename;
         this.cacheService = cacheService;
         this.configurationFilesManager = configurationFilesManager;
-        readPropertiesFromDatabaseAndStoreThemInCache();
     }
 
     private Properties readPropertiesFromDatabaseAndStoreThemInCache() {
@@ -68,9 +67,11 @@ public abstract class ConfigurationFile {
     void storePropertiesInCache(Properties tenantProperties) {
         try {
             cacheService.store(CONFIGURATION_FILES_CACHE, cacheKey, tenantProperties);
-        } catch (SCacheException e) {
-            log.warn(format("Problem storing configuration file %s (tenant %s) in dedicated cache",
+            log.debug(format("Successfully stored configuration file %s (tenant %s) in dedicated cache",
                     propertiesFilename, tenantId));
+        } catch (SCacheException e) {
+            log.warn(format("Problem storing configuration file %s (tenant %s) in dedicated cache (%s)",
+                    propertiesFilename, tenantId, e.getMessage()));
         }
     }
 

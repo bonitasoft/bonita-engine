@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Fabio Lombardi
  */
 @Component
+@Order(3)
 public class ResourcesPermissionsMapping extends ConfigurationFile {
 
     public static final String RESOURCE_IDS_SEPARATOR = "/";

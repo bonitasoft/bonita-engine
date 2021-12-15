@@ -15,12 +15,14 @@ package org.bonitasoft.engine.authorization.properties;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Anthony Birembaut
  */
 @Component
+@Order(3)
 public class CustomPermissionsMapping extends ConfigurationFile {
 
     /**

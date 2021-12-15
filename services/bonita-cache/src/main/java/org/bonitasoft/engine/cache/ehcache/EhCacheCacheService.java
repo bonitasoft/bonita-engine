@@ -20,6 +20,7 @@ import java.util.List;
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +30,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 // Must be started before the work service so it has a "higher" priority
-@Order(10)
+@Order(2)
 @Component
 @ConditionalOnSingleCandidate(CacheService.class)
 public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
@@ -73,6 +74,11 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
 
     private String getCacheNameFromKey(final String cacheNameKey) {
         return cacheNameKey.substring(cacheNameKey.indexOf('_') + 1);
+    }
+
+    @Override
+    public void init() throws SBonitaException {
+        buildCacheManagerWithDefaultConfiguration();
     }
 
     @Override

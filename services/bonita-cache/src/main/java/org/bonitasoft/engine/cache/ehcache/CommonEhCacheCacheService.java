@@ -80,22 +80,16 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         return ehCacheConfig;
     }
 
-    protected void buildCacheManagerWithDefaultConfiguration() throws SCacheException {
-        if (cacheManager != null) {
-            String message = "Unable to build a new Cache Manager as the existing one is still alive: " + cacheManager
-                    + ". ";
+    protected void buildCacheManagerWithDefaultConfiguration() {
+        if (cacheManager == null) {
+            final Configuration configuration = new Configuration();
+            configuration.setName(getCacheManagerName());
+            configuration.setDefaultCacheConfiguration(defaultCacheConfiguration);
+            configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
+            cacheManager = new CacheManager(configuration);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                message += " Last creation was: \n" + cacheManagerLastCreation;
+                cacheManagerLastCreation = getCacheManagerCreationDetails();
             }
-            throw new SCacheException(message);
-        }
-        final Configuration configuration = new Configuration();
-        configuration.setName(getCacheManagerName());
-        configuration.setDefaultCacheConfiguration(defaultCacheConfiguration);
-        configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
-        cacheManager = new CacheManager(configuration);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            cacheManagerLastCreation = getCacheManagerCreationDetails();
         }
     }
 
