@@ -107,13 +107,16 @@ class BonitaDataSourceInitializer {
 
         BasicManagedDataSource bonitaDataSource = new BasicManagedDataSource();
         bonitaDataSource.setDefaultAutoCommit(false);
-        bonitaDataSource.setRemoveAbandonedOnBorrow(true);
-        bonitaDataSource.setRemoveAbandonedOnMaintenance(true);
-        bonitaDataSource.setLogAbandoned(true);
+        bonitaDataSource.setRemoveAbandonedOnBorrow(false);
+        bonitaDataSource.setRemoveAbandonedOnMaintenance(false);
+        bonitaDataSource.setLogAbandoned(false);
         bonitaDataSource.setTestOnBorrow(true);
         bonitaDataSource.setValidationQuery(defaultTestQueries.get(dbVendor));
         bonitaDataSource.setTransactionManager(transactionManager);
         bonitaDataSource.setInitialSize(1);
+        bonitaDataSource.setTestWhileIdle(false);
+        bonitaDataSource.setTimeBetweenEvictionRunsMillis(60000);
+        bonitaDataSource.setMinEvictableIdleTimeMillis(600000);
         if (dbVendor.equals(ORACLE)) {
             bonitaDataSource.setXaDataSourceInstance(overrideSameRM(xaDataSource));
         } else {
