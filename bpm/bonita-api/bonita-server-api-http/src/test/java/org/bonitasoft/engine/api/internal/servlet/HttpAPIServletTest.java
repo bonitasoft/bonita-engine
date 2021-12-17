@@ -46,7 +46,6 @@ public class HttpAPIServletTest {
     public void should_send_403_when_disabled_using_env() throws Exception {
         HttpAPIServlet httpAPIServlet = spy(new HttpAPIServlet());
         envVar.set("HTTP_API", "false");
-        doNothing().when(httpAPIServlet).log(any());
 
         httpAPIServlet.init();
         httpAPIServlet.doPost(request, response);
@@ -58,7 +57,6 @@ public class HttpAPIServletTest {
     public void should_send_403_when_disabled_using_props() throws Exception {
         System.setProperty("http.api", "false");
         HttpAPIServlet httpAPIServlet = spy(new HttpAPIServlet());
-        doNothing().when(httpAPIServlet).log(any());
 
         httpAPIServlet.init();
         httpAPIServlet.doPost(request, response);
@@ -71,7 +69,6 @@ public class HttpAPIServletTest {
         System.setProperty("http.api", "true");
         HttpAPIServlet httpAPIServlet = spy(new HttpAPIServlet());
         doNothing().when(httpAPIServlet).callHttpApi(any(), any());
-        doNothing().when(httpAPIServlet).log(any());
 
         httpAPIServlet.init();
         httpAPIServlet.doPost(request, response);
@@ -83,7 +80,6 @@ public class HttpAPIServletTest {
     public void should_be_enabled_by_default() throws Exception {
         HttpAPIServlet httpAPIServlet = spy(new HttpAPIServlet());
         doNothing().when(httpAPIServlet).callHttpApi(any(), any());
-        doNothing().when(httpAPIServlet).log(any());
 
         httpAPIServlet.init();
         httpAPIServlet.doPost(request, response);

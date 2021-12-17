@@ -23,8 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileUploadException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bonitasoft.engine.properties.BooleanProperty;
 
 /**
  * @author Julien Mege
@@ -34,28 +33,19 @@ import org.slf4j.LoggerFactory;
 public class HttpAPIServlet extends HttpServlet {
 
     public static final String PROPERTY_TO_ENABLE_HTTP_API = "http.api";
-    private static final Logger logger = LoggerFactory.getLogger(HttpAPIServlet.class);
 
     private static final long serialVersionUID = 4936475894513095747L;
-    private boolean enabled;
+    private BooleanProperty httpApi;
 
     @Override
     public void init() throws ServletException {
-        enabled = Boolean.parseBoolean(
-                System.getProperty(PROPERTY_TO_ENABLE_HTTP_API, System.getenv().getOrDefault(envProperty(), "true")));
-        logger.info("Http API is {}, you may {} it using env property {} or System property {} [=true/false]",
-                enabled ? "enabled" : "disabled", enabled ? "disable" : "enable", envProperty(),
-                PROPERTY_TO_ENABLE_HTTP_API);
-    }
-
-    private String envProperty() {
-        return PROPERTY_TO_ENABLE_HTTP_API.toUpperCase().replace(".", "_");
+        httpApi = new BooleanProperty("Http API", PROPERTY_TO_ENABLE_HTTP_API, true);
     }
 
     @Override
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
-        if (!enabled) {
+        if (!httpApi.isEnabled()) {
             resp.sendError(SC_FORBIDDEN);
             return;
         }
