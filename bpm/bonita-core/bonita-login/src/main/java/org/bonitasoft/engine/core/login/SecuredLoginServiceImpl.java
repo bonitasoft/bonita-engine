@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.identity.model.builder.impl.SUserUpdateBuild
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -86,11 +87,6 @@ public class SecuredLoginServiceImpl implements LoginService {
         checkIsEnabled(user);
         SSession session = createSession(tenantId, userName, user.getId(), false);
         updateLastConnectionDate(user);
-        try {
-            session.setUserPermissions(permissionsBuilder.getPermissions(session));
-        } catch (SBonitaReadException e) {
-            throw new SLoginException("Problem reading user permissions: " + e.getMessage());
-        }
         return session;
     }
 
@@ -112,11 +108,13 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
     }
 
-    private SSession createSession(Long tenantId, String userName, long id, boolean b) throws SLoginException {
+    private SSession createSession(Long tenantId, String userName, long id, boolean isTechnicalUser)
+            throws SLoginException {
         try {
             List<SProfile> profilesOfUser = profileService.getProfilesOfUser(id);
             List<String> profiles = profilesOfUser.stream().map(SProfile::getName).collect(Collectors.toList());
-            return sessionService.createSession(tenantId, id, userName, b, profiles);
+            Set<String> permissions = permissionsBuilder.getPermissions(isTechnicalUser, profiles, userName);
+            return sessionService.createSession(tenantId, id, userName, isTechnicalUser, profiles, permissions);
         } catch (SSessionException | SBonitaReadException e) {
             throw new SLoginException(e);
         }

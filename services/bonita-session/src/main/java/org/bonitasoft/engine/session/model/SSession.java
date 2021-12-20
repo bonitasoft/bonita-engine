@@ -19,8 +19,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -28,6 +30,7 @@ import lombok.Data;
  * @author Matthieu Chaffotte
  */
 @Data
+@Setter(AccessLevel.PRIVATE) // to ensure fields are immutable
 @Builder(toBuilder = true)
 public class SSession implements Serializable {
 
@@ -42,6 +45,7 @@ public class SSession implements Serializable {
     /**
      * last renew date (GMT+0)
      */
+    @Setter(AccessLevel.PUBLIC) // for cluster testing
     private Date lastRenewDate;
     private String userName;
     private long userId;

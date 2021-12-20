@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.login;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.*;
@@ -75,7 +76,7 @@ public class SecuredLoginServiceImplTest {
                 identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS), profileService,
                 permissionsBuilder);
         //return a session with given arguments
-        when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean(), anyList()))
+        when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean(), anyList(), anySet()))
                 .thenAnswer(invok -> SSession.builder()
                         .id(UUID.randomUUID().getLeastSignificantBits())
                         .applicationName("myApp")
@@ -184,12 +185,13 @@ public class SecuredLoginServiceImplTest {
     public void testSecuredLoginServiceWithPlatformCredentialsWithGenericAuthenticationService() throws Exception {
         final Map<String, Serializable> credentials = credentials(TECH_USER_NAME, TECH_USER_PASS, TENANT_ID);
         final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(TENANT_ID, -1L, TECH_USER_NAME, true, emptyList())).thenReturn(sSession);
+        when(sessionService.createSession(TENANT_ID, -1L, TECH_USER_NAME, true, emptyList(), emptySet()))
+                .thenReturn(sSession);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(0)).checkUserCredentials(anyMap());
-        verify(sessionService, times(1)).createSession(1L, -1L, TECH_USER_NAME, true, emptyList());
+        verify(sessionService, times(1)).createSession(1L, -1L, TECH_USER_NAME, true, emptyList(), emptySet());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
@@ -198,12 +200,13 @@ public class SecuredLoginServiceImplTest {
         final Map<String, Serializable> credentials = credentials(TECH_USER_NAME, TECH_USER_PASS, TENANT_ID);
 
         final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true, emptyList())).thenReturn(sSession);
+        when(sessionService.createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true, emptyList(), emptySet()))
+                .thenReturn(sSession);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, never()).checkUserCredentials(credentials);
-        verify(sessionService).createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true, emptyList());
+        verify(sessionService).createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true, emptyList(), emptySet());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
@@ -217,13 +220,14 @@ public class SecuredLoginServiceImplTest {
 
         when(sUser.getId()).thenReturn(112345L);
         when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn("julien");
-        when(sessionService.createSession(TENANT_ID, 112345L, "julien", false, emptyList())).thenReturn(sSession);
+        when(sessionService.createSession(TENANT_ID, 112345L, "julien", false, emptyList(), emptySet()))
+                .thenReturn(sSession);
         when(identityService.getUserByUserName("julien")).thenReturn(sUser);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(1)).checkUserCredentials(credentials);
-        verify(sessionService, times(1)).createSession(TENANT_ID, 112345L, "julien", false, emptyList());
+        verify(sessionService, times(1)).createSession(TENANT_ID, 112345L, "julien", false, emptyList(), emptySet());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 

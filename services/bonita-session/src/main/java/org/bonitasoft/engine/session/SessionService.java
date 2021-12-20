@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.session;
 
 import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -50,7 +51,8 @@ public interface SessionService {
 
     SSession createSession(long tenantId, long userId, String userName, boolean technicalUser) throws SSessionException;
 
-    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser, List<String> profiles)
+    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser, List<String> profiles,
+            Set<String> permissions)
             throws SSessionException;
 
     /**
