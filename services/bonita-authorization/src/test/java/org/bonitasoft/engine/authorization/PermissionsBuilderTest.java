@@ -61,7 +61,8 @@ public class PermissionsBuilderTest {
         final SSession session = mock(SSession.class);
         doReturn("Jean-Claude").when(session).getUserName();
 
-        final Set<String> permissions = permissionsBuilder.getPermissions(session);
+        final Set<String> permissions = permissionsBuilder.getPermissions(session.isTechnicalUser(),
+                session.getProfiles(), session.getUserName());
 
         assertThat(permissions).as("No permissions other than the user should have been returned")
                 .containsOnly("user|Jean-Claude");
@@ -74,7 +75,7 @@ public class PermissionsBuilderTest {
         final SSession session = mock(SSession.class);
         doReturn("Loïc").when(session).getUserName();
 
-        permissionsBuilder.getPermissions(session);
+        permissionsBuilder.getPermissions(session.isTechnicalUser(), session.getProfiles(), session.getUserName());
 
         verify(permissionsBuilder).getProfilesPermissions(anyList());
         verify(permissionsBuilder).getCustomUserPermissions(anyString());
@@ -105,7 +106,8 @@ public class PermissionsBuilderTest {
         doReturn("Jean-Claude").when(session).getUserName();
 
         // when
-        final Set<String> permissions = permissionsBuilder.getPermissions(session);
+        final Set<String> permissions = permissionsBuilder.getPermissions(session.isTechnicalUser(),
+                session.getProfiles(), session.getUserName());
 
         // then
         assertThat(permissions).containsExactlyInAnyOrder("Perm1", "Perm2", "Perm21", "Perm31", "Perm32",
@@ -132,7 +134,8 @@ public class PermissionsBuilderTest {
         doReturn(true).when(session).isTechnicalUser();
 
         // when:
-        final Set<String> permissions = permissionsBuilder.getPermissions(session);
+        final Set<String> permissions = permissionsBuilder.getPermissions(session.isTechnicalUser(),
+                session.getProfiles(), session.getUserName());
 
         // then:
         assertThat(permissions).isEmpty();

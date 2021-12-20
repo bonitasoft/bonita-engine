@@ -22,7 +22,6 @@ import org.bonitasoft.engine.authorization.properties.CompoundPermissionsMapping
 import org.bonitasoft.engine.authorization.properties.CustomPermissionsMapping;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.session.model.SSession;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,15 +43,16 @@ public class PermissionsBuilder {
         this.compoundPermissionsMapping = compoundPermissionsMapping;
     }
 
-    public Set<String> getPermissions(SSession session) throws SBonitaReadException {
+    public Set<String> getPermissions(boolean isTechnicalUser, List<String> profiles, String userName)
+            throws SBonitaReadException {
         Set<String> permissions;
-        if (session.isTechnicalUser()) {
+        if (isTechnicalUser) {
             permissions = Collections.emptySet();
         } else {
             permissions = new HashSet<>();
-            permissions.addAll(getProfilesPermissions(session.getProfiles()));
-            permissions.addAll(getCustomUserPermissions(session.getUserName()));
-            permissions.add(getUserPermission(session.getUserName()));
+            permissions.addAll(getProfilesPermissions(profiles));
+            permissions.addAll(getCustomUserPermissions(userName));
+            permissions.add(getUserPermission(userName));
         }
         return permissions;
     }

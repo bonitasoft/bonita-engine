@@ -14,9 +14,11 @@
 package org.bonitasoft.engine.session.impl;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -59,12 +61,12 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public SSession createSession(final long tenantId, final long userId, final String userName,
             final boolean isTechnicalUser) throws SSessionException {
-        return createSession(tenantId, userId, userName, isTechnicalUser, emptyList());
+        return createSession(tenantId, userId, userName, isTechnicalUser, emptyList(), emptySet());
     }
 
     @Override
     public SSession createSession(final long tenantId, final long userId, final String userName,
-            final boolean isTechnicalUser, List<String> profiles) throws SSessionException {
+            final boolean isTechnicalUser, List<String> profiles, Set<String> permissions) throws SSessionException {
         final long id = SessionIdGenerator.getNextId();
         Date now = new Date();
         SSession session = SSession.builder()
@@ -78,6 +80,7 @@ public class SessionServiceImpl implements SessionService {
                 .creationDate(now)
                 .lastRenewDate(now)
                 .profiles(profiles)
+                .userPermissions(permissions)
                 .build();
         sessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
