@@ -28,8 +28,6 @@ public class PageSearchDescriptor {
 
     public static final String PROVIDED = "provided";
 
-    public static final String HIDDEN = "hidden";
-
     public static final String INSTALLATION_DATE = "installationDate";
 
     public static final String LAST_MODIFICATION_DATE = "lastModificationDate";

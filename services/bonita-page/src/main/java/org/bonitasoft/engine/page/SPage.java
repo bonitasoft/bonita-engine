@@ -42,7 +42,6 @@ public class SPage extends AbstractSPage {
     public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
     public static final String ID = "id";
     public static final String PROVIDED = "provided";
-    public static final String HIDDEN = "hidden";
     public static final String DISPLAY_NAME = "displayName";
     public static final String LAST_MODIFICATION_DATE = "lastModificationDate";
     public static final String LAST_UPDATE_BY = "lastUpdateBy";
@@ -61,7 +60,7 @@ public class SPage extends AbstractSPage {
 
     public SPage(final String name, final String description, final String displayName, final long installationDate,
             final long installedBy,
-            final boolean provided, boolean editable, boolean hidden, final long lastModificationDate,
+            final boolean provided, boolean editable, final long lastModificationDate,
             final long lastUpdatedBy,
             final String contentName) {
         this(name, installationDate, installedBy, provided, contentName);
@@ -70,13 +69,12 @@ public class SPage extends AbstractSPage {
         setProvided(provided);
         setLastModificationDate(lastModificationDate);
         setLastUpdatedBy(lastUpdatedBy);
-        setHidden(hidden);
         setEditable(editable);
     }
 
     public SPage(final SPage sPage) {
         this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(),
-                sPage.getInstalledBy(), sPage.isProvided(), sPage.isEditable(), sPage.isHidden(), sPage
+                sPage.getInstalledBy(), sPage.isProvided(), sPage.isEditable(), sPage
                         .getLastModificationDate(),
                 sPage.getLastUpdatedBy(), sPage.getContentName());
         setContentType(sPage.getContentType());

@@ -37,7 +37,6 @@ public class SearchPageDescriptor extends SearchEntityDescriptor {
         pageKeys.put(PageSearchDescriptor.ID, new FieldDescriptor(SPage.class, SPage.ID));
         pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, SPage.NAME));
         pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, SPage.PROVIDED));
-        pageKeys.put(PageSearchDescriptor.HIDDEN, new FieldDescriptor(SPage.class, SPage.HIDDEN));
         pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE,
                 new FieldDescriptor(SPage.class, SPage.INSTALLATION_DATE));
         pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE,

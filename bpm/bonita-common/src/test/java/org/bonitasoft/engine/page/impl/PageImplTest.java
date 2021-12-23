@@ -28,8 +28,6 @@ public class PageImplTest {
 
     private static final boolean PROVIDED = true;
 
-    private static final boolean HIDDEN = true;
-
     private static final boolean EDITABLE = true;
 
     private static final boolean REMOVABLE = true;
@@ -48,7 +46,7 @@ public class PageImplTest {
 
         PageImplAssert
                 .assertThat(
-                        new PageImpl(-1L, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, EDITABLE, REMOVABLE, DESCRIPTION,
+                        new PageImpl(-1L, NAME, DISPLAY_NAME, PROVIDED, EDITABLE, REMOVABLE, DESCRIPTION,
                                 date.getTime(), USER_ID,
                                 modificationDate.getTime(), USER_ID,
                                 "content.zip", ContentType.PAGE, null))
@@ -58,7 +56,6 @@ public class PageImplTest {
                 .isProvided()
                 .isEditable()
                 .isRemovable()
-                .isHidden()
                 .hasDescription(DESCRIPTION).hasInstallationDate(date)
                 .hasLastModificationDate(modificationDate)
                 .hasContentType(ContentType.PAGE);
@@ -73,7 +70,7 @@ public class PageImplTest {
 
         PageImplAssert
                 .assertThat(
-                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, EDITABLE, REMOVABLE, DESCRIPTION,
+                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, EDITABLE, REMOVABLE, DESCRIPTION,
                                 date.getTime(), USER_ID,
                                 modificationDate.getTime(), USER_ID,
                                 "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID))
@@ -82,7 +79,6 @@ public class PageImplTest {
                 .hasDisplayName(DISPLAY_NAME)
                 .isProvided()
                 .isRemovable()
-                .isHidden()
                 .isEditable()
                 .hasDescription(DESCRIPTION).hasInstallationDate(date)
                 .hasLastModificationDate(modificationDate)
@@ -98,7 +94,7 @@ public class PageImplTest {
         Date modificationDate = new Date(2);
 
         assertThat(
-                new PageImpl(-1L, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, EDITABLE, REMOVABLE, DESCRIPTION,
+                new PageImpl(-1L, NAME, DISPLAY_NAME, PROVIDED, EDITABLE, REMOVABLE, DESCRIPTION,
                         date.getTime(), USER_ID,
                         modificationDate.getTime(), USER_ID,
                         "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID).toString())

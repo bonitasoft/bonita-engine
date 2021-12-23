@@ -31,7 +31,7 @@ public class PageUpdater implements Serializable {
          *             the page update
          **/
         @Deprecated
-        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID, HIDDEN
+        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID
     }
 
     private final Map<PageUpdateField, Serializable> fields;
@@ -72,11 +72,6 @@ public class PageUpdater implements Serializable {
 
     public PageUpdater setProcessDefinitionId(final Long processDefinitionId) {
         fields.put(PageUpdateField.PROCESS_DEFINITION_ID, processDefinitionId);
-        return this;
-    }
-
-    public PageUpdater setHidden(Boolean hidden) {
-        fields.put(PageUpdateField.HIDDEN, hidden);
         return this;
     }
 

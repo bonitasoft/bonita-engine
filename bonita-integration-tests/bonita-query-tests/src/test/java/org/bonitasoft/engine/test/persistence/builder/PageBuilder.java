@@ -31,8 +31,6 @@ public class PageBuilder extends PersistentObjectBuilder<AbstractSPage, PageBuil
 
     private boolean provided;
 
-    private boolean hidden = false;
-
     private long lastModificationDate;
 
     private long lastUpdatedBy;
@@ -53,7 +51,6 @@ public class PageBuilder extends PersistentObjectBuilder<AbstractSPage, PageBuil
     @Override
     public SPageWithContent _build() {
         final SPage sPage = new SPage(name, description, displayName, installationDate, installedBy, provided, editable,
-                hidden,
                 lastModificationDate, lastUpdatedBy,
                 contentName);
         sPage.setProcessDefinitionId(processDefinitionId);
@@ -123,11 +120,6 @@ public class PageBuilder extends PersistentObjectBuilder<AbstractSPage, PageBuil
 
     public PageBuilder makeEditable(Boolean editable) {
         this.editable = editable;
-        return this;
-    }
-
-    public PageBuilder makeHidden(Boolean hidden) {
-        this.hidden = hidden;
         return this;
     }
 

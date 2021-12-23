@@ -864,7 +864,6 @@ CREATE TABLE page (
   provided BOOLEAN,
   editable BOOLEAN,
   removable BOOLEAN,
-  hidden BOOLEAN default false,
   lastModificationDate INT8 NOT NULL,
   lastUpdatedBy INT8 NOT NULL,
   contentName VARCHAR(280) NOT NULL,

@@ -398,27 +398,6 @@ public class PageImplAssert extends AbstractAssert<PageImplAssert, PageImpl> {
     }
 
     /**
-     * Verifies that the actual PageImpl is hidden.
-     *
-     * @return this assertion object.
-     * @throws AssertionError - if the actual PageImpl is not hidden.
-     */
-    public PageImplAssert isHidden() {
-        // check that actual PageImpl we want to make assertions on is not null.
-        isNotNull();
-
-        // we overrides the default error message with a more explicit one
-        String errorMessage = format("Expected actual PageImpl to be hidden but was not.", actual);
-
-        // check
-        if (!actual.isHidden())
-            throw new AssertionError(errorMessage);
-
-        // return the current assertion for method chaining
-        return this;
-    }
-
-    /**
      * Verifies that the actual PageImpl is not provided.
      *
      * @return this assertion object.
