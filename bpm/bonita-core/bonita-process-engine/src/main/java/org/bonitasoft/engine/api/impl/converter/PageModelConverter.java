@@ -37,12 +37,7 @@ public class PageModelConverter {
         final String contentName = (String) fields.get(PageCreator.PageField.CONTENT_NAME);
         final String contentType = (String) fields.get(PageCreator.PageField.CONTENT_TYPE);
         final Long processDefinitionId = (Long) fields.get(PageCreator.PageField.PROCESS_DEFINITION_ID);
-        Boolean hidden = (Boolean) fields.get(PageCreator.PageField.HIDDEN);
-        if (hidden == null) {
-            hidden = false;
-        }
-        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId,
-                hidden);
+        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId);
     }
 
     public SPage constructSPage(final PageUpdater pageUpdater, final long creatorUserId) {
@@ -53,21 +48,16 @@ public class PageModelConverter {
         final String contentName = (String) fields.get(PageUpdater.PageUpdateField.CONTENT_NAME);
         final String contentType = (String) fields.get(PageUpdater.PageUpdateField.CONTENT_TYPE);
         final Long processDefinitionId = (Long) fields.get(PageUpdater.PageUpdateField.PROCESS_DEFINITION_ID);
-        Boolean hidden = (Boolean) fields.get(PageUpdater.PageUpdateField.HIDDEN);
-        if (hidden == null) {
-            hidden = false;
-        }
-        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId,
-                hidden);
+        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId);
     }
 
     private SPage buildSPage(long creatorUserId, String name, String description, String displayName,
             String contentName, String contentType,
-            Long processDefinitionId, boolean hidden) {
+            Long processDefinitionId) {
         return SPage.builder().name(name).description(description).displayName(displayName)
                 .installationDate(System.currentTimeMillis()).lastModificationDate(System.currentTimeMillis())
                 .installedBy(creatorUserId).lastUpdatedBy(creatorUserId)
-                .provided(false).hidden(hidden)
+                .provided(false)
                 .contentName(contentName)
                 .contentType(contentType)
                 .editable(true)
@@ -79,7 +69,7 @@ public class PageModelConverter {
     public Page toPage(final SPage sPage) {
         Long processDefinitionId = sPage.getProcessDefinitionId() > 0 ? sPage.getProcessDefinitionId() : null;
         return new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(),
-                sPage.isHidden(), sPage.isEditable(), sPage.isRemovable(), sPage.getDescription(),
+                sPage.isEditable(), sPage.isRemovable(), sPage.getDescription(),
                 sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.getLastModificationDate(),
                 sPage.getLastUpdatedBy(), sPage.getContentName(),
                 sPage.getContentType(), processDefinitionId);

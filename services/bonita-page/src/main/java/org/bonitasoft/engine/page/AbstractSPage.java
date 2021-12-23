@@ -44,7 +44,6 @@ public class AbstractSPage implements PersistentObject {
     private long installedBy;
     private boolean provided;
     private boolean editable = true;
-    private boolean hidden;
     private boolean removable = true;
     private long lastModificationDate;
     private long lastUpdatedBy;
@@ -66,7 +65,6 @@ public class AbstractSPage implements PersistentObject {
         installationDate = sPage.getInstallationDate();
         installedBy = sPage.getInstalledBy();
         provided = sPage.isProvided();
-        hidden = sPage.isHidden();
         lastModificationDate = sPage.getLastModificationDate();
         lastUpdatedBy = sPage.getLastUpdatedBy();
         contentName = sPage.getContentName();

@@ -638,40 +638,6 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_search_by_hidden_param() throws Exception {
-        // given
-        final String matchingDisplayName = DISPLAY_NAME;
-
-        // given
-        final int expectedMatchingResults = 3;
-        for (int i = 0; i < expectedMatchingResults; i++) {
-            final String generateUniquePageName = generateUniquePageName(i);
-            final byte[] pageContent = createTestPageContent(generateUniquePageName, matchingDisplayName,
-                    PAGE_DESCRIPTION);
-            getPageAPI().createPage(
-                    new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i)
-                            .setDescription(
-                                    "should be excluded from results")
-                            .setDisplayName(matchingDisplayName).setHidden(false),
-                    pageContent);
-            getPageAPI().createPage(
-                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription("should be in search results")
-                            .setDisplayName(matchingDisplayName).setHidden(true),
-                    pageContent);
-        }
-
-        // when
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(
-                new SearchOptionsBuilder(0, expectedMatchingResults + 10).filter(PageSearchDescriptor.HIDDEN, true)
-                        .done());
-        // then
-        final List<Page> results = searchPages.getResult();
-        assertThat(results.size()).as("should have " + expectedMatchingResults + " results")
-                .isEqualTo(expectedMatchingResults);
-
-    }
-
-    @Test
     public void should_search_work_on_desc_order() throws Exception {
         final String displayName = DISPLAY_NAME;
         final String description = PAGE_DESCRIPTION;

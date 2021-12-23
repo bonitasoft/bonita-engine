@@ -985,7 +985,6 @@ CREATE TABLE page (
   provided BIT,
   editable BIT,
   removable BIT,
-  hidden BIT NOT NULL,
   lastModificationDate NUMERIC(19, 0) NOT NULL,
   lastUpdatedBy NUMERIC(19, 0) NOT NULL,
   contentName NVARCHAR(280) NOT NULL,

@@ -222,14 +222,13 @@ public class PageServiceImpl implements PageService {
             boolean removable, boolean editable) throws SInvalidPageZipException,
             SInvalidPageTokenException {
         final Properties pageProperties = readPageZip(content, provided);
-        boolean hidden = pageProperties.getProperty("name").equals(TENANT_STATUS_PAGE_NAME);
         long currentTime = System.currentTimeMillis();
         return SPage.builder().name(pageProperties.getProperty(PageService.PROPERTIES_NAME))
                 .description(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION))
                 .displayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME))
                 .installationDate(currentTime).installedBy(userId).provided(provided)
                 .lastModificationDate(currentTime).lastUpdatedBy(userId)
-                .hidden(hidden).removable(removable).editable(editable)
+                .removable(removable).editable(editable)
                 .contentName(contentName)
                 .contentType(pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE)).build();
 

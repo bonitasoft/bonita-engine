@@ -40,34 +40,11 @@ public class PageImpl implements Page {
     private final String contentName;
     private final String contentType;
     private final Long processDefinitionId;
-    private final boolean hidden;
     private final boolean editable;
     private final boolean removable;
 
-    /**
-     * Builds a Page that is editable and removable by default. It is also not hidden
-     */
     public PageImpl(final long pageId, final String name, final String displayName, final boolean provided,
-            final String description, final long installationDate, final long installedBy,
-            final long lastModificationDate, final long lastUpdatedBy, final String zipName, String contentType,
-            Long processDefinitionId) {
-        this(pageId, name, displayName, provided, false, true, true, description, installationDate, installedBy,
-                lastModificationDate, lastUpdatedBy, zipName, contentType, processDefinitionId);
-    }
-
-    /**
-     * Builds a Page that is editable and removable by default
-     */
-    public PageImpl(final long pageId, final String name, final String displayName, final boolean provided,
-            boolean hidden, final String description, final long installationDate, final long installedBy,
-            final long lastModificationDate, final long lastUpdatedBy, final String zipName, String contentType,
-            Long processDefinitionId) {
-        this(pageId, name, displayName, provided, hidden, true, true, description, installationDate, installedBy,
-                lastModificationDate, lastUpdatedBy, zipName, contentType, processDefinitionId);
-    }
-
-    public PageImpl(final long pageId, final String name, final String displayName, final boolean provided,
-            boolean hidden, boolean editable, boolean removable, final String description,
+            boolean editable, boolean removable, final String description,
             final long installationDate,
             final long installedBy, final long lastModificationDate, final long lastUpdatedBy, final String zipName,
             String contentType,
@@ -76,7 +53,6 @@ public class PageImpl implements Page {
         this.name = name;
         this.displayName = displayName;
         this.provided = provided;
-        this.hidden = hidden;
         this.description = description;
         this.lastUpdatedBy = lastUpdatedBy;
         this.contentName = zipName;
@@ -151,11 +127,6 @@ public class PageImpl implements Page {
     @Override
     public Long getProcessDefinitionId() {
         return processDefinitionId;
-    }
-
-    @Override
-    public boolean isHidden() {
-        return hidden;
     }
 
     @Override

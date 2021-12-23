@@ -23,7 +23,7 @@ import java.util.Map;
 public class PageCreator implements Serializable {
 
     public enum PageField {
-        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID, HIDDEN
+        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID
     }
 
     private static final long serialVersionUID = 8174091386958635983L;
@@ -64,11 +64,6 @@ public class PageCreator implements Serializable {
 
     public PageCreator setProcessDefinitionId(final Long processDefinitionId) {
         fields.put(PageField.PROCESS_DEFINITION_ID, processDefinitionId);
-        return this;
-    }
-
-    public PageCreator setHidden(boolean hidden) {
-        fields.put(PageField.HIDDEN, hidden);
         return this;
     }
 
