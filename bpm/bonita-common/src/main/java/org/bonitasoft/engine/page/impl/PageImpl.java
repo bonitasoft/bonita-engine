@@ -43,6 +43,17 @@ public class PageImpl implements Page {
     private final boolean editable;
     private final boolean removable;
 
+    /**
+     * Builds a Page that is editable and removable by default
+     */
+    public PageImpl(final long pageId, final String name, final String displayName, final boolean provided,
+            final String description, final long installationDate, final long installedBy,
+            final long lastModificationDate, final long lastUpdatedBy, final String zipName, String contentType,
+            Long processDefinitionId) {
+        this(pageId, name, displayName, provided, true, true, description, installationDate, installedBy,
+                lastModificationDate, lastUpdatedBy, zipName, contentType, processDefinitionId);
+    }
+
     public PageImpl(final long pageId, final String name, final String displayName, final boolean provided,
             boolean editable, boolean removable, final String description,
             final long installationDate,
