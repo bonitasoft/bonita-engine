@@ -17,7 +17,7 @@ dependencies {
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    compileOnly "javax.transaction:jta:${Deps.javaxJtaVersion}"
+    compileOnly "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

@@ -1,6 +1,6 @@
 dependencies {
     compile project(':services:bonita-commons')
-    compile "javax.transaction:jta:${Deps.javaxJtaVersion}"
+    compile "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
