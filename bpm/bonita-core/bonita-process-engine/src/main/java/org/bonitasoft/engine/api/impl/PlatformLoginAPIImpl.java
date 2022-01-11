@@ -45,14 +45,9 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         } catch (final Exception e) {
-            e.printStackTrace();// no logger available yet
-            throw new PlatformLoginException(e.getMessage());
+            throw new PlatformLoginException(e);
         }
         final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
-        //        PlatformService platformService = platformAccessor.getPlatformService(); // TO UNCOMMENT lvaills
-
-        // first call before create session: put the platform in cache if necessary
-        //        putPlatformInCacheIfNecessary(platformAccessor, platformService); // TO UNCOMMENT lvaills
 
         final SPlatformSession platformSession;
         try {
@@ -77,8 +72,7 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         } catch (final Exception e) {
-            e.printStackTrace();// no logger available yet
-            throw new PlatformLogoutException(e.getMessage());
+            throw new PlatformLogoutException(e);
         }
         final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
         try {
