@@ -37,8 +37,8 @@ class BooleanPropertyTest {
 
     @Test
     public void booleanProperty_should_take_envVar_if_no_System_property_if_set() throws Exception {
-        final String systemPropertyKey = "my.feature.enable";
-        final String envPropertyKey = "MY_FEATURE_ENABLE";
+        final String systemPropertyKey = "my.super-cool.feature.enabled";
+        final String envPropertyKey = "MY_SUPERCOOL_FEATURE_ENABLED";
         Boolean enabled = withEnvironmentVariable(envPropertyKey, "false")
                 .execute(() -> new BooleanProperty("Some feature", systemPropertyKey, true).isEnabled());
         assertThat(enabled).isFalse();
