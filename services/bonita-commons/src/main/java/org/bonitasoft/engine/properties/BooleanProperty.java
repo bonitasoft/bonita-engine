@@ -48,7 +48,7 @@ public class BooleanProperty {
     }
 
     private String envProperty() {
-        return propertyKey.toUpperCase().replace(".", "_");
+        return propertyKey.toUpperCase().replace(".", "_").replaceAll("-", "");
     }
 
     public boolean isEnabled() {
