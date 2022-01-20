@@ -41,3 +41,5 @@ fi
 # extra lib required at Tomcat startup
 export CLASSPATH="${CATALINA_HOME}/lib/ext/*"
 
+# Uncomment the line below to add any custom JVM System property, like the example to increase the XA transaction timeout:
+# export JAVA_OPTS="-Dbonita.runtime.transaction.xa-timeout=180"

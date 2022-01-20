@@ -21,7 +21,7 @@ class JVMModifier {
             jvmArgs.addAll sysProperty.split(" ")
         }
         System.getProperties().each { p ->
-            if (p.key.contains('sysprop.bonita')) {
+            if (p.key.contains('sysprop.bonita') || p.key.startsWith('bonita.runtime')) {
                 jvmArgs.add("-D${p.key}=${p.value}")
             }
         }
