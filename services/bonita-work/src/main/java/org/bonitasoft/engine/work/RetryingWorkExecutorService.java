@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.commons.ExceptionUtils.printRootCauseOnly;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -213,9 +214,14 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
         // first time is delay
         // second time is delay * delayFactor
         // third time is delay * delayFactor * delayFactor
-        //and so on
+        // and so on
+        // Also add a random scatter delay to avoid retry "waves"
+        // when several jobs fail & are retried at exactly the same time, causing further fails...
+        // see RUNTIME-302 for more details
         double factor = Math.pow(delayFactor, retryCount);
-        return Math.round(delay * factor);
+        Random random = new Random();
+        int scatter = random.nextInt(1000);
+        return Math.round((delay * factor) + scatter);
     }
 
     //For testing purpose
