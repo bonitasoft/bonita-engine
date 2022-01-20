@@ -33,3 +33,6 @@ set CATALINA_PID=%CATALINA_BASE%\catalina.pid
 
 @rem extra lib at Tomcat startup
 set CLASSPATH="%CATALINA_HOME%\lib\ext\*"
+
+rem Uncomment the line below to add any custom JVM System property, like the example to increase the XA transaction timeout:
+rem set JAVA_OPTS="-Dbonita.runtime.transaction.xa-timeout=180"
