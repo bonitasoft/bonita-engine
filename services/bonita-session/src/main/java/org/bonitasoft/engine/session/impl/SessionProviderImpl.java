@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(SessionProvider.class)
 public final class SessionProviderImpl extends AbstractSessionProvider {
 
-    private static final Map<Long, SSession> sessions = new HashMap<>();
+    private final Map<Long, SSession> sessions = new HashMap<>();
 
     @Override
     protected Map<Long, SSession> getSessions() {
