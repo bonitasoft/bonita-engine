@@ -17,7 +17,9 @@ dependencies {
     }
     compile "org.springframework.boot:spring-boot-starter-jdbc:${Deps.springBootVersion}"
     compile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    compile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    compile ("mysql:mysql-connector-java:${Deps.mysqlVersion}") {
+        exclude(module: 'protobuf-java')
+    }
     compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     compile "com.h2database:h2:${Deps.h2Version}"
     compile("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
