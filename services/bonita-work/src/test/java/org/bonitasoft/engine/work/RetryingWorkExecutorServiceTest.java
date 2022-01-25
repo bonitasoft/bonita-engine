@@ -468,7 +468,8 @@ public class RetryingWorkExecutorServiceTest {
                 exception);
 
         verify(bonitaExecutorService).submit(eq(workDescriptor));
-        assertThat(workDescriptor.getExecutionThreshold()).isEqualTo(now.plusMillis(DELAY));
+        assertThat(workDescriptor.getExecutionThreshold()).isAfterOrEqualTo(now.plusMillis(DELAY));
+        assertThat(workDescriptor.getExecutionThreshold()).isBeforeOrEqualTo(now.plusMillis(DELAY + DELAY));
     }
 
     @Test
@@ -483,7 +484,9 @@ public class RetryingWorkExecutorServiceTest {
         verify(bonitaExecutorService, times(3)).submit(eq(workDescriptor));
         //date after delay is: delay * factor * factor because there is 3 retry
         assertThat(workDescriptor.getExecutionThreshold())
-                .isEqualTo(now.plusMillis(DELAY * DELAY_FACTOR * DELAY_FACTOR));
+                .isAfterOrEqualTo(now.plusMillis(DELAY * DELAY_FACTOR * DELAY_FACTOR));
+        assertThat(workDescriptor.getExecutionThreshold())
+                .isBeforeOrEqualTo(now.plusMillis(DELAY * DELAY_FACTOR * DELAY_FACTOR * 2));
     }
 
     @Test

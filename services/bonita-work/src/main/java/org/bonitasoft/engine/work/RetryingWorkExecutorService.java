@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.commons.ExceptionUtils.printRootCauseOnly;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -57,6 +58,7 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
     private final IncidentService incidentService;
     private final long tenantId;
     public int numberOfFramesToLogInExceptions = 3;
+    private Random random = new Random();
 
     public RetryingWorkExecutorService(BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
             TechnicalLoggerService loggerService,
@@ -142,7 +144,7 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
             case RETRYABLE:
                 if (work.getRetryCount() < maxRetry) {
                     logger.warn(
-                            "Work {} failed because of {}. It will be retried. Attempt {} on {} with a delay of {} ms",
+                            "Work {} failed because of {}. It will be retried. Attempt {} of {} with a delay of {} ms",
                             bonitaWork.getDescription(),
                             printRootCauseOnly(thrown),
                             work.getRetryCount() + 1,
@@ -213,9 +215,12 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
         // first time is delay
         // second time is delay * delayFactor
         // third time is delay * delayFactor * delayFactor
-        //and so on
+        // and so on
+        // Also add a random scatter delay to avoid retry "waves"
+        // when several jobs fail & are retried at exactly the same time, causing further fails...
+        // see RUNTIME-302 for more details
         double factor = Math.pow(delayFactor, retryCount);
-        return Math.round(delay * factor);
+        return Math.round((delay * factor) * (random.nextFloat() + 1));
     }
 
     //For testing purpose
