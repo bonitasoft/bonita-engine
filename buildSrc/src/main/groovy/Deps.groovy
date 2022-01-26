@@ -13,7 +13,7 @@ class Deps {
     public static String commonsCLIVersion = "1.4"
     public static String slf4jVersion = "1.7.30"
     public static String h2Version = "1.4.199"
-    public static String hibernateVersion = "5.4.10.Final"
+    public static String hibernateVersion = "5.4.32.Final"
     public static String jacksonDataBindingVersion = "2.12.6"
     public static String javaxJtaVersion = "1.1"
     public static String javaxServletVersion = "3.0.1"
