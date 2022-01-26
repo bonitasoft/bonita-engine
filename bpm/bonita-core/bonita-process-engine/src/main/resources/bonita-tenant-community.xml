@@ -1596,7 +1596,6 @@
                        value="${bonita.tenant.bdm.schemamanager.validator.apply_to_ddl}" />
                 <entry key="javax.persistence.validation.mode"
                        value="${bonita.tenant.bdm.schemamanager.javax.persistence.validation.mode}" />
-                <entry key="hibernate.schema_management_tool" value="org.bonitasoft.engine.business.data.impl.hibernatepatch.HibernateSchemaManagementTool" />
             </map>
         </constructor-arg>
     </bean>
