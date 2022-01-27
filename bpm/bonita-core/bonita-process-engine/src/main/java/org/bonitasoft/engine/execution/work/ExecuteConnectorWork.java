@@ -23,6 +23,7 @@ import java.util.concurrent.CompletionException;
 
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -159,7 +160,9 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                             executeOutputOperationsAndContinue(context, tenantAccessor, userTransactionService,
                                     sConnectorDefinition, r);
                         } catch (Exception e) {
-                            throw new CompletionException(e);
+                            throw new CompletionException(
+                                    new SConnectorException(
+                                            "Unable to evaluate output operations of connectors and continue", e));
                         }
                     });
 

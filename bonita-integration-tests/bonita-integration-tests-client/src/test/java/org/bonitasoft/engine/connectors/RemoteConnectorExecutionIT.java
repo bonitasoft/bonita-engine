@@ -1601,4 +1601,35 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         waitForProcessToFinish(processInstance);
     }
 
+    @Test
+    public void should_put_connector_in_failed_even_when_retryable_exception_happens_while_evaluating_output_operations()
+            throws Exception {
+
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithoutFlownodes", "1.0");
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addData("output", "java.lang.String", null);
+        processBuilder
+                .addAutomaticTask("task")
+                .addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput(TestConnector.INPUT1,
+                        new ExpressionBuilder().createConstantStringExpression("valueOfInput1"))
+                .addOutput(new OperationBuilder().createSetDataOperation("output",
+                        new ExpressionBuilder().createGroovyScriptExpression("throw retryable",
+                                "throw new org.bonitasoft.engine.commons.exceptions.SRetryableException('a retryable exception')",
+                                "java.lang.String")));
+
+        ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector(processBuilder, ACTOR_NAME, user);
+
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        ActivityInstance failedTask = waitForTaskToFail(processInstance);
+        Assertions.assertThat(getProcessAPI()
+                .searchConnectorInstances(
+                        getFirst100ConnectorInstanceSearchOptions(failedTask.getId(), FLOWNODE).done())
+                .getResult().get(0)).satisfies(connector -> {
+                    Assertions.assertThat(connector.getState()).isEqualTo(ConnectorState.FAILED);
+                });
+    }
+
 }
