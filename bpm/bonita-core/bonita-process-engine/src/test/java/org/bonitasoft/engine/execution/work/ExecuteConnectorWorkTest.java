@@ -14,7 +14,10 @@
 package org.bonitasoft.engine.execution.work;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
@@ -22,17 +25,22 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.connector.exception.SConnectorException;
+import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SConnectorDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.lock.BonitaLock;
@@ -53,6 +61,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ExecuteConnectorWorkTest {
 
+    private interface EvaluateOutputCallable {
+
+        void call() throws SBonitaException;
+    }
+
     private static final long PROCESS_DEFINITION_ID = 154323L;
     private static final long CONNECTOR_INSTANCE_ID = 95043L;
     private static final String CONNECTOR_NAME = "MyConnector";
@@ -65,6 +78,12 @@ public class ExecuteConnectorWorkTest {
     private LockService lockService;
     @Mock
     private UserTransactionService userTransactionService;
+    @Mock
+    private ConnectorInstanceService connectorInstanceService;
+    private SConnectorDefinition sConnectorDefinition = new SConnectorDefinitionImpl("testDef", "connectorDef", "1.0",
+            ConnectorEvent.ON_ENTER);
+    private EvaluateOutputCallable evaluateOutput = () -> {
+    };
     private SExpressionContext expressionContext = new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS",
             PROCESS_DEFINITION_ID);
     private Map<String, Object> workContext = new HashMap<>();
@@ -85,7 +104,7 @@ public class ExecuteConnectorWorkTest {
         @Override
         protected SConnectorDefinition getSConnectorDefinition(ProcessDefinitionService processDefinitionService)
                 throws SBonitaException {
-            return null;
+            return sConnectorDefinition;
         }
 
         @Override
@@ -99,6 +118,7 @@ public class ExecuteConnectorWorkTest {
         @Override
         protected void evaluateOutput(Map<String, Object> context, ConnectorResult result,
                 SConnectorDefinition sConnectorDefinition) throws SBonitaException {
+            evaluateOutput.call();
         }
 
         @Override
@@ -114,15 +134,18 @@ public class ExecuteConnectorWorkTest {
     private ConnectorService connectorService;
 
     @Before
-    public void before() throws SClassLoaderException {
+    public void before() throws Exception {
         workContext.put(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
         doReturn(lockService).when(tenantServiceAccessor).getLockService();
         doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
+        doAnswer(args -> ((Callable) args.getArgument(0)).call()).when(userTransactionService)
+                .executeInTransaction(any());
         executeConnectorWork.setTenantId(TENANT_ID);
         doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();
         doReturn(this.getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
         doReturn(timeTracker).when(tenantServiceAccessor).getTimeTracker();
         doReturn(connectorService).when(tenantServiceAccessor).getConnectorService();
+        doReturn(connectorInstanceService).when(tenantServiceAccessor).getConnectorInstanceService();
     }
 
     @Test
@@ -141,5 +164,26 @@ public class ExecuteConnectorWorkTest {
                 eq(TENANT_ID));
         inOrder.verify(userTransactionService).executeInTransaction(any());
         inOrder.verify(lockService).unlock(nullable(BonitaLock.class), eq(TENANT_ID));
+    }
+
+    @Test
+    public void should_throw_SConnectorException_when_an_error_occurs_while_evaluating_output_operations()
+            throws Exception {
+        //We need to have an SConnectorException thrown when evaluating output operation because we don't want connectors to be automatically retried
+        evaluateOutput = () -> {
+            throw new SOperationExecutionException("Unable to save some connector output ¯\\_(ツ)_/¯");
+        };
+        CompletableFuture<ConnectorResult> toBeReturned = completedFuture(
+                new ConnectorResult(null, Collections.emptyMap(), 100));
+        when(connectorService.executeConnector(anyLong(), any(), any(), any(), any())).thenReturn(toBeReturned);
+
+        CompletableFuture<Void> work = executeConnectorWork.work(workContext);
+
+        assertThatThrownBy(work::get).satisfies(exception -> {
+            assertThat(exception).hasCauseInstanceOf(SConnectorException.class);
+            assertThat(exception.getCause())
+                    .hasMessageContaining("Unable to evaluate output operations of connectors and continue");
+            assertThat(exception.getCause()).hasCauseInstanceOf(SOperationExecutionException.class);
+        });
     }
 }
