@@ -50,7 +50,7 @@ class DockerDatabaseContainerTasksCreator {
             ],
             [name       : 'sqlserver',
              repository : 'bonitasoft/bonita-sqlserver',
-             tag        : '2017-CU22',
+             tag        : '2019-CU14',
              portBinding: 1433,
              uriTemplate: 'jdbc:sqlserver://%s:%s;database=%s',
             ]
@@ -169,7 +169,7 @@ class DockerDatabaseContainerTasksCreator {
                             "db.user"         : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'bonita'),
                             "db.password"     : project.hasProperty('db.password') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_PASSWORD) ? System.getProperty(SYS_PROP_DB_PASSWORD) : 'bpm'),
                             "bdm.db.url"      : bdmDbConnectionSettings.dbUrl,
-                            "bdm.db.user"      : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'business_data'),
+                            "bdm.db.user"     : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'business_data'),
                             "db.server.name"  : connectionSettings.serverName,
                             "db.server.port"  : connectionSettings.portNumber,
                             "db.database.name": connectionSettings.databaseName
