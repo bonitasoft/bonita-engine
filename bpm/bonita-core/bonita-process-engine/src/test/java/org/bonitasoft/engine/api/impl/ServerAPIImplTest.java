@@ -19,11 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.only;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -46,7 +42,8 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.TenantStatusException;
-import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.PlatformManager;
+import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.APIAccessResolver;
@@ -108,7 +105,7 @@ public class ServerAPIImplTest {
     @Mock
     private PlatformSessionService platformSessionService;
     @Mock
-    private PlatformService platformService;
+    private PlatformManager platformManager;
 
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
@@ -135,8 +132,8 @@ public class ServerAPIImplTest {
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
         doReturn(platformLoginService).when(platformServiceAccessor).getPlatformLoginService();
         doReturn(platformSessionService).when(platformServiceAccessor).getPlatformSessionService();
-        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(anyLong());
+        doReturn(platformManager).when(platformServiceAccessor).getPlatformManager();
         doReturn(tenantLoginService).when(tenantServiceAccessor).getLoginService();
         doReturn(sessionService).when(tenantServiceAccessor).getSessionService();
         doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();
@@ -342,7 +339,7 @@ public class ServerAPIImplTest {
 
     @Test
     public void should_renew_platform_session_when_call_is_ok() throws Exception {
-
+        doReturn(PlatformState.STARTING).when(platformManager).getState();
         serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
                 null);
 
