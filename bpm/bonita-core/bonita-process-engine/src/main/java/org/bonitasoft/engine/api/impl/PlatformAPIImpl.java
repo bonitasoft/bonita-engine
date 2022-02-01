@@ -18,12 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -32,8 +33,6 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformManager;
@@ -44,7 +43,6 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.STenantCreationException;
-import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
@@ -67,7 +65,11 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
+@Slf4j
 public class PlatformAPIImpl implements PlatformAPI {
+
+    private static final String ALL_TENANTS_PORTAL_CONFIGURATIONS_CACHE_NAME = "ALL_TENANTS_PORTAL_CONFIGURATIONS";
+    private static final String ALL_TENANTS_PORTAL_CONFIGURATIONS_CACHE_KEY = "UNIQUE_INSTANCE";
 
     public PlatformAPIImpl() {
         super();
@@ -92,7 +94,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionService transactionService = platformAccessor.getTransactionService();
-        final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
         // 1 tx to create content and default tenant
         try {
             transactionService.begin();
@@ -100,9 +101,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 // inside new tx because we need sequence ids
                 createDefaultTenant(platformAccessor, platformService, transactionService);
             } catch (final Exception e) {
-                if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-                }
+                log.warn("Cannot create default tenant", e);
                 throw new CreationException("Platform initialisation failed.", e);
             } finally {
                 transactionService.complete();
@@ -312,7 +311,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionService transactionService = platformAccessor.getTransactionService();
-            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             tenantServiceAccessor.getTenantStateManager().stop();
@@ -330,7 +328,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 return null;
             });
 
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
+            log.info("Destroy tenant context of tenant " + tenantId);
 
             // delete tenant folder
             getBonitaHomeServer().deleteTenant(tenantId);
@@ -413,16 +411,32 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     public Map<Long, Map<String, byte[]>> getClientTenantConfigurations() {
         try {
-            PlatformService platformService = getPlatformAccessor().getPlatformService();
-            List<STenant> tenants = platformService.getTenants(QueryOptions.countQueryOptions());
-            HashMap<Long, Map<String, byte[]>> conf = new HashMap<>();
-            for (STenant tenant : tenants) {
-                conf.put(tenant.getId(),
-                        getBonitaHomeServer().getClientTenantConfigurations(tenant.getId()));
+            Map<Long, Map<String, byte[]>> configurations = null;
+
+            final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            try {
+                configurations = (Map<Long, Map<String, byte[]>>) platformAccessor.getPlatformCacheService()
+                        .get(ALL_TENANTS_PORTAL_CONFIGURATIONS_CACHE_NAME, ALL_TENANTS_PORTAL_CONFIGURATIONS_CACHE_KEY);
+            } catch (SCacheException e) {
+                log.warn("Cannot retrieve client tenant configurations from cache", e);
             }
-            return conf;
-        } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException
-                | InstantiationException | STenantException e) {
+            if (configurations == null) {
+                configurations = new HashMap<>();
+                List<STenant> tenants = platformAccessor.getPlatformService()
+                        .getTenants(QueryOptions.countQueryOptions());
+                for (STenant tenant : tenants) {
+                    configurations.put(tenant.getId(),
+                            getBonitaHomeServer().getClientTenantConfigurations(tenant.getId()));
+                }
+                try {
+                    platformAccessor.getPlatformCacheService().store(ALL_TENANTS_PORTAL_CONFIGURATIONS_CACHE_NAME,
+                            ALL_TENANTS_PORTAL_CONFIGURATIONS_CACHE_KEY, configurations);
+                } catch (SCacheException e) {
+                    log.warn("Cannot put client tenant configurations from cache", e);
+                }
+            }
+            return configurations;
+        } catch (Exception e) {
             throw new RetrieveException(e);
         }
     }
@@ -439,5 +453,11 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     public void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
         getBonitaHomeServer().updateTenantPortalConfigurationFile(tenantId, file, content);
+        // and clear cache configuration, so that it is reloaded next time:
+        try {
+            getPlatformAccessor().getPlatformCacheService().clear(ALL_TENANTS_PORTAL_CONFIGURATIONS_CACHE_NAME);
+        } catch (Exception e) {
+            log.warn("Cannot clear client tenant configurations cache", e);
+        }
     }
 }
