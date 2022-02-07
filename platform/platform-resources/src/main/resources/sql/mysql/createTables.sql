@@ -493,20 +493,6 @@ CREATE TABLE arch_multi_biz_data (
 ALTER TABLE arch_multi_biz_data ADD CONSTRAINT pk_arch_rbdi_mbd PRIMARY KEY (tenantid, id, data_id);
 ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
 
-CREATE TABLE report (
-  tenantId BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  description TEXT,
-  installationDate BIGINT NOT NULL,
-  installedBy BIGINT NOT NULL,
-  provided BOOLEAN,
-  lastModificationDate BIGINT NOT NULL,
-  screenshot MEDIUMBLOB,
-  content LONGBLOB,
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
-) ENGINE = INNODB;
 CREATE TABLE processsupervisor (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,

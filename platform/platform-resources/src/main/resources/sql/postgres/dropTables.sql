@@ -25,7 +25,6 @@ DROP TABLE IF EXISTS process_instance;
 DROP TABLE IF EXISTS event_trigger_instance;
 DROP TABLE IF EXISTS waiting_event;
 DROP TABLE IF EXISTS message_instance;
-DROP TABLE IF EXISTS report;
 DROP TABLE IF EXISTS processsupervisor;
 DROP TABLE IF EXISTS business_app_menu;
 DROP TABLE IF EXISTS business_app_page;

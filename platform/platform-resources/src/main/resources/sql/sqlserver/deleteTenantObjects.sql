@@ -50,8 +50,6 @@ DELETE FROM process_instance WHERE tenantid = ${tenantid}
 GO
 DELETE FROM flownode_instance WHERE tenantid = ${tenantid}
 GO
-DELETE FROM report WHERE tenantid = ${tenantid}
-GO
 DELETE FROM processsupervisor WHERE tenantid = ${tenantid}
 GO
 DELETE FROM business_app_menu WHERE tenantid = ${tenantid} AND parentId IS NOT NULL

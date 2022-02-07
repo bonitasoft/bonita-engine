@@ -24,7 +24,6 @@ DELETE FROM event_trigger_instance WHERE tenantid = ${tenantid};
 DELETE FROM waiting_event WHERE tenantid = ${tenantid};
 DELETE FROM process_instance WHERE tenantid = ${tenantid};
 DELETE FROM flownode_instance WHERE tenantid = ${tenantid};
-DELETE FROM report WHERE tenantid = ${tenantid};
 DELETE FROM processsupervisor WHERE tenantid = ${tenantid};
 DELETE FROM business_app_menu WHERE tenantid = ${tenantid} AND parentId IS NOT NULL;
 DELETE FROM business_app_menu WHERE tenantid = ${tenantid};
