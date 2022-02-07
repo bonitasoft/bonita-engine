@@ -562,21 +562,6 @@ GO
 ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE
 GO
 
-CREATE TABLE report (
-  tenantId NUMERIC(19, 0) NOT NULL,
-  id NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(50) NOT NULL,
-  description NVARCHAR(MAX),
-  installationDate NUMERIC(19, 0) NOT NULL,
-  installedBy NUMERIC(19, 0) NOT NULL,
-  provided BIT,
-  lastModificationDate NUMERIC(19, 0) NOT NULL,
-  screenshot VARBINARY(MAX),
-  content VARBINARY(MAX),
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
-)
-GO
 CREATE TABLE processsupervisor (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,

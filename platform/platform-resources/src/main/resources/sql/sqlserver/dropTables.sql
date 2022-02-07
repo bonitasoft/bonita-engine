@@ -52,8 +52,6 @@ DROP TABLE waiting_event
 GO
 DROP TABLE message_instance
 GO
-DROP TABLE report
-GO
 DROP TABLE processsupervisor
 GO
 DROP TABLE business_app_menu

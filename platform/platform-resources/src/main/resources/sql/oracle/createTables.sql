@@ -489,20 +489,6 @@ CREATE TABLE arch_multi_biz_data (
 ALTER TABLE arch_multi_biz_data ADD CONSTRAINT pk_arch_rbdi_mbd PRIMARY KEY (tenantid, id, data_id);
 ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
 
-CREATE TABLE report (
-  tenantId NUMBER(19, 0) NOT NULL,
-  id NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50 CHAR) NOT NULL,
-  description VARCHAR2(1024 CHAR),
-  installationDate NUMBER(19, 0) NOT NULL,
-  installedBy NUMBER(19, 0) NOT NULL,
-  provided NUMBER(1),
-  lastModificationDate NUMBER(19, 0) NOT NULL,
-  screenshot BLOB,
-  content BLOB,
-  CONSTRAINT UK_Report UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
-);
 CREATE TABLE processsupervisor (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
