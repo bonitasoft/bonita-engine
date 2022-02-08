@@ -9,6 +9,7 @@
 
     <!--<logger name="org.bonitasoft" level="INFO" />-->
     <logger name="org.bonitasoft.engine.work" level="INFO" />
+    <logger name="org.bonitasoft.engine.work.RetryingWorkExecutorService" level="DEBUG" />
     <logger name="BONITA_WORK_AUDIT.EXECUTION" level="INFO" />
 
     <root level="WARN">
