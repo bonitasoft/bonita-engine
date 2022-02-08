@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doReturn;
@@ -49,12 +48,13 @@ import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.commons.time.FixedEngineClock;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -70,6 +70,9 @@ public class RetryingWorkExecutorServiceTest {
     private static final int DELAY = 1000;
     private static final int DELAY_FACTOR = 2;
     public static final long TENANT_ID = 12L;
+
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
     private RetryingWorkExecutorService workExecutorService;
@@ -77,8 +80,6 @@ public class RetryingWorkExecutorServiceTest {
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     @Mock(lenient = true)
     private BonitaExecutorService bonitaExecutorService;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     @Mock
     private TechnicalLogger logger;
     @Mock
@@ -99,7 +100,6 @@ public class RetryingWorkExecutorServiceTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(logger).when(technicalLoggerService).asLogger(any());
         doReturn(bonitaExecutorService).when(bonitaExecutorServiceFactory).createExecutorService(any());
         doReturn(RETRYABLE).when(retryabilityEvaluator)
                 .evaluateRetryability(argThat(t -> t instanceof SRetryableException));
@@ -107,7 +107,7 @@ public class RetryingWorkExecutorServiceTest {
                 .evaluateRetryability(argThat(t -> !(t instanceof SRetryableException)));
         workExecutorService = new RetryingWorkExecutorService(
                 bonitaExecutorServiceFactory,
-                technicalLoggerService, engineClock, WORK_TERMINATION_TIMEOUT, MAX_RETRY, DELAY, DELAY_FACTOR,
+                new TechnicalLoggerSLF4JImpl(), engineClock, WORK_TERMINATION_TIMEOUT, MAX_RETRY, DELAY, DELAY_FACTOR,
                 retryabilityEvaluator,
                 workExecutionAuditor, meterRegistry, incidentService, TENANT_ID);
         doReturn(true).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
@@ -224,7 +224,7 @@ public class RetryingWorkExecutorServiceTest {
         workExecutorService.stop();
 
         // then: will only be started one time
-        verify(logger).warn(contains("Waited"));
+        assertThat(systemOutRule.getLog()).contains("Waited");
     }
 
     @Test(expected = SWorkException.class)
@@ -252,7 +252,7 @@ public class RetryingWorkExecutorServiceTest {
 
         // then: will only be started one time
 
-        verify(logger).warn(contains("Interrupted"), any(InterruptedException.class));
+        assertThat(systemOutRule.getLog()).contains("Interrupted").contains("InterruptedException");
     }
 
     @Test
@@ -291,14 +291,14 @@ public class RetryingWorkExecutorServiceTest {
                 new LockException("lock timeout", new Exception()));
 
         verify(bonitaExecutorService).submit(eq(workDescriptor));
-        verify(logger).warn(any(), any(), any(Exception.class));
+        assertThat(systemOutRule.getLog()).contains("WARN");
     }
 
     @Test
     public void should_log_on_success() {
         workExecutorService.onSuccess(workDescriptor);
 
-        verify(logger).debug(eq("Completed work {}"), any(Object.class));
+        assertThat(systemOutRule.getLog()).contains("Completed work ");
     }
 
     @Test
@@ -315,8 +315,7 @@ public class RetryingWorkExecutorServiceTest {
                 new SWorkPreconditionException("My precondition"));
 
         verifyNoMoreInteractions(bonitaExecutorService);
-        verify(logger).warn(contains("Work was not executed because preconditions were not met,"), (Object) any(),
-                (Object) any());
+        assertThat(systemOutRule.getLog()).contains("Work was not executed because preconditions were not met,");
     }
 
     @Test
@@ -470,6 +469,23 @@ public class RetryingWorkExecutorServiceTest {
         verify(bonitaExecutorService).submit(eq(workDescriptor));
         assertThat(workDescriptor.getExecutionThreshold()).isAfterOrEqualTo(now.plusMillis(DELAY));
         assertThat(workDescriptor.getExecutionThreshold()).isBeforeOrEqualTo(now.plusMillis(DELAY + DELAY));
+    }
+
+    @Test
+    public void should_log_the_delay_used_to_retry_the_work() {
+        WorkDescriptor workDescriptor = WorkDescriptor.create("MY_WORK");
+        SRetryableException exception = new SRetryableException(new Exception("rootCause"));
+        Instant now = engineClock.now();
+
+        systemOutRule.clearLog();
+        workExecutorService.onFailure(workDescriptor, bonitaWork, emptyMap(),
+                exception);
+
+        verify(bonitaExecutorService).submit(workDescriptor);
+        assertThat(workDescriptor.getExecutionThreshold()).isAfterOrEqualTo(now.plusMillis(DELAY));
+        assertThat(workDescriptor.getExecutionThreshold()).isBeforeOrEqualTo(now.plusMillis(DELAY + DELAY));
+        assertThat(systemOutRule.getLog()).contains("It will be retried. Attempt 1 of 4 with a delay of "
+                + Duration.between(now, workDescriptor.getExecutionThreshold()).toMillis());
     }
 
     @Test

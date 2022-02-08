@@ -143,14 +143,15 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
                         bonitaWork.getDescription());
             case RETRYABLE:
                 if (work.getRetryCount() < maxRetry) {
+                    long delayInMillis = getDelayInMillis(work.getRetryCount());
                     logger.warn(
                             "Work {} failed because of {}. It will be retried. Attempt {} of {} with a delay of {} ms",
                             bonitaWork.getDescription(),
                             printRootCauseOnly(thrown),
                             work.getRetryCount() + 1,
-                            maxRetry, getDelayInMillis(work.getRetryCount()));
+                            maxRetry, delayInMillis);
                     incrementRetryCounterIfNeeded(work);
-                    retry(work);
+                    retry(work, delayInMillis);
                 } else {
                     logger.warn("Work {} failed. It has already been retried {} times. " +
                             "No more retries will be attempted, it will be marked as failed. Exception is: {}",
@@ -202,8 +203,7 @@ public class RetryingWorkExecutorService implements WorkExecutorService, WorkExe
         }
     }
 
-    private void retry(WorkDescriptor work) {
-        long delayInMillis = getDelayInMillis(work.getRetryCount());
+    private void retry(WorkDescriptor work, long delayInMillis) {
         Instant mustBeExecutedAfter = engineClock.now().plusMillis(delayInMillis);
         work.incrementRetryCount();
         work.mustBeExecutedAfter(mustBeExecutedAfter);
