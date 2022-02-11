@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -66,6 +66,10 @@ public class EventTriggerIT extends AbstractEventIT {
         assertEquals(0, searchTimerEventTriggerInstances.getCount());
         assertTrue(searchTimerEventTriggerInstances.getResult().isEmpty());
 
+        searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(),
+                options);
+        assertEquals(2, searchTimerEventTriggerInstances.getCount());
+
         options = new SearchOptionsBuilder(0, 10)
                 .filter(TimerEventTriggerInstanceSearchDescriptor.EVENT_INSTANCE_NAME, "timer").done();
         searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(),
@@ -90,7 +94,7 @@ public class EventTriggerIT extends AbstractEventIT {
             final SearchOptions options = new SearchOptionsBuilder(0, 10).done();
             final List<TimerEventTriggerInstance> result = getProcessAPI()
                     .searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult();
-            assertEquals(1, result.size());
+            assertThat(result).hasSize(2);
 
             final Date date = new Date();
             final Date newDate = getProcessAPI().updateExecutionDateOfTimerEventTriggerInstance(result.get(0).getId(),
@@ -99,9 +103,8 @@ public class EventTriggerIT extends AbstractEventIT {
 
             waitForUserTask(processInstance2, EXCEPTION_STEP);
 
-            Assertions.assertThat(
-                    getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult())
-                    .isEmpty();
+            assertThat(getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult())
+                    .hasSize(1);
         } finally {
             disableAndDeleteProcess(process2, process1);
         }

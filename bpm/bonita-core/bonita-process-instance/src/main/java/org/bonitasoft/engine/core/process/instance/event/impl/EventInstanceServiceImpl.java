@@ -235,8 +235,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     @Override
     public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId,
             QueryOptions searchOptions) throws SBonitaReadException {
-        return this.eventInstanceRepository.searchTimerEventTriggerInstances(processInstanceId,
-                QueryOptions.countQueryOptions());
+        return this.eventInstanceRepository.searchTimerEventTriggerInstances(processInstanceId, searchOptions);
     }
 
     @Override
