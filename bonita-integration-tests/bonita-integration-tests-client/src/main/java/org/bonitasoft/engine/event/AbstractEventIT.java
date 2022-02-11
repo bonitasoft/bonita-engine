@@ -237,7 +237,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     /**
-     * Deploy and enable a process containing a timer boundary event attached to a call activity
+     * Deploy and enable a process containing two timer boundary events attached to a call activity
      *
      * @param timerDuration
      *        after how long time the boundary will be triggered
@@ -255,6 +255,7 @@ public abstract class AbstractEventIT extends TestWithUser {
             final boolean interrupting,
             final String targetProcessName) throws BonitaException {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerDuration);
+        final Expression timerExpr2 = new ExpressionBuilder().createConstantLongExpression(timerDuration + 1000L);
         final Expression targetProcessNameExpr = new ExpressionBuilder()
                 .createConstantStringExpression(targetProcessName);
         final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression("1.0");
@@ -267,10 +268,15 @@ public abstract class AbstractEventIT extends TestWithUser {
                 targetProcessVersionExpr);
         callActivityBuilder.addBoundaryEvent("timer", interrupting).addTimerEventTriggerDefinition(TimerType.DURATION,
                 timerExpr);
+
+        callActivityBuilder.addBoundaryEvent("timer2", interrupting).addTimerEventTriggerDefinition(TimerType.DURATION,
+                timerExpr2);
+
         processDefinitionBuilder.addUserTask(EXCEPTION_STEP, ACTOR_NAME)
                 .addUserTask(PARENT_PROCESS_USER_TASK_NAME, ACTOR_NAME).addEndEvent("end")
                 .addTransition("start", "callActivity").addTransition("callActivity", PARENT_PROCESS_USER_TASK_NAME)
-                .addTransition(PARENT_PROCESS_USER_TASK_NAME, "end").addTransition("timer", EXCEPTION_STEP);
+                .addTransition(PARENT_PROCESS_USER_TASK_NAME, "end").addTransition("timer", EXCEPTION_STEP)
+                .addTransition("timer2", EXCEPTION_STEP);
 
         return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
     }
