@@ -20,7 +20,7 @@ rem Optional JAAS configuration. Usually used when delegating authentication to 
 rem set SECURITY_OPTS="-Djava.security.auth.login.config=%CATALINA_HOME%\conf\jaas-standard.cfg"
 
 rem Pass the JVM system properties to Tomcat JVM using CATALINA_OPTS variable
-set CATALINA_OPTS=%CATALINA_OPTS% %PLATFORM_SETUP% %H2_DATABASE_DIR% %DB_OPTS% %BDM_DB_OPTS% %ARJUNA_OPTS% %INCIDENT_LOG_DIR% -Dfile.encoding=UTF-8 -Xshare:auto -Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError
+set CATALINA_OPTS=%CATALINA_OPTS% %PLATFORM_SETUP% %H2_DATABASE_DIR% %DB_OPTS% %BDM_DB_OPTS% %ARJUNA_OPTS% %INCIDENT_LOG_DIR% -Dfile.encoding=UTF-8 -Xshare:auto -Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -Dlog4j2.formatMsgNoLookups=true
 
 set CATALINA_PID=%CATALINA_BASE%\catalina.pid
 
