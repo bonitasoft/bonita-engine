@@ -18,7 +18,7 @@ class Deps {
     public static String jakartaTransactionVersion = "1.3.3"
     public static String javaxServletVersion = "4.0.1"
     // The groovy version must be in synch with the runtime-bom artifact
-    public static String groovyVersion = "3.0.8"
+    public static String groovyVersion = "3.0.9"
     public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
     public static String httpComponentsVersion = "4.5.13"
     public static String xstreamVersion = "1.4.18"
