@@ -1,5 +1,6 @@
 plugins {
     id "com.bonitasoft.gradle.bonita-release"
+    id "com.bonitasoft.gradle.maven-settings"
     id "org.sonarqube" version "3.0"
 }
   
