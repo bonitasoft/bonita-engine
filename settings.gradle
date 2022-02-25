@@ -1,18 +1,10 @@
+rootProject.name = 'bonita-engine'
+
 pluginManagement {
-    repositories { gradlePluginPortal() }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id.startsWith("io.spring.dependency-management")) {
-                useVersion("1.0.6.RELEASE")
-            }
-            if (requested.id.namespace == 'com.bonitasoft.gradle') {
-                //use same version for all bonita gradle plugins
-                useModule("${requested.id.id}:${requested.id.id}.gradle.plugin:0.1.50")
-            }
-        }
+    plugins {
+        id "com.bonitasoft.gradle.bonita-release" version  "${versionsPluginsBonita}"
+        id "com.bonitasoft.gradle.maven-settings" version "${versionsPluginsMavenSettings}"
     }
 }
-
-rootProject.name = 'bonita-engine'
 
 apply from: 'engine-settings.gradle'
