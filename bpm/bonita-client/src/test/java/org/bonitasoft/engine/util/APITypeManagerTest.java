@@ -45,6 +45,11 @@ public class APITypeManagerTest {
         System.clearProperty("bonita.home");
         System.clearProperty("org.bonitasoft.engine.api-type");
         System.clearProperty("org.bonitasoft.engine.api-type.server.url");
+        System.clearProperty("org.bonitasoft.engine.api-type.application.name");
+        System.clearProperty("org.bonitasoft.engine.api-type.connections.max");
+        System.clearProperty("org.bonitasoft.engine.api-type.basicAuthentication.active");
+        System.clearProperty("org.bonitasoft.engine.api-type.basicAuthentication.username");
+        System.clearProperty("org.bonitasoft.engine.api-type.basicAuthentication.password");
     }
 
     @Test
@@ -162,10 +167,18 @@ public class APITypeManagerTest {
     public void should_getAPITypeParameters_when_set_with_system_properties_works() throws Exception {
         //given
         System.setProperty("org.bonitasoft.engine.api-type.server.url", "localhost");
+        System.setProperty("org.bonitasoft.engine.api-type.application.name", "bonita");
+        System.setProperty("org.bonitasoft.engine.api-type.connections.max", "12");
+        System.setProperty("org.bonitasoft.engine.api-type.basicAuthentication.active", "true");
+        System.setProperty("org.bonitasoft.engine.api-type.basicAuthentication.username", "someUser");
+        System.setProperty("org.bonitasoft.engine.api-type.basicAuthentication.password", "secret");
         //when
         Map<String, String> apiTypeParameters = APITypeManager.getAPITypeParameters();
         //then
-        assertThat(apiTypeParameters).containsOnly(entry("server.url", "localhost"));
+        assertThat(apiTypeParameters).containsOnly(entry("server.url", "localhost"),
+                entry("application.name", "bonita"), entry("connections.max", "12"),
+                entry("basicAuthentication.active", "true"), entry("basicAuthentication.username", "someUser"),
+                entry("basicAuthentication.password", "secret"));
     }
 
     @Test

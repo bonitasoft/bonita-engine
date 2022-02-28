@@ -178,6 +178,9 @@ public class APITypeManager {
         addParameter(properties, "org.bonitasoft.engine.api-type.", "server.url");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "application.name");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "connections.max");
+        addParameter(properties, "org.bonitasoft.engine.api-type.", "basicAuthentication.active");
+        addParameter(properties, "org.bonitasoft.engine.api-type.", "basicAuthentication.username");
+        addParameter(properties, "org.bonitasoft.engine.api-type.", "basicAuthentication.password");
         return properties;
     }
 
