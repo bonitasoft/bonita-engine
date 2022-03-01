@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
@@ -32,8 +33,6 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformManager;
@@ -67,6 +66,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
+@Slf4j
 public class PlatformAPIImpl implements PlatformAPI {
 
     public PlatformAPIImpl() {
@@ -92,7 +92,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionService transactionService = platformAccessor.getTransactionService();
-        final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
         // 1 tx to create content and default tenant
         try {
             transactionService.begin();
@@ -100,9 +99,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 // inside new tx because we need sequence ids
                 createDefaultTenant(platformAccessor, platformService, transactionService);
             } catch (final Exception e) {
-                if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-                }
+                log.warn("Cannot create default tenant", e);
                 throw new CreationException("Platform initialisation failed.", e);
             } finally {
                 transactionService.complete();
@@ -312,7 +309,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionService transactionService = platformAccessor.getTransactionService();
-            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             tenantServiceAccessor.getTenantStateManager().stop();
@@ -330,7 +326,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 return null;
             });
 
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
+            log.info("Destroy tenant context of tenant " + tenantId);
 
             // delete tenant folder
             getBonitaHomeServer().deleteTenant(tenantId);

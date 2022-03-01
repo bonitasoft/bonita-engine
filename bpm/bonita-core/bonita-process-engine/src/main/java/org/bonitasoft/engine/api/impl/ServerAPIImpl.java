@@ -48,6 +48,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -482,6 +483,14 @@ public class ServerAPIImpl implements ServerAPI {
     private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor)
             throws SClassLoaderException {
         ClassLoader classLoader = null;
+        PlatformState state = platformServiceAccessor.getPlatformManager().getState();
+        if (state != PlatformState.STARTED) {
+            // We do not retrieve the platform classloader when the platform is not yet started
+            // It needs to have services to be started to retrieve it
+            // Returning null will cause the context classloader to be left untouched
+            logger.debug("Tried to retrieve platform classloader on a not started platform, state = {}", state);
+            return null;
+        }
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         // get the platform to put it in cache if needed
         if (!platformService.isPlatformCreated()) {
