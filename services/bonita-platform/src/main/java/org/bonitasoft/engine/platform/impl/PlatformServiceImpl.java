@@ -30,7 +30,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -43,6 +42,7 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.cache.PlatformCacheService;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
@@ -91,7 +91,7 @@ public class PlatformServiceImpl implements PlatformService {
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever,
             final Recorder recorder,
-            final TechnicalLoggerService logger, final PlatformCacheService platformCacheService,
+            final TechnicalLoggerService logger, PlatformCacheService platformCacheService,
             final SPlatformProperties sPlatformProperties,
             final DataSource datasource, final List<String> sqlFolders) {
         this.platformPersistenceService = platformPersistenceService;

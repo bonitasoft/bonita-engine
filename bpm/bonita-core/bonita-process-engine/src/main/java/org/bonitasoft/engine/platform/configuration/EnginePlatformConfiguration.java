@@ -23,6 +23,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
+import org.bonitasoft.engine.platform.cache.PlatformCacheServiceConfiguration;
 import org.bonitasoft.engine.platform.session.PlatformSessionConfiguration;
 import org.bonitasoft.engine.scheduler.SchedulerConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -43,7 +44,9 @@ import org.springframework.context.annotation.Import;
         SchedulerConfiguration.class,
         LockServiceConfiguration.class,
         PlatformSessionConfiguration.class,
-        ClassloaderConfiguration.class
+        ClassloaderConfiguration.class,
+        PlatformCacheServiceConfiguration.class // might not be useful because EnginePlatformConfiguration already have
+                                                                                                                                                                                            // a component scan on 'org.bonitasoft.engine.platform'
 })
 @ComponentScan("org.bonitasoft.engine.platform")
 public class EnginePlatformConfiguration {
