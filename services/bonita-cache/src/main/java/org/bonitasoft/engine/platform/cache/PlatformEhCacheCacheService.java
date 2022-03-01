@@ -11,27 +11,32 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.cache.ehcache;
+package org.bonitasoft.engine.platform.cache;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
-import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.cache.ehcache.CommonEhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Platform version of the EhCacheCacheService
  *
  * @author Baptiste Mesta
  */
+@Component
 public class PlatformEhCacheCacheService extends CommonEhCacheCacheService implements PlatformCacheService {
 
-    public PlatformEhCacheCacheService(final TechnicalLoggerService logger,
-            final List<CacheConfiguration> cacheConfigurations,
-            final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
+    public PlatformEhCacheCacheService(TechnicalLoggerService logger,
+            List<CacheConfiguration> cacheConfigurations,
+            @Qualifier("defaultPlatformCacheConfiguration") CacheConfiguration defaultCacheConfiguration,
+            @Value("java.io.tmpdir/platform.cache") String diskStorePath) {
         super(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
     }
 

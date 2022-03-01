@@ -12,7 +12,6 @@
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
         <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="cacheService" ref="platformCacheService" />
     </bean>
 
     <bean id="quartzProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -111,7 +110,6 @@
         <constructor-arg ref="platformPersistenceService" />
         <constructor-arg name="platformRetriever" ref="platformRetriever" />
         <constructor-arg ref="platformTechnicalLoggerService" />
-        <constructor-arg ref="platformCacheService" />
         <constructor-arg ref="platformProperties" />
         <constructor-arg name="recorder" ref="platformRecorderSync" />
         <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
@@ -162,12 +160,6 @@
 
     <bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyService">
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
-    </bean>
-
-    <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="defaultCacheConfiguration" ref="defaultPlatformCacheConfiguration" />
-        <constructor-arg name="diskStorePath" value="java.io.tmpdir/platform.cache" />
     </bean>
 
     <bean id="defaultPlatformCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
@@ -683,7 +675,6 @@
     </bean>
 
 
-
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="txManager" ref="transactionManager" />
@@ -1061,7 +1052,7 @@
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
-        <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory"/>
+        <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory" />
     </bean>
 
     <bean id="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
@@ -1094,13 +1085,13 @@
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
-        <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory"/>
+        <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory" />
     </bean>
 
     <bean id="queryBuilderFactory" class="org.bonitasoft.engine.persistence.QueryBuilderFactory">
-        <constructor-arg name="orderByCheckingMode" value="${sysprop.bonita.orderby.checking.mode:NONE}"/>
-        <constructor-arg name="classAliasMappings" >
-            <bean factory-bean="hbmConfigurationProvider" factory-method="getClassAliasMappings"/>
+        <constructor-arg name="orderByCheckingMode" value="${sysprop.bonita.orderby.checking.mode:NONE}" />
+        <constructor-arg name="classAliasMappings">
+            <bean factory-bean="hbmConfigurationProvider" factory-method="getClassAliasMappings" />
         </constructor-arg>
         <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.tenant.likeEscapeCharacter}" />
         <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.tenant.enableWordSearch}" />
