@@ -194,8 +194,8 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean isAuthorized(APICallContext apiCallContext) throws SExecutionException {
-        if (log.isDebugEnabled()) {
-            log.debug("Static REST API permissions check");
+        if (log.isTraceEnabled()) {
+            log.trace("Static REST API permissions check");
         }
         final Set<String> resourcePermissions = getDeclaredPermissions(apiCallContext.getApiName(),
                 apiCallContext.getResourceName(), apiCallContext.getMethod(), apiCallContext.getResourceId(),
