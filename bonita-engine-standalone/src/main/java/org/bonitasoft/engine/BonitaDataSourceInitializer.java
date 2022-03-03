@@ -107,8 +107,8 @@ class BonitaDataSourceInitializer {
 
         BasicManagedDataSource bonitaDataSource = new BasicManagedDataSource();
         bonitaDataSource.setDefaultAutoCommit(false);
-        bonitaDataSource.setRemoveAbandonedOnBorrow(false);
-        bonitaDataSource.setRemoveAbandonedOnMaintenance(false);
+        bonitaDataSource.setRemoveAbandonedOnBorrow(true);
+        bonitaDataSource.setRemoveAbandonedOnMaintenance(true);
         bonitaDataSource.setLogAbandoned(false);
         bonitaDataSource.setTestOnBorrow(true);
         bonitaDataSource.setValidationQuery(defaultTestQueries.get(dbVendor));
