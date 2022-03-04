@@ -578,18 +578,27 @@ public class PageServiceImpl implements PageService {
             sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, pageId));
 
             // Need to read previous version permissions from page properties before deleting the page:
-            Properties previousPageProperties = getPreviousPageProperties(sPageContent.getContent());
+            Properties previousPageProperties;
+            try {
+                previousPageProperties = getPreviousPageProperties(sPageContent.getContent());
+            } catch (SInvalidPageZipMissingPropertiesException | IOException e) {
+                previousPageProperties = null;
+            }
 
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("content", content);
             recorder.recordUpdate(UpdateRecord.buildSetFields(sPageContent, entityUpdateDescriptor), PAGE);
 
             // remove previous permissions before adding the new ones:
-            removePermissionsDeclaredInPageProperties(previousPageProperties);
+            if (previousPageProperties != null) {
+                // this can happen when update-tool puts empty content in new inserted pages,
+                // so that Engine startup update the page content, as it is detected as newer:
+                removePermissionsDeclaredInPageProperties(previousPageProperties);
+            }
             addPermissionsFromPageProperties(pageProperties.getProperty(PROPERTIES_NAME), pageProperties);
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
-        } catch (SRecorderException | SBonitaReadException | IOException re) {
+        } catch (SRecorderException | SBonitaReadException re) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(re);
         }
