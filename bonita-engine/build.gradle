@@ -28,6 +28,7 @@ dependencyManagement {
         dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
         dependency "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
         dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
+        dependency "commons-codec:commons-codec:${Deps.commonscodec}"
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
         dependency "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
