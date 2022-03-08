@@ -1,7 +1,7 @@
 class Deps {
 
-    public static String springVersion = "5.2.2.RELEASE"
-    public static String springBootVersion = "2.2.2.RELEASE"
+    public static String springVersion = "5.2.19.RELEASE"
+    public static String springBootVersion = "2.3.12.RELEASE"
     public static String commonsIOVersion = "2.6"
     //fileupload 1.4 does not work on web-side.
     public static String commonsFileupload = "1.3.3"
@@ -16,13 +16,13 @@ class Deps {
     public static String slf4jVersion = "1.7.25"
     public static String h2Version = "1.4.199"
     public static String hibernateVersion = "5.4.10.Final"
-    public static String jacksonDataBindingVersion = "2.10.1"
+    public static String jacksonDataBindingVersion = "2.12.6"
     public static String javaxJtaVersion = "1.1"
     public static String javaxServletVersion = "3.0.1"
     public static String groovyAllVersion = "2.4.16"
     public static String javassistVersion = "3.18.1-GA"
     public static String httpComponentsVersion = "4.5.2"
-    public static String xstreamVersion = "1.4.14"
+    public static String xstreamVersion = "1.4.19"
     public static String hibernateJpaVersion = "1.0.2.Final"
     public static String ehcacheVersion = "2.10.6"
     public static String eclipseCompilerVersion = "3.20.0"
@@ -40,7 +40,7 @@ class Deps {
     public static String naranayaVersion = "5.9.3.Final"
     public static String jbossLoggingVersion = "3.1.3.GA"
     public static String jaxbVersion = "2.3.1"
-    public static String logbackVersion = "1.2.3"
+    public static String logbackVersion = "1.2.8"
     public static String xbeanClassloaderVersion = "3.7"
 
     public static String junit4Version = "4.12"

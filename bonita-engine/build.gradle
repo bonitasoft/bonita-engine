@@ -6,6 +6,9 @@ plugins {
 }
 dependencyManagement {
     dependencies {
+        imports {
+            mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonDataBindingVersion}"
+        }
         dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
             entry 'slf4j-api'
             entry 'slf4j-simple'
