@@ -1,6 +1,6 @@
 class Deps {
 
-    public static String springVersion = "5.2.15.RELEASE"
+    public static String springVersion = "5.2.19.RELEASE"
     public static String springBootVersion = "2.3.12.RELEASE"
     public static String commonsIOVersion = "2.8.0"
     //fileupload 1.4 does not work on web-side.
@@ -29,7 +29,7 @@ class Deps {
     public static String quartzVersion = "2.3.2"
     public static String micrometerVersion = "1.6.1"
 
-    public static String mysqlVersion = "8.0.27"
+    public static String mysqlVersion = "8.0.28"
     public static String mssqlVersion = "8.4.1.jre8"
     public static String oracleVersion = "19.3.0.0"
     public static String postgresqlVersion = "42.3.3"
