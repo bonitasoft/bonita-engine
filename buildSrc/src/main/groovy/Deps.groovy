@@ -48,6 +48,7 @@ class Deps {
     public static String hazelcastKubernetesVersion = "1.5"
     
     public static String guavaVersion = "30.1.1-jre"
+    public static String antlr4RuntimeVersion = "4.7.2"
 
     // Test dependency versions:
     public static String junit4Version = "4.13.2"
