@@ -42,6 +42,7 @@ class Deps {
     public static String xbeanClassloaderVersion = "3.7"
     
     public static String guavaVersion = "30.1.1-jre"
+    public static String antlr4RuntimeVersion = "4.7.2"
 
     public static String junit4Version = "4.13.2"
     public static String junit5Version = "5.6.3"
