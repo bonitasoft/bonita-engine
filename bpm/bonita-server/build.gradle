@@ -3,6 +3,11 @@ import org.bonitasoft.engine.gradle.ShadeDependency
 plugins { id 'bonita-shade' }
 
 dependencies {
+    // import jackson bom to align jackson dependencies even when resolving shade dependencies
+    // When create the shade version of bonita-server, the bonita-common project is excluded causing the jackson bom not to be imported
+    // This cause issues to the code deposit because an different version of jackson, that was not downloaded to local cache, can be required during offline build.
+    // Remove the shade to solve that issue
+    implementation(platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonDataBindingVersion}"))
     compile project(':bpm:bonita-core:bonita-process-engine')
     compile project(':services:bonita-builder')
     compile project(':bpm:bonita-core:bonita-actor-mapping')
