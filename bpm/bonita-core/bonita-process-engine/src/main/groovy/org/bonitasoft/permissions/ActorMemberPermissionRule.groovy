@@ -26,7 +26,7 @@ import org.bonitasoft.engine.session.APISession
 
 /**
  *
- * Let a user add an actorMember only if he is process owner
+ * Let a user add an actorMember only if he is process supervisor
  *
  * <ul>
  *     <li>bpm/actorMember</li>

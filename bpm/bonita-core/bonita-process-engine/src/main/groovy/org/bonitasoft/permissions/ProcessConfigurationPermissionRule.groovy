@@ -24,7 +24,7 @@ import org.bonitasoft.engine.session.APISession
 
 /**
  *
- * Let a user manage process connectors and parameters only if he is process owner
+ * Let a user manage process connectors and parameters only if he is process supervisor
  *
  * <ul>
  *     <li>bpm/processConnector</li>
