@@ -27,7 +27,7 @@ import org.bonitasoft.engine.session.APISession
 
 /**
  *
- * Let a user get and update a variable of a case only if he is the process owner
+ * Let a user get and update a variable of a case only if he is the process supervisor
  *
  * <ul>
  *     <li>bpm/caseVariable</li>

@@ -24,7 +24,7 @@ import org.bonitasoft.engine.session.APISession
 
 /**
  *
- * Let a user see process connector dependency problem only if he is process owner
+ * Let a user see process connector dependency problem only if he is process supervisor
  *
  * <ul>
  *     <li>bpm/processConnectorDependency</li>
