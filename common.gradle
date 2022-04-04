@@ -2,7 +2,6 @@ allprojects {
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
     apply plugin: 'idea'
-    apply plugin: 'com.bonitasoft.gradle.maven-settings'
     group = 'org.bonitasoft.engine'
 
     publishing {
@@ -12,6 +11,8 @@ allprojects {
                 maven {
                     name = repoProperties.first()
                     url = repoProperties.last()
+                    //those credentials can be given using -P<repo_name>Username and -P<repo_name>Password see README.md
+                    credentials(PasswordCredentials)
                 }
             }
         }
@@ -22,7 +23,7 @@ allprojects {
             testOutputDir file('build/classes/test')
         }
     }
-    if(project.convention.findPlugin(JavaPluginConvention)) {
+    if (project.convention.findPlugin(JavaPluginConvention)) {
         // Change the output directory for the main and test source sets back to the old path
         sourceSets.main.output.classesDir = new File(buildDir, "classes/main")
         sourceSets.test.output.classesDir = new File(buildDir, "classes/test")
@@ -38,26 +39,39 @@ subprojects {
     repositories {
         mavenCentral()
 
-        sourceCompatibility = '1.8'
+        if (project.hasProperty("extraRepositories")) {
 
-        configurations.all {
-        }
-        afterEvaluate {
-            tasks.withType(AbstractCompile) { options.encoding = 'UTF-8' }
-        }
-        tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
-        tasks.withType(Javadoc) {
-            options.addStringOption('Xdoclint:none', '-quiet')
-            options.encoding = 'UTF-8'
-        }
-        tasks.withType(DependencyReportTask) {
-            group "Documentation"
-            description "List runtime dependencies for a specified configuration"
-            configurations = [project.configurations.runtimeClasspath]
+            def extraRepositories = project.getProperties().get("extraRepositories")
+            extraRepositories.split(",").each { repo ->
+                def repoProperties = repo.split("::")
+                maven {
+                    name = repoProperties.first()
+                    url = repoProperties.last()
+                    //those credentials can be given using -P<repo_name>Username and -P<repo_name>Password see README.md
+                    credentials(PasswordCredentials)
+                }
+            }
         }
 
     }
 
+    sourceCompatibility = '1.8'
+
+    configurations.all {
+    }
+    afterEvaluate {
+        tasks.withType(AbstractCompile) { options.encoding = 'UTF-8' }
+    }
+    tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.encoding = 'UTF-8'
+    }
+    tasks.withType(DependencyReportTask) {
+        group "Documentation"
+        description "List runtime dependencies for a specified configuration"
+        configurations = [project.configurations.runtimeClasspath]
+    }
     testlogger {
         showFullStackTraces false
         showCauses true
