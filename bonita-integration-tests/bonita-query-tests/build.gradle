@@ -9,7 +9,7 @@ dependencies {
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     testCompile 'org.springframework:spring-orm:4.3.16.RELEASE'
     testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
-    testCompile 'javax.inject:javax.inject:1'
+    testCompile 'jakarta.inject:jakarta.inject-api:1.0.5'
     testCompile project(':bpm:bonita-server')
     testCompile project(':bpm:bonita-common')
 
