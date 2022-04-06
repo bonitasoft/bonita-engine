@@ -13,6 +13,6 @@ dependencies {
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testRuntimeOnly "org.springframework:spring-webmvc:${Deps.springVersion}"
-    compileOnly "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
-    testCompile "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
+    compileOnly "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
+    testCompile "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
 }
