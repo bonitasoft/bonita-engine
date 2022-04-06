@@ -2,7 +2,6 @@ rootProject.name = 'bonita-engine'
 
 pluginManagement {
     plugins {
-        id "com.bonitasoft.gradle.bonita-release" version  "${versionsPluginsBonita}"
         id "com.bonitasoft.gradle.maven-settings" version "${versionsPluginsMavenSettings}"
     }
 }

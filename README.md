@@ -39,12 +39,12 @@ The command above runs all unit tests. To skip them, add the `-x test`
 option.
 
 ### Version
-Due to the Gradle plugin **com.bonitasoft.gradle.bonita-release**, the version of the artifacts is automatically calculated from the last tag of the current branch.
+Version is declared in gradle.properties
 
-To override the current version on build, use the parameter **forceCurrentVersion** like:
+To override the current version on build, use the parameter **-Pversion** like:
 
 ```
- ./gradlew -PforceCurrentVersion=7.9.3 <tasks>
+ ./gradlew -Pversion=7.9.3 <tasks>
 ```
 
 ### Running unit / integration tests
