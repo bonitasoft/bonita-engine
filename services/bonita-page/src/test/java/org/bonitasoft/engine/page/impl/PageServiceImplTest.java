@@ -1438,4 +1438,22 @@ public class PageServiceImplTest {
         verify(permissionService, never()).removePermissions(any());
     }
 
+    @Test
+    public void updatePageContent_should_not_try_to_remove_permissions_if_previous_page_content_was_null()
+            throws Exception {
+        final SPage page = new SPage("name", 10201983L, 2005L, false, "contentName");
+        page.setId(45L);
+        final SPageWithContent previousPageContent = new SPageWithContent(page, null);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, page.getId())))
+                .thenReturn(previousPageContent);
+
+        final byte[] newContent = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair("contentType=" + SContentType.PAGE));
+
+        pageServiceImpl.updatePageContent(page.getId(), newContent, "contentName");
+
+        verify(permissionService, never()).removePermissions(any());
+
+    }
+
 }
