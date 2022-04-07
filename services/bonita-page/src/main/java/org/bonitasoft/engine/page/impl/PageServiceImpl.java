@@ -576,15 +576,17 @@ public class PageServiceImpl implements PageService {
         final SPageWithContent sPageContent;
         try {
             sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, pageId));
-
-            // Need to read previous version permissions from page properties before deleting the page:
             Properties previousPageProperties;
-            try {
-                previousPageProperties = getPreviousPageProperties(sPageContent.getContent());
-            } catch (SInvalidPageZipMissingPropertiesException | IOException e) {
+            if (sPageContent.getContent() == null || sPageContent.getContent().length == 0) {
                 previousPageProperties = null;
+            } else {
+                // Need to read previous version permissions from page properties before deleting the page:
+                try {
+                    previousPageProperties = getPreviousPageProperties(sPageContent.getContent());
+                } catch (SInvalidPageZipMissingPropertiesException | IOException e) {
+                    previousPageProperties = null;
+                }
             }
-
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("content", content);
             recorder.recordUpdate(UpdateRecord.buildSetFields(sPageContent, entityUpdateDescriptor), PAGE);

@@ -1,7 +1,6 @@
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
-    apply plugin: 'com.bonitasoft.gradle.maven-settings'
     group = 'org.bonitasoft.engine'
 
     publishing {
@@ -11,6 +10,8 @@ allprojects {
                 maven {
                     name = repoProperties.first()
                     url = repoProperties.last()
+                    //those credentials can be given using -P<repo_name>Username and -P<repo_name>Password see README.md
+                    credentials(PasswordCredentials)
                 }
             }
         }
@@ -30,29 +31,43 @@ subprojects {
     repositories {
         mavenCentral()
 
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        if (project.hasProperty("extraRepositories")) {
 
-        configurations.all {
+            def extraRepositories = project.getProperties().get("extraRepositories")
+            extraRepositories.split(",").each { repo ->
+                def repoProperties = repo.split("::")
+                maven {
+                    name = repoProperties.first()
+                    url = repoProperties.last()
+                    //those credentials can be given using -P<repo_name>Username and -P<repo_name>Password see README.md
+                    credentials(PasswordCredentials)
+                }
+            }
         }
-        afterEvaluate {
+
+    }
+
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+
+    configurations.all {
+    }
+    afterEvaluate {
             tasks.withType(AbstractCompile).configureEach { options.encoding = 'UTF-8' }
-        }
+    }
         tasks.withType(JavaCompile).configureEach {
             options.encoding = 'UTF-8'
             options.fork = true
         }
         tasks.withType(Javadoc).configureEach {
-            options.addStringOption('Xdoclint:none', '-quiet')
-            options.encoding = 'UTF-8'
-        }
-        tasks.withType(DependencyReportTask).configureEach {
-            group "Documentation"
-            description "List runtime dependencies for a specified configuration"
-            configurations = [project.configurations.runtimeClasspath]
-        }
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.encoding = 'UTF-8'
     }
-
+        tasks.withType(DependencyReportTask).configureEach {
+        group "Documentation"
+        description "List runtime dependencies for a specified configuration"
+        configurations = [project.configurations.runtimeClasspath]
+    }
     testlogger {
         showFullStackTraces false
         showCauses true
