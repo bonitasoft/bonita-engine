@@ -41,7 +41,7 @@ class Deps {
     public static String javaxAnnotationsVersion = "1.3.2"
 
     // extensions versions
-    public static String hazelcastVersion = "4.1"
+    public static String hazelcastVersion = "5.1.1"
     //Last version compatible with hibernate 5
     public static String hazelcastHibernateVersion = "2.1.1"
     public static String hazelcastAWSVersion = "3.3"
