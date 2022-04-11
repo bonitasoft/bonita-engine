@@ -82,6 +82,9 @@ dependencyManagement {
         dependency "com.hazelcast:hazelcast-hibernate53:${Deps.hazelcastHibernateVersion}"
         // declared here because it is used by web-extension and by distrib
         dependency "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
+        // To be removed only when client projects (rest api extension) have all moved their deps to jakarta
+        // Just keep a version managed to prevent client build breaks
+        dependency "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
     }
 }
 publishing {
