@@ -88,6 +88,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
             final Path targetBdmDriverFile = getPathUnderAppServer("lib/bonita", true)
                     .resolve(srcBdmDriverFile.getFileName());
             copyDatabaseDriversIfNecessary(srcBdmDriverFile, targetBdmDriverFile, bdmDbVendor);
+            removeH2DriverIfNecessary(targetBonitaDbDriverFile.getParent(), dbVendor, bdmDbVendor);
             LOGGER.info("Tomcat auto-configuration complete.");
         } catch (PlatformException e) {
             restorePreviousConfiguration(setEnvUnixFile, setEnvWindowsFile, bonitaXmlFile);
