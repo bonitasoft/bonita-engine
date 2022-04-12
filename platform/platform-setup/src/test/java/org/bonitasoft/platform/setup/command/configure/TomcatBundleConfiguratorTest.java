@@ -74,6 +74,108 @@ public class TomcatBundleConfiguratorTest {
     }
 
     @Test
+    public void should_delete_h2_jar_from_classpath_if_h2_is_not_used() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "oracle");
+        System.setProperty("db.database.name", "bonita_with$dollarXXX\\myInstance.of.bonita&perf=good");
+        System.setProperty("db.user", "_bonita_with$dollar\\andBackSlash");
+        System.setProperty("db.password", "bpm_With$dollar\\andBackSlash");
+
+        System.setProperty("bdm.db.vendor", "oracle");
+        System.setProperty("bdm.db.database.name",
+                "bonita_bdm_with$dollarXXX\\myInstance.of.bdm&perf=good?oracle.net.disableOob=true");
+        System.setProperty("bdm.db.user", "_bdmWith$dollar\\andBackSlash");
+        System.setProperty("bdm.db.password", "bdm_bpm_With$dollar\\andBackSlash");
+
+        // given:
+        final Path h2jarPath = tomcatFolder.resolve("lib").resolve("bonita").resolve("h2.jar");
+
+        assertThat(h2jarPath).exists();
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        assertThat(h2jarPath).doesNotExist();
+    }
+
+    @Test
+    public void should_not_delete_h2_jar_from_classpath_if_h2_is_used_for_bdm() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "oracle");
+        System.setProperty("db.database.name", "bonita_with$dollarXXX\\myInstance.of.bonita&perf=good");
+        System.setProperty("db.user", "_bonita_with$dollar\\andBackSlash");
+        System.setProperty("db.password", "bpm_With$dollar\\andBackSlash");
+
+        System.setProperty("bdm.db.vendor", "h2");
+        System.setProperty("bdm.db.database.name", "business_data.db");
+        System.setProperty("bdm.db.user", "sa");
+        System.setProperty("bdm.db.password", "");
+
+        // given:
+        final Path h2jarPath = tomcatFolder.resolve("lib").resolve("bonita").resolve("h2.jar");
+
+        assertThat(h2jarPath).exists();
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        assertThat(h2jarPath).exists();
+    }
+
+    @Test
+    public void should_not_delete_h2_jar_from_classpath_if_h2_is_used_for_bonita() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "h2");
+        System.setProperty("db.database.name", "internal_database.db");
+        System.setProperty("db.user", "myUser");
+        System.setProperty("db.password", "myPwd");
+
+        System.setProperty("bdm.db.vendor", "oracle");
+        System.setProperty("bdm.db.database.name",
+                "bonita_bdm_with$dollarXXX\\myInstance.of.bdm&perf=good?oracle.net.disableOob=true");
+        System.setProperty("bdm.db.user", "_bdmWith$dollar\\andBackSlash");
+        System.setProperty("bdm.db.password", "bdm_bpm_With$dollar\\andBackSlash");
+
+        // given:
+        final Path h2jarPath = tomcatFolder.resolve("lib").resolve("bonita").resolve("h2.jar");
+
+        assertThat(h2jarPath).exists();
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        assertThat(h2jarPath).exists();
+    }
+
+    @Test
+    public void should_not_delete_h2_jar_from_classpath_if_h2_is_used_for_bonita_and_for_BDM() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "h2");
+        System.setProperty("db.database.name", "internal_database.db");
+        System.setProperty("db.user", "myUser");
+        System.setProperty("db.password", "myPwd");
+
+        System.setProperty("bdm.db.vendor", "h2");
+        System.setProperty("bdm.db.database.name", "business_data.db");
+        System.setProperty("bdm.db.user", "sa");
+        System.setProperty("bdm.db.password", "");
+
+        // given:
+        final Path h2jarPath = tomcatFolder.resolve("lib").resolve("bonita").resolve("h2.jar");
+
+        assertThat(h2jarPath).exists();
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        assertThat(h2jarPath).exists();
+    }
+
+    @Test
     public void should_not_fail_if_bonita_xml_file_does_not_pre_exist() throws Exception {
         // given:
         final Path bonitaXmlPath = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost")

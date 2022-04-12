@@ -14,6 +14,7 @@
 package org.bonitasoft.platform.setup.command.configure;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -21,10 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 
 import org.apache.commons.io.FileUtils;
@@ -135,6 +133,31 @@ abstract class BundleConfigurator {
             return;
         }
         copyDriverFile(srcDriverFile, targetDriverFile, dbVendor);
+    }
+
+    //This method will remove h2 from bonita the classPath to mitigate the cve https://nvd.nist.gov/vuln/detail/CVE-2022-23221
+    void removeH2DriverIfNecessary(Path targetBonitaDbDriverFile, String bonitaDbVendor, String bdmDbVendor)
+            throws PlatformException {
+        if (!bonitaDbVendor.equals("h2") && !bdmDbVendor.equals("h2")) {
+            FilenameFilter filter = (file, s) -> s.contains("h2");
+            File[] driversFiles = targetBonitaDbDriverFile.toFile().listFiles(filter);
+
+            if (driversFiles != null && driversFiles.length > 0) {
+                for (File driver : driversFiles) {
+                    try {
+                        LOGGER.info(
+                                "H2 driver has been found located in bonita classpath {}, the driver file  will be removed",
+                                driver.getPath());
+                        Files.delete(driver.toPath());
+                        LOGGER.info("File has been removed");
+                    } catch (IOException e) {
+                        LOGGER.error(
+                                "Fail to delete driver file lib/ {}", driver.getPath(),
+                                e);
+                    }
+                }
+            }
+        }
     }
 
     private Path getRelativePath(Path pathToRelativize) {
