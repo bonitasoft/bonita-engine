@@ -14,7 +14,7 @@ class Deps {
     public static String slf4jVersion = "1.7.30"
     public static String h2Version = "1.4.199"
     public static String hibernateVersion = "5.4.32.Final"
-    public static String jacksonDataBindingVersion = "2.12.6"
+    public static String jacksonDataBindingVersion = "2.13.2"
     public static String jakartaTransactionVersion = "1.3.3"
     public static String jakartaServletVersion = "4.0.4"
     // Keep this until all client projects have migrated to jakarta or it will break their builds !
