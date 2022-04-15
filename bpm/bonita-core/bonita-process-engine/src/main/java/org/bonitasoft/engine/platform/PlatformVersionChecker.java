@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bonitasoft.engine.EngineInitializer;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -123,10 +125,12 @@ public class PlatformVersionChecker {
      * This is accepted to limit over-engineering just to extract an util method.
      */
     private String extractMinorVersion(String version) {
-        String major = version.substring(0, version.indexOf('.'));
-        String minor = version.substring(version.indexOf('.') + 1);
-        minor = minor.substring(0, minor.indexOf('.'));
-        return major + "." + minor;
+        final Matcher matcher = Pattern.compile("(\\d+\\.\\d+).*").matcher(version);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        } else {
+            throw new IllegalArgumentException(version + " does not respect Semantic Versioning");
+        }
     }
 
     public String getErrorMessage() {
