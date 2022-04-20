@@ -7,7 +7,7 @@ plugins {
 dependencyManagement {
     dependencies {
         imports {
-            mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonDataBindingVersion}"
+            mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}"
         }
         dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
             entry 'slf4j-api'
@@ -30,7 +30,6 @@ dependencyManagement {
         dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
-        dependency "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
         dependency "junit:junit:${Deps.junit4Version}"
         dependency "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
         dependency "org.awaitility:awaitility:${Deps.awaitilityVersion}"
