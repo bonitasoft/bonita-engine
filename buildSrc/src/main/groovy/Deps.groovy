@@ -15,7 +15,7 @@ class Deps {
     public static String slf4jVersion = "1.7.30"
     public static String h2Version = "1.4.199"
     public static String hibernateVersion = "5.4.32.Final"
-    public static String jacksonDataBindingVersion = "2.12.6"
+    public static String jacksonBomVersion = "2.12.6.20220326"
     public static String javaxJtaVersion = "1.1"
     public static String javaxServletVersion = "3.0.1"
     public static String groovyAllVersion = "2.4.21"
@@ -40,7 +40,7 @@ class Deps {
     public static String jaxbVersion = "2.3.1"
     public static String logbackVersion = "1.2.8"
     public static String xbeanClassloaderVersion = "3.7"
-    
+
     public static String guavaVersion = "30.1.1-jre"
     public static String antlr4RuntimeVersion = "4.7.2"
 
