@@ -7,7 +7,7 @@ plugins {
 dependencyManagement {
     dependencies {
         imports {
-            mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonDataBindingVersion}"
+            mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}"
         }
         dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
             entry 'slf4j-api'
@@ -36,7 +36,6 @@ dependencyManagement {
         dependency "commons-codec:commons-codec:${Deps.commonscodec}"
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
-        dependency "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
         dependency "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
         dependency "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
         // groovy-all is not pulled by the engine but we declare it in case a client app depends on groovy-all directly

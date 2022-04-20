@@ -52,7 +52,7 @@ dependencies {
     compile project(':bpm:bonita-core:bonita-form-mapping')
     compile project(':services:bonita-business-data:bonita-business-data-api')
     compile project(':services:bonita-resources')
-    compile "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
+    compile "com.fasterxml.jackson.core:jackson-databind"
     compile project(':platform:platform-resources')
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     compile "org.springframework:spring-context:${Deps.springVersion}"
