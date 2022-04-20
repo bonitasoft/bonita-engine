@@ -16,6 +16,8 @@ package org.bonitasoft.platform.version.impl;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.platform.exception.PlatformException;
@@ -74,10 +76,12 @@ public class VersionServiceImpl implements VersionService {
      * This is accepted to limit over-engineering just to extract an util method.
      */
     private String extractMinorVersion(String version) {
-        String major = version.substring(0, version.indexOf('.'));
-        String minor = version.substring(version.indexOf('.') + 1);
-        minor = minor.substring(0, minor.indexOf('.'));
-        return major + "." + minor;
+        final Matcher matcher = Pattern.compile("(\\d+\\.\\d+).*").matcher(version);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        } else {
+            throw new IllegalArgumentException(version + " does not respect Semantic Versioning");
+        }
     }
 
     private String getVersionProperty(String versionFileName) {
