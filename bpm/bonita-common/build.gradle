@@ -4,11 +4,13 @@ plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
 
 
 dependencies {
+    compile platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
+
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
-    compile "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
+    compile "com.fasterxml.jackson.core:jackson-databind"
     compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    compile "com.fasterxml.jackson.core:jackson-annotations:${Deps.jacksonDataBindingVersion}"
+    compile "com.fasterxml.jackson.core:jackson-annotations"
     runtime("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"){
         exclude(group: "javax.activation") //replaced by jakarta
     }
