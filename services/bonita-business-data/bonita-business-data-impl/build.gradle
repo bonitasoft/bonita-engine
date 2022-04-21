@@ -1,27 +1,27 @@
 plugins { id 'bonita-docker-database' }
 
 dependencies {
-    compile project(':bpm:bonita-common')
-    compile project(':services:bonita-business-data:bonita-business-data-generator')
-    compile project(':services:bonita-classloader')
-    compile project(':services:bonita-business-data:bonita-business-data-api')
-    compile project(':services:bonita-resources')
-    compile project(':services:bonita-transaction')
-    compile project(':services:bonita-commons')
-    compile(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) {
+    api project(':bpm:bonita-common')
+    api project(':services:bonita-business-data:bonita-business-data-generator')
+    api project(':services:bonita-classloader')
+    api project(':services:bonita-business-data:bonita-business-data-api')
+    api project(':services:bonita-resources')
+    api project(':services:bonita-transaction')
+    api project(':services:bonita-commons')
+    api(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) {
         exclude(module: 'jboss-transaction-api_1.2_spec')
     }
-    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    compile project(':services:bonita-classloader')
-    runtime "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
-    testCompile "org.springframework:spring-test:${Deps.springVersion}"
-    testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
-    testCompile project(':bpm:bonita-util:bonita-common-util-test')
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api project(':services:bonita-classloader')
+    runtimeOnly "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
+    testImplementation "org.springframework:spring-jdbc:${Deps.springVersion}"
+    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
     testRuntimeOnly "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
     testRuntimeOnly "com.h2database:h2:${Deps.h2Version}"
     testRuntimeOnly "mysql:mysql-connector-java:${Deps.mysqlVersion}"

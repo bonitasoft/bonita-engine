@@ -15,18 +15,18 @@ dependencies {
     implementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
     implementation "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
     implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    runtime "com.h2database:h2:${Deps.h2Version}"
+    runtimeOnly "com.h2database:h2:${Deps.h2Version}"
 
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testCompile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    testCompile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
-    testCompile "com.h2database:h2:${Deps.h2Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    testImplementation "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    testImplementation "com.h2database:h2:${Deps.h2Version}"
 
 }
 

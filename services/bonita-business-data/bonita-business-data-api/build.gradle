@@ -1,11 +1,11 @@
 
 
 dependencies {
-    compile project(':services:bonita-commons')
-    compile "org.javassist:javassist:${Deps.javassistVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api project(':services:bonita-commons')
+    api "org.javassist:javassist:${Deps.javassistVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     compileOnly project(':bpm:bonita-common')
-    testCompile project(':bpm:bonita-common')
+    testImplementation project(':bpm:bonita-common')
 }

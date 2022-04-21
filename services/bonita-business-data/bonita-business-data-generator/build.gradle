@@ -4,19 +4,19 @@ plugins {
 }
 
 dependencies {
-    compile project(':services:bonita-commons')
-    compile "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
-    compile "org.springframework:spring-core:${Deps.springVersion}"
-    compile project(':bpm:bonita-common')
-    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    compile "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"
-    compile "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile project(':services:bonita-business-data:bonita-business-data-client-resources')
-    testCompile project(':bpm:bonita-util:bonita-common-util-test')
-    testCompile project(':services:bonita-business-data:bonita-business-data-api')
+    api project(':services:bonita-commons')
+    api "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
+    api "org.springframework:spring-core:${Deps.springVersion}"
+    api project(':bpm:bonita-common')
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"
+    api "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation project(':services:bonita-business-data:bonita-business-data-client-resources')
+    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
+    testImplementation project(':services:bonita-business-data:bonita-business-data-api')
 }
 
 group = 'org.bonitasoft.engine.data'
@@ -24,7 +24,7 @@ group = 'org.bonitasoft.engine.data'
 
 sourceSets {
     main {
-        resources { srcDirs "src/main/resources", "../bonita-business-data-client-resources/src/main/java" }
+        resources { srcDirs "../bonita-business-data-client-resources/src/main/java" }
     }
 }
 
