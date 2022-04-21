@@ -1,27 +1,27 @@
 
 
 dependencies {
-    compile project(':services:bonita-session')
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-cache')
-    compile project(':services:bonita-time-tracker')
-    compile project(':services:bonita-classloader')
-    compile "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-json:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-jmx:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-nio:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-groovysh:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-datetime:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-dateutil:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-docgenerator:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-jsr223:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
-    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    api project(':services:bonita-session')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-cache')
+    api project(':services:bonita-time-tracker')
+    api project(':services:bonita-classloader')
+    api "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-json:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-jmx:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-nio:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-groovysh:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-datetime:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-dateutil:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-docgenerator:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-jsr223:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
 }

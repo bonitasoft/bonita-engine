@@ -6,19 +6,19 @@ plugins {
 }
 
 dependencies {
-    compile project(':bpm:bonita-common')
-    compile "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
-    compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
-    compile "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"
-    runtime "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
-    runtime "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile 'org.eclipse.jetty:jetty-server:8.1.14.v20131031'
-    testCompile 'org.eclipse.jetty:jetty-jndi:8.1.14.v20131031'
-    testCompile 'org.eclipse.jetty:jetty-webapp:8.1.14.v20131031'
-    testCompile 'org.eclipse.jetty:jetty-plus:8.1.14.v20131031'
+    api project(':bpm:bonita-common')
+    api "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
+    api "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    api "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"
+    runtimeOnly "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
+    runtimeOnly "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation 'org.eclipse.jetty:jetty-server:8.1.14.v20131031'
+    testImplementation 'org.eclipse.jetty:jetty-jndi:8.1.14.v20131031'
+    testImplementation 'org.eclipse.jetty:jetty-webapp:8.1.14.v20131031'
+    testImplementation 'org.eclipse.jetty:jetty-plus:8.1.14.v20131031'
 }
 
 tasks.register("testsJar", Jar) {

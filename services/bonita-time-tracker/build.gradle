@@ -1,11 +1,11 @@
 
 
 dependencies {
-    compile project(':services:bonita-commons')
-    compile "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    api project(':services:bonita-commons')
+    api "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
 }
 
 description = 'Bonita Time Tracker'

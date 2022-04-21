@@ -1,10 +1,10 @@
 
 
 dependencies {
-    compile project(':services:bonita-persistence')
-    compile project(':services:bonita-commons')
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-commons')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

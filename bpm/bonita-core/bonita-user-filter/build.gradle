@@ -1,17 +1,17 @@
 
 
 dependencies {
-    compile project(':services:bonita-session')
-    compile project(':services:bonita-expression')
-    compile project(':bpm:bonita-common')
-    compile project(':bpm:bonita-core:bonita-process-definition')
-    compile project(':services:bonita-cache')
-    compile project(':services:bonita-resources')
-    compile project(':services:bonita-connector-executor')
-    compile project(':bpm:bonita-core:bonita-process-instance')
-    compile project(':bpm:bonita-core:bonita-home-server')
-    compile project(':services:bonita-commons')
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api project(':services:bonita-session')
+    api project(':services:bonita-expression')
+    api project(':bpm:bonita-common')
+    api project(':bpm:bonita-core:bonita-process-definition')
+    api project(':services:bonita-cache')
+    api project(':services:bonita-resources')
+    api project(':services:bonita-connector-executor')
+    api project(':bpm:bonita-core:bonita-process-instance')
+    api project(':bpm:bonita-core:bonita-home-server')
+    api project(':services:bonita-commons')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }

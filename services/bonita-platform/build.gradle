@@ -1,14 +1,14 @@
 
 
 dependencies {
-    compile project(':services:bonita-cache')
-    compile project(':services:bonita-builder')
-    compile project(':services:bonita-persistence')
-    compile project(':services:bonita-commons')
-    testCompile project(':services:bonita-events')
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    api project(':services:bonita-cache')
+    api project(':services:bonita-builder')
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-commons')
+    testImplementation project(':services:bonita-events')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
