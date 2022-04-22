@@ -225,7 +225,7 @@ class ShadePlugin implements Plugin<Project> {
     private Set<ResolvedDependency> getPomDependencies(Project project, ShadeExtension extension, Set<Project> allProjectsAlreadyShaded, boolean isRootProject) {
         Set<ResolvedDependency> allDependencies = []
         // We include api + runtime dependencies (like hazelcast-aws), to be complete:
-        def allScopes = project.configurations.compileClasspath.resolvedConfiguration.firstLevelModuleDependencies + project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies
+        def allScopes = project.configurations.compileClasspath.resolvedConfiguration.firstLevelModuleDependencies + project.configurations.runtimeClasspath.resolvedConfiguration.firstLevelModuleDependencies
         allScopes.forEach {
             Project projectDependency = getAssociatedProjectFromDependency(project, it)
             if (projectDependency) {
