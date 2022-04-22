@@ -1,11 +1,11 @@
 dependencies {
-    api project(':bpm:bonita-client')
-    api project(':bpm:bonita-common')
-    api project(':bonita-test-api')
-    api "junit:junit:${Deps.junit4Version}"
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
-    api "xmlunit:xmlunit:${Deps.xmlunitVersion}"
-    api "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compile project(':bpm:bonita-client')
+    compile project(':bpm:bonita-common')
+    compile project(':bonita-test-api')
+    compile "junit:junit:${Deps.junit4Version}"
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    compile "org.assertj:assertj-core:${Deps.assertjVersion}"
 }
 
 publishing {

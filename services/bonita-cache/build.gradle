@@ -1,10 +1,10 @@
 
 
 dependencies {
-    api "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
-    api project(':services:bonita-commons')
-    api project(':services:bonita-session')
-    api "org.springframework:spring-context:${Deps.springVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    compile "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-session')
+    compile "org.springframework:spring-context:${Deps.springVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }

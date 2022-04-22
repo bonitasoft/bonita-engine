@@ -3,30 +3,30 @@ import org.bonitasoft.engine.gradle.PomUtils
 configurations { schemagen }
 
 dependencies {
-    api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
+    compile platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
 
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
-    api "com.fasterxml.jackson.core:jackson-databind"
-    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    api "com.fasterxml.jackson.core:jackson-annotations"
-    api("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile "com.fasterxml.jackson.core:jackson-databind"
+    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    compile "com.fasterxml.jackson.core:jackson-annotations"
+    compile("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    api("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
+    compile("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation 'org.jmockit:jmockit:1.44'
-    testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
-    testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    runtime "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile 'org.jmockit:jmockit:1.44'
+    testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly project(':bpm:bonita-sap-jco-connector-api')
-    testImplementation project(':bpm:bonita-sap-jco-connector-api')
+    testCompile project(':bpm:bonita-sap-jco-connector-api')
 
     schemagen(
             "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",

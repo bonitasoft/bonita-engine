@@ -1,22 +1,22 @@
 
 
 dependencies {
-    api project(':services:bonita-commons')
-    api project(':services:bonita-events')
-    api project(':bpm:bonita-core:bonita-home-server')
-    api project(':services:bonita-transaction')
-    api project(':services:bonita-builder')
-    api project(':services:bonita-persistence')
-    api project(':services:bonita-log')
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-events')
+    compile project(':bpm:bonita-core:bonita-home-server')
+    compile project(':services:bonita-transaction')
+    compile project(':services:bonita-builder')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-log')
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
-    api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
+    compile("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
 
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

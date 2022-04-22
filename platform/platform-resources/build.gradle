@@ -10,22 +10,24 @@ description = ''
 dependencies {
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
-    api "org.springframework:spring-tx:${Deps.springVersion}"
-    api "org.springframework:spring-jdbc:${Deps.springVersion}"
-    api "org.springframework:spring-context:${Deps.springVersion}"
-    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile "org.springframework:spring-tx:${Deps.springVersion}"
+    compile "org.springframework:spring-jdbc:${Deps.springVersion}"
+    compile "org.springframework:spring-context:${Deps.springVersion}"
+    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
 
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }
 
 
 processResources {
-    inputs.property("PLATFORM_ENGINE_VERSION", project.version)
-
-    filter(ReplaceTokens, tokens: [PLATFORM_ENGINE_VERSION: project.version])
+    inputs.property("version", project.version)
+    from('src/main/resources') {
+        include 'PLATFORM_ENGINE_VERSION'
+        filter(ReplaceTokens, tokens: [version: project.version])
+    }
     from("${projectDir}/../../bpm/bonita-core/bonita-process-engine/src/main/resources/bonita-platform-community.properties") {
         filter(PrefixLines, prefix: "#")
         rename 'bonita-platform-community.properties', 'platform_engine/bonita-platform-community-custom.properties'

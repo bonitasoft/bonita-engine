@@ -1,6 +1,6 @@
 
 
 dependencies {
-    api project(':services:bonita-commons')
-    api project(':services:bonita-builder')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-builder')
 }

@@ -1,18 +1,18 @@
 
 
 dependencies {
-    api project(':services:bonita-expression')
-    api project(':services:bonita-builder')
-    api project(':services:bonita-persistence')
-    api project(':services:bonita-data-definition')
-    api project(':services:bonita-commons')
-    api project(':services:bonita-events')
-    api project(':services:bonita-log')
-    api project(':services:bonita-archive')
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    compile project(':services:bonita-expression')
+    compile project(':services:bonita-builder')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-data-definition')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-events')
+    compile project(':services:bonita-log')
+    compile project(':services:bonita-archive')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

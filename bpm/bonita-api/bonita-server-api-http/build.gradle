@@ -1,18 +1,18 @@
 dependencies {
-    api project(':platform:platform-resources')
-    api project(':bpm:bonita-core:bonita-process-engine')
-    api project(':services:bonita-platform-session')
-    api project(':services:bonita-session')
-    api project(':bpm:bonita-common')
-    api "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
-    api "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
-    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    compile project(':platform:platform-resources')
+    compile project(':bpm:bonita-core:bonita-process-engine')
+    compile project(':services:bonita-platform-session')
+    compile project(':services:bonita-session')
+    compile project(':bpm:bonita-common')
+    compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    compile "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    testCompile "org.springframework:spring-test:${Deps.springVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testRuntimeOnly "org.springframework:spring-webmvc:${Deps.springVersion}"
     compileOnly "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
-    testImplementation "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
+    testCompile "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
 }

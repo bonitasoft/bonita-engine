@@ -1,8 +1,8 @@
 dependencies {
-    api project(':bpm:bonita-common')
-    api "junit:junit:${Deps.junit4Version}"
-    api "org.assertj:assertj-core:${Deps.assertjVersion}"
-    api "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    compile project(':bpm:bonita-common')
+    compile "junit:junit:${Deps.junit4Version}"
+    compile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }
 
 // Used by Selenium tests:
