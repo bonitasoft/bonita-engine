@@ -1,9 +1,9 @@
 
 
 dependencies {
-    api project(':services:bonita-commons')
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
+    compile project(':services:bonita-commons')
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
 }
 
 tasks.register("testsJar", Jar) {

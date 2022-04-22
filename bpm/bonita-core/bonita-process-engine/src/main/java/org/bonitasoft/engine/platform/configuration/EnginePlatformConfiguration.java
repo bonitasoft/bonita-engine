@@ -46,7 +46,7 @@ import org.springframework.context.annotation.Import;
         PlatformSessionConfiguration.class,
         ClassloaderConfiguration.class,
         PlatformCacheServiceConfiguration.class // might not be useful because EnginePlatformConfiguration already have
-                                                                                                                                                                                                           // a component scan on 'org.bonitasoft.engine.platform'
+                                                                                                                                                                                            // a component scan on 'org.bonitasoft.engine.platform'
 })
 @ComponentScan("org.bonitasoft.engine.platform")
 public class EnginePlatformConfiguration {

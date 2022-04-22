@@ -1,8 +1,8 @@
 
 
 dependencies {
-    api project(':services:bonita-identity')
-    api project(':services:bonita-commons')
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    compile project(':services:bonita-identity')
+    compile project(':services:bonita-commons')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }

@@ -1,11 +1,11 @@
 
 
 dependencies {
-    api project(':services:bonita-log')
-    api project(':services:bonita-commons')
-    api project(':services:bonita-persistence')
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    compile project(':services:bonita-log')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-persistence')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

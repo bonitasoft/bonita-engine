@@ -1,4 +1,5 @@
 allprojects {
+    apply plugin: 'maven'
     apply plugin: 'maven-publish'
     group = 'org.bonitasoft.engine'
 
@@ -23,7 +24,7 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'java-library'
+    apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: 'com.adarshr.test-logger'
 

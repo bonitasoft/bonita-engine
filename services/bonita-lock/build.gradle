@@ -1,8 +1,8 @@
 
 
 dependencies {
-    api project(':services:bonita-commons')
-    api project(':services:bonita-session')
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-session')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
 }

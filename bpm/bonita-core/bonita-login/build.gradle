@@ -1,12 +1,12 @@
 dependencies {
-    api project(':services:bonita-session')
-    api project(':services:bonita-identity')
-    api project(':services:bonita-commons')
-    api project(':bpm:bonita-core:bonita-home-server')
-    api project(':services:bonita-authentication')
-    api project(':services:bonita-profile')
-    api project(':services:bonita-authorization')
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compile project(':services:bonita-session')
+    compile project(':services:bonita-identity')
+    compile project(':services:bonita-commons')
+    compile project(':bpm:bonita-core:bonita-home-server')
+    compile project(':services:bonita-authentication')
+    compile project(':services:bonita-profile')
+    compile project(':services:bonita-authorization')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
 }

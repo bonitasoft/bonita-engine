@@ -1,24 +1,24 @@
 dependencies {
-    api(group: 'commons-beanutils', name: 'commons-beanutils', version: Deps.commonsBeanutilsVersion) {
+    compile(group: 'commons-beanutils', name: 'commons-beanutils', version: Deps.commonsBeanutilsVersion) {
         exclude(module: 'commons-collections')
     }
-    api "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
-    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    api(group: 'com.thoughtworks.xstream', name: 'xstream', version: Deps.xstreamVersion)
-    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
-    api "org.springframework:spring-context:${Deps.springVersion}"
-    api "org.springframework.boot:spring-boot-autoconfigure:${Deps.springBootVersion}"
-    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
-    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: Deps.junit5Version
-    testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"
-    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: Deps.junit5Version
-    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: Deps.junit5Version
+    compile "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    compile(group: 'com.thoughtworks.xstream', name: 'xstream', version: Deps.xstreamVersion)
+    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    compile "org.springframework:spring-context:${Deps.springVersion}"
+    compile "org.springframework.boot:spring-boot-autoconfigure:${Deps.springBootVersion}"
+    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: Deps.junit5Version
+    testCompile "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: Deps.junit5Version
+    testRuntime group: 'org.junit.vintage', name: 'junit-vintage-engine', version: Deps.junit5Version
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
