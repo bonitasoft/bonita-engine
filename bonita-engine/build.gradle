@@ -14,7 +14,9 @@ dependencyManagement {
             entry 'slf4j-jdk14'
         }
         dependency "com.h2database:h2:${Deps.h2Version}"
-        dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
+        dependency("net.sf.ehcache.internal:ehcache-core:${Deps.ehcacheVersion}"){
+            exclude 'org.hibernate:hibernate-core'
+        }
 
         dependencySet(group: 'org.springframework', version: Deps.springVersion) {
             entry 'spring-context'
@@ -28,7 +30,9 @@ dependencyManagement {
         dependency("org.hibernate:hibernate-core:${Deps.hibernateVersion}") {
             exclude 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec'
         }
-        dependency "org.hibernate:hibernate-ehcache:${Deps.hibernateVersion}"
+        dependency ("org.hibernate:hibernate-ehcache:${Deps.hibernateVersion}"){
+            exclude 'net.sf.ehcache:ehcache'
+        }
         dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
         dependency "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
         dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
