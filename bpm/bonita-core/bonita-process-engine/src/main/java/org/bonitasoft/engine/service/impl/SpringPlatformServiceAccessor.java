@@ -35,9 +35,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
- * @author Matthieu Chaffotte
- * @author Elias Ricken de Medeiros
- * @author Zhao Na
+ * Uses spring to access platform services
  */
 public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 

@@ -17,7 +17,8 @@ import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 
 /**
- * @author Emmanuel Duchastenier
+ * This class load the server api implementation configured using the property `serverApi`.
+ * All server-side code goes through this class to retrieve the server api implementation.
  */
 public class ServerAPIFactory {
 

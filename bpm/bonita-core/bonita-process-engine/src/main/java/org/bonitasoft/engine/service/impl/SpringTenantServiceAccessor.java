@@ -100,10 +100,7 @@ import org.bonitasoft.engine.work.WorkService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
- * @author Matthieu Chaffotte
- * @author Yanyan Liu
- * @author Elias Ricken de Medeiros
- * @author Celine Souchet
+ * Uses spring to access tenant services
  */
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 

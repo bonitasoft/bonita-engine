@@ -40,20 +40,15 @@ import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.springframework.core.io.ClassPathResource;
 
 /**
- * Utility class that handles the path to the server part of the bonita home
- * <p>
- * The server part of the bonita home contains configuration files and working directories
- * </p>
- *
- * @author Baptiste Mesta
- * @author Frederic Bouquet
- * @author Matthieu Chaffotte
- * @author Charles Souillard
- * @since 6.0.0
+ * Retrieve configuration files from database and from classpath
  */
 public class BonitaHomeServer {
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
+
+    /**
+     * property name of the server api implementation class name
+     */
     private static final String SERVER_API_IMPLEMENTATION = "serverApi";
     private final TenantStorage tenantStorage;
     private ConfigurationService configurationService;

@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Matthieu Chaffotte
+ * This interface defines a common entry point for APIs to be called by engine client.
+ * Depending on what is the client connection mode, the client retrieve an implementation of this interface to call the
+ * server side API.
  */
 public interface ServerAPI extends Serializable, Remote {
 

@@ -48,10 +48,9 @@ import org.bonitasoft.engine.digest.DigestUtils;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 /**
- * @author Baptiste Mesta
- * @author Julien Mege
- * @author Elias Ricken de Medeiros
- * @author Celine Souchet
+ * Call the remote engine using HTTP post
+ * That class serialize api call parameters in a XML body and post it to the serverAPI servlet like this
+ * /serverAPI/[api interface name]/[method name]
  */
 public class HTTPServerAPI implements ServerAPI {
 
