@@ -68,9 +68,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Matthieu Chaffotte
- * @author Baptiste Mesta
- * @author Celine Souchet
+ * This class is in charge of calling APIs while adding behavior:
+ * <ul>
+ * <li>It sets the classloader to the one from platform or tenant</li>
+ * <li>When the method is <b>NOT</b> annotated with {@link NoSessionRequired}, it verifies that the given session is
+ * valid, is on the right scope (tenant or platform), and renew it</li>
+ * <li>When the method is <b>NOT</b> annotated with {@link CustomTransactions}, it opens a transaction</li>
+ * <li>When the method is deprecated, it print a warning</li>
+ * <li>When the method or class is annotated with {@link AvailableWhenTenantIsPaused}, it verifies the tenant is
+ * paused</li>
+ * <li>When the method or class is annotated with {@link AvailableWhenTenantIsPaused} and onlyAvailableWhenPaused is set
+ * to true, it verifies the tenant is running</li>
+ * <li>When the method is <b>NOT</b> annotated with {@link AvailableOnStoppedNode}, it verifies the platform is
+ * running</li>
+ * </ul>
  */
 public class ServerAPIImpl implements ServerAPI {
 

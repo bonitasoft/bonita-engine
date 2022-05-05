@@ -14,8 +14,19 @@
 package org.bonitasoft.engine.api;
 
 /**
- * @author Elias Ricken de Medeiros
+ * Enum that defines how APIs should be accessed
  */
 public enum ApiAccessType {
-    LOCAL, HTTP, TCP
+    /**
+     * Local access to the api, it means that the local JVM is running the engine.
+     */
+    LOCAL,
+
+    /**
+     * Access a remote engine using through a servlet. The remote engine should have the HTTP_API env property set to
+     * true.
+     */
+    HTTP,
+
+    TCP
 }

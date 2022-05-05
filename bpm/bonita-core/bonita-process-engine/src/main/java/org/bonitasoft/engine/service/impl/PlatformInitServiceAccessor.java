@@ -16,8 +16,7 @@ package org.bonitasoft.engine.service.impl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
+ * Access all Platform init (bootstrap) services
  */
 public interface PlatformInitServiceAccessor {
 

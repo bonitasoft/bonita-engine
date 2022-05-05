@@ -25,9 +25,7 @@ import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.context.ApplicationContext;
 
 /**
- * @author Matthieu Chaffotte
- * @author Charles Souillard
- * @author Celine Souchet
+ * This class define what spring configuration files should be used for the Platform level spring context
  */
 public class PlatformBeanAccessor extends SpringBeanAccessor {
 

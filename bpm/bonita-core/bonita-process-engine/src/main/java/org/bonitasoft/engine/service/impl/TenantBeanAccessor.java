@@ -22,8 +22,7 @@ import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.context.ApplicationContext;
 
 /**
- * @author Matthieu Chaffotte
- * @author Charles Souillard
+ * This class define what spring configuration files should be used for the Tenant level spring context
  */
 public class TenantBeanAccessor extends SpringBeanAccessor {
 

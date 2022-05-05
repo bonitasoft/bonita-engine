@@ -26,8 +26,9 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * @author Matthieu Chaffotte
- * @author Frederic Bouquet
+ * Main entry point to access services and api implementation of the engine
+ * {@link ServiceAccessors} and {@link APIAccessResolver} classes can be overridden in the configuration
+ * under the name `serviceAccessors` and `apiAccessResolver`
  */
 public class ServiceAccessorFactory {
 

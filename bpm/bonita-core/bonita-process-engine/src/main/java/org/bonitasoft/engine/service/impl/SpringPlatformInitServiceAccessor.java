@@ -16,7 +16,7 @@ package org.bonitasoft.engine.service.impl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * @author Matthieu Chaffotte
+ * Uses spring to access platform init services
  */
 public class SpringPlatformInitServiceAccessor implements PlatformInitServiceAccessor {
 

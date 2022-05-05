@@ -30,17 +30,12 @@ import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.session.Session;
 
 /**
- * @author Matthieu Chaffotte
+ * API classes given to the client are proxies. That class is the {@link InvocationHandler} given when proxying the
+ * client api classes
+ * Its purpose is to keep the client session and give it to the {@link ServerAPI} call
  */
 public class ClientInterceptor implements InvocationHandler, Serializable {
 
-    /**
-     * This interceptor is used only to access the PlatformLoginAPI or the Tenant Login API
-     * It is used to (and only to) convert the call into a "serverAPI" call
-     * Server API has only one operation
-     * This interceptor is used to login as we do not transmit any session to server side.
-     * For other operations, a child of this class is used: ClientSessionInterceptor
-     */
     private static final long serialVersionUID = -6284726148297940515L;
 
     private final ServerAPI api;
