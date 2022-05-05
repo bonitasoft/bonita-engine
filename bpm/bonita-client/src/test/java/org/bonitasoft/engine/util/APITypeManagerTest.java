@@ -150,11 +150,11 @@ public class APITypeManagerTest {
     @Test
     public void should_getAPIType_when_set_programmatically_should_work() throws Exception {
         //given
-        APITypeManager.setAPITypeAndParams(ApiAccessType.TCP, null);
+        APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, null);
         //when
         ApiAccessType apiType = APITypeManager.getAPIType();
         //then
-        assertThat(apiType).isEqualTo(ApiAccessType.TCP);
+        assertThat(apiType).isEqualTo(ApiAccessType.HTTP);
     }
 
     @Test
@@ -226,7 +226,7 @@ public class APITypeManagerTest {
     @Test
     public void should_getAPITypeParameters_when_set_programmatically_should_work() throws Exception {
         //given
-        APITypeManager.setAPITypeAndParams(ApiAccessType.TCP, Collections.singletonMap("server.url", "localhost"));
+        APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, Collections.singletonMap("server.url", "localhost"));
         //when
         Map<String, String> apiTypeParameters = APITypeManager.getAPITypeParameters();
         //then

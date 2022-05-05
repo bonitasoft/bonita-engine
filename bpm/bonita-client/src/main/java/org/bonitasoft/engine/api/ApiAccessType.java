@@ -26,7 +26,5 @@ public enum ApiAccessType {
      * Access a remote engine using through a servlet. The remote engine should have the HTTP_API env property set to
      * true.
      */
-    HTTP,
-
-    TCP
+    HTTP
 }

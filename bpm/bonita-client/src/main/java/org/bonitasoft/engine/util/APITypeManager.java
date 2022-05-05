@@ -105,8 +105,6 @@ public class APITypeManager {
                 apiAccessType = LOCAL;
             } else if (HTTP.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = HTTP;
-            } else if (TCP.name().equalsIgnoreCase(apiType)) {
-                apiAccessType = TCP;
             } else {
                 throw new UnknownAPITypeException("Invalid API type: " + apiType);
             }
