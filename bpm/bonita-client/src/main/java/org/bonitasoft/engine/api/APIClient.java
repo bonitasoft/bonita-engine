@@ -78,9 +78,6 @@ public class APIClient {
                 case HTTP:
                     parameters = APITypeManager.getAPITypeParameters();
                     return new HTTPServerAPI(parameters);
-                case TCP:
-                    parameters = APITypeManager.getAPITypeParameters();
-                    return new TCPServerAPI(parameters);
                 default:
                     throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
             }

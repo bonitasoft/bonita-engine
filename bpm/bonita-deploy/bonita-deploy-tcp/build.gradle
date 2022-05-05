@@ -1,6 +1,0 @@
-
-
-dependencies {
-    compileOnly project(':bpm:bonita-common')
-    compileOnly project(':bpm:bonita-server')
-}
