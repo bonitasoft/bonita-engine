@@ -80,8 +80,6 @@ dependencyManagement {
             entry 'hazelcast'
             entry 'hazelcast-spring'
         }
-        dependency "com.hazelcast:hazelcast-aws:${Deps.hazelcastAWSVersion}"
-        dependency "com.hazelcast:hazelcast-kubernetes:${Deps.hazelcastKubernetesVersion}"
         dependency "com.hazelcast:hazelcast-hibernate53:${Deps.hazelcastHibernateVersion}"
         // declared here because it is used by web-extension and by distrib
         dependency "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"

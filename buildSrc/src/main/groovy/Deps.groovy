@@ -46,8 +46,7 @@ class Deps {
     public static String hazelcastVersion = "5.1.1"
     //Last version compatible with hibernate 5
     public static String hazelcastHibernateVersion = "2.1.1"
-    public static String hazelcastAWSVersion = "3.3"
-    public static String hazelcastKubernetesVersion = "2.2"
+ 
 
     public static String guavaVersion = "30.1.1-jre"
     public static String antlr4RuntimeVersion = "4.7.2"
