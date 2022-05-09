@@ -25,18 +25,10 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class SpringServiceAccessors implements ServiceAccessors {
 
-    private SpringBeanAccessor platformInit;
     private SpringBeanAccessor platform;
     private Map<Long, SpringBeanAccessor> tenants = new HashMap<>();
 
     //----  Initialize spring contexts
-    protected synchronized SpringBeanAccessor getPlatformInitBeanAccessor() {
-        if (platformInit == null) {
-            platformInit = new PlatformInitBeanAccessor();
-        }
-        return platformInit;
-    }
-
     protected synchronized SpringBeanAccessor getPlatformBeanAccessor() {
         if (platform == null) {
             platform = createPlatformBeanAccessor();
@@ -44,8 +36,8 @@ public class SpringServiceAccessors implements ServiceAccessors {
         return platform;
     }
 
-    protected PlatformBeanAccessor createPlatformBeanAccessor() {
-        return new PlatformBeanAccessor(getPlatformInitBeanAccessor().getContext());
+    protected SpringBeanAccessor createPlatformBeanAccessor() {
+        return new PlatformBeanAccessor();
     }
 
     protected synchronized SpringBeanAccessor getTenantBeanAccessor(final long tenantId) {
@@ -63,7 +55,7 @@ public class SpringServiceAccessors implements ServiceAccessors {
 
     @Override
     public PlatformInitServiceAccessor getPlatformInitServiceAccessor() {
-        return new SpringPlatformInitServiceAccessor(getPlatformInitBeanAccessor());
+        return new SpringPlatformInitServiceAccessor(getPlatformBeanAccessor());
     }
 
     @Override
@@ -86,10 +78,6 @@ public class SpringServiceAccessors implements ServiceAccessors {
         if (platform != null) {
             platform.destroy();
             platform = null;
-        }
-        if (platformInit != null) {
-            platformInit.destroy();
-            platformInit = null;
         }
     }
 }
