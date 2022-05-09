@@ -22,18 +22,18 @@ import java.util.Properties;
 
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
-import org.springframework.context.ApplicationContext;
 
 /**
- * This class define what spring configuration files should be used for the Platform level spring context
+ * @author Matthieu Chaffotte
+ * @author Charles Souillard
  */
 public class PlatformBeanAccessor extends SpringBeanAccessor {
 
     private File bonita_conf;
-    private ApplicationContext parent;
 
-    protected PlatformBeanAccessor(ApplicationContext parent) {
-        this.parent = parent;
+    @Override
+    protected BonitaSpringContext createContext() {
+        return new BonitaSpringContext(null, "Platform");
     }
 
     @Override
@@ -44,12 +44,10 @@ public class PlatformBeanAccessor extends SpringBeanAccessor {
     }
 
     @Override
-    protected BonitaSpringContext createContext() {
-        return new BonitaSpringContext(parent, "Platform");
-    }
-
-    @Override
     protected List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException {
+        List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
+        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getPlatformInitConfiguration());
+
         List<BonitaConfiguration> platformConfiguration = BONITA_HOME_SERVER.getPlatformConfiguration();
         //handle special case for cache configuration files
         Iterator<BonitaConfiguration> iterator = platformConfiguration.iterator();
@@ -65,12 +63,17 @@ public class PlatformBeanAccessor extends SpringBeanAccessor {
                         bonitaConfiguration.getResourceContent());
             }
         }
-        return platformConfiguration;
+
+        bonitaConfigurations.addAll(platformConfiguration);
+
+        return bonitaConfigurations;
     }
 
     @Override
     protected List<String> getSpringFileFromClassPath(boolean cluster) {
-        ArrayList<String> resources = new ArrayList<>();
+        List<String> resources = new ArrayList<>();
+        resources.add("bonita-platform-init-community.xml");
+        resources.add("bonita-platform-init-sp.xml");
         resources.add("bonita-platform-community.xml");
         resources.add("bonita-platform-sp.xml");
         if (cluster) {
