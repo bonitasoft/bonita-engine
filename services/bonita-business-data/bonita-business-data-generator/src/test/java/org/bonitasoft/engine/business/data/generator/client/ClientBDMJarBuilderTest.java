@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer;
 import org.bonitasoft.engine.business.data.generator.BOMBuilder;
 import org.bonitasoft.engine.io.IOUtils;
 import org.junit.Before;
@@ -48,7 +47,7 @@ public class ClientBDMJarBuilderTest {
 
         clientBDMJarBuilder.addSourceFilesToDirectory(BOMBuilder.aBOM().build(), directory);
 
-        verify(resourcesLoader).copyJavaFilesToDirectory(BusinessObjectDeserializer.class.getPackage().getName(),
+        verify(resourcesLoader).copyJavaFilesToDirectory("org.bonitasoft.engine.bdm.dao.client.resources",
                 directory);
         FileUtils.deleteDirectory(directory);
     }
