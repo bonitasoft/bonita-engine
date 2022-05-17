@@ -1,9 +1,7 @@
 
 
 dependencies {
-    compile("net.sf.ehcache.internal:ehcache-core:${Deps.ehcacheVersion}"){
-        exclude group:'org.hibernate', module: 'hibernate-core'
-    }
+    compile "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
     compile project(':services:bonita-commons')
     compile project(':services:bonita-session')
     compile "org.springframework:spring-context:${Deps.springVersion}"
