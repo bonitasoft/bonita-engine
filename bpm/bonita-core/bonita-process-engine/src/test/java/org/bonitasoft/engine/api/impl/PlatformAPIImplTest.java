@@ -14,38 +14,19 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-
-import javax.transaction.Synchronization;
 
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformManager;
-import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.StartNodeException;
-import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,26 +39,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class PlatformAPIImplTest {
 
     public static final long TENANT_ID = 56423L;
-    private final List<STenant> tenants = Collections.singletonList(mock(STenant.class));
     @Mock
     private PlatformServiceAccessor platformServiceAccessor;
     @Mock
     private SchedulerService schedulerService;
     @Mock
-    private SessionService sessionService;
-    @Mock
-    private SessionAccessor sessionAccessor;
-    @Mock
-    private NodeConfiguration platformConfiguration;
-    @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
-    @Mock
     private BonitaHomeServer bonitaHomeServer;
-    @Mock
-    private PlatformService platformService;
-    @Mock
-    private STenant sTenant;
-    private TransactionService transactionService = new MockedTransactionService();
     @Mock
     private PlatformManager platformManager;
     @Spy
@@ -87,8 +54,6 @@ public class PlatformAPIImplTest {
     @Before
     public void setup() throws Exception {
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
-        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
-        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
         doReturn(platformManager).when(platformServiceAccessor).getPlatformManager();
         doReturn(platformServiceAccessor).when(platformAPI).getPlatformAccessor();
         doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServer();
@@ -140,25 +105,6 @@ public class PlatformAPIImplTest {
         verify(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID, configurationFile);
     }
 
-    @Test
-    public void should_deactivate_and_delete_tenant_when_cleaning_platform() throws Exception {
-        //given
-        STenant tenant1 = new STenant("t1", "john", 123342, "ACTIVATED", true);
-        tenant1.setId(1L);
-        STenant tenant2 = new STenant("t2", "john", 12335645, "ACTIVATED", false);
-        tenant2.setId(2L);
-        doReturn(Arrays.asList(tenant1,
-                tenant2)).when(platformService).getTenants(any(QueryOptions.class));
-        doNothing().when(platformAPI).deleteTenant(anyLong());
-        //when
-        platformAPI.cleanPlatform();
-        //then
-        verify(platformService).deactivateTenant(1L);
-        verify(platformService).deactivateTenant(2L);
-        verify(platformAPI).deleteTenant(1L);
-        verify(platformAPI).deleteTenant(2L);
-    }
-
     @Test(expected = StartNodeException.class)
     public void startNode_should_throw_exception_when_platform_is_not_in_state_stopped() throws Exception {
         doReturn(false).when(platformManager).start();
@@ -175,54 +121,4 @@ public class PlatformAPIImplTest {
         verify(platformManager).start();
     }
 
-    private static class MockedTransactionService implements TransactionService {
-
-        @Override
-        public void begin() {
-        }
-
-        @Override
-        public void complete() {
-        }
-
-        @Override
-        public boolean isTransactionActive() {
-            return false;
-        }
-
-        @Override
-        public Optional<Boolean> hasMultipleResources() {
-            return Optional.empty();
-        }
-
-        @Override
-        public void setRollbackOnly() {
-        }
-
-        @Override
-        public boolean isRollbackOnly() {
-            return false;
-        }
-
-        @Override
-        public long getNumberOfActiveTransactions() {
-            return 0;
-        }
-
-        @Override
-        public <T> T executeInTransaction(Callable<T> callable) throws Exception {
-            return callable.call();
-        }
-
-        @Override
-        public void registerBonitaSynchronization(Synchronization txSync) {
-
-        }
-
-        @Override
-        public void registerBeforeCommitCallable(Callable<Void> callable) {
-
-        }
-
-    }
 }

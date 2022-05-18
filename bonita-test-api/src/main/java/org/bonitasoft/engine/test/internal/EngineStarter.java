@@ -138,9 +138,6 @@ public class EngineStarter {
         final PlatformAPI platformAPI = getPlatformAPI(session);
         if (platformAPI.isNodeStarted()) {
             platformAPI.stopNode();
-            if (dropOnStop) {
-                platformAPI.cleanPlatform();
-            }
         }
         logoutOnPlatform(session);
         engine.stop();

@@ -102,12 +102,6 @@ public class PlatformIT extends CommonAPIIT {
         assertTrue(platformAPI.isPlatformInitialized());
     }
 
-    @Test
-    public void should_cleanPlatform_remove_tenant() throws BonitaException {
-        platformAPI.cleanPlatform();
-        assertFalse(platformAPI.isPlatformInitialized());
-    }
-
     @Test(expected = CreationException.class)
     public void createPlatformException() throws BonitaException {
         assertTrue(platformAPI.isPlatformInitialized());
@@ -124,9 +118,6 @@ public class PlatformIT extends CommonAPIIT {
         state = platformAPI.getPlatformState();
         assertEquals(PlatformState.STOPPED, state);
         // test exception:PlatformNotFoundException
-        platformAPI.cleanPlatform();
-        // when platform does not exists it return STOPPED now
-        assertEquals(PlatformState.STOPPED, platformAPI.getPlatformState());
     }
 
     @Test

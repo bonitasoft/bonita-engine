@@ -23,7 +23,6 @@ import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <b>Manage the platform.</b>
@@ -134,49 +133,6 @@ public interface PlatformAPI {
      *         occurs when an exception is thrown during platform deletion
      */
     void cleanPlatform() throws DeletionException;
-
-    /**
-     * <b>Delete the platform</b>
-     * <p>
-     * This method delete the platform, i.e. all the database tables.
-     *
-     * @see #createPlatform()
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws DeletionException
-     *         occurs when an exception is thrown during platform deletion
-     * @deprecated since 7.3.0. Use {@link #cleanPlatform()} instead.
-     */
-    @Deprecated
-    void deletePlatform() throws DeletionException;
-
-    /**
-     * Clean and delete a platform.
-     *
-     * @see #cleanPlatform()
-     * @see #deletePlatform()
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws DeletionException
-     *         occurs when an exception is thrown during platform deletion
-     * @deprecated since 6.5.0 (typo in method name). Use {@link #cleanPlatform()} instead.
-     */
-    @Deprecated
-    void cleanAndDeletePlaftorm() throws DeletionException;
-
-    /**
-     * Clean and delete a platform.
-     *
-     * @see #cleanPlatform()
-     * @see #deletePlatform()
-     * @throws InvalidSessionException
-     *         Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws DeletionException
-     *         occurs when an exception is thrown during platform deletion
-     * @deprecated since 7.3.0. Use {@link #cleanPlatform()} instead.
-     */
-    @Deprecated
-    void cleanAndDeletePlatform() throws DeletionException;
 
     /**
      * Get the platform.

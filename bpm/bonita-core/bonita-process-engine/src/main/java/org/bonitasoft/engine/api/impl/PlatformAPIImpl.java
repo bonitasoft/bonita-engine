@@ -171,49 +171,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void cleanPlatform() throws DeletionException {
-        final PlatformServiceAccessor platformAccessor;
-
-        try {
-            platformAccessor = getPlatformAccessor();
-            List<STenant> sTenants = platformAccessor.getTransactionService().executeInTransaction(() -> {
-                final PlatformService platformService = platformAccessor.getPlatformService();
-                final List<STenant> tenants = platformService.getTenants(new QueryOptions(0, Integer.MAX_VALUE));
-                for (final STenant sTenant : tenants) {
-                    platformService.deactivateTenant(sTenant.getId());
-                }
-                return tenants;
-            });
-            for (STenant sTenant : sTenants) {
-                deleteTenant(sTenant.getId());
-            }
-        } catch (DeletionException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new DeletionException(e);
-        }
-    }
-
-    @Override
-    @CustomTransactions
-    @AvailableOnStoppedNode
-    public void deletePlatform() throws DeletionException {
-
-    }
-
-    @Override
-    @CustomTransactions
-    @AvailableOnStoppedNode
-    @Deprecated
-    public void cleanAndDeletePlaftorm() throws DeletionException {
-        cleanAndDeletePlatform();
-    }
-
-    @Override
-    @CustomTransactions
-    @AvailableOnStoppedNode
-    public void cleanAndDeletePlatform() throws DeletionException {
-        cleanPlatform();
-        deletePlatform();
     }
 
     @Override
