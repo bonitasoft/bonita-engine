@@ -36,10 +36,12 @@ import org.bonitasoft.engine.profile.xml.MembershipNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta
  */
+@Component
 public class ProfilesExporter {
 
     private final static String USER_SUFFIX = "ForUser";
