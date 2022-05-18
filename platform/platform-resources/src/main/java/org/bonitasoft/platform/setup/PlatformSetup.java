@@ -59,6 +59,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlatformSetup {
 
+    public static final long DEFAULT_TENANT_ID = 1L;
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     public static final String BONITA_SETUP_FOLDER = "org.bonitasoft.platform.setup.folder";
@@ -132,6 +133,16 @@ public class PlatformSetup {
         }
         pushLicenses();
         LOGGER.info("Initial configuration files successfully pushed to database");
+        initializeTenant();
+    }
+
+    private void initializeTenant() {
+        configurationService.storeTenantEngineConf(configurationService.getTenantTemplateEngineConf(),
+                DEFAULT_TENANT_ID);
+        configurationService
+                .storeTenantSecurityScripts(configurationService.getTenantTemplateSecurityScripts(), DEFAULT_TENANT_ID);
+        configurationService.storeTenantPortalConf(configurationService.getTenantTemplatePortalConf(),
+                DEFAULT_TENANT_ID);
     }
 
     boolean isPlatformAlreadyCreated() {
@@ -463,10 +474,6 @@ public class PlatformSetup {
     public void initPlatformSetup() throws PlatformException {
         initProperties();
         initDataSource();
-    }
-
-    public ConfigurationService getConfigurationService() {
-        return configurationService;
     }
 
     void preventFromPushingZeroLicense() throws PlatformException {

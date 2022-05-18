@@ -266,13 +266,9 @@ public class PlatformSetupIT {
         assertThat(platformSetup.isPlatformAlreadyCreated()).isTrue();
 
         final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        final String[] split = log.split("\n");
         assertThat(log).as("should setup log message").doesNotContain("Platform is already created. Nothing to do.");
-        assertThat(split).as("should setup log message").isNotEmpty();
-        assertThat(log).as("should create platform and log message").contains("Platform created.");
-        assertThat(split[split.length - 1]).as("should push Initial configuration and log message")
-                .contains("INFO")
-                .endsWith("Initial configuration files successfully pushed to database");
+        assertThat(log).contains("Platform created.")
+                .contains("Initial configuration files successfully pushed to database");
     }
 
     @Test
@@ -573,30 +569,33 @@ public class PlatformSetupIT {
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList(
                         "SELECT * FROM CONFIGURATION WHERE resource_name = 'resources-permissions-mapping.properties'");
-        assertThat(rows).hasSize(1);
-        assertThat(rows.get(0).get("resource_content")).isEqualTo(new_7_6_0_content.getBytes());
+        assertThat(rows).hasSize(2)
+                .allSatisfy(row -> assertThat(row.get("RESOURCE_CONTENT")).isEqualTo(new_7_6_0_content.getBytes()));
     }
 
     @Test
     public void init_on_existing_platform_should_add_new_config_files() throws Exception {
         //given
         platformSetup.init();
-        final String countConfigFile = "SELECT count(1) FROM CONFIGURATION WHERE resource_name = 'bonita-tenant-community-custom.properties'";
-        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class)).isEqualTo(1);
+        final String countConfigFile = "SELECT * FROM CONFIGURATION WHERE resource_name = 'bonita-tenant-community-custom.properties'";
+        assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(2)
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"))
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_TEMPLATE_ENGINE"));
 
         // Delete it to check that init method adds it again:
         jdbcTemplate
                 .update("DELETE from configuration WHERE resource_name = 'bonita-tenant-community-custom.properties'");
 
-        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class)).isZero();
+        assertThat(jdbcTemplate.queryForList(countConfigFile)).isEmpty();
         systemOutRule.clearLog();
 
         //when
         platformSetup.init();
 
         //then
-        assertThat(jdbcTemplate.queryForObject(countConfigFile, Integer.class))
-                .isEqualTo(1);
+        assertThat(jdbcTemplate.queryForList(countConfigFile)).hasSize(2)
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_ENGINE"))
+                .anyMatch(map -> map.get("CONTENT_TYPE").equals("TENANT_TEMPLATE_ENGINE"));
         assertThat(systemOutRule.getLog()).contains(
                 "New configuration file detected 'bonita-tenant-community-custom.properties'");
     }
