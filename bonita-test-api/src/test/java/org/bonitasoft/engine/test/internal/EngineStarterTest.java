@@ -55,28 +55,14 @@ public class EngineStarterTest {
     }
 
     @Test
-    public void should_not_drop_platform_when_dropOnStop_is_false() throws Exception {
+    public void should_stop_node() throws Exception {
         //given
         doReturn(true).when(platformAPI).isNodeStarted();
         //when
-        engineStarter.setDropOnStop(false);
         engineStarter.stop();
         //then
-        verify(platformAPI, never()).cleanPlatform();
         verify(platformAPI).stopNode();
         verify(bonitaEngine).stop();
     }
 
-    @Test
-    public void should_not_drop_platform_when_dropOnStop_is_true() throws Exception {
-        //given
-        doReturn(true).when(platformAPI).isNodeStarted();
-        //when
-        engineStarter.setDropOnStop(true);
-        engineStarter.stop();
-        //then
-        verify(platformAPI).cleanPlatform();
-        verify(platformAPI).stopNode();
-        verify(bonitaEngine).stop();
-    }
 }
