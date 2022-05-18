@@ -19,38 +19,38 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
- * Class that creates and updates default profiles<br/>
- * Called at node restart and tenant creation
- *
- * @author Philippe Ozil
+ * Update provided profiles from profiles.xml from classpath
  */
-public class DefaultProfilesUpdater {
+@Component
+public class DefaultProfilesUpdater implements TenantLifecycleService {
 
-    private TechnicalLoggerService logger;
-    private ProfilesImporter profilesImporter;
-    private Long tenantId;
+    private final TechnicalLoggerService logger;
+    private final ProfilesImporter profilesImporter;
+    private final Long tenantId;
 
-    public DefaultProfilesUpdater(Long tenantId, TechnicalLoggerService logger,
+    public DefaultProfilesUpdater(@Value("${tenantId}") Long tenantId, TechnicalLoggerService logger,
             ProfilesImporter profilesImporter) {
         this.logger = logger;
         this.profilesImporter = profilesImporter;
         this.tenantId = tenantId;
     }
 
-    public DefaultProfilesUpdater(final TenantServiceAccessor tenantServiceAccessor) {
-        this.logger = tenantServiceAccessor.getTechnicalLoggerService();
-        this.profilesImporter = tenantServiceAccessor.getProfilesImporter();
-        this.tenantId = tenantServiceAccessor.getTenantId();
+    @Override
+    public void init() throws SBonitaException {
+        execute();
     }
 
     /**
@@ -59,7 +59,7 @@ public class DefaultProfilesUpdater {
      * @return whether the default profiles where updated
      * @throws Exception if execution fails
      */
-    public boolean execute() throws Exception {
+    public boolean execute() {
         try {
             final File md5File = getProfilesMD5File();
             final String defaultProfilesXml = getDefaultProfilesXml();

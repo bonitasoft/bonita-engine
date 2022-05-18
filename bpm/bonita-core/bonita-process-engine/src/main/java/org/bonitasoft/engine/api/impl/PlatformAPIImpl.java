@@ -23,7 +23,6 @@ import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -46,13 +45,11 @@ import org.bonitasoft.engine.platform.exception.STenantCreationException;
 import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -211,23 +208,6 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             transactionService.complete();
             transactionService.begin();
-            createTenantFolderInBonitaHome(tenantId);
-
-            // Create session
-            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final SessionService sessionService = tenantServiceAccessor.getSessionService();
-            TechnicalUser technicalUser = tenantServiceAccessor.getTechnicalUser();
-            sessionAccessor = createSessionAccessor();
-            final SSession session = sessionService.createSession(tenantId, -1L, technicalUser.getUserName(), true);
-            platformSessionId = sessionAccessor.getSessionId();
-            sessionAccessor.deleteSessionId();
-            sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
-
-            // Create default profiles: they will be updated by the tenant profile update handler in a separate thread but we create them here synchronously
-            new DefaultProfilesUpdater(tenantServiceAccessor).execute();
-            // Create custom page examples: done by page service start
-            // Import default applications done in ApplicationImporter.init()
-            sessionService.deleteSession(session.getId());
         } catch (final STenantCreationException e) {
             if (tenantId != -1L) {
                 try {
@@ -244,10 +224,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
-    }
-
-    private void createTenantFolderInBonitaHome(final long tenantId) {
-        getBonitaHomeServer().createTenant(tenantId);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {

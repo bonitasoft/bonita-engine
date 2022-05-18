@@ -37,7 +37,8 @@ import org.springframework.context.annotation.Import;
         "org.bonitasoft.engine.operation",
         "org.bonitasoft.engine.business.application",
         "org.bonitasoft.engine.core.login",
-        "org.bonitasoft.engine.authorization"
+        "org.bonitasoft.engine.authorization",
+        "org.bonitasoft.engine.profile"
 })
 @Import({
         WorkServiceConfiguration.class,

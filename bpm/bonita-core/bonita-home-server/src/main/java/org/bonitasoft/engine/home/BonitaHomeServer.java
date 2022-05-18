@@ -206,9 +206,6 @@ public class BonitaHomeServer {
         return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType, artifactId).toURI();
     }
 
-    public void createTenant(final long tenantId) {
-    }
-
     public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
         getConfigurationService().deleteTenantConfiguration(tenantId);
         //allow re-import of profiles, need to be deleted when we remove the ability to delete tenant

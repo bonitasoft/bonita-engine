@@ -45,12 +45,14 @@ import org.bonitasoft.engine.profile.xml.MembershipNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
+import org.springframework.stereotype.Component;
 
 /**
  * Import profiles with mapping and entries using Policy
  *
  * @author Baptiste Mesta
  */
+@Component
 public class ProfilesImporter {
 
     private final ProfileService profileService;
