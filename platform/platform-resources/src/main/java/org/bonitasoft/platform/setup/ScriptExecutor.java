@@ -107,6 +107,7 @@ public class ScriptExecutor {
 
     public boolean isPlatformAlreadyCreated() {
         try {
+            // FIXME: 18/05/2022 should be update to check if tenant is created .
             return new JdbcTemplate(datasource).queryForObject("select count(*) from sequence", Integer.class) > 0;
         } catch (DataAccessException e) {
             return false;

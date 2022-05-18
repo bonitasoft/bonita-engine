@@ -207,13 +207,6 @@ public class BonitaHomeServer {
     }
 
     public void createTenant(final long tenantId) {
-        getConfigurationService().storeTenantEngineConf(getConfigurationService().getTenantTemplateEngineConf(),
-                tenantId);
-        getConfigurationService()
-                .storeTenantSecurityScripts(getConfigurationService().getTenantTemplateSecurityScripts(), tenantId);
-        getConfigurationService().storeTenantPortalConf(getConfigurationService().getTenantTemplatePortalConf(),
-                tenantId);
-
     }
 
     public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {

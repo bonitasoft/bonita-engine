@@ -62,27 +62,6 @@ public class BonitaHomeServerTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void should_createTenant_copy_tenant_template_files() throws Exception {
-        //given
-        List<BonitaConfiguration> tenantTemplateConf = confs(conf("file1", "file1Content".getBytes()),
-                conf("file2", "file2Content".getBytes()));
-        doReturn(tenantTemplateConf)
-                .when(configurationService).getTenantTemplateEngineConf();
-        List<BonitaConfiguration> tenantTemplateScripts = confs(
-                conf("org/bonitasoft/package/TrueScript.groovy", "return true".getBytes()),
-                conf("org/bonitasoft/package/FalseScript.groovy", "return false".getBytes()));
-        doReturn(tenantTemplateScripts)
-                .when(configurationService).getTenantTemplateSecurityScripts();
-
-        //when
-        bonitaHomeServer.createTenant(12L);
-        //then
-        verify(configurationService).storeTenantEngineConf(tenantTemplateConf, 12L);
-        verify(configurationService).storeTenantSecurityScripts(tenantTemplateScripts, 12L);
-
-    }
-
-    @Test
     public void should_updateTenantPortalConfigurationFile_update_the_files() throws Exception {
         //given
         doReturn(conf("myFile.properties", "previous content".getBytes()))

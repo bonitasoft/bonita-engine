@@ -16,16 +16,18 @@ package org.bonitasoft.platform.setup;
 import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.bonitasoft.platform.configuration.ConfigurationService;
+import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.util.ConfigurationFolderUtil;
@@ -102,6 +104,37 @@ public class PlatformSetupTest {
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("No license (.lic file) found");
         platformSetup.init();
+    }
+
+    @Test
+    public void should_store_tenant_configurationFile_when_initializing_platform() throws PlatformException {
+        List<BonitaConfiguration> tenantTemplateEngineConfs = List
+                .of(new BonitaConfiguration("tenantTemplateEngineConf", null));
+        List<BonitaConfiguration> tenantTemplateSecurityScripts = List
+                .of(new BonitaConfiguration("tenantTemplateSecurityScript", null));
+        List<BonitaConfiguration> tenantTemplatePortalConfs = List
+                .of(new BonitaConfiguration("tenantTemplatePortalConf", null));
+
+        when(configurationService.getTenantTemplateEngineConf()).thenReturn(tenantTemplateEngineConfs);
+        when(configurationService.getTenantTemplateSecurityScripts()).thenReturn(tenantTemplateSecurityScripts);
+        when(configurationService.getTenantTemplatePortalConf()).thenReturn(tenantTemplatePortalConfs);
+
+        platformSetup.init();
+
+        verify(configurationService).storeTenantEngineConf(tenantTemplateEngineConfs, 1L);
+        verify(configurationService).storeTenantSecurityScripts(tenantTemplateSecurityScripts, 1L);
+        verify(configurationService).storeTenantPortalConf(tenantTemplatePortalConfs, 1L);
+    }
+
+    @Test
+    public void should_not_store_tenant_configurationFile_when_platform_is_initialized() throws PlatformException {
+        when(platformSetup.isPlatformAlreadyCreated()).thenReturn(true);
+
+        platformSetup.init();
+
+        verify(configurationService, never()).storeTenantEngineConf(any(), anyLong());
+        verify(configurationService, never()).storeTenantSecurityScripts(any(), anyLong());
+        verify(configurationService, never()).storeTenantPortalConf(any(), anyLong());
     }
 
     @Test
