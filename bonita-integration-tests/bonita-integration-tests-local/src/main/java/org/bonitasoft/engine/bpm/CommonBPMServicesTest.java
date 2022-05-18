@@ -72,7 +72,6 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.junit.BonitaEngineRule;
-import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
@@ -655,18 +654,6 @@ public class CommonBPMServicesTest {
 
     private void closeTx() throws STransactionCommitException, STransactionRollbackException {
         platformServiceAccessor.getTransactionService().complete();
-    }
-
-    protected long createTenant(String tenantName) throws Exception {
-        return PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(),
-                tenantName,
-                PlatformUtil.DEFAULT_CREATED_BY, PlatformUtil.TENANT_STATUS_ACTIVATED);
-    }
-
-    protected void changeTenant(final long tenantId) throws Exception {
-        getTransactionService().begin();
-        TestUtil.createSessionOn(getSessionAccessor(), getTenantAccessor().getSessionService(), tenantId);
-        getTransactionService().complete();
     }
 
 }

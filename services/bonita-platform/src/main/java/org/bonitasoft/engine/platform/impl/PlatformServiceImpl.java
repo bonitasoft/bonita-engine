@@ -228,6 +228,8 @@ public class PlatformServiceImpl implements PlatformService {
 
         // create the tenant
         try {
+            // force tenant to be created with id one, there is only at most one tenant
+            tenant.setId(1);
             recorder.recordInsert(new InsertRecord(tenant), TENANT);
         } catch (final SRecorderException e) {
             throw new STenantCreationException("Unable to insert the tenant row : " + e.getMessage(), e);

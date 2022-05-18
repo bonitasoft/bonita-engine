@@ -16,24 +16,14 @@ package org.bonitasoft.engine.platform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.exception.STenantAlreadyExistException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
-import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -74,7 +64,7 @@ public class TenantManagementIT extends CommonBPMServicesTest {
 
     @Test(expected = STenantAlreadyExistException.class)
     public void cannotCreateSecondTenantWithSameName() throws Exception {
-        STenant sTenant = STenant.builder().name(PlatformUtil.DEFAULT_TENANT_NAME).createdBy("anyone")
+        STenant sTenant = STenant.builder().name("default").createdBy("anyone")
                 .created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false).build();
         getTransactionService().begin();
         try {
@@ -87,79 +77,23 @@ public class TenantManagementIT extends CommonBPMServicesTest {
     }
 
     @Test
-    public void newlyCreatedTenantShouldBeAvailableForRetrieve() throws Exception {
-        final String name = "newlyCreatedTenant1";
-        final String createdBy = "mycreatedBy";
-        final long created = System.currentTimeMillis();
-
-        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false).build();
-
-        getTransactionService().begin();
-        long tenantId = platformService.createTenant(tenant);
-        getTransactionService().complete();
-
-        getTransactionService().begin();
-        final STenant readTenant = platformService.getTenant(tenantId);
-        getTransactionService().complete();
-
-        assertThat(readTenant.getName()).isEqualTo(tenant.getName());
-        assertThat(readTenant.getCreatedBy()).isEqualTo(tenant.getCreatedBy());
-        assertThat(readTenant.getCreated()).isEqualTo(tenant.getCreated());
-
-        deleteTenant(tenant.getId());
-    }
-
-    @Test(expected = STenantNotFoundException.class)
-    public void deletedTenantShouldNotBeAvailableAnymore() throws Exception {
-        getTransactionService().begin();
-        long tenantId = platformService.createTenant(
-                STenant.builder().name("deletedTenantShouldNotBeAvailableAnymore").createdBy("created by me")
-                        .created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false)
-                        .build());
-        getTransactionService().complete();
-
-        getTransactionService().begin();
-        platformService.deleteTenant(tenantId);
-        getTransactionService().complete();
-
-        // check the tenant was well deleted by trying to delete it again:
-        getTransactionService().begin();
-        platformService.deleteTenant(tenantId);
-        getTransactionService().complete();
-    }
-
-    @Test
     public void updateTenantShouldUpdateAllFields() throws Exception {
-        final String name = "updateTenant1";
-        final String createdBy = "mycreatedBy";
-        final long created = System.currentTimeMillis();
-
-        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false).build();
-
         getTransactionService().begin();
-        platformService.createTenant(tenant);
 
         final String newDescription = "newDescription";
-        final String newName = "newName";
 
         final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
         final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
         updateDescriptor.setDescription(newDescription);
-        updateDescriptor.setName(newName);
 
-        platformService.updateTenant(tenant, updateDescriptor.done());
+        platformService.updateTenant(platformService.getDefaultTenant(), updateDescriptor.done());
         getTransactionService().complete();
 
         getTransactionService().begin();
-        final STenant readTenant = platformService.getTenant(tenant.getId());
+        final STenant readTenant = platformService.getDefaultTenant();
         getTransactionService().complete();
 
-        assertThat(readTenant.getName()).isEqualTo(newName);
         assertThat(readTenant.getDescription()).isEqualTo(newDescription);
-
-        deleteTenant(tenant.getId());
     }
 
     @Test(expected = STenantUpdateException.class)
@@ -178,41 +112,6 @@ public class TenantManagementIT extends CommonBPMServicesTest {
         }
     }
 
-    @Test(expected = STenantUpdateException.class)
-    public void updatingTenantNameWithAlreadyExistingShouldFail() throws Exception {
-        final String tenant1Name = "updatingTenantName1";
-        final String tenant2Name = "updatingTenantName2";
-        final String createdBy = "mycreatedBy";
-        final long created = System.currentTimeMillis();
-
-        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false)
-                .build();
-        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false)
-                .build();
-
-        getTransactionService().begin();
-
-        long tenantId1 = platformService.createTenant(tenant1);
-        long tenantId2 = platformService.createTenant(tenant2);
-
-        final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
-        final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
-        updateDescriptor.setName(tenant1Name);
-
-        try {
-            platformService.updateTenant(tenant2, updateDescriptor.done());
-            fail("should not ne able to update the tenant with a name that already exists");
-        } finally {
-            getTransactionService().complete();
-            getTransactionService().begin();
-            platformService.deleteTenant(tenantId1);
-            platformService.deleteTenant(tenantId2);
-            getTransactionService().complete();
-        }
-    }
-
     @Test(expected = STenantNotFoundException.class)
     public void shouldNotBeAbleToRetrieveUnknownTenantByName() throws Exception {
         getTransactionService().begin();
@@ -222,141 +121,6 @@ public class TenantManagementIT extends CommonBPMServicesTest {
             getTransactionService().complete();
         }
 
-    }
-
-    @Test
-    public void shouldBeAbleToRetrieveTenantByName() throws Exception {
-        final String name = "tenantByName";
-        final String createdBy = "myCreatedBy";
-        final long created = System.currentTimeMillis();
-
-        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false).build();
-
-        getTransactionService().begin();
-        platformService.createTenant(tenant);
-        getTransactionService().complete();
-
-        getTransactionService().begin();
-        final STenant readTenant = platformService.getTenantByName(name);
-        getTransactionService().complete();
-
-        assertThat(readTenant.getName()).isEqualTo(tenant.getName());
-
-        deleteTenant(tenant.getId());
-    }
-
-    @Test
-    public void getTenantsShouldFilterOnSearchCriteria() throws Exception {
-        final String tenant1Name = "tTenantsShouldFilter1";
-        final String tenant2Name = "tTenantsShouldFilter2";
-        final String createdBy = "myCreatedBy";
-        final long created = System.currentTimeMillis();
-
-        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false)
-                .build();
-        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false)
-                .build();
-
-        getTransactionService().begin();
-        platformService.createTenant(tenant1);
-        platformService.createTenant(tenant2);
-        getTransactionService().complete();
-
-        try {
-            final List<OrderByOption> orderByOptions = new ArrayList<>();
-            orderByOptions.add(new OrderByOption(STenant.class, STenant.ID, OrderByType.DESC));
-            final QueryOptions queryOptions = new QueryOptions(0, 20, orderByOptions,
-                    Collections.singletonList(new FilterOption(STenant.class, "name").like("tTenantsShouldFilter")),
-                    null);
-
-            getTransactionService().begin();
-            List<STenant> readTenants = platformService.getTenants(queryOptions);
-            getTransactionService().complete();
-
-            // count also default tenant:
-            assertThat(readTenants.size()).isEqualTo(2);
-            assertThat(readTenants.get(0).getId()).isEqualTo(tenant2.getId());
-            assertThat(readTenants.get(1).getId()).isEqualTo(tenant1.getId());
-
-            final Collection<Long> ids = new ArrayList<>();
-            ids.add(tenant1.getId());
-            ids.add(tenant2.getId());
-
-            getTransactionService().begin();
-            readTenants = platformService.getTenants(ids, queryOptions);
-            getTransactionService().complete();
-
-            assertThat(readTenants.size()).isEqualTo(2);
-            assertThat(readTenants.get(0).getId()).isEqualTo(tenant2.getId());
-            assertThat(readTenants.get(1).getId()).isEqualTo(tenant1.getId());
-
-            ids.clear();
-            ids.add(tenant1.getId());
-            getTransactionService().begin();
-            readTenants = platformService.getTenants(ids, queryOptions);
-            getTransactionService().complete();
-
-            assertThat(readTenants.size()).isEqualTo(1);
-            assertThat(readTenants.get(0).getId()).isEqualTo(tenant1.getId());
-        } finally {
-            deleteTenant(tenant1.getId());
-            deleteTenant(tenant2.getId());
-        }
-    }
-
-    /**
-     * @param id
-     * @throws Exception
-     */
-    private void deleteTenant(final long id) throws Exception {
-        // delete tenant objects
-        getTransactionService().begin();
-        platformService.deleteTenantObjects(id);
-        getTransactionService().complete();
-
-        // delete tenant
-        getTransactionService().begin();
-        platformService.deleteTenant(id);
-        getTransactionService().complete();
-    }
-
-    @Test
-    public void searchTenants() throws Exception {
-        final String tenant1Name = "searchTenants1";
-        final String tenant2Name = "searchTenants2";
-        final String createdBy = "mycreatedBy";
-        final long created = System.currentTimeMillis();
-
-        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false)
-                .build();
-        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created)
-                .status(STATUS_DEACTIVATED).defaultTenant(false)
-                .build();
-
-        getTransactionService().begin();
-
-        platformService.createTenant(tenant1);
-        platformService.createTenant(tenant2);
-
-        // sort
-        final List<OrderByOption> orderbyOptions = new ArrayList<>();
-        orderbyOptions.add(new OrderByOption(STenant.class, STenant.ID, OrderByType.DESC));
-        final QueryOptions queryOptions = new QueryOptions(0, 10, orderbyOptions,
-                Collections.singletonList(new FilterOption(STenant.class, "name").like("searchTenants")), null);
-
-        final List<STenant> readTenants = platformService.searchTenants(queryOptions);
-        // count also default tenant:
-        assertThat(readTenants.size()).isEqualTo(2);
-        assertThat(readTenants.get(0).getId()).isEqualTo(tenant2.getId());
-        assertThat(readTenants.get(1).getId()).isEqualTo(tenant1.getId());
-        getTransactionService().complete();
-
-        deleteTenant(tenant1.getId());
-        deleteTenant(tenant2.getId());
     }
 
 }

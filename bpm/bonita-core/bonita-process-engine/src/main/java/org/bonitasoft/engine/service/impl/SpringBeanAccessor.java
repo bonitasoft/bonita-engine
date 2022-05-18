@@ -94,6 +94,7 @@ public abstract class SpringBeanAccessor {
             context.close();
             context = null;
         }
+        contextFinishedInitialized = false;
     }
 
     protected abstract Properties getProperties() throws IOException;
