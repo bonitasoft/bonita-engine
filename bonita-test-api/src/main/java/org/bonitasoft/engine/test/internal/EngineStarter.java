@@ -338,6 +338,7 @@ public class EngineStarter {
         return dropOnStart;
     }
 
+    @Deprecated(forRemoval = true, since = "7.15.0")
     public void setDropOnStop(boolean dropOnStop) {
         this.dropOnStop = dropOnStop;
     }
