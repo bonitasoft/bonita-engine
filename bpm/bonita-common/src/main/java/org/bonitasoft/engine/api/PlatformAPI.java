@@ -131,7 +131,10 @@ public interface PlatformAPI {
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
      *         occurs when an exception is thrown during platform deletion
+     * @deprecated since 7.15.0, that method delete all tenants, we don't want to do that, delete the database schema
+     *             instead
      */
+    @Deprecated(forRemoval = true, since = "7.15.0")
     void cleanPlatform() throws DeletionException;
 
     /**
