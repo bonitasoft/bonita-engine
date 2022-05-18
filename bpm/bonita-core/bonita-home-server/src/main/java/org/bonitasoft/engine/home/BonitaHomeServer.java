@@ -218,6 +218,8 @@ public class BonitaHomeServer {
 
     public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
         getConfigurationService().deleteTenantConfiguration(tenantId);
+        //allow re-import of profiles, need to be deleted when we remove the ability to delete tenant
+        getTenantStorage().getProfileMD5(tenantId).delete();
     }
 
     public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException {
