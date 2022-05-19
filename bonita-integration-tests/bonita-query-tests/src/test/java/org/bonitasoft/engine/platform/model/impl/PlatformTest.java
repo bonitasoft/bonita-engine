@@ -80,7 +80,7 @@ public class PlatformTest {
                 .build());
         repository.flush();
 
-        PersistentObject tenantFromQuery = repository.selectOneOnPlatform("getTenantByName", pair("name", "MyTenant"));
+        PersistentObject tenantFromQuery = repository.selectOneOnPlatform("getTenantById", pair("id", tenant.getId()));
         Map<String, Object> tenantAsMap = jdbcTemplate.queryForMap("SELECT * FROM tenant");
 
         assertThat(tenantFromQuery).isEqualTo(tenant);

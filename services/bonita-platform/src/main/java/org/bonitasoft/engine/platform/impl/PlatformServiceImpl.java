@@ -13,19 +13,11 @@
  **/
 package org.bonitasoft.engine.platform.impl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.bonitasoft.engine.cache.SCacheException;
-import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -33,13 +25,11 @@ import org.bonitasoft.engine.platform.cache.PlatformCacheService;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -55,11 +45,7 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
 public class PlatformServiceImpl implements PlatformService {
 
     private static final String TENANT = "TENANT";
-    private static final String QUERY_GET_TENANT_BY_NAME = "getTenantByName";
-    private static final String LOG_GET_TENANTS = "getTenants";
     private static final String QUERY_GET_DEFAULT_TENANT = "getDefaultTenant";
-    private static final String QUERY_GET_NUMBER_OF_TENANTS = "getNumberOfTenants";
-    private static final String QUERY_GET_TENANTS_BY_IDS = "getTenantsByIds";
     private static final String CACHE_KEY = "PLATFORM";
 
     private final PersistenceService platformPersistenceService;
@@ -148,22 +134,6 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public STenant getTenantByName(final String name) throws STenantNotFoundException {
-        STenant tenant;
-        try {
-            final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, name);
-            tenant = platformPersistenceService
-                    .selectOne(new SelectOneDescriptor<>(QUERY_GET_TENANT_BY_NAME, parameters, STenant.class));
-            if (tenant == null) {
-                throw new STenantNotFoundException("No tenant found with name: " + name);
-            }
-        } catch (final SBonitaReadException e) {
-            throw new STenantNotFoundException("Unable to check if a tenant already exists: " + e.getMessage(), e);
-        }
-        return tenant;
-    }
-
-    @Override
     public STenant getDefaultTenant() throws STenantNotFoundException {
         try {
             STenant tenant = platformPersistenceService
@@ -185,39 +155,8 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public List<STenant> getTenants(final Collection<Long> ids, final QueryOptions queryOptions)
-            throws STenantNotFoundException, STenantException {
-        List<STenant> tenants;
-        try {
-            final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
-            tenants = platformPersistenceService
-                    .selectList(new SelectListDescriptor<>(QUERY_GET_TENANTS_BY_IDS, parameters, STenant.class,
-                            queryOptions));
-            if (tenants.size() != ids.size()) {
-                throw new STenantNotFoundException(
-                        "Unable to retrieve all tenants by ids. Expected: " + ids + ", retrieved: " + tenants);
-            }
-        } catch (final SBonitaReadException e) {
-            throw new STenantException("Problem getting list of tenants: " + e.getMessage(), e);
-        }
-        return tenants;
-    }
-
-    @Override
     public void updateTenant(final STenant tenant, final EntityUpdateDescriptor descriptor)
             throws STenantUpdateException {
-        final String tenantName = (String) descriptor.getFields().get(STenantUpdateBuilderFactory.NAME);
-        if (tenantName != null) {
-            try {
-                if (getTenantByName(tenantName).getId() != tenant.getId()) {
-                    throw new STenantUpdateException(
-                            "Unable to update the tenant with new name " + tenantName + " : it already exists.");
-                }
-            } catch (final STenantNotFoundException e) {
-                // Ok
-            }
-        }
-
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(tenant, descriptor), TENANT);
         } catch (final SRecorderException e) {
@@ -259,41 +198,6 @@ public class PlatformServiceImpl implements PlatformService {
         } catch (final SPersistenceException e) {
             throw new STenantUpdateException("Unable to update tenant status in database.", e);
         }
-    }
-
-    @Override
-    public List<STenant> getTenants(final QueryOptions queryOptions) throws STenantException {
-        List<STenant> tenants;
-        try {
-            tenants = platformPersistenceService
-                    .selectList(new SelectListDescriptor<>(LOG_GET_TENANTS, null, STenant.class, queryOptions));
-        } catch (final SBonitaReadException e) {
-            throw new STenantException("Problem getting list of tenants : " + e.getMessage(), e);
-        }
-        return tenants;
-    }
-
-    @Override
-    public int getNumberOfTenants() throws STenantException {
-        final Map<String, Object> emptyMap = Collections.emptyMap();
-        try {
-            final Long read = platformPersistenceService
-                    .selectOne(new SelectOneDescriptor<>(QUERY_GET_NUMBER_OF_TENANTS, emptyMap, STenant.class,
-                            Long.class));
-            return read.intValue();
-        } catch (final SBonitaReadException e) {
-            throw new STenantException(e);
-        }
-    }
-
-    @Override
-    public List<STenant> searchTenants(final QueryOptions options) throws SBonitaReadException {
-        return platformPersistenceService.searchEntity(STenant.class, options, null);
-    }
-
-    @Override
-    public long getNumberOfTenants(final QueryOptions options) throws SBonitaReadException {
-        return platformPersistenceService.getNumberOfEntities(STenant.class, options, null);
     }
 
     @Override

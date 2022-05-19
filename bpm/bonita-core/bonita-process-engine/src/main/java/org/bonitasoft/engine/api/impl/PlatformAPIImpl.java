@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,6 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
@@ -39,7 +37,7 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
-import org.bonitasoft.engine.platform.exception.STenantException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -206,14 +204,12 @@ public class PlatformAPIImpl implements PlatformAPI {
     public Map<Long, Map<String, byte[]>> getClientTenantConfigurations() {
         try {
             PlatformService platformService = getPlatformAccessor().getPlatformService();
-            List<STenant> tenants = platformService.getTenants(QueryOptions.countQueryOptions());
+            STenant tenant = platformService.getDefaultTenant();
             HashMap<Long, Map<String, byte[]>> conf = new HashMap<>();
-            for (STenant tenant : tenants) {
-                conf.put(tenant.getId(), getBonitaHomeServer().getTenantPortalConfigurations(tenant.getId()));
-            }
+            conf.put(tenant.getId(), getBonitaHomeServer().getTenantPortalConfigurations(tenant.getId()));
             return conf;
         } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException
-                | InstantiationException | STenantException e) {
+                | InstantiationException | STenantNotFoundException e) {
             throw new RetrieveException(e);
         }
     }

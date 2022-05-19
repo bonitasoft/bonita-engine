@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
@@ -95,17 +94,6 @@ public class TenantManagementIT extends CommonBPMServicesTest {
         } finally {
             getTransactionService().complete();
         }
-    }
-
-    @Test(expected = STenantNotFoundException.class)
-    public void shouldNotBeAbleToRetrieveUnknownTenantByName() throws Exception {
-        getTransactionService().begin();
-        try {
-            platformService.getTenantByName("probably_not_existing");
-        } finally {
-            getTransactionService().complete();
-        }
-
     }
 
 }
