@@ -12,6 +12,7 @@
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
         <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="cacheService" ref="platformEhCacheCacheService" />
     </bean>
 
     <bean id="quartzProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
