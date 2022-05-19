@@ -14,12 +14,10 @@
 package org.bonitasoft.engine.platform;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
@@ -121,9 +119,8 @@ public class PlatformManager {
     }
 
     private List<TenantStateManager> getTenantStateManagers() throws Exception {
-        List<STenant> sTenants = transactionService
-                .executeInTransaction(() -> platformService.getTenants(QueryOptions.ALL_RESULTS));
-        return sTenants.stream().map(this::getTenantStateManager).collect(Collectors.toList());
+        return List.of(getTenantStateManager(transactionService
+                .executeInTransaction(platformService::getDefaultTenant)));
     }
 
     private void restartHandlersOfPlatform() {
