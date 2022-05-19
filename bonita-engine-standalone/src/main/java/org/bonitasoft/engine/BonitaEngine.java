@@ -122,9 +122,6 @@ public class BonitaEngine {
 
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
 
-        if (!platformAPI.isPlatformInitialized()) {
-            platformAPI.initializePlatform();
-        }
         platformAPI.startNode();
         logoutFromPlatform(platformSession);
     }

@@ -134,6 +134,7 @@ public class PlatformSetup {
         pushLicenses();
         LOGGER.info("Initial configuration files successfully pushed to database");
         initializeTenant();
+
     }
 
     private void initializeTenant() {

@@ -18,13 +18,9 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
-import org.bonitasoft.engine.platform.exception.STenantAlreadyExistException;
-import org.bonitasoft.engine.platform.exception.STenantCreationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeletionException;
 import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantUpdateException;
@@ -52,52 +48,6 @@ public interface PlatformService {
      * @since 6.0
      */
     SPlatform getPlatform() throws SPlatformNotFoundException;
-
-    /**
-     * insert a new row in the Tenant table
-     * case 1 - create tenants tables if not already exists + insert rows where necessary (sequences for example) +
-     * insert default users (defined in
-     * configuration)
-     * case 2 - create tenants tables + insert rows where necessary (sequences for example) + insert default users
-     * (defined in configuration)
-     *
-     * @param tenant
-     *        sTenant
-     * @return id of new created tenant
-     * @throws STenantCreationException
-     *         occurs when an exception is thrown during sTenant creation
-     * @throws STenantAlreadyExistException
-     *         occurs when the sTenant has already been taken
-     * @since 6.0
-     */
-    long createTenant(STenant tenant) throws STenantCreationException, STenantAlreadyExistException;
-
-    /**
-     * case 1 - Remove tenant specific tenant tables if no mor etenant in the db
-     * case 2 - Remove tenant specific tables
-     *
-     * @param tenantId
-     * @throws STenantDeletionException
-     *         occurs when an exception is thrown during sTenant deletion
-     * @throws STenantNotFoundException
-     *         occurs when the identifier does not refer to an existing sTenant
-     * @throws SDeletingActivatedTenantException
-     *         occurs when an exception is thrown during deleting an activated sTenant
-     * @since 6.0
-     */
-    void deleteTenant(long tenantId)
-            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
-
-    /**
-     * Remove all rows from all tables where the tenantId matches
-     *
-     * @param tenantId
-     * @throws STenantDeletionException
-     * @throws STenantNotFoundException
-     * @throws SDeletingActivatedTenantException
-     */
-    void deleteTenantObjects(long tenantId)
-            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
 
     /**
      * Update a sTenant from given sTenant and new content.

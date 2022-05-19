@@ -32,7 +32,6 @@ public class ConfigurationFolderUtil {
             "dropQuartzTables.sql",
             "dropTables.sql",
             "initTables.sql",
-            "initTenantTables.sql",
             "postCreateStructure.sql",
             "preDropStructure.sql" };
 
