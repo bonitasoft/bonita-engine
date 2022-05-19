@@ -13,26 +13,13 @@
  **/
 package org.bonitasoft.engine.platform.impl;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -43,13 +30,9 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.cache.PlatformCacheService;
-import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
-import org.bonitasoft.engine.platform.exception.STenantAlreadyExistException;
-import org.bonitasoft.engine.platform.exception.STenantCreationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeletionException;
 import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantUpdateException;
@@ -60,7 +43,6 @@ import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -85,215 +67,19 @@ public class PlatformServiceImpl implements PlatformService {
     private final PlatformCacheService platformCacheService;
     private final SPlatformProperties sPlatformProperties;
     private final Recorder recorder;
-    private final DataSource datasource;
     private final PlatformRetriever platformRetriever;
-    private final List<String> sqlFolders;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever,
             final Recorder recorder,
             final TechnicalLoggerService logger, PlatformCacheService platformCacheService,
-            final SPlatformProperties sPlatformProperties,
-            final DataSource datasource, final List<String> sqlFolders) {
+            final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
         this.logger = logger.asLogger(PlatformServiceImpl.class);
         this.platformCacheService = platformCacheService;
         this.sPlatformProperties = sPlatformProperties;
         this.recorder = recorder;
-        this.datasource = datasource;
-        this.sqlFolders = sqlFolders;
         this.platformRetriever = platformRetriever;
 
-    }
-
-    /**
-     * @param sqlFiles the sql files to execute
-     * @throws SQLException
-     */
-    private void executeSQLResources(final List<String> sqlFiles, final Map<String, String> replacements)
-            throws IOException, SQLException {
-        for (final String sqlFile : sqlFiles) {
-            executeSQLResource(sqlFile, replacements);
-        }
-    }
-
-    /**
-     * @param sqlFolder the folder to look in.
-     * @param sqlFile the name of the file to load.
-     * @return null if not found, the SQL text content in normal cases.
-     */
-    private String getSQLFileContent(final String sqlFolder, final String sqlFile) {
-        final String resourcePath = sqlFolder + "/" + sqlFile; // Must always be forward slash, even on Windows.
-        try {
-            final URL url = this.getClass().getResource(resourcePath);
-            if (url != null) {
-                final byte[] content = IOUtil.getAllContentFrom(url);
-                if (content != null) {
-                    return new String(content);
-                }
-            } else {
-                // try to read from File():
-                final File sqlResource = new File(sqlFolder, sqlFile);
-                if (sqlResource.exists()) {
-                    return new String(IOUtil.getAllContentFrom(sqlResource));
-                }
-            }
-        } catch (final IOException e) {
-            // ignore, will return null
-        }
-        return null;
-    }
-
-    /**
-     * @param sqlFile the sql file to execute
-     * @throws IOException
-     */
-    private void executeSQLResource(final String sqlFile, final Map<String, String> replacements)
-            throws IOException, SQLException {
-        for (final String sqlFolder : sqlFolders) {
-            final String fileContent = getSQLFileContent(sqlFolder, sqlFile);
-
-            final String path = sqlFolder + File.separator + sqlFile;
-            if (fileContent != null) {
-                logger.debug("Processing SQL Resource: {}", path);
-                final List<String> commands = new ArrayList<>(asList(fileContent.split("(;|GO)\r?\n"))); // to be compatible with SQL Server and other RDBMS
-                final int lastIndex = commands.size() - 1;
-
-                // TODO : Review the algorithm and see if we can avoid the array.
-                String lastCommand = commands.get(lastIndex);
-                int index = lastCommand.indexOf(";");
-                if (index == -1) {
-                    index = lastCommand.indexOf("GO");
-                }
-                if (index > 0) {
-                    lastCommand = lastCommand.substring(0, index);
-                    commands.remove(lastIndex);
-                    commands.add(lastCommand);
-                }
-
-                doExecuteSQLThroughJDBC(commands, replacements);
-            } else {
-                logger.warn("SQL resource file not found: {}", path);
-            }
-        }
-    }
-
-    private void doExecuteSQLThroughJDBC(final List<String> commands, final Map<String, String> replacements)
-            throws SQLException {
-        final Connection connection = getConnection();
-        connection.setAutoCommit(false);
-        try {
-            Statement stmt = connection.createStatement();
-            for (final String command : commands) {
-                if (command.trim().length() > 0) {
-                    final String filledCommand = fillTemplate(command, replacements);
-                    logger.debug("Executing the following command : {}", filledCommand);
-                    stmt.addBatch(filledCommand);
-                }
-            }
-            stmt.executeBatch();
-            connection.commit();
-        } catch (final SQLException e) {
-            if (e.getNextException() != null) {
-                logger.error("Error while executing sql batch: {}", e.getNextException().getMessage());
-            }
-            connection.rollback();
-            throw e;
-        } finally {
-            connection.close();
-        }
-    }
-
-    private String fillTemplate(final String command, final Map<String, String> replacements) {
-        String trimmedCommand = command.trim();
-        if (trimmedCommand.isEmpty() || replacements == null) {
-            return trimmedCommand;
-        }
-
-        for (final Map.Entry<String, String> tableMapping : replacements.entrySet()) {
-            final String stringToReplace = tableMapping.getKey();
-            final String value = tableMapping.getValue();
-            trimmedCommand = trimmedCommand.replaceAll(stringToReplace, value);
-        }
-        return trimmedCommand;
-    }
-
-    private Connection getConnection() throws SQLException {
-        return datasource.getConnection();
-    }
-
-    @Override
-    public long createTenant(final STenant tenant) throws STenantCreationException, STenantAlreadyExistException {
-        // check if the tenant already exists. If yes, throws TenantAlreadyExistException
-        checkIfTenantAlreadyExists(tenant);
-
-        // create the tenant
-        try {
-            // force tenant to be created with id one, there is only at most one tenant
-            tenant.setId(1);
-            recorder.recordInsert(new InsertRecord(tenant), TENANT);
-        } catch (final SRecorderException e) {
-            throw new STenantCreationException("Unable to insert the tenant row : " + e.getMessage(), e);
-        }
-
-        initializeTenant(tenant);
-        return tenant.getId();
-    }
-
-    private void checkIfTenantAlreadyExists(final STenant tenant) throws STenantAlreadyExistException {
-        try {
-            final String tenantName = tenant.getName();
-            final STenant existingTenant = getTenantByName(tenantName);
-            if (existingTenant != null) {
-                throw new STenantAlreadyExistException(
-                        "Unable to create the tenant " + tenantName + " : it already exists.");
-            }
-        } catch (final STenantNotFoundException ignored) {
-            //it's ok, the tenant does not exists
-        }
-    }
-
-    private void initializeTenant(final STenant tenant) throws STenantCreationException {
-        try {
-            executeSQLResources(Collections.singletonList("initTenantTables.sql"), buildReplacements(tenant));
-        } catch (final IOException | SQLException e) {
-            throw new STenantCreationException(e);
-        }
-    }
-
-    private Map<String, String> buildReplacements(final STenant tenant) {
-        return singletonMap("\\$\\{tenantid\\}", Long.toString(tenant.getId()));
-    }
-
-    @Override
-    public void deleteTenant(final long tenantId)
-            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
-        final STenant tenant = getTenant(tenantId);
-        if (tenant.getStatus().equals(STenant.ACTIVATED)) {
-            throw new SDeletingActivatedTenantException();
-        }
-        try {
-            platformPersistenceService.delete(tenant);
-        } catch (final SPersistenceException e) {
-            throw new STenantDeletionException("Unable to delete the tenant : " + e.getMessage(), e);
-        }
-
-    }
-
-    @Override
-    public void deleteTenantObjects(final long tenantId)
-            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
-        final STenant tenant = getTenant(tenantId);
-        if (tenant.getStatus().equals(STenant.ACTIVATED)) {
-            throw new SDeletingActivatedTenantException();
-        }
-
-        final Map<String, String> replacements = buildReplacements(tenant);
-
-        try {
-            executeSQLResources(Collections.singletonList("deleteTenantObjects.sql"), replacements);
-        } catch (final IOException | SQLException e) {
-            throw new STenantDeletionException(e);
-        }
     }
 
     @Override

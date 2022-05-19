@@ -111,6 +111,8 @@ public class PlatformSetupIT {
         assertThat(sequences).isGreaterThan(1);
         final int platformRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "platform");
         assertThat(platformRows).isEqualTo(1);
+        final int tenantRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "tenant");
+        assertThat(tenantRows).isEqualTo(1);
         final int configurationFiles = JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration");
         assertThat(configurationFiles).isGreaterThan(1);
     }

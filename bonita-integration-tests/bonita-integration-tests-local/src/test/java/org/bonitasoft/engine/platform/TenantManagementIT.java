@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.platform.exception.STenantAlreadyExistException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -60,20 +59,6 @@ public class TenantManagementIT extends CommonBPMServicesTest {
         assertThat(tenant.getCreatedBy()).isEqualTo(createdBy);
         assertThat(tenant.getCreated()).isEqualTo(created);
         assertThat(tenant.getDescription()).isEqualTo(description);
-    }
-
-    @Test(expected = STenantAlreadyExistException.class)
-    public void cannotCreateSecondTenantWithSameName() throws Exception {
-        STenant sTenant = STenant.builder().name("default").createdBy("anyone")
-                .created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false).build();
-        getTransactionService().begin();
-        try {
-            platformService.createTenant(sTenant);
-            fail("Tenant should already exist...");
-        } finally {
-            getTransactionService().complete();
-        }
-
     }
 
     @Test

@@ -42,25 +42,6 @@ import org.bonitasoft.engine.platform.StopNodeException;
 public interface PlatformAPI {
 
     /**
-     * <b>Create the platform.</b>
-     * <p>
-     * The platform creation is done in 3 steps:
-     * <ul>
-     * <li>Creation of the persistence structure: tables are created</li>
-     * <li>Initialization of persistence structure: index are added, default values and so on</li>
-     * <li>The platform state is persisted</li>
-     * </ul>
-     *
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         occurs if the API session is invalid, e.g session has expired.
-     * @throws CreationException
-     *         occurs when an exception is thrown during platform creation
-     * @deprecated since 7.3.0. Use {@link #initializePlatform()} instead.
-     */
-    @Deprecated
-    void createPlatform() throws CreationException;
-
-    /**
      * <b>Initialize the platform.</b>
      * The running environment of Bonita Engine is initialized and marked as activated.<br>
      * Business elements linked to the execution are initialized, after this step the technical user will be able to
@@ -70,22 +51,10 @@ public interface PlatformAPI {
      *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
      *         occurs when an exception is thrown during platform creation
+     * @deprecated Not usefull anymore, initialization is done by the setup tool
      */
+    @Deprecated(forRemoval = true, since = "7.16.0")
     void initializePlatform() throws CreationException;
-
-    /**
-     * Utility method that call {@link #createPlatform()} and {@link #initializePlatform()}
-     *
-     * @see #createPlatform()
-     * @see #initializePlatform()
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         occurs if the API session is invalid, e.g session has expired.
-     * @throws CreationException
-     *         occurs when an exception is thrown during platform creation
-     * @deprecated since 7.3.0. Use {@link #initializePlatform()} instead.
-     */
-    @Deprecated
-    void createAndInitializePlatform() throws CreationException;
 
     /**
      * <b>Starts the node.</b>

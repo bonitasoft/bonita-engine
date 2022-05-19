@@ -31,7 +31,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
@@ -58,9 +57,6 @@ public class PlatformIT extends CommonAPIIT {
 
     @After
     public void after() throws BonitaException {
-        if (!platformAPI.isPlatformInitialized()) {
-            platformAPI.initializePlatform();
-        }
         if (!platformAPI.isNodeStarted()) {
             platformAPI.startNode();
         }
@@ -76,9 +72,6 @@ public class PlatformIT extends CommonAPIIT {
     public void before() throws BonitaException {
         session = platformTestUtil.loginOnPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        if (!platformAPI.isPlatformCreated()) {
-            platformAPI.createAndInitializePlatform();
-        }
         if (!platformAPI.isNodeStarted()) {
             platformAPI.startNode();
         }
@@ -100,12 +93,6 @@ public class PlatformIT extends CommonAPIIT {
     @Test
     public void isPlatformInitialized() throws BonitaException {
         assertTrue(platformAPI.isPlatformInitialized());
-    }
-
-    @Test(expected = CreationException.class)
-    public void createPlatformException() throws BonitaException {
-        assertTrue(platformAPI.isPlatformInitialized());
-        platformAPI.initializePlatform();
     }
 
     @Test

@@ -64,16 +64,16 @@ public class EngineInitializerTest {
     }
 
     @Test
-    public void initializeEngine_should_initialize_platform_and_start_node() throws Exception {
+    public void initializeEngine_should_start_node() throws Exception {
         // given
         doReturn(true).when(platformAPI).isPlatformCreated();
+        doReturn(true).when(platformAPI).isPlatformInitialized();
         systemOutRule.clearLog();
 
         // when
         engineInitializer.initializeEngine();
 
         //then
-        verify(platformAPI).initializePlatform();
         verify(platformAPI).startNode();
         // This message below is a line of the "Bonita Community" message:
         assertThat(systemOutRule.getLog()).contains(
@@ -93,25 +93,15 @@ public class EngineInitializerTest {
     }
 
     @Test
-    public void should_not_initialize_platform_when_platform_is_not_created() throws Exception {
+    public void should_not_start_node_when_platform_is_not_initialized() throws Exception {
         //given
-        doReturn(false).when(platformAPI).isPlatformCreated();
+        doReturn(true).when(platformAPI).isPlatformCreated();
+        doReturn(false).when(platformAPI).isPlatformInitialized();
         //when
         final Throwable throwable = catchThrowable(() -> engineInitializer.initializeEngine());
         //then
         assertThat(throwable).isInstanceOf(PlatformNotFoundException.class);
-        verify(platformAPI, never()).initializePlatform();
-    }
-
-    @Test
-    public void should_not_initialize_platform_when_platform_is_already_initialized() throws Exception {
-        //given
-        doReturn(true).when(platformAPI).isPlatformCreated();
-        doReturn(true).when(platformAPI).isPlatformInitialized();
-        //when
-        engineInitializer.initializeEngine();
-        //then
-        verify(platformAPI, never()).initializePlatform();
+        verify(platformAPI, never()).startNode();
     }
 
     @Test

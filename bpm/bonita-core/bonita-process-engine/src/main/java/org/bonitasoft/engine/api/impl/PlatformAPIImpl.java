@@ -27,7 +27,6 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -40,19 +39,12 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
-import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.exception.STenantCreationException;
 import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Matthieu Chaffotte
@@ -73,45 +65,8 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
-    public void createPlatform() throws CreationException {
+    public void initializePlatform() {
         //nothing to do
-    }
-
-    @Override
-    @CustomTransactions
-    @AvailableOnStoppedNode
-    public void initializePlatform() throws CreationException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = getPlatformAccessor();
-        } catch (final Exception e) {
-            throw new CreationException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionService transactionService = platformAccessor.getTransactionService();
-        // 1 tx to create content and default tenant
-        try {
-            transactionService.begin();
-            try {
-                // inside new tx because we need sequence ids
-                createDefaultTenant(platformAccessor, platformService, transactionService);
-            } catch (final Exception e) {
-                log.warn("Cannot create default tenant", e);
-                throw new CreationException("Platform initialisation failed.", e);
-            } finally {
-                transactionService.complete();
-            }
-        } catch (final STransactionException e1) {
-            throw new CreationException(e1);
-        }
-    }
-
-    @Override
-    @CustomTransactions
-    @AvailableOnStoppedNode
-    public void createAndInitializePlatform() throws CreationException {
-        createPlatform();
-        initializePlatform();
     }
 
     protected PlatformServiceAccessor getPlatformAccessor()
@@ -142,12 +97,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new StartNodeException(
                     "Platform is in state " + platformManager.getState() + " and cannot be started");
         }
-    }
-
-    SessionAccessor createSessionAccessor()
-            throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException,
-            IOException, BonitaHomeConfigurationException {
-        return ServiceAccessorFactory.getInstance().createSessionAccessor();
     }
 
     @Override
@@ -190,92 +139,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ModelConvertor.toPlatform(sPlatform, platformAccessor.getPlatformService().getSPlatformProperties());
     }
 
-    private void createDefaultTenant(final PlatformServiceAccessor platformAccessor,
-            final PlatformService platformService,
-            final TransactionService transactionService) throws STenantCreationException {
-        final String tenantName = "default";
-        final String description = "Default tenant";
-        SessionAccessor sessionAccessor = null;
-        long platformSessionId = -1;
-        Long tenantId = -1L;
-        try {
-            // add tenant to database
-            final String createdBy = "defaultUser";
-            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy)
-                    .created(System.currentTimeMillis()).status(STenant.ACTIVATED).defaultTenant(true)
-                    .description(description).build();
-            tenantId = platformService.createTenant(tenant);
-
-            transactionService.complete();
-            transactionService.begin();
-        } catch (final STenantCreationException e) {
-            if (tenantId != -1L) {
-                try {
-                    deleteTenant(tenantId);
-                } catch (DeletionException ex) {
-                    throw new STenantCreationException(
-                            "Unable to delete default tenant (after a STenantCreationException) that was being created",
-                            ex);
-                }
-            }
-            throw e;
-        } catch (final Exception e) {
-            throw new STenantCreationException("Unable to create default tenant", e);
-        } finally {
-            cleanSessionAccessor(sessionAccessor, platformSessionId);
-        }
-    }
-
-    protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
-        if (sessionAccessor != null) {
-            sessionAccessor.deleteSessionId();
-            if (platformSessionId != -1) {
-                sessionAccessor.setSessionInfo(platformSessionId, -1);
-            }
-        }
-    }
-
-    @CustomTransactions
-    protected void deleteTenant(final long tenantId) throws DeletionException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = getPlatformAccessor();
-            final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionService transactionService = platformAccessor.getTransactionService();
-
-            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            tenantServiceAccessor.getTenantStateManager().stop();
-            tenantServiceAccessor.destroy();
-
-            // delete tenant objects in database
-            transactionService.executeInTransaction(() -> {
-                platformService.deleteTenantObjects(tenantId);
-                return null;
-            });
-
-            // delete tenant in database
-            transactionService.executeInTransaction(() -> {
-                platformService.deleteTenant(tenantId);
-                return null;
-            });
-
-            log.info("Destroy tenant context of tenant " + tenantId);
-
-            // delete tenant folder
-            getBonitaHomeServer().deleteTenant(tenantId);
-        } catch (final SDeletingActivatedTenantException e) {
-            throw new DeletionException("Unable to delete an activated tenant " + tenantId);
-        } catch (final DeletionException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new DeletionException(e);
-        }
-    }
-
-    protected Long createSession(final long tenantId, final SessionService sessionService) throws SBonitaException {
-        return sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
-    }
-
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
@@ -293,7 +156,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
-    public boolean isPlatformCreated() throws PlatformNotFoundException {
+    public boolean isPlatformCreated() {
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = getPlatformAccessor();
