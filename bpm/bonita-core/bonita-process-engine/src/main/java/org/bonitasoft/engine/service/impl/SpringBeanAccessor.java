@@ -15,10 +15,14 @@ package org.bonitasoft.engine.service.impl;
 
 import static org.bonitasoft.engine.Profiles.CLUSTER;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
@@ -31,12 +35,13 @@ import org.springframework.core.env.PropertiesPropertySource;
  *
  * @author Charles Souillard
  */
-public abstract class SpringBeanAccessor {
+public class SpringBeanAccessor {
 
     static final BonitaHomeServer BONITA_HOME_SERVER = BonitaHomeServer.getInstance();
     private BonitaSpringContext context;
 
     private boolean contextFinishedInitialized = false;
+    private File bonita_conf;
 
     public <T> T getService(final Class<T> serviceClass) {
         return getContext().getBean(serviceClass);
@@ -87,7 +92,9 @@ public abstract class SpringBeanAccessor {
         propertySources.addFirst(new PropertiesPropertySource("contextProperties", getProperties()));
     }
 
-    protected abstract BonitaSpringContext createContext();
+    protected BonitaSpringContext createContext() {
+        return new BonitaSpringContext(null, "Platform");
+    }
 
     public void destroy() {
         if (context != null) {
@@ -97,11 +104,52 @@ public abstract class SpringBeanAccessor {
         contextFinishedInitialized = false;
     }
 
-    protected abstract Properties getProperties() throws IOException;
+    protected Properties getProperties() throws IOException {
+        Properties platformProperties = BONITA_HOME_SERVER.getPlatformProperties();
+        platformProperties.putAll(BONITA_HOME_SERVER.getTenantProperties(1));
+        platformProperties.setProperty("bonita.conf.folder", bonita_conf.getAbsolutePath());
+        return platformProperties;
+    }
 
-    protected abstract List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException;
+    protected List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException {
+        List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
+        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getPlatformInitConfiguration());
 
-    protected abstract List<String> getSpringFileFromClassPath(boolean cluster);
+        List<BonitaConfiguration> platformConfiguration = BONITA_HOME_SERVER.getPlatformConfiguration();
+        //handle special case for cache configuration files
+        Iterator<BonitaConfiguration> iterator = platformConfiguration.iterator();
+        bonita_conf = org.bonitasoft.engine.io.IOUtil
+                .createTempDirectory(File.createTempFile("bonita_conf", "").toURI());
+        bonita_conf.delete();
+        bonita_conf.mkdir();
+        while (iterator.hasNext()) {
+            BonitaConfiguration bonitaConfiguration = iterator.next();
+            if (bonitaConfiguration.getResourceName().contains("cache")) {
+                iterator.remove();
+                IOUtil.write(new File(bonita_conf, bonitaConfiguration.getResourceName()),
+                        bonitaConfiguration.getResourceContent());
+            }
+        }
+
+        bonitaConfigurations.addAll(platformConfiguration);
+        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getTenantConfiguration(1));
+        return bonitaConfigurations;
+    }
+
+    protected List<String> getSpringFileFromClassPath(boolean cluster) {
+        List<String> resources = new ArrayList<>();
+        resources.add("bonita-platform-init-community.xml");
+        resources.add("bonita-platform-init-sp.xml");
+        resources.add("bonita-platform-community.xml");
+        resources.add("bonita-platform-sp.xml");
+        resources.add("bonita-tenant-community.xml");
+        resources.add("bonita-tenant-sp.xml");
+        if (cluster) {
+            resources.add("bonita-platform-sp-cluster.xml");
+            resources.add("bonita-tenant-sp-cluster.xml");
+        }
+        return resources;
+    }
 
     String getPropertyWithPlaceholder(Properties properties, String key, String defaultValue) {
         String property = properties.getProperty(key, defaultValue);

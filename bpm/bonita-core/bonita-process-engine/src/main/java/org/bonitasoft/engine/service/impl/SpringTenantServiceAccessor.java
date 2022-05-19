@@ -343,7 +343,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public EventService getEventService() {
-        return beanAccessor.getService(EventService.class);
+        return beanAccessor.getService("tenantEventService", EventService.class);
     }
 
     public SpringBeanAccessor getBeanAccessor() {
