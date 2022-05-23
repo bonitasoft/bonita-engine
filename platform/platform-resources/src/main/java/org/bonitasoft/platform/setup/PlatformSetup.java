@@ -477,6 +477,11 @@ public class PlatformSetup {
         initDataSource();
     }
 
+    // Used by distrib bundle tests
+    public ConfigurationService getConfigurationService() {
+        return configurationService;
+    }
+
     void preventFromPushingZeroLicense() throws PlatformException {
         if (Files.isDirectory(licensesFolder)) {
             final String[] licenseFiles = licensesFolder.toFile().list(new RegexFileFilter(".*\\.lic"));
