@@ -433,6 +433,21 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
+    public List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesOfProcessDefinitionInAllStates(
+            final long processDefinitionId)
+            throws SBonitaReadException {
+        final HashMap<String, Object> parameters = new HashMap<>(2);
+        parameters.put("processDefinitionId", processDefinitionId);
+        final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<>(
+                "getNumberOfFlowNodesOfProcessDefinitionInAllStates", parameters, SFlowNodeInstance.class,
+                new QueryOptions(0, Integer.MAX_VALUE)));
+        if (result != null && result.size() > 0) {
+            return result;
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
     public List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long parentProcessInstanceId)
             throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<>(2);
