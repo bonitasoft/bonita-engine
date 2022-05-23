@@ -4187,6 +4187,29 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public Map<String, Map<String, Long>> getActiveFlownodeStateCountersForProcessDefinition(
+            final long processDefinitionId) {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final HashMap<String, Map<String, Long>> countersForProcessDefinition = new HashMap<>();
+        try {
+            // Active flownodes:
+            final List<SFlowNodeInstanceStateCounter> flownodes = serviceAccessor.getActivityInstanceService()
+                    .getNumberOfFlownodesOfProcessDefinitionInAllStates(
+                            processDefinitionId);
+            for (final SFlowNodeInstanceStateCounter nodeCounter : flownodes) {
+                final String flownodeName = nodeCounter.getFlownodeName();
+                final Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessDefinition,
+                        flownodeName);
+                flownodeCounters.put(nodeCounter.getStateName(), nodeCounter.getNumberOf());
+                countersForProcessDefinition.put(flownodeName, flownodeCounters);
+            }
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+        return countersForProcessDefinition;
+    }
+
+    @Override
     public Map<String, Map<String, Long>> getFlownodeStateCounters(final long processInstanceId) {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final HashMap<String, Map<String, Long>> countersForProcessInstance = new HashMap<>();
