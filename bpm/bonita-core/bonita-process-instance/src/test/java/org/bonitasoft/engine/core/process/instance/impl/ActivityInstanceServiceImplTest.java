@@ -335,6 +335,18 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
+    public void getNumberOfFlownodesOfProcessDefinitionInAllStates_should_return_empty_collections_if_no_results()
+            throws SBonitaReadException {
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Map<String, Object>>> any()))
+                .thenReturn(
+                        Collections.<Map<String, Object>> emptyList());
+
+        final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl
+                .getNumberOfFlownodesOfProcessDefinitionInAllStates(1L);
+        assertThat(numberOfFlownodesInState).isEmpty();
+    }
+
+    @Test
     public void getNumberOfFlownodesInAllStates_should_return_empty_collections_if_no_results()
             throws SBonitaReadException {
         when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Map<String, Object>>> any()))

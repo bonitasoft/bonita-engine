@@ -378,6 +378,46 @@ public class FlowNodeInstanceTest {
     }
 
     @Test
+    public void getNumberOfFlowNodesOfProcessDefinitionInAllStates_should_return_results_aggregated_by_name_and_state() {
+        buildAndAddUserTaskWithProcessDefinitionId("step1", 15L, 28, "executing");
+        buildAndAddUserTaskWithProcessDefinitionId("step1", 15L, 28, "executing");
+        buildAndAddUserTaskWithProcessDefinitionId("step1", 15L, 3, "failed");
+        buildAndAddUserTaskWithProcessDefinitionId("step1", 1L, 29, "someflownodeStateName"); // should not be selected because it is a flownode of another process
+        buildAndAddUserTaskWithProcessDefinitionId("step2", 15L, 3, "failed");
+        buildAndAddUserTaskWithProcessDefinitionId("step1", 15L, 4, "ready");
+
+        List<SFlowNodeInstanceStateCounter> counters = repository
+                .getNumberOfFlowNodesOfProcessDefinitionInAllStates(15L);
+        assertThat(counters).hasSize(4);
+
+        assertThat(counters.get(0).getFlownodeName()).isEqualTo("step1");
+        assertThat(counters.get(0).getStateName()).isEqualTo("executing");
+        assertThat(counters.get(0).getNumberOf()).isEqualTo(2L);
+
+        assertThat(counters.get(1).getFlownodeName()).isEqualTo("step1");
+        assertThat(counters.get(1).getStateName()).isEqualTo("failed");
+        assertThat(counters.get(1).getNumberOf()).isEqualTo(1L);
+
+        assertThat(counters.get(2).getFlownodeName()).isEqualTo("step1");
+        assertThat(counters.get(2).getStateName()).isEqualTo("ready");
+        assertThat(counters.get(2).getNumberOf()).isEqualTo(1L);
+
+        assertThat(counters.get(3).getFlownodeName()).isEqualTo("step2");
+        assertThat(counters.get(3).getStateName()).isEqualTo("failed");
+        assertThat(counters.get(3).getNumberOf()).isEqualTo(1L);
+
+    }
+
+    private SFlowNodeInstance buildAndAddUserTaskWithProcessDefinitionId(final String taskName,
+            final long processDefinitionId,
+            int stateId, String stateName) {
+        return repository
+                .add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false)
+                        .withLogicalGroup1(processDefinitionId)
+                        .withStateId(stateId).withStateName(stateName).build());
+    }
+
+    @Test
     public void getNumberOfFlowNodesInAllStates_should_return_results_aggregated_by_name_and_state() {
         buildAndAddUserTaskWithParentAndRootProcessInstanceId("step1", 147L, 0L, 28, "executing");
         buildAndAddUserTaskWithParentAndRootProcessInstanceId("step1", 147L, 0L, 28, "executing");

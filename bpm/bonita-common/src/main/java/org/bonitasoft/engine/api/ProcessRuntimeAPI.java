@@ -2773,14 +2773,28 @@ public interface ProcessRuntimeAPI {
             SearchOptions searchOptions) throws SearchException;
 
     /**
+     * Retrieve, for a given process definition, the current counters on active (not archived) flownodes.
+     *
+     * @param processDefinitionId ID of the process definition for which to retrieve the current indicators.
+     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the
+     *         current counters for this flownode, that is,
+     *         a map of &lt;state name, number of current flownode in that state&gt; (possible state names are: ready,
+     *         executing, waiting, initializing, failed, completing)
+     *         If no results, returns an empty Map.
+     * @since 7.15.0
+     */
+    Map<String, Map<String, Long>> getActiveFlownodeStateCountersForProcessDefinition(final long processDefinitionId);
+
+    /**
      * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not
      * count the flownodes of sub-process instances
      * of the given process instance.
      *
-     * @param processInstanceId ID of the process instance of which to retrieve the current indicators.
+     * @param processInstanceId ID of the process instance for which to retrieve the current indicators.
      * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the
      *         current counters for this flownode, that is,
-     *         a map of &lt;state name, number of current flownode in that state&gt;
+     *         a map of &lt;state name, number of current flownode in that state&gt; (possible state names are: ready,
+     *         executing, waiting, initializing, failed, completing, completed, skipped, cancelled, aborted)
      *         If no results, returns an empty Map.
      * @since 6.5.0
      */
