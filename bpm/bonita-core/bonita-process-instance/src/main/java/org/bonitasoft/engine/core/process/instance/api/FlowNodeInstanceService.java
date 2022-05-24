@@ -185,11 +185,23 @@ public interface FlowNodeInstanceService {
 
     /**
      * Counts the number of flownode instances in all states. Only considers flownodes direcly contained in given
+     * process definition. Results are counted per flownode name and per state.
+     *
+     * @param processDefinitionId the ID of the process definition to search flownodes for.
+     * @return a list of FlowNodeInstanceStateCounter. If no results, returns an empty list.
+     * @throws SBonitaReadException if a read exception occurs.
+     */
+    List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesOfProcessDefinitionInAllStates(
+            final long processDefinitionId)
+            throws SBonitaReadException;
+
+    /**
+     * Counts the number of flownode instances in all states. Only considers flownodes direcly contained in given
      * process instance, not flownodes in
      * sub-process instances. Results are counted per flownode name and per state.
      *
      * @param processInstanceId the ID of the process instance to search flownodes for.
-     * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
+     * @return a list of FlowNodeInstanceStateCounter. If no results, returns an empty list.
      * @throws SBonitaReadException if a read exception occurs.
      */
     List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long processInstanceId)
@@ -203,7 +215,7 @@ public interface FlowNodeInstanceService {
      * @param processInstanceId the ID of the process instance to search flownodes for. This is the ID of the process
      *        instance before it was archived
      *        (corresponding to the sourceObjectId in the archives)
-     * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
+     * @return a list of FlowNodeInstanceStateCounter. If no results, returns an empty list.
      * @throws SBonitaReadException if a read exception occurs.
      */
     public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(final long processInstanceId)

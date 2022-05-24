@@ -359,6 +359,35 @@ public class ProcessAPIImplTest {
     }
 
     @Test
+    public void getFlownodeStateCountersForProcessDefinition_should_build_proper_journal_counters() throws Exception {
+        final long processDefinitionId = 58L;
+        final List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<>(4);
+        flownodes.add(new SFlowNodeInstanceStateCounter("step1", "ready", 2L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step2", "ready", 4L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step1", "executing", 1L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step3", "failed", 8L));
+        when(activityInstanceService.getNumberOfFlownodesOfProcessDefinitionInAllStates(processDefinitionId))
+                .thenReturn(flownodes);
+
+        final Map<String, Map<String, Long>> flownodeStateCounters = processAPI
+                .getActiveFlownodeStateCountersForProcessDefinition(processDefinitionId);
+        assertThat(flownodeStateCounters.size()).isEqualTo(3);
+
+        final Map<String, Long> step1 = flownodeStateCounters.get("step1");
+        assertThat(step1.size()).isEqualTo(2);
+        assertThat(step1.get("ready")).isEqualTo(2L);
+        assertThat(step1.get("executing")).isEqualTo(1L);
+
+        final Map<String, Long> step2 = flownodeStateCounters.get("step2");
+        assertThat(step2.size()).isEqualTo(1);
+        assertThat(step2.get("ready")).isEqualTo(4L);
+
+        final Map<String, Long> step3 = flownodeStateCounters.get("step3");
+        assertThat(step3.size()).isEqualTo(1);
+        assertThat(step3.get("failed")).isEqualTo(8L);
+    }
+
+    @Test
     public void getFlownodeStateCounters_should_build_proper_journal_and_archived_counters() throws Exception {
         final long processInstanceId = 9811L;
         final List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<>(4);

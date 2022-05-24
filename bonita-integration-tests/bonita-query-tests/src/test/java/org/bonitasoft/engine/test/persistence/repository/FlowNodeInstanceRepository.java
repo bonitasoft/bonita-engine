@@ -125,4 +125,13 @@ public class FlowNodeInstanceRepository extends TestRepository {
         return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<SFlowNodeInstanceStateCounter> getNumberOfFlowNodesOfProcessDefinitionInAllStates(
+            long processDefinitionId) {
+        getSessionWithTenantFilter();
+        Query namedQuery = getNamedQuery("getNumberOfFlowNodesOfProcessDefinitionInAllStates");
+        namedQuery.setParameter("processDefinitionId", processDefinitionId);
+        return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();
+    }
+
 }
