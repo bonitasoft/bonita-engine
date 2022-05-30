@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl.transaction.process;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -24,8 +25,6 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -36,24 +35,22 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public final class DisableProcess implements TransactionContent {
 
     private final ProcessDefinitionService processDefinitionService;
     private final EventInstanceService eventInstanceService;
     private final long processDefinitionId;
     private final SchedulerService scheduler;
-    private final TechnicalLoggerService logger;
     private final String username;
 
     public DisableProcess(final ProcessDefinitionService processDefinitionService, final long processId,
             final EventInstanceService eventInstanceService,
-            final SchedulerService scheduler,
-            final TechnicalLoggerService logger, final String username) {
+            final SchedulerService scheduler, final String username) {
         this.processDefinitionService = processDefinitionService;
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionId = processId;
         this.scheduler = scheduler;
-        this.logger = logger;
         this.username = username;
     }
 
@@ -62,12 +59,10 @@ public final class DisableProcess implements TransactionContent {
         processDefinitionService.disableProcessDeploymentInfo(processDefinitionId);
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         disableStartEvents(processDefinition);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
-                    "The user <" + username + "> has disabled process <" + processDefinition.getName()
-                            + "> in version <" + processDefinition.getVersion() + "> with id <"
-                            + processDefinition.getId() + ">");
-        }
+        log.info("The user <" + username + "> has disabled process <" + processDefinition.getName()
+                + "> in version <" + processDefinition.getVersion() + "> with id <"
+                + processDefinition.getId() + ">");
+
     }
 
     private void disableStartEvents(final SProcessDefinition processDefinition) throws SBonitaException {

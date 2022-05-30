@@ -3,13 +3,14 @@ plugins {
 }
 
 dependencies {
+    runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     compile project(':services:bonita-commons')
     compile project(':services:bonita-time-tracker')
     compile project(':services:bonita-session')
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
-
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 }

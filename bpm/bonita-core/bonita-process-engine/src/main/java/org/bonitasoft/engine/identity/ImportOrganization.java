@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
 import org.bonitasoft.engine.api.impl.SessionInfos;
@@ -37,14 +38,13 @@ import org.bonitasoft.engine.identity.xml.ExportedRole;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
 import org.bonitasoft.engine.identity.xml.ExportedUserMembership;
 import org.bonitasoft.engine.identity.xml.Organization;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class ImportOrganization {
 
     private static final String LEGACY_NS = "xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema\"";
@@ -52,9 +52,6 @@ public class ImportOrganization {
     private static final String VERSIONED_NS = "xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema/1.1\"";
 
     final IdentityService identityService;
-
-    private final TechnicalLoggerService logger;
-
     private final String organizationContent;
 
     private final List<String> warnings;
@@ -72,7 +69,6 @@ public class ImportOrganization {
         this.userInfoValueAPI = userInfoValueAPI;
         identityService = serviceAccessor.getIdentityService();
         this.organizationContent = updateNamespace(organizationContent);
-        logger = serviceAccessor.getTechnicalLoggerService();
         warnings = new ArrayList<>();
         switch (policy) {
             case FAIL_ON_DUPLICATES:
@@ -82,7 +78,7 @@ public class ImportOrganization {
                 strategy = new ImportOrganizationIgnoreDuplicatesStrategy();
                 break;
             case MERGE_DUPLICATES:
-                strategy = new ImportOrganizationMergeDuplicatesStrategy(identityService, userInfoValueAPI, logger);
+                strategy = new ImportOrganizationMergeDuplicatesStrategy(identityService, userInfoValueAPI);
                 break;
             default:
                 throw new OrganizationImportException("No import strategy found for " + policy);
@@ -167,11 +163,9 @@ public class ImportOrganization {
                     addMembership(newMembership, userId, groupId, roleId, assignedBy);
                 }
             } else {
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(getClass(), TechnicalLogSeverity.WARNING, "The membership " + newMembership
-                            + " could not be imported because the user, group or role can't be found\n userId=" +
-                            userId + " groupId=" + groupId + " roleId=" + roleId);
-                }
+                log.warn("The membership " + newMembership
+                        + " could not be imported because the user, group or role can't be found\n userId=" +
+                        userId + " groupId=" + groupId + " roleId=" + roleId);
             }
         }
     }
@@ -281,9 +275,8 @@ public class ImportOrganization {
                             BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance()
                                     .updateManagerUserId(manager.getId()).done());
                 } else {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                            "The user " + user.getUserName() + " has a manager with username "
-                                    + managerUserName + ", but this one does not exist. Please set it manually.");
+                    log.warn("The user " + user.getUserName() + " has a manager with username "
+                            + managerUserName + ", but this one does not exist. Please set it manually.");
                 }
             }
         }

@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -35,17 +34,15 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 /**
  * @author Baptiste Mesta
  */
+@Slf4j
 public class TenantResourcesServiceImpl implements TenantResourcesService {
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
-    private final TechnicalLoggerService logger;
 
-    public TenantResourcesServiceImpl(Recorder recorder, ReadPersistenceService persistenceService,
-            TechnicalLoggerService logger) {
+    public TenantResourcesServiceImpl(Recorder recorder, ReadPersistenceService persistenceService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
-        this.logger = logger;
     }
 
     @Override
@@ -55,9 +52,9 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
                     INSTALLED);
             recorder.recordInsert(new InsertRecord(resource), TENANT_RESOURCE);
         } else {
-            logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                    "Tenant resource file contains an empty file " + name
-                            + " that will be ignored. Check that this is not a mistake.");
+            log.warn(
+                    "Tenant resource file contains an empty file {} that will be ignored. Check that this is not a mistake.",
+                    name);
         }
     }
 

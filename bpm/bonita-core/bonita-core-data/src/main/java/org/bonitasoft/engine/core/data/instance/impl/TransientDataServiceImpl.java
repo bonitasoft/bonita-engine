@@ -53,34 +53,34 @@ import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWell
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptiste Mesta
  */
+
 public class TransientDataServiceImpl implements TransientDataService {
 
+    private static final Logger log = LoggerFactory.getLogger(TransientDataServiceImpl.class);
     static final String TRANSIENT_DATA_CACHE_NAME = "transient_data";
 
     private final CacheService cacheService;
     private final ExpressionResolverService expressionResolverService;
-    private final TechnicalLoggerService logger;
+
     private final FlowNodeInstanceService flowNodeInstanceService;
     private final ProcessDefinitionService processDefinitionService;
 
     public TransientDataServiceImpl(final CacheService cacheService,
             ExpressionResolverService expressionResolverService,
             FlowNodeInstanceService flowNodeInstanceService,
-            ProcessDefinitionService processDefinitionService,
-            TechnicalLoggerService logger) {
+            ProcessDefinitionService processDefinitionService) {
         this.cacheService = cacheService;
         this.expressionResolverService = expressionResolverService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processDefinitionService = processDefinitionService;
-        this.logger = logger;
     }
 
     @Override
@@ -233,19 +233,14 @@ public class TransientDataServiceImpl implements TransientDataService {
         Serializable dataValue = null;
         final SExpression defaultValueExpression = dataDefinition.getDefaultValueExpression();
         if (defaultValueExpression != null) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                        String.format(
-                                "The value of the transient data %s of %s %s is reevaluated from its default value expression.",
-                                dataDefinition.getName(), containerId, containerType));
-            }
+            log.warn(String.format(
+                    "The value of the transient data %s of %s %s is reevaluated from its default value expression.",
+                    dataDefinition.getName(), containerId, containerType));
+
             dataValue = (Serializable) expressionResolverService.evaluate(dataDefinition.getDefaultValueExpression(),
                     expressionContext);
         } else {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                        "Creating a transient data instance with a null expression is not a good practice.");
-            }
+            log.warn("Creating a transient data instance with a null expression is not a good practice.");
         }
 
         try {

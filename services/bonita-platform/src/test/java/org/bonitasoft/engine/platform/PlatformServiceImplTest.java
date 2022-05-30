@@ -26,7 +26,6 @@ import javax.sql.DataSource;
 
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -60,9 +59,6 @@ public class PlatformServiceImplTest {
 
     @Mock
     private PlatformRetriever platformRetriever;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @Mock
     private PlatformCacheService platformCacheService;

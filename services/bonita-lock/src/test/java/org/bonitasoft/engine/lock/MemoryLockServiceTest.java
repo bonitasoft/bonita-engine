@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.lock;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -24,8 +22,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -110,13 +106,11 @@ public class MemoryLockServiceTest {
         }
     }
 
-    private final TechnicalLoggerService logger = new TechnicalLoggerSLF4JImpl();
-
     private MemoryLockService memoryLockService;
 
     @Before
     public void before() {
-        memoryLockService = new MemoryLockService(logger, 1);
+        memoryLockService = new MemoryLockService(1);
     }
 
     @Test

@@ -21,13 +21,12 @@ import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class GroovyScriptConditionExpressionExecutorStrategy extends GroovyScriptExpressionExecutorCacheStrategy {
 
     public GroovyScriptConditionExpressionExecutorStrategy(CacheService cacheService,
-            ClassLoaderService classLoaderService, TechnicalLoggerService logger) {
-        super(cacheService, classLoaderService, logger);
+            ClassLoaderService classLoaderService) {
+        super(cacheService, classLoaderService);
     }
 
     @Override

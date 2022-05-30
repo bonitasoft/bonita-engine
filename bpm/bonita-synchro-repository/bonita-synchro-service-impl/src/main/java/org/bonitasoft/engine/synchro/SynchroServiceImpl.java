@@ -24,7 +24,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.cache.CommonCacheService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Emmanuel Duchastenier
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class SynchroServiceImpl extends AbstractSynchroService {
 
+    private Logger logger = LoggerFactory.getLogger(SynchroServiceImpl.class);
     private final Map<Map<String, Serializable>, String> waiters;
 
     private final Map<String, Serializable> eventKeyAndIdMap;
@@ -44,12 +46,9 @@ public class SynchroServiceImpl extends AbstractSynchroService {
     /**
      * @param initialCapacity
      *        the initial capacity of the map of fired events / waiters (default 50)
-     * @param logger
-     *        the technical logger service
      */
-    private SynchroServiceImpl(final int initialCapacity, final TechnicalLoggerService logger,
-            final CommonCacheService cacheService) {
-        super(logger, cacheService);
+    private SynchroServiceImpl(final int initialCapacity, final CommonCacheService cacheService) {
+        super(cacheService);
         waiters = new HashMap<Map<String, Serializable>, String>(initialCapacity);
         eventKeyAndIdMap = new HashMap<String, Serializable>(initialCapacity);
         eventSemaphores = new HashMap<String, Semaphore>();
@@ -62,6 +61,11 @@ public class SynchroServiceImpl extends AbstractSynchroService {
     @Override
     protected Map<Map<String, Serializable>, String> getWaitersMap() {
         return waiters;
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return logger;
     }
 
     @Override

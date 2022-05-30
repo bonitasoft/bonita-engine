@@ -50,39 +50,39 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.filter.UserFilter;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+
 public class UserFilterServiceImpl implements UserFilterService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserFilterServiceImpl.class);
     public static final String FILTER_CACHE_NAME = "USER_FILTER";
 
     private final ConnectorExecutor connectorExecutor;
     private final CacheService cacheService;
     private final ExpressionResolverService expressionResolverService;
-    private final TechnicalLoggerService logger;
     private final ProcessResourcesService processResourcesService;
     private final JAXBContext jaxbContext;
     private final Schema schema;
 
     public UserFilterServiceImpl(final ConnectorExecutor connectorExecutor, final CacheService cacheService,
-            final ExpressionResolverService expressionResolverService, final TechnicalLoggerService logger,
+            final ExpressionResolverService expressionResolverService,
             ProcessResourcesService processResourcesService) {
         super();
         this.connectorExecutor = connectorExecutor;
         this.cacheService = cacheService;
         this.expressionResolverService = expressionResolverService;
-        this.logger = logger;
         this.processResourcesService = processResourcesService;
         try {
             jaxbContext = JAXBContext.newInstance(UserFilterImplementationDescriptor.class);
@@ -102,8 +102,8 @@ public class UserFilterServiceImpl implements UserFilterService {
         final FilterResult filterResult;
         String implementationClassName = "";
         UserFilterImplementationDescriptor descriptor = null;
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     Thread.currentThread().toString() + "-[" + Thread.currentThread().getId() + ","
                             + Thread.currentThread().getState() + "]");
         }
@@ -122,7 +122,7 @@ public class UserFilterServiceImpl implements UserFilterService {
                     actorName);
         } catch (final SConnectorException e) {
             String dbgInfo = "";
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            if (logger.isDebugEnabled()) {
                 dbgInfo = buildDebugMessage(processDefinitionId, sUserFilterDefinition, inputs, classLoader,
                         expressionContext, actorName,
                         implementationClassName, descriptor);
@@ -138,7 +138,7 @@ public class UserFilterServiceImpl implements UserFilterService {
             throw new SUserFilterExecutionException(e);
         }
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+        if (logger.isDebugEnabled()) {
             String stb = "Executed userFilter [name: <" +
                     sUserFilterDefinition.getName() +
                     ">, user filter id: <" +
@@ -149,7 +149,7 @@ public class UserFilterServiceImpl implements UserFilterService {
                     expressionContext.getContainerId() +
                     ">";
 
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb);
+            logger.debug(stb);
         }
         return filterResult;
     }

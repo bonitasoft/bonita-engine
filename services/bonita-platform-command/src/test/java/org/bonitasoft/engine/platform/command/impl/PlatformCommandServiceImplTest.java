@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -43,9 +42,6 @@ public class PlatformCommandServiceImplTest {
 
     @Mock
     private PersistenceService persistenceService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @InjectMocks
     private PlatformCommandServiceImpl platformCommandServiceImpl;

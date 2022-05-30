@@ -40,8 +40,6 @@ import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,17 +69,12 @@ public class JPABusinessDataRepositoryImplTest {
     @Mock
     EntityManager manager;
 
-    @Mock
-    private TechnicalLoggerService loggerService;
-
     private JPABusinessDataRepositoryImpl realJPABusinessDataRepository;
 
     @Before
     public void setUp() {
-        doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
         realJPABusinessDataRepository = new JPABusinessDataRepositoryImpl(transactionService,
-                businessDataModelRepository, loggerService,
-                configuration, classLoaderService, 1L);
+                businessDataModelRepository, configuration, classLoaderService, 1L);
         repository = spy(
                 realJPABusinessDataRepository);
         doReturn(manager).when(repository).getEntityManager();

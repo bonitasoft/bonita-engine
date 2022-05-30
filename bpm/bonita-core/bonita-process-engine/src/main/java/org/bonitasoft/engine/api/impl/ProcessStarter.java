@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
@@ -45,8 +46,6 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -60,6 +59,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Vincent Elcrin
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class ProcessStarter {
 
     private final long userId;
@@ -142,7 +142,6 @@ public class ProcessStarter {
                     operationContext, connectorsWithInput,
                     new FlowNodeSelector(sProcessDefinition, filter), processContractInputs);
         } catch (final SProcessInstanceCreationException e) {
-            log(tenantAccessor, e);
             e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
             e.setProcessDefinitionNameOnContext(sProcessDefinition.getName());
             e.setProcessDefinitionVersionOnContext(sProcessDefinition.getVersion());
@@ -152,11 +151,6 @@ public class ProcessStarter {
         logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId,
                 startedSProcessInstance);
         return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
-    }
-
-    protected void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
     }
 
     protected long getStarterUserId(final long starterSubstituteUserId) {
@@ -176,9 +170,6 @@ public class ProcessStarter {
     private void logProcessInstanceStartedAndAddComment(final SProcessDefinition sProcessDefinition,
             final long starterId, final long starterSubstituteId,
             final SProcessInstance sProcessInstance) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-
         final StringBuilder stb = new StringBuilder();
         stb.append("The user <");
         stb.append(SessionInfos.getUserNameFromSession());
@@ -196,9 +187,7 @@ public class ProcessStarter {
         stb.append(sProcessDefinition.getId());
         stb.append(">");
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
-        }
+        log.info(stb.toString());
 
         addSystemCommentOnProcessInstanceWhenStartingProcessFor(sProcessInstance, starterId, starterSubstituteId);
     }
@@ -207,7 +196,6 @@ public class ProcessStarter {
             final long starterId,
             final long starterSubstituteId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final SCommentService commentService = tenantAccessor.getCommentService();
 
         if (starterId != starterSubstituteId) {
@@ -219,8 +207,7 @@ public class ProcessStarter {
                                 + " acting as delegate of the user " + starter.getUserName()
                                 + " has started the case.");
             } catch (final SBonitaException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
-                        "Error when adding a comment on the process instance.", e);
+                log.error("Error when adding a comment on the process instance.", e);
             }
         }
     }

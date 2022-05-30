@@ -13,13 +13,9 @@
  **/
 package org.bonitasoft.engine.execution.archive;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.nullable;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +37,6 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessM
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -61,8 +56,6 @@ public class BPMArchiverServiceTest {
     private ProcessInstanceService processInstanceService;
     @Mock
     private DocumentService documentService;
-    @Mock
-    private TechnicalLoggerService logger;
     @Mock
     private SCommentService commentService;
     @Mock

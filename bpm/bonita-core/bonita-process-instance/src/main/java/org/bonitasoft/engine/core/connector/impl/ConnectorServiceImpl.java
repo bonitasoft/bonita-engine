@@ -42,6 +42,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -72,8 +73,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -90,6 +89,7 @@ import org.bonitasoft.engine.tracking.TimeTrackerRecords;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Slf4j
 public class ConnectorServiceImpl implements ConnectorService {
 
     protected static final String CONNECTOR_CACHE_NAME = "CONNECTOR";
@@ -101,7 +101,6 @@ public class ConnectorServiceImpl implements ConnectorService {
     private final OperationService operationService;
     private final DependencyService dependencyService;
     private final ClassLoaderService classLoaderService;
-    private final TechnicalLogger logger;
     private final TimeTracker timeTracker;
     private ConnectorExecutionTimeLogger connectorExecutionTimeLogger;
     private final ProcessResourcesService processResourcesService;
@@ -112,7 +111,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     public ConnectorServiceImpl(final CacheService cacheService, final ConnectorExecutor connectorExecutor,
             final ExpressionResolverService expressionResolverService, final OperationService operationService,
             final DependencyService dependencyService, ClassLoaderService classLoaderService,
-            final TechnicalLoggerService logger, final TimeTracker timeTracker,
+            final TimeTracker timeTracker,
             ProcessResourcesService processResourcesService,
             ConnectorExecutionTimeLogger connectorExecutionTimeLogger) {
         this.cacheService = cacheService;
@@ -122,7 +121,6 @@ public class ConnectorServiceImpl implements ConnectorService {
         this.processResourcesService = processResourcesService;
         this.operationService = operationService;
         this.dependencyService = dependencyService;
-        this.logger = logger.asLogger(getClass());
         this.timeTracker = timeTracker;
         this.connectorExecutionTimeLogger = connectorExecutionTimeLogger;
         try {
@@ -171,8 +169,8 @@ public class ConnectorServiceImpl implements ConnectorService {
             SConnectorImplementationDescriptor connectorImplementationDescriptor, final ClassLoader classLoader,
             final Map<String, Object> inputParameters) throws SConnectorException {
         final String implementationClassName = connectorImplementationDescriptor.getImplementationClassName();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Executing connector {} {}", buildConnectorContextMessage(sConnectorInstance),
+        if (log.isDebugEnabled()) {
+            log.debug("Executing connector {} {}", buildConnectorContextMessage(sConnectorInstance),
                     buildConnectorInputMessage(inputParameters));
         }
         return executeConnectorInClassloader(implementationClassName, classLoader, inputParameters)
@@ -297,8 +295,8 @@ public class ConnectorServiceImpl implements ConnectorService {
         } catch (InterruptedException | ExecutionException e) {
             throw new SConnectorException(e);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Executed connector <{}> with definition id <{}>, version <{}>, {}", implementationClassName,
+        if (log.isDebugEnabled()) {
+            log.debug("Executed connector <{}> with definition id <{}>, version <{}>, {}", implementationClassName,
                     connectorDefinitionId, connectorDefinitionVersion, buildConnectorInputMessage(inputParameters));
         }
         return connectorResult;
@@ -489,7 +487,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                 if (existingDependency != null) {
                     //a dependency with this name did exists event if it was not declared as a dependency of the connector inside the connector impl file
                     if (connectorImplementationDescriptorToReplace != null) {
-                        logger.warn(
+                        log.warn(
                                 "Updating a dependency of the connector {} in version {} of process definition {}. " +
                                         "The jar file {} was not declared in the previous connector implementation but is in the dependencies of the process."
                                         +

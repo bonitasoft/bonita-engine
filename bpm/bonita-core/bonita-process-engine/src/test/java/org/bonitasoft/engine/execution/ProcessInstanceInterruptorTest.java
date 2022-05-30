@@ -27,8 +27,6 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,8 +46,6 @@ public class ProcessInstanceInterruptorTest {
     private FlowNodeInstanceService flowNodeInstanceService;
     @Mock
     private ContainerRegistry containerRegistry;
-    private TechnicalLoggerService technicalLoggerService = new TechnicalLoggerSLF4JImpl();
-
     private ProcessInstanceInterruptor processInstanceInterruptor;
 
     private long PROCESS_INSTANCE_ID = 5348927512390L;
@@ -60,7 +56,7 @@ public class ProcessInstanceInterruptorTest {
     @Before
     public void before() throws Exception {
         processInstanceInterruptor = new ProcessInstanceInterruptor(processInstanceService, flowNodeInstanceService,
-                containerRegistry, technicalLoggerService);
+                containerRegistry);
         flownode1_stable = new SUserTaskInstance("user1", 532654L, 54336L, 5643456L, 897523454L,
                 STaskPriority.ABOVE_NORMAL, PROCESS_DEFINITION_ID, 67547L);
         flownode1_stable.setId(9846769L);

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.execution.work;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
@@ -25,8 +26,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -34,6 +33,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
 
     private final long messageInstanceId;
@@ -91,21 +91,14 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
             resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService());
             return null;
         });
-        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        logger.log(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.WARNING,
+        log.warn(
                 String.format(
                         "Unable to execute message couple with sent message %s and waiting message %s, the waiting message was reset"
                                 +
                                 " to allow other message to trigger it. This failure might come from a design issue, cause is: %s",
                         messageInstanceId, waitingMessageId, getRootCause(e)));
-        if (logger.isLoggable(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.DEBUG)) {
-            logger.log(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.DEBUG,
-                    String.format(
-                            "Cause of the issue while executing message couple: sent message %s and waiting message %s:",
-                            messageInstanceId, waitingMessageId),
-                    e);
-        }
-
+        log.debug("Cause of the issue while executing message couple: sent message {} and waiting message {} error {}",
+                messageInstanceId, waitingMessageId, e);
     }
 
     private String getRootCause(Throwable e) {

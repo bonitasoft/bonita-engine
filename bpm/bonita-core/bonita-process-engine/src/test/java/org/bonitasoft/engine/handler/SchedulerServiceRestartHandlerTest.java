@@ -15,14 +15,11 @@ package org.bonitasoft.engine.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -49,8 +46,7 @@ public class SchedulerServiceRestartHandlerTest {
 
     @Before
     public void before() throws Exception {
-        handler = new SchedulerServiceRestartHandler(schedulerService, new TechnicalLoggerSLF4JImpl(),
-                userTransactionService);
+        handler = new SchedulerServiceRestartHandler(schedulerService, userTransactionService);
         when(userTransactionService.executeInTransaction(any()))
                 .thenAnswer(invocation -> ((Callable) invocation.getArgument(0)).call());
 

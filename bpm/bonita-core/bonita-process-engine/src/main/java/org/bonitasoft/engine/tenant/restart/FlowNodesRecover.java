@@ -16,6 +16,7 @@ package org.bonitasoft.engine.tenant.restart;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -26,8 +27,6 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.stereotype.Component;
 
@@ -36,22 +35,20 @@ import org.springframework.stereotype.Component;
  * <p>
  * This class is called after the start of the engine or periodically and will recover elements given their ids.
  */
+@Slf4j
 @Component
 public class FlowNodesRecover {
 
     private final WorkService workService;
     private final BPMWorkFactory workFactory;
-    private final TechnicalLogger logger;
     private final ActivityInstanceService activityInstanceService;
     private final FlowNodeStateManager flowNodeStateManager;
 
     public FlowNodesRecover(WorkService workService,
-            TechnicalLoggerService logger,
             ActivityInstanceService activityInstanceService,
             FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory) {
         this.workService = workService;
         this.workFactory = workFactory;
-        this.logger = logger.asLogger(FlowNodesRecover.class);
         this.activityInstanceService = activityInstanceService;
         this.flowNodeStateManager = flowNodeStateManager;
     }
@@ -63,20 +60,20 @@ public class FlowNodesRecover {
             unprocessed.remove(flowNodeInstance.getId());
             if (flowNodeInstance.isTerminal()) {
                 recoveryMonitor.incrementFinishing();
-                logger.debug("Restarting flow node (Notify finished...) with name = <" + flowNodeInstance.getName()
+                log.debug("Restarting flow node (Notify finished...) with name = <" + flowNodeInstance.getName()
                         + ">, and id = <" + flowNodeInstance.getId()
                         + " in state = <" + flowNodeInstance.getStateName() + ">");
                 workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(flowNodeInstance));
             } else {
                 if (shouldBeRecovered(flowNodeInstance)) {
                     recoveryMonitor.incrementExecuting();
-                    logger.debug("Recovering flow node (Execute ...) with name = <" + flowNodeInstance.getName()
+                    log.debug("Recovering flow node (Execute ...) with name = <" + flowNodeInstance.getName()
                             + ">, and id = <" + flowNodeInstance.getId()
                             + "> in state = <" + flowNodeInstance.getStateName() + ">");
                     workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
                 } else {
                     recoveryMonitor.incrementNotExecutable();
-                    logger.debug(
+                    log.debug(
                             "Flownode with name = <{}>, and id = <{}> in state = <{}> does not fulfill the recovered conditions.",
                             flowNodeInstance.getName(), flowNodeInstance.getId(), flowNodeInstance.getStateName());
                 }

@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.tenant.restart;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.execution.work.ExecuteMessageCoupleWork;
 import org.bonitasoft.engine.execution.work.RestartException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.stereotype.Component;
@@ -29,19 +28,17 @@ import org.springframework.stereotype.Component;
  *
  * @author Emmanuel Duchastenier
  */
+@Slf4j
 @Component
 public class MessagesRestartHandler implements TenantRestartHandler {
 
-    private TechnicalLoggerService technicalLoggerService;
     private EventInstanceRepository eventInstanceRepository;
     private UserTransactionService userTransactionService;
     private MessagesHandlingService messagesHandlingService;
 
     public MessagesRestartHandler(
-            TechnicalLoggerService technicalLoggerService,
             EventInstanceRepository eventInstanceRepository, UserTransactionService userTransactionService,
             MessagesHandlingService messagesHandlingService) {
-        this.technicalLoggerService = technicalLoggerService;
         this.eventInstanceRepository = eventInstanceRepository;
         this.userTransactionService = userTransactionService;
         this.messagesHandlingService = messagesHandlingService;
@@ -53,26 +50,22 @@ public class MessagesRestartHandler implements TenantRestartHandler {
 
         try {
             // Reset of all SMessageInstance:
-            logInfo(technicalLoggerService,
+            log.info(
                     "Reinitializing message instances in non-stable state to make them reworked by MessagesHandlingService");
             final int nbMessagesReset = eventInstanceRepository.resetProgressMessageInstances();
-            logInfo(technicalLoggerService, nbMessagesReset + " message instances found and reset.");
+            log.info(nbMessagesReset + " message instances found and reset.");
 
             // Reset of all SWaitingMessageEvent:
-            logInfo(technicalLoggerService,
+            log.info(
                     "Reinitializing waiting message events in non-stable state to make them reworked by MessagesHandlingService");
             final int nbWaitingEventsReset = eventInstanceRepository.resetInProgressWaitingEvents();
-            logInfo(technicalLoggerService, nbWaitingEventsReset + " waiting message events found and reset.");
+            log.info(nbWaitingEventsReset + " waiting message events found and reset.");
 
         } catch (final SBonitaException e) {
             throw new RestartException(
                     "Unable to reset MessageInstances / WaitingMessageEvents that were 'In Progress' when the node stopped",
                     e);
         }
-    }
-
-    void logInfo(final TechnicalLoggerService technicalLoggerService, final String msg) {
-        technicalLoggerService.log(MessagesRestartHandler.class, TechnicalLogSeverity.INFO, msg);
     }
 
     @Override
@@ -83,7 +76,7 @@ public class MessagesRestartHandler implements TenantRestartHandler {
                 return null;
             });
         } catch (Exception e) {
-            technicalLoggerService.log(MessagesRestartHandler.class, TechnicalLogSeverity.ERROR,
+            log.error(
                     "Unable to register work to handle message events on startup, work will be triggered on next message event update",
                     e);
         }

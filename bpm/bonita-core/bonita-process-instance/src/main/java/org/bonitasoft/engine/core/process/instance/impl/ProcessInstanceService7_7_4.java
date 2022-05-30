@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -57,8 +58,6 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -75,6 +74,7 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
  * It is not used by default but is a fallback in case the trigger of events on archived elements deletion is important
  * It will most likely be deleted in 7.9.0
  */
+@Slf4j
 @Deprecated
 public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
 
@@ -83,7 +83,6 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     private Recorder recorder;
     private ReadPersistenceService persistenceRead;
     private ActivityInstanceService activityService;
-    private TechnicalLoggerService logger;
     private DataInstanceService dataInstanceService;
     private ArchiveService archiveService;
     private ConnectorInstanceService connectorInstanceService;
@@ -93,22 +92,20 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     private RefBusinessDataService refBusinessDataService;
 
     public ProcessInstanceService7_7_4(final Recorder recorder, final ReadPersistenceService persistenceRead,
-            final ActivityInstanceService activityService, final TechnicalLoggerService logger,
-            final EventInstanceService bpmEventInstanceService,
+            final ActivityInstanceService activityService, final EventInstanceService bpmEventInstanceService,
             final DataInstanceService dataInstanceService, final ArchiveService archiveService,
             final ProcessDefinitionService processDefinitionService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
             final DocumentService documentService,
             final SCommentService commentService, final RefBusinessDataService refBusinessDataService,
             ContractDataService contractDataService) {
-        super(recorder, persistenceRead, activityService, logger, bpmEventInstanceService, dataInstanceService,
+        super(recorder, persistenceRead, activityService, bpmEventInstanceService, dataInstanceService,
                 archiveService, processDefinitionService,
                 connectorInstanceService, classLoaderService, documentService, commentService, refBusinessDataService,
                 contractDataService);
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.activityService = activityService;
-        this.logger = logger;
         this.dataInstanceService = dataInstanceService;
         this.archiveService = archiveService;
         this.connectorInstanceService = connectorInstanceService;
@@ -116,7 +113,7 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         this.documentService = documentService;
         this.commentService = commentService;
         this.refBusinessDataService = refBusinessDataService;
-        logger.log(getClass(), TechnicalLogSeverity.WARNING,
+        log.warn(
                 "You are using a deprecated implementation of the ProcessInstanceService, This implementation will most likely be deleted in 7.9.");
     }
 
@@ -126,12 +123,6 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
                 sourceProcessInstanceIds);
         return deleteArchivedParentProcessInstancesAndElements(saProcessInstances);
 
-    }
-
-    private void logArchivedProcessInstanceNotFound(final SBonitaException e) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
-        }
     }
 
     private int deleteArchivedParentProcessInstancesAndElements(final List<SAProcessInstance> saProcessInstances)
@@ -176,9 +167,9 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
                 // archived process is still here, that's not normal. The problem must be raised:
                 throw e;
             }
-            logArchivedProcessInstanceNotFound(new SAProcessInstanceNotFoundException(saProcessInstance.getId()));
+            log.warn(new SAProcessInstanceNotFoundException(saProcessInstance.getId()).getMessage());
         } catch (final SProcessInstanceReadException e1) {
-            logArchivedProcessInstanceNotFound(e);
+            log.warn(e.getMessage());
         }
     }
 

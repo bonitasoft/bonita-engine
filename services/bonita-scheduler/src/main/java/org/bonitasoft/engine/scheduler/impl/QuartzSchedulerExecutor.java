@@ -28,8 +28,6 @@ import java.util.UUID;
 import javax.transaction.Status;
 
 import org.bonitasoft.engine.commons.ExceptionUtils;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -51,6 +49,8 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -59,7 +59,7 @@ import org.quartz.impl.matchers.GroupMatcher;
  */
 public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
-    private final TechnicalLogger logger;
+    private Logger logger = LoggerFactory.getLogger(QuartzSchedulerExecutor.class);
     private Scheduler scheduler;
 
     private final BonitaSchedulerFactory schedulerFactory;
@@ -67,8 +67,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     private final TransactionService transactionService;
 
     private final SessionAccessor sessionAccessor;
-
-    private final TechnicalLoggerService loggerService;
 
     private final boolean useOptimization;
 
@@ -78,12 +76,9 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory,
             final TransactionService transactionService,
-            final SessionAccessor sessionAccessor, final TechnicalLoggerService loggerService,
-            final boolean useOptimization) {
+            final SessionAccessor sessionAccessor, final boolean useOptimization) {
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
-        this.loggerService = loggerService;
-        this.logger = loggerService.asLogger(QuartzSchedulerExecutor.class);
         this.useOptimization = useOptimization;
         this.schedulerFactory = schedulerFactory;
     }
@@ -466,7 +461,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     private void addListeners() throws SSchedulerException {
         try {
             final ListenerManager listenerManager = scheduler.getListenerManager();
-            listenerManager.addJobListener(new QuartzJobListener(jobListeners, sessionAccessor, loggerService));
+            listenerManager.addJobListener(new QuartzJobListener(jobListeners, sessionAccessor));
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }

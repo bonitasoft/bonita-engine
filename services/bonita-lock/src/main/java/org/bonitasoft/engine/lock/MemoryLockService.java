@@ -21,9 +21,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
@@ -32,15 +31,14 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(LockService.class)
 public class MemoryLockService implements LockService {
 
-    private final TechnicalLogger logger;
+    private Logger logger = LoggerFactory.getLogger(MemoryLockService.class);
+
     // need to have a synchronized map to synchronize the get with map modifications
     private final Map<String, ReentrantLock> locks = synchronizedMap(new HashMap<>());
     private final int lockTimeoutSeconds;
 
-    public MemoryLockService(@Qualifier("platformTechnicalLoggerService") TechnicalLoggerService loggerService,
-            @Value("${bonita.platform.lock.memory.timeout}") int lockTimeoutSeconds) {
+    public MemoryLockService(@Value("${bonita.platform.lock.memory.timeout}") int lockTimeoutSeconds) {
         this.lockTimeoutSeconds = lockTimeoutSeconds;
-        logger = loggerService.asLogger(MemoryLockService.class);
     }
 
     @Override

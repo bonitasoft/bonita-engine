@@ -20,9 +20,7 @@ import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDef
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyMap;
 
@@ -36,10 +34,10 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -50,10 +48,10 @@ public class ContractConstraintsValidatorTest {
     private static final String NICE_COMMENT = "no way!";
     private static final String COMMENT = "comment";
     private static final String IS_VALID = "isValid";
-    private static final long PROCESS_DEFINITION_ID = 154l;
+    private static final long PROCESS_DEFINITION_ID = 154L;
 
-    @Mock
-    private TechnicalLoggerService loggerService;
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
     @Mock
     private ExpressionService expressionService;
 
@@ -63,12 +61,11 @@ public class ContractConstraintsValidatorTest {
     public void setUp() throws SExpressionTypeUnknownException, SExpressionDependencyMissingException,
             SExpressionEvaluationException,
             SInvalidExpressionException {
-        when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
         doReturn(false).when(expressionService).evaluate(any(SExpression.class), anyMap(), anyMap(),
                 any(ContainerState.class));
         returnTrueForExpressionWithContent("isValid != null");
         returnTrueForExpressionWithContent("isValid || !isValid && comment != null");
-        validator = new ContractConstraintsValidator(loggerService, expressionService);
+        validator = new ContractConstraintsValidator(expressionService);
     }
 
     private void returnTrueForExpressionWithContent(String content)
@@ -86,37 +83,29 @@ public class ContractConstraintsValidatorTest {
     public void should_log_all_rules_in_debug_mode() throws Exception {
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
 
+        systemOutRule.clearLog();
         validator.validate(PROCESS_DEFINITION_ID, contract,
                 contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
 
         //then
-        verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
-                "Evaluating constraint [Mandatory] on input(s) [isValid]");
-        verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
-                "Evaluating constraint [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment]");
-        verify(loggerService, never()).log(eq(ContractConstraintsValidator.class), eq(TechnicalLogSeverity.WARNING),
-                anyString());
+        String[] log = systemOutRule.getLog().split("\n");
+        assertThat(log).anyMatch(l -> l.matches(".*DEBUG.*Evaluating constraint.*"));
+        assertThat(systemOutRule.getLog()).doesNotContain("WARN");
     }
 
     @Test
     public void should_not_log_all_rules_in_info_mode() throws Exception {
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
 
-        //given
-        when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG))
-                .thenReturn(false);
-
         //
+        systemOutRule.clearLog();
         validator.validate(PROCESS_DEFINITION_ID, contract,
                 contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
 
         //then
-        verify(loggerService, never()).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
-                "Evaluating constraint [Mandatory] on input(s) [isValid]");
-        verify(loggerService, never()).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
-                "Evaluating constraint [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment]");
-        verify(loggerService, never()).log(eq(ContractConstraintsValidator.class), eq(TechnicalLogSeverity.WARNING),
-                anyString());
+        String[] log = systemOutRule.getLog().split("\n");
+        assertThat(log).noneMatch(l -> l.matches(".*INFO.*Evaluating constraint.*"));
+        assertThat(systemOutRule.getLog()).doesNotContain("WARN");
     }
 
     @Test
@@ -129,11 +118,12 @@ public class ContractConstraintsValidatorTest {
                 .build();
 
         try {
+            systemOutRule.clearLog();
             validator.validate(PROCESS_DEFINITION_ID, contract,
                     contractInputMap(entry(IS_VALID, false), entry(COMMENT, null)));
             fail("validation should fail");
         } catch (final SContractViolationException e) {
-            verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING,
+            assertThat(systemOutRule.getLog()).contains(
                     "Constraint [false constraint] on input(s) [isValid] is not valid");
         }
     }

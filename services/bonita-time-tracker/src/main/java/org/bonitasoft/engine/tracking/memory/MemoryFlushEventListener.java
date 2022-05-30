@@ -13,20 +13,20 @@
  **/
 package org.bonitasoft.engine.tracking.memory;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.AbstractFlushEventListener;
 import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.FlushEventListenerResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MemoryFlushEventListener extends AbstractFlushEventListener {
 
+    private static final Logger log = LoggerFactory.getLogger(MemoryFlushEventListener.class);
     private final int maxSize;
     private DayRecord dayRecord;
 
-    public MemoryFlushEventListener(final boolean activateAtStart, final TechnicalLoggerService logger,
-            final int maxSize) {
-        super(activateAtStart, logger);
+    public MemoryFlushEventListener(final boolean activateAtStart, final int maxSize) {
+        super(activateAtStart);
         this.maxSize = maxSize;
     }
 
@@ -37,8 +37,7 @@ public class MemoryFlushEventListener extends AbstractFlushEventListener {
             return new FlushEventListenerResult(flushEvent);
         }
 
-        log(TechnicalLogSeverity.DEBUG,
-                "Reusing csv file: " + "FlushEvent received with " + flushEvent.getRecords().size() + " records.");
+        log.debug("Reusing csv file: FlushEvent received with {}   records.", flushEvent.getRecords().size());
 
         final long flushTime = flushEvent.getFlushTime();
         if (this.dayRecord == null || !this.dayRecord.isExpectedDayKey(flushTime)) {
@@ -46,8 +45,8 @@ public class MemoryFlushEventListener extends AbstractFlushEventListener {
         }
         this.dayRecord.addRecords(flushEvent.getRecords());
 
-        log(TechnicalLogSeverity.INFO, "Adding '" + flushEvent.getRecords().size()
-                + "' records to DayRecord with dayKey '" + this.dayRecord.getDayKey() + "'");
+        log.info("Adding '{}' records to DayRecord with dayKey '{}'", flushEvent.getRecords().size(),
+                this.dayRecord.getDayKey());
 
         return new FlushEventListenerResult(flushEvent);
     }

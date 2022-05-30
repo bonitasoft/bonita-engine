@@ -40,7 +40,6 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -72,9 +71,6 @@ public class IdentityServiceImplForCustomUserInfoTest {
 
     @Mock
     private Recorder recorder;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @Mock
     private QueriableLoggerService queriableLoggerService;

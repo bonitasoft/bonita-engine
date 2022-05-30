@@ -37,6 +37,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -202,6 +203,7 @@ import org.bonitasoft.engine.bpm.supervisor.SupervisorNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
@@ -348,8 +350,6 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.lock.SLockTimeoutException;
 import org.bonitasoft.engine.log.LogMessageBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
@@ -446,6 +446,7 @@ import org.bonitasoft.platform.setup.PlatformSetupAccessor;
  * @author Celine Souchet
  * @author Arthur Freycon
  */
+@Slf4j
 public class ProcessAPIImpl implements ProcessAPI {
 
     private static final int BATCH_SIZE = 500;
@@ -666,8 +667,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ConfigurationService configurationService = PlatformSetupAccessor.getConfigurationService();
             final EnableProcess enableProcess = new EnableProcess(processDefinitionService,
                     processDefinitionId,
-                    eventsHandler,
-                    tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession());
+                    eventsHandler, getUserNameFromSession());
             enableProcess.execute();
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
@@ -688,21 +688,19 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         try {
-            TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
             ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
             SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-            logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    String.format(
-                            "executeFlowNode was called: <%s> is forcing the execution of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s>. "
-                                    +
-                                    "Executing a flow node directly through that API method is not recommended and can affect the normal behavior of the platform. "
-                                    +
-                                    "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore. "
-                                    +
-                                    "If you are trying to execute a user task, please use executeUserTask method instead.",
-                            getLoggedUsername(logger), flowNodeInstance.getName(), flowNodeInstance.getId(),
-                            flowNodeInstance.getType().name(),
-                            flowNodeInstance.getStateId(), flowNodeInstance.getStateName()));
+            log.warn(String.format(
+                    "executeFlowNode was called: <%s> is forcing the execution of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s>. "
+                            +
+                            "Executing a flow node directly through that API method is not recommended and can affect the normal behavior of the platform. "
+                            +
+                            "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore. "
+                            +
+                            "If you are trying to execute a user task, please use executeUserTask method instead.",
+                    getLoggedUsername(), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getType().name(),
+                    flowNodeInstance.getStateId(), flowNodeInstance.getStateName()));
             executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Serializable>(), false);
         } catch (final ContractViolationException | SBonitaException e) {
             throw new FlowNodeExecutionException(e);
@@ -780,16 +778,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void logError(final TenantServiceAccessor tenantAccessor, final Exception e) {
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
-            logger.log(getClass(), TechnicalLogSeverity.ERROR, e);
+        if (log.isErrorEnabled()) {
+            log.error("", e);
         }
     }
 
     private void logInstanceNotFound(final TenantServiceAccessor tenantAccessor, final SBonitaException e) {
-        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It may have been completed.");
+        if (log.isDebugEnabled()) {
+            log.debug(e.getMessage() + ". It may have been completed.");
         }
     }
 
@@ -2156,11 +2152,10 @@ public class ProcessAPIImpl implements ProcessAPI {
                     createPendingMappingsAndAssignHumanTask(humanTaskInstanceId, result);
                 }
             }
-            tenantAccessor.getTechnicalLoggerService().log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO,
-                    "User '" + getUserNameFromSession() + "' has re-executed assignation on activity "
-                            + humanTaskInstanceId +
-                            " of process instance " + humanTaskInstance.getLogicalGroup(1) + " of process named '" +
-                            processDefinition.getName() + "' in version " + processDefinition.getVersion());
+            log.info("User '" + getUserNameFromSession() + "' has re-executed assignation on activity "
+                    + humanTaskInstanceId +
+                    " of process instance " + humanTaskInstance.getLogicalGroup(1) + " of process named '" +
+                    processDefinition.getName() + "' in version " + processDefinition.getVersion());
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
         }
@@ -3496,26 +3491,24 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
             SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(activityInstanceId);
-            TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
             FlowNodeState state = getTenantAccessor().getFlowNodeStateManager().getState(stateId);
-            logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    String.format(
-                            "setActivityStateById was called: <%s> is forcing state of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s> to the state <%s: %s>. "
-                                    +
-                                    "Setting the state of a flow node through the API is not recommended and can affect the normal behavior of the platform. "
-                                    +
-                                    "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore.",
-                            getLoggedUsername(logger), flowNodeInstance.getName(), flowNodeInstance.getId(),
-                            flowNodeInstance.getType().name(),
-                            flowNodeInstance.getStateId(), flowNodeInstance.getStateName(),
-                            stateId, state.getName()));
+            log.warn(String.format(
+                    "setActivityStateById was called: <%s> is forcing state of the flow node with name = <%s> id = <%d> and type <%s> in current state <%s: %s> to the state <%s: %s>. "
+                            +
+                            "Setting the state of a flow node through the API is not recommended and can affect the normal behavior of the platform. "
+                            +
+                            "If that flow node was already scheduled for execution, there is no guarantee on how that flow node will behave anymore.",
+                    getLoggedUsername(), flowNodeInstance.getName(), flowNodeInstance.getId(),
+                    flowNodeInstance.getType().name(),
+                    flowNodeInstance.getStateId(), flowNodeInstance.getStateName(),
+                    stateId, state.getName()));
             getTenantAccessor().getFlowNodeExecutor().setStateByStateId(activityInstanceId, stateId);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
     }
 
-    private String getLoggedUsername(TechnicalLoggerService logger) {
+    private String getLoggedUsername() {
         SSession session = getSession();
         if (session == null || session.getUserId() <= 0) {
             return "SYSTEM";
@@ -3524,7 +3517,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             return getTenantAccessor().getIdentityService().getUser(userId).getUserName();
         } catch (Exception ignored) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Unable to retrieve user with id " + userId
+            log.warn("Unable to retrieve user with id " + userId
                     + " exception: " + ignored.getClass().getName() + " " + ignored.getMessage());
         }
         return String.valueOf(userId);
@@ -3665,7 +3658,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SSubProcessDefinition sSubProcessDefinition,
             final List<? extends SCatchEventDefinition> sCatchEventDefinitions) {
         final SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
-        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
 
         for (final SCatchEventDefinition sCatchEventDefinition : sCatchEventDefinitions) {
             try {
@@ -3675,20 +3667,17 @@ public class ProcessAPIImpl implements ProcessAPI {
                             sSubProcessDefinition.getId());
                     final boolean delete = schedulerService.delete(jobName);
                     if (!delete && schedulerService.isExistingJob(jobName)) {
-                        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                            logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                                    "No job found with name '" + jobName
-                                            + "' when interrupting timer catch event named '"
-                                            + sCatchEventDefinition.getName()
-                                            + "' on event sub process with the id '" + sSubProcessDefinition.getId()
-                                            + "'. It was probably already triggered.");
+                        if (log.isWarnEnabled()) {
+                            log.warn("No job found with name '" + jobName
+                                    + "' when interrupting timer catch event named '"
+                                    + sCatchEventDefinition.getName()
+                                    + "' on event sub process with the id '" + sSubProcessDefinition.getId()
+                                    + "'. It was probably already triggered.");
                         }
                     }
                 }
             } catch (final Exception e) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-                }
+                log.warn(ExceptionUtils.printLightWeightStacktrace(e));
             }
         }
     }
@@ -3734,7 +3723,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         List<ActivityInstance> flowNodeInstances;
         int index = 0;
         final ProcessInstanceService processInstanceService = getTenantAccessor().getProcessInstanceService();
-        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
         do {
             try {
                 flowNodeInstances = searchActivities(new SearchOptionsBuilder(index, index + BATCH_SIZE)
@@ -3750,9 +3738,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                     deleteJobsOnProcessInstance(
                             processInstanceService.getChildOfActivity(callActivityInstance.getId()));
                 } catch (SBonitaException e) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO,
-                            "Can't find the process instance called by the activity. This process may be already finished.",
-                            e);
+                    log.info(
+                            "Can't find the process instance called by the activity. This process may be already finished. {}",
+                            ExceptionUtils.printLightWeightStacktrace(e));
 
                 }
             }
@@ -3798,7 +3786,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SCatchEventDefinition sCatchEventDefinition,
             final SCatchEventInstance sCatchEventInstance) {
         final SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
-        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
         EventInstanceService eventInstanceService = getTenantAccessor().getEventInstanceService();
         try {
             if (!sCatchEventDefinition.getTimerEventTriggerDefinitions().isEmpty()) {
@@ -3808,24 +3795,21 @@ public class ProcessAPIImpl implements ProcessAPI {
                 try {
                     eventInstanceService.deleteEventTriggerInstanceOfFlowNode(sCatchEventInstance.getId());
                 } catch (SEventTriggerInstanceDeletionException e) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                    log.warn(
                             "Unable to delete event trigger of flow node instance " + sCatchEventInstance + " because: "
                                     + e.getMessage());
                 }
                 if (!delete && schedulerService.isExistingJob(jobName)) {
-                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                                "No job found with name '" + jobName + "' when interrupting timer catch event named '"
-                                        + sCatchEventDefinition.getName()
-                                        + "' and id '" + sCatchEventInstance.getId()
-                                        + "'. It was probably already triggered.");
+                    if (log.isWarnEnabled()) {
+                        log.warn("No job found with name '" + jobName + "' when interrupting timer catch event named '"
+                                + sCatchEventDefinition.getName()
+                                + "' and id '" + sCatchEventInstance.getId()
+                                + "'. It was probably already triggered.");
                     }
                 }
             }
         } catch (final Exception e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-            }
+            log.warn(ExceptionUtils.printLightWeightStacktrace(e));
         }
     }
 
@@ -4341,13 +4325,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void deleteSupervisor(final long supervisorId) throws DeletionException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
-        final TechnicalLoggerService technicalLoggerService = serviceAccessor.getTechnicalLoggerService();
         try {
             supervisorService.deleteProcessSupervisor(supervisorId);
-            if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
-                        "The process manager has been deleted with id = <" + supervisorId + ">.");
-            }
+            log.info("The process manager has been deleted with id = <" + supervisorId + ">.");
+
         } catch (final SSupervisorNotFoundException spsnfe) {
             throw new DeletionException(new SupervisorNotFoundException(
                     "The process manager was not found with id = <" + supervisorId + ">"));
@@ -4361,7 +4342,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Long groupId) throws DeletionException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
-        final TechnicalLoggerService technicalLoggerService = serviceAccessor.getTechnicalLoggerService();
 
         try {
             final List<SProcessSupervisor> sProcessSupervisors = searchSProcessSupervisors(processDefinitionId, userId,
@@ -4370,12 +4350,9 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (!sProcessSupervisors.isEmpty()) {
                 // Then, delete it
                 supervisorService.deleteProcessSupervisor(sProcessSupervisors.get(0));
-                if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
-                            "The process manager has been deleted with process definition id = <"
-                                    + processDefinitionId + ">, user id = <" + userId + ">, group id = <" + groupId
-                                    + ">, and role id = <" + roleId + ">.");
-                }
+                log.info("The process manager has been deleted with process definition id = <"
+                        + processDefinitionId + ">, user id = <" + userId + ">, group id = <" + groupId
+                        + ">, and role id = <" + roleId + ">.");
             } else {
                 throw new DeletionException(new SupervisorNotFoundException(
                         "The process manager was not found with process definition id = <"
@@ -4418,7 +4395,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException {
         final TenantServiceAccessor tenantServiceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = tenantServiceAccessor.getSupervisorService();
-        final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
 
         try {
             checkIfProcessSupervisorAlreadyExists(sProcessSupervisor.getProcessDefId(), sProcessSupervisor.getUserId(),
@@ -4426,14 +4402,11 @@ public class ProcessAPIImpl implements ProcessAPI {
                     sProcessSupervisor.getRoleId());
 
             final SProcessSupervisor supervisor = supervisorService.createProcessSupervisor(sProcessSupervisor);
-            if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
-                        "The process manager has been created with process definition id = <"
-                                + sProcessSupervisor.getProcessDefId() + ">, user id = <"
-                                + sProcessSupervisor.getUserId() + ">, group id = <"
-                                + sProcessSupervisor.getGroupId() + ">, and role id = <"
-                                + sProcessSupervisor.getRoleId() + ">");
-            }
+            log.info("The process manager has been created with process definition id = <"
+                    + sProcessSupervisor.getProcessDefId() + ">, user id = <"
+                    + sProcessSupervisor.getUserId() + ">, group id = <"
+                    + sProcessSupervisor.getGroupId() + ">, and role id = <"
+                    + sProcessSupervisor.getRoleId() + ">");
             return ModelConvertor.toProcessSupervisor(supervisor);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
@@ -6435,7 +6408,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         ContractDataService contractDataService = tenantAccessor.getContractDataService();
-        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         IdentityService identityService = tenantAccessor.getIdentityService();
         SCommentService commentService = tenantAccessor.getCommentService();
         FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
@@ -6491,18 +6463,17 @@ public class ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
             WorkDescriptor work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
             workService.registerWork(work);
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /*
-                                                                                           * don't log when create
-                                                                                           * subtask
-                                                                                           */) {
+            if (log.isInfoEnabled() && !isFirstState /*
+                                                      * don't log when create
+                                                      * subtask
+                                                      */) {
                 final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance,
                         session.getUserName(), executerUserId,
                         executerSubstituteUserId, inputs);
-                logger.log(getClass(), TechnicalLogSeverity.INFO, message);
-            } else if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                        "Executing state " + flowNodeInstance.getStateName() + " (" + flowNodeInstance.getStateId()
-                                + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
+                log.info(message);
+            } else if (log.isDebugEnabled()) {
+                log.debug("Executing state " + flowNodeInstance.getStateName() + " (" + flowNodeInstance.getStateId()
+                        + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
             }
             if (executerUserId != executerSubstituteUserId) {
                 try {
@@ -6512,7 +6483,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                             + "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
                     commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb);
                 } catch (final SBonitaException e) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
+                    log.error(
                             "Error when adding a comment on the process instance.", e);
                 }
             }
@@ -6528,9 +6499,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 .getFlowNode(
                         flowNodeInstance.getFlowNodeDefinitionId());
         final SContractDefinition contractDefinition = userTaskDefinition.getContract();
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(
-                tenantAccessor.getTechnicalLoggerService(),
-                tenantAccessor.getExpressionService());
+        final ContractValidator validator = new ContractValidatorFactory()
+                .createContractValidator(tenantAccessor.getExpressionService());
         validator.validate(flowNodeInstance.getProcessDefinitionId(), contractDefinition, inputs);
 
     }

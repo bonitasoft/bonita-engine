@@ -17,6 +17,7 @@ import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -39,41 +40,16 @@ import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.*;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatewayInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SALoopActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAMultiInstanceActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAReceiveTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASendTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubProcessActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.*;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -83,12 +59,12 @@ import org.bonitasoft.engine.recorder.SRecorderException;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@Slf4j
 public class BPMArchiverService {
 
     private final ArchiveService archiveService;
     private final ProcessInstanceService processInstanceService;
     private final DocumentService documentService;
-    private final TechnicalLoggerService logger;
     private final SCommentService commentService;
     private final ProcessDefinitionService processDefinitionService;
     private final ConnectorInstanceService connectorInstanceService;
@@ -103,7 +79,6 @@ public class BPMArchiverService {
     public BPMArchiverService(ArchiveService archiveService,
             ProcessInstanceService processInstanceService,
             DocumentService documentService,
-            TechnicalLoggerService logger,
             SCommentService commentService,
             ProcessDefinitionService processDefinitionService,
             ConnectorInstanceService connectorInstanceService,
@@ -115,7 +90,6 @@ public class BPMArchiverService {
         this.archiveService = archiveService;
         this.processInstanceService = processInstanceService;
         this.documentService = documentService;
-        this.logger = logger;
         this.commentService = commentService;
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
@@ -227,10 +201,9 @@ public class BPMArchiverService {
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saProcessInstance);
             archiveService.recordInsert(archiveDate, insertRecord);
 
-            if (logger.isLoggable(BPMArchiverService.class, TechnicalLogSeverity.DEBUG)) {
-                logger.log(BPMArchiverService.class, TechnicalLogSeverity.DEBUG,
-                        "Archiving process instance with id = <" + processInstance.getId() + ">" +
-                                " and state " + processInstance.getStateId());
+            if (log.isDebugEnabled()) {
+                log.debug("Archiving process instance with id = <{}> and state {}", processInstance.getId(),
+                        processInstance.getStateId());
             }
             try {
                 processInstanceService.deleteProcessInstance(processInstance.getId());

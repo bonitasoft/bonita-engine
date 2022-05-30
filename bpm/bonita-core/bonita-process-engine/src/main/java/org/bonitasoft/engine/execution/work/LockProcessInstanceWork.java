@@ -17,11 +17,11 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.LockException;
 import org.bonitasoft.engine.work.LockTimeoutException;
@@ -34,6 +34,7 @@ import org.bonitasoft.engine.work.LockTimeoutException;
  * @author Charles Souillard
  * @author Baptiste Mesta
  */
+@Slf4j
 public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     protected final long processInstanceId;
@@ -49,21 +50,19 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
-        final TechnicalLogger logger = getTenantAccessor(context).getTechnicalLoggerService()
-                .asLogger(LockProcessInstanceWork.class);
         final LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
         BonitaLock lock = null;
         try {
-            logger.debug("{} trying to get lock for instance {}: {}", Thread.currentThread().getName(),
+            log.debug("{} trying to get lock for instance {}: {}", Thread.currentThread().getName(),
                     processInstanceId, getDescription());
             lock = lockService.tryLock(processInstanceId, objectType, TIMEOUT, timeUnit, getTenantId());
             if (lock == null) {
                 throw new LockTimeoutException(
                         "Unable to lock process instance " + processInstanceId + ": " + getDescription());
             }
-            logger.debug("{} obtained lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId,
+            log.debug("{} obtained lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId,
                     getDescription());
             return getWrappedWork().work(context);
         } catch (SLockException e) {
@@ -72,7 +71,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         } finally {
             if (lock != null) {
                 lockService.unlock(lock, getTenantId());
-                logger.debug("{} has unlocked lock for instance {}: {}", Thread.currentThread().getName(),
+                log.debug("{} has unlocked lock for instance {}: {}", Thread.currentThread().getName(),
                         processInstanceId, getDescription());
             }
         }

@@ -26,7 +26,6 @@ import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -56,8 +55,7 @@ public class TenantDependencyServiceTest {
     private Recorder recorder;
     @Mock
     private EventService eventService;
-    @Mock
-    private TechnicalLoggerService logger;
+
     @Mock
     private QueriableLoggerService queriableLoggerService;
     @InjectMocks

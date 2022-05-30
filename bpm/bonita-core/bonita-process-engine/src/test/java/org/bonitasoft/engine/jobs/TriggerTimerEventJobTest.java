@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
@@ -63,8 +62,6 @@ public class TriggerTimerEventJobTest {
     @Mock
     private SchedulerService schedulerService;
     @Mock
-    private TechnicalLoggerService loggerService;
-    @Mock
     private EventInstanceService eventInstanceService;
     @Mock
     private TenantServicesManager tenantServicesManager;
@@ -85,7 +82,6 @@ public class TriggerTimerEventJobTest {
         doReturn(eventsHandler).when(tenantServiceAccessor).getEventsHandler();
         doReturn(jobService).when(tenantServiceAccessor).getJobService();
         doReturn(schedulerService).when(tenantServiceAccessor).getSchedulerService();
-        doReturn(loggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
         doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
         doReturn(tenantServicesManager).when(tenantServiceAccessor).getTenantServicesManager();
         doReturn(true).when(tenantServicesManager).isStarted();

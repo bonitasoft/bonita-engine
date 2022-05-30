@@ -22,10 +22,10 @@ import java.util.concurrent.TimeUnit;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -41,15 +41,16 @@ import org.springframework.stereotype.Component;
  *
  * @author Baptiste Mesta
  */
+
 @Component("bonitaExecutorServiceFactory")
 public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
 
+    private Logger logger = LoggerFactory.getLogger(DefaultBonitaExecutorServiceFactory.class);
     private final int corePoolSize;
     private final int queueCapacity;
     private final int maximumPoolSize;
     private final long keepAliveTimeSeconds;
     private final EngineClock engineClock;
-    private final TechnicalLoggerService logger;
     private final WorkFactory workFactory;
     private final long tenantId;
     private final WorkExecutionAuditor workExecutionAuditor;
@@ -57,7 +58,6 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     private final ExecutorServiceMetricsProvider executorServiceMetricsProvider;
 
     public DefaultBonitaExecutorServiceFactory(
-            TechnicalLoggerService logger,
             WorkFactory workFactory,
             @Value("${tenantId}") long tenantId,
             @Value("${bonita.tenant.work.corePoolSize}") int corePoolSize,
@@ -68,7 +68,6 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
             WorkExecutionAuditor workExecutionAuditor,
             MeterRegistry meterRegistry,
             ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
-        this.logger = logger;
         this.workFactory = workFactory;
         this.tenantId = tenantId;
         this.corePoolSize = corePoolSize;
@@ -89,9 +88,9 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
 
         final BonitaThreadPoolExecutor bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(corePoolSize,
                 maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
-                workQueue, threadFactory, handler, workFactory, logger, engineClock, workExecutionCallback,
+                workQueue, threadFactory, handler, workFactory, engineClock, workExecutionCallback,
                 workExecutionAuditor, meterRegistry, tenantId);
-        logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+        logger.info(
                 "Creating a new Thread pool to handle works: " + bonitaThreadPoolExecutor);
 
         //TODO this returns the timed executor service, this should be used instead of the BonitaExecutorService but we should change it everywhere
@@ -113,7 +112,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             if (executor.isShutdown()) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Tried to run work " + task
+                logger.info("Tried to run work " + task
                         + " but the work service is shutdown. work will be restarted with the node");
             } else {
                 throw new RejectedExecutionException(

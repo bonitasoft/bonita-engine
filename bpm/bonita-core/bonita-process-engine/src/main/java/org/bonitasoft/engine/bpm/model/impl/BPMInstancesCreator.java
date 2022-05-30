@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -125,8 +126,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.LogMessageBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -135,6 +134,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public class BPMInstancesCreator {
 
     private final ActivityInstanceService activityInstanceService;
@@ -153,8 +153,6 @@ public class BPMInstancesCreator {
 
     private final TransientDataService transientDataService;
 
-    private final TechnicalLoggerService logger;
-
     private final ParentContainerResolver parentContainerResolver;
 
     private final RefBusinessDataService refBusinessDataService;
@@ -165,8 +163,7 @@ public class BPMInstancesCreator {
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger,
-            final TransientDataService transientDataService,
+            final DataInstanceService dataInstanceService, final TransientDataService transientDataService,
             final ParentContainerResolver parentContainerResolver, RefBusinessDataService refBusinessDataService) {
         super();
         this.activityInstanceService = activityInstanceService;
@@ -176,7 +173,6 @@ public class BPMInstancesCreator {
         this.connectorInstanceService = connectorInstanceService;
         this.expressionResolverService = expressionResolverService;
         this.dataInstanceService = dataInstanceService;
-        this.logger = logger;
         this.transientDataService = transientDataService;
         this.parentContainerResolver = parentContainerResolver;
         this.refBusinessDataService = refBusinessDataService;
@@ -726,7 +722,7 @@ public class BPMInstancesCreator {
     }
 
     void debugLogVariableInitialized(SProcessInstance processInstance, SProcessDefinition processDefinition) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+        if (log.isDebugEnabled()) {
             final StringBuilder stb = new StringBuilder();
             stb.append("Initialized variables for process instance [name: <");
             stb.append(processInstance.getName());
@@ -745,7 +741,7 @@ public class BPMInstancesCreator {
                 stb.append(processInstance.getCallerType());
             }
             stb.append(">]");
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
+            log.debug(stb.toString());
         }
     }
 
@@ -763,10 +759,7 @@ public class BPMInstancesCreator {
     }
 
     void warningWhenTransientDataWithNullValue() {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                    "Creating a transient data instance with a null expression is not a good practice.");
-        }
+        log.warn("Creating a transient data instance with a null expression is not a good practice.");
     }
 
     private void createDataForProcess(final List<SDataInstance> sDataInstances)
@@ -892,10 +885,10 @@ public class BPMInstancesCreator {
                 createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE,
                         expressionContext);
             }
-            if (!sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            if (!sDataDefinitions.isEmpty() && log.isDebugEnabled()) {
                 final String message = "Initialized variables for flow node"
                         + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
+                log.debug(message);
             }
             return sDataDefinitions.size() > 0;
         } catch (final SBonitaException e) {
@@ -913,10 +906,6 @@ public class BPMInstancesCreator {
                 DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
                 miLoop.getLoopDataInputRef(), flowNodeInstance.getLoopCounter(), miLoop.getDataInputItemRef(),
                 flowNodeInstance.getParentContainerId());
-    }
-
-    public TechnicalLoggerService getLogger() {
-        return logger;
     }
 
     private void createBusinessDataInstancesForMultiInstance(SActivityDefinition activityDefinition,

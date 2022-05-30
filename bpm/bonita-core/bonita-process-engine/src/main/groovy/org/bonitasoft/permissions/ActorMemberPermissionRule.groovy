@@ -45,9 +45,9 @@ class ActorMemberPermissionRule implements PermissionRule {
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         long currentUserId = apiSession.getUserId()
         if (apiCallContext.isPOST()) {
-            return checkPostMethod(apiCallContext, apiAccessor, currentUserId, logger)
+            return checkPostMethod(apiCallContext, apiAccessor, currentUserId)
         } else if (apiCallContext.isGET()) {
-            return checkGetMethod(apiCallContext, apiAccessor, currentUserId, logger)
+            return checkGetMethod(apiCallContext, apiAccessor, currentUserId)
         } else if (apiCallContext.isDELETE()) {
             //TODO unable to find an actor member with the API!
             return false
@@ -56,7 +56,7 @@ class ActorMemberPermissionRule implements PermissionRule {
         return true
     }
 
-    private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
+    private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
 
         ObjectMapper mapper = new ObjectMapper()
         def list = mapper.readValue(apiCallContext.getBody(), List.class)
@@ -86,7 +86,7 @@ class ActorMemberPermissionRule implements PermissionRule {
         return true
     }
 
-    private boolean checkGetMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
+    private boolean checkGetMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
         try {
             def filters = apiCallContext.getFilters()
             if (filters.containsKey(ACTOR_ID)) {

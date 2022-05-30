@@ -25,7 +25,6 @@ import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpd
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,8 +51,6 @@ public class ImportOrganizationMergeDuplicatesStrategyTest {
     private ImportOrganizationMergeDuplicatesStrategy strategy;
     @Mock
     private SUser existingUser;
-    @Mock
-    private TechnicalLoggerService logger;
     private ExportedUser userToImport;
     @Mock
     private SCustomUserInfoDefinition infoDef;

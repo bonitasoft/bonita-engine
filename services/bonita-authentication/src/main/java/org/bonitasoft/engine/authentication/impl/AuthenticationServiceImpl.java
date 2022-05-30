@@ -22,8 +22,8 @@ import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -39,13 +39,11 @@ import org.springframework.stereotype.Component;
 @Component("authenticationService")
 public class AuthenticationServiceImpl implements GenericAuthenticationService {
 
+    private Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
     private final IdentityService identityService;
 
-    private final TechnicalLoggerService logger;
-
-    public AuthenticationServiceImpl(final IdentityService identityService, final TechnicalLoggerService logger) {
+    public AuthenticationServiceImpl(final IdentityService identityService) {
         this.identityService = identityService;
-        this.logger = logger;
     }
 
     /**
@@ -57,25 +55,25 @@ public class AuthenticationServiceImpl implements GenericAuthenticationService {
         try {
             final String password = String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
             final String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+            if (logger.isTraceEnabled()) {
+                logger.trace(
                         LogUtil.getLogBeforeMethod(this.getClass(), methodName));
             }
             final SUser user = identityService.getUserByUserName(userName);
             if (identityService.checkCredentials(user, password)) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                if (logger.isTraceEnabled()) {
+                    logger.trace(
                             LogUtil.getLogAfterMethod(this.getClass(), methodName));
                 }
                 return userName;
             }
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+            if (logger.isTraceEnabled()) {
+                logger.trace(
                         LogUtil.getLogAfterMethod(this.getClass(), methodName));
             }
         } catch (final SUserNotFoundException sunfe) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+            if (logger.isTraceEnabled()) {
+                logger.trace(
                         LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, sunfe));
             }
         }

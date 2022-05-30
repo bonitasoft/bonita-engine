@@ -54,7 +54,6 @@
     <!-- Schema Manager that avoids to update the database schema when updating BDM -->
     <!--
     <bean id="schemaManager" class="org.bonitasoft.engine.business.data.impl.SchemaManagerReadOnly">
-        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
     </bean>
         -->
 </beans>

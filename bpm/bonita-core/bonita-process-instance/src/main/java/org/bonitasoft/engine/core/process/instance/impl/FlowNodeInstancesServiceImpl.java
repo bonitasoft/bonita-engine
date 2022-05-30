@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -44,8 +45,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManua
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -65,6 +64,7 @@ import org.bonitasoft.engine.services.PersistenceService;
  * @author Frederic Bouquet
  * @author Celine Souchet
  */
+@Slf4j
 public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceService {
 
     private static final String SUPERVISED_BY = "SupervisedBy";
@@ -79,14 +79,10 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     private final ArchiveService archiveService;
 
-    private final TechnicalLoggerService logger;
-
     public FlowNodeInstancesServiceImpl(final Recorder recorder, final PersistenceService persistenceService,
-            final EventService eventService,
-            final TechnicalLoggerService logger, final ArchiveService archiveService) {
+            final EventService eventService, final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
-        this.logger = logger;
         activityInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         this.eventService = eventService;
         this.archiveService = archiveService;
@@ -109,15 +105,10 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         descriptor.addField(activityInstanceKeyProvider.getReachStateDateKey(), now);
         descriptor.addField(activityInstanceKeyProvider.getLastUpdateDateKey(), now);
         descriptor.addField(activityInstanceKeyProvider.getStateExecutingKey(), false);
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(
-                    getClass(),
-                    TechnicalLogSeverity.DEBUG,
-                    MessageFormat.format("[{0} with id {1}] changed state {2}->{3}(new={4})",
-                            flowNodeInstance.getClass().getSimpleName(),
-                            flowNodeInstance.getId(), flowNodeInstance.getStateId(), state.getId(),
-                            state.getClass().getSimpleName()));
-        }
+        log.debug(MessageFormat.format("[{0} with id {1}] changed state {2}->{3}(new={4})",
+                flowNodeInstance.getClass().getSimpleName(),
+                flowNodeInstance.getId(), flowNodeInstance.getStateId(), state.getId(),
+                state.getClass().getSimpleName()));
 
         updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
     }
@@ -128,15 +119,9 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getStateExecutingKey(), true);
         descriptor.addField(activityInstanceKeyProvider.getLastUpdateDateKey(), now);
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(
-                    getClass(),
-                    TechnicalLogSeverity.DEBUG,
-                    MessageFormat.format("[{0} with id {1}] have executing flag set to true",
-                            flowNodeInstance.getClass().getSimpleName(),
-                            flowNodeInstance.getId()));
-        }
-
+        log.debug(MessageFormat.format("[{0} with id {1}] have executing flag set to true",
+                flowNodeInstance.getClass().getSimpleName(),
+                flowNodeInstance.getId()));
         updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
     }
 
@@ -163,7 +148,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     private void logTruncationWarning(final String value, final String truncatedValue, final int maxLengh,
             final SFlowNodeInstance flowNodeInstance,
             final String key) {
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+        if (log.isWarnEnabled()) {
             final StringBuilder stb = new StringBuilder();
             stb.append("The field ");
             stb.append(key);
@@ -183,7 +168,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             stb.append(value);
             stb.append("'.");
             final String message = stb.toString();
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, message);
+            log.warn(message);
         }
     }
 
@@ -511,10 +496,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     protected PersistenceService getPersistenceService() {
         return persistenceService;
-    }
-
-    protected TechnicalLoggerService getLogger() {
-        return logger;
     }
 
     @Override

@@ -19,7 +19,6 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -37,7 +36,7 @@ public class TransactionServiceTest {
 
     @Before
     public void before() {
-        txService = new JTATransactionServiceImpl(new TechnicalLoggerSLF4JImpl(), transactionManager);
+        txService = new JTATransactionServiceImpl(transactionManager);
     }
 
     @After

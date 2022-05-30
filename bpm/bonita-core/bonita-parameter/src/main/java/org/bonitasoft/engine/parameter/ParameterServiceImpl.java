@@ -19,11 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bpm.bar.ParameterContribution;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -41,6 +40,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 /**
  * @author Baptiste Mesta
  */
+@Slf4j
 public class ParameterServiceImpl implements ParameterService {
 
     private static final String VALUE_KEY = "value";
@@ -51,13 +51,11 @@ public class ParameterServiceImpl implements ParameterService {
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
-    private TechnicalLoggerService technicalLoggerService;
 
-    public ParameterServiceImpl(Recorder recorder, ReadPersistenceService persistenceService,
-            TechnicalLoggerService technicalLoggerService) {
+    public ParameterServiceImpl(Recorder recorder, ReadPersistenceService persistenceService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
-        this.technicalLoggerService = technicalLoggerService;
+
     }
 
     @Override
@@ -88,14 +86,8 @@ public class ParameterServiceImpl implements ParameterService {
             if (sParameter != null) {
                 update(sParameter, parameters.get(parameter.getKey()));
             } else {
-                if (technicalLoggerService.isLoggable(ParameterServiceImpl.class, TechnicalLogSeverity.DEBUG)) {
-                    technicalLoggerService.log(ParameterServiceImpl.class,
-                            TechnicalLogSeverity.DEBUG,
-                            String.format(
-                                    "Parameter <%s> doesn't exist in process definition <%s> and has not been merged.",
-                                    parameter.getKey(),
-                                    processDefinitionId));
-                }
+                log.debug("Parameter <{}> doesn't exist in process definition <{}> and has not been merged.",
+                        parameter.getKey(), processDefinitionId);
             }
         }
     }

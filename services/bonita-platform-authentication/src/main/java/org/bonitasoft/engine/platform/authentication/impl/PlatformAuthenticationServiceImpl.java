@@ -14,34 +14,32 @@
 package org.bonitasoft.engine.platform.authentication.impl;
 
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.authentication.SInvalidPasswordException;
 import org.bonitasoft.engine.platform.authentication.SInvalidUserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class PlatformAuthenticationServiceImpl implements PlatformAuthenticationService {
 
+    private Logger logger = LoggerFactory.getLogger(PlatformAuthenticationServiceImpl.class);
     private static final String USERNAME = "platformAdmin";
 
     private static final String PASSWORD = "platform";
 
-    private final TechnicalLoggerService logger;
-
-    public PlatformAuthenticationServiceImpl(final TechnicalLoggerService logger) {
+    public PlatformAuthenticationServiceImpl() {
         super();
-        this.logger = logger;
     }
 
     @Override
     public void checkUserCredentials(final String username, final String password)
             throws SInvalidUserException, SInvalidPasswordException {
         final String methodName = "checkUserCredentials";
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+        if (logger.isTraceEnabled()) {
+            logger.trace(
                     LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
         // FIXME read user and password from a configuration file
@@ -53,15 +51,15 @@ public class PlatformAuthenticationServiceImpl implements PlatformAuthentication
             logOnExceptionMethod(username, methodName);
             throw new SInvalidPasswordException("Invalid password");
         }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+        if (logger.isTraceEnabled()) {
+            logger.trace(
                     LogUtil.getLogAfterMethod(this.getClass(), methodName));
         }
     }
 
     private void logOnExceptionMethod(final String username, final String methodName) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+        if (logger.isTraceEnabled()) {
+            logger.trace(
                     LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, "Invalid user : " + username));
         }
     }

@@ -17,7 +17,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
@@ -46,8 +45,6 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     PlatformLoginService getPlatformLoginService();
 
     SchedulerService getSchedulerService();
-
-    TechnicalLoggerService getTechnicalLoggerService();
 
     TransactionService getTransactionService();
 

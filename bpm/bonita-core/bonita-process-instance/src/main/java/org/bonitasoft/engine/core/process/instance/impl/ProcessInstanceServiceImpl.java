@@ -26,12 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletionException;
@@ -73,8 +75,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -97,6 +97,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  * @author Frederic Bouquet
  * @author Celine Souchet
  */
+@Slf4j
 public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private static final String MANAGER_USER_ID = "managerUserId";
@@ -129,8 +130,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private final ArchiveService archiveService;
 
-    private final TechnicalLoggerService logger;
-
     private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
@@ -145,7 +144,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     private final ContractDataService contractDataService;
 
     public ProcessInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead,
-            final ActivityInstanceService activityService, final TechnicalLoggerService logger,
+            final ActivityInstanceService activityService,
             final EventInstanceService bpmEventInstanceService,
             final DataInstanceService dataInstanceService, final ArchiveService archiveService,
             final ProcessDefinitionService processDefinitionService,
@@ -166,7 +165,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         this.bpmEventInstanceService = bpmEventInstanceService;
         this.dataInstanceService = dataInstanceService;
         this.archiveService = archiveService;
-        this.logger = logger;
     }
 
     @Override
@@ -235,13 +233,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             // process is still here, that's not normal. The problem must be raised:
             throw e;
         } catch (final SProcessInstanceReadException | SProcessInstanceNotFoundException e1) {
-            logProcessInstanceNotFound(e);
-        }
-    }
-
-    protected void logProcessInstanceNotFound(final SProcessInstanceModificationException e) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It has probably completed.");
+            log.debug("{}. It has probably completed.", e.getMessage());
         }
     }
 
@@ -510,11 +502,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             setExceptionContext(processDefinition, flowNodeInstance, e);
 
             // if the child process is not found, it's because it has already finished and archived or it was not created
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                        "Can't find the process instance called by the activity. This process may be already finished.");
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, e);
-            }
+            log.debug("Can't find the process instance called by the activity. This process may be already finished.");
+            log.debug(ExceptionUtils.printLightWeightStacktrace(e));
         }
     }
 
@@ -567,13 +556,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         archiveProcessInstance(processInstance);
         final int previousStateId = processInstance.getStateId();
         setProcessState(processInstance, state);
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(
-                    getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})",
-                            processInstance.getClass()
-                                    .getSimpleName(),
-                            processInstance.getId(), previousStateId, state.getId(), state.name()));
-        }
+        log.debug(MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})",
+                processInstance.getClass()
+                        .getSimpleName(),
+                processInstance.getId(), previousStateId, state.getId(), state.name()));
     }
 
     private void setProcessState(final SProcessInstance processInstance, final ProcessInstanceState state)

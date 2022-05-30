@@ -13,43 +13,40 @@
  **/
 package org.bonitasoft.engine.handler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class SchedulerServiceRestartHandler implements PlatformRestartHandler {
 
     private final SchedulerService schedulerService;
-    private final TechnicalLogger logger;
     private UserTransactionService userTransactionService;
 
     public SchedulerServiceRestartHandler(SchedulerService schedulerService,
-            TechnicalLoggerService technicalLoggerService,
             UserTransactionService userTransactionService) {
         super();
         this.schedulerService = schedulerService;
-        this.logger = technicalLoggerService.asLogger(SchedulerServiceRestartHandler.class);
         this.userTransactionService = userTransactionService;
     }
 
     @Override
     public void execute() {
-        logger.info("Rescheduling all scheduler Triggers in ERROR state");
+        log.info("Rescheduling all scheduler Triggers in ERROR state");
         try {
             userTransactionService.executeInTransaction(() -> {
                 schedulerService.rescheduleErroneousTriggers();
                 return null;
             });
         } catch (Exception e) {
-            logger.warn(
+            log.warn(
                     "Unable to reschedule all erroneous triggers, call PlatformAPI.rescheduleErroneousTriggers to retry. Cause is {}",
                     e.getMessage());
-            logger.debug("Cause: ", e);
+            log.debug("Cause: ", e);
         }
     }
 

@@ -13,20 +13,15 @@
  **/
 package org.bonitasoft.engine.tracking;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-
 /**
  * @author Charles Souillard
  */
 public abstract class AbstractFlushEventListener implements FlushEventListener {
 
     private boolean active = false;
-    protected final TechnicalLoggerService logger;
 
-    protected AbstractFlushEventListener(final boolean activateByDefault, final TechnicalLoggerService logger) {
+    protected AbstractFlushEventListener(final boolean activateByDefault) {
         this.active = activateByDefault;
-        this.logger = logger;
     }
 
     @Override
@@ -56,9 +51,4 @@ public abstract class AbstractFlushEventListener implements FlushEventListener {
         notifyStopTracking();
     }
 
-    protected void log(final TechnicalLogSeverity severity, final String message) {
-        if (this.logger.isLoggable(getClass(), severity)) {
-            this.logger.log(getClass(), severity, message);
-        }
-    }
 }

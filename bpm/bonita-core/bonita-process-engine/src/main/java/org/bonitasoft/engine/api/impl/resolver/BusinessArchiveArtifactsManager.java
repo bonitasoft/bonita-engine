@@ -13,12 +13,10 @@
  **/
 package org.bonitasoft.engine.api.impl.resolver;
 
-import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.ERROR;
-import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.INFO;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
@@ -33,8 +31,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -49,15 +45,13 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public class BusinessArchiveArtifactsManager {
 
     private final List<BusinessArchiveArtifactManager> dependencyResolvers;
-    private final TechnicalLoggerService technicalLoggerService;
 
-    public BusinessArchiveArtifactsManager(final List<BusinessArchiveArtifactManager> dependencyResolvers,
-            TechnicalLoggerService technicalLoggerService) {
+    public BusinessArchiveArtifactsManager(final List<BusinessArchiveArtifactManager> dependencyResolvers) {
         this.dependencyResolvers = dependencyResolvers;
-        this.technicalLoggerService = technicalLoggerService;
     }
 
     public boolean resolveDependencies(final BusinessArchive businessArchive, final SProcessDefinition sDefinition) {
@@ -68,13 +62,12 @@ public class BusinessArchiveArtifactsManager {
                 resolved &= artifactManager.deploy(businessArchive, sDefinition);
                 if (!resolved) {
                     for (Problem problem : artifactManager.checkResolution(sDefinition)) {
-                        technicalLoggerService.log(BusinessArchiveArtifactsManager.class, INFO,
-                                problem.getDescription());
+                        log.info(problem.getDescription());
                     }
                 }
             } catch (BonitaException | SBonitaException e) {
                 // not logged, we will check later why the process is not resolved
-                technicalLoggerService.log(BusinessArchiveArtifactsManager.class, ERROR, "Unable to deploy process", e);
+                log.error("Unable to deploy process", e);
                 resolved = false;
             }
         }
@@ -87,8 +80,7 @@ public class BusinessArchiveArtifactsManager {
                     Integer.MAX_VALUE);
             resolveDependencies(processDefinitionIds, tenantAccessor);
         } catch (SBonitaReadException e) {
-            technicalLoggerService.log(BusinessArchiveArtifactsManager.class, ERROR,
-                    "Unable to retrieve tenant process definitions, dependency resolution aborted");
+            log.error("Unable to retrieve tenant process definitions, dependency resolution aborted");
         }
     }
 
@@ -120,7 +112,6 @@ public class BusinessArchiveArtifactsManager {
 
     public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor,
             final BusinessArchiveArtifactManager... resolvers) {
-        final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
             boolean resolved = true;
@@ -132,14 +123,11 @@ public class BusinessArchiveArtifactsManager {
             changeResolutionStatus(processDefinitionId, processDefinitionService, resolved);
         } catch (final SBonitaException e) {
             final Class<BusinessArchiveArtifactsManager> clazz = BusinessArchiveArtifactsManager.class;
-            if (loggerService.isLoggable(clazz, TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(clazz, TechnicalLogSeverity.DEBUG, e);
+            if (log.isDebugEnabled()) {
+                log.debug(e.toString());
             }
-            if (loggerService.isLoggable(clazz, TechnicalLogSeverity.WARNING)) {
-                loggerService.log(clazz, TechnicalLogSeverity.WARNING,
-                        "Unable to resolve dependencies after they were modified because of " + e.getMessage()
-                                + ". Please retry it manually");
-            }
+            log.warn("Unable to resolve dependencies after they were modified because of " + e.getMessage()
+                    + ". Please retry it manually");
         }
     }
 

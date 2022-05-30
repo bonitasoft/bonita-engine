@@ -33,7 +33,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateC
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SUserTaskInstanceBuilderFactoryImpl;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -64,9 +63,6 @@ public class ActivityInstanceServiceImplTest {
 
     @Mock
     private Recorder recorder;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @InjectMocks
     private ActivityInstanceServiceImpl activityInstanceServiceImpl;

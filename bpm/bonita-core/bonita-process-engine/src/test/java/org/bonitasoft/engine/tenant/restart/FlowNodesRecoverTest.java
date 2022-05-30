@@ -25,15 +25,10 @@ import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.*;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -68,7 +63,7 @@ public class FlowNodesRecoverTest {
 
     @Before
     public void before() throws Exception {
-        flowNodesRecover = new FlowNodesRecover(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
+        flowNodesRecover = new FlowNodesRecover(workService, activityInstanceService,
                 flownodeStateManager, workFactory);
         when(activityInstanceService.getFlowNodeInstancesByIds(any())).thenAnswer(invocationOnMock -> {
             List<Long> ids = invocationOnMock.getArgument(0);

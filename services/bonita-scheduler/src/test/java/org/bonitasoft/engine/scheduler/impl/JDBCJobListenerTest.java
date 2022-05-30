@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.bonitasoft.engine.scheduler.BonitaJobListener.TRIGGER_NEXT_FIRE_TIME;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -25,8 +24,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -48,18 +45,13 @@ public class JDBCJobListenerTest {
     @Mock
     private JobService jobService;
     @Mock
-    private TechnicalLoggerService loggerService;
-    @Mock
-    private TechnicalLogger logger;
-    @Mock
     private SchedulerService schedulerService;
     private JDBCJobListener jdbcJobListener;
 
     @Before
     public void setUp() {
         context.put(BonitaJobListener.JOB_DESCRIPTOR_ID, JOB_DESCRIPTOR_ID);
-        doReturn(logger).when(loggerService).asLogger(any());
-        jdbcJobListener = new JDBCJobListener(jobService, loggerService, schedulerService);
+        jdbcJobListener = new JDBCJobListener(jobService, schedulerService);
     }
 
     @Test

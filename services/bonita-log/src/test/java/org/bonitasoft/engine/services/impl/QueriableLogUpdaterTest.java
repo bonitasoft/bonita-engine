@@ -14,12 +14,9 @@
 package org.bonitasoft.engine.services.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -28,7 +25,6 @@ import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -41,9 +37,6 @@ public class QueriableLogUpdaterTest {
 
     @Mock
     private PlatformService platformService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     private SQueriableLog log;
 
@@ -58,8 +51,6 @@ public class QueriableLogUpdaterTest {
         final SPlatformProperties properties = mock(SPlatformProperties.class);
         given(platformService.getSPlatformProperties()).willReturn(properties);
         given(properties.getPlatformVersion()).willReturn("platform.version");
-
-        given(logger.isLoggable(ArgumentMatchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
 
         log = getLogBuilderWithMandatoryFields();
     }

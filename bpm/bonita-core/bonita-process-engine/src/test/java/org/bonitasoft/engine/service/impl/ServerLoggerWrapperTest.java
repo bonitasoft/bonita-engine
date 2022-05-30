@@ -15,47 +15,46 @@ package org.bonitasoft.engine.service.impl;
 
 import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServerLoggerWrapperTest {
 
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     private final Class<?> aClass = ServerLoggerWrapperTest.class;
     private final IllegalStateException anException = new IllegalStateException();
     private ServerLoggerWrapper logger;
+    @Mock
+    private Logger loggerSL4J;
 
     @Before
     public void before() {
-        logger = new ServerLoggerWrapper(aClass, technicalLoggerService);
+        logger = new ServerLoggerWrapper(aClass, loggerSL4J);
     }
 
     @Test
     public void testTrace() {
         logger.trace("msg");
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.TRACE, "msg");
+        verify(loggerSL4J).trace("msg");
     }
 
     @Test
     public void testTrace1() {
         logger.trace("msg", anException);
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.TRACE, "msg", anException);
+        verify(loggerSL4J).trace("msg", anException);
     }
 
     @Test
     public void testDebug() {
         logger.debug("msg");
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.DEBUG, "msg");
+        verify(loggerSL4J).debug("msg");
 
     }
 
@@ -63,7 +62,7 @@ public class ServerLoggerWrapperTest {
     public void testDebug1() {
         logger.debug("msg", anException);
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.DEBUG, "msg", anException);
+        verify(loggerSL4J).debug("msg", anException);
 
     }
 
@@ -71,7 +70,7 @@ public class ServerLoggerWrapperTest {
     public void testInfo() {
         logger.info("msg");
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.INFO, "msg");
+        verify(loggerSL4J).info("msg");
 
     }
 
@@ -79,7 +78,7 @@ public class ServerLoggerWrapperTest {
     public void testInfo1() {
         logger.info("msg", anException);
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.INFO, "msg", anException);
+        verify(loggerSL4J).info("msg", anException);
 
     }
 
@@ -87,7 +86,7 @@ public class ServerLoggerWrapperTest {
     public void testWarning() {
         logger.warning("msg");
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.WARNING, "msg");
+        verify(loggerSL4J).warn("msg");
 
     }
 
@@ -95,7 +94,7 @@ public class ServerLoggerWrapperTest {
     public void testWarning1() {
         logger.warning("msg", anException);
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.WARNING, "msg", anException);
+        verify(loggerSL4J).warn("msg", anException);
 
     }
 
@@ -103,7 +102,7 @@ public class ServerLoggerWrapperTest {
     public void testError() {
         logger.error("msg");
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.ERROR, "msg");
+        verify(loggerSL4J).error("msg");
 
     }
 
@@ -111,7 +110,7 @@ public class ServerLoggerWrapperTest {
     public void testError1() {
         logger.error("msg", anException);
 
-        verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.ERROR, "msg", anException);
+        verify(loggerSL4J).error("msg", anException);
 
     }
 }

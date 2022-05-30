@@ -31,7 +31,6 @@ import java.security.NoSuchAlgorithmException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,8 +46,6 @@ public class DefaultProfilesUpdaterTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     @Mock
-    public TechnicalLoggerService technicalLoggerService;
-    @Mock
     public ProfilesImporter profilesImporter;
     @Mock
     public ProfilesNode defaultProfiles;
@@ -58,7 +55,7 @@ public class DefaultProfilesUpdaterTest {
     @Before
     public void before() throws IOException, BonitaHomeNotSetException, ExecutionException {
         md5File = temporaryFolder.newFile();
-        defaultProfilesUpdater = spy(new DefaultProfilesUpdater(1L, technicalLoggerService, profilesImporter));
+        defaultProfilesUpdater = spy(new DefaultProfilesUpdater(1L, profilesImporter));
         doReturn(md5File).when(defaultProfilesUpdater).getProfilesMD5File();
         doReturn("xml content").when(defaultProfilesUpdater).getDefaultProfilesXml();
         doReturn(defaultProfiles).when(defaultProfilesUpdater).getProfilesFromXML(anyString());

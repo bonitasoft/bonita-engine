@@ -20,7 +20,8 @@ import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.ehcache.CommonEhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -33,11 +34,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlatformEhCacheCacheService extends CommonEhCacheCacheService implements PlatformCacheService {
 
-    public PlatformEhCacheCacheService(TechnicalLoggerService logger,
-            List<CacheConfiguration> cacheConfigurations,
+    public PlatformEhCacheCacheService(List<CacheConfiguration> cacheConfigurations,
             @Qualifier("defaultPlatformCacheConfiguration") CacheConfiguration defaultCacheConfiguration,
             @Value("java.io.tmpdir/platform.cache") String diskStorePath) {
-        super(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
+        super(cacheConfigurations, defaultCacheConfiguration, diskStorePath);
     }
 
     @Override
@@ -96,5 +96,10 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
     @Override
     protected String getCacheManagerIdentifier() {
         return "platform";
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LoggerFactory.getLogger(PlatformEhCacheCacheService.class);
     }
 }

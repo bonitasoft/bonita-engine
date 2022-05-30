@@ -68,7 +68,6 @@ import org.bonitasoft.engine.identity.IconService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
@@ -122,8 +121,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     LoginService getLoginService();
 
     QueriableLoggerService getQueriableLoggerService();
-
-    TechnicalLoggerService getTechnicalLoggerService();
 
     UserTransactionService getUserTransactionService();
 

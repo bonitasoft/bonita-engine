@@ -34,7 +34,6 @@ import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -59,8 +58,7 @@ public class DataInstanceServiceImplTest {
     private ReadPersistenceService persistenceService;
     @Mock
     private ArchiveService archiveService;
-    @Mock
-    private TechnicalLoggerService logger;
+
     @Mock
     private ParentContainerResolver parentContainerResolver;
     @Captor

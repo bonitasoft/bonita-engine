@@ -16,7 +16,6 @@ package org.bonitasoft.engine.services.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -40,9 +39,6 @@ public class QueriableLogSessionProviderImplTest {
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
-
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
 
     @Mock
     private SSession session;

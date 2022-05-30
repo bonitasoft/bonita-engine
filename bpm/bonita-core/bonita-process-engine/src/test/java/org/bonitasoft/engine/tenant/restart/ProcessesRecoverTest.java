@@ -37,7 +37,6 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.state.FailedActivityState;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -78,7 +77,7 @@ public class ProcessesRecoverTest {
     public void setUp() throws Exception {
         recoveryMonitor = new RecoveryMonitor();
         recoveryMonitor.startNow(100);
-        processesRecover = new ProcessesRecover(workService, new TechnicalLoggerSLF4JImpl(), activityInstanceService,
+        processesRecover = new ProcessesRecover(workService, activityInstanceService,
                 processDefinitionService, processInstanceService, processExecutor, new BPMWorkFactory());
         doAnswer(args -> ((Callable) args.getArgument(0)).call()).when(userTransactionService)
                 .executeInTransaction(any());

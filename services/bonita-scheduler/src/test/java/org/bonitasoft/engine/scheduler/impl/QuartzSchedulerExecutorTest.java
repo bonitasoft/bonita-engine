@@ -16,29 +16,16 @@ package org.bonitasoft.engine.scheduler.impl;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupStartsWith;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
@@ -54,17 +41,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.quartz.CronTrigger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.ListenerManager;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 import org.quartz.Trigger.TriggerState;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
@@ -111,7 +89,7 @@ public class QuartzSchedulerExecutorTest {
 
     private QuartzSchedulerExecutor initQuartzScheduler(final boolean useOptimization) throws SSchedulerException {
         final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, transactionService,
-                sessionAccessor, new TechnicalLoggerSLF4JImpl(), useOptimization);
+                sessionAccessor, useOptimization);
         quartz.start();
         return quartz;
     }
@@ -707,7 +685,7 @@ public class QuartzSchedulerExecutorTest {
         BonitaJobListener listener1 = mock(BonitaJobListener.class);
         BonitaJobListener listener2 = mock(BonitaJobListener.class);
         quartzSchedulerExecutor = new QuartzSchedulerExecutor(schedulerFactory, transactionService, sessionAccessor,
-                new TechnicalLoggerSLF4JImpl(), false);
+                false);
         quartzSchedulerExecutor.setJobListeners(asList(listener1, listener2));
 
         quartzSchedulerExecutor.start();

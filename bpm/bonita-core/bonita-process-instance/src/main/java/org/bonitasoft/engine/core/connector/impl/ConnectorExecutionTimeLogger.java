@@ -16,27 +16,23 @@ package org.bonitasoft.engine.core.connector.impl;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * Log connector execution time when the connector took more than the configured threshold
  */
+@Slf4j
 public class ConnectorExecutionTimeLogger {
 
-    private final TechnicalLogger logger;
     private Long warnWhenLongerThanMillis;
 
     /**
-     * @param technicalLoggerService the technical logger
      * @param warnWhenLongerThanMillis the duration in milli seconds above which the time taken will be logged as a
      *        warning
      */
-    public ConnectorExecutionTimeLogger(TechnicalLoggerService technicalLoggerService,
-            Long warnWhenLongerThanMillis) {
-        logger = technicalLoggerService.asLogger(ConnectorExecutionTimeLogger.class);
+    public ConnectorExecutionTimeLogger(Long warnWhenLongerThanMillis) {
         this.warnWhenLongerThanMillis = warnWhenLongerThanMillis;
     }
 
@@ -45,12 +41,12 @@ public class ConnectorExecutionTimeLogger {
         if (executionTimeMillis < warnWhenLongerThanMillis) {
             return;
         }
-        logger.warn(
+        log.warn(
                 "Connector {} with id {} with class {} of process definition {} on element {} took {} ms.",
                 sConnectorInstance.getName(), sConnectorInstance.getId(), connector.getClass().getName(),
                 processDefinitionId, printContext(sConnectorInstance), executionTimeMillis);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Input parameters of the connector with id {}: {}", sConnectorInstance.getId(),
+        if (log.isDebugEnabled()) {
+            log.debug("Input parameters of the connector with id {}: {}", sConnectorInstance.getId(),
                     print(inputParameters));
         }
     }

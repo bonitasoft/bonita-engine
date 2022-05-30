@@ -20,8 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
@@ -34,6 +33,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Slf4j
 public class SessionServiceImpl implements SessionService {
 
     private static final long DEFAULT_SESSION_DURATION = 3600000;
@@ -44,13 +44,9 @@ public class SessionServiceImpl implements SessionService {
 
     private final String applicationName;
 
-    private final TechnicalLoggerService logger;
-
-    public SessionServiceImpl(final SessionProvider sessionProvider, final String applicationName,
-            final TechnicalLoggerService logger) {
+    public SessionServiceImpl(final SessionProvider sessionProvider, final String applicationName) {
         this.sessionProvider = sessionProvider;
         this.applicationName = applicationName;
-        this.logger = logger;
     }
 
     @Override
@@ -83,8 +79,8 @@ public class SessionServiceImpl implements SessionService {
                 .userPermissions(permissions)
                 .build();
         sessionProvider.addSession(session);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+        if (log.isTraceEnabled()) {
+            log.trace(
                     "CreateSession with tenantId = <" + tenantId + ">, username = <" + userName + ">, id = <"
                             + id + ">");
         }
@@ -159,8 +155,8 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void deleteSessions() {
         sessionProvider.removeSessions();
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Sessions were deleted.");
+        if (log.isTraceEnabled()) {
+            log.trace("Sessions were deleted.");
         }
     }
 

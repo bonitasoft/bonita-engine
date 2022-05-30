@@ -26,7 +26,6 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefiniti
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,8 +52,7 @@ public class WaitingEventsInterrupterTest {
 
     @Before
     public void before() {
-        waitingEventsInterrupter = new WaitingEventsInterrupter(eventInstanceService, schedulerService,
-                new TechnicalLoggerSLF4JImpl());
+        waitingEventsInterrupter = new WaitingEventsInterrupter(eventInstanceService, schedulerService);
 
         processDefinition = new SProcessDefinitionImpl("myPocess", "1.0");
         catchEventInstance = new SIntermediateCatchEventInstance();

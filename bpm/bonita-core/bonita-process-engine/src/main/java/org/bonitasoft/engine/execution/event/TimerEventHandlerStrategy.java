@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -43,8 +44,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.jobs.TriggerTimerEventJob;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -59,6 +58,7 @@ import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     private static final OperationsWithContext EMPTY = new OperationsWithContext(null, null);
@@ -69,15 +69,12 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     private final EventInstanceService eventInstanceService;
 
-    private final TechnicalLoggerService logger;
-
     public TimerEventHandlerStrategy(final ExpressionResolverService expressionResolverService,
             final SchedulerService schedulerService,
-            final EventInstanceService eventInstanceService, final TechnicalLoggerService logger) {
+            final EventInstanceService eventInstanceService) {
         this.schedulerService = schedulerService;
         this.expressionResolverService = expressionResolverService;
         this.eventInstanceService = eventInstanceService;
-        this.logger = logger;
     }
 
     @Override
@@ -254,7 +251,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
                 parentProcessInstance.getId(), subProcessId);
         final boolean delete = schedulerService.delete(jobName);
         if (!delete) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            if (log.isDebugEnabled()) {
                 final StringBuilder stb = new StringBuilder();
                 stb.append("No job found with name '");
                 stb.append(jobName);
@@ -267,7 +264,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
                 stb.append(">]");
                 stb.append("'. It was probably already triggered.");
                 final String message = stb.toString();
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
+                log.debug(message);
             }
         }
 

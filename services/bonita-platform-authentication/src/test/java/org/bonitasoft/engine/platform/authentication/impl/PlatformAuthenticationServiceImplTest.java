@@ -13,22 +13,17 @@
  **/
 package org.bonitasoft.engine.platform.authentication.impl;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.authentication.SInvalidPasswordException;
 import org.bonitasoft.engine.platform.authentication.SInvalidUserException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 /**
  * @author Celine Souchet
  */
 public class PlatformAuthenticationServiceImplTest {
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @InjectMocks
     private PlatformAuthenticationServiceImpl platformAuthenticationServiceImpl;

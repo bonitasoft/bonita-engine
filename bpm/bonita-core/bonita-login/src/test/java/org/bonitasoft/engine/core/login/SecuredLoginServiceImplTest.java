@@ -38,7 +38,6 @@ import org.bonitasoft.engine.authorization.PermissionsBuilder;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.session.SessionService;
@@ -64,8 +63,6 @@ public class SecuredLoginServiceImplTest {
     @Mock
     private IdentityService identityService;
     @Mock
-    private TechnicalLoggerService logger;
-    @Mock
     private ProfileService profileService;
     @Mock
     private PermissionsBuilder permissionsBuilder;
@@ -73,7 +70,7 @@ public class SecuredLoginServiceImplTest {
     @Before
     public void setUp() throws Exception {
         securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService,
-                identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS), profileService,
+                identityService, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS), profileService,
                 permissionsBuilder);
         //return a session with given arguments
         when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean(), anyList(), anySet()))

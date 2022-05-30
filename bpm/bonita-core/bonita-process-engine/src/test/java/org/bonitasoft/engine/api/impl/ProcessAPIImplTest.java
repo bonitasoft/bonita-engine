@@ -158,7 +158,6 @@ import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
@@ -267,8 +266,6 @@ public class ProcessAPIImplTest {
     @Mock
     private ExpressionResolverService expressionResolverService;
     @Mock
-    private TechnicalLoggerService technicalLoggerService;
-    @Mock
     private FlowNodeExecutor flowNodeExecutor;
     @Mock
     private WorkService workService;
@@ -319,7 +316,6 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
         when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
         when(tenantAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
         when(tenantAccessor.getFlowNodeExecutor()).thenReturn(flowNodeExecutor);
         when(tenantAccessor.getWorkService()).thenReturn(workService);
         when(tenantAccessor.getBPMWorkFactory()).thenReturn(workFactory);

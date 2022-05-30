@@ -22,8 +22,6 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.SWorkPreconditionException;
 import org.junit.Before;
@@ -44,7 +42,6 @@ public class ExecuteFlowNodeWorkTest {
     public static final long PROCESS_INSTANCE_ID = 34552L;
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
-    private TechnicalLoggerService technicalLoggerService = new TechnicalLoggerSLF4JImpl();
     @Mock
     private ActivityInstanceService activityInstanceService;
     @Mock

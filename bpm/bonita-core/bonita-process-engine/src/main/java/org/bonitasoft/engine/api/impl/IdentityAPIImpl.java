@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -120,8 +121,6 @@ import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -150,6 +149,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Celine Souchet
  */
 @AvailableWhenTenantIsPaused
+@Slf4j
 public class IdentityAPIImpl implements IdentityAPI {
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -187,8 +187,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         IdentityService identityService = tenantAccessor.getIdentityService();
         if (creator.getFields().containsKey(UserCreator.UserField.ICON_NAME)
                 || creator.getFields().containsKey(UserCreator.UserField.ICON_PATH)) {
-            tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                    "setIconName and setIconPath are deprecated, use setIcon instead");
+            log.warn("setIconName and setIconPath are deprecated, use setIcon instead");
         }
         final SUser sUser = ModelConvertor.constructSUser(creator);
         final SContactInfo personalContactInfo = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), true);
@@ -234,8 +233,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
 
         // User change
-        final EntityUpdateDescriptor userUpdateDescriptor = getUserUpdateDescriptor(updater,
-                tenantAccessor.getTechnicalLoggerService());
+        final EntityUpdateDescriptor userUpdateDescriptor = getUserUpdateDescriptor(updater);
         // Personal data change
         final EntityUpdateDescriptor personalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(
                 updater.getPersoContactUpdater());
@@ -281,8 +279,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         return entityUpdateDescriptor;
     }
 
-    private EntityUpdateDescriptor getUserUpdateDescriptor(final UserUpdater updateDescriptor,
-            TechnicalLoggerService technicalLoggerService) {
+    private EntityUpdateDescriptor getUserUpdateDescriptor(final UserUpdater updateDescriptor) {
         final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class)
                 .createNewInstance();
         if (updateDescriptor != null) {
@@ -305,12 +302,10 @@ public class IdentityAPIImpl implements IdentityAPI {
                         userUpdateBuilder.updateManagerUserId((Long) field.getValue());
                         break;
                     case ICON_NAME:
-                        technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                                "setIconName is deprecated, use setIcon instead");
+                        log.warn("setIconName is deprecated, use setIcon instead");
                         break;
                     case ICON_PATH:
-                        technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                                "setIconPath is deprecated, use setIcon instead");
+                        log.warn("setIconPath is deprecated, use setIcon instead");
                         break;
                     case TITLE:
                         userUpdateBuilder.updateTitle((String) field.getValue());
@@ -753,8 +748,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         if (creator.getFields().containsKey(RoleCreator.RoleField.ICON_NAME)
                 || creator.getFields().containsKey(RoleCreator.RoleField.ICON_PATH)) {
-            tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                    "setIconName and setIconPath are deprecated, use setIcon instead");
+            log.warn("setIconName and setIconPath are deprecated, use setIcon instead");
         }
         final SRole sRole = ModelConvertor.constructSRole(creator);
         try {
@@ -782,8 +776,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final EntityUpdateDescriptor changeDescriptor = getRoleUpdateDescriptor(updateDescriptor,
-                    tenantAccessor.getTechnicalLoggerService());
+            final EntityUpdateDescriptor changeDescriptor = getRoleUpdateDescriptor(updateDescriptor);
             return ModelConvertor.toRole(identityService.updateRole(identityService.getRole(roleId), changeDescriptor,
                     getIconUpdater(updateDescriptor)));
         } catch (final SRoleNotFoundException e) {
@@ -793,8 +786,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private EntityUpdateDescriptor getRoleUpdateDescriptor(final RoleUpdater updateDescriptor,
-            TechnicalLoggerService technicalLoggerService) {
+    private EntityUpdateDescriptor getRoleUpdateDescriptor(final RoleUpdater updateDescriptor) {
         final SRoleUpdateBuilder roleUpdateBuilder = BuilderFactory.get(SRoleUpdateBuilderFactory.class)
                 .createNewInstance();
         final Map<RoleField, Serializable> fields = updateDescriptor.getFields();
@@ -810,12 +802,10 @@ public class IdentityAPIImpl implements IdentityAPI {
                     roleUpdateBuilder.updateDescription((String) field.getValue());
                     break;
                 case ICON_NAME:
-                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                            "setIconPath is deprecated, use setIcon instead");
+                    log.warn("setIconPath is deprecated, use setIcon instead");
                     break;
                 case ICON_PATH:
-                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                            "setIconPath is deprecated, use setIcon instead");
+                    log.warn("setIconPath is deprecated, use setIcon instead");
                     break;
                 default:
                     break;
@@ -982,8 +972,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         if (creator.getFields().containsKey(GroupCreator.GroupField.ICON_NAME)
                 || creator.getFields().containsKey(GroupCreator.GroupField.ICON_PATH)) {
-            tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                    "setIconName and setIconPath are deprecated, use setIcon instead");
+            log.warn("setIconName and setIconPath are deprecated, use setIcon instead");
         }
         final SGroup sGroup = ModelConvertor.constructSGroup(creator);
         try {
@@ -1012,8 +1001,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             checkPathUnicity(groupId, updater, identityService);
-            final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(updater,
-                    tenantAccessor.getTechnicalLoggerService());
+            final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(updater);
             return ModelConvertor.toGroup(
                     new UpdateGroup(groupId, changeDescriptor, identityService, getIconUpdater(updater)).update());
         } catch (final SGroupNotFoundException e) {
@@ -1043,8 +1031,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private EntityUpdateDescriptor getGroupUpdateDescriptor(final GroupUpdater updateDescriptor,
-            TechnicalLoggerService technicalLoggerService)
+    private EntityUpdateDescriptor getGroupUpdateDescriptor(final GroupUpdater updateDescriptor)
             throws UpdateException {
         final SGroupUpdateBuilder groupUpdateBuilder = BuilderFactory.get(SGroupUpdateBuilderFactory.class)
                 .createNewInstance();
@@ -1062,12 +1049,10 @@ public class IdentityAPIImpl implements IdentityAPI {
                     groupUpdateBuilder.updateDescription((String) value);
                     break;
                 case ICON_NAME:
-                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                            "updateIconName is deprecated, use updateIcon instead");
+                    log.warn("updateIconName is deprecated, use updateIcon instead");
                     break;
                 case ICON_PATH:
-                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
-                            "updateIconPath is deprecated, use updateIcon instead");
+                    log.warn("updateIconPath is deprecated, use updateIcon instead");
                     break;
                 case ICON_CONTENT:
                     break;

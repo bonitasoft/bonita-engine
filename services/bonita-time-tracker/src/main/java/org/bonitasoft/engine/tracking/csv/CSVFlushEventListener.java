@@ -19,14 +19,15 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.AbstractFlushEventListener;
 import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.Record;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CSVFlushEventListener extends AbstractFlushEventListener {
 
+    private static final Logger log = LoggerFactory.getLogger(CSVFlushEventListener.class);
     private final String csvSeparator;
 
     private final String outputFolder;
@@ -35,9 +36,8 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
 
     public static final String FILE_SUFFIX = ".csv";
 
-    public CSVFlushEventListener(final boolean activateAtStart, final TechnicalLoggerService logger,
-            final String outputFolder, final String csvSeparator) {
-        super(activateAtStart, logger);
+    public CSVFlushEventListener(final boolean activateAtStart, final String outputFolder, final String csvSeparator) {
+        super(activateAtStart);
         this.outputFolder = outputFolder;
         this.csvSeparator = csvSeparator;
 
@@ -63,10 +63,10 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
         final File outputFile = getDayFile(flushTime, this.outputFolder, FILE_PREFIX, FILE_SUFFIX);
 
         if (!outputFile.exists()) {
-            log(TechnicalLogSeverity.INFO, "Generating new csv file to: " + outputFile);
+            log.info("Generating new csv file to: {} ", outputFile);
             CSVUtil.writeCSVRow(outputFile, getHeaderRow(), this.csvSeparator);
         } else {
-            log(TechnicalLogSeverity.INFO, "Reusing csv file: " + outputFile);
+            log.info("Reusing csv file: {}", outputFile);
         }
         CSVUtil.writeCSVRows(outputFile, csvContent, this.csvSeparator);
         return new CSVFlushEventListenerResult(flushEvent, outputFile);

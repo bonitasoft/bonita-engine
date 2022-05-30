@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -32,8 +33,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -45,19 +44,18 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 /**
  * @author Elias Ricken de Medeiros
  */
+@Slf4j
 public class WaitingEventsInterrupter {
 
     private final EventInstanceService eventInstanceService;
     private final SchedulerService schedulerService;
-    private final TechnicalLoggerService logger;
 
     private static final int MAX_NUMBER_OF_RESULTS = 100;
 
     public WaitingEventsInterrupter(final EventInstanceService eventInstanceService,
-            final SchedulerService schedulerService, final TechnicalLoggerService logger) {
+            final SchedulerService schedulerService) {
         this.eventInstanceService = eventInstanceService;
         this.schedulerService = schedulerService;
-        this.logger = logger;
     }
 
     public void interruptWaitingEvents(final SProcessDefinition processDefinition,
@@ -141,17 +139,13 @@ public class WaitingEventsInterrupter {
             try {
                 eventInstanceService.deleteEventTriggerInstanceOfFlowNode(catchEventInstance.getId());
             } catch (SEventTriggerInstanceDeletionException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                        "Unable to delete event trigger of flow node instance " + catchEventInstance + " because: "
-                                + e.getMessage());
+                log.warn("Unable to delete event trigger of flow node instance {} because: {}", catchEventInstance,
+                        e.getMessage());
             }
             if (!delete) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
-                            + "' when interrupting timer catch event named '" + catchEventDef.getName() + "' and id '"
-                            + catchEventInstance.getId()
-                            + "'. It was probably already triggered.");
-                }
+                log.warn("No job found with name '{}'  when interrupting timer catch event named '{}' and id '{}'." +
+                        " It was probably already triggered.", jobName, catchEventDef.getName(),
+                        catchEventDef.getName());
             }
         }
     }

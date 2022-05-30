@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.AbstractTimeTrackerTest;
 import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.Record;
@@ -32,7 +31,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,12 +44,9 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    @Mock
-    private TechnicalLoggerService logger;
-
     @Test
     public void should_work_if_output_folder_is_a_folder() throws Exception {
-        new CSVFlushEventListener(true, this.logger, this.temporaryFolder.newFolder().getAbsolutePath(), ";");
+        new CSVFlushEventListener(true, this.temporaryFolder.newFolder().getAbsolutePath(), ";");
     }
 
     @Test
@@ -61,7 +56,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         this.expectedException.expectMessage("Output folder does not exist");
 
         //when
-        new CSVFlushEventListener(true, this.logger, "unknownFolder", ";");
+        new CSVFlushEventListener(true, "unknownFolder", ";");
     }
 
     @Test
@@ -71,13 +66,13 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         this.expectedException.expectMessage("Output folder is not a directory");
 
         //when
-        new CSVFlushEventListener(true, this.logger, this.temporaryFolder.newFile().getAbsolutePath(), ";");
+        new CSVFlushEventListener(true, this.temporaryFolder.newFile().getAbsolutePath(), ";");
     }
 
     @Test
     public void flushedCsv() throws Exception {
         //given
-        final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(true, this.logger,
+        final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(true,
                 this.temporaryFolder.newFolder().getAbsolutePath(), ";");
         final Record rec1 = new Record(System.currentTimeMillis(), TIME_TRACKER_RECORDS, "rec1Desc", 100);
         final Record rec2 = new Record(System.currentTimeMillis(), TIME_TRACKER_RECORDS, "rec2Desc", 200);

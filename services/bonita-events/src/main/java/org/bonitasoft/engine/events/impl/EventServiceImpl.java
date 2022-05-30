@@ -24,22 +24,30 @@ import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christophe Havard
  * @author Matthieu Chaffotte
  * @author Laurent Vaills
  */
+
 public class EventServiceImpl extends AbstractEventServiceImpl {
 
+    private Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
     /**
      * Contains a list of all events type and their registered handlers
      */
     protected Map<String, List<SHandler<SEvent>>> registeredHandlers;
 
-    public EventServiceImpl(final TechnicalLoggerService logger) {
-        super(logger);
+    @Override
+    protected Logger getLogger() {
+        return logger;
+    }
+
+    public EventServiceImpl() {
+        super();
         registeredHandlers = new HashMap<String, List<SHandler<SEvent>>>();
     }
 

@@ -15,14 +15,11 @@ package org.bonitasoft.engine.transaction;
 
 import static javax.transaction.Status.STATUS_COMMITTED;
 import static javax.transaction.Status.STATUS_ROLLEDBACK;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import javax.transaction.Status;
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -40,7 +37,7 @@ public class TransactionLifeCycleTest {
 
     @Before
     public void before() {
-        txService = new JTATransactionServiceImpl(new TechnicalLoggerSLF4JImpl(), transactionManager);
+        txService = new JTATransactionServiceImpl(transactionManager);
     }
 
     @SuppressWarnings("deprecation")

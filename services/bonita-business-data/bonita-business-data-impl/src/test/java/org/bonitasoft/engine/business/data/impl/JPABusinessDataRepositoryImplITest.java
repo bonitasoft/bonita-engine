@@ -39,8 +39,6 @@ import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
@@ -90,16 +88,12 @@ public class JPABusinessDataRepositoryImplITest {
 
         transactionService = mock(UserTransactionService.class);
 
-        final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
-        doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
-
-        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(),
-                loggerService);
+        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration());
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(
                 new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
                         classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(
-                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService,
+                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,
                         configuration.getJpaConfiguration(), classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();

@@ -17,13 +17,7 @@ import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import groovy.lang.GroovyClassLoader;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +34,6 @@ import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -77,7 +69,6 @@ public class PermissionServiceImpl implements PermissionService {
     public static final String EXTENSION_SEPARATOR = ",";
 
     private final ClassLoaderService classLoaderService;
-    private final TechnicalLoggerService logger;
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
     private GroovyClassLoader groovyClassLoader;
@@ -87,14 +78,13 @@ public class PermissionServiceImpl implements PermissionService {
 
     protected final long tenantId;
 
-    public PermissionServiceImpl(final ClassLoaderService classLoaderService, final TechnicalLoggerService logger,
-            final SessionAccessor sessionAccessor, final SessionService sessionService,
+    public PermissionServiceImpl(final ClassLoaderService classLoaderService, final SessionAccessor sessionAccessor,
+            final SessionService sessionService,
             @Value("${tenantId}") final long tenantId,
             CompoundPermissionsMapping compoundPermissionsMapping,
             ResourcesPermissionsMapping resourcesPermissionsMapping,
             CustomPermissionsMapping customPermissionsMapping) {
         this.classLoaderService = classLoaderService;
-        this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.tenantId = tenantId;
@@ -124,7 +114,7 @@ public class PermissionServiceImpl implements PermissionService {
             final APISession apiSession = ModelConvertor.toAPISession(session, null);
             final PermissionRule permissionRule = (PermissionRule) aClass.getDeclaredConstructor().newInstance();
             return permissionRule.isAllowed(apiSession, context, createAPIAccessorImpl(),
-                    new ServerLoggerWrapper(permissionRule.getClass(), logger));
+                    new ServerLoggerWrapper(permissionRule.getClass(), log));
         } catch (final Throwable e) {
             throw new SExecutionException("The permission rule " + aClass.getName() + " threw an exception", e);
         }
@@ -206,7 +196,7 @@ public class PermissionServiceImpl implements PermissionService {
                 return true;
             }
         }
-        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+        log.debug(
                 "Unauthorized access to " + apiCallContext.getMethod() + " " + apiCallContext.getApiName() + "/"
                         + apiCallContext.getResourceName()
                         + (apiCallContext.getResourceId() != null ? "/" + apiCallContext.getResourceId() : "")
