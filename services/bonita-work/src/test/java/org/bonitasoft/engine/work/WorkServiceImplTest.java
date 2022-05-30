@@ -21,8 +21,6 @@ import java.time.temporal.ChronoUnit;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.time.EngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
@@ -38,8 +36,6 @@ public class WorkServiceImplTest {
     @Mock
     private UserTransactionService transactionService;
     @Mock
-    private TechnicalLoggerService loggerService;
-    @Mock
     private SessionAccessor sessionAccessor;
     @Mock
     private WorkExecutorService workExecutorService;
@@ -48,9 +44,8 @@ public class WorkServiceImplTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
         doReturn(1L).when(sessionAccessor).getTenantId();
-        workService = new WorkServiceImpl(transactionService, loggerService, sessionAccessor, workExecutorService,
+        workService = new WorkServiceImpl(transactionService, sessionAccessor, workExecutorService,
                 engineClock, 0);
     }
 

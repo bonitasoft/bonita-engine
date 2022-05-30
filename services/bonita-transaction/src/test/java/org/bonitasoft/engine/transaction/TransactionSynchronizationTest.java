@@ -18,7 +18,6 @@ import static org.junit.Assert.*;
 import javax.transaction.Status;
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.transaction.synchronization.SimpleSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronizationResult;
@@ -39,7 +38,7 @@ public class TransactionSynchronizationTest {
 
     @Before
     public void before() {
-        txService = new JTATransactionServiceImpl(new TechnicalLoggerSLF4JImpl(), transactionManager);
+        txService = new JTATransactionServiceImpl(transactionManager);
     }
 
     @After

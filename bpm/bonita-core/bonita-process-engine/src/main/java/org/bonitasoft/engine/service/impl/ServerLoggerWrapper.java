@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.service.impl;
 
 import org.bonitasoft.engine.api.Logger;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * Wrap the technical logger service to be available to client extensions
@@ -25,60 +23,60 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 public class ServerLoggerWrapper implements Logger {
 
     private Class<?> clazz;
-    private TechnicalLoggerService logger;
+    private org.slf4j.Logger logger;
 
-    public ServerLoggerWrapper(Class<?> clazz, TechnicalLoggerService logger) {
+    public ServerLoggerWrapper(Class<?> clazz, org.slf4j.Logger logger) {
         this.clazz = clazz;
         this.logger = logger;
     }
 
     @Override
     public void trace(String message, Throwable t) {
-        logger.log(clazz, TechnicalLogSeverity.TRACE, message, t);
+        logger.trace(message, t);
     }
 
     @Override
     public void trace(String message) {
-        logger.log(clazz, TechnicalLogSeverity.TRACE, message);
+        logger.trace(message);
     }
 
     @Override
     public void debug(String message, Throwable t) {
-        logger.log(clazz, TechnicalLogSeverity.DEBUG, message, t);
+        logger.debug(message, t);
     }
 
     @Override
     public void debug(String message) {
-        logger.log(clazz, TechnicalLogSeverity.DEBUG, message);
+        logger.debug(message);
     }
 
     @Override
     public void info(String message, Throwable t) {
-        logger.log(clazz, TechnicalLogSeverity.INFO, message, t);
+        logger.info(message, t);
     }
 
     @Override
     public void info(String message) {
-        logger.log(clazz, TechnicalLogSeverity.INFO, message);
+        logger.info(message);
     }
 
     @Override
     public void warning(String message, Throwable t) {
-        logger.log(clazz, TechnicalLogSeverity.WARNING, message, t);
+        logger.warn(message, t);
     }
 
     @Override
     public void warning(String message) {
-        logger.log(clazz, TechnicalLogSeverity.WARNING, message);
+        logger.warn(message);
     }
 
     @Override
     public void error(String message, Throwable t) {
-        logger.log(clazz, TechnicalLogSeverity.ERROR, message, t);
+        logger.error(message, t);
     }
 
     @Override
     public void error(String message) {
-        logger.log(clazz, TechnicalLogSeverity.ERROR, message);
+        logger.error(message);
     }
 }

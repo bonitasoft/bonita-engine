@@ -15,9 +15,7 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -25,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -69,9 +65,6 @@ public class JobServiceImplForJobDescriptorTest {
 
     @Mock
     private Recorder recorder;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @Spy
     @InjectMocks
@@ -145,7 +138,6 @@ public class JobServiceImplForJobDescriptorTest {
         // Given
         when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any()))
                 .thenReturn(null);
-        when(logger.isLoggable(any(Class.class), eq(TechnicalLogSeverity.TRACE))).thenReturn(true);
 
         // When
         jobServiceImpl.deleteJobDescriptor(1);

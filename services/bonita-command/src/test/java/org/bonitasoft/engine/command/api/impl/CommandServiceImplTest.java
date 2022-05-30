@@ -32,7 +32,6 @@ import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandLogBuilder;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilderImpl;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -67,9 +66,6 @@ public class CommandServiceImplTest {
     private EventService eventService;
 
     @Mock
-    private TechnicalLoggerService logger;
-
-    @Mock
     private QueriableLoggerService queriableLoggerService;
 
     @Mock
@@ -79,7 +75,7 @@ public class CommandServiceImplTest {
 
     @Before
     public final void setUp() {
-        commandServiceImpl = new CommandServiceImpl(persistence, recorder, eventService, logger, queriableLoggerService,
+        commandServiceImpl = new CommandServiceImpl(persistence, recorder, eventService, queriableLoggerService,
                 commandProvider, FETCH_SIZE);
     }
 

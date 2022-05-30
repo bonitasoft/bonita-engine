@@ -16,15 +16,10 @@ package org.bonitasoft.engine.execution;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
@@ -61,38 +56,15 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.definition.model.*;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.*;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.*;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
@@ -115,8 +87,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -134,6 +104,7 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Hongwen Zang
  * @author Celine Souchet
  */
+@Slf4j
 public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected final ActivityInstanceService activityInstanceService;
@@ -145,7 +116,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     protected final BPMInstancesCreator bpmInstancesCreator;
     protected final EventsHandler eventsHandler;
     private final FlowNodeExecutor flowNodeExecutor;
-    private final TechnicalLoggerService logger;
     private final WorkService workService;
     private final ProcessDefinitionService processDefinitionService;
     private final GatewayInstanceService gatewayInstanceService;
@@ -161,8 +131,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final BPMArchiverService bpmArchiverService;
 
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService,
-            final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
+            final ProcessInstanceService processInstanceService, final FlowNodeExecutor flowNodeExecutor,
+            final WorkService workService,
             final ProcessDefinitionService processDefinitionService,
             final GatewayInstanceService gatewayInstanceService,
             final ProcessResourcesService processResourcesService, final ConnectorService connectorService,
@@ -182,7 +152,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.processInstanceService = processInstanceService;
         this.processResourcesService = processResourcesService;
         this.connectorInstanceService = connectorInstanceService;
-        this.logger = logger;
         this.flowNodeExecutor = flowNodeExecutor;
         this.workService = workService;
         this.processDefinitionService = processDefinitionService;
@@ -207,12 +176,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             try {
                 eventService.addHandler(handler.getKey(), handler.getValue());
             } catch (final HandlerRegistrationException e) {
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
-                }
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-                }
+                log.warn(e.getMessage());
+                log.debug("", e);
             }
         }
         containerRegistry.addContainerExecutor(this);
@@ -273,9 +238,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     flownNodeDefinitions, rootProcessInstanceId, sProcessInstance.getId(), SStateCategory.NORMAL);
         } catch (final SBonitaException e) {
             setExceptionContext(selector.getProcessDefinition(), sProcessInstance, e);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-            }
+            log.error("", e);
             throw new BonitaRuntimeException(e);
         }
     }
@@ -351,7 +314,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
         } catch (final SBonitaException e) {
             setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            log.error("", e);
             throw e;
         }
     }
@@ -653,10 +616,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final boolean wasTheLastFlowNodeToExecute = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition,
                 childFlowNode,
                 sProcessInstance);
-        logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
-                "The flow node <" + childFlowNode.getName() + "> with id<"
-                        + childFlowNode.getId() + "> of process instance <" + processInstanceId
-                        + "> finished");
+        log.debug("The flow node <{}> with id<{}> of process instance <{}> finished",
+                childFlowNode.getName(), childFlowNode.getId(), processInstanceId);
         if (wasTheLastFlowNodeToExecute) {
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
             if (sProcessInstance.getInterruptingEventId() > 0) {
@@ -664,23 +625,18 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 numberOfFlowNode -= 1;
             }
             if (numberOfFlowNode > 0) {
-                if (logger.isLoggable(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG)) {
-
-                    logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
-                            "The process instance <" + processInstanceId + "> from definition <"
-                                    + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion()
-                                    + "> executed a branch that is finished but there is still <"
-                                    + numberOfFlowNode + "> to execute");
-                    logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
-                            activityInstanceService
-                                    .getDirectChildrenOfProcessInstance(processInstanceId, 0, numberOfFlowNode)
-                                    .toString());
+                if (log.isDebugEnabled()) {
+                    log.debug("The process instance <{}> from definition <{}:{}> executed a branch " +
+                            "that is finished but there is still <{}> to execute",
+                            processInstanceId, sProcessDefinition.getName(), sProcessDefinition.getVersion(),
+                            numberOfFlowNode);
+                    log.debug(activityInstanceService.getDirectChildrenOfProcessInstance(processInstanceId,
+                            0, numberOfFlowNode).toString());
                 }
                 return;
             }
-            logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
-                    "The process instance <" + processInstanceId + "> from definition <"
-                            + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> finished");
+            log.debug("The process instance <{}> from definition <{}:{}> finished",
+                    processInstanceId, sProcessDefinition.getName(), sProcessDefinition.getVersion());
             boolean hasTriggeredErrorEvents = false;
             // in case of interruption by error event:
             // * the first time the last element (except the error event itself)  goes here, it put the process in aborting
@@ -704,7 +660,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                             childFlowNode);
                 }
                 // the process instance has maybe changed
-                logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "has action to execute");
+                log.debug("has action to execute");
                 if (hasTriggeredErrorEvents) {
                     sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
                 }
@@ -821,8 +777,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void reevaluateGateways(SProcessDefinition processDefinition, long processInstanceId)
             throws SBonitaException {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                "some branches died, will check again all inclusive gateways");
+        log.debug("some branches died, will check again all inclusive gateways");
         final List<SGatewayInstance> inclusiveGatewaysOfProcessInstance = gatewayInstanceService
                 .getInclusiveGatewaysOfProcessInstanceThatShouldFire(
                         processDefinition, processInstanceId);
@@ -1028,8 +983,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             throws SContractViolationException {
         final SContractDefinition contractDefinition = sProcessDefinition.getContract();
         if (contractDefinition != null) {
-            final ContractValidator validator = new ContractValidatorFactory().createContractValidator(logger,
-                    expressionService);
+            final ContractValidator validator = new ContractValidatorFactory()
+                    .createContractValidator(expressionService);
             validator.validate(sProcessDefinition.getId(), contractDefinition, processInputs);
         }
     }

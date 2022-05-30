@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.CollectionUtil;
@@ -42,8 +43,6 @@ import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceExceptio
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -71,6 +70,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta: include data instance data source directly here
  */
+@Slf4j
 public class DataInstanceServiceImpl implements DataInstanceService {
 
     private static final String DATA_INSTANCE = "DATA_INSTANCE";
@@ -81,14 +81,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     protected final ArchiveService archiveService;
 
-    protected final TechnicalLoggerService logger;
-
     public DataInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-            final ArchiveService archiveService, final TechnicalLoggerService logger) {
+            final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.archiveService = archiveService;
-        this.logger = logger;
     }
 
     private void archiveDataInstance(final SDataInstance sDataInstance) throws SDataInstanceException {
@@ -497,23 +494,20 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     private void logBeforeMethod(final String methodName) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                    LogUtil.getLogBeforeMethod(this.getClass(), methodName));
+        if (log.isTraceEnabled()) {
+            log.trace(LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
     }
 
     private void logAfterMethod(final String methodName) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                    LogUtil.getLogAfterMethod(this.getClass(), methodName));
+        if (log.isTraceEnabled()) {
+            log.trace(LogUtil.getLogAfterMethod(this.getClass(), methodName));
         }
     }
 
     private void logOnExceptionMethod(final String methodName, final Exception e) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                    LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
+        if (log.isTraceEnabled()) {
+            log.trace(LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
         }
     }
 

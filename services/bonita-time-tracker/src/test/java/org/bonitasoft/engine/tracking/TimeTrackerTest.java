@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.memory.MemoryFlushEventListener;
 import org.junit.After;
 import org.junit.Test;
@@ -42,8 +41,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Mock
     private FlushThread flushThread;
-    @Mock
-    private TechnicalLoggerService logger;
+
     private static final TimeTrackerRecords REC = TimeTrackerRecords.EVALUATE_EXPRESSION;
 
     private static final TimeTrackerRecords REC1 = TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT;
@@ -59,10 +57,10 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         }
     }
 
-    TimeTracker createTimeTracker(final TechnicalLoggerService logger, final Clock clock,
+    TimeTracker createTimeTracker(final Clock clock,
             final List<FlushEventListener> listeners, final boolean enabled, final int maxSize,
             final int flushIntervalInSeconds, final TimeTrackerRecords rec) {
-        return new TimeTracker(logger, clock, enabled, listeners, maxSize, flushIntervalInSeconds, rec.name()) {
+        return new TimeTracker(clock, enabled, listeners, maxSize, flushIntervalInSeconds, rec.name()) {
 
             @Override
             FlushThread createFlushThread() {
@@ -78,7 +76,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         for (final TimeTrackerRecords record : records) {
             recordsAsString.add(record.name());
         }
-        return new TimeTracker(this.logger, enabled, flushEventListeners, maxSize, flushIntervalInSeconds,
+        return new TimeTracker(enabled, flushEventListeners, maxSize, flushIntervalInSeconds,
                 recordsAsString.toArray(new String[records.length])) {
 
             @Override
@@ -234,7 +232,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         listeners.add(listener2);
         listeners.add(listener3);
 
-        this.tracker = createTimeTracker(this.logger, clock, listeners, true, 10, 1, REC);
+        this.tracker = createTimeTracker(clock, listeners, true, 10, 1, REC);
 
         this.tracker.track(REC, "desc", 10);
 
@@ -260,7 +258,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         listeners.add(listener1);
         listeners.add(listener2);
 
-        this.tracker = createTimeTracker(this.logger, clock, listeners, true, 10, 1, REC);
+        this.tracker = createTimeTracker(clock, listeners, true, 10, 1, REC);
 
         this.tracker.track(REC, "desc", 10);
 
@@ -416,7 +414,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     public void should_pause_resume_without_error() {
 
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
+        this.tracker = new TimeTracker(true, new LinkedList<>(), 500, 1, (String[]) null);
 
         //when
         this.tracker.start();
@@ -441,7 +439,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     public void should_start_method_be_reentrant() {
 
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
+        this.tracker = new TimeTracker(true, new LinkedList<>(), 500, 1, (String[]) null);
         final Set<Thread> initialThreadSet = Thread.getAllStackTraces().keySet();
         this.tracker.start();
         //expect
@@ -459,7 +457,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void isTracking_should_be_false_if_tracking_not_started() {
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
+        this.tracker = new TimeTracker(true, new LinkedList<>(), 500, 1, (String[]) null);
         //when
         final boolean trackingStatus = this.tracker.isTracking();
         //then
@@ -469,7 +467,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void isTracking_should_be_true_if_tracking_is_started() {
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
+        this.tracker = new TimeTracker(true, new LinkedList<>(), 500, 1, (String[]) null);
         try {
             this.tracker.start();
 
@@ -486,7 +484,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void should_not_leave_unused_threads_when_stopped() {
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
+        this.tracker = new TimeTracker(true, new LinkedList<>(), 500, 1, (String[]) null);
         final Set<Thread> beforeTimeTrackerStartedThreadSet = Thread.getAllStackTraces().keySet();
         this.tracker.start();
 
@@ -504,13 +502,13 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void should_add_remove_listeners() {
         // create a tracker
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1);
+        this.tracker = new TimeTracker(true, new LinkedList<>(), 500, 1);
 
         // no active listener
         assertThat(this.tracker.getActiveFlushEventListeners()).isEmpty();
 
         // add a new listener
-        final FlushEventListener flushEvent = new MemoryFlushEventListener(true, this.logger, 10);
+        final FlushEventListener flushEvent = new MemoryFlushEventListener(true, 10);
 
         this.tracker.addFlushEventListener(flushEvent);
         assertThat(this.tracker.getActiveFlushEventListeners()).containsOnly(flushEvent);
@@ -523,10 +521,10 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void should_have_one_listener_based_on_listener_name() {
         // create a tracker
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1);
+        this.tracker = new TimeTracker(true, new LinkedList<>(), 500, 1);
         // add a new listener
-        final FlushEventListener flushEvent1 = new MemoryFlushEventListener(true, this.logger, 10);
-        final FlushEventListener flushEvent2 = new MemoryFlushEventListener(true, this.logger, 10);
+        final FlushEventListener flushEvent1 = new MemoryFlushEventListener(true, 10);
+        final FlushEventListener flushEvent2 = new MemoryFlushEventListener(true, 10);
 
         this.tracker.addFlushEventListener(flushEvent1);
         this.tracker.addFlushEventListener(flushEvent2);

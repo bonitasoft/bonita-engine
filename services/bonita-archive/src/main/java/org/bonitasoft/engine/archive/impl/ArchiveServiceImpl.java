@@ -20,8 +20,6 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -31,29 +29,29 @@ import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
  * @author Celine Souchet
  */
+
 public class ArchiveServiceImpl implements ArchiveService {
 
+    private static final Logger log = LoggerFactory.getLogger(ArchiveServiceImpl.class);
     private final UserTransactionService transactionService;
 
     private final PersistenceService definitiveArchivePersistenceService;
 
-    private final TechnicalLoggerService logger;
-
     private ArchivingStrategy archivingStrategy;
 
     public ArchiveServiceImpl(final PersistenceService definitiveArchivePersistenceService,
-            final TechnicalLoggerService logger, final ArchivingStrategy archivingStrategy,
-            final UserTransactionService transactionService) {
+            final ArchivingStrategy archivingStrategy, final UserTransactionService transactionService) {
         super();
         this.definitiveArchivePersistenceService = definitiveArchivePersistenceService;
         this.archivingStrategy = archivingStrategy;
-        this.logger = logger;
         this.transactionService = transactionService;
     }
 
@@ -67,7 +65,7 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Override
     public void recordInserts(final long time, final ArchiveInsertRecord... records) throws SRecorderException {
         final String methodName = "recordInserts";
-        logBeforeMethod(TechnicalLogSeverity.TRACE, methodName);
+        logBeforeMethod(methodName);
         if (records != null) {
             assignArchiveDate(time, records);
             final BatchArchiveCallable callable = buildBatchArchiveCallable(records);
@@ -75,15 +73,15 @@ public class ArchiveServiceImpl implements ArchiveService {
             try {
                 transactionService.registerBeforeCommitCallable(callable);
             } catch (final STransactionNotFoundException e) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
+                if (log.isTraceEnabled()) {
+                    log.error(
                             "Unable to register the beforeCommitCallable to log queriable logs: transaction not found",
                             e);
                 }
             }
         }
 
-        logAfterMethod(TechnicalLogSeverity.TRACE, methodName);
+        logAfterMethod(methodName);
     }
 
     // As a protected method for test purposes.
@@ -114,32 +112,31 @@ public class ArchiveServiceImpl implements ArchiveService {
     public void recordDelete(final DeleteRecord record) throws SRecorderException {
         String methodName = "recordDelete";
         try {
-            logBeforeMethod(TechnicalLogSeverity.TRACE, methodName);
+            logBeforeMethod(methodName);
             definitiveArchivePersistenceService.delete(record.getEntity());
-            logAfterMethod(TechnicalLogSeverity.TRACE, methodName);
+            logAfterMethod(methodName);
         } catch (final SPersistenceException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, methodName, e);
+            logOnExceptionMethod(methodName, e);
             throw new SRecorderException(e);
         }
     }
 
-    private void logOnExceptionMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName,
+    private void logOnExceptionMethod(final String methodName,
             final Exception e) {
-        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
-            logger.log(this.getClass(), technicalLogSeverity,
-                    LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
+        if (log.isTraceEnabled()) {
+            log.trace(LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
         }
     }
 
-    private void logAfterMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
-        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
-            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogAfterMethod(this.getClass(), methodName));
+    private void logAfterMethod(final String methodName) {
+        if (log.isTraceEnabled()) {
+            log.trace(LogUtil.getLogAfterMethod(this.getClass(), methodName));
         }
     }
 
-    private void logBeforeMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
-        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
-            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
+    private void logBeforeMethod(final String methodName) {
+        if (log.isTraceEnabled()) {
+            log.trace(LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
     }
 

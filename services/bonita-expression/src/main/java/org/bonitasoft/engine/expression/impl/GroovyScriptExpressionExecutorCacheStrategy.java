@@ -42,14 +42,15 @@ import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingEx
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContentExpressionExecutorStrategy
         implements SingleClassLoaderListener {
 
+    private static final Logger log = LoggerFactory.getLogger(GroovyScriptExpressionExecutorCacheStrategy.class);
     public static final String GROOVY_SCRIPT_CACHE_NAME = "GROOVY_SCRIPT_CACHE_NAME";
 
     public static final String SCRIPT_KEY = "SCRIPT_";
@@ -59,17 +60,12 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
     private final CacheService cacheService;
 
     private final ClassLoaderService classLoaderService;
-
-    private final TechnicalLoggerService logger;
-
     private static final AtomicLong counter = new AtomicLong();
 
     public GroovyScriptExpressionExecutorCacheStrategy(final CacheService cacheService,
-            final ClassLoaderService classLoaderService,
-            final TechnicalLoggerService logger) {
+            final ClassLoaderService classLoaderService) {
         this.cacheService = cacheService;
         this.classLoaderService = classLoaderService;
-        this.logger = logger;
     }
 
     private String generateScriptName() {
@@ -106,10 +102,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         GroovyShell shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
         if (shell == null) {
             ClassLoader classLoader = getClassLoaderForShell(definitionId);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                        "Create a new groovy classloader for " + definitionId + " " + classLoader);
-            }
+            log.debug("Create a new groovy classloader for {} {}", definitionId, classLoader);
+
             shell = new GroovyShell(classLoader);
             cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
         }
@@ -121,11 +115,10 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         if (definitionId == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
             //do not has listener, should not happen...
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            if (log.isDebugEnabled()) {
                 IllegalStateException illegalStateException = new IllegalStateException();
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                        "Creating a shell without definition id, might cause issue when reloading classes",
-                        illegalStateException);
+                log.debug("Creating a shell without definition id, might cause issue when reloading classes {}",
+                        illegalStateException.getMessage());
             }
         } else {
             classLoader = classLoaderService.getClassLoader(identifier(ScopeType.PROCESS, definitionId));
@@ -177,13 +170,13 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
 
     @Override
     public void onUpdate(ClassLoader newClassLoader) {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Groovy cache cleared after update on {}", newClassLoader);
+        log.debug("Groovy cache cleared after update on {}", newClassLoader);
         clearCache();
     }
 
     @Override
     public void onDestroy(ClassLoader oldClassLoader) {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Groovy cache cleared after destroy of {}", oldClassLoader);
+        log.debug("Groovy cache cleared after destroy of {}", oldClassLoader);
         clearCache();
     }
 
@@ -191,7 +184,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         try {
             cacheService.clear(GROOVY_SCRIPT_CACHE_NAME);
         } catch (SCacheException e) {
-            logger.log(getClass(), TechnicalLogSeverity.ERROR,
+            log.error(
                     "error while clearing the cache of the groovy script executor strategy, you might have classloading issue, restart the server if it's the case",
                     e);
         }

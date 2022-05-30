@@ -23,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.LockTimeoutException;
@@ -59,9 +57,6 @@ public class LockProcessInstanceWorkTest {
         workService = mock(WorkExecutorService.class);
         when(tenantAccessor.getLockService()).thenReturn(lockService);
         when(tenantAccessor.getWorkExecutorService()).thenReturn(workService);
-        TechnicalLoggerService technicalLoggerService = mock(TechnicalLoggerService.class);
-        when(technicalLoggerService.asLogger(any())).thenReturn(mock(TechnicalLogger.class));
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
     }
 
     @Test

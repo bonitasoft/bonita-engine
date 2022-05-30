@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -32,8 +33,6 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.springframework.stereotype.Service;
 
@@ -45,24 +44,22 @@ import org.springframework.stereotype.Service;
  * @author Matthieu Chaffotte
  */
 @Service("operationService")
+@Slf4j
 public class OperationServiceImpl implements OperationService {
 
     private final Map<String, LeftOperandHandler> leftOperandHandlersMap;
     private final ExpressionResolverService expressionResolverService;
     private final PersistRightOperandResolver persistRightOperandResolver;
-    private final TechnicalLoggerService logger;
     private final OperationExecutorStrategyProvider operationExecutorStrategyProvider;
 
     public OperationServiceImpl(OperationExecutorStrategyProvider operationExecutorStrategyProvider,
             List<LeftOperandHandler> leftOperandHandlers,
             ExpressionResolverService expressionResolverService,
-            PersistRightOperandResolver persistRightOperandResolver,
-            TechnicalLoggerService logger) {
+            PersistRightOperandResolver persistRightOperandResolver) {
         super();
         this.operationExecutorStrategyProvider = operationExecutorStrategyProvider;
         this.expressionResolverService = expressionResolverService;
         this.persistRightOperandResolver = persistRightOperandResolver;
-        this.logger = logger;
         leftOperandHandlersMap = new HashMap<>(leftOperandHandlers.size());
         for (final LeftOperandHandler leftOperandHandler : leftOperandHandlers) {
             leftOperandHandlersMap.put(leftOperandHandler.getType(), leftOperandHandler);
@@ -136,7 +133,9 @@ public class OperationServiceImpl implements OperationService {
                     expressionContext,
                     shouldPersistValue);
             expressionContext.getInputValues().put(leftOperand.getName(), value);
-            logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
+            if (log.isDebugEnabled()) {
+                log.debug(buildLogMessage(operation, rightOperandValue, expressionContext));
+            }
         }
         return currentUpdateStatus;
     }
@@ -223,15 +222,6 @@ public class OperationServiceImpl implements OperationService {
                     e);
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
-        }
-    }
-
-    private void logOperation(final TechnicalLogSeverity severity, final SOperation operation,
-            final Object operationValue,
-            final SExpressionContext expressionContext) {
-        if (logger.isLoggable(this.getClass(), severity)) {
-            final String message = buildLogMessage(operation, operationValue, expressionContext);
-            logger.log(this.getClass(), severity, message);
         }
     }
 

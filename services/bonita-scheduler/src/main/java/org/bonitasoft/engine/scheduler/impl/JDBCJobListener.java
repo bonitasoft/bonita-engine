@@ -16,8 +16,7 @@ package org.bonitasoft.engine.scheduler.impl;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -28,18 +27,16 @@ import org.quartz.JobExecutionException;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
+@Slf4j
 public class JDBCJobListener implements BonitaJobListener {
 
     private final JobService jobService;
-    private final TechnicalLogger logger;
     private SchedulerService schedulerService;
 
     public JDBCJobListener(final JobService jobService,
-            final TechnicalLoggerService logger,
             SchedulerService schedulerService) {
         super();
         this.jobService = jobService;
-        this.logger = logger.asLogger(JDBCJobListener.class);
         this.schedulerService = schedulerService;
     }
 
@@ -58,15 +55,15 @@ public class JDBCJobListener implements BonitaJobListener {
         if (jobException != null) {
             if (jobException instanceof JobExecutionException
                     && ((JobExecutionException) jobException).refireImmediately()) {
-                logger.debug("An exception occurs during the job execution but it will be retried.", jobException);
+                log.debug("An exception occurs during the job execution but it will be retried.", jobException);
             } else {
-                logger.warn("An exception occurs during the job execution.", jobException);
+                log.warn("An exception occurs during the job execution.", jobException);
             }
             return;
         }
         Long jobDescriptorId = (Long) context.get(JOB_DESCRIPTOR_ID);
         if (isNullOrEmpty(jobDescriptorId)) {
-            logger.warn("A quartz job was executed but is not a bonita Job, context: {}", context);
+            log.warn("A quartz job was executed but is not a bonita Job, context: {}", context);
             return;
         }
         if (context.get(TRIGGER_NEXT_FIRE_TIME) == null) {
@@ -82,13 +79,13 @@ public class JDBCJobListener implements BonitaJobListener {
             boolean mayFireAgain = schedulerService.mayFireAgain(((String) context.get(JOB_GROUP)),
                     ((String) context.get(JOB_NAME)));
 
-            logger.debug("{} job descriptor of job {} because it may {}fire again.",
+            log.debug("{} job descriptor of job {} because it may {}fire again.",
                     mayFireAgain ? "Keeping" : "Deleting", context.get(JOB_NAME), mayFireAgain ? "" : "not ");
             if (!mayFireAgain) {
                 jobService.deleteJobDescriptor(jobDescriptorId);
             }
         } catch (final Exception e) {
-            logger.warn("Unable to delete job descriptor {} of job {}", jobDescriptorId, context.get(JOB_NAME), e);
+            log.warn("Unable to delete job descriptor {} of job {}", jobDescriptorId, context.get(JOB_NAME), e);
         }
     }
 

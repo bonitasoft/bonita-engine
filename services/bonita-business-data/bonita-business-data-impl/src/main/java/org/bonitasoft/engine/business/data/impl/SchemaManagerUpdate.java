@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.business.data.SchemaManager;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.boot.Metadata;
@@ -31,19 +29,20 @@ import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class SchemaManagerUpdate implements SchemaManager {
 
-    private final TechnicalLogger log;
+    private static final Logger log = LoggerFactory.getLogger(SchemaManagerUpdate.class);
 
     private final Map<String, Object> configuration;
 
-    public SchemaManagerUpdate(final Map<String, Object> configuration, final TechnicalLoggerService loggerService)
+    public SchemaManagerUpdate(final Map<String, Object> configuration)
             throws HibernateException {
-        this.log = loggerService.asLogger(getClass());
         this.configuration = new HashMap<>(configuration);
         final Object remove = this.configuration.remove("hibernate.hbm2ddl.auto");
         if (remove != null && log.isInfoEnabled()) {

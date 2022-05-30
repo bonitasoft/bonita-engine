@@ -14,17 +14,12 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
 import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.JpaTestConfiguration;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,9 +40,7 @@ public class SchemaManagerUpdateTest {
 
     @Before
     public void setUp() {
-        final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
-        doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
-        schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(), loggerService);
+        schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration());
     }
 
     @Test

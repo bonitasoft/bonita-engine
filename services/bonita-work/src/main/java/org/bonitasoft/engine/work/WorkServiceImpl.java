@@ -14,11 +14,11 @@
 package org.bonitasoft.engine.work;
 
 import org.bonitasoft.engine.commons.time.EngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,24 +29,23 @@ import org.springframework.stereotype.Service;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+
 @Service("workService")
 public class WorkServiceImpl implements WorkService {
 
+    private Logger log = LoggerFactory.getLogger(WorkServiceImpl.class);
     private final UserTransactionService transactionService;
-    private final TechnicalLogger log;
     private final SessionAccessor sessionAccessor;
     private final WorkExecutorService workExecutorService;
     private final EngineClock engineClock;
     private int workDelayOnMultipleXAResource;
 
     public WorkServiceImpl(UserTransactionService transactionService,
-            TechnicalLoggerService loggerService,
             SessionAccessor sessionAccessor,
             WorkExecutorService workExecutorService,
             EngineClock engineClock,
             @Value("${bonita.tenant.work.${db.vendor}.delayOnMultipleXAResource:0}") int workDelayOnMultipleXAResource) {
         this.transactionService = transactionService;
-        this.log = loggerService.asLogger(WorkServiceImpl.class);
         this.sessionAccessor = sessionAccessor;
         this.workExecutorService = workExecutorService;
         this.engineClock = engineClock;

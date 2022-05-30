@@ -19,13 +19,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bdm.Entity;
@@ -45,21 +39,8 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SBusinessDataDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SSubProcessDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.*;
+import org.bonitasoft.engine.core.process.definition.model.impl.*;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -82,7 +63,6 @@ import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -159,9 +139,6 @@ public class ProcessExecutorImplTest {
 
     @Mock
     private LockService lockService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @Mock
     private OperationService operationService;

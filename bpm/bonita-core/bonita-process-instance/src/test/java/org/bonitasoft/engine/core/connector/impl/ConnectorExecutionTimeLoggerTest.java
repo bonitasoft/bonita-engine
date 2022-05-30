@@ -20,7 +20,6 @@ import java.util.HashMap;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -31,7 +30,7 @@ public class ConnectorExecutionTimeLoggerTest {
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     private static final long MAX_DURATION_IN_MILLIS_THRESHOLD = 1000L;
     private ConnectorExecutionTimeLogger connectorExecutionTimeLogger = new ConnectorExecutionTimeLogger(
-            new TechnicalLoggerSLF4JImpl(), MAX_DURATION_IN_MILLIS_THRESHOLD);
+            MAX_DURATION_IN_MILLIS_THRESHOLD);
 
     @Test
     public void should_log_a_warning_when_connector_takes_more_time_than_the_defined_threshold() {

@@ -28,15 +28,8 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SBoundaryEventDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SSubProcessDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SUserTaskDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.*;
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,8 +56,6 @@ public class AdvancedStartProcessValidatorTest {
 
     @Mock
     private ProcessDefinitionService processDefinitionService;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     @Mock
     private ExpressionService expressionService;
 
@@ -116,8 +107,7 @@ public class AdvancedStartProcessValidatorTest {
     }
 
     private AdvancedStartProcessValidator createValidatorFor(long process_definition_id) {
-        return new AdvancedStartProcessValidator(processDefinitionService, process_definition_id,
-                technicalLoggerService, expressionService);
+        return new AdvancedStartProcessValidator(processDefinitionService, process_definition_id, expressionService);
     }
 
     @Test

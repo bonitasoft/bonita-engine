@@ -17,7 +17,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.impl.EventServiceImpl;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
@@ -35,14 +34,14 @@ public class EngineConfiguration {
     // the bean is injected using the name "tenantEventService" and is overridden thanks to the ConditionalOnMissingBean condition on the name
     @Bean("tenantEventService")
     @ConditionalOnMissingBean(name = "tenantEventService")
-    EventService tenantEventService(TechnicalLoggerService logger) {
-        return new EventServiceImpl(logger);
+    EventService tenantEventService() {
+        return new EventServiceImpl();
     }
 
     @Bean("platformEventService")
     @ConditionalOnMissingBean(name = "platformEventService")
-    EventService platformEventService(TechnicalLoggerService loggerService) {
-        return new EventServiceImpl(loggerService);
+    EventService platformEventService() {
+        return new EventServiceImpl();
     }
 
     @Bean

@@ -13,20 +13,15 @@
  **/
 package org.bonitasoft.engine.platform.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.cache.SCacheException;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.cache.PlatformCacheService;
-import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
-import org.bonitasoft.engine.platform.exception.STenantActivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
-import org.bonitasoft.engine.platform.exception.STenantUpdateException;
+import org.bonitasoft.engine.platform.exception.*;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -42,6 +37,7 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
  * @author Charles Souillard
  * @author Celine Souchet
  */
+@Slf4j
 public class PlatformServiceImpl implements PlatformService {
 
     private static final String TENANT = "TENANT";
@@ -49,18 +45,15 @@ public class PlatformServiceImpl implements PlatformService {
     private static final String CACHE_KEY = "PLATFORM";
 
     private final PersistenceService platformPersistenceService;
-    private final TechnicalLogger logger;
     private final PlatformCacheService platformCacheService;
     private final SPlatformProperties sPlatformProperties;
     private final Recorder recorder;
     private final PlatformRetriever platformRetriever;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever,
-            final Recorder recorder,
-            final TechnicalLoggerService logger, PlatformCacheService platformCacheService,
+            final Recorder recorder, PlatformCacheService platformCacheService,
             final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
-        this.logger = logger.asLogger(PlatformServiceImpl.class);
         this.platformCacheService = platformCacheService;
         this.sPlatformProperties = sPlatformProperties;
         this.recorder = recorder;
@@ -94,7 +87,7 @@ public class PlatformServiceImpl implements PlatformService {
         try {
             platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
         } catch (final SCacheException e) {
-            logger.warn("Can't cache the platform, maybe the platform cache service is not started yet: {}",
+            log.warn("Can't cache the platform, maybe the platform cache service is not started yet: {}",
                     e.getMessage());
         }
     }

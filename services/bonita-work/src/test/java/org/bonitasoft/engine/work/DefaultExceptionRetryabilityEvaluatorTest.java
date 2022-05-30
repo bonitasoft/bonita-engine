@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import javax.transaction.xa.XAException;
 
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.junit.Test;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -105,14 +104,12 @@ public class DefaultExceptionRetryabilityEvaluatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void should_constructor_fail_if_classname_do_not_exists() {
-        new DefaultExceptionRetryabilityEvaluator(Collections.singletonList("unkown class"), Collections.emptyList(),
-                new TechnicalLoggerSLF4JImpl());
+        new DefaultExceptionRetryabilityEvaluator(Collections.singletonList("unkown class"), Collections.emptyList());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void should_constructor_fail_if_class_is_not_throwable() {
-        new DefaultExceptionRetryabilityEvaluator(Collections.singletonList("java.util.List"), Collections.emptyList(),
-                new TechnicalLoggerSLF4JImpl());
+        new DefaultExceptionRetryabilityEvaluator(Collections.singletonList("java.util.List"), Collections.emptyList());
     }
 
     @Test
@@ -184,14 +181,14 @@ public class DefaultExceptionRetryabilityEvaluatorTest {
     @SafeVarargs
     private final void initWith(Class<? extends Throwable>... throwables) {
         defaultExceptionRetryabilityEvaluator = new DefaultExceptionRetryabilityEvaluator(toListNames(throwables),
-                Collections.emptyList(), new TechnicalLoggerSLF4JImpl());
+                Collections.emptyList());
     }
 
     @SafeVarargs
     private final void initWithBlackListed(Class<? extends Throwable> toRetry,
             Class<? extends Throwable>... blackListed) {
         defaultExceptionRetryabilityEvaluator = new DefaultExceptionRetryabilityEvaluator(
-                toListNames(toRetry), toListNames(blackListed), new TechnicalLoggerSLF4JImpl());
+                toListNames(toRetry), toListNames(blackListed));
     }
 
     private List<String> toListNames(Class<? extends Throwable>... blackListed) {

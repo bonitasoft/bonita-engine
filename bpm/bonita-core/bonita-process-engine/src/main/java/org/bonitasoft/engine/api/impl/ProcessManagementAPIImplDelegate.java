@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
@@ -43,8 +44,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
@@ -60,6 +59,7 @@ import org.bonitasoft.platform.setup.PlatformSetupAccessor;
  * @author Matthieu Chaffotte
  */
 // Uncomment the "implements" when this delegate implements all the methods.
+@Slf4j
 public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */ {
 
     private static PlatformServiceAccessor getPlatformServiceAccessor() {
@@ -83,14 +83,10 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     public void deleteProcessDefinition(final long processDefinitionId)
             throws SBonitaException, BonitaHomeNotSetException, IOException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         tenantAccessor.getBusinessArchiveService().delete(processDefinitionId);
 
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
-                    "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
-                            + processDefinitionId + ">");
-        }
+        log.info("The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
+                + processDefinitionId + ">");
     }
 
     public void disableProcess(final long processId) throws SBonitaException {
@@ -99,12 +95,10 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
 
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId,
                 eventInstanceService,
-                schedulerService,
-                logger, SessionInfos.getUserNameFromSession());
+                schedulerService, SessionInfos.getUserNameFromSession());
         disableProcess.execute();
     }
 

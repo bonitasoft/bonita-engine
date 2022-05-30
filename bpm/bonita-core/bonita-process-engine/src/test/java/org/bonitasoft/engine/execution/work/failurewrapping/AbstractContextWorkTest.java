@@ -22,7 +22,6 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.work.TransactionServiceForTest;
 import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -47,9 +46,6 @@ public abstract class AbstractContextWorkTest {
 
     @Mock
     private IncidentService incidentService;
-
-    @Mock
-    private TechnicalLoggerService loggerService;
 
     @Mock
     private SessionAccessor sessionAccessor;

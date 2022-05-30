@@ -30,8 +30,6 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +41,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class JTATransactionServiceImplTest {
 
-    @Mock
-    TechnicalLoggerService logger;
     @Mock
     TransactionManager txManager;
     @Mock
@@ -77,7 +73,7 @@ public class JTATransactionServiceImplTest {
     public void should_throw_exception_if_call_is_nested() throws Exception {
         when(txManager.getStatus()).thenReturn(Status.STATUS_ACTIVE);
 
-        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
+        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(txManager);
 
         txService.begin();
         txService.begin();
@@ -117,7 +113,7 @@ public class JTATransactionServiceImplTest {
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_ACTIVE);
         when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
 
-        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(txManager));
         Callable<?> callable = mock(Callable.class);
 
         txService.executeInTransaction(callable);
@@ -318,9 +314,8 @@ public class JTATransactionServiceImplTest {
 
     @Test
     public void should_trace_call_when_TRACE_active() throws Exception {
-        doReturn(true).when(logger).isLoggable(any(Class.class), eq(TechnicalLogSeverity.TRACE));
         doReturn(Status.STATUS_NO_TRANSACTION).doReturn(Status.STATUS_ACTIVE).when(txManager).getStatus();
-        TransactionService txService = new JTATransactionServiceImpl(logger, txManager);
+        TransactionService txService = new JTATransactionServiceImpl(txManager);
 
         in_an_other_method_to_verify_the_stacktrace_contains_this_method_name(txService);
 

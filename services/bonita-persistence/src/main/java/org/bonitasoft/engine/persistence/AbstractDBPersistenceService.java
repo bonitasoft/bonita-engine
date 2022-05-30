@@ -22,11 +22,11 @@ import java.util.TreeSet;
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.TenantPersistenceService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.slf4j.Logger;
 
 /**
  * Common implementation to persistence services relying on a database
@@ -44,21 +44,19 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     protected final DataSource datasource;
 
-    protected final TechnicalLoggerService logger;
+    protected abstract Logger getLogger();
 
-    public AbstractDBPersistenceService(final String name, final TechnicalLoggerService logger) {
+    public AbstractDBPersistenceService(final String name) {
         this.name = name;
         sequenceManager = null;
         datasource = null;
-        this.logger = logger;
     }
 
     public AbstractDBPersistenceService(final String name, final SequenceManager sequenceManager,
-            final DataSource datasource, final TechnicalLoggerService logger) {
+            final DataSource datasource) {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
-        this.logger = logger;
     }
 
     @Override

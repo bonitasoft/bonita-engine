@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
@@ -45,8 +46,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstan
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -75,6 +74,7 @@ import org.bonitasoft.engine.services.PersistenceService;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@Slf4j
 public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl implements ActivityInstanceService {
 
     private static final String ASSIGNED_AND_PENDING_BY_ROOT_PROCESS = "AssignedAndPendingByRootProcess";
@@ -111,9 +111,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     public ActivityInstanceServiceImpl(final Recorder recorder, final PersistenceService persistenceService,
             final ArchiveService archiveService,
-            final EventService eventService,
-            final TechnicalLoggerService logger) {
-        super(recorder, persistenceService, eventService, logger, archiveService);
+            final EventService eventService) {
+        super(recorder, persistenceService, eventService, archiveService);
         sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         sMultiInstanceActivityInstanceBuilder = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class);
     }
@@ -125,7 +124,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         } catch (final SRecorderException e) {
             throw new SActivityCreationException(e);
         }
-        if (getLogger().isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+        if (log.isDebugEnabled()) {
             final StringBuilder stb = new StringBuilder();
             stb.append("Created ");
             stb.append(activityInstance.getType().getValue());
@@ -144,7 +143,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             stb.append(">, process definition id = <");
             stb.append(activityInstance.getProcessDefinitionId());
             stb.append(">");
-            getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
+            log.debug(stb.toString());
         }
     }
 

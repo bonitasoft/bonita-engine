@@ -65,7 +65,6 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -113,7 +112,6 @@ public class EventsHandler {
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator,
             final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
             final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService,
-            final TechnicalLoggerService logger,
             OperationService operationService,
             MessagesHandlingService messagesHandlingService, WorkService workService, BPMWorkFactory workFactory,
             ProcessInstanceInterruptor processInstanceInterruptor) {
@@ -127,7 +125,7 @@ public class EventsHandler {
         this.processInstanceInterruptor = processInstanceInterruptor;
         handlers = new HashMap<>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService,
-                eventInstanceService, logger));
+                eventInstanceService));
         handlers.put(SEventTriggerType.MESSAGE,
                 new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
                         bpmInstancesCreator, processDefinitionService, messagesHandlingService));

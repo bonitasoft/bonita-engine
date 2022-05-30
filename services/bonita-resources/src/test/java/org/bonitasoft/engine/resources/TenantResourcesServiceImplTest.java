@@ -13,16 +13,17 @@
  **/
 package org.bonitasoft.engine.resources;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,12 +35,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class TenantResourcesServiceImplTest {
 
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
     @Mock
     Recorder recorder;
     @Mock
     ReadPersistenceService persistenceService;
-    @Mock
-    TechnicalLoggerService logger;
 
     @InjectMocks
     TenantResourcesServiceImpl tenantResourcesService;
@@ -56,8 +57,6 @@ public class TenantResourcesServiceImplTest {
 
         // then
         verifyZeroInteractions(recorder);
-        verify(logger).log(TenantResourcesServiceImpl.class, TechnicalLogSeverity.WARNING,
-                "Tenant resource file contains an empty file resourceName that will be ignored. Check that this is not a mistake.");
     }
 
     @Test
@@ -67,18 +66,17 @@ public class TenantResourcesServiceImplTest {
 
         // then
         verifyZeroInteractions(recorder);
-        verify(logger).log(TenantResourcesServiceImpl.class, TechnicalLogSeverity.WARNING,
-                "Tenant resource file contains an empty file resourceName that will be ignored. Check that this is not a mistake.");
     }
 
     @Test
     public void add_should_work_for_valid_file_content() throws Exception {
         // when
+        systemOutRule.clearLog();
         tenantResourcesService.add("resourceName", TenantResourceType.BDM, "someValidContent".getBytes(), -1);
 
         // then
         verify(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
-        verifyZeroInteractions(logger);
+        assertThat(systemOutRule.getLog()).isEmpty();
     }
 
 }

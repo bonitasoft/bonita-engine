@@ -32,7 +32,6 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -63,8 +62,6 @@ public class TimerEventHandlerStrategyTest {
     private ExpressionResolverService expressionResolverService;
     @Mock
     private EventInstanceService eventInstanceService;
-    @Mock
-    private TechnicalLoggerService logger;
     @InjectMocks
     private TimerEventHandlerStrategy timerEventHandlerStrategy;
     private SProcessDefinitionImpl processDefinition;

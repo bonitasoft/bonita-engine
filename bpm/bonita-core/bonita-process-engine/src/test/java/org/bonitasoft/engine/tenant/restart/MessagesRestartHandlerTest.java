@@ -13,16 +13,16 @@
  **/
 package org.bonitasoft.engine.tenant.restart;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,12 +32,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class MessagesRestartHandlerTest {
 
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
     @Mock
     private UserTransactionService userTransactionService;
     @Mock
     private EventInstanceRepository eventInstanceRepository;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     @Mock
     private MessagesHandlingService messagesHandlingService;
     @InjectMocks
@@ -47,10 +47,18 @@ public class MessagesRestartHandlerTest {
     @Test
     public void handleRestartShouldLog4Infos() throws Exception {
         // when:
+        systemOutRule.clearLog();
         messagesRestartHandler.beforeServicesStart();
-
         // then:
-        verify(messagesRestartHandler, times(4)).logInfo(any(TechnicalLoggerService.class), anyString());
+        assertThat(systemOutRule.getLog())
+                .containsPattern(
+                        "INFO.*.MessagesRestartHandler.*Reinitializing message instances in non-stable state " +
+                                "to make them reworked by MessagesHandlingService")
+                .containsPattern("INFO.*.MessagesRestartHandler.*.message instances found and reset.")
+                .containsPattern(
+                        "INFO.*.MessagesRestartHandler.*.Reinitializing waiting message events in non-stable " +
+                                "state to make them reworked by MessagesHandlingService")
+                .containsPattern("INFO.*.MessagesRestartHandler.*.waiting message events found and reset");
     }
 
     @Test

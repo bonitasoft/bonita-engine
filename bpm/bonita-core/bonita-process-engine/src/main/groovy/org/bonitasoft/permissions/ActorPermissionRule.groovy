@@ -43,14 +43,14 @@ class ActorPermissionRule implements PermissionRule {
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         long currentUserId = apiSession.getUserId()
         if (apiCallContext.isGET()) {
-            return checkGetMethod(apiCallContext, apiAccessor, currentUserId, logger)
+            return checkGetMethod(apiCallContext, apiAccessor, currentUserId)
         } else if (apiCallContext.isPUT()) {
-            return checkPutMethod(apiCallContext, apiAccessor, currentUserId, logger)
+            return checkPutMethod(apiCallContext, apiAccessor, currentUserId)
         }
         return true
     }
 
-    private boolean checkGetMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
+    private boolean checkGetMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
         def resourceId = apiCallContext.getResourceId()
         if (resourceId == null || resourceId.isEmpty()) {
             def filters = apiCallContext.getFilters()
@@ -69,7 +69,7 @@ class ActorPermissionRule implements PermissionRule {
         }
     }
 
-    private boolean checkPutMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
+    private boolean checkPutMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
         def resourceId = apiCallContext.getResourceId()
         try {
             return isProcessOwnerOfTheProcess(apiAccessor, resourceId, currentUserId)

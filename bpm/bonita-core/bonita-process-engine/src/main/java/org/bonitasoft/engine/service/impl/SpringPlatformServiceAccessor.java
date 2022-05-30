@@ -17,7 +17,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
@@ -26,11 +25,7 @@ import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.service.BroadcastService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.ServicesResolver;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.*;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
@@ -48,11 +43,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public TransactionService getTransactionService() {
         return beanAccessor.getService(TransactionService.class);
-    }
-
-    @Override
-    public TechnicalLoggerService getTechnicalLoggerService() {
-        return beanAccessor.getService("platformTechnicalLoggerService", TechnicalLoggerService.class);
     }
 
     @Override

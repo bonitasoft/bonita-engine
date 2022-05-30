@@ -28,7 +28,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -58,9 +57,6 @@ public class IdentityServiceImplForUserMembershipTest {
 
     @Mock
     private EventService eventService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @InjectMocks
     private IdentityServiceImpl identityServiceImpl;

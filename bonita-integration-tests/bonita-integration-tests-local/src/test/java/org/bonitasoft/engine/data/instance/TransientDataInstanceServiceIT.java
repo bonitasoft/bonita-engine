@@ -82,8 +82,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         dataInstanceService = new TransientDataServiceImpl(cacheService,
                 getTenantAccessor().getExpressionResolverService(),
                 getTenantAccessor().getActivityInstanceService(),
-                getTenantAccessor().getProcessDefinitionService(),
-                getTenantAccessor().getTechnicalLoggerService());
+                getTenantAccessor().getProcessDefinitionService());
     }
 
     @After

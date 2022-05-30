@@ -31,7 +31,6 @@ import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.After;
 import org.junit.Before;
@@ -45,9 +44,6 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
 
     @Mock
     private ClassLoaderService classLoaderService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
@@ -68,11 +64,9 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
         final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName("GROOVY_SCRIPT_CACHE_NAME");
         final List<CacheConfiguration> cacheConfigurations = Collections.singletonList(cacheConfiguration);
-        cacheService = new EhCacheCacheService(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath,
-                1);
+        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, diskStorePath, 1);
         cacheService.start();
-        executorStrategy = new GroovyScriptConditionExpressionExecutorStrategy(cacheService, classLoaderService,
-                logger);
+        executorStrategy = new GroovyScriptConditionExpressionExecutorStrategy(cacheService, classLoaderService);
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService)
                 .getClassLoader(any());
         context = new HashMap<>();

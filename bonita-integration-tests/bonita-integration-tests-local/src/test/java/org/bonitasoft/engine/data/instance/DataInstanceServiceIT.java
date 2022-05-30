@@ -47,7 +47,6 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -77,12 +76,10 @@ public class DataInstanceServiceIT extends CommonBPMServicesTest {
     public void setupDataInstanceService() {
         final Recorder recorder = getTenantAccessor().getRecorder();
         final ReadPersistenceService persistenceService = getTenantAccessor().getReadPersistenceService();
-        final TechnicalLoggerService technicalLoggerService = getTenantAccessor().getTechnicalLoggerService();
         final ArchiveService archiveService = getTenantAccessor().getArchiveService();
         expressionService = getTenantAccessor().getExpressionService();
         parentContainerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
-        dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService,
-                technicalLoggerService);
+        dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService);
         parentContainerResolver.setAllowUnknownContainer(true);
         final CacheService cacheService = getTenantAccessor().getCacheService();
         if (cacheService.isStopped()) {

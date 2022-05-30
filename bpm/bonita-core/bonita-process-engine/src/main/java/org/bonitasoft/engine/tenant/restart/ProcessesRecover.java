@@ -15,6 +15,7 @@ package org.bonitasoft.engine.tenant.restart;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -28,8 +29,6 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.stereotype.Component;
 
@@ -39,11 +38,11 @@ import org.springframework.stereotype.Component;
  * The logic ensures that if an instance fails to continue its execution,
  * the error is logged and other instances are continued anyways.
  */
+@Slf4j
 @Component
 public class ProcessesRecover {
 
     private final WorkService workService;
-    private final TechnicalLogger logger;
     private final ActivityInstanceService activityInstanceService;
     private final ProcessDefinitionService processDefinitionService;
     private final ProcessInstanceService processInstanceService;
@@ -51,14 +50,12 @@ public class ProcessesRecover {
     private final BPMWorkFactory workFactory;
 
     public ProcessesRecover(WorkService workService,
-            TechnicalLoggerService logger,
             ActivityInstanceService activityInstanceService,
             ProcessDefinitionService processDefinitionService,
             ProcessInstanceService processInstanceService,
             ProcessExecutor processExecutor,
             BPMWorkFactory workFactory) {
         this.workService = workService;
-        this.logger = logger.asLogger(ProcessesRecover.class);
         this.activityInstanceService = activityInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.processInstanceService = processInstanceService;
@@ -97,14 +94,14 @@ public class ProcessesRecover {
                 }
             } catch (final SProcessInstanceNotFoundException e) {
                 recoveryMonitor.incrementNotFound();
-                logger.debug("Unable to recover the process instance {}, it is not found (probably already completed).",
+                log.debug("Unable to recover the process instance {}, it is not found (probably already completed).",
                         processId);
             } catch (final Exception e) {
                 recoveryMonitor.incrementInError();
-                logger.warn(
+                log.warn(
                         "Unable to recover the process instance {}, it will be retry in next recovery. Because : {} ",
                         processId, e.getMessage());
-                logger.debug("Cause", e);
+                log.debug("Cause", e);
             }
         }
     }
@@ -121,7 +118,7 @@ public class ProcessesRecover {
                         .getActivityInstance(processInstance.getCallerId());
                 if (callActivityInstance.getStateId() != FlowNodeState.ID_ACTIVITY_FAILED) {
                     workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(callActivityInstance));
-                    logger.info("Restarting notification of finished process '{}' with id {} in state {}",
+                    log.info("Restarting notification of finished process '{}' with id {} in state {}",
                             processInstance.getName(), processInstance.getId(),
                             ProcessInstanceState.getFromId(processInstance.getStateId()));
                 }

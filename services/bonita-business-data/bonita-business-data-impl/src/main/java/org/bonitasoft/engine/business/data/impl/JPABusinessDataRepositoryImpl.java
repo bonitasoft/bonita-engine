@@ -48,21 +48,23 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SingleClassLoaderListener;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.hibernate.Hibernate;
 import org.hibernate.QueryException;
 import org.hibernate.boot.archive.scan.internal.DisabledScanner;
 import org.hibernate.proxy.HibernateProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
  */
+
 public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, SingleClassLoaderListener {
 
+    private static final Logger log = LoggerFactory.getLogger(JPABusinessDataRepositoryImpl.class);
     private static final String BDR_PERSISTENCE_UNIT = "BDR";
 
     private final Map<String, Object> configuration;
@@ -72,19 +74,16 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Si
     private final ThreadLocal<EntityManager> managers = new ThreadLocal<>();
 
     private final BusinessDataModelRepository businessDataModelRepository;
-    private final TechnicalLogger log;
     private final ClassLoaderService classLoaderService;
     private final long tenantId;
 
     private final UserTransactionService transactionService;
 
     public JPABusinessDataRepositoryImpl(final UserTransactionService transactionService,
-            final BusinessDataModelRepository businessDataModelRepository,
-            TechnicalLoggerService loggerService, final Map<String, Object> configuration,
+            final BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration,
             ClassLoaderService classLoaderService, long tenantId) {
         this.transactionService = transactionService;
         this.businessDataModelRepository = businessDataModelRepository;
-        this.log = loggerService.asLogger(getClass());
         this.classLoaderService = classLoaderService;
         this.tenantId = tenantId;
         this.configuration = new HashMap<>(configuration);

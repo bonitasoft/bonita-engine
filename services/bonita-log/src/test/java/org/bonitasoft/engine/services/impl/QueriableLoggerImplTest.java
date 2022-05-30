@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -58,8 +57,7 @@ public class QueriableLoggerImplTest {
     private QueriableLoggerStrategy loggerStrategy;
     @Mock
     private QueriableLogSessionProvider sessionProvider;
-    @Mock
-    private TechnicalLoggerService logger;
+
     private SQueriableLog log1 = SQueriableLog.builder().build();
     private SQueriableLog log2 = SQueriableLog.builder().build();
     @Mock

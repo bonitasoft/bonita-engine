@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -47,7 +46,7 @@ public class QueriableLoggerImpl implements QueriableLoggerService {
     private final PersistenceService persistenceService;
     private final QueriableLoggerStrategy loggerStrategy;
     private TransactionService transactionService;
-    protected final TechnicalLoggerService logger;
+
     private final QueriableLogUpdater logUpdater;
     private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<>();
 
@@ -55,13 +54,11 @@ public class QueriableLoggerImpl implements QueriableLoggerService {
             TransactionService transactionService,
             QueriableLoggerStrategy loggerStrategy,
             QueriableLogSessionProvider sessionProvider,
-            PlatformService platformService,
-            TechnicalLoggerService logger) {
+            PlatformService platformService) {
         this.transactionService = transactionService;
-        this.logger = logger;
         this.persistenceService = persistenceService;
         this.loggerStrategy = loggerStrategy;
-        logUpdater = new QueriableLogUpdater(sessionProvider, platformService, logger);
+        logUpdater = new QueriableLogUpdater(sessionProvider, platformService);
     }
 
     @Override

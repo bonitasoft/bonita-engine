@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.process;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -20,8 +21,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * @author Baptiste Mesta
@@ -29,6 +28,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public final class EnableProcess implements TransactionContent {
 
     private final ProcessDefinitionService processDefinitionService;
@@ -36,19 +36,14 @@ public final class EnableProcess implements TransactionContent {
     private final long processId;
 
     private final EventsHandler eventsHandler;
-
-    private final TechnicalLoggerService logger;
-
     private final String userName;
 
     public EnableProcess(final ProcessDefinitionService processDefinitionService,
             final long processId,
-            final EventsHandler eventsHandler,
-            final TechnicalLoggerService logger, final String userName) {
+            final EventsHandler eventsHandler, final String userName) {
         this.processDefinitionService = processDefinitionService;
         this.processId = processId;
         this.eventsHandler = eventsHandler;
-        this.logger = logger;
         this.userName = userName;
     }
 
@@ -58,12 +53,9 @@ public final class EnableProcess implements TransactionContent {
         handleStartEvents(sProcessDefinition);
         processDefinitionService.enableProcessDeploymentInfo(processId);
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
-                    "The user <" + userName + "> has enabled process <" + sProcessDefinition.getName()
-                            + "> in version <" + sProcessDefinition.getVersion() + "> with id <"
-                            + sProcessDefinition.getId() + ">");
-        }
+        log.info("The user <" + userName + "> has enabled process <" + sProcessDefinition.getName()
+                + "> in version <" + sProcessDefinition.getVersion() + "> with id <"
+                + sProcessDefinition.getId() + ">");
     }
 
     private void handleStartEvents(final SProcessDefinition sProcessDefinition) throws SBonitaException {

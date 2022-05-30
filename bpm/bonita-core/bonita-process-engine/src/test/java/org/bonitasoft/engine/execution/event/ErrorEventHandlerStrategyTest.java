@@ -15,9 +15,7 @@ package org.bonitasoft.engine.execution.event;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -36,7 +34,6 @@ import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,10 +60,6 @@ public class ErrorEventHandlerStrategyTest {
 
     @Mock
     private EventsHandler eventsHandler;
-
-    @Mock
-    private TechnicalLoggerService logger;
-
     @Mock
     private ProcessInstanceInterruptor processInstanceInterruptor;
 

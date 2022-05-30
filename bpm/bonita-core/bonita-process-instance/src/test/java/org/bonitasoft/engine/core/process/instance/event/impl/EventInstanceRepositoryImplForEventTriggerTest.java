@@ -28,7 +28,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -61,10 +60,6 @@ public class EventInstanceRepositoryImplForEventTriggerTest {
 
     @Mock
     private EventService eventService;
-
-    @Mock
-    private TechnicalLoggerService logger;
-
     @Mock
     private PersistenceService persistenceService;
 

@@ -13,29 +13,18 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.bonitasoft.engine.services.Vendor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.hibernate.AssertionFailure;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.StaleStateException;
+import org.hibernate.*;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.query.Query;
 import org.hibernate.stat.Statistics;
@@ -69,9 +58,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory,
             final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
+            final Set<String> wordSearchExclusionMappings)
             throws Exception {
-        super("TEST", logger);
+        super("TEST");
         this.sessionFactory = sessionFactory;
         this.classAliasMappings = classAliasMappings;
         this.classMapping = classMapping;
@@ -85,10 +74,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     public AbstractHibernatePersistenceService(final String name,
             final HibernateConfigurationProvider hbmConfigurationProvider,
             final Properties extraHibernateProperties,
-            final TechnicalLoggerService logger,
             final SequenceManager sequenceManager, final DataSource datasource, QueryBuilderFactory queryBuilderFactory)
             throws Exception {
-        super(name, sequenceManager, datasource, logger);
+        super(name, sequenceManager, datasource);
         hbmConfigurationProvider.bootstrap(extraHibernateProperties);
         sessionFactory = hbmConfigurationProvider.getSessionFactory();
 
@@ -107,7 +95,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * Log synthetic information about cache every 10.000 sessions, if hibernate.gather_statistics, is enabled.
      */
     private void logStats() {
-        if (!statistics.isStatisticsEnabled() || !logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+        if (!statistics.isStatisticsEnabled() || !getLogger().isInfoEnabled()) {
             return;
         }
         if (stat_display_count == 10 || stat_display_count == 100 || stat_display_count == 1000
@@ -119,11 +107,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final long level_2_cache_miss = statistics.getSecondLevelCacheMissCount();
             final long level_2_put = statistics.getSecondLevelCachePutCount();
 
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Query Cache Ratio "
+            getLogger().info("Query Cache Ratio "
                     + (int) ((double) query_cache_hit / (query_cache_hit + query_cache_miss) * 100) + "% "
                     + query_cache_hit + " hits " + query_cache_miss
                     + " miss " + query_cache_put + " puts");
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "2nd Level Cache Ratio "
+            getLogger().info("2nd Level Cache Ratio "
                     + (int) ((double) level_2_cache_hit / (level_2_cache_hit + level_2_cache_miss) * 100) + "% "
                     + level_2_cache_hit + " hits "
                     + level_2_cache_miss + " miss " + level_2_put + " puts");
@@ -147,8 +135,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     @Override
     public void delete(final PersistentObject entity) throws SPersistenceException {
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug(
                     "Deleting instance of class " + entity.getClass().getSimpleName() + " with id=" + entity.getId());
         }
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
@@ -443,7 +431,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     public void destroy() {
-        logger.log(getClass(), TechnicalLogSeverity.INFO,
+        getLogger().info(
                 "Closing Hibernate session factory of " + getClass().getName());
         sessionFactory.close();
     }

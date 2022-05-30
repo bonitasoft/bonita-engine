@@ -26,7 +26,7 @@ public class AbstractFlushEventListenerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_deactivate_notifyStopTracking() {
-        final AbstractFlushEventListener listener = spy(new AbstractFlushEventListener(true, null) {
+        final AbstractFlushEventListener listener = spy(new AbstractFlushEventListener(true) {
 
             @Override
             public FlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception {
@@ -49,7 +49,7 @@ public class AbstractFlushEventListenerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_activate_notifyStartTracking() {
-        final AbstractFlushEventListener listener = spy(new AbstractFlushEventListener(true, null) {
+        final AbstractFlushEventListener listener = spy(new AbstractFlushEventListener(true) {
 
             @Override
             public FlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception {

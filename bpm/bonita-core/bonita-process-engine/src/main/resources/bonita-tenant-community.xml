@@ -16,7 +16,6 @@
 
     <bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
         <constructor-arg name="applicationName" value="BPM" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <!-- set Engine session duration (in ms) : -->
         <property name="sessionDuration" value="${bonita.tenant.session.duration}" />
     </bean>
@@ -24,12 +23,10 @@
     <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="tenantRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl" primary="true">
         <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
     </bean>
 
@@ -54,7 +51,6 @@
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="transientDataService" ref="transientDataService" />
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
@@ -64,14 +60,12 @@
     <bean id="waitingEventsInterrupter" class="org.bonitasoft.engine.execution.WaitingEventsInterrupter">
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="schedulerService" ref="scheduler" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="processInstanceInterruptor" class="org.bonitasoft.engine.execution.ProcessInstanceInterruptor">
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
         <constructor-arg name="containerRegistry" ref="containerRegistry" />
-        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
@@ -83,7 +77,6 @@
         <constructor-arg name="containerRegistry" ref="containerRegistry" />
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="messagesHandlingService" ref="messagesHandlingService" />
         <constructor-arg name="workService" ref="workService" />
@@ -95,7 +88,6 @@
     <bean id="messagesHandlingService" class="org.bonitasoft.engine.message.MessagesHandlingService">
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="workService" ref="workService" />
-        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="tenantId" value="${tenantId}" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -150,7 +142,6 @@
     <bean id="processExecutor" class="org.bonitasoft.engine.execution.ProcessExecutorImpl">
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="flowNodeExecutor" ref="flowNodeExecutor" />
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
@@ -206,7 +197,6 @@
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ActorBusinessArchiveArtifactManager">
                     <constructor-arg name="actorMappingService" ref="actorMappingService" />
                     <constructor-arg name="identityService" ref="identityService" />
-                    <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
                 </bean>
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorBusinessArchiveArtifactManager">
                     <constructor-arg name="connectorService" ref="connectorService" />
@@ -222,7 +212,6 @@
                     <constructor-arg name="sessionService" ref="sessionService" />
                     <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
                     <constructor-arg name="pageService" ref="pageService" />
-                    <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
                     <constructor-arg name="formMappingService" ref="formMappingService" />
                     <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
                 </bean>
@@ -237,7 +226,6 @@
                 </bean>
             </list>
         </constructor-arg>
-        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="processResourcesService" class="org.bonitasoft.engine.resources.ProcessResourcesServiceImpl">
@@ -248,21 +236,18 @@
     <bean id="tenantResourcesService" class="org.bonitasoft.engine.resources.TenantResourcesServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="businessArchiveService" class="org.bonitasoft.engine.bar.BusinessArchiveServiceImpl">
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
         <constructor-arg name="businessArchiveArtifactsManager" ref="dependencyResolver" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="commandService" class="org.bonitasoft.engine.command.api.impl.CommandServiceImpl">
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="defaultCommandProvider" ref="defaultCommandProvider" />
     </bean>
@@ -488,7 +473,6 @@
     <bean id="connectorExecutor" class="org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl">
         <constructor-arg name="queueCapacity" value="${bonita.tenant.connector.queueCapacity}" />
         <constructor-arg name="corePoolSize" value="${bonita.tenant.connector.corePoolSize}" />
-        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="maximumPoolSize" value="${bonita.tenant.connector.maximumPoolSize}" />
         <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.connector.keepAliveTimeSeconds}" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -499,7 +483,6 @@
     </bean>
 
     <bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="checkExpressionReturnType" value="true" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
     </bean>
@@ -542,12 +525,10 @@
 
     <bean id="groovyScriptExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="groovyScriptConditionExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptConditionExpressionExecutorStrategy">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="inputExpressionExecutorStrategy"
@@ -613,7 +594,6 @@
     <bean id="parameterService" class="org.bonitasoft.engine.parameter.ParameterServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
@@ -653,7 +633,6 @@
                 <value>org.bonitasoft.engine.connector.exception.SConnectorException</value>
             </list>
         </constructor-arg>
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
 
@@ -694,7 +673,6 @@
         <constructor-arg name="connectorExecutor" ref="connectorExecutor" />
         <constructor-arg name="processResourcesService" ref="processResourcesService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
 
@@ -740,7 +718,6 @@
     </bean>
 
     <bean id="timeTracker" class="org.bonitasoft.engine.tracking.TimeTracker">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="startTracking" value="${bonita.tenant.timetracker.startTracking}" />
         <constructor-arg name="flushEventListeners" ref="flushEventListeners" />
         <constructor-arg name="maxSize" value="${bonita.tenant.timetracker.maxSize}" />
@@ -751,14 +728,12 @@
 
     <bean id="csvFlushEventListener" class="org.bonitasoft.engine.tracking.csv.CSVFlushEventListener">
         <constructor-arg name="activateAtStart" value="${bonita.tenant.timetracker.csv.activateAtStart}" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="outputFolder" value="${bonita.tenant.timetracker.csv.folder}" />
         <constructor-arg name="csvSeparator" value="${bonita.tenant.timetracker.csv.separator}" />
     </bean>
 
     <bean id="memoryFlushEventListener" class="org.bonitasoft.engine.tracking.memory.MemoryFlushEventListener">
         <constructor-arg name="activateAtStart" value="${bonita.tenant.timetracker.memory.activateAtStart}" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="maxSize" value="${bonita.tenant.timetracker.memory.maxSize}" />
     </bean>
 
@@ -797,7 +772,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="processInstanceService"
@@ -805,7 +779,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="activityService" ref="activityInstanceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
@@ -821,7 +794,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
     </bean>
 
@@ -830,7 +802,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
@@ -889,16 +860,11 @@
         <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
     </bean>
 
-    <bean id="tenantTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" primary="true">
-        <constructor-arg name="tenantId" value="${tenantId}" />
-    </bean>
-
     <bean id="externalIdentityMappingService"
           class="org.bonitasoft.engine.external.identity.mapping.impl.ExternalIdentityMappingServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
@@ -942,7 +908,6 @@
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="transientDataExpressionExecutorStrategy"
@@ -955,7 +920,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="dataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.DataExpressionExecutorStrategy">
@@ -968,7 +932,6 @@
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
         <constructor-arg name="processResourcesService" ref="processResourcesService" />
     </bean>
@@ -978,7 +941,6 @@
     </bean>
 
     <bean id="connectorTimeExecutionLogger" class="org.bonitasoft.engine.core.connector.impl.ConnectorExecutionTimeLogger">
-        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="warnWhenLongerThanMillis" value="${bonita.tenant.connector.warnWhenLongerThanMillis}" />
     </bean>
 
@@ -1137,7 +1099,6 @@
                 <entry key="hibernate.current_session_context_class" value="thread" />
             </map>
         </constructor-arg>
-        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
@@ -1150,7 +1111,6 @@
     </bean>
 
     <bean id="schemaManager" class="org.bonitasoft.engine.business.data.impl.SchemaManagerUpdate">
-        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="configuration">
             <map>
                 <!-- to prevent Hibernate 5 from changing its way of managing ID generation: -->
@@ -1210,7 +1170,6 @@
 
     <bean id="archiveService" class="org.bonitasoft.engine.archive.impl.ArchiveServiceImpl">
         <constructor-arg name="definitiveArchivePersistenceService" ref="persistenceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="archivingStrategy" ref="archivingStrategy" />
         <constructor-arg ref="transactionService" />
     </bean>
@@ -1248,7 +1207,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
         <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="platformService" ref="platformService" />
         <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
@@ -1333,7 +1291,6 @@
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
         <constructor-arg name="documentService" ref="documentService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="commentService" ref="commentService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />

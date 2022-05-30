@@ -16,8 +16,6 @@ package org.bonitasoft.engine.work;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,8 +31,6 @@ import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.time.FixedEngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,11 +47,6 @@ public class BonitaThreadPoolExecutorTest {
     public static final long TENANT_ID = 13L;
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
-    @Mock
-    private TechnicalLogger log;
     @Mock
     private WorkExecutionAuditor workExecutionAuditor;
     private MyWorkExecutionCallback workExecutionCallback = new MyWorkExecutionCallback();
@@ -70,14 +61,13 @@ public class BonitaThreadPoolExecutorTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(log).when(technicalLoggerService).asLogger(any());
         bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(threadNumber, threadNumber //
                 , 1_000, TimeUnit.SECONDS //
                 , new ArrayBlockingQueue<>(1_000) //
                 , new WorkerThreadFactory("test-worker", 1, threadNumber) //
                 , (r, executor) -> {
                 } //
-                , workFactory, technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor,
+                , workFactory, engineClock, workExecutionCallback, workExecutionAuditor,
                 meterRegistry, TENANT_ID);
     }
 

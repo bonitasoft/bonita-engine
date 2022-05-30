@@ -11,7 +11,6 @@
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
         <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="cacheService" ref="platformEhCacheCacheService" />
     </bean>
 
@@ -46,7 +45,6 @@
     </bean>
 
     <bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor" autowire="byType">
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="useOptimization" value="true" />
@@ -56,13 +54,11 @@
         <constructor-arg name="eventService" ref="platformEventService" />
         <constructor-arg name="recorder" ref="tenantRecorderSyncForPlatform" />
         <constructor-arg name="readPersistenceService" ref="persistenceService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerServiceImpl">
         <constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
         <constructor-arg name="jobService" ref="jobService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -82,7 +78,6 @@
 
     <bean id="platformCommandService" class="org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl">
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="platformAuthenticationService" class="org.bonitasoft.engine.service.impl.PlatformAuthenticationChecker" />
@@ -96,7 +91,6 @@
     <bean id="platformService" class="org.bonitasoft.engine.platform.impl.PlatformServiceImpl">
         <constructor-arg ref="platformPersistenceService" />
         <constructor-arg name="platformRetriever" ref="platformRetriever" />
-        <constructor-arg ref="platformTechnicalLoggerService" />
         <constructor-arg ref="platformProperties" />
         <constructor-arg name="recorder" ref="platformRecorderSync" />
     </bean>
@@ -105,7 +99,6 @@
 
     <bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
         <constructor-arg name="jobService" ref="jobService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="schedulerService" ref="scheduler" />
     </bean>
 
@@ -115,11 +108,8 @@
 
     <bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">
         <constructor-arg name="schedulerService" ref="scheduler" />
-        <constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
-
-    <bean id="platformTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" />
 
     <bean id="incidentService" class="org.bonitasoft.engine.incident.IncidentServiceImpl">
         <constructor-arg name="handlers">
@@ -127,7 +117,6 @@
                 <bean class="org.bonitasoft.engine.incident.FileLoggerIncidentHandler" />
             </list>
         </constructor-arg>
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="bonitaDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
@@ -189,13 +178,11 @@
 
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="platformPersistenceService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
 
     <bean id="tenantRecorderSyncForPlatform" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
 
@@ -660,7 +647,6 @@
 
 
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="txManager" ref="transactionManager" />
     </bean>
 
@@ -1033,7 +1019,6 @@
         <constructor-arg name="name" value="platform" />
         <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
         <constructor-arg name="extraHibernateProperties" ref="extraPlatformHibernateProperties" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory" />
@@ -1066,7 +1051,6 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
         <constructor-arg name="extraHibernateProperties" ref="extraTenantHibernateProperties" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory" />

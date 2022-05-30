@@ -32,8 +32,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.SUserUpdateException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -41,6 +39,8 @@ import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,22 +50,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class SecuredLoginServiceImpl implements LoginService {
 
+    private static final Logger log = LoggerFactory.getLogger(SecuredLoginServiceImpl.class);
     private final GenericAuthenticationService authenticationService;
     private final SessionService sessionService;
     private final IdentityService identityService;
-    private final TechnicalLoggerService logger;
     private final TechnicalUser technicalUser;
     private final ProfileService profileService;
     private final PermissionsBuilder permissionsBuilder;
 
     public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService,
             final SessionService sessionService,
-            final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
+            final IdentityService identityService,
             TechnicalUser technicalUser, ProfileService profileService, PermissionsBuilder permissionsBuilder) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
         this.identityService = identityService;
-        this.logger = tenantTechnicalLoggerService;
         this.technicalUser = technicalUser;
         this.profileService = profileService;
         this.permissionsBuilder = permissionsBuilder;
@@ -180,8 +179,6 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     private void debugLog(String message) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
-        }
+        log.debug(message);
     }
 }

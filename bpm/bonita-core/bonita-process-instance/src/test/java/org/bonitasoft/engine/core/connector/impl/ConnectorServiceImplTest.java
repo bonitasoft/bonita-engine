@@ -65,7 +65,6 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
@@ -125,10 +124,9 @@ public class ConnectorServiceImplTest {
     @SuppressWarnings("unchecked")
     @Before
     public void setup() {
-        TechnicalLoggerSLF4JImpl logger = new TechnicalLoggerSLF4JImpl();
         connectorService = new ConnectorServiceImpl(cacheService, connectorExecutor, expressionResolverService,
                 operationService,
-                dependencyService, classLoaderService, logger, timeTracker, processResourcesService,
+                dependencyService, classLoaderService, timeTracker, processResourcesService,
                 connectorExecutionTimeLogger);
         processDefinition = new SProcessDefinitionImpl("proc", "1");
         processDefinition.setId(PROCESS_DEFINITION_ID);

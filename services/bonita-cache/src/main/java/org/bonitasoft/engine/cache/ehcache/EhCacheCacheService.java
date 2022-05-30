@@ -22,7 +22,8 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
@@ -30,19 +31,20 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 // Must be started before the work service so it has a "higher" priority
+
 @Order(2)
 @Component
 @ConditionalOnSingleCandidate(CacheService.class)
 public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
 
+    private Logger logger = LoggerFactory.getLogger(EhCacheCacheService.class);
     private final long tenantId;
 
-    public EhCacheCacheService(TechnicalLoggerService logger,
-            List<CacheConfiguration> cacheConfigurations,
+    public EhCacheCacheService(List<CacheConfiguration> cacheConfigurations,
             @Qualifier("defaultTenantCacheConfiguration") CacheConfiguration defaultCacheConfiguration,
             @Value("java.io.tmpdir/tenant.${tenantId}.cache") String diskStorePath,
             @Value("${tenantId}") long tenantId) {
-        super(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
+        super(cacheConfigurations, defaultCacheConfiguration, diskStorePath);
         this.tenantId = tenantId;
     }
 
@@ -105,6 +107,11 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
         if (cacheManager == null) {
             start();
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return logger;
     }
 
     @Override

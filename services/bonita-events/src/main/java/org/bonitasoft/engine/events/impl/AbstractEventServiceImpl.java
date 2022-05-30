@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
@@ -25,15 +26,13 @@ import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.slf4j.Logger;
 
 public abstract class AbstractEventServiceImpl implements EventService {
 
-    protected static TechnicalLoggerService logger;
+    protected abstract Logger getLogger();
 
-    protected AbstractEventServiceImpl(final TechnicalLoggerService logger) {
-        AbstractEventServiceImpl.logger = logger;
+    protected AbstractEventServiceImpl() {
     }
 
     /**
@@ -52,8 +51,8 @@ public abstract class AbstractEventServiceImpl implements EventService {
             final Collection<SHandler<SEvent>> handlers = getHandlersFor(event.getType());
 
             if (handlers.size() > 0) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                if (getLogger().isTraceEnabled()) {
+                    getLogger().trace(
                             "Found " + handlers.size() + " for event " + event.getType()
                                     + ". All handlers: " + handlers);
                 }
@@ -69,8 +68,8 @@ public abstract class AbstractEventServiceImpl implements EventService {
                             sFireEventException = new SFireEventException("Unable to execute some handler.", e);
                         }
                         sFireEventException.addHandlerException(e);
-                        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Handler failed", e);
+                        if (getLogger().isDebugEnabled()) {
+                            getLogger().debug("Handler failed {}", ExceptionUtils.printLightWeightStacktrace(e));
                         }
                     }
                 }

@@ -18,14 +18,13 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.session.SessionService;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,16 +33,15 @@ import org.springframework.stereotype.Component;
 /**
  * Update provided profiles from profiles.xml from classpath
  */
+@Slf4j
 @Component
 public class DefaultProfilesUpdater implements TenantLifecycleService {
 
-    private final TechnicalLoggerService logger;
     private final ProfilesImporter profilesImporter;
     private final Long tenantId;
 
-    public DefaultProfilesUpdater(@Value("${tenantId}") Long tenantId, TechnicalLoggerService logger,
+    public DefaultProfilesUpdater(@Value("${tenantId}") Long tenantId,
             ProfilesImporter profilesImporter) {
-        this.logger = logger;
         this.profilesImporter = profilesImporter;
         this.tenantId = tenantId;
     }
@@ -65,23 +63,23 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
             final String defaultProfilesXml = getDefaultProfilesXml();
             if (shouldUpdateProfiles(md5File, defaultProfilesXml)) {
                 // Default profiles do not exist or are different
-                logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+                log.info(
                         "Default profiles not up to date, updating them...");
                 final ProfilesNode defaultProfiles = getProfilesFromXML(defaultProfilesXml);
                 doUpdateProfiles(defaultProfiles, md5File, defaultProfilesXml);
                 return true;
             } else {
                 // No update required
-                logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+                log.info(
                         "Default profiles are up to date");
                 return false;
             }
 
         } catch (IOException e) {
-            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
+            log.error(
                     "Unable to read the read the default profile file to update them", e);
         } catch (Exception e) {
-            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
+            log.error(
                     "Unable to update default profiles", e);
         }
         return false;
@@ -92,13 +90,13 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
         try {
             final List<ImportStatus> importStatuses = profilesImporter.importProfiles(defaultProfiles,
                     ImportPolicy.UPDATE_DEFAULTS, SessionService.SYSTEM_ID);
-            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+            log.info(
                     "Updated default profiles " + importStatuses);
             if (md5File != null) {
                 IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
             }
         } catch (ExecutionException e) {
-            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
+            log.error(
                     "Unable to update default profiles", e);
         }
         return null;
@@ -127,11 +125,11 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
     String getDefaultProfilesXml() throws IOException {
         String profiles = IOUtil.readResource("profiles-sp.xml");
         if (profiles != null) {
-            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+            log.info(
                     "Loading profiles from file profiles-sp.xml");
         } else {
             profiles = IOUtil.readResource("profiles.xml");
-            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+            log.info(
                     "Loading profiles from file profiles.xml");
         }
         return profiles;

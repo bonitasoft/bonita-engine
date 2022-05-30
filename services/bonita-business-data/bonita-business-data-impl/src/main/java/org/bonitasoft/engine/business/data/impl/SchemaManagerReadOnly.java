@@ -18,19 +18,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.business.data.SchemaManager;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hibernate.HibernateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pablo Alonso de Linaje García
  */
 public class SchemaManagerReadOnly implements SchemaManager {
 
-    private final TechnicalLogger log;
+    private static final Logger log = LoggerFactory.getLogger(SchemaManagerReadOnly.class);
 
-    public SchemaManagerReadOnly(final TechnicalLoggerService loggerService) throws HibernateException {
-        log = loggerService.asLogger(getClass());
+    public SchemaManagerReadOnly() throws HibernateException {
         log.warn("Ready-Only Schema manager. No change will be performed on the BDM DB Schema." +
                 " Please ensure that this update is done before using the new BDM");
     }

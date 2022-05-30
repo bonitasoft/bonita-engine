@@ -19,7 +19,6 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +40,7 @@ public class IncidentServiceImplTest {
         handlers.add(handler1);
         handler2 = mock(IncidentHandler.class);
         handlers.add(handler2);
-        incidentService = new IncidentServiceImpl(mock(TechnicalLoggerService.class), handlers);
+        incidentService = new IncidentServiceImpl(handlers);
     }
 
     @Test

@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.services.impl;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.commons.ExceptionUtils;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
@@ -27,22 +27,19 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Slf4j
 public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvider {
 
     private final SessionService sessionService;
 
     private final ReadSessionAccessor sessionAccessor;
 
-    private final TechnicalLoggerService technicalLoggerService;
-
-    private final ThreadLocal<SSession> localSession = new ThreadLocal<SSession>();
+    private final ThreadLocal<SSession> localSession = new ThreadLocal<>();
 
     public QueriableLogSessionProviderImpl(final SessionService sessionService,
-            final ReadSessionAccessor sessionAccessor,
-            final TechnicalLoggerService technicalLoggerService) {
+            final ReadSessionAccessor sessionAccessor) {
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
-        this.technicalLoggerService = technicalLoggerService;
     }
 
     private SSession getSession() {
@@ -58,9 +55,7 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
             // system: no session
             return null;
         } catch (final SSessionNotFoundException e) {
-            if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-            }
+            log.warn(ExceptionUtils.printLightWeightStacktrace(e));
         }
         return session;
     }

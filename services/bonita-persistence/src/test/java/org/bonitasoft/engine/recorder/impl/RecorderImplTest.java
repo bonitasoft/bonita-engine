@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -40,8 +39,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class RecorderImplTest {
 
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     @Mock
     private PersistenceService persistenceService;
     @Mock

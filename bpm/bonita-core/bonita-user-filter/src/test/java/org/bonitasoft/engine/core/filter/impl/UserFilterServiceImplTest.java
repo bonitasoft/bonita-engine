@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.filter.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -42,8 +43,6 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SUserFilterDefin
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.filter.AbstractUserFilter;
 import org.bonitasoft.engine.filter.UserFilterException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
@@ -67,8 +66,6 @@ public class UserFilterServiceImplTest {
     public static final long PROCESS_DEFINITION_ID = 123456L;
     @InjectMocks
     private UserFilterServiceImpl userFilterService;
-    @Mock
-    private TechnicalLoggerService logger;
     @Mock
     private ConnectorExecutor connectorExecutor;
     @Mock
@@ -166,8 +163,7 @@ public class UserFilterServiceImplTest {
 
         //given
         UserFilterServiceImpl spyUserFilterService = spy(
-                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger,
-                        resourceService));
+                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, resourceService));
         doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"),
                 eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
         doThrow(new SConnectorException("Test exception")).when(spyUserFilterService).executeFilterInClassloader(
@@ -191,8 +187,7 @@ public class UserFilterServiceImplTest {
         //given
         SConnectorException theException = mock(SConnectorException.class);
         UserFilterServiceImpl spyUserFilterService = spy(
-                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger,
-                        resourceService));
+                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, resourceService));
         doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"),
                 eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
         when(theException.getCause()).thenReturn(new RuntimeException(" The root cause"));
@@ -202,12 +197,14 @@ public class UserFilterServiceImplTest {
 
         //then
         expectedException.expect(SUserFilterExecutionException.class);
-        expectedException.expectMessage("The root cause");
+        expectedException.expectMessage("Flow node instance id:");
+        expectedException.expectCause(instanceOf(RuntimeException.class));
         //when
         spyUserFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition,
                 Collections.<String, SExpression> emptyMap(),
                 new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()),
                 new SExpressionContext(), "actorName");
+
     }
 
     @Test
@@ -217,15 +214,13 @@ public class UserFilterServiceImplTest {
         //given
         SConnectorException theException = mock(SConnectorException.class);
         UserFilterServiceImpl spyUserFilterService = spy(
-                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger,
-                        resourceService));
+                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, resourceService));
         doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"),
                 eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
         when(theException.getCause()).thenReturn(new RuntimeException(" The root cause"));
         doThrow(theException).when(spyUserFilterService).executeFilterInClassloader(anyString(), anyMap(),
                 (URLClassLoader) any(), (SExpressionContext) any(),
                 anyString());
-        when(logger.isLoggable((Class) any(), eq(TechnicalLogSeverity.DEBUG))).thenReturn(true);
 
         //then
         expectedException.expect(SUserFilterExecutionException.class);

@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -46,13 +47,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.page.ContentType;
-import org.bonitasoft.engine.page.PageCreator;
-import org.bonitasoft.engine.page.PageService;
-import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.page.*;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.FormRequiredAnalyzer;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -62,6 +57,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Laurent Leseigneur
  */
+@Slf4j
 public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifactManager {
 
     public static final String ERROR_MESSAGE_FORM_NOT_SET = "Error while resolving form mapping for processDefinitionId=%s and task=%s. The target bonita form is not defined";
@@ -72,19 +68,16 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
     private final SessionService sessionService;
     private final SessionAccessor sessionAccessor;
     private final PageService pageService;
-    private final TechnicalLoggerService technicalLoggerService;
     private final FormMappingService formMappingService;
     private final ProcessDefinitionService processDefinitionService;
     public static final int NUMBER_OF_RESULTS = 100;
 
     public FormMappingAndPageArtifactManager(SessionService sessionService, SessionAccessor sessionAccessor,
-            PageService pageService,
-            TechnicalLoggerService technicalLoggerService, FormMappingService formMappingService,
+            PageService pageService, FormMappingService formMappingService,
             ProcessDefinitionService processDefinitionService) {
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.pageService = pageService;
-        this.technicalLoggerService = technicalLoggerService;
         this.formMappingService = formMappingService;
         this.processDefinitionService = processDefinitionService;
     }
@@ -107,7 +100,7 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
                 // Remove this notion of external resource for custom pages.
                 deployPage(resource.getKey(), resource.getValue(), processDefinitionId, userId, pageService);
             } catch (SBonitaException e) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Unable to deploy all pages", e);
+                log.error("Unable to deploy all pages", e);
             }
         }
     }

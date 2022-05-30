@@ -17,22 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder.buildFormMapping;
 import static org.bonitasoft.engine.bpm.form.FormMappingModelBuilder.buildFormMappingModel;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -49,7 +38,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
@@ -100,8 +88,6 @@ public class FormMappingAndPageArtifactManagerTest {
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
-    private TechnicalLoggerService technicalLoggerService;
-    @Mock
     private ProcessDefinitionService processDefinitionService;
 
     private BusinessArchiveBuilder barBuilder;
@@ -109,8 +95,8 @@ public class FormMappingAndPageArtifactManagerTest {
     @Before
     public void before() {
         formMappingAndPageArtifactManager = spy(
-                new FormMappingAndPageArtifactManager(sessionService, sessionAccessor, pageService,
-                        technicalLoggerService, formMappingService, processDefinitionService));
+                new FormMappingAndPageArtifactManager(sessionService, sessionAccessor, pageService, formMappingService,
+                        processDefinitionService));
         formMappings = new ArrayList<>();
 
         doReturn(PROCESS_DEFINITION_ID).when(sDefinition).getId();
