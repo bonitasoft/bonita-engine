@@ -30,7 +30,11 @@ import org.bonitasoft.engine.business.data.impl.jackson.EntityMixin;
 import org.bonitasoft.engine.business.data.impl.jackson.utils.LinkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
+@Component
+@ConditionalOnSingleCandidate(JsonBusinessDataSerializer.class)
 public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
         implements JsonBusinessDataSerializer {
 

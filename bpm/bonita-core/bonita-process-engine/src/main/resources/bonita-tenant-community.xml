@@ -1175,10 +1175,6 @@
         </constructor-arg>
     </bean>
 
-    <bean id="jsonBusinessDataSerializer"
-          class="org.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl">
-    </bean>
-
     <bean id="typeConverterUtil" class="org.bonitasoft.engine.commons.TypeConverterUtil">
         <constructor-arg name="datePatterns" type="java.lang.String[]">
             <list>
@@ -1199,7 +1195,6 @@
 
     <bean id="businessDataService" class="org.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
-        <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer" />
         <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
         <constructor-arg name="typeConverterUtil" ref="typeConverterUtil" />
         <constructor-arg name="businessDataReloader" ref="businessDataReloader" />
@@ -1348,6 +1343,6 @@
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
     </bean>
 
-    <bean class="org.bonitasoft.engine.configuration.EngineTenantConfiguration" />
+    <bean class="org.bonitasoft.engine.EngineConfiguration" />
 
 </beans>

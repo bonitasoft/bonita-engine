@@ -1149,6 +1149,4 @@
 
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
-    <bean class="org.bonitasoft.engine.platform.configuration.EnginePlatformConfiguration" />
-
 </beans>
