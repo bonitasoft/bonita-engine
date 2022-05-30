@@ -30,11 +30,13 @@ import org.gradle.api.tasks.testing.Test
 class DockerDatabaseContainerTasksCreator {
 
     def static vendors = [
-            [name       : 'oracle',
-             repository : 'registry.rd.lan/bonitasoft/oracle-19c-ee',
-             tag        : '0.0.1',
-             portBinding: 1521,
-             uriTemplate: 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1?oracle.net.disableOob=true',
+            [name               : 'oracle',
+             image              : 'bonitasoft.jfrog.io/docker-releases/bonita-oracle-19c-ee:0.0.2',
+             registryUrlEnv     : 'DOCKER_BONITASOFT_REGISTRY',
+             registryUsernameEnv: 'REGISTRY_USERNAME',
+             registryPasswordEnv: 'REGISTRY_TOKEN',
+             portBinding        : 1521,
+             uriTemplate        : 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1?oracle.net.disableOob=true',
             ],
             [name       : 'postgres',
              repository : 'bonitasoft/bonita-postgres',
@@ -43,8 +45,7 @@ class DockerDatabaseContainerTasksCreator {
              uriTemplate: 'jdbc:postgresql://%s:%s/%s',
             ],
             [name       : 'mysql',
-             repository : 'bonitasoft/bonita-mysql',
-             tag        : '8.0.22',
+             image      : 'bonitasoft/bonita-mysql:8.0.22',
              portBinding: 3306,
              uriTemplate: 'jdbc:mysql://%s:%s/%s?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
             ],
@@ -76,7 +77,7 @@ class DockerDatabaseContainerTasksCreator {
         }
         project.plugins.apply('com.bmuschko.docker-remote-api')
         vendors.each { vendor ->
-            def uniqueName = "${vendor.name.capitalize()}"
+            def uniqueName = vendor.name.capitalize()
 
             DbParser.DbConnectionSettings dbConnectionSettings = new DbParser.DbConnectionSettings()
             DbParser.DbConnectionSettings bdmDbConnectionSettings = new DbParser.DbConnectionSettings()
@@ -87,8 +88,15 @@ class DockerDatabaseContainerTasksCreator {
                 description "Pull docker image for $uniqueName db vendor"
                 group null // do not show task when running `gradle tasks`
 
-                repository = vendor.repository
-                tag = vendor.tag
+                image = vendor.image
+
+                if (vendor.registryUrlEnv != null) {
+                    registryCredentials.with {
+                        url = System.getenv(vendor.registryUrlEnv)
+                        username = System.getenv(vendor.registryUsernameEnv)
+                        password = System.getenv(vendor.registryPasswordEnv)
+                    }
+                }
             }
 
             def createContainer = createTaskInRootProject(project, "create${uniqueName}Container", DockerCreateContainer) {
@@ -98,12 +106,13 @@ class DockerDatabaseContainerTasksCreator {
                 if (project.hasProperty("docker-container-alias")) {
                     containerName = project.getProperty("docker-container-alias")
                 }
-                portBindings = [":$vendor.portBinding"]
-                targetImageId pullImage.getImageId()
-                if (vendor.name == 'oracle') {
+                hostConfig.portBindings = [":$vendor.portBinding"]
+                targetImageId pullImage.getImage()
+                if ('oracle' == vendor.name) {
                     // 1Go
-                    shmSize = 1099511627776
+                    hostConfig.shmSize = 1099511627776
                 }
+                hostConfig.autoRemove = true
             }
 
             def startContainer = createTaskInRootProject(project, "start${uniqueName}Container", DockerStartContainer) {
@@ -211,10 +220,6 @@ class DockerDatabaseContainerTasksCreator {
     }
 
     static Task createTaskInRootProject(Project project, String taskName, Class<? extends Task> taskType, Closure configuration) {
-        def task = project.rootProject.tasks.findByPath(taskName)
-        if (!task) {
-            task = project.rootProject.tasks.create(taskName, taskType, configuration)
-        }
-        return task
+        project.rootProject.tasks.findByPath(taskName) ?: project.rootProject.tasks.create(taskName, taskType, configuration)
     }
 }
