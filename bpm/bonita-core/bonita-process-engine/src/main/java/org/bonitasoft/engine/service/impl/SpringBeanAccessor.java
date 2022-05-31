@@ -118,8 +118,7 @@ public class SpringBeanAccessor {
         List<BonitaConfiguration> platformConfiguration = BONITA_HOME_SERVER.getPlatformConfiguration();
         //handle special case for cache configuration files
         Iterator<BonitaConfiguration> iterator = platformConfiguration.iterator();
-        bonita_conf = org.bonitasoft.engine.io.IOUtil
-                .createTempDirectory(File.createTempFile("bonita_conf", "").toURI());
+        bonita_conf = IOUtil.createTempDirectory(File.createTempFile("bonita_conf", "").toURI());
         bonita_conf.delete();
         bonita_conf.mkdir();
         while (iterator.hasNext()) {
@@ -139,7 +138,6 @@ public class SpringBeanAccessor {
     protected List<String> getSpringFileFromClassPath(boolean cluster) {
         List<String> resources = new ArrayList<>();
         resources.add("bonita-platform-init-community.xml");
-        resources.add("bonita-platform-init-sp.xml");
         resources.add("bonita-platform-community.xml");
         resources.add("bonita-platform-sp.xml");
         resources.add("bonita-tenant-community.xml");

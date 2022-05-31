@@ -65,9 +65,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.xml.sax.SAXException;
 
 /**
@@ -266,35 +264,6 @@ public class IOUtil {
         try (InputStream in = url.openStream()) {
             return getAllContentFrom(in);
         }
-    }
-
-    public static File createTempDirectory(final URI directoryPath) {
-        final File tmpDir = new File(directoryPath);
-        tmpDir.setReadable(true);
-        tmpDir.setWritable(true);
-
-        mkdirs(tmpDir);
-
-        FileUtils.isSymlink(tmpDir);
-
-        try {
-
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    final boolean deleted = deleteDir(tmpDir);
-                    if (!deleted) {
-                        System.err.println(
-                                "Unable to delete directory: " + tmpDir + ". Trying with an alternative force delete.");
-                        FileUtils.forceDelete(tmpDir);
-                    }
-                } catch (final IOException e) {
-                    throw new BonitaRuntimeException(e);
-                }
-            }));
-        } catch (IllegalStateException ignored) {
-            // happen in case of hook already registered and when shutting down
-        }
-        return tmpDir;
     }
 
     public static boolean deleteDir(final File dir) throws IOException {

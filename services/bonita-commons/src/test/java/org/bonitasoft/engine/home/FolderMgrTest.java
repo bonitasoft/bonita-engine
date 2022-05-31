@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
@@ -54,10 +55,10 @@ public class FolderMgrTest {
         //when
         Folder tempFolder1 = FolderMgr.getTempFolder();
         //then
-        assertThat(systemOutRule.getLog()).contains("Delete these folders to free up space:");
-        assertThat(systemOutRule.getLog()).contains(bonita_engine_old1.getAbsolutePath());
-        assertThat(systemOutRule.getLog()).contains(bonita_engine_old2.getAbsolutePath());
-        assertThat(systemOutRule.getLog()).doesNotContain(tempFolder1.getFile().getName());
+        Assertions.assertThat(systemOutRule.getLog()).contains("Delete these folders to free up space:");
+        Assertions.assertThat(systemOutRule.getLog()).contains(bonita_engine_old1.getAbsolutePath());
+        Assertions.assertThat(systemOutRule.getLog()).contains(bonita_engine_old2.getAbsolutePath());
+        Assertions.assertThat(systemOutRule.getLog()).doesNotContain(tempFolder1.getFile().getName());
 
     }
 
