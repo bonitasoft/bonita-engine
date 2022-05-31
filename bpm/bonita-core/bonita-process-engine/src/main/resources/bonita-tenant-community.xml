@@ -22,7 +22,6 @@
 
     <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
     <bean id="tenantRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl" primary="true">
@@ -90,7 +89,6 @@
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="tenantId" value="${tenantId}" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="workFactory" ref="workFactory" />
         <constructor-arg name="meterRegistry" ref="meterRegistry" />
     </bean>
@@ -210,7 +208,6 @@
                 </bean>
                 <bean class="org.bonitasoft.engine.api.impl.resolver.FormMappingAndPageArtifactManager">
                     <constructor-arg name="sessionService" ref="sessionService" />
-                    <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
                     <constructor-arg name="pageService" ref="pageService" />
                     <constructor-arg name="formMappingService" ref="formMappingService" />
                     <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
@@ -475,7 +472,6 @@
         <constructor-arg name="corePoolSize" value="${bonita.tenant.connector.corePoolSize}" />
         <constructor-arg name="maximumPoolSize" value="${bonita.tenant.connector.maximumPoolSize}" />
         <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.connector.keepAliveTimeSeconds}" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
         <constructor-arg name="meterRegistry" ref="meterRegistry" />
@@ -545,7 +541,6 @@
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
     <bean id="contractInputExpressionExecutorStrategy"
@@ -758,7 +753,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
     </bean>
 
@@ -827,7 +821,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
@@ -835,7 +828,6 @@
     <bean id="commentService" class="org.bonitasoft.engine.core.process.comment.api.impl.SCommentServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="systemCommentType">
@@ -956,7 +948,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
@@ -1187,7 +1178,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="pageMappingService" ref="pageMappingService" />
         <constructor-arg name="pageService" ref="pageService" />
         <constructor-arg name="formMappingKeyGenerator" ref="formMappingKeyGenerator" />
@@ -1215,7 +1205,6 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
     <bean id="urlAdapterInjector" class="org.bonitasoft.engine.page.impl.UrlAdapterInjector" autowire="byType"
@@ -1234,40 +1223,33 @@
 
     <!-- Authorization rules to register -->
     <bean id="isAdmin" class="org.bonitasoft.engine.page.IsAdminRule">
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
     </bean>
 
     <bean id="isProcessOwner" class="org.bonitasoft.engine.page.IsProcessOwnerRule">
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="formMappingService" ref="formMappingService" />
         <constructor-arg name="supervisorMappingService" ref="supervisorMappingService" />
     </bean>
     <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
     </bean>
     <bean id="isActorInitiatorRule" class="org.bonitasoft.engine.page.IsActorInitiatorRule">
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="formMappingService" ref="formMappingService" />
         <constructor-arg name="actorMappingService" ref="actorMappingService" />
     </bean>
     <bean id="isProcessInitiator" class="org.bonitasoft.engine.page.IsProcessInitiatorRule">
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="processInvolvementDelegate" ref="processInvolvementDelegate" />
     </bean>
     <bean id="isTaskPerformer" class="org.bonitasoft.engine.page.IsTaskPerformerRule">
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="taskInvolvementDelegate" ref="taskInvolvementDelegate" />
     </bean>
     <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule">
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="taskInvolvementDelegate" ref="taskInvolvementDelegate" />
     </bean>
 

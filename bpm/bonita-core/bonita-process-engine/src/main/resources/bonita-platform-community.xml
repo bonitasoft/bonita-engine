@@ -45,7 +45,6 @@
     </bean>
 
     <bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor" autowire="byType">
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="useOptimization" value="true" />
     </bean>
@@ -61,7 +60,6 @@
         <constructor-arg name="jobService" ref="jobService" />
         <constructor-arg name="eventService" ref="platformEventService" />
         <constructor-arg name="transactionService" ref="transactionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="servicesResolver" ref="servicesResolver" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
     </bean>
@@ -81,7 +79,6 @@
     </bean>
 
     <bean id="platformAuthenticationService" class="org.bonitasoft.engine.service.impl.PlatformAuthenticationChecker" />
-
 
 
     <bean id="platformRetriever" class="org.bonitasoft.engine.platform.impl.PlatformRetrieverImpl">
@@ -1048,7 +1045,6 @@
 
     <bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" destroy-method="destroy">
         <constructor-arg name="name" value="journal" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
         <constructor-arg name="extraHibernateProperties" ref="extraTenantHibernateProperties" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />

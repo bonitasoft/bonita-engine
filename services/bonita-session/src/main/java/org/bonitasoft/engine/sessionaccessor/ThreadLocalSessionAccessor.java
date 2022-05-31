@@ -13,10 +13,12 @@
  **/
 package org.bonitasoft.engine.sessionaccessor;
 
+import org.springframework.stereotype.Component;
+
 /**
- * @author Yanyan Liu
- * @author Matthieu Chaffotte
+ * Store and access the current session id of the current thread
  */
+@Component
 public class ThreadLocalSessionAccessor implements SessionAccessor {
 
     private final ThreadLocal<Long> sessionData = new ThreadLocal<>();

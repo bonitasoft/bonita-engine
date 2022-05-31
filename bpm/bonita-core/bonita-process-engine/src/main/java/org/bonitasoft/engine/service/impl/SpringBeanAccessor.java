@@ -137,7 +137,6 @@ public class SpringBeanAccessor {
 
     protected List<String> getSpringFileFromClassPath(boolean cluster) {
         List<String> resources = new ArrayList<>();
-        resources.add("bonita-platform-init-community.xml");
         resources.add("bonita-platform-community.xml");
         resources.add("bonita-platform-sp.xml");
         resources.add("bonita-tenant-community.xml");
