@@ -13,21 +13,17 @@
  **/
 package org.bonitasoft.engine.home;
 
-import java.io.ByteArrayOutputStream;
+import static org.bonitasoft.engine.commons.io.IOUtil.*;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
-import org.bonitasoft.engine.DeepRegexFileFilter;
-import org.bonitasoft.engine.commons.io.IOUtil;
 
 /**
  * @author Charles Souillard
@@ -66,7 +62,7 @@ public class Folder {
     public void delete() throws IOException {
         //System.err.println("DELETING FOLDER: " + folder);
         checkFolderExists();
-        IOUtil.deleteDir(folder);
+        deleteDir(folder);
     }
 
     public File getFile(final String name) throws IOException {
@@ -101,32 +97,6 @@ public class Folder {
         FileUtils.copyDirectory(this.getFile(), destFolder.getFile());
     }
 
-    public byte[] zip(Folder destFolder) throws IOException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ZipOutputStream zos = new ZipOutputStream(baos);
-        try {
-            org.bonitasoft.engine.io.IOUtil.zipDir(this.folder.getAbsolutePath(), zos,
-                    destFolder.getFile().getAbsolutePath());
-            return baos.toByteArray();
-        } finally {
-            zos.close();
-            baos.close();
-        }
-    }
-
-    public Map<String, byte[]> getResources(String filenamesPattern) throws IOException {
-        final Collection<File> files = FileUtils.listFiles(getFile(),
-                new DeepRegexFileFilter(getFile(), filenamesPattern),
-                DirectoryFileFilter.DIRECTORY);
-        final Map<String, byte[]> res = new HashMap<>(files.size());
-        for (final File file : files) {
-            final String key = Util.generateRelativeResourcePath(getFile(), file);
-            final byte[] value = IOUtil.getAllContentFrom(file);
-            res.put(key, value);
-        }
-        return res;
-    }
-
     public Map<String, byte[]> listFilesAsResources() throws IOException {
         checkFolderExists();
         final Map<String, byte[]> resources = new HashMap<>();
@@ -140,7 +110,7 @@ public class Folder {
     }
 
     protected byte[] getFileContent(File file) throws IOException {
-        return IOUtil.getAllContentFrom(file);
+        return getAllContentFrom(file);
     }
 
     @Override
@@ -173,6 +143,6 @@ public class Folder {
     }
 
     public void createAsTemporaryFolder() {
-        org.bonitasoft.engine.io.IOUtil.createTempDirectory(this.folder.toURI());
+        createTempDirectory(this.folder.toURI());
     }
 }

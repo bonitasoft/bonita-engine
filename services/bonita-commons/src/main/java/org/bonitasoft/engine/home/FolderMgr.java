@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author Charles Souillard
  * @author Emmanuel Duchastenier
  */
-class FolderMgr {
+public class FolderMgr {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(FolderMgr.class);
     public static final String TEMP_FOLDER_NAME_PREFIX = "bonita_engine_";
@@ -68,7 +68,7 @@ class FolderMgr {
         return getFolder(getTempFolder(), "platform").createIfNotExists();
     }
 
-    static Folder getLicensesFolder() throws IOException {
+    public static Folder getLicensesFolder() throws IOException {
         return getFolder(getTempFolder(), "licenses");
     }
 
