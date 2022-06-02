@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -155,24 +156,21 @@ public class ApplicationIT extends TestWithTechnicalUser {
         builderUser1.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
         final SearchResult<Application> applicationsUser1 = getApplicationAPI().searchApplications(builderUser1.done());
         assertThat(applicationsUser1).isNotNull();
-        assertThat(applicationsUser1.getCount()).isEqualTo(2);
-        assertThat(applicationsUser1.getResult()).containsExactly(engineering, hr);
+        assertThat(applicationsUser1.getResult()).contains(engineering, hr).doesNotContain(marketing);
 
         final SearchOptionsBuilder builderUser2 = new SearchOptionsBuilder(0, 10);
         builderUser2.filter(ApplicationSearchDescriptor.USER_ID, user2.getId());
         builderUser2.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
         final SearchResult<Application> applicationsUser2 = getApplicationAPI().searchApplications(builderUser2.done());
         assertThat(applicationsUser2).isNotNull();
-        assertThat(applicationsUser2.getCount()).isEqualTo(1);
-        assertThat(applicationsUser2.getResult()).containsExactly(marketing);
+        assertThat(applicationsUser2.getResult()).contains(marketing).doesNotContain(engineering, hr);
 
         final SearchOptionsBuilder builderUser3 = new SearchOptionsBuilder(0, 10);
         builderUser3.filter(ApplicationSearchDescriptor.USER_ID, user3.getId());
         builderUser3.sort(ApplicationSearchDescriptor.DISPLAY_NAME, Order.ASC);
         final SearchResult<Application> applicationsUser3 = getApplicationAPI().searchApplications(builderUser3.done());
         assertThat(applicationsUser3).isNotNull();
-        assertThat(applicationsUser3.getCount()).isEqualTo(3);
-        assertThat(applicationsUser3.getResult()).containsExactly(engineering, hr, marketing);
+        assertThat(applicationsUser3.getResult()).contains(engineering, hr, marketing);
 
         final SearchOptionsBuilder builderUser4 = new SearchOptionsBuilder(0, 10);
         builderUser4.filter(ApplicationSearchDescriptor.USER_ID, user4.getId());
@@ -239,6 +237,28 @@ public class ApplicationIT extends TestWithTechnicalUser {
 
     private SearchOptionsBuilder getApplicationSearchOptionsOrderByToken(final int startIndex, final int maxResults) {
         return new SearchOptionsBuilder(startIndex, maxResults).sort(ApplicationSearchDescriptor.TOKEN, Order.ASC);
+    }
+
+    @Test
+    public void should_access_identity_api_using_default_application_permissions() throws Exception {
+
+        // Uses page-to-test-permissions.zip
+        // Uses application-to-test-permissions.zip
+        User user = createUser("baptiste", "bpm");
+        loginOnDefaultTenantWith("baptiste", "bpm");
+
+        assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "identity", "user", null))).isFalse();
+
+        getProfileAPI().createProfileMember(
+                getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).searchTerm("User").done()).getResult()
+                        .get(0).getId(),
+                user.getId(),
+                -1L,
+                -1L);
+
+        loginOnDefaultTenantWith("baptiste", "bpm");
+
+        assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "identity", "user", null))).isTrue();
     }
 
 }

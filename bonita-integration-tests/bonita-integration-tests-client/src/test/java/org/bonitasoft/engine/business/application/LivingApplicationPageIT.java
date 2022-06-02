@@ -202,17 +202,17 @@ public class LivingApplicationPageIT extends TestWithCustomPage {
         final Application application = getLivingApplicationAPI()
                 .createApplication(new ApplicationCreator("app", "My app", "1.0"));
         final ApplicationPage appPage1 = getLivingApplicationAPI().createApplicationPage(application.getId(),
-                getPage().getId(), "firstPage");
+                getPage().getId(), "AAA_1");
         final ApplicationPage appPage2 = getLivingApplicationAPI().createApplicationPage(application.getId(),
-                getPage().getId(), "secondPage");
+                getPage().getId(), "AAA_2");
         final ApplicationPage appPage3 = getLivingApplicationAPI().createApplicationPage(application.getId(),
-                getPage().getId(), "thirdPage");
+                getPage().getId(), "AAA_3");
 
         //when
         final SearchResult<ApplicationPage> searchResultPage1 = getLivingApplicationAPI()
-                .searchApplicationPages(buildSearchOptions(0, 2));
+                .searchApplicationPages(buildSearchOptions("AAA", 0, 2));
         final SearchResult<ApplicationPage> searchResultPage2 = getLivingApplicationAPI()
-                .searchApplicationPages(buildSearchOptions(2, 2));
+                .searchApplicationPages(buildSearchOptions("AAA", 2, 2));
 
         //then
         assertThat(searchResultPage1).isNotNull();
@@ -329,8 +329,9 @@ public class LivingApplicationPageIT extends TestWithCustomPage {
         getLivingApplicationAPI().deleteApplication(application.getId());
     }
 
-    private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        return getAppSearchBuilderOrderByToken(startIndex, maxResults).done();
+    private SearchOptions buildSearchOptions(String prefix, final int startIndex, final int maxResults) {
+        return getAppSearchBuilderOrderByToken(startIndex, maxResults)
+                .searchTerm(prefix).done();
     }
 
     @Test
@@ -367,10 +368,10 @@ public class LivingApplicationPageIT extends TestWithCustomPage {
 
         //then
         assertThat(allPagesForProfile1).containsExactlyInAnyOrder("custompage_themeBonita", "custompage_layoutBonita",
-                "custompage_page1", "custompage_page2", "custompage_page3");
+                "custompage_page1", "custompage_page2", "custompage_page3", "custompage_pageToTestPermissions");
         assertThat(getLivingApplicationAPI().getAllPagesForProfile(profile1.getName())).containsExactlyInAnyOrder(
                 "custompage_themeBonita", "custompage_layoutBonita", "custompage_page1", "custompage_page2",
-                "custompage_page3");
+                "custompage_page3", "custompage_pageToTestPermissions");
         assertThat(allPagesForProfile2).containsExactlyInAnyOrder("custompage_themeBonita", "custompage_layoutBonita",
                 "custompage_page4");
         assertThat(getLivingApplicationAPI().getAllPagesForProfile(profile2.getName()))

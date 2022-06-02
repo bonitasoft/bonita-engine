@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import org.bonitasoft.engine.search.Order;
-import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.After;
@@ -64,7 +63,7 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
         assertThat(createdAppMenu.getDisplayName()).isEqualTo("Main");
         assertThat(createdAppMenu.getApplicationId()).isEqualTo(application.getId());
         assertThat(createdAppMenu.getApplicationPageId()).isNull();
-        assertThat(createdAppMenu.getIndex()).isEqualTo(1);
+        assertThat(createdAppMenu.getIndex()).isGreaterThan(1);
         assertThat(createdAppMenu.getParentId()).isNull();
         assertThat(createdAppMenu.getId()).isGreaterThan(0);
 
@@ -75,7 +74,7 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
 
         //then
         // should have a index incremented
-        assertThat(index2Menu.getIndex()).isEqualTo(2);
+        assertThat(index2Menu.getIndex()).isEqualTo(createdAppMenu.getIndex() + 1);
 
     }
 
@@ -167,7 +166,7 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
         // updated:
         assertThat(updatedChildMenu.getApplicationPageId()).isNull();
         assertThat(updatedChildMenu.getParentId()).isNull();
-        assertThat(updatedChildMenu.getIndex()).isEqualTo(2); //because parent changed
+        assertThat(updatedChildMenu.getIndex()).isEqualTo(3); //because parent changed
         //not changed:
         assertThat(updatedChildMenu.getDisplayName()).isEqualTo("Updated child");
         assertThat(updatedChildMenu.getApplicationId()).isEqualTo(application.getId());
@@ -366,9 +365,9 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
 
         //when
         final SearchResult<ApplicationMenu> firstPage = getLivingApplicationAPI()
-                .searchApplicationMenus(buildSearchOptions(0, 2));
+                .searchApplicationMenus(buildSearchOptions(0, 2).filter("applicationId", application.getId()).done());
         final SearchResult<ApplicationMenu> secondPage = getLivingApplicationAPI()
-                .searchApplicationMenus(buildSearchOptions(2, 2));
+                .searchApplicationMenus(buildSearchOptions(2, 2).filter("applicationId", application.getId()).done());
 
         //then
         assertThat(firstPage).isNotNull();
@@ -413,7 +412,7 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
 
         //when
         final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
-        builder.filter(ApplicationMenuSearchDescriptor.INDEX, 3);
+        builder.filter(ApplicationMenuSearchDescriptor.INDEX, menu3.getIndex());
         final SearchResult<ApplicationMenu> searchResult = getLivingApplicationAPI()
                 .searchApplicationMenus(builder.done());
 
@@ -522,10 +521,9 @@ public class LivingApplicationMenuIT extends TestWithCustomPage {
         assertThat(searchResult.getResult()).containsExactly(menu2);
     }
 
-    private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
+    private SearchOptionsBuilder buildSearchOptions(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(startIndex, maxResults);
-        final SearchOptions options = builder.done();
-        return options;
+        return builder;
     }
 
     private SearchOptionsBuilder getApplicationMenuSearchBuilder(final int startIndex, final int maxResults) {
