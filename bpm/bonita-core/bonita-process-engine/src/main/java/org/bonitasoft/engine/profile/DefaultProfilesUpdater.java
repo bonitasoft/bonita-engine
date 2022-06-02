@@ -28,6 +28,7 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.session.SessionService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,6 +36,8 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+//must be initialized before page and application import to ensure applications are mapped to profile
+@Order(3)
 public class DefaultProfilesUpdater implements TenantLifecycleService {
 
     private final ProfilesImporter profilesImporter;

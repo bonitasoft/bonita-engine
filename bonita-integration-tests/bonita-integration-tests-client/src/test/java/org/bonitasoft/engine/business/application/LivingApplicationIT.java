@@ -165,10 +165,11 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     @Test
     public void searchApplications_without_filter_return_all_elements_based_on_pagination() throws Exception {
         //given
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+        final ApplicationCreator hrCreator = new ApplicationCreator("AAA_HR-dashboard", "HR dash board", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("AAA_Engineering-dashboard",
                 "Engineering dashboard", "1.0");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
+        final ApplicationCreator marketingCreator = new ApplicationCreator("AAA_Marketing-dashboard",
+                "Marketing dashboard",
                 "1.0");
 
         final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
@@ -177,7 +178,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
 
         //when
         final SearchResult<Application> firstPage = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions(0, 2));
+                .searchApplications(buildSearchOptions("AAA", 0, 2));
 
         //then
         assertThat(firstPage).isNotNull();
@@ -186,7 +187,7 @@ public class LivingApplicationIT extends TestWithLivingApplication {
 
         //when
         final SearchResult<Application> secondPage = getLivingApplicationAPI()
-                .searchApplications(buildSearchOptions(2, 2));
+                .searchApplications(buildSearchOptions("AAA", 2, 2));
 
         //then
         assertThat(secondPage).isNotNull();
@@ -268,6 +269,9 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     public void searchApplications_can_filter_on_profileId() throws Exception {
         //given
         final Profile profile = getProfileUser();
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
+        long initialCount = getLivingApplicationAPI().searchApplications(builder.done()).getCount();
+        builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
                 "Engineering dashboard", "1.0");
@@ -280,13 +284,11 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         final Application marketing = getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
-        builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
 
         final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
-        assertThat(applications.getCount()).isEqualTo(1);
-        assertThat(applications.getResult()).containsExactly(engineering);
+        assertThat(applications.getCount()).isEqualTo(initialCount + 1);
+        assertThat(applications.getResult()).contains(engineering);
 
         getLivingApplicationAPI().deleteApplication(hr.getId());
         getLivingApplicationAPI().deleteApplication(engineering.getId());
@@ -356,8 +358,9 @@ public class LivingApplicationIT extends TestWithLivingApplication {
                 .isInstanceOf(ApplicationNotFoundException.class);
     }
 
-    private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
+    private SearchOptions buildSearchOptions(String prefix, final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(startIndex, maxResults);
+        builder.searchTerm(prefix);
         return builder.done();
     }
 

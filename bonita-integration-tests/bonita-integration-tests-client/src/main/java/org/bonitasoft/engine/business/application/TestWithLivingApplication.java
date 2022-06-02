@@ -162,7 +162,6 @@ public class TestWithLivingApplication extends CommonAPIIT {
     }
 
     protected void assertIsHrFollowUpMenu(final ApplicationMenu applicationMenu) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(1);
         assertThat(applicationMenu.getParentId()).isNull();
         assertThat(applicationMenu.getDisplayName()).isEqualTo("HR follow-up");
         assertThat(applicationMenu.getApplicationPageId()).isNull();
@@ -170,14 +169,12 @@ public class TestWithLivingApplication extends CommonAPIIT {
 
     protected void assertIsDailyHrFollowUpMenu(final ApplicationMenu applicationMenu, ApplicationMenu hrFollowUpMenu,
             ApplicationPage myNewCustomPage) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(1);
         assertThat(applicationMenu.getParentId()).isEqualTo(hrFollowUpMenu.getId());
         assertThat(applicationMenu.getDisplayName()).isEqualTo("Daily HR follow-up");
         assertThat(applicationMenu.getApplicationPageId()).isEqualTo(myNewCustomPage.getId());
     }
 
     protected void assertIsEmptyMenu(final ApplicationMenu applicationMenu) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(2);
         assertThat(applicationMenu.getParentId()).isNull();
         assertThat(applicationMenu.getDisplayName()).isEqualTo("Empty menu");
         assertThat(applicationMenu.getApplicationPageId()).isNull();
