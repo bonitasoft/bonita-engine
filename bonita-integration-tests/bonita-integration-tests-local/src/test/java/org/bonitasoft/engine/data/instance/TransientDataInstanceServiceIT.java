@@ -27,7 +27,7 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl;
@@ -64,14 +64,14 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
     private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.emptyMap();
 
     protected ExpressionService expressionService;
-    protected CacheService cacheService;
+    protected EhCacheCacheService cacheService;
 
     protected TransientDataService dataInstanceService;
 
     @Before
     public void setup() {
         expressionService = getTenantAccessor().getExpressionService();
-        cacheService = getTenantAccessor().getCacheService();
+        cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
                 cacheService.start();

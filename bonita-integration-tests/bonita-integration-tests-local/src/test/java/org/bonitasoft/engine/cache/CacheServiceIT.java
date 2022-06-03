@@ -42,7 +42,7 @@ public class CacheServiceIT {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CacheServiceIT.class);
 
-    private CacheService cacheService;
+    private EhCacheCacheService cacheService;
 
     @Rule
     public TestName name = new TestName();
@@ -50,7 +50,7 @@ public class CacheServiceIT {
     @Before
     public void setUp() throws Exception {
         LOGGER.info("Testing : {}", name.getMethodName());
-        cacheService = getCacheService();
+        cacheService = (EhCacheCacheService) getCacheService();
         cacheService.clearAll();
         cacheService.start();
     }
@@ -104,7 +104,7 @@ public class CacheServiceIT {
         configurationsList.add(cacheWithOneElementInMemoryOnly);
 
         return new EhCacheCacheService(configurationsList, new CacheConfiguration(),
-                "target", 1) {
+                "target") {
 
             @Override
             protected String getCacheManagerName() {

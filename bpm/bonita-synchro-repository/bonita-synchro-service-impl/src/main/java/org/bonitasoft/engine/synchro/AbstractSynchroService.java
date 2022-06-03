@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 
-import org.bonitasoft.engine.cache.CommonCacheService;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.slf4j.Logger;
 
@@ -50,9 +50,9 @@ public abstract class AbstractSynchroService implements SynchroService {
 
     protected abstract Lock getServiceLock();
 
-    protected final CommonCacheService cacheService;
+    protected final CacheService cacheService;
 
-    public AbstractSynchroService(final CommonCacheService cacheService) {
+    public AbstractSynchroService(final CacheService cacheService) {
         this.cacheService = cacheService;
     }
 

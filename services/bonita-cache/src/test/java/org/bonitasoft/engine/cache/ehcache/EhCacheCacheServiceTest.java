@@ -27,7 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CommonEhCacheCacheServiceTest {
+public class EhCacheCacheServiceTest {
 
     @Mock
     private List<CacheConfiguration> cacheConfigurations;
@@ -45,11 +45,11 @@ public class CommonEhCacheCacheServiceTest {
 
     @Before
     public void setup() {
-        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, null, 1) {
+        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, null) {
 
             @Override
             public synchronized void start() {
-                cacheManager = CommonEhCacheCacheServiceTest.this.cacheManager;
+                cacheManager = EhCacheCacheServiceTest.this.cacheManager;
             }
         };
     }

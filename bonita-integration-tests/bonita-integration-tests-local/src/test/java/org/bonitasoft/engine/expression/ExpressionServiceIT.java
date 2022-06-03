@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.ParentContainerResolverImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
@@ -62,7 +62,7 @@ public class ExpressionServiceIT extends CommonBPMServicesTest {
 
     private static ExpressionService expressionService;
 
-    private static CacheService cacheService;
+    private static EhCacheCacheService cacheService;
     private ParentContainerResolverImpl containerResolver;
 
     @Before
@@ -71,7 +71,7 @@ public class ExpressionServiceIT extends CommonBPMServicesTest {
         dataInstanceService = getTenantAccessor().getDataInstanceService();
         containerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
         containerResolver.setAllowUnknownContainer(true);
-        cacheService = getTenantAccessor().getCacheService();
+        cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
                 cacheService.start();

@@ -85,8 +85,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName("GROOVY_SCRIPT_CACHE_NAME");
         final List<CacheConfiguration> cacheConfigurations = Collections.singletonList(cacheConfiguration);
-        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, diskStorePath,
-                1);
+        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, diskStorePath);
         cacheService.start();
         groovyScriptExpressionExecutorCacheStrategy = new GroovyScriptExpressionExecutorCacheStrategy(cacheService,
                 classLoaderService);

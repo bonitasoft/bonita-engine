@@ -64,7 +64,7 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
         final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName("GROOVY_SCRIPT_CACHE_NAME");
         final List<CacheConfiguration> cacheConfigurations = Collections.singletonList(cacheConfiguration);
-        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, diskStorePath, 1);
+        cacheService = new EhCacheCacheService(cacheConfigurations, defaultCacheConfiguration, diskStorePath);
         cacheService.start();
         executorStrategy = new GroovyScriptConditionExpressionExecutorStrategy(cacheService, classLoaderService);
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService)
