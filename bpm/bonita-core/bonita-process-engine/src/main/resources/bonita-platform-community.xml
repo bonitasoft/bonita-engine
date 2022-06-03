@@ -11,7 +11,6 @@
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
         <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
-        <constructor-arg name="cacheService" ref="platformEhCacheCacheService" />
     </bean>
 
     <bean id="quartzProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -132,7 +131,7 @@
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
     </bean>
 
-    <bean id="defaultPlatformCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
+    <bean id="defaultCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="DEFAULT_PLATFORM" />
         <property name="maxElementsInMemory" value="${bonita.platform.cache.default.maxElementsInMemory}" />
         <property name="inMemoryOnly" value="${bonita.platform.cache.default.inMemoryOnly}" />

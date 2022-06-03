@@ -23,7 +23,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.bonitasoft.engine.cache.CommonCacheService;
+import org.bonitasoft.engine.cache.CacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class SynchroServiceImpl extends AbstractSynchroService {
      * @param initialCapacity
      *        the initial capacity of the map of fired events / waiters (default 50)
      */
-    private SynchroServiceImpl(final int initialCapacity, final CommonCacheService cacheService) {
+    private SynchroServiceImpl(final int initialCapacity, final CacheService cacheService) {
         super(cacheService);
         waiters = new HashMap<Map<String, Serializable>, String>(initialCapacity);
         eventKeyAndIdMap = new HashMap<String, Serializable>(initialCapacity);

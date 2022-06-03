@@ -13,16 +13,101 @@
  **/
 package org.bonitasoft.engine.cache;
 
-import org.bonitasoft.engine.commons.TenantLifecycleService;
+import java.io.Serializable;
+import java.util.List;
 
 /**
- * Service that helps you to cache objects
- * Objects must be stored in a specific cache and this cache must exists
- *
  * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- * @since 6.0
  */
-public interface CacheService extends CommonCacheService, TenantLifecycleService {
+public interface CacheService {
 
+    /**
+     * Store an object in the cache. If the cache don't exists it will be created.
+     *
+     * @param cacheName
+     *        The name of the cache in which the object must be stored
+     * @param key
+     *        The key that will allow to retrieve the object
+     * @param value
+     *        The object to store
+     * @throws SCacheException
+     *         Error thrown if has exceptions during the cache store.
+     */
+    void store(String cacheName, Serializable key, Object value) throws SCacheException;
+
+    /**
+     * Remove the element according to the cache name and the key
+     *
+     * @param cacheName
+     * @param key
+     *        The name of the cache where the object must be stored
+     *        The key that will allow to retrieve the object
+     * @return
+     *         true if an element was removed
+     * @throws SCacheException
+     *         Error thrown if has exceptions during the cache remove.
+     */
+    boolean remove(String cacheName, Object key) throws SCacheException;
+
+    /**
+     * Get a cached object.
+     *
+     * @param cacheName
+     *        The name of the cache on which to get the object
+     * @param key
+     *        The key that is used to store the object
+     * @return the cached object, or null if it doesn't exists
+     * @throws SCacheException
+     *         Error thrown if has exceptions during the cache object get.
+     */
+    Object get(String cacheName, Object key) throws SCacheException;
+
+    /**
+     * Get list of keys on a cache.
+     *
+     * @param cacheName
+     *        The name of the cache on which to get the key list
+     * @return the list of keys on the cache, or null if no keys exist
+     * @throws SCacheException
+     */
+    List<Object> getKeys(String cacheName) throws SCacheException;
+
+    /**
+     * Clear the cache named by cacheName
+     *
+     * @param cacheName
+     *        The name of the cache to clear
+     * @return
+     * @throws SCacheException
+     *         Error thrown if has exceptions during the cache clear.
+     */
+    boolean clear(String cacheName) throws SCacheException;
+
+    /**
+     * Clear all cache of the service
+     *
+     * @throws SCacheException
+     *         Error thrown if has exceptions during the cache clear.
+     */
+    void clearAll() throws SCacheException;
+
+    /**
+     * Return the size of the cache with cacheName.
+     *
+     * @param cacheName
+     *        The name of cache
+     * @return the size of the named cache
+     * @throws SCacheException
+     *         if no cache is found with that name.
+     */
+    int getCacheSize(String cacheName) throws SCacheException;
+
+    /**
+     * Get the names of all the caches
+     *
+     * @return a list of caches names
+     */
+    List<String> getCachesNames();
+
+    boolean isStopped();
 }

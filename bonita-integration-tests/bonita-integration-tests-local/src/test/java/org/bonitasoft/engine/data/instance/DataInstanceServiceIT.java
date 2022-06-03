@@ -26,7 +26,7 @@ import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.ParentContainerResolverImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
@@ -81,7 +81,7 @@ public class DataInstanceServiceIT extends CommonBPMServicesTest {
         parentContainerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
         dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService);
         parentContainerResolver.setAllowUnknownContainer(true);
-        final CacheService cacheService = getTenantAccessor().getCacheService();
+        final EhCacheCacheService cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
                 cacheService.start();
@@ -93,7 +93,7 @@ public class DataInstanceServiceIT extends CommonBPMServicesTest {
 
     @After
     public void tearDown() {
-        final CacheService cacheService = getTenantAccessor().getCacheService();
+        final EhCacheCacheService cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
         try {
             cacheService.stop();
             cacheService.start();

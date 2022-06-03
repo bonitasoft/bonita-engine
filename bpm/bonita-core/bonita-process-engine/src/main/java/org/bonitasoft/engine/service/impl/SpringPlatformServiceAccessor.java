@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -20,7 +21,6 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
-import org.bonitasoft.engine.platform.cache.PlatformCacheService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
@@ -96,8 +96,8 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public PlatformCacheService getPlatformCacheService() {
-        return beanAccessor.getService(PlatformCacheService.class);
+    public CacheService getPlatformCacheService() {
+        return beanAccessor.getService(CacheService.class);
 
     }
 

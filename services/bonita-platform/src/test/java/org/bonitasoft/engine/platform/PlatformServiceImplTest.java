@@ -24,12 +24,12 @@ import java.io.File;
 
 import javax.sql.DataSource;
 
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.platform.cache.PlatformCacheService;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.impl.PlatformServiceImpl;
@@ -61,7 +61,7 @@ public class PlatformServiceImplTest {
     private PlatformRetriever platformRetriever;
 
     @Mock
-    private PlatformCacheService platformCacheService;
+    private CacheService platformCacheService;
 
     @Mock
     private Recorder recorder;

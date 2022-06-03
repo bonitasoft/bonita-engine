@@ -951,19 +951,6 @@
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
-    <bean id="defaultTenantCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="DEFAULT_TENANT" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.default.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.default.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.default.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.default.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.default.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.default.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.default.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.default.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.default.readIntensive}" />
-    </bean>
-
     <bean id="connectorCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="CONNECTOR" />
         <property name="maxElementsInMemory" value="${bonita.tenant.cache.connector.maxElementsInMemory}" />
@@ -1041,19 +1028,6 @@
         <property name="copyOnRead" value="${bonita.tenant.cache.transientdata.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.tenant.cache.transientdata.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.tenant.cache.transientdata.readIntensive}" />
-    </bean>
-
-    <bean id="configFilesCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="CONFIGURATION_FILES_CACHE" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.default.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.default.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.default.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.default.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.default.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.default.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.default.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.default.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.default.readIntensive}" />
     </bean>
 
     <bean id="bdmDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">

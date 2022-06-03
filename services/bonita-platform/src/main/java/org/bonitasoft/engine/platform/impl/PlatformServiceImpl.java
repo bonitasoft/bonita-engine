@@ -14,13 +14,13 @@
 package org.bonitasoft.engine.platform.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.cache.PlatformCacheService;
 import org.bonitasoft.engine.platform.exception.*;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
@@ -45,16 +45,16 @@ public class PlatformServiceImpl implements PlatformService {
     private static final String CACHE_KEY = "PLATFORM";
 
     private final PersistenceService platformPersistenceService;
-    private final PlatformCacheService platformCacheService;
+    private final CacheService cacheService;
     private final SPlatformProperties sPlatformProperties;
     private final Recorder recorder;
     private final PlatformRetriever platformRetriever;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever,
-            final Recorder recorder, PlatformCacheService platformCacheService,
+            final Recorder recorder, CacheService cacheService,
             final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
-        this.platformCacheService = platformCacheService;
+        this.cacheService = cacheService;
         this.sPlatformProperties = sPlatformProperties;
         this.recorder = recorder;
         this.platformRetriever = platformRetriever;
@@ -64,7 +64,7 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public SPlatform getPlatform() throws SPlatformNotFoundException {
         try {
-            SPlatform sPlatform = (SPlatform) platformCacheService.get(CACHE_KEY, CACHE_KEY);
+            SPlatform sPlatform = (SPlatform) cacheService.get(CACHE_KEY, CACHE_KEY);
             if (sPlatform == null) {
                 // try to read it from database
                 sPlatform = readPlatform();
@@ -85,7 +85,7 @@ public class PlatformServiceImpl implements PlatformService {
      */
     private void cachePlatform(final SPlatform platform) {
         try {
-            platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
+            cacheService.store(CACHE_KEY, CACHE_KEY, platform);
         } catch (final SCacheException e) {
             log.warn("Can't cache the platform, maybe the platform cache service is not started yet: {}",
                     e.getMessage());
