@@ -669,6 +669,7 @@ public class IOUtil {
         }
     }
 
+    // Copied from org.bonitasoft.engine.io.IOUtil, as it is used by client applications (bonita-web-sp)
     public static File createTempDirectory(final URI directoryPath) {
         final File tmpDir = new File(directoryPath);
         tmpDir.setReadable(true);
