@@ -31,15 +31,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan("org.bonitasoft.engine")
 public class EngineConfiguration {
 
-    //There is one instance of that bean in the platform context and one in the tenant context
-    // Also it is overridden in cluster mode
-    // the bean is injected using the name "tenantEventService" and is overridden thanks to the ConditionalOnMissingBean condition on the name
-    @Bean("tenantEventService")
-    @ConditionalOnMissingBean(name = "tenantEventService")
-    EventService tenantEventService() {
-        return new EventServiceImpl();
-    }
-
     @Bean("platformEventService")
     @ConditionalOnMissingBean(name = "platformEventService")
     EventService platformEventService() {

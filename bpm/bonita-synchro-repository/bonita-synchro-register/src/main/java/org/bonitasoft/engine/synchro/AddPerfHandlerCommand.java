@@ -46,15 +46,15 @@ public class AddPerfHandlerCommand extends TenantCommand {
             final long tenantId = serviceAccessor.getTenantId();
             if (!containsHandler(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceFinishedHandler.class)) {
                 eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED,
-                        new ProcessInstanceFinishedHandler(tenantId, messageTimeout, brokerURL));
+                        new ProcessInstanceFinishedHandler(messageTimeout, brokerURL));
             }
             if (!containsHandler(eventService, ACTIVITYINSTANCE_STATE_UPDATED, TaskReadyHandler.class)) {
                 eventService.addHandler(ACTIVITYINSTANCE_STATE_UPDATED,
-                        new TaskReadyHandler(tenantId, messageTimeout, brokerURL));
+                        new TaskReadyHandler(messageTimeout, brokerURL));
             }
             if (!containsHandler(eventService, ACTIVITYINSTANCE_STATE_UPDATED, FlowNodeReachStateHandler.class)) {
                 eventService.addHandler(ACTIVITYINSTANCE_STATE_UPDATED,
-                        new FlowNodeReachStateHandler(tenantId, messageTimeout, brokerURL, 3));
+                        new FlowNodeReachStateHandler(messageTimeout, brokerURL, 3));
             }
             final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("system", true);

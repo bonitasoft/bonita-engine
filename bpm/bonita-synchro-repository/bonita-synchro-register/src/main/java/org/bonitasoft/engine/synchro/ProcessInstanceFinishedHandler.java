@@ -31,8 +31,8 @@ public class ProcessInstanceFinishedHandler extends AbstractJMSUpdateHandler {
 
     private final String identifier;
 
-    public ProcessInstanceFinishedHandler(final long tenantId, final long messageTimeout, final String brokerURL) {
-        super(tenantId, messageTimeout, brokerURL);
+    public ProcessInstanceFinishedHandler(final long messageTimeout, final String brokerURL) {
+        super(messageTimeout, brokerURL);
         identifier = UUID.randomUUID().toString();
     }
 

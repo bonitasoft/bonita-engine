@@ -46,16 +46,16 @@ public class AddHandlerCommand extends TenantCommand {
         try {
             final long tenantId = serviceAccessor.getTenantId();
             if (!containsHandler(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceHandler.class)) {
-                eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED, new ProcessInstanceHandler(tenantId));
+                eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED, new ProcessInstanceHandler());
             }
             if (!containsHandler(eventService, ACTIVITYINSTANCE_STATE_UPDATED, FlowNodeHandler.class)) {
-                eventService.addHandler(ACTIVITYINSTANCE_STATE_UPDATED, new FlowNodeHandler(tenantId));
-                eventService.addHandler(ACTIVITYINSTANCE_CREATED, new FlowNodeHandler(tenantId));
-                eventService.addHandler(EVENT_INSTANCE_CREATED, new FlowNodeHandler(tenantId));
+                eventService.addHandler(ACTIVITYINSTANCE_STATE_UPDATED, new FlowNodeHandler());
+                eventService.addHandler(ACTIVITYINSTANCE_CREATED, new FlowNodeHandler());
+                eventService.addHandler(EVENT_INSTANCE_CREATED, new FlowNodeHandler());
             }
             if (!containsHandler(eventService, GATEWAYINSTANCE_CREATED, GatewayHandler.class)) {
-                eventService.addHandler(GATEWAYINSTANCE_CREATED, new GatewayHandler(tenantId));
-                eventService.addHandler(GATEWAYINSTANCE_STATE_UPDATED, new GatewayHandler(tenantId));
+                eventService.addHandler(GATEWAYINSTANCE_CREATED, new GatewayHandler());
+                eventService.addHandler(GATEWAYINSTANCE_STATE_UPDATED, new GatewayHandler());
             }
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);

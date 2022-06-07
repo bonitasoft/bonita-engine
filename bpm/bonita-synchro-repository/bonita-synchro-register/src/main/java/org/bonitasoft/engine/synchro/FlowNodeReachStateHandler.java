@@ -31,9 +31,9 @@ public class FlowNodeReachStateHandler extends AbstractJMSUpdateHandler {
 
     private final int stateId;
 
-    public FlowNodeReachStateHandler(final long tenantId, final long messageTimeout, String brokerURL,
+    public FlowNodeReachStateHandler(final long messageTimeout, String brokerURL,
             final int stateId) {
-        super(tenantId, messageTimeout, brokerURL);
+        super(messageTimeout, brokerURL);
         this.stateId = stateId;
         identifier = UUID.randomUUID().toString();
     }
