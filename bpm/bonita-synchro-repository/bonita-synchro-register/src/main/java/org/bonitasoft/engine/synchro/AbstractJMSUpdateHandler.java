@@ -31,8 +31,8 @@ public abstract class AbstractJMSUpdateHandler extends AbstractUpdateHandler {
 
     private String brokerURL;
 
-    public AbstractJMSUpdateHandler(final long tenantId, final long messageTimeout, String brokerURL) {
-        super(tenantId);
+    public AbstractJMSUpdateHandler(final long messageTimeout, String brokerURL) {
+        super();
         this.messageTimeout = messageTimeout;
         this.brokerURL = brokerURL;
     }

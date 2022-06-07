@@ -28,8 +28,8 @@ public class FlowNodeHandler extends AbstractUpdateHandler {
     private static final long serialVersionUID = 1L;
     private final String identifier;
 
-    public FlowNodeHandler(final long tenantId) {
-        super(tenantId);
+    public FlowNodeHandler() {
+        super();
         identifier = UUID.randomUUID().toString();
     }
 

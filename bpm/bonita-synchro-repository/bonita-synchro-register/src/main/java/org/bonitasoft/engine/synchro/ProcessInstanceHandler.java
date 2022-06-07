@@ -28,8 +28,8 @@ public class ProcessInstanceHandler extends AbstractUpdateHandler {
     private static final long serialVersionUID = 1L;
     private final String identifier;
 
-    public ProcessInstanceHandler(final long tenantId) {
-        super(tenantId);
+    public ProcessInstanceHandler() {
+        super();
         identifier = UUID.randomUUID().toString();
     }
 

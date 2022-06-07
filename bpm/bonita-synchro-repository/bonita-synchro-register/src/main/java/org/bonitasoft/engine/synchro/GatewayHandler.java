@@ -30,8 +30,8 @@ public class GatewayHandler extends AbstractUpdateHandler {
 
     private final String identifier;
 
-    public GatewayHandler(final long tenantId) {
-        super(tenantId);
+    public GatewayHandler() {
+        super();
         this.identifier = UUID.randomUUID().toString();
     }
 
