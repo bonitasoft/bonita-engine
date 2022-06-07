@@ -95,7 +95,7 @@ public class PlatformManagerTest {
                     ((RunnableWithException) invocationOnMock.getArgument(0)).run();
                     return null;
                 });
-        doReturn(tenantManager).when(platformManager).getTenantStateManager(argThat(t -> t.getId() == TENANT_ID));
+        doReturn(tenantManager).when(platformManager).getDefaultTenantStateManager();
         doReturn(new SPlatform("1.3", "1.1.0", "someUser", 123455)).when(platformService).getPlatform();
         doReturn(new SPlatformPropertiesImpl("1.3.0")).when(platformService).getSPlatformProperties();
         tenant = new STenant();
