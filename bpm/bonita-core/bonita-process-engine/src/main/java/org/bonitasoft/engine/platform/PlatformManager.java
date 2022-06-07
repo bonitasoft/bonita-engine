@@ -77,10 +77,7 @@ public class PlatformManager {
         if (!platformStateProvider.initializeStop()) {
             return false;
         }
-        List<TenantStateManager> tenantStateManagers = getTenantStateManagers();
-        for (TenantStateManager tenantStateManager : tenantStateManagers) {
-            tenantStateManager.stop();
-        }
+        getDefaultTenantStateManager().stop();
         for (final PlatformLifecycleService platformService : platformServices) {
             logger.info("Stop service of platform: {}", platformService);
             platformService.stop();
@@ -105,22 +102,16 @@ public class PlatformManager {
         startPlatformServices();
         platformStateProvider.setStarted();
 
-        for (TenantStateManager tenantStateManager : getTenantStateManagers()) {
-            tenantStateManager.start();
-        }
+        getDefaultTenantStateManager().start();
 
         restartHandlersOfPlatform();
         logger.info("Platform started.");
         return true;
     }
 
-    TenantStateManager getTenantStateManager(STenant tenant) {
-        return TenantServiceSingleton.getInstance(tenant.getId()).getTenantStateManager();
-    }
-
-    private List<TenantStateManager> getTenantStateManagers() throws Exception {
-        return List.of(getTenantStateManager(transactionService
-                .executeInTransaction(platformService::getDefaultTenant)));
+    TenantStateManager getDefaultTenantStateManager() throws Exception {
+        return TenantServiceSingleton.getInstance(transactionService
+                .executeInTransaction(platformService::getDefaultTenant).getId()).getTenantStateManager();
     }
 
     private void restartHandlersOfPlatform() {
@@ -148,7 +139,7 @@ public class PlatformManager {
             throw new STenantActivationException(
                     "Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
         }
-        getTenantStateManager(tenant).activate();
+        getDefaultTenantStateManager().activate();
     }
 
     public void deactivateTenant(long tenantId) throws Exception {
@@ -156,7 +147,7 @@ public class PlatformManager {
         if (STenant.DEACTIVATED.equals(tenant.getStatus())) {
             throw new STenantDeactivationException("Tenant deactivation failed. Tenant is already deactivated");
         }
-        getTenantStateManager(tenant).deactivate();
+        getDefaultTenantStateManager().deactivate();
     }
 
     private STenant getTenantInTransaction(long tenantId) throws Exception {
