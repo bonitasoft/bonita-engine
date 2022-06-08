@@ -53,7 +53,7 @@ public class PlatformIT extends CommonAPIIT {
 
     private static PlatformSession session;
 
-    private static PlatformTestUtil platformTestUtil = new PlatformTestUtil();
+    private static final PlatformTestUtil platformTestUtil = new PlatformTestUtil();
 
     @After
     public void after() throws BonitaException {
@@ -81,7 +81,7 @@ public class PlatformIT extends CommonAPIIT {
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
 
         @Override
-        public void clean() throws Exception {
+        public void clean() {
         }
     };
 
