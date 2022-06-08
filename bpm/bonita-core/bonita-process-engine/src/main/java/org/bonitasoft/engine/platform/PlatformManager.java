@@ -68,7 +68,7 @@ public class PlatformManager {
     }
 
     /**
-     * Stop the platform and its tenants
+     * Stop the platform and default tenant
      *
      * @return true if the node was stopped, false if it was not stoppable (already stopped, starting or stopping)
      */
@@ -88,7 +88,7 @@ public class PlatformManager {
     }
 
     /**
-     * Start the platform and its tenants
+     * Start the platform and default tenant
      *
      * @return true if the node was started, false if it was not startable (already started, starting or stopping)
      */

@@ -23,14 +23,12 @@ import org.bonitasoft.engine.execution.work.RestartException;
 public interface TenantRestartHandler {
 
     /**
-     * called in a transaction during {@link PlatformAPI#startNode()}
+     * Called in a transaction during {@link PlatformAPI#startNode()}.
      */
     void beforeServicesStart() throws RestartException;
 
     /**
-     * called outside of a transaction after {@link PlatformAPI#startNode()} in a separate thread than the api call
-     *
-     * @throws RestartException
+     * Called outside a transaction after {@link PlatformAPI#startNode()} in a separate thread from the api call.
      */
     void afterServicesStart();
 

@@ -177,7 +177,8 @@ public interface PlatformAPI {
 
     /**
      * INTERNAL USE ONLY
-     * get client configuration files of the tenants
+     * get client configuration files of the tenants. Since 7.16, as there is only 1 tenant, the map only contains
+     * 1 element.
      *
      * @return the client tenants configuration files as a map containing for each tenant id a map with file name and
      *         file content
