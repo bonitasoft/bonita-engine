@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+
+@Deprecated(forRemoval = true, since = "7.15.0")
 public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
 
     private String hostname = null;
