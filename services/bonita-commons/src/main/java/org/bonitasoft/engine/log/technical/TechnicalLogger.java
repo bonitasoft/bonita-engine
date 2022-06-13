@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.*;
  * A logger backed to a Technical Logger Service which provides provides methods like <a
  * href="https://www.slf4j.org/apidocs/org/slf4j/Logger.html">slf4j</a>.
  */
+@Deprecated(forRemoval = true, since = "7.15.0")
 public class TechnicalLogger {
 
     private Class<?> clazz;

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.log.technical;
 /**
  * @author Baptiste Mesta
  */
+@Deprecated(forRemoval = true, since = "7.15.0")
 public interface TechnicalLoggerService {
 
     /**
