@@ -1,0 +1,44 @@
+<configuration debug="false" scan="false">
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS}|%-5level|%logger{16}| %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.bonitasoft" level="INFO"/>
+    <logger name="org.bonitasoft.platform" level="DEBUG"/>
+
+    <!--TRACE level displays all relevant jdbc transaction information-->
+    <!--<logger name="org.springframework" level="TRACE" />-->
+
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.springframework.jdbc" level="INFO"/>
+    <logger name="org.springframework.jdbc.support" level="WARN"/>
+
+    <logger name="org.springframework.jdbc.datasource.init.ScriptUtils" level="OFF"/>
+
+
+    <!-- appender to log all logs marked as INCIDENT to specific file -->
+    <appender name="INCIDENT_FILE" class="ch.qos.logback.core.FileAppender">
+        <!-- the filter element -->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+                <marker>INCIDENT</marker>
+            </evaluator>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>./${INCIDENT_LOG_PATH}/incidents.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS}|%-5level|%logger{16}| %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="INCIDENT_FILE"/>
+    </root>
+
+</configuration>
