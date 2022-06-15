@@ -13,16 +13,10 @@
  **/
 package org.bonitasoft.engine.incident;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 /**
  * Report incident in a log file located inside the bonita home
@@ -31,47 +25,25 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+
 public class FileLoggerIncidentHandler implements IncidentHandler {
 
-    private final Map<Long, Logger> loggers;
+    Logger logger = LoggerFactory.getLogger(FileLoggerIncidentHandler.class);
 
     public FileLoggerIncidentHandler() {
-        loggers = new HashMap<>(2);
     }
 
     @Override
     public void handle(final long tenantId, final Incident incident) {
-        try {
-            final Logger logger = getLogger(tenantId);
-            logger.log(Level.SEVERE, "An incident occurred: " + incident.getDescription());
-            logger.log(Level.SEVERE, "Exception was", incident.getCause());
-            logger.log(Level.SEVERE, "We were unable to handle the failure on the elements because of",
-                    incident.getExceptionWhenHandlingFailure());
-            final String recoveryProcedure = incident.getRecoveryProcedure();
-            if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
-                logger.log(Level.SEVERE, "Procedure to recover: " + recoveryProcedure);
-            }
-        } catch (final SecurityException | IOException | BonitaHomeNotSetException e) {
-            e.printStackTrace();
+        Marker INCIDENT = MarkerFactory.getMarker("INCIDENT");
+        logger.error(INCIDENT, "An incident on tenant id {} occurred: {}", tenantId, incident.getDescription());
+        logger.error(INCIDENT, "Exception was:", incident.getCause());
+        logger.error(INCIDENT, "We were unable to handle the failure on the elements because of",
+                incident.getExceptionWhenHandlingFailure());
+        final String recoveryProcedure = incident.getRecoveryProcedure();
+        if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
+            logger.error(INCIDENT, "Procedure to recover: " + recoveryProcedure);
         }
-    }
-
-    protected Logger getLogger(final long tenantId) throws SecurityException, IOException, BonitaHomeNotSetException {
-        Logger logger = loggers.get(tenantId);
-        if (logger == null) {
-            logger = Logger.getLogger("INCIDENT" + tenantId);
-            final FileHandler fh = getBonitaHomeServer().getTenantStorage().getIncidentFileHandler(tenantId);
-            logger.addHandler(fh);
-            final SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-            loggers.put(tenantId, logger);
-        }
-        return logger;
-    }
-
-    // For testing purpose
-    BonitaHomeServer getBonitaHomeServer() {
-        return BonitaHomeServer.getInstance();
     }
 
 }
