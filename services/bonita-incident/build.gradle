@@ -5,4 +5,7 @@ dependencies {
     compile project(':bpm:bonita-core:bonita-home-server')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
 }
