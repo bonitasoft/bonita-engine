@@ -13,19 +13,21 @@
  **/
 package org.bonitasoft.engine.incident;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Logger;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.home.TenantStorage;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -34,46 +36,57 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class FileLoggerIncidentHandlerTest {
 
     @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     @Mock
     private BonitaHomeServer bonitaHomeServer;
     @Mock
     private TenantStorage tenantStorage;
 
+    String INCIDENT_LOG_PATH = "log/";
+
+    @Before
+    public void init() throws IOException {
+        Files.createDirectories(Path.of(INCIDENT_LOG_PATH));
+        System.setProperty("INCIDENT_LOG_PATH", INCIDENT_LOG_PATH);
+    }
+
+    @After
+    public void clean() throws IOException {
+        org.bonitasoft.engine.io.IOUtil.deleteDir(new File(INCIDENT_LOG_PATH));
+    }
+
     @Test
     public void should_write_into_file_when_handle_incident() throws Exception {
         //Given
         long tenantId = 1;
-        temporaryFolder.newFolder("logFolder");
-        final File incidentFile = new File(temporaryFolder.newFolder("logFolder", String.valueOf(tenantId)),
-                TenantStorage.INCIDENTS_LOG_FILENAME);
-        final FileHandler fh = new FileHandler(incidentFile.getAbsolutePath());
 
-        when(bonitaHomeServer.getTenantStorage()).thenReturn(tenantStorage);
-        doReturn(fh).when(tenantStorage).getIncidentFileHandler(tenantId);
+        String cause = "an unexpected exception";
+        String handlingFailure = "unable to handle failure";
 
-        final Incident incident = new Incident("test", "recovery", new Exception("an unexpected exception"),
-                new Exception("unable to handle failure"));
-        FileLoggerIncidentHandler fileLoggerIncidentHandler = spy(new FileLoggerIncidentHandler());
-        doReturn(bonitaHomeServer).when(fileLoggerIncidentHandler).getBonitaHomeServer();
-
+        String recovery = "recovery";
+        String description = "test";
+        final Incident incident = new Incident(description, recovery, new Exception(cause),
+                new Exception(handlingFailure));
+        FileLoggerIncidentHandler fileLoggerIncidentHandler = new FileLoggerIncidentHandler();
         //When
         fileLoggerIncidentHandler.handle(tenantId, incident);
 
-        String content = org.bonitasoft.engine.io.IOUtil.read(incidentFile);
+        String expectedDescription = "An incident on tenant id 1 occurred: " + description;
+        String expectedRecoveryProcedureMessage = "Procedure to recover: " + recovery;
 
-        // Close the open stream to allow to delete the logfile on the file system
-        Logger logger = fileLoggerIncidentHandler.getLogger(tenantId);
-        Handler[] handlers = logger.getHandlers();
-        for (Handler handler : handlers) {
-            handler.close();
-        }
+        // as defined in logback.xml all logs are log in system out so we  check that incident are logged into console also.
+        assertThat(systemOutRule.getLog()).contains(expectedDescription);
+        assertThat(systemOutRule.getLog()).contains(cause);
+        assertThat(systemOutRule.getLog()).contains(handlingFailure);
+        assertThat(systemOutRule.getLog()).contains(expectedRecoveryProcedureMessage);
 
-        //Then
-        assertTrue("File content is: " + content, content.contains("An incident occurred: test"));
-        assertTrue("File content is: " + content, content.contains("an unexpected exception"));
-        assertTrue("File content is: " + content, content.contains("unable to handle failure"));
-        assertTrue("File content is: " + content, content.contains("Procedure to recover: recovery"));
+        //  as defined in logback.xml logs marked with INCIDENT should be logged also in a specific file.
+        String log = org.bonitasoft.engine.io.IOUtil.read(new File(INCIDENT_LOG_PATH + "/incidents.log"));
+
+        assertThat(log).contains(expectedDescription);
+        assertThat(log).contains(cause);
+        assertThat(log).contains(handlingFailure);
+        assertThat(log).contains(expectedRecoveryProcedureMessage);
 
     }
 

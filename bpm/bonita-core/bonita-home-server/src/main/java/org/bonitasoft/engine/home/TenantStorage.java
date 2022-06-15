@@ -15,9 +15,6 @@ package org.bonitasoft.engine.home;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.logging.FileHandler;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 
@@ -28,9 +25,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
  */
 public class TenantStorage {
 
-    static final String INCIDENT_LOG_FOLDER_PROPERTY = "org.bonitasoft.engine.incident.folder";
-    public static final String INCIDENTS_LOG_FILENAME = "incidents.log";
-
     TenantStorage() {
     }
 
@@ -38,23 +32,6 @@ public class TenantStorage {
         if (!current.exists()) {
             current.getFile().mkdirs();
         }
-    }
-
-    public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
-        final String incidentLogFolder = System.getProperty(INCIDENT_LOG_FOLDER_PROPERTY);
-        if (incidentLogFolder != null) {
-            final Path tenantFolder = Paths.get(incidentLogFolder).resolve("tenants").resolve("" + tenantId);
-            createFolders(new Folder(tenantFolder.toFile()));
-            return getFileHandler(tenantFolder.resolve(INCIDENTS_LOG_FILENAME).toString());
-        } else {
-            Folder tenantWorkFolder = getTenantTempFolder(tenantId);
-            final File incidentFile = tenantWorkFolder.getFile(INCIDENTS_LOG_FILENAME);
-            return getFileHandler(incidentFile.getAbsolutePath());
-        }
-    }
-
-    FileHandler getFileHandler(String incidentFileAbsolutePath) throws IOException {
-        return new FileHandler(incidentFileAbsolutePath);
     }
 
     public File getProfileMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
