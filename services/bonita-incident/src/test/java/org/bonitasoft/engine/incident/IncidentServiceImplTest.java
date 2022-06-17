@@ -28,6 +28,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class IncidentServiceImplTest {
 
+    static {
+        BeforeAllLoggerInitializer.initialize();
+    }
+
     private IncidentHandler handler1;
 
     private IncidentHandler handler2;
@@ -36,7 +40,7 @@ public class IncidentServiceImplTest {
 
     @Before
     public void before() {
-        final List<IncidentHandler> handlers = new ArrayList<IncidentHandler>(2);
+        final List<IncidentHandler> handlers = new ArrayList<>(2);
         handler1 = mock(IncidentHandler.class);
         handlers.add(handler1);
         handler2 = mock(IncidentHandler.class);
