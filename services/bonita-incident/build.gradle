@@ -1,5 +1,3 @@
-
-
 dependencies {
     compile project(':bpm:bonita-common')
     compile project(':bpm:bonita-core:bonita-home-server')
