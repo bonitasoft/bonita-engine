@@ -39,8 +39,7 @@ class DockerDatabaseContainerTasksCreator {
              uriTemplate        : 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1?oracle.net.disableOob=true',
             ],
             [name       : 'postgres',
-             repository : 'bonitasoft/bonita-postgres',
-             tag        : '12.6',
+             image      : 'bonitasoft/bonita-postgres:12.6',
              portBinding: 5432,
              uriTemplate: 'jdbc:postgresql://%s:%s/%s',
             ],
@@ -50,8 +49,7 @@ class DockerDatabaseContainerTasksCreator {
              uriTemplate: 'jdbc:mysql://%s:%s/%s?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
             ],
             [name       : 'sqlserver',
-             repository : 'bonitasoft/bonita-sqlserver',
-             tag        : '2019-CU14',
+             image      : 'bonitasoft/bonita-sqlserver:2019-CU14',
              portBinding: 1433,
              uriTemplate: 'jdbc:sqlserver://%s:%s;database=%s',
             ]
@@ -174,14 +172,14 @@ class DockerDatabaseContainerTasksCreator {
                     def dbValues = [
                             "sysprop.bonita.db.vendor"    : vendor.name,
                             "sysprop.bonita.bdm.db.vendor": vendor.name,
-                            "db.url"          : dbUrl,
-                            "db.user"         : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'bonita'),
-                            "db.password"     : project.hasProperty('db.password') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_PASSWORD) ? System.getProperty(SYS_PROP_DB_PASSWORD) : 'bpm'),
-                            "bdm.db.url"      : bdmDbConnectionSettings.dbUrl,
-                            "bdm.db.user"     : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'business_data'),
-                            "db.server.name"  : connectionSettings.serverName,
-                            "db.server.port"  : connectionSettings.portNumber,
-                            "db.database.name": connectionSettings.databaseName
+                            "db.url"                      : dbUrl,
+                            "db.user"                     : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'bonita'),
+                            "db.password"                 : project.hasProperty('db.password') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_PASSWORD) ? System.getProperty(SYS_PROP_DB_PASSWORD) : 'bpm'),
+                            "bdm.db.url"                  : bdmDbConnectionSettings.dbUrl,
+                            "bdm.db.user"                 : project.hasProperty('db.user') ? project.property(SYS_PROP_DB_URL) : (System.getProperty(SYS_PROP_DB_USER) ? System.getProperty(SYS_PROP_DB_USER) : 'business_data'),
+                            "db.server.name"              : connectionSettings.serverName,
+                            "db.server.port"              : connectionSettings.portNumber,
+                            "db.database.name"            : connectionSettings.databaseName
                     ]
 
                     if ('oracle' == vendor.name) {
