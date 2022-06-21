@@ -23,7 +23,6 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
@@ -140,8 +139,6 @@ public class LoginAPIImpl implements LoginAPI {
             throws SBonitaException {
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
-        // first call before create session: put the platform in cache if necessary
-        final TransactionContentWithResult<STenant> getTenant;
         try {
             if (tenantId == null) {
                 return transactionService.executeInTransaction(platformService::getDefaultTenant);
