@@ -53,9 +53,8 @@ public class FullBonitaConfigurationTest {
     @Test
     public void should_not_be_a_licence_file() {
         //given
-        final List<ConfigurationType> allExceptLicense = Arrays.asList(PLATFORM_PORTAL, PLATFORM_INIT_ENGINE,
-                PLATFORM_ENGINE, TENANT_PORTAL, TENANT_ENGINE,
-                TENANT_TEMPLATE_ENGINE, TENANT_SECURITY_SCRIPTS, TENANT_TEMPLATE_SECURITY_SCRIPTS,
+        final List<ConfigurationType> allExceptLicense = Arrays.asList(PLATFORM_PORTAL, PLATFORM_ENGINE, TENANT_PORTAL,
+                TENANT_ENGINE, TENANT_TEMPLATE_ENGINE, TENANT_SECURITY_SCRIPTS, TENANT_TEMPLATE_SECURITY_SCRIPTS,
                 TENANT_TEMPLATE_PORTAL);
 
         for (ConfigurationType configurationType : allExceptLicense) {

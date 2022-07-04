@@ -123,10 +123,6 @@ public class BonitaHomeServer {
         return properties;
     }
 
-    public List<BonitaConfiguration> getPlatformInitConfiguration() throws IOException {
-        return getAllXmlConfiguration(getConfigurationService().getPlatformInitEngineConf());
-    }
-
     public List<BonitaConfiguration> getPlatformConfiguration() throws IOException {
         return getAllXmlConfiguration(getConfigurationService().getPlatformEngineConf());
     }

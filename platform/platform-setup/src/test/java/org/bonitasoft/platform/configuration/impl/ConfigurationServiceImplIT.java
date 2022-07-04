@@ -23,8 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -101,14 +99,14 @@ public class ConfigurationServiceImplIT {
     }
 
     @Test
-    public void should_add_configuration() throws Exception {
+    public void should_add_configuration() {
         //given
-        final List<BonitaConfiguration> bonitaConfigurations1 = new ArrayList<>();
-        bonitaConfigurations1.add(new BonitaConfiguration("resource 1", "resource content1".getBytes(UTF_8)));
-        bonitaConfigurations1.add(new BonitaConfiguration("resource 2", "resource content2".getBytes(UTF_8)));
+        final List<BonitaConfiguration> bonitaConfigurations = List.of(
+                new BonitaConfiguration("resource 1", "resource content1".getBytes(UTF_8)),
+                new BonitaConfiguration("resource 2", "resource content2".getBytes(UTF_8)));
 
         //when
-        configurationService.storePlatformInitEngineConf(bonitaConfigurations1);
+        configurationService.storePlatformEngineConf(bonitaConfigurations);
 
         //then
         Assertions.assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should insert row")
@@ -117,11 +115,8 @@ public class ConfigurationServiceImplIT {
     }
 
     @Test
-    public void should_store_put_resources_in_database() throws Exception {
+    public void should_store_put_resources_in_database() {
         //when
-        configurationService.storePlatformInitEngineConf(Arrays.asList(
-                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 1", "resource content1".getBytes(UTF_8)),
-                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 2", "resource content2".getBytes(UTF_8))));
         configurationService.storePlatformEngineConf(Collections.singletonList(
                 new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes(UTF_8))));
         configurationService.storeTenantTemplateEngineConf(Collections.singletonList(
@@ -131,9 +126,6 @@ public class ConfigurationServiceImplIT {
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_12), TENANT_ID_12);
 
         //then
-        Assertions.assertThat(configurationService.getPlatformInitEngineConf()).containsExactly(
-                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 1", "resource content1".getBytes(UTF_8)),
-                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 2", "resource content2".getBytes(UTF_8)));
         Assertions.assertThat(configurationService.getPlatformEngineConf()).containsExactly(
                 new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes(UTF_8)));
         Assertions.assertThat(configurationService.getTenantTemplateEngineConf()).containsExactly(
@@ -146,7 +138,7 @@ public class ConfigurationServiceImplIT {
     }
 
     @Test
-    public void should_store_overwrite_content() throws Exception {
+    public void should_store_overwrite_content() {
         //given
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_1), TENANT_ID_1);
         //when
@@ -256,12 +248,12 @@ public class ConfigurationServiceImplIT {
     }
 
     @Test
-    public void should_clean_configuration() throws Exception {
+    public void should_clean_configuration() {
         //given
-        final List<BonitaConfiguration> bonitaConfigurations1 = new ArrayList<>();
-        bonitaConfigurations1.add(new BonitaConfiguration("resource 1", "resource content1".getBytes(UTF_8)));
-        bonitaConfigurations1.add(new BonitaConfiguration("resource 2", "resource content2".getBytes(UTF_8)));
-        configurationService.storePlatformInitEngineConf(bonitaConfigurations1);
+        final List<BonitaConfiguration> bonitaConfigurations = List.of(
+                new BonitaConfiguration("resource 1", "resource content1".getBytes(UTF_8)),
+                new BonitaConfiguration("resource 2", "resource content2".getBytes(UTF_8)));
+        configurationService.storePlatformEngineConf(bonitaConfigurations);
 
         //when
         configurationService.deleteAllConfiguration();
