@@ -113,7 +113,6 @@ public class SpringBeanAccessor {
 
     protected List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException {
         List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
-        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getPlatformInitConfiguration());
 
         List<BonitaConfiguration> platformConfiguration = BONITA_HOME_SERVER.getPlatformConfiguration();
         //handle special case for cache configuration files

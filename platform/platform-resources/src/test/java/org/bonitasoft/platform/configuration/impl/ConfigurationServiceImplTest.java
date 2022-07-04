@@ -63,9 +63,9 @@ public class ConfigurationServiceImplTest {
         Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
                 .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
 
-        configurationService.getPlatformInitEngineConf();
+        configurationService.getPlatformEngineConf();
 
-        Mockito.verify(configurationService).getNonTenantResource(ConfigurationType.PLATFORM_INIT_ENGINE);
+        Mockito.verify(configurationService).getNonTenantResource(ConfigurationType.PLATFORM_ENGINE);
     }
 
     @Test

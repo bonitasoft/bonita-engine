@@ -24,10 +24,6 @@ import org.junit.runners.model.Statement;
  */
 public class BonitaEngineRule implements MethodRule {
 
-    public static String CUSTOM_CONFIG_PLATFORM_INIT = "engine-server/conf/platform-init/bonita-platform-init-custom.xml";
-    public static String CUSTOM_CONFIG_PLATFORM = "engine-server/conf/platform/bonita-platform-custom.xml";
-    public static String CUSTOM_CONFIG_TENANT = "engine-server/conf/tenants/template/bonita-tenants-custom.xml";
-
     private TestEngine testEngine;
     private boolean cleanAfterTest;
 

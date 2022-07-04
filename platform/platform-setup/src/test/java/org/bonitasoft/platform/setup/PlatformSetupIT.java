@@ -123,7 +123,7 @@ public class PlatformSetupIT {
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
         FileUtils.write(setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
-                .resolve("platform_init_engine")
+                .resolve("platform_engine")
                 .resolve("whatever.properties").toFile(), "custom content", Charset.defaultCharset());
         configurationFolderUtil.buildSqlFolder(setupFolder.toPath(), dbVendor);
         systemOutRule.clearLog();
@@ -195,7 +195,7 @@ public class PlatformSetupIT {
     public void init_method_should_store_security_scripts_from_folder_if_exists() throws Exception {
         //when
         final Path confFolder = temporaryFolder.newFolder().toPath();
-        configurationFolderUtil.buildInitialFolder(confFolder);
+        configurationFolderUtil.buildPlatformEngineFolder(confFolder);
         configurationFolderUtil.buildSqlFolder(confFolder, dbVendor);
 
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toString());
@@ -238,7 +238,6 @@ public class PlatformSetupIT {
         assertThat(configurations).extracting("resourceName").containsOnly(
                 "bonita-platform-community-custom.properties",
                 "bonita-platform-custom.xml",
-                "bonita-platform-init-custom.xml",
                 "cache-config.xml",
                 "platform-tenant-config.properties",
                 "security-config.properties",
@@ -328,14 +327,14 @@ public class PlatformSetupIT {
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
         platformSetup.pull();
-        final Path platform_init_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
-                .resolve("platform_init_engine");
-        FileUtils.deleteDirectory(platform_init_engine.toFile());
+        final Path platform_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
+                .resolve("platform_engine");
+        FileUtils.deleteDirectory(platform_engine.toFile());
 
         // then
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("You are trying to remove a protected folder from configuration");
-        expectedException.expectMessage(platform_init_engine.toString());
+        expectedException.expectMessage(platform_engine.toString());
         expectedException.expectMessage("To restore the deleted folders");
 
         // when
@@ -423,7 +422,7 @@ public class PlatformSetupIT {
         //given
         List<FullBonitaConfiguration> configurations = new ArrayList<>();
         final Path confFolder = temporaryFolder.newFolder().toPath();
-        configurationFolderUtil.buildInitialFolder(confFolder);
+        configurationFolderUtil.buildPlatformEngineFolder(confFolder);
         configurationFolderUtil.buildSqlFolder(confFolder, dbVendor);
 
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toString());
@@ -502,7 +501,7 @@ public class PlatformSetupIT {
     public void should_not_fail_when_pulling_twice_in_the_same_jvm() throws Exception {
         final Path setupFolder = temporaryFolder.newFolder().toPath();
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
-        configurationFolderUtil.buildInitialFolder(setupFolder);
+        configurationFolderUtil.buildPlatformEngineFolder(setupFolder);
         configurationFolderUtil.buildSqlFolder(setupFolder, dbVendor);
         platformSetup.init();
         platformSetup.pull();

@@ -55,11 +55,11 @@ public class ConfigurationFolderUtilTest {
         Path setupFolder = temporaryFolder.newFolder().toPath();
 
         //when
-        configurationFolderUtil.buildInitialFolder(setupFolder);
+        configurationFolderUtil.buildPlatformEngineFolder(setupFolder);
 
         //then
         final File expectedFolder = setupFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
-                .resolve("platform_init_engine").toFile();
+                .resolve("platform_engine").toFile();
         assertThat(expectedFolder).exists().isDirectory();
         assertThat(expectedFolder.listFiles()).extracting("name").hasSize(1).containsOnly("initialConfig.properties");
     }
@@ -75,7 +75,7 @@ public class ConfigurationFolderUtilTest {
 
         //then
         final File expectedFolder = setupFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current")
-                .resolve("platform_init_engine").toFile();
+                .resolve("platform_engine").toFile();
         assertThat(expectedFolder).exists().isDirectory();
         assertThat(expectedFolder.listFiles()).extracting("name").hasSize(1).containsOnly("currentConfig.properties");
     }

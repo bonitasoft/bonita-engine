@@ -90,11 +90,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
-    public List<BonitaConfiguration> getPlatformInitEngineConf() {
-        return getNonTenantResource(PLATFORM_INIT_ENGINE);
-    }
-
-    @Override
     public List<BonitaConfiguration> getPlatformEngineConf() {
         return getNonTenantResource(PLATFORM_ENGINE);
     }
@@ -107,11 +102,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public List<BonitaConfiguration> getTenantTemplateSecurityScripts() {
         return getNonTenantResource(TENANT_TEMPLATE_SECURITY_SCRIPTS);
-    }
-
-    @Override
-    public void storePlatformInitEngineConf(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, PLATFORM_INIT_ENGINE, NON_TENANT_RESOURCE);
     }
 
     @Override

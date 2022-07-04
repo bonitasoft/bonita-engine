@@ -369,7 +369,6 @@ public class PlatformSetup {
         final List<Long> allTenants = configurationService.getAllTenants();
         try {
             configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_ENGINE, allTenants));
-            configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_INIT_ENGINE, allTenants));
             configurations.addAll(getConfigurationsMatchingPattern(PLATFORM_PORTAL, allTenants));
             configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_ENGINE, allTenants));
             configurations.addAll(getConfigurationsMatchingPattern(TENANT_TEMPLATE_PORTAL, allTenants));

@@ -38,8 +38,7 @@ public class AllConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AllConfigurationResourceVisitor.class);
 
     private static final List<String> PLATFORM_FOLDERS = Arrays.asList(PLATFORM_PORTAL.name().toLowerCase(),
-            PLATFORM_INIT_ENGINE.name().toLowerCase(), PLATFORM_ENGINE.name().toLowerCase(),
-            TENANT_TEMPLATE_ENGINE.name().toLowerCase(),
+            PLATFORM_ENGINE.name().toLowerCase(), TENANT_TEMPLATE_ENGINE.name().toLowerCase(),
             TENANT_TEMPLATE_SECURITY_SCRIPTS.name().toLowerCase(), TENANT_TEMPLATE_PORTAL.name().toLowerCase());
 
     private static final List<String> TENANT_FOLDERS = Arrays.asList(TENANT_PORTAL.name().toLowerCase(),
