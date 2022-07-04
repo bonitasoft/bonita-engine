@@ -136,6 +136,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         if (displayName != null && !displayName.equals(existingRole.getDisplayName())) {
             roleUpdateBuilder.updateDisplayName(displayName);
         }
+        roleUpdateBuilder.updateLastUpdate(System.currentTimeMillis());
         return roleUpdateBuilder.done();
     }
 
@@ -158,6 +159,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         if (displayName != null && !displayName.equals(existingGroup.getDisplayName())) {
             groupUpdateBuilder.updateDisplayName(displayName);
         }
+        groupUpdateBuilder.updateLastUpdate(System.currentTimeMillis());
         return groupUpdateBuilder.done();
     }
 
@@ -204,6 +206,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         userUpdateBuilder.updateTitle(user.getTitle());
         userUpdateBuilder.updateUserName(user.getUserName());
         userUpdateBuilder.updateEnabled(user.isEnabled());
+        userUpdateBuilder.updateLastUpdate(System.currentTimeMillis());
         return userUpdateBuilder.done();
     }
 
