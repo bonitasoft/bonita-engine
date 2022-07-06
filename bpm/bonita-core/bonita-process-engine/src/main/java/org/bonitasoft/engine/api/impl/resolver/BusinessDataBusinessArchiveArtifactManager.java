@@ -58,9 +58,9 @@ public class BusinessDataBusinessArchiveArtifactManager implements BusinessArchi
             final String className = sBusinessDataDefinition.getClassName();
             if (!entityClassNames.contains(className)) {
                 final Problem problem = new ProblemImpl(Level.ERROR, sBusinessDataDefinition.getName(), "business data",
-                        "The business data '"
-                                + sBusinessDataDefinition.getName() + "' with the class name '" + className
-                                + "', is not managed by the current version of the BDM");
+                        String.format(
+                                "Unknown Business Object type '%s'. Deploy a Business Data Model defining this type first.",
+                                className));
                 problems.add(problem);
             }
         }
