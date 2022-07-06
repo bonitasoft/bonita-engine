@@ -95,6 +95,12 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
     private static final String UTF_8 = "UTF-8";
 
+    private static Date defaultUserLastUpdateDate = null;
+
+    private static Date defaultGroupLastUpdateDate = null;
+
+    private static Date defaultRoleLastUpdateDate = null;
+
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule();
 
@@ -937,6 +943,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final Role persistedRole1 = getIdentityAPI().getRoleByName(DEVELOPER);
         assertNotNull(persistedRole1);
         assertEquals("Bonitasoft developer", persistedRole1.getDisplayName());
+        assertTrue(persistedRole1.getLastUpdate().after(defaultRoleLastUpdateDate));
 
         final Role persistedRole2 = getIdentityAPI().getRoleByName("Tester");
         assertNotNull(persistedRole2);
@@ -950,6 +957,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final Group persistedGroup1 = getIdentityAPI().getGroupByPath(ENGINE);
         assertNotNull(persistedGroup1);
         assertEquals("RD engine team", persistedGroup1.getDisplayName());
+        assertTrue(persistedGroup1.getLastUpdate().after(defaultGroupLastUpdateDate));
 
         final Group persistedGroup2 = getIdentityAPI().getGroupByPath(QA);
         assertNotNull(persistedGroup2);
@@ -966,6 +974,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
         final User persistedUser1 = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         assertNotNull(persistedUser1);
+        assertTrue(persistedUser1.getLastUpdate().after(defaultUserLastUpdateDate));
 
         final User persistedUser2 = getIdentityAPI().getUserByUserName(JOHNNYFOOTBALL);
         assertNotNull(persistedUser2);
@@ -1154,7 +1163,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         checkDefaultGroups();
         checkDefaultRoles();
         checkDefaultMembership();
-
     }
 
     private void checkDefaultMembership() throws UserNotFoundException {
@@ -1175,6 +1183,9 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
         final Role persistedRole1 = getIdentityAPI().getRoleByName(DEVELOPER);
         assertNotNull(persistedRole1);
+        if (defaultRoleLastUpdateDate == null) {
+            defaultRoleLastUpdateDate = persistedRole1.getLastUpdate();
+        }
     }
 
     private void checkDefaultGroups() throws GroupNotFoundException {
@@ -1184,6 +1195,9 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
         final Group persistedGroup1 = getIdentityAPI().getGroupByPath(ENGINE);
         assertNotNull(persistedGroup1);
+        if (defaultGroupLastUpdateDate == null) {
+            defaultGroupLastUpdateDate = persistedGroup1.getLastUpdate();
+        }
     }
 
     private void checkDefaultUsers() throws UserNotFoundException {
@@ -1193,6 +1207,9 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
         final User persistedUser1 = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         assertNotNull(persistedUser1);
+        if (defaultUserLastUpdateDate == null) {
+            defaultUserLastUpdateDate = persistedUser1.getLastUpdate();
+        }
     }
 
     @Test
