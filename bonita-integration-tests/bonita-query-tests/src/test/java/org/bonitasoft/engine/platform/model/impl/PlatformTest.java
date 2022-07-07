@@ -15,7 +15,6 @@ package org.bonitasoft.engine.platform.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.bonitasoft.engine.commons.Pair.pair;
 
 import java.util.Map;
 
@@ -23,7 +22,6 @@ import javax.inject.Inject;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.platform.model.SPlatform;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.test.persistence.repository.PlatformRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,36 +62,6 @@ public class PlatformTest {
                 entry("INITIAL_BONITA_VERSION", "5.9.0"),
                 entry("VERSION", "1.2"),
                 entry("INFORMATION", "some infos XYZ"));
-    }
-
-    @Test
-    public void should_save_and_get_STenant() {
-        STenant tenant = repository.add(STenant.builder()
-                .created(456L)
-                .createdBy("The almighty")
-                .defaultTenant(true)
-                .description("A tenant created to do things")
-                .name("MyTenant")
-                .status("OK")
-                .iconName("toto.png")
-                .iconPath("path/toto.png")
-                .build());
-        repository.flush();
-
-        PersistentObject tenantFromQuery = repository.selectOneOnPlatform("getTenantById", pair("id", tenant.getId()));
-        Map<String, Object> tenantAsMap = jdbcTemplate.queryForMap("SELECT * FROM tenant");
-
-        assertThat(tenantFromQuery).isEqualTo(tenant);
-        assertThat(tenantAsMap).containsOnly(
-                entry("ID", tenant.getId()),
-                entry("CREATED", 456L),
-                entry("CREATEDBY", "The almighty"),
-                entry("DESCRIPTION", "A tenant created to do things"),
-                entry("DEFAULTTENANT", true),
-                entry("ICONNAME", "toto.png"),
-                entry("ICONPATH", "path/toto.png"),
-                entry("STATUS", "OK"),
-                entry("NAME", "MyTenant"));
     }
 
 }
