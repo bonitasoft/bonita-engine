@@ -199,6 +199,7 @@ public interface PlatformAPI {
      * @throws PlatformNotFoundException when the default tenant existence cannot be determined
      * @since 7.3
      */
+    @Deprecated(forRemoval = true, since = "7.15.0")
     boolean isPlatformInitialized() throws PlatformNotFoundException;
 
     /**
