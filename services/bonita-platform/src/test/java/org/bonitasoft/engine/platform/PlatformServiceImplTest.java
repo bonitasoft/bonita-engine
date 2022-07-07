@@ -28,7 +28,6 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
@@ -133,29 +132,6 @@ public class PlatformServiceImplTest {
         when(platformCacheService.get(anyString(), anyString())).thenThrow(new SCacheException(""));
 
         platformServiceImpl.getPlatform();
-    }
-
-    @Test
-    public final void getTenantById() throws SBonitaException {
-        final STenant sTenant = buildTenant(15L, "tenant1");
-        when(persistenceService.selectById(new SelectByIdDescriptor<>(STenant.class, 15L))).thenReturn(sTenant);
-
-        assertEquals(sTenant, platformServiceImpl.getTenant(15L));
-    }
-
-    @Test(expected = STenantNotFoundException.class)
-    public final void getTenantByIdNotExists() throws SBonitaException {
-        when(persistenceService.selectById(new SelectByIdDescriptor<>(STenant.class, 15L))).thenReturn(null);
-
-        platformServiceImpl.getTenant(15L);
-    }
-
-    @Test(expected = STenantNotFoundException.class)
-    public final void getTenantByIdThrowException() throws SBonitaException {
-        when(persistenceService.selectById(new SelectByIdDescriptor<>(STenant.class, 15L)))
-                .thenThrow(new SBonitaReadException(""));
-
-        platformServiceImpl.getTenant(15L);
     }
 
     @Test
