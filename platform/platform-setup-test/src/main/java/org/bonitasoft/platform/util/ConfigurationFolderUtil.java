@@ -28,7 +28,6 @@ public class ConfigurationFolderUtil {
     public static final String[] ALL_SQL_FILES = new String[] { "cleanTables.sql",
             "createQuartzTables.sql",
             "createTables.sql",
-            "deleteTenantObjects.sql",
             "dropQuartzTables.sql",
             "dropTables.sql",
             "initTables.sql",
