@@ -53,8 +53,8 @@ public class SpringServiceAccessors implements ServiceAccessors {
     }
 
     @Override
-    public TenantServiceAccessor getTenantServiceAccessor(Long tenantId) {
-        return new SpringTenantServiceAccessor(getPlatformBeanAccessor(), tenantId);
+    public TenantServiceAccessor getTenantServiceAccessor() {
+        return new SpringTenantServiceAccessor(getPlatformBeanAccessor());
     }
 
     @Override

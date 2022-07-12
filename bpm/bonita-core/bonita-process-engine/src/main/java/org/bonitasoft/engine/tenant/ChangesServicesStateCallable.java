@@ -25,16 +25,14 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 class ChangesServicesStateCallable implements Callable<Void>, Serializable {
 
     private TenantServicesManager.ServiceAction action;
-    private Long tenantId;
 
-    public ChangesServicesStateCallable(TenantServicesManager.ServiceAction action, Long tenantId) {
+    public ChangesServicesStateCallable(TenantServicesManager.ServiceAction action) {
         this.action = action;
-        this.tenantId = tenantId;
     }
 
     @Override
     public Void call() throws Exception {
-        TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance(tenantId);
+        TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance();
         TenantServicesManager tenantServicesManager = tenantServiceAccessor.getTenantServicesManager();
         TenantStateManager tenantStateManager = tenantServiceAccessor.getTenantStateManager();
         return tenantStateManager.executeTenantManagementOperation(

@@ -37,9 +37,8 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
     public void should_pause_tenant_then_stop_start_node_start_pageService_again_but_dont_restart_elements_but_resume_restart_them()
             throws Exception {
         // given: tenant is paused
-        long tenantId = getSession().getTenantId();
-        WorkService workService = getTenantAccessor(tenantId).getWorkService();
-        PageService pageService = getTenantAccessor(tenantId).getPageService();
+        WorkService workService = getTenantAccessor().getWorkService();
+        PageService pageService = getTenantAccessor().getPageService();
         assertFalse(workService.isStopped());
 
         logoutThenloginAs(USERNAME, PASSWORD);
@@ -63,7 +62,7 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         // assert the page service has been restarted even though the tenant is paused, and that provided pages have been re-imported
         assertTrue(pageService.initialized());
         // then: work service is not running
-        workService = getTenantAccessor(tenantId).getWorkService();
+        workService = getTenantAccessor().getWorkService();
         assertTrue(workService.isStopped());
 
         // cleanup
@@ -74,8 +73,8 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         disableAndDeleteProcess(pd);
     }
 
-    protected TenantServiceAccessor getTenantAccessor(final long tenantId) {
-        return TenantServiceSingleton.getInstance(tenantId);
+    protected TenantServiceAccessor getTenantAccessor() {
+        return TenantServiceSingleton.getInstance();
     }
 
 }

@@ -27,7 +27,7 @@ public interface ServiceAccessors {
 
     PlatformServiceAccessor getPlatformServiceAccessor();
 
-    TenantServiceAccessor getTenantServiceAccessor(Long tenantId);
+    TenantServiceAccessor getTenantServiceAccessor();
 
     void destroy();
 }

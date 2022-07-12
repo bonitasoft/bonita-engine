@@ -104,11 +104,9 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private final SpringBeanAccessor beanAccessor;
-    private Long tenantId;
 
-    public SpringTenantServiceAccessor(final SpringBeanAccessor beanAccessor, Long tenantId) {
+    public SpringTenantServiceAccessor(final SpringBeanAccessor beanAccessor) {
         this.beanAccessor = beanAccessor;
-        this.tenantId = tenantId;
     }
 
     @Override
@@ -227,7 +225,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public long getTenantId() {
-        return tenantId;
+        try {
+            return ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

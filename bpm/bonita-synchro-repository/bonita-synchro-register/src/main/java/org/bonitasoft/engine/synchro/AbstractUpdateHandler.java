@@ -95,8 +95,7 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
         try {
             PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance()
                     .createPlatformServiceAccessor();
-            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(
-                    platformServiceAccessor.getPlatformService().getDefaultTenant().getId());
+            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor();
         } catch (final Exception e) {
             throw new SHandlerExecutionException(e.getMessage(), null);
         }

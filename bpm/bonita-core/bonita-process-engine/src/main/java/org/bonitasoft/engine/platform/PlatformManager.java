@@ -109,9 +109,8 @@ public class PlatformManager {
         return true;
     }
 
-    TenantStateManager getDefaultTenantStateManager() throws Exception {
-        return TenantServiceSingleton.getInstance(transactionService
-                .executeInTransaction(platformService::getDefaultTenant).getId()).getTenantStateManager();
+    TenantStateManager getDefaultTenantStateManager() {
+        return TenantServiceSingleton.getInstance().getTenantStateManager();
     }
 
     private void restartHandlersOfPlatform() {

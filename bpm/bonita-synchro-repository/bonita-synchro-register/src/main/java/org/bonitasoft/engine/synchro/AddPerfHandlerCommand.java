@@ -43,7 +43,6 @@ public class AddPerfHandlerCommand extends TenantCommand {
         final String brokerURL = (String) parameters.get("brokerURL");
 
         try {
-            final long tenantId = serviceAccessor.getTenantId();
             if (!containsHandler(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceFinishedHandler.class)) {
                 eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED,
                         new ProcessInstanceFinishedHandler(messageTimeout, brokerURL));

@@ -48,7 +48,7 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     TransactionService getTransactionService();
 
-    TenantServiceAccessor getTenantServiceAccessor(long tenantId);
+    TenantServiceAccessor getTenantServiceAccessor();
 
     PlatformSessionService getPlatformSessionService();
 
