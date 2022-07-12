@@ -114,7 +114,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         waitForUserTask(processInstance2, "step3");
         waitForUserTask(processInstance2, "step4");
 
-        // 2 tasks should already be pending for me:
+        // 4 tasks should already be pending for me:
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, Order.DESC);
         SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(),
@@ -128,16 +128,22 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         // Force assigning 'task3' (DESC name sort) to me (event though I am not an actor for it):
         getProcessAPI().assignUserTask(step3Id, user.getId());
 
-        // 3 tasks should now be available for me:
+        // 5 tasks should now be available for me:
         humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptionsBuilder.done());
         assertEquals(5, humanTasksSearch.getCount());
 
         // Force assigning 'task2' (DESC name sort) to someone else than me (event though he is not an actor for it):
         getProcessAPI().assignUserTask(step2Id, user2.getId());
 
-        // 2 tasks should now be available for me:
+        // 4 tasks should now be available for me:
         humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptionsBuilder.done());
         assertEquals(4, humanTasksSearch.getCount());
+
+        // 5 tasks should be available for me when calling searchPendingOrAssignedToUserOrTakenTasks
+        // because I can see tasks assigned to others
+        humanTasksSearch = getProcessAPI().searchPendingOrAssignedToUserOrAssignedToOthersTasks(user.getId(),
+                searchOptionsBuilder.done());
+        assertEquals(5, humanTasksSearch.getCount());
 
         disableAndDeleteProcess(processDefinition);
         deleteUsers(user, user2);

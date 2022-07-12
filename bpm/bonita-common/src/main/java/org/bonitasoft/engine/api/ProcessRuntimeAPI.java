@@ -1981,6 +1981,26 @@ public interface ProcessRuntimeAPI {
             throws SearchException;
 
     /**
+     * Search for all tasks assigned to the user or taken by others users, or pending for that user.
+     *
+     * @param userId
+     *        The identifier of the user for whom the tasks are available.
+     * @param searchOptions
+     *        The options used to search for tasks. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
+     * @return The list of tasks matching the search options.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the current session is invalid.
+     * @throws SearchException
+     *         If an exception occurs during the search.
+     * @since 7.15
+     */
+    SearchResult<HumanTaskInstance> searchPendingOrAssignedToUserOrAssignedToOthersTasks(long userId,
+            SearchOptions searchOptions)
+            throws SearchException;
+
+    /**
      * Search for comments related to the specified process instance.
      *
      * @param searchOptions

@@ -743,6 +743,26 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     long getNumberOfPendingOrAssignedTasks(long userId, QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
+     * @param userId
+     * @param searchOptions
+     * @return
+     * @throws SBonitaReadException
+     * @since 7.15
+     */
+    List<SHumanTaskInstance> searchPendingOrAssignedOrAssignedToOthersTasks(long userId, QueryOptions searchOptions)
+            throws SBonitaReadException;
+
+    /**
+     * @param userId
+     * @param searchOptions
+     * @return
+     * @throws SBonitaReadException
+     * @since 7.15
+     */
+    long getNumberOfPendingOrAssignedOrAssignedToOthersTasks(long userId, QueryOptions searchOptions)
+            throws SBonitaReadException;
+
+    /**
      * @param activityInstance
      * @param boundaryEventId
      * @throws SActivityModificationException
