@@ -59,8 +59,7 @@ public class PageAPIImpl implements PageAPI {
     protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
+            return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

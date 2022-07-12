@@ -15,8 +15,6 @@ package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -29,9 +27,7 @@ public class APIUtils {
 
     protected static TenantServiceAccessor getTenantAccessor() {
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
+            return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

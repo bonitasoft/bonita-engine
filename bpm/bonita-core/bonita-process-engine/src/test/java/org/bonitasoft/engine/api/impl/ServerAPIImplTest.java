@@ -18,7 +18,6 @@ import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -132,7 +131,7 @@ public class ServerAPIImplTest {
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
         doReturn(platformLoginService).when(platformServiceAccessor).getPlatformLoginService();
         doReturn(platformSessionService).when(platformServiceAccessor).getPlatformSessionService();
-        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(anyLong());
+        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor();
         doReturn(platformManager).when(platformServiceAccessor).getPlatformManager();
         doReturn(tenantLoginService).when(tenantServiceAccessor).getLoginService();
         doReturn(sessionService).when(tenantServiceAccessor).getSessionService();

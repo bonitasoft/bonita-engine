@@ -61,12 +61,12 @@ public class ServiceAccessorFactory {
         return serviceAccessors;
     }
 
-    public TenantServiceAccessor createTenantServiceAccessor(final long tenantId)
+    public TenantServiceAccessor createTenantServiceAccessor()
             throws SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             InvocationTargetException,
             ClassNotFoundException {
-        return getServiceAccessors().getTenantServiceAccessor(tenantId);
+        return getServiceAccessors().getTenantServiceAccessor();
     }
 
     public SessionAccessor createSessionAccessor()

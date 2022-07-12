@@ -16,9 +16,7 @@ package org.bonitasoft.engine.bpm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.actor.mapping.SActorCreationException;
@@ -98,7 +96,7 @@ public class CommonBPMServicesTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
     protected static SessionAccessor sessionAccessor;
     protected static PlatformServiceAccessor platformServiceAccessor;
-    protected static Map<Long, TenantServiceAccessor> tenantServiceAccessors;
+    protected static TenantServiceAccessor tenantServiceAccessor;
     private static long tenantId;
     @Rule
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
@@ -129,10 +127,10 @@ public class CommonBPMServicesTest {
     }
 
     protected TenantServiceAccessor getAccessor(final long tenantId) throws Exception {
-        if (!tenantServiceAccessors.containsKey(tenantId)) {
-            tenantServiceAccessors.put(tenantId, getServiceAccessorFactory().createTenantServiceAccessor(tenantId));
+        if (tenantServiceAccessor == null) {
+            tenantServiceAccessor = getServiceAccessorFactory().createTenantServiceAccessor();
         }
-        return tenantServiceAccessors.get(tenantId);
+        return tenantServiceAccessor;
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -153,7 +151,6 @@ public class CommonBPMServicesTest {
 
     @Before
     public void commonSetup() throws Exception {
-        tenantServiceAccessors = new HashMap<>();
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         tenantId = apiSession.getTenantId();
         if (sessionAccessor == null) {

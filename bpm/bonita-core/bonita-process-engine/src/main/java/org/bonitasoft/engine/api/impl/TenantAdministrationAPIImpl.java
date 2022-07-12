@@ -83,7 +83,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @CustomTransactions
     public void pause() throws UpdateException {
         TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException()
-                .getTenantServiceAccessor(getTenantId());
+                .getTenantServiceAccessor();
         try {
             tenantServiceAccessor.getTenantStateManager().pause();
         } catch (Exception e) {
@@ -96,7 +96,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @CustomTransactions
     public void resume() throws UpdateException {
         TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException()
-                .getTenantServiceAccessor(getTenantId());
+                .getTenantServiceAccessor();
         try {
             tenantServiceAccessor.getTenantStateManager().resume();
             tenantServiceAccessor.getUserTransactionService().executeInTransaction(() -> {
@@ -240,7 +240,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     protected TenantServiceAccessor getTenantAccessor() {
         try {
-            return TenantServiceSingleton.getInstance(getTenantId());
+            return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

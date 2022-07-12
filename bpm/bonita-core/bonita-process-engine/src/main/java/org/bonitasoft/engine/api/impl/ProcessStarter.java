@@ -51,8 +51,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -214,9 +212,7 @@ public class ProcessStarter {
 
     protected TenantServiceAccessor getTenantAccessor() {
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
+            return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

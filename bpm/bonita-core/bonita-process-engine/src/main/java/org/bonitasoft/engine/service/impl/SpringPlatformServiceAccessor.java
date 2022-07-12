@@ -61,8 +61,8 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
-        return TenantServiceSingleton.getInstance(tenantId);
+    public TenantServiceAccessor getTenantServiceAccessor() {
+        return TenantServiceSingleton.getInstance();
     }
 
     @Override

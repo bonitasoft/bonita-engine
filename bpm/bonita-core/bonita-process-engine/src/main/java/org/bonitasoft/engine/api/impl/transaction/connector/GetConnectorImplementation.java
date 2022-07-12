@@ -31,18 +31,15 @@ public class GetConnectorImplementation implements TransactionContentWithResult<
 
     private final String connectorVersion;
 
-    private final long tenantId;
-
     private SConnectorImplementationDescriptor connectorImplementation;
 
     public GetConnectorImplementation(final ConnectorService connectorService, final long processDefinitionId,
             final String connectorId,
-            final String connectorVersion, final long tenantId) {
+            final String connectorVersion) {
         this.connectorService = connectorService;
         this.processDefinitionId = processDefinitionId;
         this.connectorId = connectorId;
         this.connectorVersion = connectorVersion;
-        this.tenantId = tenantId;
     }
 
     @Override

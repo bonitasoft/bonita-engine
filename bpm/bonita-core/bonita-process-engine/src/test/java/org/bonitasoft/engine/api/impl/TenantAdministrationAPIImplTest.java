@@ -72,14 +72,13 @@ public class TenantAdministrationAPIImplTest {
     @Before
     public void before() throws Exception {
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
-        doReturn(17L).when(tenantManagementAPI).getTenantId();
         doReturn(tenantServiceAccessor).when(tenantManagementAPI).getTenantAccessor();
         doReturn(tenantResourcesService).when(tenantServiceAccessor).getTenantResourcesService();
         doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
 
         doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(userTransactionService)
                 .executeInTransaction(any());
-        when(platformServiceAccessor.getTenantServiceAccessor(17)).thenReturn(tenantServiceAccessor);
+        when(platformServiceAccessor.getTenantServiceAccessor()).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
         when(tenantServiceAccessor.getTenantStateManager()).thenReturn(tenantStateManager);

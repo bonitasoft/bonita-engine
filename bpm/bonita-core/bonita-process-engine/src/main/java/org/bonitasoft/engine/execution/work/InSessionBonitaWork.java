@@ -33,7 +33,7 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
 
     TenantServiceAccessor getTenantAccessor() {
         try {
-            return TenantServiceSingleton.getInstance(getTenantId());
+            return TenantServiceSingleton.getInstance();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

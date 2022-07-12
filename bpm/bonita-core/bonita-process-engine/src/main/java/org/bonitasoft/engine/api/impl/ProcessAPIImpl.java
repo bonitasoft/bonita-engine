@@ -5110,7 +5110,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final GetConnectorImplementation transactionContent = new GetConnectorImplementation(connectorService,
                 processDefinitionId, connectorId,
-                connectorVersion, tenantAccessor.getTenantId());
+                connectorVersion);
         try {
             transactionContent.execute();
             final SConnectorImplementationDescriptor sConnectorImplementationDescriptor = transactionContent

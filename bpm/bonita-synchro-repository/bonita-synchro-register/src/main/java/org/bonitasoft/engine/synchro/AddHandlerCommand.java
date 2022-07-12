@@ -44,7 +44,6 @@ public class AddHandlerCommand extends TenantCommand {
             throws SCommandExecutionException {
         final EventService eventService = serviceAccessor.getEventService();
         try {
-            final long tenantId = serviceAccessor.getTenantId();
             if (!containsHandler(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceHandler.class)) {
                 eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED, new ProcessInstanceHandler());
             }
