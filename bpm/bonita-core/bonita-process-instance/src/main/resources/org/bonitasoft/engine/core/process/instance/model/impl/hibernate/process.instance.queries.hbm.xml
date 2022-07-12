@@ -409,6 +409,80 @@
 		)
 	</query>
 
+	<query name="getNumberOfSHumanTaskInstancePendingOrAssignedOrAssignedToOthers">
+		SELECT COUNT(a.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
+		WHERE a.stable = TRUE
+		AND a.stateExecuting = FALSE
+		AND a.terminal = FALSE
+		AND (
+			(
+				a.assigneeId = :userId
+			) OR (
+				EXISTS (SELECT mapping.id
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
+					WHERE mapping.activityId=a.id
+					AND ( mapping.userId = :userId
+						OR mapping.actorId in (SELECT actor.id
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
+							WHERE actor.id = actormember.actorId
+							AND ( actormember.userId = :userId
+		 	  					OR actormember.id IN (
+									SELECT actormember.id
+									FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
+									WHERE um.userId = :userId
+									AND (
+										(actormember.groupId = um.groupId AND actormember.roleId = -1)
+										OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
+										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+									)
+								)
+		     				)
+						)
+					)
+				)
+			)
+		)
+	</query>
+
+	<query name="searchSHumanTaskInstancePendingOrAssignedOrAssignedToOthers">
+		SELECT a
+		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
+		WHERE a.stable = TRUE
+		AND a.stateExecuting = FALSE
+		AND a.terminal = FALSE
+		AND (
+			(
+				a.assigneeId = :userId
+			) OR (
+				EXISTS (SELECT mapping.id
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
+					WHERE mapping.activityId=a.id
+					AND ( mapping.userId = :userId
+						OR mapping.actorId in (SELECT actor.id
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
+							WHERE actor.id = actormember.actorId
+							AND ( actormember.userId = :userId
+		 	  					OR actormember.id IN (
+									SELECT actormember.id
+									FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
+									WHERE um.userId = :userId
+									AND (
+										(actormember.groupId = um.groupId AND actormember.roleId = -1)
+										OR (actormember.roleId = um.roleId AND actormember.groupId = -1)
+										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+									)
+								)
+		     				)
+						)
+					)
+				)
+			)
+		)
+	</query>
+
 	<query name="getNumberOfSHumanTaskInstancePendingAssignedTo">
         SELECT COUNT(a.id)
         FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a

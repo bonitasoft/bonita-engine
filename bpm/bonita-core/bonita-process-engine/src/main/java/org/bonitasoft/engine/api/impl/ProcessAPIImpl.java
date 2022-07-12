@@ -445,6 +445,7 @@ import org.bonitasoft.platform.setup.PlatformSetupAccessor;
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  * @author Arthur Freycon
+ * @author Haroun EL ALAMI
  */
 public class ProcessAPIImpl implements ProcessAPI {
 
@@ -453,6 +454,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     private static final String CONTAINER_TYPE_PROCESS_INSTANCE = "PROCESS_INSTANCE";
 
     private static final String CONTAINER_TYPE_ACTIVITY_INSTANCE = "ACTIVITY_INSTANCE";
+
+    private static final String PENDING_OR_ASSIGNED = "PendingOrAssigned";
+
+    private static final String PENDING_OR_ASSIGNED_OR_ASSIGNED_TO_OTHERS = "PendingOrAssignedOrAssignedToOthers";
+
     protected final ProcessConfigurationAPIImpl processConfigurationAPI;
     private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
     private final DocumentAPI documentAPI;
@@ -4637,37 +4643,57 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<HumanTaskInstance> searchPendingTasksForUser(final long userId,
             final SearchOptions searchOptions) throws SearchException {
-        return searchTasksForUser(userId, searchOptions, false);
+        return searchTasksForUser(userId, searchOptions, "");
     }
 
     /**
-     * @param orAssignedToUser do we also want to retrieve tasks directly assigned to this user ?
+     * @param queryType can be :
+     *        PendingOrAssignedOrAssignedToOthers if we also want to retrieve tasks directly assigned to this user or
+     *        tasks assigned
+     *        to other users.
+     *        PendingOrAssigned if we also want to retrieve tasks directly assigned to this user.
+     *        empty for the default behaviour; retrieve pending tasks for user.
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions,
-            final boolean orAssignedToUser)
+            final String queryType)
             throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        if (orAssignedToUser) {
-            return AbstractHumanTaskInstanceSearchEntity.searchHumanTaskInstance(
-                    searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
-                    searchOptions,
-                    flowNodeStateManager,
-                    (queryOptions) -> activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, queryOptions),
-                    (queryOptions) -> activityInstanceService.searchPendingOrAssignedTasks(userId, queryOptions))
-                    .search();
-        } else {
-            return AbstractHumanTaskInstanceSearchEntity
-                    .searchHumanTaskInstance(searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
-                            searchOptions,
-                            flowNodeStateManager,
-                            (queryOptions) -> activityInstanceService.getNumberOfPendingTasksForUser(userId,
-                                    queryOptions),
-                            (queryOptions) -> activityInstanceService.searchPendingTasksForUser(userId, queryOptions))
-                    .search();
+
+        switch (queryType) {
+            case PENDING_OR_ASSIGNED_OR_ASSIGNED_TO_OTHERS:
+                return AbstractHumanTaskInstanceSearchEntity.searchHumanTaskInstance(
+                        searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
+                        searchOptions,
+                        flowNodeStateManager,
+                        (queryOptions) -> activityInstanceService.getNumberOfPendingOrAssignedOrAssignedToOthersTasks(
+                                userId,
+                                queryOptions),
+                        (queryOptions) -> activityInstanceService.searchPendingOrAssignedOrAssignedToOthersTasks(userId,
+                                queryOptions))
+                        .search();
+            case PENDING_OR_ASSIGNED:
+                return AbstractHumanTaskInstanceSearchEntity.searchHumanTaskInstance(
+                        searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
+                        searchOptions,
+                        flowNodeStateManager,
+                        (queryOptions) -> activityInstanceService.getNumberOfPendingOrAssignedTasks(userId,
+                                queryOptions),
+                        (queryOptions) -> activityInstanceService.searchPendingOrAssignedTasks(userId, queryOptions))
+                        .search();
+            default:
+                return AbstractHumanTaskInstanceSearchEntity
+                        .searchHumanTaskInstance(searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
+                                searchOptions,
+                                flowNodeStateManager,
+                                (queryOptions) -> activityInstanceService.getNumberOfPendingTasksForUser(userId,
+                                        queryOptions),
+                                (queryOptions) -> activityInstanceService.searchPendingTasksForUser(userId,
+                                        queryOptions))
+                        .search();
         }
     }
 
@@ -4691,7 +4717,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<HumanTaskInstance> searchMyAvailableHumanTasks(final long userId,
             final SearchOptions searchOptions) throws SearchException {
-        return searchTasksForUser(userId, searchOptions, true);
+        return searchTasksForUser(userId, searchOptions, PENDING_OR_ASSIGNED);
+    }
+
+    @Override
+    public SearchResult<HumanTaskInstance> searchPendingOrAssignedToUserOrAssignedToOthersTasks(final long userId,
+            final SearchOptions searchOptions) throws SearchException {
+        return searchTasksForUser(userId, searchOptions, PENDING_OR_ASSIGNED_OR_ASSIGNED_TO_OTHERS);
     }
 
     @Override
