@@ -6,7 +6,6 @@ plugins {
 dependencies {
     compile project(':services:bonita-commons')
     compile "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
-    compile "org.javassist:javassist:${Deps.javassistVersion}"
     compile "org.springframework:spring-core:${Deps.springVersion}"
     compile project(':bpm:bonita-common')
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
@@ -15,6 +14,7 @@ dependencies {
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile project(':services:bonita-business-data:bonita-business-data-client-resources')
     testCompile project(':bpm:bonita-util:bonita-common-util-test')
     testCompile project(':services:bonita-business-data:bonita-business-data-api')
 }
@@ -24,7 +24,6 @@ group = 'org.bonitasoft.engine.data'
 
 sourceSets {
     main {
-        // allow to add sources of bonita-business-data-client-resources to the bdm client jar
         resources { srcDirs "src/main/resources", "../bonita-business-data-client-resources/src/main/java" }
     }
 }
