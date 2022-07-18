@@ -6,15 +6,15 @@ plugins {
 dependencies {
     compile project(':services:bonita-commons')
     compile "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
+    compile "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
     compile "org.springframework:spring-core:${Deps.springVersion}"
+    compile "org.javassist:javassist:${Deps.javassistVersion}"
     compile project(':bpm:bonita-common')
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"
-    compile "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile project(':services:bonita-business-data:bonita-business-data-client-resources')
     testCompile project(':bpm:bonita-util:bonita-common-util-test')
     testCompile project(':services:bonita-business-data:bonita-business-data-api')
 }
