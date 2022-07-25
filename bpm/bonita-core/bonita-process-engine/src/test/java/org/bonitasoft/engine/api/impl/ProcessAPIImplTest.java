@@ -383,9 +383,24 @@ public class ProcessAPIImplTest {
         assertThat(step3.get("failed")).isEqualTo(8L);
     }
 
+    @Test(expected = ProcessDefinitionNotFoundException.class)
+    public void getFlownodeStateCountersForProcessDefinition_should_throw_exception_when_process_is_not_found()
+            throws Exception {
+        final long processDefinitionId = 35L;
+
+        when(processDefinitionService.getProcessDeploymentInfo(processDefinitionId))
+                .thenThrow(new SProcessDefinitionNotFoundException("process not found", processDefinitionId));
+
+        processAPI.getActiveFlownodeStateCountersForProcessDefinition(processDefinitionId);
+    }
+
     @Test
     public void getFlownodeStateCounters_should_build_proper_journal_and_archived_counters() throws Exception {
         final long processInstanceId = 9811L;
+
+        when(processInstanceService.getLastArchivedProcessInstance(processInstanceId))
+                .thenReturn(mock(SAProcessInstance.class));
+
         final List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<>(4);
         flownodes.add(new SFlowNodeInstanceStateCounter("step1", "completed", 2L));
         flownodes.add(new SFlowNodeInstanceStateCounter("step2", "completed", 4L));
@@ -415,6 +430,14 @@ public class ProcessAPIImplTest {
         final Map<String, Long> step3 = flownodeStateCounters.get("step3");
         assertThat(step3.size()).isEqualTo(1);
         assertThat(step3.get("failed")).isEqualTo(8L);
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getFlownodeStateCounters_should_throw_exception_when_process_instance_is_not_found() throws Exception {
+        final long processInstanceId = 11L;
+        when(processInstanceService.getLastArchivedProcessInstance(processInstanceId)).thenReturn(null);
+
+        processAPI.getFlownodeStateCounters(processInstanceId);
     }
 
     @Test

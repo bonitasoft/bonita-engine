@@ -4178,10 +4178,12 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<String, Map<String, Long>> getActiveFlownodeStateCountersForProcessDefinition(
-            final long processDefinitionId) {
+            final long processDefinitionId) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final HashMap<String, Map<String, Long>> countersForProcessDefinition = new HashMap<>();
         try {
+            //make sure a process definition with this Id exists
+            serviceAccessor.getProcessDefinitionService().getProcessDeploymentInfo(processDefinitionId);
             // Active flownodes:
             final List<SFlowNodeInstanceStateCounter> flownodes = serviceAccessor.getActivityInstanceService()
                     .getNumberOfFlownodesOfProcessDefinitionInAllStates(
@@ -4195,6 +4197,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
+        } catch (SProcessDefinitionNotFoundException e) {
+            throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
         }
         return countersForProcessDefinition;
     }
@@ -4204,6 +4208,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final HashMap<String, Map<String, Long>> countersForProcessInstance = new HashMap<>();
         try {
+            //make sure a process instance with this Id exists
+            if (serviceAccessor.getProcessInstanceService().getLastArchivedProcessInstance(processInstanceId) == null) {
+                throw new SProcessInstanceNotFoundException(processInstanceId);
+            }
             // Active flownodes:
             final List<SFlowNodeInstanceStateCounter> flownodes = serviceAccessor.getActivityInstanceService()
                     .getNumberOfFlownodesInAllStates(
@@ -4226,6 +4234,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                 flownodeCounters.put(nodeCounter.getStateName(), nodeCounter.getNumberOf());
                 countersForProcessInstance.put(flownodeName, flownodeCounters);
             }
+        } catch (final SProcessInstanceNotFoundException e) {
+            //cannot throw directly a ProcessInstanceNotFoundException to avoid API break
+            throw new RetrieveException(new ProcessInstanceNotFoundException(processInstanceId));
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }

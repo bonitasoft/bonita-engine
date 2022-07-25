@@ -59,14 +59,7 @@ import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.ContractDataNotFoundException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.identity.User;
@@ -2801,9 +2794,12 @@ public interface ProcessRuntimeAPI {
      *         a map of &lt;state name, number of current flownode in that state&gt; (possible state names are: ready,
      *         executing, waiting, initializing, failed, completing)
      *         If no results, returns an empty Map.
+     * @throws ProcessDefinitionNotFoundException
+     *         If not process definition exists with the ID processDefinitionId.
      * @since 7.15.0
      */
-    Map<String, Map<String, Long>> getActiveFlownodeStateCountersForProcessDefinition(final long processDefinitionId);
+    Map<String, Map<String, Long>> getActiveFlownodeStateCountersForProcessDefinition(final long processDefinitionId)
+            throws ProcessDefinitionNotFoundException;
 
     /**
      * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not
@@ -2816,6 +2812,8 @@ public interface ProcessRuntimeAPI {
      *         a map of &lt;state name, number of current flownode in that state&gt; (possible state names are: ready,
      *         executing, waiting, initializing, failed, completing, completed, skipped, cancelled, aborted)
      *         If no results, returns an empty Map.
+     * @throws RetrieveException
+     *         If not process instance exists with the ID processInstanceId.
      * @since 6.5.0
      */
     Map<String, Map<String, Long>> getFlownodeStateCounters(long processInstanceId);

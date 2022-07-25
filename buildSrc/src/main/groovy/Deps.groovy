@@ -13,7 +13,7 @@ class Deps {
     public static String commonsCLIVersion = "1.4"
     public static String slf4jVersion = "1.7.30"
     public static String h2Version = "1.4.199"
-    public static String hibernateVersion = "5.6.7.Final"
+    public static String hibernateVersion = "5.4.32.Final"
     public static String jacksonBomVersion = "2.13.2.20220328"
     public static String jakartaTransactionVersion = "1.3.3"
     public static String jakartaServletVersion = "4.0.4"
@@ -43,7 +43,7 @@ class Deps {
     public static String javaxAnnotationsVersion = "1.3.2"
 
     // extensions versions
-    public static String hazelcastVersion = "5.1.1"
+    public static String hazelcastVersion = "5.1.2"
     //Last version compatible with hibernate 5
     public static String hazelcastHibernateVersion = "2.1.1"
  
