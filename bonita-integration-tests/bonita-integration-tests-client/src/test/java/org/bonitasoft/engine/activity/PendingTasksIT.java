@@ -151,6 +151,93 @@ public class PendingTasksIT extends TestWithTechnicalUser {
     }
 
     @Test
+    public void searchMyAvailableHumanTasksWithActorFilters() throws Exception {
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        final User user = createUser("Barnabooth", "Strongwood");
+
+        //Build 2 processes with actor filters
+        final ProcessDefinitionBuilder jackDesignProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilter", "1.0");
+        jackDesignProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
+        jackDesignProcessDefinition.addAutomaticTask("step1");
+        final UserTaskDefinitionBuilder addUserTask = jackDesignProcessDefinition.addUserTask("step2", ACTOR_NAME);
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
+                // filter selects "jack" as candidate:
+                new ExpressionBuilder().createConstantLongExpression(jack.getId()));
+        jackDesignProcessDefinition.addTransition("step1", "step2");
+
+        final ProcessDefinitionBuilder userDesignProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilter", "2.0");
+        userDesignProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
+        userDesignProcessDefinition.addAutomaticTask("step1");
+        userDesignProcessDefinition.addUserTask("step2", ACTOR_NAME)
+                .addUserFilter("test2", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
+                        // filter selects "user" as candidate:
+                        new ExpressionBuilder().createConstantLongExpression(user.getId()));
+        userDesignProcessDefinition.addTransition("step1", "step2");
+
+        // Only john is member of the actor, for both processes:
+        final ProcessDefinition jackProcessDefinition = deployProcessWithTestFilter(jackDesignProcessDefinition,
+                ACTOR_NAME, john, "TestFilter");
+        final ProcessDefinition userProcessDefinition = deployProcessWithTestFilter(userDesignProcessDefinition,
+                ACTOR_NAME, john, "TestFilter");
+
+        // Start first process
+        ProcessInstance jackProcessInstance = getProcessAPI().startProcess(jackProcessDefinition.getId());
+        long stepIdProc1 = waitForUserTask(jackProcessInstance, "step2");
+
+        // actor filter allows jack to see it
+        SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI()
+                .searchPendingOrAssignedToUserOrAssignedToOthersTasks(jack.getId(),
+                        searchOptionsBuilder.done());
+        assertEquals(1, humanTasksSearch.getCount());
+        // but not john
+        humanTasksSearch = getProcessAPI().searchPendingOrAssignedToUserOrAssignedToOthersTasks(john.getId(),
+                searchOptionsBuilder.done());
+        assertEquals(0, humanTasksSearch.getCount());
+
+        //john takes the task. This overrides the actor filter
+        getProcessAPI().assignUserTask(stepIdProc1, john.getId());
+        // jack still sees the task
+        humanTasksSearch = getProcessAPI().searchPendingOrAssignedToUserOrAssignedToOthersTasks(jack.getId(),
+                searchOptionsBuilder.done());
+        assertEquals(1, humanTasksSearch.getCount());
+        // john sees the task because he is now assigned to it
+        humanTasksSearch = getProcessAPI().searchPendingOrAssignedToUserOrAssignedToOthersTasks(john.getId(),
+                searchOptionsBuilder.done());
+        assertEquals(1, humanTasksSearch.getCount());
+
+        // assign jack
+        getProcessAPI().assignUserTask(stepIdProc1, jack.getId());
+        // jack sees the task
+        humanTasksSearch = getProcessAPI().searchPendingOrAssignedToUserOrAssignedToOthersTasks(jack.getId(),
+                searchOptionsBuilder.done());
+        assertEquals(1, humanTasksSearch.getCount());
+        // john does not see the task anymore
+        humanTasksSearch = getProcessAPI().searchPendingOrAssignedToUserOrAssignedToOthersTasks(john.getId(),
+                searchOptionsBuilder.done());
+        assertEquals(0, humanTasksSearch.getCount());
+
+        //start proc 2
+        ProcessInstance userProcessInstance = getProcessAPI().startProcess(userProcessDefinition.getId());
+        waitForUserTask(userProcessInstance, "step2");
+
+        // Proc2
+        // Non-actor user sees the task, because actor filter allows him specifically
+        humanTasksSearch = getProcessAPI().searchPendingOrAssignedToUserOrAssignedToOthersTasks(user.getId(),
+                searchOptionsBuilder.done());
+        assertEquals(1, humanTasksSearch.getCount());
+        // actor member does not see it, because actor filter does not allow him to
+        humanTasksSearch = getProcessAPI().searchPendingOrAssignedToUserOrAssignedToOthersTasks(john.getId(),
+                searchOptionsBuilder.done());
+        assertEquals(0, humanTasksSearch.getCount());
+
+        disableAndDeleteProcess(jackProcessDefinition);
+        disableAndDeleteProcess(userProcessDefinition);
+        deleteUser(user);
+    }
+
+    @Test
     public void getPendingHumanTaskInstancesInTwoProcesses() throws Exception {
         // 1. create a user 'test'
         User test;
