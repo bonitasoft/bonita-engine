@@ -170,6 +170,19 @@
         <property name="readIntensive" value="${bonita.platform.cache.platform.readIntensive}" />
     </bean>
 
+    <bean id="configFilesCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="CONFIGURATION_FILES_CACHE" />
+        <property name="maxElementsInMemory" value="${bonita.platform.cache.configfiles.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.platform.cache.configfiles.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.platform.cache.configfiles.eternal}" />
+        <property name="evictionPolicy" value="${bonita.platform.cache.configfiles.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.platform.cache.configfiles.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.platform.cache.configfiles.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.platform.cache.configfiles.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.platform.cache.configfiles.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.platform.cache.configfiles.readIntensive}" />
+    </bean>
+
     <bean id="bonitaTaskExecutor" class="org.bonitasoft.engine.service.BonitaTaskExecutor" />
 
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">

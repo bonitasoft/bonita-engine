@@ -268,7 +268,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     protected String buildConnectorImplementationKey(final long rootDefinitionId, final String connectorId,
             final String version) {
-        return String.valueOf(rootDefinitionId) + ":" + connectorId + "-" + version;
+        return rootDefinitionId + ":" + connectorId + "-" + version;
     }
 
     @Override
@@ -349,12 +349,8 @@ public class ConnectorServiceImpl implements ConnectorService {
         } finally {
             if (timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS)) {
                 final long endTime = System.currentTimeMillis();
-                final StringBuilder desc = new StringBuilder();
-                desc.append("Connector ID: ");
-                desc.append(connectorId);
-                desc.append(" - input parameters: ");
-                desc.append(inputParameters);
-                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS, desc.toString(),
+                String desc = "Connector ID: " + connectorId + " - input parameters: " + inputParameters;
+                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS, desc,
                         endTime - startTime);
             }
         }

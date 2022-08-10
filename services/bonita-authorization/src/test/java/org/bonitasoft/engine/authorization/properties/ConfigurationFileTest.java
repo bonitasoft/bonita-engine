@@ -138,8 +138,8 @@ public class ConfigurationFileTest {
         configFile.getTenantProperties();
 
         // then:
-        verify(cacheService).get(CONFIGURATION_FILES_CACHE, TENANT_ID + "_resources-permissions-mapping.properties");
-        verify(cacheService).store(CONFIGURATION_FILES_CACHE, TENANT_ID + "_resources-permissions-mapping.properties",
+        verify(cacheService).get(CONFIGURATION_FILES_CACHE, "resources-permissions-mapping.properties");
+        verify(cacheService).store(CONFIGURATION_FILES_CACHE, "resources-permissions-mapping.properties",
                 props);
     }
 }

@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.cache.ehcache;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -26,8 +30,6 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
@@ -43,7 +45,6 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(CacheService.class)
 public class EhCacheCacheService implements CacheService, PlatformLifecycleService {
 
-    private Logger logger = LoggerFactory.getLogger(EhCacheCacheService.class);
     protected CacheManager cacheManager;
 
     protected final Map<String, CacheConfiguration> cacheConfigurations;
@@ -51,8 +52,6 @@ public class EhCacheCacheService implements CacheService, PlatformLifecycleServi
     private final CacheConfiguration defaultCacheConfiguration;
 
     private final String diskStorePath;
-
-    private String cacheManagerLastCreation;
 
     public EhCacheCacheService(List<org.bonitasoft.engine.cache.CacheConfiguration> cacheConfigurations,
             @Qualifier("defaultCacheConfiguration") org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
@@ -69,6 +68,11 @@ public class EhCacheCacheService implements CacheService, PlatformLifecycleServi
         }
     }
 
+    // VisibleForTesting
+    protected Set<String> getCacheConfigurationNames() {
+        return cacheConfigurations.keySet();
+    }
+
     protected CacheConfiguration getEhCacheConfiguration(
             final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig) {
         final CacheConfiguration ehCacheConfig = new CacheConfiguration();
@@ -82,19 +86,6 @@ public class EhCacheCacheService implements CacheService, PlatformLifecycleServi
             ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
         }
         return ehCacheConfig;
-    }
-
-    private String getCacheManagerCreationDetails() {
-        final StringBuilder sb = new StringBuilder();
-        String identifier = getCacheManagerIdentifier();
-        sb.append("CacheManager (").append(cacheManager).append(") built for ").append(identifier);
-        sb.append("\n");
-        final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        for (final StackTraceElement stackTraceElement : stackTraceElements) {
-            sb.append("\n        at ");
-            sb.append(stackTraceElement);
-        }
-        return sb.toString();
     }
 
     @Override
@@ -121,10 +112,6 @@ public class EhCacheCacheService implements CacheService, PlatformLifecycleServi
         if (cacheManager == null) {
             start();
         }
-    }
-
-    protected String getCacheManagerIdentifier() {
-        return "platform";
     }
 
     protected synchronized Cache createCache(final String cacheName, final String internalCacheName)
@@ -289,9 +276,6 @@ public class EhCacheCacheService implements CacheService, PlatformLifecycleServi
             configuration.setDefaultCacheConfiguration(defaultCacheConfiguration);
             configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
             cacheManager = new CacheManager(configuration);
-            if (logger.isTraceEnabled()) {
-                cacheManagerLastCreation = getCacheManagerCreationDetails();
-            }
         }
     }
 }
