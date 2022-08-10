@@ -86,7 +86,7 @@ public class TransientDataServiceImpl implements TransientDataService {
     @Override
     public List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId,
             final String containerType) throws SDataInstanceException {
-        final ArrayList<SDataInstance> data = new ArrayList<SDataInstance>(dataNames.size());
+        final ArrayList<SDataInstance> data = new ArrayList<>(dataNames.size());
         for (final String dataName : dataNames) {
             data.add(getDataInstance(dataName, containerId, containerType));
         }
@@ -280,7 +280,7 @@ public class TransientDataServiceImpl implements TransientDataService {
 
     @Override
     public List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) {
-        final List<SDataInstance> results = new ArrayList<SDataInstance>(dataInstanceIds.size());
+        final List<SDataInstance> results = new ArrayList<>(dataInstanceIds.size());
         for (final Long dataInstanceId : dataInstanceIds) {
             try {
                 results.add(getDataInstance(dataInstanceId));

@@ -87,13 +87,13 @@ public class ResourcesPermissionsMapping extends ConfigurationFile {
 
     protected String buildResourceKey(final String method, final String apiName, final String resourceName,
             final List<String> resourceQualifiers) {
-        String key = method + API_METHOD_SEPARATOR + apiName + "/" + resourceName;
+        StringBuilder key = new StringBuilder(method + API_METHOD_SEPARATOR + apiName + "/" + resourceName);
         if (resourceQualifiers != null) {
             for (final String resourceQualifier : resourceQualifiers) {
-                key += RESOURCE_IDS_SEPARATOR + resourceQualifier;
+                key.append(RESOURCE_IDS_SEPARATOR).append(resourceQualifier);
             }
         }
-        return key;
+        return key.toString();
     }
 
     public Set<String> getResourcePermissions(final String method, final String apiName, final String resourceName) {

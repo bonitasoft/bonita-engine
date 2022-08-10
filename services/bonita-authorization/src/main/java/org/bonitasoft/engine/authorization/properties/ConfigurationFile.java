@@ -47,7 +47,7 @@ public abstract class ConfigurationFile {
             ConfigurationFilesManager configurationFilesManager) {
         this.tenantId = tenantId;
         this.propertiesFilename = getPropertiesFileName();
-        this.cacheKey = tenantId + "_" + propertiesFilename;
+        this.cacheKey = propertiesFilename;
         this.cacheService = cacheService;
         this.configurationFilesManager = configurationFilesManager;
     }
