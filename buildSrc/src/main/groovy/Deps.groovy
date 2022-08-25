@@ -8,7 +8,7 @@ class Deps {
     public static String commonsFileupload = "1.3.3"
     public static String commonsBeanutilsVersion = "1.9.4"
     public static String commonsCollections4Version = "4.4"
-    public static String commonsLangVersion = "3.12.0"
+    public static String commonsLangVersion = "3.11"
     public static String commonsDbcp2Version = "2.5.0"
     public static String commonsCLIVersion = "1.4"
     public static String slf4jVersion = "1.7.30"
