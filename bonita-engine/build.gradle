@@ -61,6 +61,7 @@ dependencyManagement {
         dependency "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
         dependency "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
         dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+        dependency "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
     }
 }
 publishing {
