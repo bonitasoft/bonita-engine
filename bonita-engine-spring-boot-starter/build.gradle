@@ -6,7 +6,10 @@ dependencies {
     api(project(":bpm:bonita-common"))
     api(project(":bpm:bonita-client"))
 
-    api("org.springframework.boot:spring-boot-starter:${Deps.springBootVersion}")
+    api("org.springframework.boot:spring-boot-starter:${Deps.springBootVersion}") {
+        exclude(module: 'snakeyaml')
+    }
+    api("org.yaml:snakeyaml:${Deps.snakeyamlVersion}")
 
     implementation(project(":bonita-engine-standalone"))
     implementation(project(":bpm:bonita-server"))
