@@ -15,6 +15,7 @@ class Deps {
     public static String h2Version = "1.4.199"
     public static String hibernateVersion = "5.4.32.Final"
     public static String jacksonBomVersion = "2.13.2.20220328"
+    public static String snakeyamlVersion = "1.32"
     public static String jakartaTransactionVersion = "1.3.3"
     public static String jakartaServletVersion = "4.0.4"
     // Keep this until all client projects have migrated to jakarta or it will break their builds !
@@ -46,7 +47,7 @@ class Deps {
     public static String hazelcastVersion = "5.1.2"
     //Last version compatible with hibernate 5
     public static String hazelcastHibernateVersion = "2.1.1"
- 
+
 
     public static String guavaVersion = "30.1.1-jre"
     public static String antlr4RuntimeVersion = "4.7.2"

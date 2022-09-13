@@ -17,7 +17,9 @@ dependencies {
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter', version: Deps.springBootVersion) {
         exclude(module: 'jul-to-slf4j')
         exclude(module: 'log4j-to-slf4j')
+        exclude(module: 'snakeyaml')
     }
+    compile "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
     compile "org.springframework.boot:spring-boot-starter-jdbc:${Deps.springBootVersion}"
     compile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     compile ("mysql:mysql-connector-java:${Deps.mysqlVersion}") {
