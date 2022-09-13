@@ -63,6 +63,7 @@ dependencyManagement {
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
         dependency "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
         dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+        dependency "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
         dependency "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
         dependency("org.quartz-scheduler:quartz:${Deps.quartzVersion}")
         dependency "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
