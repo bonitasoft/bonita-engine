@@ -220,8 +220,8 @@ public class EngineCommander {
         messages.addAll(checkNoComments());
         messages.addAll(checkNoArchivedComments());
         messages.addAll(checkNoWaitingEvent());
-        messages.addAll(checkNoProcessIntances());
-        messages.addAll(checkNoArchivedProcessIntances());
+        messages.addAll(checkNoProcessInstances());
+        messages.addAll(checkNoArchivedProcessInstances());
         messages.addAll(checkNoProcessDefinitions());
         messages.addAll(checkNoCategories());
         messages.addAll(checkNoUsers());
@@ -229,9 +229,11 @@ public class EngineCommander {
         messages.addAll(checkNoRoles());
         messages.addAll(checkNoSupervisors());
         logoutOnTenant();
-        LOGGER.warn("Engine was not clean after test:");
-        for (String message : messages) {
-            LOGGER.warn(message);
+        if (!messages.isEmpty()) {
+            LOGGER.warn("Engine was not clean after test. We cleaned for you the following elements:");
+            for (String message : messages) {
+                LOGGER.warn(message);
+            }
         }
     }
 
@@ -240,7 +242,7 @@ public class EngineCommander {
         final long numberOfCategories = getProcessAPI().getNumberOfCategories();
         if (numberOfCategories > 0) {
             final List<Category> categories = getProcessAPI().getCategories(0, 5000, CategoryCriterion.NAME_ASC);
-            final StringBuilder categoryBuilder = new StringBuilder("Categories are still present: ");
+            final StringBuilder categoryBuilder = new StringBuilder("Categories were still present: ");
             for (final Category category : categories) {
                 categoryBuilder.append(category.getName()).append(", ");
                 getProcessAPI().deleteCategory(category.getId());
@@ -256,7 +258,7 @@ public class EngineCommander {
         final SearchResult<FlowNodeInstance> searchResult = getProcessAPI().searchFlowNodeInstances(build.done());
         final List<FlowNodeInstance> flowNodeInstances = searchResult.getResult();
         if (searchResult.getCount() > 0) {
-            final StringBuilder messageBuilder = new StringBuilder("FlowNodes are still present: ");
+            final StringBuilder messageBuilder = new StringBuilder("FlowNodes were still present: ");
             for (final FlowNodeInstance flowNodeInstance : flowNodeInstances) {
                 messageBuilder.append("{").append(flowNodeInstance.getName()).append(" - ")
                         .append(flowNodeInstance.getType()).append("}").append(", ");
@@ -273,7 +275,7 @@ public class EngineCommander {
                 .searchArchivedFlowNodeInstances(build.done());
         final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = searchResult.getResult();
         if (searchResult.getCount() > 0) {
-            final StringBuilder messageBuilder = new StringBuilder("Archived flowNodes are still present: ");
+            final StringBuilder messageBuilder = new StringBuilder("Archived flowNodes were still present: ");
             for (final ArchivedFlowNodeInstance archivedFlowNodeInstance : archivedFlowNodeInstances) {
                 messageBuilder.append(archivedFlowNodeInstance.getName()).append(", ");
             }
@@ -288,7 +290,7 @@ public class EngineCommander {
         final SearchResult<Comment> searchResult = getProcessAPI().searchComments(build.done());
         final List<Comment> comments = searchResult.getResult();
         if (searchResult.getCount() > 0) {
-            final StringBuilder messageBuilder = new StringBuilder("Comments are still present: ");
+            final StringBuilder messageBuilder = new StringBuilder("Comments were still present: ");
             for (final Comment comment : comments) {
                 messageBuilder.append(comment.getContent()).append(", ");
             }
@@ -303,7 +305,7 @@ public class EngineCommander {
         final SearchResult<ArchivedComment> searchResult = getProcessAPI().searchArchivedComments(build.done());
         final List<ArchivedComment> archivedComments = searchResult.getResult();
         if (searchResult.getCount() > 0) {
-            final StringBuilder messageBuilder = new StringBuilder("Archived comments are still present: ");
+            final StringBuilder messageBuilder = new StringBuilder("Archived comments were still present: ");
             for (final ArchivedComment archivedComment : archivedComments) {
                 messageBuilder.append(archivedComment.getName()).append(", ");
             }
@@ -317,7 +319,7 @@ public class EngineCommander {
         final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200,
                 ProcessDeploymentInfoCriterion.DEFAULT);
         if (processes.size() > 0) {
-            final StringBuilder processBuilder = new StringBuilder("Process Definitions are still active: ");
+            final StringBuilder processBuilder = new StringBuilder("Process Definitions were still active: ");
             for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
                 processBuilder.append(processDeploymentInfo.getId()).append(", ");
                 if (ActivationState.ENABLED.equals(processDeploymentInfo.getActivationState())) {
@@ -339,7 +341,8 @@ public class EngineCommander {
         final List<WaitingEvent> waitingEvents = ((SearchResult<WaitingEvent>) getCommandAPI()
                 .execute("searchWaitingEventsCommand", parameters)).getResult();
         if (waitingEvents.size() > 0) {
-            final StringBuilder messageBuilder = new StringBuilder("Waiting Event are still present: ");
+            final StringBuilder messageBuilder = new StringBuilder(
+                    "Waiting Events are still present (not deleted automatically): ");
             for (final WaitingEvent waitingEvent : waitingEvents) {
                 messageBuilder.append("[process instance:").append(waitingEvent.getProcessName())
                         .append(", flow node instance:")
@@ -359,7 +362,7 @@ public class EngineCommander {
                 .getResult();
 
         if (supervisors.size() > 0) {
-            final StringBuilder processBuilder = new StringBuilder("Process Supervisors are still active: ");
+            final StringBuilder processBuilder = new StringBuilder("Process Supervisors were still active: ");
             for (final ProcessSupervisor supervisor : supervisors) {
                 processBuilder.append(supervisor.getSupervisorId()).append(", ");
                 getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
@@ -369,12 +372,12 @@ public class EngineCommander {
         return messages;
     }
 
-    public List<String> checkNoProcessIntances() throws DeletionException {
+    public List<String> checkNoProcessInstances() throws DeletionException {
         final List<String> messages = new ArrayList<>();
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 1000,
                 ProcessInstanceCriterion.DEFAULT);
         if (!processInstances.isEmpty()) {
-            final StringBuilder stb = new StringBuilder("Process instances are still present: ");
+            final StringBuilder stb = new StringBuilder("Process instances were still present: ");
             for (final ProcessInstance processInstance : processInstances) {
                 stb.append(processInstance).append(", ");
                 getProcessAPI().deleteProcessInstance(processInstance.getId());
@@ -384,12 +387,12 @@ public class EngineCommander {
         return messages;
     }
 
-    public List<String> checkNoArchivedProcessIntances() throws DeletionException {
+    public List<String> checkNoArchivedProcessInstances() throws DeletionException {
         final List<String> messages = new ArrayList<>();
         final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0,
                 1000, ProcessInstanceCriterion.DEFAULT);
         if (!archivedProcessInstances.isEmpty()) {
-            final StringBuilder stb = new StringBuilder("Archived process instances are still present: ");
+            final StringBuilder stb = new StringBuilder("Archived process instances were still present: ");
             for (final ArchivedProcessInstance archivedProcessInstance : archivedProcessInstances) {
                 stb.append(archivedProcessInstance).append(", ");
                 getProcessAPI().deleteArchivedProcessInstancesInAllStates(archivedProcessInstance.getSourceObjectId());
@@ -405,7 +408,7 @@ public class EngineCommander {
         if (numberOfGroups > 0) {
             final List<Group> groups = getIdentityAPI().getGroups(0, Long.valueOf(numberOfGroups).intValue(),
                     GroupCriterion.NAME_ASC);
-            final StringBuilder groupBuilder = new StringBuilder("Groups are still present: ");
+            final StringBuilder groupBuilder = new StringBuilder("Groups were still present: ");
             for (final Group group : groups) {
                 groupBuilder.append(group.getId()).append(", ");
                 getIdentityAPI().deleteGroup(group.getId());
@@ -421,7 +424,7 @@ public class EngineCommander {
         if (numberOfRoles > 0) {
             final List<Role> roles = getIdentityAPI().getRoles(0, Long.valueOf(numberOfRoles).intValue(),
                     RoleCriterion.NAME_ASC);
-            final StringBuilder roleBuilder = new StringBuilder("Roles are still present: ");
+            final StringBuilder roleBuilder = new StringBuilder("Roles were still present: ");
             for (final Role role : roles) {
                 roleBuilder.append(role.getId()).append(", ");
                 getIdentityAPI().deleteRole(role.getId());
@@ -437,7 +440,7 @@ public class EngineCommander {
         if (numberOfUsers > 0) {
             final List<User> users = getIdentityAPI().getUsers(0, Long.valueOf(numberOfUsers).intValue(),
                     UserCriterion.USER_NAME_ASC);
-            final StringBuilder userBuilder = new StringBuilder("Users are still present: ");
+            final StringBuilder userBuilder = new StringBuilder("Users were still present: ");
             for (final User user : users) {
                 userBuilder.append(user.getId()).append(", ");
                 getIdentityAPI().deleteUser(user.getId());
@@ -457,7 +460,7 @@ public class EngineCommander {
                 .searchCommands(searchOptionsBuilder.done());
         final List<CommandDescriptor> commands = searchCommands.getResult();
         if (searchCommands.getCount() > 0) {
-            final StringBuilder commandBuilder = new StringBuilder("Commands are still present: ");
+            final StringBuilder commandBuilder = new StringBuilder("Commands were still present: ");
             for (final CommandDescriptor command : commands) {
                 commandBuilder.append(command.getName()).append(", ");
                 getCommandAPI().unregister(command.getName());
