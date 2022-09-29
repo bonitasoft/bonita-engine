@@ -18,8 +18,8 @@ import static org.junit.Assert.assertEquals;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -241,7 +241,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
                 String.class.getName());
 
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcessAndData(
-                Collections.singletonList(new BEntry<>(
+                Collections.singletonList(Map.entry(
                         correlationKey, catchCorrelationValue)));
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
         waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
@@ -281,7 +281,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         // Receiver
         final ProcessDefinition receiverProcessDefinition = deployAndEnableProcessWithMessageEventSubProcessAndData(
                 Collections
-                        .singletonList(new BEntry<>(correlationKey, correlationValue)));
+                        .singletonList(Map.entry(correlationKey, correlationValue)));
         final ProcessInstance receiverProcessInstance = getProcessAPI().startProcess(receiverProcessDefinition.getId());
         waitForUserTask(receiverProcessInstance, PARENT_PROCESS_USER_TASK_NAME);
 
