@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -827,7 +826,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithMessageEventSubProcessAndData(
-            final List<BEntry<Expression, Expression>> correlations)
+            final List<Entry<Expression, Expression>> correlations)
             throws BonitaException {
         final ProcessDefinitionBuilder builder = buildParentProcessDefinition(false, true);
         buildSubProcessDefinition(builder, true, correlations, false);
@@ -864,7 +863,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public void buildSubProcessDefinition(final ProcessDefinitionBuilder builder, final boolean withData,
-            final List<BEntry<Expression, Expression>> correlations, final boolean isSignal)
+            final List<Entry<Expression, Expression>> correlations, final boolean isSignal)
             throws InvalidExpressionException {
         final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess(SUB_PROCESS_NAME, true)
                 .getSubProcessBuilder();
@@ -896,16 +895,16 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public void addCorrelations(final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger,
-            final List<BEntry<Expression, Expression>> correlations) {
+            final List<Entry<Expression, Expression>> correlations) {
         if (correlations != null) {
-            for (final BEntry<Expression, Expression> correlation : correlations) {
+            for (final Entry<Expression, Expression> correlation : correlations) {
                 messageEventTrigger.addCorrelation(correlation.getKey(), correlation.getValue());
             }
         }
     }
 
     public void addCorrelations(final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder,
-            final List<BEntry<Expression, Expression>> correlations) {
+            final List<Entry<Expression, Expression>> correlations) {
         if (correlations != null) {
             for (final Entry<Expression, Expression> entry : correlations) {
                 throwMessageEventTriggerBuilder.addCorrelation(entry.getKey(), entry.getValue());
@@ -920,7 +919,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String targetProcess,
             final String targetFlowNode,
-            final List<BEntry<Expression, Expression>> correlations, final Map<String, String> processData,
+            final List<Entry<Expression, Expression>> correlations, final Map<String, String> processData,
             final Map<String, String> messageData,
             final Map<String, String> dataInputMapping) throws BonitaException {
         return deployAndEnableProcessWithEndMessageEvent("Send message in the end", MESSAGE_NAME, targetProcess,
@@ -930,7 +929,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName,
             final String messageName, final String targetProcess,
-            final String targetFlowNode, final List<BEntry<Expression, Expression>> correlations,
+            final String targetFlowNode, final List<Entry<Expression, Expression>> correlations,
             final Map<String, String> processData,
             final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
@@ -1093,7 +1092,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchMessageEvent(
-            final List<BEntry<Expression, Expression>> correlations,
+            final List<Entry<Expression, Expression>> correlations,
             final Map<String, String> processData, final List<Operation> operations) throws BonitaException {
         return deployAndEnableProcessWithIntermediateCatchMessageEvent(CATCH_MESSAGE_PROCESS_NAME, MESSAGE_NAME,
                 correlations, processData, operations);
@@ -1101,7 +1100,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchMessageEvent(final String processName,
             final String messageName,
-            final List<BEntry<Expression, Expression>> correlations, final Map<String, String> processData,
+            final List<Entry<Expression, Expression>> correlations, final Map<String, String> processData,
             final List<Operation> operations)
             throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
@@ -1196,19 +1195,19 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchMessageEventAnd1Correlation()
             throws BonitaException {
-        final Map<String, String> data = new HashMap<String, String>();
+        final Map<String, String> data = new HashMap<>();
         data.put("docRef", Integer.class.getName());
-        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(1);
+        final ArrayList<Entry<Expression, Expression>> correlations = new ArrayList<Entry<Expression, Expression>>(1);
         final Expression docCorrelationKey = new ExpressionBuilder().createConstantStringExpression("docKey");
         final Expression docCorrelationValue = new ExpressionBuilder().createDataExpression("docRef",
                 Integer.class.getName());
-        correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
+        correlations.add(Map.entry(docCorrelationKey, docCorrelationValue));
         return deployAndEnableProcessWithIntermediateCatchMessageEvent(correlations, data, null);
     }
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchMessageEventAnd2Correlations()
             throws BonitaException {
-        final Map<String, String> data = new HashMap<String, String>();
+        final Map<String, String> data = new HashMap<>();
         data.put("docRef", Integer.class.getName());
         data.put("name", String.class.getName());
         final Expression docCorrelationKey = new ExpressionBuilder().createConstantStringExpression("docKey");
@@ -1217,26 +1216,26 @@ public abstract class AbstractEventIT extends TestWithUser {
         final Expression nameCorrelationKey = new ExpressionBuilder().createConstantStringExpression("nameKey");
         final Expression nameCorrelationValue = new ExpressionBuilder().createDataExpression("name",
                 String.class.getName());
-        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(2);
-        correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
-        correlations.add(new BEntry<Expression, Expression>(nameCorrelationKey, nameCorrelationValue));
+        final ArrayList<Entry<Expression, Expression>> correlations = new ArrayList<Entry<Expression, Expression>>(2);
+        correlations.add(Map.entry(docCorrelationKey, docCorrelationValue));
+        correlations.add(Map.entry(nameCorrelationKey, nameCorrelationValue));
         return deployAndEnableProcessWithIntermediateCatchMessageEvent(correlations, data, null);
     }
 
     public ProcessDefinition deployAndEnableProcessWithEndMessageEventAndCorrelation() throws BonitaException {
-        final Map<String, String> data = new HashMap<String, String>();
+        final Map<String, String> data = new HashMap<>();
         data.put("docNumber", Integer.class.getName());
         data.put("lastName", String.class.getName());
 
-        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(2);
+        final ArrayList<Entry<Expression, Expression>> correlations = new ArrayList<Entry<Expression, Expression>>(2);
         final Expression docCorrelationKey = new ExpressionBuilder().createConstantStringExpression("docKey");
         final Expression docCorrelationValue = new ExpressionBuilder().createDataExpression("docNumber",
                 Integer.class.getName());
         final Expression nameCorrelationKey = new ExpressionBuilder().createConstantStringExpression("nameKey");
         final Expression nameCorrelationValue = new ExpressionBuilder().createDataExpression("lastName",
                 String.class.getName());
-        correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
-        correlations.add(new BEntry<Expression, Expression>(nameCorrelationKey, nameCorrelationValue));
+        correlations.add(Map.entry(docCorrelationKey, docCorrelationValue));
+        correlations.add(Map.entry(nameCorrelationKey, nameCorrelationValue));
 
         return deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, correlations,
                 data, null, null);
