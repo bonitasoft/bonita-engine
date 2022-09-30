@@ -32,7 +32,6 @@ import org.bonitasoft.engine.session.APISession
  * can be added to
  * <ul>
  *     <li>portal/profile</li>
- *     <li>userXP/profile</li>
  * </ul>
  * @author Baptiste Mesta
  */
