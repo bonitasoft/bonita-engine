@@ -17,6 +17,9 @@ import java.util.Properties;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.core.QuartzScheduler;
+import org.quartz.core.QuartzSchedulerResources;
+import org.quartz.impl.StdScheduler;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
@@ -40,6 +43,11 @@ public class BonitaSchedulerFactory extends StdSchedulerFactory {
         final Scheduler scheduler = super.getScheduler();
         scheduler.setJobFactory(new TransactionalSimpleJobFactory(schedulerService));
         return scheduler;
+    }
+
+    @Override
+    protected Scheduler instantiate(QuartzSchedulerResources rsrcs, QuartzScheduler qs) {
+        return new StdScheduler(qs);
     }
 
     public void setBOSSchedulerService(final SchedulerServiceImpl schedulerService) {
