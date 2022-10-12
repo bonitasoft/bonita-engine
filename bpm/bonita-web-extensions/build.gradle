@@ -1,0 +1,23 @@
+dependencies {
+    compile "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
+    compile(project(":bpm:bonita-client"))
+    compile(project(":bpm:bonita-common"))
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+}
+
+group = 'org.bonitasoft.web'
+description = 'Bonita Web Extensions'
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
