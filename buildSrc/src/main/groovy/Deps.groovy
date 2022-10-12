@@ -18,7 +18,7 @@ class Deps {
     public static String jacksonBomVersion = "2.12.6.20220326"
     public static String snakeyamlVersion = "1.32"
     public static String javaxJtaVersion = "1.1"
-    public static String javaxServletVersion = "3.0.1"
+    public static String javaxServletVersion = "3.1.0"
     public static String groovyAllVersion = "2.4.21"
     public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
     public static String httpComponentsVersion = "4.5.13"
