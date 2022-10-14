@@ -1,0 +1,20 @@
+[
+  {
+    "name": "john",
+    "type": "com.bonitasoft.pojo.Employee",
+    "storageId": 487467354,
+    "storageId_string": "487467354"
+  },
+  {
+    "name": "Ateam",
+    "type": "com.bonitasoft.pojo.Employee",
+    "storageIds": [
+      687646784,
+      2313213874354
+    ],
+    "storageIds_string": [
+      "687646784",
+      "2313213874354"
+    ]
+  }
+]

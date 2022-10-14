@@ -1,0 +1,102 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+group = 'org.bonitasoft.console'
+description = 'Bonita Web Server'
+
+repositories {
+    maven { url = uri('https://maven.restlet.talend.com') }
+}
+
+dependencies {
+    implementation(project(":bpm:bonita-common"))
+    implementation(project(":bpm:bonita-web-extensions"))
+    implementation "commons-io:commons-io:${Deps.commonsIOVersion}"
+    implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    implementation "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
+    implementation "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
+    implementation "commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}"
+    implementation "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
+    implementation "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    implementation "org.codehaus.jettison:jettison:${Deps.jettisonVersion}"
+    implementation "com.googlecode.json-simple:json-simple:${Deps.jsonSimpleVersion}"
+    implementation "org.tuckey:urlrewritefilter:${Deps.urlrewriteVersion}"
+    implementation "org.glassfish.web:jakarta.servlet.jsp.jstl:${Deps.jakartaJstlVersion}"
+    implementation "jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:${Deps.jakartaJstlApiVersion}"
+    implementation "org.restlet.jse:org.restlet:${Deps.restletVersion}"
+    implementation "org.restlet.jee:org.restlet.ext.servlet:${Deps.restletVersion}"
+    implementation "org.restlet.jse:org.restlet.ext.jackson:${Deps.restletVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${Deps.restletVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${Deps.restletVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:${Deps.restletVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${Deps.restletVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${Deps.restletVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${Deps.restletVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-jsonSchema:${Deps.restletVersion}"
+    implementation "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
+    implementation "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
+    implementation "org.springframework:spring-web:${Deps.springVersion}"
+    implementation "org.springframework:spring-core:${Deps.springVersion}"
+    implementation "org.fedorahosted.tennera:jgettext:${Deps.jgettextVersion}"
+    testImplementation(project(":bpm:bonita-server"))
+    testImplementation "net.javacrumbs.json-unit:json-unit:${Deps.jsonUnitVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation "org.mockito:mockito-core:1.10.19" // because of many unnecessary Mockito stubbings
+    testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+}
+
+configurations {
+    tests
+}
+
+processResources {
+    inputs.property("version", project.version)
+    inputs.property("brandingVersion", brandingVersion)
+    from('src/main/resources') {
+        include '**/*'
+        filter(ReplaceTokens, tokens: [projectVersion : project.version,
+                                       brandingVersion: brandingVersion,
+                                       buildYear      : String.valueOf(LocalDate.now().getYear())])
+    }
+}
+
+tasks.register('buildZip', Zip) {
+    from('src/main/resources') {
+        include 'VERSION'
+        filter(ReplaceTokens, tokens: [projectVersion : project.version,
+                                       brandingVersion: brandingVersion,
+                                       buildYear      : String.valueOf(LocalDate.now().getYear())])
+    }
+    from 'src/main/webapp'
+}
+
+tasks.named("build") {
+    dependsOn tasks.named("buildZip")
+}
+
+tasks.named("test") {
+    dependsOn tasks.named("testsJar")
+}
+
+tasks.register('testsJar', Jar) {
+    dependsOn testClasses
+    archiveClassifier = 'tests'
+    from(sourceSets.test.output)
+}
+
+artifacts {
+    tests testsJar
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+            artifact testsJar
+            artifact buildZip
+        }
+    }
+}

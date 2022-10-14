@@ -1,0 +1,2 @@
+msgid "web site title"
+msgstr "Bienvenue dans Bonita Portal 7+"
