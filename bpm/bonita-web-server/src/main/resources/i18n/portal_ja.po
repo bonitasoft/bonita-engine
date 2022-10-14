@@ -1,0 +1,508 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: bonita\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-20 05:22+0200\n"
+"PO-Revision-Date: 2022-09-27 01:29\n"
+"Last-Translator: \n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: bonita\n"
+"X-Crowdin-Project-ID: 13316\n"
+"X-Crowdin-Language: ja\n"
+"X-Crowdin-File: /dev/bonita-web/portal/portal.po\n"
+"X-Crowdin-File-ID: 60581\n"
+
+msgid "%attribute% file format is not allowed. Only %file_formats% files are allowed."
+msgstr "%attribute% ファイルの形式は許可されていません。%file_formats%のファイルのみが許可されます。"
+
+msgid "%attribute% file format not allowed"
+msgstr "%attribute%のファイル形式は許可されていません。"
+
+msgid "%attribute% file format not allowed or not starting with correct servlet path"
+msgstr "%attribute% ファイル形式は正しいサーブレットパスで開始できません。"
+
+msgid "%attribute% is mandatory"
+msgstr "%attribute%は必須です。"
+
+msgid "%attribute% is not a valid Color value"
+msgstr "%attribute% は、有効なカラー値ではありません。"
+
+msgid "%attribute% is not a valid URL"
+msgstr "%attribute% は、有効な URL ではありません。"
+
+msgid "%attribute% is not a valid email"
+msgstr "%attribute% は、有効なメール・アドレスではありません。"
+
+msgid "%attribute% is not well written"
+msgstr "%attribute% は、よく書かれていません。"
+
+msgid "%attribute% must be a boolean value"
+msgstr "%attribute% は、ブール値である必要があります。"
+
+msgid "%attribute% must be a negative value"
+msgstr "%attribute% は、マイナス値でなければなりません。"
+
+msgid "%attribute% must be a negative value diffrent from 0"
+msgstr "%attribute% は、ゼロ以下のマイナス値にする必要があります。"
+
+msgid "%attribute% must be a numeric value"
+msgstr "%attribute% は数値でなければなりません"
+
+msgid "%attribute% must be a positive value"
+msgstr "%attribute% は、正の値でなければなりません。"
+
+msgid "%attribute% must be a positive value different from 0"
+msgstr "%attribute% は、ゼロ以上の正数にする必要があります。"
+
+msgid "%attribute% must be a valid date"
+msgstr "%attribute% は有効な日付にする必要があります。"
+
+msgid "%attribute% must be an integer value"
+msgstr "%attribute% は、 整数値を指定する必要があります。"
+
+msgid "%attribute% must be equal to %secondAttribute%"
+msgstr "%attribute% は、 %secondAttribute% に等しくなければなりません。"
+
+msgid "%attribute% must be less or equal than %value%"
+msgstr "%attribute% は、%value%以下にする必要があります。"
+
+msgid "%attribute% must be less than %secondAttribute%"
+msgstr "%attribute% は、 %secondAttribute% より小さくなければなりません。"
+
+msgid "%attribute% must be less than %value%"
+msgstr "%attribute% は、%value%より小さくなければなりません"
+
+msgid "%attribute% must be more or equal than %secondAttribute%"
+msgstr "%attribute% は、%secondAttribute% 以上にする必要があります。"
+
+msgid "%attribute% must be more or equal than %value%"
+msgstr "%attribute% は、%value%以上にする必要があります。"
+
+msgid "%attribute% must be more than %secondAttribute%"
+msgstr "%attribute% は、%secondAttribute% より大きくなければなりません。"
+
+msgid "%attribute% must be more than %value%"
+msgstr "%attribute% は、%value%より大きくなければなりません"
+
+msgid "%attribute% must be on a single line"
+msgstr "%attribute% は、1 行にする必要があります。"
+
+msgid "%attribute% must be one of {%list%}"
+msgstr "%attribute% は、{%list%}のいずれかする必要があります。"
+
+msgid "%attribute% must contain exactly %length% characters"
+msgstr "%attribute% には、正確に%length%文字が含まれている必要があります。"
+
+msgid "%attribute% must not be equal to %secondAttribute%"
+msgstr "%attribute% は、 %secondAttribute% と異なっていなければなりません。"
+
+msgid "%className% is not Serializable"
+msgstr "%className% は、シリアライズ可能ではありません"
+
+msgid "%className% not found. Only jdk types are supported"
+msgstr "%className% が見つかりません。jdk type だけがサポートされます"
+
+msgid "%secondAttribute% must be a numeric value"
+msgstr "%secondAttribute% は数値でなければなりません"
+
+msgid "%time% ago"
+msgstr "%time%前"
+
+msgid "%value% is not a valid value for %className%"
+msgstr "%value% は、%className% の適正な値ではありません"
+
+msgid "A group with the name %groupName% already exists"
+msgstr "%groupName% と同名のグループが既に存在しています。"
+
+msgid "Administrator"
+msgstr "システム管理者"
+
+msgid "An error occurred while creating a definition"
+msgstr "定義の作成中にエラーが発生しました"
+
+msgid "An error occurred while deleting an item with the id %id%"
+msgstr "Id %id% を持つ項目を削除中にエラーが発生しました"
+
+msgid "Analytics"
+msgstr "分析"
+
+msgid "Applications"
+msgstr "アプリケーション"
+
+msgid "BDM"
+msgstr "BDM"
+
+msgid "Bonita Applications"
+msgstr ""
+
+msgid "Can't create group. Group '%groupName%' already exists"
+msgstr "グループを作成することはできません。グループ  '%groupName%' が既に存在します。"
+
+msgid "Can't create role. Role '%roleName%' already exists"
+msgstr "役割を作成することはできません。役割 '%roleName%' が既に存在します。"
+
+msgid "Can't create user. User '%userName%' already exists"
+msgstr "利用者を登録することはできません。利用者： '%userName%' が既に存在します。"
+
+msgid "Can't import Applications."
+msgstr "アプリケーションをインポートできません。"
+
+msgid "Can't import applications. An application '%token%' already exists"
+msgstr "アプリケーションをインポートできません。アプリケーション： '%token%' は既に存在します。"
+
+msgid "Can't import organization"
+msgstr "組織をインポートできません"
+
+msgid "Can't import organization. Please check that your file is well-formed."
+msgstr "組織をインポートできません。ファイルが正しい形式であることを確認してください。"
+
+msgid "Can't parse json, non-well formed content"
+msgstr "json を解析できません。 しっかり形式化されたコンテンツではありません。"
+
+msgid "Can't start process %processId%, user %userId% not found"
+msgstr "プロセスID: %processId% を起動できません。ユーザーID: %userId% が見つかりません。"
+
+msgid "Can't start process, process %processId% is not enabled"
+msgstr "プロセスを開始できません。プロセス：%processId% は有効になっていません"
+
+msgid "Can't start process, process %processId% not found"
+msgstr "プロセスを開始できません。 プロセス：%processId% が見つかりません"
+
+msgid "Can't update user. User not found"
+msgstr "利用者が見つからないため、更新できません"
+
+msgid "Cases"
+msgstr "案件"
+
+msgid "Category with name %categoryName% already exists"
+msgstr "カテゴリ名  %categoryName% は既に存在します。"
+
+msgid "Custom Pages"
+msgstr "カスタム ページ"
+
+msgid "Data definition %dataName% doesn't exists for process %processId%"
+msgstr "データ定義：%dataName% は、プロセス：%processId% に存在しません"
+
+msgid "Error during Application import file reading."
+msgstr "アプリケーションのインポート ファイルの読み取り中にエラーが発生しました。"
+
+msgid "Error occured when starting process %processId%"
+msgstr "プロセス：%processId% の開始時にエラーが発生しました"
+
+msgid "Error uploading the file. Maybe your session expired. You can try to refresh the page."
+msgstr ""
+
+msgid "Error when adding group to actor member"
+msgstr "アクターメンバーにグループを追加するときにエラーが発生しました"
+
+msgid "Error when creating group"
+msgstr "グループを作成するときにエラーが発生"
+
+msgid "Error when creating user"
+msgstr "利用者登録時のエラー"
+
+msgid "Error when deleting groups"
+msgstr "グループを削除するときにエラーが発生"
+
+msgid "Error when deleting users"
+msgstr "利用者削除時のエラー"
+
+msgid "Error when pausing BPM services"
+msgstr "BPM サービスを一時停止するときにエラーが発生しました。"
+
+msgid "Error when resuming BPM services"
+msgstr "BPM サービスを再開するときにエラーが発生しました。"
+
+msgid "Error when searching users"
+msgstr "利用者検索時のエラー"
+
+msgid "Error when updating %activityId% activity variables"
+msgstr "アクティビティ：%activityId% の変数を更新中にエラーが発生しました"
+
+msgid "Error when updating group"
+msgstr "グループを更新するときにエラーが発生"
+
+msgid "Error when updating process deployment informations"
+msgstr "プロセスのデプロイ情報を更新中にエラーが発生しました"
+
+msgid "Error when updating user"
+msgstr "利用者を更新時のエラー"
+
+msgid "Filters are not supported by this API"
+msgstr "この API では、フィルターはサポートされていません"
+
+msgid "For administrator-type of profiles. To manage processes: install, delete and configure, for all processes"
+msgstr "システム管理者プロファイル。すべてのプロセスを管理（インストール、削除、構成設定）"
+
+msgid "For administrator-type of profiles. To monitor all processes"
+msgstr "システム管理者プロファイル： すべてのプロセスをモニタリング"
+
+msgid "For administrator-type of profiles. To monitor cases of all processes"
+msgstr "システム管理者プロファイル： すべてのプロセスの案件をモニタリング"
+
+msgid "For administrator-type of profiles. To monitor task completion for all processes"
+msgstr "システム管理者プロファイル： すべてのプロセスのタスク完了状態をモニタリングできる。"
+
+msgid "For process manager-type of profiles. To manage processes under her responsibility"
+msgstr "プロセス管理者プロファイル： その管理者が所轄するプロセスを管理"
+
+msgid "For process manager-type of profiles. To monitor cases of processes under her responsibility"
+msgstr "プロセス管理者プロファイル： その管理者が所轄するプロセスの案件をモニタリング"
+
+msgid "For process manager-type of profiles. To monitor processes under her responsibility"
+msgstr "プロセス管理者プロファイル： その管理者が所轄するプロセスをモニタリング"
+
+msgid "For process manager-type of profiles. To monitor task completion, only for processes under her responsibility"
+msgstr "プロセス管理者プロファイル： 特定のプロセスのタスク完了状態をモニタリングできる"
+
+msgid "For user-type of profiles. To view and do tasks  if he is a candidate"
+msgstr "ユーザープロファイル： 自己にアサインされたタスクを参照、実行できる。"
+
+msgid "For user-type of profiles. To visualize cases started by the user or cases he has worked on"
+msgstr "利用者プロファイル： 彼または彼女が開始した案件、または作業した案件を表示"
+
+msgid "For user-type of profiles. UI Designer page to visualize processes and start cases"
+msgstr "ユーザータイプのプロファイル。UI デザイナーページではプロセスと開始ケースを視覚化します。"
+
+msgid "Groups"
+msgstr "グループ"
+
+msgid "High"
+msgstr "高"
+
+msgid "Highest"
+msgstr "最高"
+
+msgid "Install/Export"
+msgstr "インストール/エクスポート"
+
+msgid "Install/export organization"
+msgstr "組織のインストール/エクスポート"
+
+msgid "Json can't be mapped to "
+msgstr "Json を次にマップできません"
+
+msgid "License"
+msgstr "ライセンス"
+
+msgid "Login failed. No profile has been set up for this user. Contact your administrator."
+msgstr "ログインに失敗しました。この利用者のプロファイルが設定されていません。BPMのシステム管理者に問い合わせてください。"
+
+msgid "Login form"
+msgstr "ログイン フォーム"
+
+msgid "Look and Feel"
+msgstr "ルック＆フィール"
+
+msgid "Low"
+msgstr "低"
+
+msgid "Lowest"
+msgstr "最低"
+
+msgid "MM/dd/yyyy"
+msgstr "yyyy/MM/dd"
+
+msgid "MM/dd/yyyy h:mm a"
+msgstr "yyyy/MM/dd HH:mm"
+
+msgid "MMMM dd, yyyy"
+msgstr "yyyy年MM月dd日"
+
+msgid "Manage BDM"
+msgstr "BDM を管理"
+
+msgid "Manage Look and Feel"
+msgstr "ルック＆フィールの管理"
+
+msgid "Manage applications"
+msgstr "アプリケーションを管理します"
+
+msgid "Manage custom pages"
+msgstr "カスタム ページを管理します"
+
+msgid "Manage groups"
+msgstr "グループを管理"
+
+msgid "Manage roles"
+msgstr "役割を管理"
+
+msgid "Manage users"
+msgstr "ユーザーを管理"
+
+msgid "Monitoring"
+msgstr "モニタリング"
+
+msgid "No description."
+msgstr "説明がありません。"
+
+msgid "Normal"
+msgstr "普通"
+
+msgid "Only the value attribute can be updated"
+msgstr "Value 属性のみを更新することができます"
+
+msgid "Password"
+msgstr "パスワード"
+
+msgid "Password must be at least %number% characters long"
+msgstr "パスワードは少なくとも、%number% 文字にする必要があります"
+
+msgid "Password must contain at least %number% digits"
+msgstr "パスワードは少なくとも、%number% 文字である必要があります"
+
+msgid "Password must contain at least %number% lower case characters"
+msgstr "パスワードは少なくとも、 %number% 文字の小文字を含める必要があります"
+
+msgid "Password must contain at least %number% special characters"
+msgstr "パスワードは少なくとも、%number% 文字の特殊文字を含める必要があります"
+
+msgid "Password must contain at least %number% upper case characters"
+msgstr "パスワードは少なくとも、 %number% 文字の大文字を含める必要があります"
+
+msgid "Please, contact your administrator."
+msgstr "BPMのシステム管理者に問い合わせてください。"
+
+msgid "Process %appName% in version %version% already exists"
+msgstr "プロセス： %appName% バージョン %version% では既に存在します"
+
+msgid "Process %appName% in version %version% contains 6.x Legacy artifacts (forms or case overview page). Those are based on Google Web Toolkit (GWT), a technology that is no longer supported by Bonita. To know more, check the documentation."
+msgstr "バージョンのプロセスには、6.xレガシーアーティファクト（フォームまたはケースの概要ページ）が含まれています。これらはGoogle Web Toolkit (GWT)に基づきBonitaでサポートされなくなったテクノロジーです。詳細については、ドキュメントを確認してください。"
+
+msgid "Process definition not found for id %processId%"
+msgstr "ID: %processId% のプロセス定義 が見つかりません"
+
+msgid "Processes"
+msgstr "プロセス"
+
+msgid "Profile member already exists"
+msgstr "プロファイルのメンバーは既に存在します"
+
+msgid "Profiles"
+msgstr "プロファイル"
+
+msgid "Request parameter \"id\" must be set."
+msgstr "リクエスト パラメータ　\"id\"　を設定する必要があります。"
+
+msgid "Roles"
+msgstr "役割"
+
+msgid "Search terms are not supported by this API"
+msgstr "その検索用語は、このAPI ではサポートされていません"
+
+msgid "Session expired. Please log in again."
+msgstr "セッションが切れました。再度ログインしてください。"
+
+msgid "Sorting is not supported by this API"
+msgstr "この API では、並べ替えはサポートされていません"
+
+msgid "Tasks"
+msgstr "タスク"
+
+msgid "The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task)."
+msgstr "システム管理者は、プロセスのインストール、組織の管理、一部のエラーへの対処（たとえば、タスクの再実行）をすることができます。"
+
+msgid "The only mandatory filter is %name%"
+msgstr "唯一の必須のフィルターは、%name% です。"
+
+msgid "The server is not available"
+msgstr "サーバーは利用できません。"
+
+msgid "The user can view and perform tasks and can start a new case of a process."
+msgstr "ユーザーはタスクを表示して実行することができます。そしてプロセスの新規案件を起案することができます。"
+
+msgid "This category has already been added to this process"
+msgstr "このカテゴリは既にこのプロセスに追加されました"
+
+msgid "This group has already been mapped to actor"
+msgstr "このグループは、既にアクターにアサインされています"
+
+msgid "This membership has already been mapped to actor"
+msgstr "この所属は、既にアクターにアサインされています"
+
+msgid "This membership is already added to user"
+msgstr "この所属は既にユーザーに追加されています。"
+
+msgid "This role has already been mapped to actor"
+msgstr "この役割は、既にアクターにアサインされています"
+
+msgid "This service is offline for maintenance. Please try later."
+msgstr "このサービスは、保守のためオフラインです。後でやり直してください。"
+
+msgid "This user has already been mapped to actor"
+msgstr "このユーザーは既にアクターにアサインされています。"
+
+msgid "UI Designer page to visualize processes and start cases"
+msgstr "プロセスを視覚化してケースを開始するためのUIデザイナーページ"
+
+msgid "Unable to deploy business archive"
+msgstr "ビジネス アーカイブをデプロイすることはできません。"
+
+msgid "Unable to disable process"
+msgstr "プロセスを無効にすることはできません。"
+
+msgid "Unable to enable process"
+msgstr "プロセスを有効にすることはできません。"
+
+msgid "Unable to find data instance %dataName% for activity %activityId%"
+msgstr "アクティビティ：%activityId% のデータ・インスタンス：%dataName% を見つけることができません"
+
+msgid "Unable to find role %roleId%"
+msgstr "ロール %roleId% が見つかりません"
+
+msgid "Unable to get group path, group not found"
+msgstr "グループが見つからないため、グループのパスを取得することができません"
+
+msgid "Unable to get process data definitions, process %processId% not found"
+msgstr "プロセスのデータ定義を取得できません。 プロセス：%processId% が見つかりません"
+
+msgid "Unable to log in. Please check your username and password."
+msgstr "ログインできません。ユーザー名とパスワードを確認してください。"
+
+msgid "User"
+msgstr "利用者"
+
+msgid "User not found"
+msgstr "利用者が見つかりません"
+
+msgid "User privilege settings"
+msgstr "ユーザー権限の設定"
+
+msgid "Users"
+msgstr "ユーザー"
+
+msgid "Welcome to"
+msgstr "ようこそ"
+
+msgid "day"
+msgstr "日"
+
+msgid "hr"
+msgstr "時"
+
+msgid "in %time%"
+msgstr "%time%以内"
+
+msgid "message"
+msgstr "Message"
+
+msgid "min"
+msgstr "分"
+
+msgid "mo"
+msgstr "月"
+
+msgid "or"
+msgstr "または"
+
+msgid "sec"
+msgstr "秒"
+
+msgid "yr"
+msgstr "年"
+

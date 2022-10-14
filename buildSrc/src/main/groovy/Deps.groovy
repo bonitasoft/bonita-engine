@@ -48,9 +48,22 @@ class Deps {
     //Last version compatible with hibernate 5
     public static String hazelcastHibernateVersion = "2.1.1"
 
-
     public static String guavaVersion = "30.1.1-jre"
     public static String antlr4RuntimeVersion = "4.7.2"
+
+    // bonita-web specific dependencies:
+    public static String jettisonVersion = "1.3.1"
+    public static String jsonSimpleVersion = "1.1"
+    public static String urlrewriteVersion = "4.0.3"
+    public static String jakartaJstlVersion = "1.2.6"
+    public static String jakartaJstlApiVersion = "1.2.7"
+    public static String restletVersion = "2.3.12"
+    public static String xbeanClassloaderVersion = "3.7"
+    public static String jgettextVersion = "0.13"
+    public static String hamcrestVersion = "2.1"
+    public static String woodstoxStax2ApiVersion = "3.1.4"
+    public static String keycloakVersion = "17.0.1"
+    public static String spnegoVersion = "r9"
 
     // Test dependency versions:
     public static String junit4Version = "4.13.2"

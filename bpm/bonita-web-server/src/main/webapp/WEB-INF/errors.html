@@ -1,0 +1,29 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/html"> 
+ <head> 
+  <title>Error %s</title> 
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html,
+    body {
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+    body > .container-fluid {
+        height: inherit;
+        display: flex;
+        flex-direction: column;
+    }
+    body > .container-fluid > iframe {
+        flex: 1;
+    }
+  </style>
+ </head> 
+ <body> 
+  <div class="container-fluid">
+    <iframe id="bonitaframe" src="%s/portal/resource/app/appDirectoryBonita/error-%s/content/?_l=fr&amp;app=appDirectoryBonita" style="border: 0px none;" width="100%%"></iframe>
+  </div>  
+ </body>
+</html>

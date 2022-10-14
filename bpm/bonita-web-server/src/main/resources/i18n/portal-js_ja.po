@@ -1,0 +1,1337 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Project-Id-Version: bonita\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: bonita\n"
+"X-Crowdin-Project-ID: 13316\n"
+"X-Crowdin-Language: ja\n"
+"X-Crowdin-File: /dev/bonita-web/portal/portal-js.pot\n"
+"X-Crowdin-File-ID: 60594\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"PO-Revision-Date: 2022-03-09 02:29\n"
+
+msgid "1 case has been deleted"
+msgstr "1 案件が削除されました"
+
+msgid "A page with this name already exists."
+msgstr "この名前のページは既に存在します。"
+
+msgid "A server error occurred. The operation did not complete successfully"
+msgstr "サーバーエラーが発生しました。操作が正常に完了していません。"
+
+msgid "Above normal"
+msgstr "平均以上"
+
+msgid "Access denied. For more information, check the log file."
+msgstr "アクセスが拒否されました。 詳細についてはログファイルを確認してください。"
+
+msgid "Actions"
+msgstr "アクション"
+
+msgid "Activation state"
+msgstr "有効化の状態"
+
+msgid "Actor name"
+msgstr "アクター名"
+
+msgid "Actors"
+msgstr "アクター"
+
+msgid "Actors must be resolved before enabling the Process."
+msgstr "アクターは、プロセスを有効にする前に設定する必要があります。"
+
+msgid "Add"
+msgstr "追加"
+
+msgid "Add from custom pages"
+msgstr "カスタム ページを追加します"
+
+msgid "Add membership"
+msgstr "所属を追加"
+
+msgid "Add menu"
+msgstr "メニューを追加します"
+
+msgid "Add menu item"
+msgstr "メニュー項目を追加します"
+
+msgid "Add page"
+msgstr "ページを追加"
+
+msgid "Add pages in Navigation"
+msgstr "ナビゲーションにページを追加します"
+
+msgid "Add top-level menu"
+msgstr "最上位のメニューを追加します"
+
+msgid "Address"
+msgstr "住所"
+
+msgid "Aggregates tasks in states ready, waiting,<br>executing, completing, and initializing"
+msgstr "レディ、待機、実行、完了および初期化状態のタスクを集約"
+
+msgid "All"
+msgstr "すべて"
+
+msgid "All done. Good job!"
+msgstr "実行すべきタスクがアサインされていません。"
+
+msgid "An Error occurred during process activation/deactivation."
+msgstr "プロセスの有効化/無効化中にエラーが発生しました。"
+
+msgid "An Error occurred during process deletion."
+msgstr "プロセスの削除中にエラーが発生しました。"
+
+msgid "An application is a customized environment for a specific user profile, in which users interact with business data and business processes in the most efficient way."
+msgstr "アプリケーションは、特定のユーザー プロファイル用にカスタマイズされた環境になり、利用者はビジネス データおよびビジネス プロセスを最も効率的な方法で利用できるようになります。"
+
+msgid "An error has occurred. For more information, check the log file."
+msgstr "エラーが発生しました。 詳細についてはログファイルを確認してください。"
+
+msgid "An error occured during categories update"
+msgstr "カテゴリの更新中にエラーが発生しました"
+
+msgid "An error occurred when deploying the BDM. Consult the logs for more information."
+msgstr "BDMのデプロイ中にエラーが発生しました。\n"
+"詳細についてはログを参照してください。"
+
+msgid "An error occurred while submitting the form."
+msgstr "フォームの送信中にエラーが発生しました。"
+
+msgid "An error occurred while submitting the form.<br/>The task may not be available anymore."
+msgstr "フォームの送信中にエラーが発生しました。 <br/>このタスクはもう利用できません。"
+
+msgid "Anyone"
+msgstr "すべて"
+
+msgid "Application XML file"
+msgstr "アプリケーションのXMLファイル"
+
+msgid "Application id not provided. Unable to retrieve the application details."
+msgstr "アプリケーション ID が提供されていません。アプリケーションの詳細を取得できません。"
+
+msgid "Application list"
+msgstr "アプリケーション リスト"
+
+msgid "Apply"
+msgstr "適用"
+
+msgid "Archived cases"
+msgstr "完了済み案件"
+
+msgid "Are you sure you want to delete it?"
+msgstr ""
+
+msgid "Are you sure you want to delete this membership ?"
+msgstr "この所属を削除してもよろしいですか？"
+
+msgid "Assign to me. Only I will be able to do it"
+msgstr "自分にアサイン。それを実行できるのは、自分だけになります。"
+
+msgid "Assigned on"
+msgstr "アサイン日時"
+
+msgid "Available or My tasks"
+msgstr "このマークはあなただけに指名されたタスクを示します"
+
+msgid "Available tasks"
+msgstr "応受援タスク"
+
+msgid "BDM access control file can now be installed."
+msgstr "BDM のアクセス コントロール ファイルをインストールできるようになりました。"
+
+msgid "BDM file"
+msgstr "BDM ファイル"
+
+msgid "BDM has not been uploaded. System was not able to upload the provided BDM file for technical reasons. You can try again later."
+msgstr "BDMはアップロードされていません。\n"
+"技術的な理由によりシステムは指定されたBDMファイルをアップロードできませんでした。\n"
+"後ほど再度お試しください。"
+
+msgid "BDM successfully updated."
+msgstr "BDMは正常に更新されました。"
+
+msgid "BPM Services must be paused. Go to \"BPM Services\" menu option."
+msgstr "BPMサービスを一時停止する必要があります。 \n"
+"「BPMサービス」メニューオプションに移動します。"
+
+msgid "Back"
+msgstr "戻る"
+
+msgid "Before updating the BDM, access control file should be deleted."
+msgstr "BDMを更新する前にアクセス コントロールファイルを削除する必要があります。"
+
+msgid "Before you import the application descriptor, the pages and the profile must already be loaded in the Portal."
+msgstr "アプリケーション記述子をインポートする前に、ページとプロファイルは、ポータル内に既に読み込まれている必要があります。"
+
+msgid "Business Data Model definition"
+msgstr "ビジネス データ モデル定義"
+
+msgid "Business card"
+msgstr "業務上の連絡先"
+
+msgid "Business card has not been updated. Please retry later or contact an administrator"
+msgstr "業務上の連絡先が、更新されませんでした。後で再試行するか管理者に問い合わせてください。 "
+
+msgid "Business card successfully updated"
+msgstr "業務上の連絡先が正常に更新されました。"
+
+msgid "Can't import page or form to the process"
+msgstr "プロセスにページまたはフォームをインポートできません"
+
+msgid "Can't update expression content"
+msgstr "式のコンテンツを更新できません"
+
+msgid "Cancel"
+msgstr "キャンセル"
+
+msgid "Cancelled, skipped instances"
+msgstr "キャンセル/スキップ"
+
+msgid "Cannot upload the file"
+msgstr "ファイルをアップロードできません"
+
+msgid "Case"
+msgstr "案件"
+
+msgid "Case ID"
+msgstr "案件ID"
+
+msgid "Case comments"
+msgstr "案件コメント"
+
+msgid "Case id: {{caseId}} - Process: {{processName}} ({{processVersion}})"
+msgstr "案件ID: {{caseId}} - プロセス: {{processName}} ({{processVersion}})"
+
+msgid "Case list"
+msgstr "案件リスト"
+
+msgid "Case overview"
+msgstr "案件概況"
+
+msgid "Case start"
+msgstr "案件の開始"
+
+msgid "Case state"
+msgstr "案件の状態"
+
+msgid "Cases"
+msgstr "案件"
+
+msgid "Cases with failures"
+msgstr "ケース エラー"
+
+msgid "Categories"
+msgstr "カテゴリ"
+
+msgid "Check that each entity is mapped to a profile, for either Bonita Portal or for applications you have created."
+msgstr "各エンティティが Bonita ポータル、またはあなたが作成したアプリケーションのいずれかのプロファイルにマップされていることを確認します。"
+
+msgid "City"
+msgstr "市区町村"
+
+msgid "Class name"
+msgstr "クラス名"
+
+msgid "Click here to choose the .xml file"
+msgstr ".xml ファイルを選択するにはここをクリック"
+
+msgid "Click here to choose your .zip file"
+msgstr ".zip  ファイルを選択しクリックしてください。"
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Columns selection"
+msgstr "列の選択"
+
+msgid "Comment:"
+msgstr "コメント："
+
+msgid "Comments"
+msgstr "コメント"
+
+msgid "Compilation failure. Verify that the Index.groovy class implements the PageController interface."
+msgstr "コンパイルに失敗しました。Index.groovy クラスが PageController インターフェイスを実装することを確認します。"
+
+msgid "Completed instances"
+msgstr "実行完了"
+
+msgid "Configuration state"
+msgstr "構成設定の状態"
+
+msgid "Confirm delete?"
+msgstr "削除していいですか？"
+
+msgid "Confirm new Password"
+msgstr "新しいパスワードを確認"
+
+msgid "Connectors"
+msgstr "コネクタ"
+
+msgid "Connectors must be resolved before enabling the Process."
+msgstr "コネクタは、プロセスを有効にする前に設定する必要があります。"
+
+msgid "Core to Bonita platform"
+msgstr "Bonita プラットフォームのコア"
+
+msgid "Core to Bonita platform; cannot be deleted"
+msgstr "Bonita プラットフォームのコア; 削除できません"
+
+msgid "Country"
+msgstr "国"
+
+msgid "Create a new membership"
+msgstr "新しいメンバーシップを作成します"
+
+msgid "Create an application"
+msgstr "アプリケーションを作成します"
+
+msgid "Created by"
+msgstr "作成者"
+
+msgid "Creation"
+msgstr "作成"
+
+msgid "Creation date"
+msgstr "作成日時"
+
+msgid "Creation on"
+msgstr "作成対象："
+
+msgid "Custom information"
+msgstr "カスタム情報"
+
+msgid "Custom information has not been updated. Please retry later or contact an administrator"
+msgstr "カスタム情報が更新されませんでした。後で再試行するか管理者に問い合わせてください。"
+
+msgid "Custom information successfully updated"
+msgstr "カスタム情報が正常に更新されました"
+
+msgid "Delete"
+msgstr "削除"
+
+msgid "Delete application"
+msgstr "アプリケーションを削除"
+
+msgid "Delete membership"
+msgstr "所属を削除しますか？"
+
+msgid "Delete process"
+msgstr "プロセスを削除"
+
+msgid "Deleting a process definition will also delete all open and archived cases of this process."
+msgstr ""
+
+msgid "Description"
+msgstr "説明"
+
+msgid "Disable"
+msgstr "無効にする"
+
+msgid "Display name"
+msgstr "表示名"
+
+msgid "Don't forget to start BPM Services again."
+msgstr "BPMサービスを再開することを忘れないでください。"
+
+msgid "Done tasks"
+msgstr "完了したタスク"
+
+msgid "Drawing process..."
+msgstr "プロセス図を描画中 ..."
+
+msgid "Due date"
+msgstr "期限"
+
+msgid "Edit"
+msgstr "編集"
+
+msgid "Edit menu"
+msgstr "メニューを編集します"
+
+msgid "Edit menu item"
+msgstr "メニュー項目を編集"
+
+msgid "Email"
+msgstr "Eメール"
+
+msgid "Enable"
+msgstr "有効にする"
+
+msgid "Enable all"
+msgstr "すべて有効にする"
+
+msgid "End date"
+msgstr "終了日"
+
+msgid "Enter a new category name and press \"Enter\" key to create a new category and assign it to the current process."
+msgstr "新しいカテゴリ名を入力し、\"Enter\"キーを押して新しいカテゴリを作成したうえで、現在のプロセスにそれをアサインします。"
+
+msgid "Enter the user to start the case for..."
+msgstr "案件を開始するユーザーを入力..."
+
+msgid "Error"
+msgstr "エラー"
+
+msgid "Error on drawing process!"
+msgstr "プロセス図の描画中にエラーが発生しました！"
+
+msgid "Error while trying to start the case. Some required information is missing (contract not fulfilled)."
+msgstr "案件を開始しようとしてエラーが発生しました。一部の必須情報がありません （コントラクトのデータが満たされていない）。"
+
+msgid "Error!"
+msgstr "エラー！"
+
+msgid "Error: value must be a boolean"
+msgstr "エラー: 値はブール値である必要があります"
+
+msgid "Error: value must be a double"
+msgstr "エラー: 値は double 型の値である必要があります"
+
+msgid "Error: value must be an integer"
+msgstr "エラー: 値は整数でなければなりません"
+
+msgid "Executing, completing, initializing instances"
+msgstr "初期化中, 実行中, 完了途中"
+
+msgid "Export"
+msgstr "エクスポート"
+
+msgid "Export application descriptor"
+msgstr "アプリケーション記述子をエクスポート"
+
+msgid "Expression content has been updated"
+msgstr "式のコンテンツが更新されました"
+
+msgid "Failed"
+msgstr "エラー"
+
+msgid "Failed Flow Nodes"
+msgstr "作業中にエラー発生"
+
+msgid "Failed instances"
+msgstr "エラーがあった"
+
+msgid "File format may be invalid. For more information, check the log file."
+msgstr ""
+
+msgid "Filename too long. The zip filename must be no longer than 50 characters"
+msgstr "ファイル名が長すぎます。Zip ファイル名は 50 文字以内である必要があります。"
+
+msgid "Filters"
+msgstr "フィルター"
+
+msgid "First name"
+msgstr "姓（英語の場合：First name）"
+
+msgid "Form"
+msgstr "フォーム"
+
+msgid "Form submitted.<br/>The next task in the list is now selected."
+msgstr "フォームを送信しました。 <br/>リスト中の次のタスクが選択されました。"
+
+msgid "General"
+msgstr "全般"
+
+msgid "General information"
+msgstr "全般的な情報"
+
+msgid "General information has not been updated. Please retry later or contact an administrator"
+msgstr "全般的な情報が更新されませんでした。後で再試行するかシステム管理者に問い合わせてください。"
+
+msgid "General information successfully updated"
+msgstr "全般的な情報が正常に更新されました"
+
+msgid "Groups"
+msgstr "グループ"
+
+msgid "Healthy cases"
+msgstr "正常なケース"
+
+msgid "Hide Menu"
+msgstr "メニューを非表示"
+
+msgid "Hide menu"
+msgstr "メニューを非表示"
+
+msgid "Hide panel"
+msgstr "パネルを非表示"
+
+msgid "Highest"
+msgstr "最高"
+
+msgid "However, due to the use of Hibernate for data persistence, some changes on the data may not be well handled. These changes may lead to a corrupted database and CANNOT BE REVERTED."
+msgstr "ただし、データの永続化にHibernateを使用するため、データの一部の変更はうまく処理されない可能性があります。 これらの変更により、データベースが破損する可能性があり、元に戻すことはできません。"
+
+msgid "I have read and understood the previous warning message. I have prepared a database backup so I can rollback this operation."
+msgstr "以前の警告メッセージを読んで理解しました。 この操作をロールバックできるように、データベースのバックアップを準備しました。"
+
+msgid "ID"
+msgstr "id"
+
+msgid "IN ANY CASE, you MUST CREATE A BACKUP of the current BDM database before undergoing a BDM update."
+msgstr "いずれの場合も、BDMの更新を行う前に現在のBDMデータベースのバックアップを作成する必要があります。"
+
+msgid "If your changes do not fall into those change types, you can go ahead and proceed with the BDM update now."
+msgstr "変更がこれらの変更タイプに該当しない場合は、先に進んみ今すぐBDMアップデートを継続することができます。"
+
+msgid "Implementation version"
+msgstr "実装のバージョン"
+
+msgid "Import"
+msgstr "インポート"
+
+msgid "Import an application"
+msgstr "アプリケーションをインポート"
+
+msgid "Import an application descriptor"
+msgstr "アプリケーション記述子をインポート"
+
+msgid "In a production environment, this should be used with caution."
+msgstr ""
+
+msgid "In such cases, you must CANCEL THIS UPDATE and let the database administrator carefully script the changes and apply them to the database. Only then will you be able to update the BDM from this page."
+msgstr "このような場合、このアップデートをキャンセルし、データベース管理者に注意深く変更をスクリプトして、それらをデータベースに適用させなければなりません。 その時のみ、このページからBDMを更新することができます。"
+
+msgid "In task name column"
+msgstr "[タスク名] 列"
+
+msgid "In the menu <i>Organization > Manage</i>, go to the <i>Users</i> page of the wizard"
+msgstr "メニューの <i>組織 > 管理</i>で、 <i>ユーザー</i> のウィザード ページに進む"
+
+msgid "Install"
+msgstr "インストール"
+
+msgid "Install Business Data Model"
+msgstr "ビジネス データ モデルのインストール"
+
+msgid "Install a BDM file"
+msgstr "BDM ファイルのインストール"
+
+msgid "Installed"
+msgstr "インストール済み"
+
+msgid "Installed by"
+msgstr "インストール者 "
+
+msgid "Installed on"
+msgstr "インストール日時 "
+
+msgid "Installing"
+msgstr "インストール中 "
+
+msgid "Installing Business Data Model"
+msgstr "ビジネス データ モデルのインストール "
+
+msgid "Installing or updating the BDM implies to be logged in as Technical User, and to shut down all BPM services."
+msgstr "BDM のインストールまたは更新はテクニカルユーザーとしてログインし、すべての BPM サービスをシャットダウンすることを意味します。"
+
+msgid "Items per page"
+msgstr "ページあたりの表示件数"
+
+msgid "Job title"
+msgstr "役職名"
+
+msgid "Last login"
+msgstr "最終ログイン日時"
+
+msgid "Last name"
+msgstr "名（英語の場合：Last name）"
+
+msgid "Last update"
+msgstr "最新更新日時"
+
+msgid "Layout"
+msgstr "レイアウト"
+
+msgid "Loading..."
+msgstr "ロード中..."
+
+msgid "Logo"
+msgstr "ロゴ"
+
+msgid "Look & Feel"
+msgstr "ルック＆フィール"
+
+msgid "Lowest"
+msgstr "最低"
+
+msgid "MM/dd/yyyy h:mm a"
+msgstr "yyyy/MM/dd HH:mm"
+
+msgid "MMM DD LT"
+msgstr "MMM Do LT "
+
+msgid "Make sure all artifacts enabled on the platform are compatible with the new BDM."
+msgstr "プラットフォームで有効にされているすべてのアーティファクトが新しいBDMと互換性があることを確認してください。 "
+
+msgid "Make this task available to other team members again"
+msgstr "このタスクは他のチーム メンバーでも行えるようにする"
+
+msgid "Make this task personal: only I will be able to do it"
+msgstr "このタスクは自分だけが行えるようにする"
+
+msgid "Manage Categories"
+msgstr "カテゴリを管理"
+
+msgid "Manager"
+msgstr "マネージャ"
+
+msgid "Maximum size 255 characters"
+msgstr "最大 255 文字"
+
+msgid "Me"
+msgstr "自分"
+
+msgid "Membership has not been added. Please retry later or contact an administrator"
+msgstr "所属が追加されませんでした。後で再試行するか管理者に問い合わせてください。 "
+
+msgid "Membership has not been removed. Please retry later or contact an administrator"
+msgstr "所属が削除されませんでした。後で再試行するか管理者に問い合わせてください。 "
+
+msgid "Membership successfully added"
+msgstr "所属が正常に追加されました"
+
+msgid "Membership successfully removed"
+msgstr "所属が正常に削除されました"
+
+msgid "Memberships"
+msgstr "所属"
+
+msgid "Memberships mapped to {}"
+msgstr "{} にマップされたメンバーシップ"
+
+msgid "Mobile"
+msgstr "携帯番号"
+
+msgid "Monitoring status"
+msgstr "進捗状況のモニタリング "
+
+msgid "Multi-page menu"
+msgstr "複数ページ メニュー"
+
+msgid "My tasks"
+msgstr "マイタスク"
+
+msgid "Name"
+msgstr "名前"
+
+msgid "Navigation"
+msgstr "ナビゲーション"
+
+msgid "New"
+msgstr "新規"
+
+msgid "New Password"
+msgstr "新規パスワード"
+
+msgid "New comment"
+msgstr "新しいコメント"
+
+msgid "No application available."
+msgstr "利用可能なアプリケーションはありません。"
+
+msgid "No application found with id:"
+msgstr "ID付きのアプリケーションが見つかりません:"
+
+msgid "No cases to display"
+msgstr "表示する案件はありません"
+
+msgid "No comment on this case yet. To add one, use the input field at the bottom of this panel"
+msgstr "まだこの案件に対するコメントがありません。追加するには、このパネルの下部にあるコメント入力フィールドを使用します。"
+
+msgid "No custom information defined."
+msgstr "カスタムの情報が定義されていません。"
+
+msgid "No data"
+msgstr "データがありません。"
+
+msgid "No description."
+msgstr "説明がありません。"
+
+msgid "No done task yet."
+msgstr "まだ完了したタスクはありません。"
+
+msgid "No form is needed. You can enter a comment and confirm."
+msgstr "フォームは不要です。コメントを入力し、確認することができます。"
+
+msgid "No mapping"
+msgstr "マッピングなし"
+
+msgid "No process found with id:"
+msgstr "IDt付プロセスが見つかりません:"
+
+msgid "No profile"
+msgstr "プロファイルがありません"
+
+msgid "No profile mapped to this application"
+msgstr "このアプリケーションにマップされているプロファイルはありません。"
+
+msgid "No updates have been made on categories. Don't forget to press \"Enter\" key after selecting a category."
+msgstr "カテゴリは更新されていません。カテゴリを選択後、「Enter」キーを押すことを忘れないでください。"
+
+msgid "No user found with id:"
+msgstr "ID付ユーザーが見つかりません:"
+
+msgid "No value"
+msgstr "値なし "
+
+msgid "Normal"
+msgstr "普通"
+
+msgid "Not installed"
+msgstr "インストールされていません。"
+
+msgid "One or more connectors on case start or case end failed"
+msgstr "案件の開始または終了時に、1 つ、または複数のコネクタでエラーが発生しました"
+
+msgid "One or more tasks are not available anymore. The list is now up to date."
+msgstr "1つ以上のタスクは、もうご使用いただけません。タスク一覧が新しくなっています。"
+
+msgid "One-page menu"
+msgstr "1 ページ メニュー"
+
+msgid "Only I can do this task"
+msgstr "私だけがこのタスクを実行できる"
+
+msgid "Only cases from root processes are displayed in the table below. No details are available for cases started by call activities."
+msgstr "ルート親プロセスの案件だけが、次の表に表示されます。コール アクティビティによって開始された案件詳細は表示されません。"
+
+msgid "Only one Business Data Model (BDM) can be active at a time."
+msgstr "一度にアクティブにできるビジネスデータモデル（BDM）は1つだけです。"
+
+msgid "Open cases"
+msgstr "進行中案件"
+
+msgid "Open in a popup"
+msgstr "ポップアップで開く"
+
+msgid "Open the task to perform it"
+msgstr "実行するタスクを開く"
+
+msgid "Overview"
+msgstr "案件概況"
+
+msgid "Page"
+msgstr "ページ"
+
+msgid "Pages"
+msgstr "ページ"
+
+msgid "Parameters"
+msgstr "パラメータ"
+
+msgid "Parameters must be resolved before enabling the Process."
+msgstr "プロセスを有効にする前にパラメータを解決する必要があります。"
+
+msgid "Password"
+msgstr "パスワード"
+
+msgid "Password has not been updated. Please retry later or contact an administrator"
+msgstr "パスワードが更新されませんでした。後で再試行するか管理者に問い合わせてください。"
+
+msgid "Password successfully updated"
+msgstr "パスワードが正常に更新されました"
+
+msgid "Passwords don't match"
+msgstr "パスワードが一致しません"
+
+msgid "Pending Flow Nodes"
+msgstr "作業実行を待機中"
+
+msgid "Personal information"
+msgstr "個人情報"
+
+msgid "Personal information has not been updated. Please retry later or contact an administrator"
+msgstr "個人情報は更新されませんでした。後で再試行するか管理者に問い合わせてください。"
+
+msgid "Personal information successfully updated"
+msgstr "個人情報が正常に更新されました"
+
+msgid "Phone"
+msgstr "電話番号"
+
+msgid "Please refresh the page."
+msgstr "ページを更新してください。"
+
+msgid "Priority"
+msgstr "優先度"
+
+msgid "Process"
+msgstr "プロセス"
+
+msgid "Process id"
+msgstr "プロセス ID"
+
+msgid "Process id not provided. Unable to retrieve the process details."
+msgstr "プロセスID が提供されていません。プロセスの詳細を取得できません。"
+
+msgid "Process name"
+msgstr "プロセス名"
+
+msgid "Process:"
+msgstr "プロセス:"
+
+msgid "Profile"
+msgstr "プロファイル"
+
+msgid "Profiles"
+msgstr "プロファイル"
+
+msgid "Profiles / Memberships"
+msgstr "プロファイル /  所属"
+
+msgid "Ready, waiting instances"
+msgstr "作業開始を待機中"
+
+msgid "Refresh"
+msgstr "リフレッシュ"
+
+msgid "Refresh data"
+msgstr "データを再読み込み"
+
+msgid "Release"
+msgstr "手放す"
+
+msgid "Remove"
+msgstr "削除"
+
+msgid "Remove all"
+msgstr "すべて削除"
+
+msgid "Reset"
+msgstr "リセット"
+
+msgid "Reset to default"
+msgstr "初期設定にリセットする"
+
+msgid "Roles"
+msgstr "役割"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "Search Key 1"
+msgstr "検索キー 1"
+
+msgid "Search Key 2"
+msgstr "検索キー 2"
+
+msgid "Search Key 3"
+msgstr "検索キー 3"
+
+msgid "Search Key 4"
+msgstr "検索キー 4"
+
+msgid "Search Key 5"
+msgstr "検索キー 5"
+
+msgid "Search by process name or search keys"
+msgstr ""
+
+msgid "Search..."
+msgstr "検索..."
+
+msgid "Select a group..."
+msgstr "グループを選択..."
+
+msgid "Select a role..."
+msgstr "役割を選択..."
+
+msgid "Select all"
+msgstr "すべて選択"
+
+msgid "Select groups..."
+msgstr "グループを選択..."
+
+msgid "Select none"
+msgstr "選択を解除"
+
+msgid "Select roles..."
+msgstr "役割を選択..."
+
+msgid "Select the <i>User information management</i> tab to add <i>Custom information</i> on the right"
+msgstr " <i>ユーザー情報管理</i>タブを選択し、右側の <i>カスタム情報</i> を追加します"
+
+msgid "Select the entities (users, groups, roles, memberships) to map to the actors. These entities will do the human tasks in the process."
+msgstr "アクターにアサインするエンティティ（ユーザー、グループ、役割、所属など）を選択します。これらのエンティティは、プロセスにヒューマン タスクを実行します。"
+
+msgid "Select the page"
+msgstr "ページを選択します"
+
+msgid "Select users..."
+msgstr "ユーザーを選択..."
+
+msgid "Set as Home page"
+msgstr "ホーム ページとして設定します"
+
+msgid "Show Menu"
+msgstr "メニューを表示"
+
+msgid "Show all the tasks I can do: both personal tasks and tasks available to other team members"
+msgstr "自分が行うことができるすべてのタスクを表示する： 自分だけにアサインされたタスクおよび他のチーム メンバーでも行えるタスクの両方を表示"
+
+msgid "Show available tasks in task list for archived case"
+msgstr "完了済み案件タスク リスト内の応受援タスクを表示"
+
+msgid "Show available tasks in task list for case"
+msgstr "案件タスク リスト内の応受援タスクを表示"
+
+msgid "Show menu"
+msgstr "メニューを表示"
+
+msgid "Show my personal tasks: the ones I took and the ones assigned to me, automatically or by a process manager"
+msgstr "自分だけにアサインされたタスクを表示する： 自分自身で引き受けたもの、自動的、またはプロセス管理者によってアサインされたもの"
+
+msgid "Show panel"
+msgstr "パネルを表示"
+
+msgid "Show the tasks that I have done"
+msgstr "自分が関与し実行したタスクを表示"
+
+msgid "Something went wrong during the deletion. You might want to cancel and try again."
+msgstr "削除中に問題が発生しました。 キャンセルして再試行してください。"
+
+msgid "Something went wrong during the modification. You might want to cancel and try again."
+msgstr "変更中に問題が発生しました。キャンセルして再試行してください。"
+
+msgid "Something went wrong. You might want to cancel and try again."
+msgstr "問題が発生しました。キャンセルして再試行してください。"
+
+msgid "Sort by URL"
+msgstr "URL で並べ替え"
+
+msgid "Sort by name"
+msgstr "名前で並べ替え"
+
+msgid "Sort by updated on"
+msgstr "更新日で並べ替え"
+
+msgid "Sort by version"
+msgstr "バージョンで並び替え"
+
+msgid "Specify the menu structure."
+msgstr "メニュー構造を指定します"
+
+msgid "Start date"
+msgstr "起案日"
+
+msgid "Started"
+msgstr "開始済み"
+
+msgid "Started by"
+msgstr "起案者"
+
+msgid "State"
+msgstr "状態"
+
+msgid "Status"
+msgstr "ステータス"
+
+msgid "Status of importation"
+msgstr "インポートの状態"
+
+msgid "Still, you can customize its look & feel on this page. You can also update some of its pages in the Resources menu."
+msgstr "それでも、このページでそのルック＆フィールをカスタマイズすることができます。[リソース]メニューのいくつかのページを更新することもできます。"
+
+msgid "Submit"
+msgstr "送信"
+
+msgid "Successfully updated categories"
+msgstr "正常に更新されたカテゴリ"
+
+msgid "System"
+msgstr "システム"
+
+msgid "Table settings"
+msgstr "テーブルの設定"
+
+msgid "Take"
+msgstr "引き受ける"
+
+msgid "Task Id"
+msgstr "タスクID"
+
+msgid "Task form"
+msgstr "タスク フォーム"
+
+msgid "Task list"
+msgstr "タスク リスト"
+
+msgid "Task name"
+msgstr "タスク名"
+
+msgid "Technical User"
+msgstr "テクニカル ユーザー"
+
+msgid "Technical error."
+msgstr "テクニカルなエラーが発生。"
+
+msgid "The BDM schema and data have been rolled-back to what they were before this update attempt."
+msgstr "BDM スキーマとデータは、この更新試行される前のものにロールバックされています。"
+
+msgid "The application"
+msgstr "アプリケーション"
+
+msgid "The application does not exist. Go to application list page to see the new list of applications."
+msgstr "アプリケーションが存在しません。アプリケーションのリストページに移動して、アプリケーションの新しいリストを表示します。"
+
+msgid "The application does not exist. Reload the page to see the new list of applications."
+msgstr "アプリケーションが存在しません。 ページをリロードして、アプリケーションの新しいリストを表示します。"
+
+msgid "The application page does not exist. Reload the page to see the new list of application pages."
+msgstr "アプリケーションページが存在しません。 ページをリロードして、アプリケーションページの新しいリストを表示します。"
+
+msgid "The attachment is too big.<br/>Select a smaller attachment and submit the form again."
+msgstr "添付ファイルが大きすぎます。 <br/>小さい添付ファイルを選択して、フォームを再度送信してください。"
+
+msgid "The business data: [ {} ] uses Business Objects which are not defined in the current Business Data model. Deploy a compatible Business Data model before enabling the process."
+msgstr "ビジネス データ:  [ {} ]  は、現在のビジネス データ モデル内に定義されていないビジネス オブジェクトを使用しています。プロセスを有効にする前に互換性のあるビジネス データ モデルをデプロイしてください。"
+
+msgid "The case is archived. You cannot add comments anymore"
+msgstr "この案件は完了しています。もうコメントを追加することはできません。"
+
+msgid "The case {{caseId}} has been started successfully."
+msgstr "案件ID： %caseId% が正常に開始されました。"
+
+msgid "The current process has no connectors defined."
+msgstr "現在のプロセスには、コネクタが定義されていません。"
+
+msgid "The current process has no parameters defined."
+msgstr "現在のプロセスには、パラメータが定義されていません。"
+
+msgid "The deleted case will be permanently deleted and will not be stored in the archives."
+msgstr "削除された案件は完全に削除され、アーカイブには格納されません。"
+
+msgid "The deleted case will be permanently deleted from the archives."
+msgstr "削除された案件は、アーカイブから完全に削除されます。"
+
+msgid "The file you are trying to upload has the wrong mime type"
+msgstr "アップロードしようとしているファイルのmimeタイプが間違っています"
+
+msgid "The form mappings must be resolved before enabling the Process."
+msgstr "プロセスを有効にする前にフォームの マッピングを解決する必要があります。"
+
+msgid "The image you are trying to upload is too big"
+msgstr "アップロードしようとしている画像が大きすぎます"
+
+msgid "The item does not exist anymore. Refresh the page to see the new status"
+msgstr "アイテムは既に存在していません。新しいステータスを表示するにはページを更新してください"
+
+msgid "The menu does not exist. Reload the page to see the new list of menus."
+msgstr "メニューは存在しません。 ページをリロードしてメニューの新しいリストを表示します。"
+
+msgid "The name for the URL must start with custompage_ followed only by alphanumeric characters."
+msgstr "URL の名前は、英数字のみが続く custompage_ で始まらなければなりません。"
+
+msgid "The task has been submitted but an error occurred while adding the comment"
+msgstr "タスクが送信されましたが、コメントを追加するときにエラーが発生しました。"
+
+msgid "The whole list of such changes is listed <a ng-href=\"https://documentation.bonitasoft.com/bonita/{{bonitaVersion}}/bdm-management-in-bonita-bpm-portal\" target=\"_blank\" translate>here</a>."
+msgstr "このような変更の一覧はこちら <a ng-href=\"https://documentation.bonitasoft.com/bonita/{{bonitaVersion}}/bdm-management-in-bonita-bpm-portal\" target=\"_blank\" translate></a>に掲載されています。"
+
+msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
+msgstr "'content'、'API' 、 'theme' の単語は、内部使用のため予約されています。アプリケーション、またはページの URL にそれらを使用してはいけません。"
+
+msgid "Theme"
+msgstr "テーマ"
+
+msgid "Then for each user, fill out the custom information value, in the Studio (<i>List of users</i> tab of the organization), or right on this Portal page."
+msgstr "Studioの組織の <i>ユーザーリスト</i> タブ、またはこのポータル ページの右側で、各ユーザーのカスタム情報の値を入力します。"
+
+msgid "These deleted cases will be permanently deleted and will not be stored in the archives."
+msgstr "これらの削除された案件は完全に削除され、アーカイブには格納されません。"
+
+msgid "These deleted cases will be permanently deleted from the archives."
+msgstr "これらの削除された案件は、アーカイブから完全に削除されます。"
+
+msgid "They will be removed from the database permanently."
+msgstr ""
+
+msgid "This URL is already in use"
+msgstr "この URL は、既に使用中"
+
+msgid "This application is core to the Bonita platform. To keep it working as it should, it must remain available and its menu should stay as it is."
+msgstr "このアプリケーションは、Bonitaプラットフォームの中核です。 正常に機能し続けるには、使用可能な状態を維持し、メニューをそのままにしておく必要があります。"
+
+msgid "This field is mandatory"
+msgstr "このフィールドは必須です"
+
+msgid "This filters the case list only by process name. The display name is shown for information purposes."
+msgstr ""
+
+msgid "This is the task details panel. No information to display"
+msgstr "これは、タスクの詳細パネルです。表示する情報がありません。"
+
+msgid "This name is already in use"
+msgstr "この名前は既に使用中"
+
+msgid "This process is no longer available."
+msgstr "このプロセスは既に使用できません。"
+
+msgid "This process is not fully configured, but it is still enabled. Users may still be able to start cases or do tasks, which may lead to errors."
+msgstr "このプロセスは完全には設定されていませんが有効です。 \n"
+"ユーザーは引き続きケースを開始したりタスクを実行できますがエラーになる可能性があります。"
+
+msgid "This process is not fully configured."
+msgstr "このプロセスは完全に設定されていません。"
+
+msgid "This process is not fully configured. It cannot be enabled."
+msgstr "このプロセスは完全い設定されてないので有効ではありません。"
+
+msgid "This task cannot be executed from here."
+msgstr ""
+
+msgid "This task is completed."
+msgstr "このタスクは完了しました。"
+
+msgid "This task is not available anymore. The list is now up to date."
+msgstr "1 つまたは複数のタスクは、もうご使用いただけません。タスク一覧が新しくなっています。"
+
+msgid "This task is overdue. It was supposed to be completed by {{dueDate}}"
+msgstr "このタスクは期限切れです。 {{dueDate}} までに完了する予定でした。"
+
+msgid "Title"
+msgstr "タイトル（性別）"
+
+msgid "To create an application, click New or Import."
+msgstr "アプリケーションを作成するには、新規またはインポート をクリックします。"
+
+msgid "To do"
+msgstr "To do"
+
+msgid "To do so, go to"
+msgstr "これを行うには、次へ進む: "
+
+msgid "To do so, log out and then log back in as the Technical User, whose credentials are set upon Bonita platform installation."
+msgstr "そのためにログアウトし、Bonita プラットフォーム のインストール時に設定されたテクニカル ユーザーの資格で再度ログインします。"
+
+msgid "To fill out the form, you need to take this task. This means you will be the only one able to do it. To make it available to the team again, release it."
+msgstr "フォームに記入するには、このタスクを引き受ける必要があります。つまり、あなただけがこのタスクを実行できることになります。もう一度、チームで実行できるようにする（つまり、応受援タスクにする）には、そのタスクを手放します。"
+
+msgid "To personalize the display of search keys (and columns in general), use the table settings button on the right. You can search on up to 5 search keys."
+msgstr "検索キー の表示（および一般的な表示列）をカスタマイズしたい場合は、右側にある [テーブルの設定] ボタンを使用します。最大 5 つの検索キーで検索できます。"
+
+msgid "To use this feature, create a new version of the process in Bonita Studio version 6.4 and above, then create and install the new .bar file in the Portal."
+msgstr "この機能を使用するには、Bonita Studio バージョン 6.4 以上でプロセスの新しいバージョンを作成し、その新しい .bar ファイルをポータルにインストールします。"
+
+msgid "Type"
+msgstr "タイプ"
+
+msgid "Type here to search for a user..."
+msgstr "ユーザーを検索するには、ここを入力..."
+
+msgid "Type here to search..."
+msgstr "検索キーワードをここで入力..."
+
+msgid "Type in a case id and <br> press enter to search for <br> human task of a specific case"
+msgstr "特定案件のヒューマンタスクを検索するには、<br>案件ID を入力し <br>エンターキーを押してください。"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Unable to add the comment. Refresh your task list and try again. If the problem persists, contact your administrator"
+msgstr "コメントを追加することができません。タスク一覧を更新し、もう一度やり直してください。問題が解決しない場合はシステム管理者に問い合わせてください。"
+
+msgid "Unassign. This will make it available to team again"
+msgstr "アサインを解除します。このタスクはもう一度、応受援タスクに戻ります。"
+
+msgid "Under normal"
+msgstr "平均以下"
+
+msgid "Update"
+msgstr "更新"
+
+msgid "Update Business Data Model"
+msgstr "ビジネス データ モデルの更新"
+
+msgid "Update business card"
+msgstr "業務上の連絡先を更新"
+
+msgid "Update custom information"
+msgstr "カスタム情報を更新"
+
+msgid "Update general information"
+msgstr "全般な情報を更新"
+
+msgid "Update password"
+msgstr "パスワードを更新"
+
+msgid "Update personal information"
+msgstr "個人情報を更新"
+
+msgid "Updated by"
+msgstr "更新者"
+
+msgid "Updated on"
+msgstr "更新日時"
+
+msgid "Updating the Business Data Model applies changes to both existing database tables and data."
+msgstr "ビジネス データ モデルの更新は、既存のデータベース テーブルとデータの両方に変更を適用します。"
+
+msgid "Upload new picture"
+msgstr "新しい画像をアップロード"
+
+msgid "Use Arrow up and Arrow down keys to browse among existing categories."
+msgstr "既存のカテゴリを閲覧するには、上矢印キーおよび下矢印キーを使用します。"
+
+msgid "User id not provided. Unable to retrieve the user details."
+msgstr "ユーザーIDが提供されていません。 ユーザーの詳細を取得できません。"
+
+msgid "Username"
+msgstr "ユーザー名"
+
+msgid "Users"
+msgstr "ユーザー"
+
+msgid "Users mapped to {}"
+msgstr "{} にマップされているユーザー"
+
+msgid "Value"
+msgstr "値"
+
+msgid "Version"
+msgstr "バージョン"
+
+msgid "View application details"
+msgstr "アプリケーションの詳細表示"
+
+msgid "View case details"
+msgstr "案件詳細を表示"
+
+msgid "View case overview"
+msgstr "案件概況を表示"
+
+msgid "View task"
+msgstr "タスクを見る"
+
+msgid "View this task"
+msgstr "このタスクを見る"
+
+msgid "Warning:"
+msgstr "警告:"
+
+msgid "We couldn't find what you are looking for."
+msgstr "お探しのものが見つかりませんでした。"
+
+msgid "When you export an application descriptor, pages and profiles are not exported in the file."
+msgstr "アプリケーション記述子をエクスポートする場合、ページとプロファイルはそのファイルにエクスポートされません。"
+
+msgid "With failures"
+msgstr "エラー発生"
+
+msgid "You are about to export the descriptor of the application"
+msgstr "アプリケーションの記述子をエクスポートしようとしています"
+
+msgid "You are going to be redirected to the process list."
+msgstr "プロセスリストにリダイレクトされます。"
+
+msgid "You can create custom information in Bonita Studio:"
+msgstr "Bonita Studio でカスタム情報を作成できます："
+
+msgid "You must add a page before you can reference it in a menu."
+msgstr "それをメニューで参照する前に、ページを追加する必要があります。"
+
+msgid "Your personal task list is empty. You can take a task from the ​<a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\">To do</a> list."
+msgstr "マイタスク リストは空です。​<a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\">To do</a> リストからタスクを選ぶことができます。"
+
+msgid "Zip code"
+msgstr "郵便番号"
+
+msgid "Zip file structure error. Check that your .zip contains a well-formed page.properties and either the index.html or the Index.groovy file. For details, see the documentation or the example page readme (available in the custom page list)"
+msgstr "Zip ファイル構造にエラーがあります。.zip に適切な形式の page.properties と、index.html または Index.groovy ファイルが 含まれているか確認してください。詳細については、ドキュメント、またはサンプル ページの readme （カスタム ページのリストで利用可能） を参照してください。"
+
+msgid "an Application"
+msgstr "アプリケーション"
+
+msgid "an application"
+msgstr "アプリケーション"
+
+msgid "application descriptor has been partially imported. The following items are not loaded in the Portal."
+msgstr "アプリケーション記述子は、部分的にインポートされています。ポータル内に次の項目が読み込まれていません。"
+
+msgid "application descriptor has been successfully imported, with complete page mapping and menu mapping."
+msgstr "アプリケーション記述子は正常にインポートされ、ページ マッピングとメニュー マッピングが完了しています。"
+
+msgid "here"
+msgstr "こちら"
+
+msgid "of"
+msgstr "日目/"
+
+msgid "sort by End date ascending"
+msgstr "終了日を昇順で並べ替える"
+
+msgid "sort by End date descending"
+msgstr "終了日を降順で並べ替える"
+
+msgid "sort by ID ascending"
+msgstr "ID を昇順で並べ替える"
+
+msgid "sort by ID descending"
+msgstr "ID を降順で並べ替える"
+
+msgid "sort by Process name ascending"
+msgstr "プロセス名を昇順で並べ替える"
+
+msgid "sort by Process name descending"
+msgstr "プロセス名を降順で並べ替える"
+
+msgid "sort by Start date ascending"
+msgstr "開始日を昇順で並べ替える"
+
+msgid "sort by Start date descending"
+msgstr "開始日を降順で並べ替える"
+
+msgid "username:"
+msgstr "ユーザー名:"
+
+msgid "will be permanently deleted."
+msgstr "恒久的に削除されます。"
+
+msgid "{{firstname}} {{lastname}} already has the membership <b>{{role}} of {{group}}</b>"
+msgstr "{{firstname}} {{lastname}} さんは、既に <b>{{group}} に {{role}} として</b>に所属しています"
+
+msgid "{{membership.role_id.displayName}} of {{membership.group_id.displayName}}"
+msgstr "{{membership.group_id.displayName}} の {{membership.role_id.displayName}}"
+
+msgid "{{nbErrors}} errors on mapping updates"
+msgstr "マッピングの更新で {{nbErrors}} のエラーが発生しました"
+
+msgid "{{nbMapping}} Process manager mappings could not be updated"
+msgstr "{{nbMapping}} のプロセス管理者マッピングを更新できませんでした。"
+
+msgid "{{nbMapping}} Process manager mappings have been updated"
+msgstr "{{nbMapping}} のプロセス管理者マッピングが更新されました"
+
+msgid "{{nbOfDeletedCases}} cases have been deleted"
+msgstr "{{nbOfDeletedCases}} の案件が削除されました"
+
+msgid "{{nbSucess}} actor mapping updates succeeded"
+msgstr "{{nbSucess}} のアクターマッピングの更新に成功しました"
+
+msgid "{{role}} of {{group}}"
+msgstr "{{group}} の {{role}}"
+
+msgid "{{role}} of {{group}} has been created"
+msgstr "{{group}} の {{role}} が作成されました"
+
+msgid "{} mapped"
+msgstr "{} がマップされました"
+
+msgid "{} mappings to delete"
+msgstr "{} のマッピングが削除されます"
+
+msgid "{} more"
+msgstr "{} 以上"
+
+msgid "{} of {}"
+msgstr "{} / {}"
+
+msgid "{}-{} of {}"
+msgstr "{}-{} / {}"
+
