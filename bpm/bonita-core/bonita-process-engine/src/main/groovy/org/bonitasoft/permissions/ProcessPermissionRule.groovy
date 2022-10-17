@@ -64,17 +64,22 @@ class ProcessPermissionRule implements PermissionRule {
             def processId = Long.parseLong(resourceIds.get(0))
             def processDefinition = processAPI.getProcessDeploymentInfo(processId)
             def deployedByUser = processDefinition.getDeployedBy() == currentUserId
-            if(deployedByUser){
+            if (deployedByUser) {
                 logger.debug("deployed by the current user")
                 return true
             }
-            def canStart = processAPI.searchProcessDeploymentInfosCanBeStartedBy(currentUserId, new SearchOptionsBuilder(0, 1).filter(ProcessDeploymentInfoSearchDescriptor.PROCESS_ID, processDefinition.getProcessId()).done())
-            if(canStart.getCount()==1){
-                logger.debug("can start process, so can get")
+            def canStart = processAPI.searchProcessDeploymentInfosCanBeStartedBy(currentUserId, new SearchOptionsBuilder(0, 0).filter(ProcessDeploymentInfoSearchDescriptor.PROCESS_ID, processDefinition.getProcessId()).done())
+            if (canStart.getCount() > 0) {
+                logger.debug("can start the process, so can get it")
+                return true
+            }
+            def hasTasks = processAPI.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(new SearchOptionsBuilder(0, 0).filter(ProcessDeploymentInfoSearchDescriptor.PROCESS_ID, processDefinition.getProcessId()).done())
+            if (hasTasks.getCount() > 0) {
+                logger.debug("can execute process tasks, so can get the process")
                 return true
             }
             def isSupervisor = processAPI.isUserProcessSupervisor(processId, currentUserId)
-            if(isSupervisor){
+            if (isSupervisor) {
                 logger.debug("is supervisor of the process")
                 return true
             }
