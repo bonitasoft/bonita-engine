@@ -18,6 +18,7 @@ dependencies {
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testCompile "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"

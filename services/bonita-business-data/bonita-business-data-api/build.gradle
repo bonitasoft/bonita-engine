@@ -6,6 +6,7 @@ dependencies {
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     compileOnly project(':bpm:bonita-common')
     testCompile project(':bpm:bonita-common')
 }

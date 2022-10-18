@@ -5,4 +5,5 @@ dependencies {
     compile project(':services:bonita-session')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }
