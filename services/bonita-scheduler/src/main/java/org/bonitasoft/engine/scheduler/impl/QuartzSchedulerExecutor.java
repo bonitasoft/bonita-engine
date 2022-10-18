@@ -16,7 +16,6 @@ package org.bonitasoft.engine.scheduler.impl;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
-import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -264,15 +263,14 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
             scheduler.start();
             addListeners();
-            try {
-                if (useOptimization) {
-                    final Field quartzSchedulerField = scheduler.getClass().getDeclaredField("sched");
-                    quartzSchedulerField.setAccessible(true);
-                    quartzScheduler = (QuartzScheduler) quartzSchedulerField.get(scheduler);
+            if (useOptimization) {
+                if (scheduler instanceof BonitaScheduler) {
+                    quartzScheduler = ((BonitaScheduler) scheduler).getQuartzScheduler();
+                } else {
+                    logger.warn(
+                            "Cannot access the QuartzScheduler implementation from {}. Scheduler optimization is disabled.",
+                            scheduler.getClass().getName());
                 }
-            } catch (final Exception t) {
-                // this is an optimization, we do not want it to make the system failing
-                t.printStackTrace();
             }
 
         } catch (final SchedulerException e) {
