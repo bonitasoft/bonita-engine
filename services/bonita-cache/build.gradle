@@ -7,4 +7,5 @@ dependencies {
     compile "org.springframework:spring-context:${Deps.springVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }

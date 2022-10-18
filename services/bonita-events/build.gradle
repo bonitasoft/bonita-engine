@@ -4,6 +4,7 @@ dependencies {
     compile project(':services:bonita-commons')
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }
 
 tasks.register("testsJar", Jar) {

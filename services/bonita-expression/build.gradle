@@ -23,6 +23,7 @@ dependencies {
     compile "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
 }
