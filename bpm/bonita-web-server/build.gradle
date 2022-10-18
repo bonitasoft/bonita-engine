@@ -23,7 +23,9 @@ dependencies {
     implementation "org.glassfish.web:jakarta.servlet.jsp.jstl:${Deps.jakartaJstlVersion}"
     implementation "jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:${Deps.jakartaJstlApiVersion}"
     implementation "org.restlet.jse:org.restlet:${Deps.restletVersion}"
-    implementation "org.restlet.jee:org.restlet.ext.servlet:${Deps.restletVersion}"
+    implementation("org.restlet.jee:org.restlet.ext.servlet:${Deps.restletVersion}") {
+        exclude(group: "org.restlet.jee", module: "org.restlet")
+    }
     implementation "org.restlet.jse:org.restlet.ext.jackson:${Deps.restletVersion}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${Deps.restletVersion}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${Deps.restletVersion}"
