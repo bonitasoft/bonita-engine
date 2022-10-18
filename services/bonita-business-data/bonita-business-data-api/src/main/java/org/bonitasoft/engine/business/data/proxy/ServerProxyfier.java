@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.business.data.proxy;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,16 +25,13 @@ import javassist.util.proxy.ProxyFactory;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.PropertyAccessorFactory;
 
 /**
  * @author Colin Puy
  * @author Laurent Leseigneur
  */
 public class ServerProxyfier {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerProxyfier.class);
 
     private final ServerLazyLoader lazyLoader;
 
@@ -79,7 +75,7 @@ public class ServerProxyfier {
     }
 
     // This methods seems unused but is called by reflection, I think:
-    @SuppressWarnings({ "unchecked", "unused" })
+    @SuppressWarnings({ "unchecked" })
     public <T extends Entity> List<T> proxify(final List<T> entities) {
         if (entities == null) {
             return null;
@@ -174,27 +170,23 @@ public class ServerProxyfier {
         boolean wasNotAlreadyUnproxified = alreadyUnproxyfiedEntities.add(detachedEntity);
         // If we just unproxified this entity, we must also unproxify its related Entity fields:
         if (wasNotAlreadyUnproxified) {
-            final Field[] declaredFields = detachedEntity.getClass().getDeclaredFields();
-            for (final Field field : declaredFields) {
-                try {
-                    if (Entity.class.isAssignableFrom(field.getType())) {
-                        field.setAccessible(true);
-                        field.set(detachedEntity,
-                                unProxifyIfNeeded((Entity) field.get(detachedEntity), alreadyUnproxyfiedEntities));
-                    } else if (List.class.isAssignableFrom(field.getType())) {
-                        field.setAccessible(true);
-                        final List list = (List) field.get(detachedEntity);
-                        if (list != null && !list.isEmpty() && isThereAnyNonNullEntityInTheList(list)) {
-                            final List<Entity> realEntities = ((List<Entity>) list).stream()
-                                    .map(element -> unProxifyIfNeeded(element, alreadyUnproxyfiedEntities))
-                                    .collect(Collectors.toList());
-                            list.clear();
-                            list.addAll(realEntities);
-                            field.set(detachedEntity, list);
-                        }
+            var propertyAccessor = PropertyAccessorFactory.forBeanPropertyAccess(detachedEntity);
+            for (var property : propertyAccessor.getPropertyDescriptors()) {
+                var propertyType = property.getPropertyType();
+                if (Entity.class.isAssignableFrom(propertyType)) {
+                    propertyAccessor.setPropertyValue(property.getName(),
+                            unProxifyIfNeeded((Entity) propertyAccessor.getPropertyValue(property.getName()),
+                                    alreadyUnproxyfiedEntities));
+                } else if (List.class.isAssignableFrom(propertyType)) {
+                    final List list = (List) propertyAccessor.getPropertyValue(property.getName());
+                    if (list != null && !list.isEmpty() && isThereAnyNonNullEntityInTheList(list)) {
+                        final List<Entity> realEntities = ((List<Entity>) list).stream()
+                                .map(element -> unProxifyIfNeeded(element, alreadyUnproxyfiedEntities))
+                                .collect(Collectors.toList());
+                        list.clear();
+                        list.addAll(realEntities);
+                        propertyAccessor.setPropertyValue(property.getName(), list);
                     }
-                } catch (IllegalAccessException e) {
-                    LOGGER.error(String.format("Illegal access to field '%s' of Entity '%s'", field, detachedEntity));
                 }
             }
         }
