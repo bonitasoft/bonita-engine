@@ -27,6 +27,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
@@ -34,7 +36,6 @@ import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.engine.session.SessionNotFoundException;
-import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,6 +96,8 @@ public abstract class FileUploadServlet extends HttpServlet {
     protected boolean checkUploadedImageSize = false;
 
     protected String responseContentType = TEXT_CONTENT_TYPE;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void init() throws ServletException {
@@ -212,14 +215,14 @@ public abstract class FileUploadServlet extends HttpServlet {
     }
 
     private void generateFileTooBigError(final HttpServletResponse response, final PrintWriter responsePW,
-            final String message) {
+            final String message) throws JsonProcessingException {
         response.setStatus(HttpURLConnection.HTTP_ENTITY_TOO_LARGE);
         if (JSON_CONTENT_TYPE.equals(responseContentType)) {
             final Map<String, Serializable> errorResponse = new HashMap<>();
             errorResponse.put("type", "EntityTooLarge");
             errorResponse.put("message", message);
             errorResponse.put("statusCode", HttpURLConnection.HTTP_ENTITY_TOO_LARGE);
-            responsePW.print(new JSONObject(errorResponse));
+            responsePW.print(objectMapper.writeValueAsString(errorResponse));
             responsePW.flush();
         }
     }
@@ -243,7 +246,8 @@ public abstract class FileUploadServlet extends HttpServlet {
         return responseString;
     }
 
-    protected String generateResponseJson(final String fileName, String contentType, final File uploadedFile) {
+    protected String generateResponseJson(final String fileName, String contentType, final File uploadedFile)
+            throws JsonProcessingException {
         final Map<String, String> responseMap = new HashMap<>();
         if (alsoReturnOriginalFilename) {
             responseMap.put(FILE_NAME_RESPONSE_ATTRIBUTE, getFilenameLastSegment(fileName));
@@ -254,7 +258,7 @@ public abstract class FileUploadServlet extends HttpServlet {
             responseMap.put(TEMP_PATH_RESPONSE_ATTRIBUTE, uploadedFile.getName());
         }
         responseMap.put(CONTENT_TYPE_ATTRIBUTE, contentType);
-        return new JSONObject(responseMap).toString();
+        return objectMapper.writeValueAsString(responseMap);
     }
 
     protected File makeUniqueFilename(final File targetDirectory, final String fileName) throws IOException {

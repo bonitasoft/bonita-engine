@@ -17,7 +17,6 @@ dependencies {
     implementation "commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}"
     implementation "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
     implementation "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    implementation "org.codehaus.jettison:jettison:${Deps.jettisonVersion}"
     implementation "com.googlecode.json-simple:json-simple:${Deps.jsonSimpleVersion}"
     implementation "org.tuckey:urlrewritefilter:${Deps.urlrewriteVersion}"
     implementation "org.glassfish.web:jakarta.servlet.jsp.jstl:${Deps.jakartaJstlVersion}"
