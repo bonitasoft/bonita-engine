@@ -18,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -55,9 +54,9 @@ public class FileUploadServletTest {
         @SuppressWarnings("unchecked")
         Map<String, String> jsonResponseMap = mapper.readValue(jsonResponse, Map.class);
 
-        assertThat(jsonResponseMap.get(FileUploadServlet.FILE_NAME_RESPONSE_ATTRIBUTE)).isEqualTo("originalFileName");
-        assertThat(jsonResponseMap.get(FileUploadServlet.TEMP_PATH_RESPONSE_ATTRIBUTE)).isEqualTo("uploadedFile.txt");
-        assertThat(jsonResponseMap.get(FileUploadServlet.CONTENT_TYPE_ATTRIBUTE)).isEqualTo("application/json");
+        assertThat(jsonResponseMap).containsEntry(FileUploadServlet.FILE_NAME_RESPONSE_ATTRIBUTE, "originalFileName")
+                .containsEntry(FileUploadServlet.TEMP_PATH_RESPONSE_ATTRIBUTE, "uploadedFile.txt")
+                .containsEntry(FileUploadServlet.CONTENT_TYPE_ATTRIBUTE, "application/json");
     }
 
     @Test
@@ -76,7 +75,7 @@ public class FileUploadServletTest {
     }
 
     @Test
-    public void getExtension_should_return_proper_extension() throws IOException {
+    public void getExtension_should_return_proper_extension() {
         // given
         final String filename = "C:\\Users\\Desktop\\process.bar";
 
@@ -88,7 +87,7 @@ public class FileUploadServletTest {
     }
 
     @Test
-    public void getExtension_should_return_an_empty_extension() throws IOException {
+    public void getExtension_should_return_an_empty_extension() {
         // given
         final String filename = "C:\\Users\\Desktop\\process";
 
@@ -96,11 +95,11 @@ public class FileUploadServletTest {
         final String extension = fileUploadServlet.getExtension(filename);
 
         // then
-        assertThat(extension).isEqualTo("");
+        assertThat(extension).isEmpty();
     }
 
     @Test
-    public void getExtension_should_return_a_proper_extension_without_taking_care_of_dots() throws IOException {
+    public void getExtension_should_return_a_proper_extension_without_taking_care_of_dots() {
         // given
         final String filename = "C:\\Users\\Deskt.op\\proc.ess.bar";
 
@@ -112,7 +111,7 @@ public class FileUploadServletTest {
     }
 
     @Test
-    public void getExtension_should_return_proper_extension_for_short_filename() throws IOException {
+    public void getExtension_should_return_proper_extension_for_short_filename() {
         // given
         final String filename = "process.bar";
 
@@ -124,7 +123,7 @@ public class FileUploadServletTest {
     }
 
     @Test
-    public void getExtension_should_return_proper_extension_for_linux_like_paths() throws IOException {
+    public void getExtension_should_return_proper_extension_for_linux_like_paths() {
         // given
         final String filename = "/Users/Deskt.op/proc.ess.bar";
 
@@ -136,7 +135,7 @@ public class FileUploadServletTest {
     }
 
     @Test
-    public void getExtension_should_return_an_empty_extension_for_parent_folder_filename() throws IOException {
+    public void getExtension_should_return_an_empty_extension_for_parent_folder_filename() {
         // given
         final String filename = "../../../";
 
@@ -144,7 +143,7 @@ public class FileUploadServletTest {
         final String extension = fileUploadServlet.getExtension(filename);
 
         // then
-        assertThat(extension).isEqualTo("");
+        assertThat(extension).isEmpty();
     }
 
     @Test
@@ -172,7 +171,7 @@ public class FileUploadServletTest {
     }
 
     @Test
-    public void getFilenameLastSegment_should_return_an_empty_filename_for_parent_folder_filename() throws IOException {
+    public void getFilenameLastSegment_should_return_an_empty_filename_for_parent_folder_filename() {
         // given
         final String filename = "../../../";
 
@@ -180,6 +179,6 @@ public class FileUploadServletTest {
         final String filenameLastSegment = fileUploadServlet.getFilenameLastSegment(filename);
 
         // then
-        assertThat(filenameLastSegment).isEqualTo("");
+        assertThat(filenameLastSegment).isEmpty();
     }
 }
