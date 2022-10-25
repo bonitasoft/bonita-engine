@@ -86,6 +86,19 @@ dependencyManagement {
         // Just keep a version managed to prevent client build breaks
         dependency "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
 
+        // Bonita engine dependencies:
+        dependency "org.bonitasoft.engine:bonita-common:${project.version}"
+        dependency "org.bonitasoft.engine:bonita-server:${project.version}"
+        dependency "org.bonitasoft.engine:bonita-client:${project.version}"
+        dependency "org.bonitasoft.engine:bonita-test-api:${project.version}"
+        dependency "com.bonitasoft.engine:bonita-common-sp:${project.version}"
+        dependency "com.bonitasoft.engine:bonita-server-sp:${project.version}"
+        dependency "com.bonitasoft.engine:bonita-client-sp:${project.version}"
+
+        // Web extensions dependencies:
+        dependency "org.bonitasoft.web:bonita-web-extensions:${project.version}"
+        dependency "com.bonitasoft.web:bonita-web-extensions-sp:${project.version}"
+
         // Web layer specific dependencies:
         dependency "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
         dependency "org.glassfish.web:jakarta.servlet.jsp.jstl:${Deps.jakartaJstlVersion}"
