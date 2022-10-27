@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-20 05:22+0200\n"
-"PO-Revision-Date: 2022-09-27 01:29\n"
+"POT-Creation-Date: 2022-09-29 05:21+0200\n"
+"PO-Revision-Date: 2022-10-24 15:25\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -19,9 +19,6 @@ msgstr ""
 
 msgid "%attribute% file format is not allowed. Only %file_formats% files are allowed."
 msgstr "%attribute% ファイルの形式は許可されていません。%file_formats%のファイルのみが許可されます。"
-
-msgid "%attribute% file format not allowed"
-msgstr "%attribute%のファイル形式は許可されていません。"
 
 msgid "%attribute% file format not allowed or not starting with correct servlet path"
 msgstr "%attribute% ファイル形式は正しいサーブレットパスで開始できません。"
@@ -44,50 +41,17 @@ msgstr "%attribute% は、よく書かれていません。"
 msgid "%attribute% must be a boolean value"
 msgstr "%attribute% は、ブール値である必要があります。"
 
-msgid "%attribute% must be a negative value"
-msgstr "%attribute% は、マイナス値でなければなりません。"
-
-msgid "%attribute% must be a negative value diffrent from 0"
-msgstr "%attribute% は、ゼロ以下のマイナス値にする必要があります。"
-
 msgid "%attribute% must be a numeric value"
 msgstr "%attribute% は数値でなければなりません"
-
-msgid "%attribute% must be a positive value"
-msgstr "%attribute% は、正の値でなければなりません。"
-
-msgid "%attribute% must be a positive value different from 0"
-msgstr "%attribute% は、ゼロ以上の正数にする必要があります。"
-
-msgid "%attribute% must be a valid date"
-msgstr "%attribute% は有効な日付にする必要があります。"
 
 msgid "%attribute% must be an integer value"
 msgstr "%attribute% は、 整数値を指定する必要があります。"
 
-msgid "%attribute% must be equal to %secondAttribute%"
-msgstr "%attribute% は、 %secondAttribute% に等しくなければなりません。"
-
 msgid "%attribute% must be less or equal than %value%"
 msgstr "%attribute% は、%value%以下にする必要があります。"
 
-msgid "%attribute% must be less than %secondAttribute%"
-msgstr "%attribute% は、 %secondAttribute% より小さくなければなりません。"
-
 msgid "%attribute% must be less than %value%"
 msgstr "%attribute% は、%value%より小さくなければなりません"
-
-msgid "%attribute% must be more or equal than %secondAttribute%"
-msgstr "%attribute% は、%secondAttribute% 以上にする必要があります。"
-
-msgid "%attribute% must be more or equal than %value%"
-msgstr "%attribute% は、%value%以上にする必要があります。"
-
-msgid "%attribute% must be more than %secondAttribute%"
-msgstr "%attribute% は、%secondAttribute% より大きくなければなりません。"
-
-msgid "%attribute% must be more than %value%"
-msgstr "%attribute% は、%value%より大きくなければなりません"
 
 msgid "%attribute% must be on a single line"
 msgstr "%attribute% は、1 行にする必要があります。"
@@ -95,23 +59,11 @@ msgstr "%attribute% は、1 行にする必要があります。"
 msgid "%attribute% must be one of {%list%}"
 msgstr "%attribute% は、{%list%}のいずれかする必要があります。"
 
-msgid "%attribute% must contain exactly %length% characters"
-msgstr "%attribute% には、正確に%length%文字が含まれている必要があります。"
-
-msgid "%attribute% must not be equal to %secondAttribute%"
-msgstr "%attribute% は、 %secondAttribute% と異なっていなければなりません。"
-
 msgid "%className% is not Serializable"
 msgstr "%className% は、シリアライズ可能ではありません"
 
 msgid "%className% not found. Only jdk types are supported"
 msgstr "%className% が見つかりません。jdk type だけがサポートされます"
-
-msgid "%secondAttribute% must be a numeric value"
-msgstr "%secondAttribute% は数値でなければなりません"
-
-msgid "%time% ago"
-msgstr "%time%前"
 
 msgid "%value% is not a valid value for %className%"
 msgstr "%value% は、%className% の適正な値ではありません"
@@ -119,23 +71,11 @@ msgstr "%value% は、%className% の適正な値ではありません"
 msgid "A group with the name %groupName% already exists"
 msgstr "%groupName% と同名のグループが既に存在しています。"
 
-msgid "Administrator"
-msgstr "システム管理者"
-
 msgid "An error occurred while creating a definition"
 msgstr "定義の作成中にエラーが発生しました"
 
 msgid "An error occurred while deleting an item with the id %id%"
 msgstr "Id %id% を持つ項目を削除中にエラーが発生しました"
-
-msgid "Analytics"
-msgstr "分析"
-
-msgid "Applications"
-msgstr "アプリケーション"
-
-msgid "BDM"
-msgstr "BDM"
 
 msgid "Bonita Applications"
 msgstr ""
@@ -176,14 +116,8 @@ msgstr "プロセスを開始できません。 プロセス：%processId% が�
 msgid "Can't update user. User not found"
 msgstr "利用者が見つからないため、更新できません"
 
-msgid "Cases"
-msgstr "案件"
-
 msgid "Category with name %categoryName% already exists"
 msgstr "カテゴリ名  %categoryName% は既に存在します。"
-
-msgid "Custom Pages"
-msgstr "カスタム ページ"
 
 msgid "Data definition %dataName% doesn't exists for process %processId%"
 msgstr "データ定義：%dataName% は、プロセス：%processId% に存在しません"
@@ -236,74 +170,14 @@ msgstr "利用者を更新時のエラー"
 msgid "Filters are not supported by this API"
 msgstr "この API では、フィルターはサポートされていません"
 
-msgid "For administrator-type of profiles. To manage processes: install, delete and configure, for all processes"
-msgstr "システム管理者プロファイル。すべてのプロセスを管理（インストール、削除、構成設定）"
-
-msgid "For administrator-type of profiles. To monitor all processes"
-msgstr "システム管理者プロファイル： すべてのプロセスをモニタリング"
-
-msgid "For administrator-type of profiles. To monitor cases of all processes"
-msgstr "システム管理者プロファイル： すべてのプロセスの案件をモニタリング"
-
-msgid "For administrator-type of profiles. To monitor task completion for all processes"
-msgstr "システム管理者プロファイル： すべてのプロセスのタスク完了状態をモニタリングできる。"
-
-msgid "For process manager-type of profiles. To manage processes under her responsibility"
-msgstr "プロセス管理者プロファイル： その管理者が所轄するプロセスを管理"
-
-msgid "For process manager-type of profiles. To monitor cases of processes under her responsibility"
-msgstr "プロセス管理者プロファイル： その管理者が所轄するプロセスの案件をモニタリング"
-
-msgid "For process manager-type of profiles. To monitor processes under her responsibility"
-msgstr "プロセス管理者プロファイル： その管理者が所轄するプロセスをモニタリング"
-
-msgid "For process manager-type of profiles. To monitor task completion, only for processes under her responsibility"
-msgstr "プロセス管理者プロファイル： 特定のプロセスのタスク完了状態をモニタリングできる"
-
-msgid "For user-type of profiles. To view and do tasks  if he is a candidate"
-msgstr "ユーザープロファイル： 自己にアサインされたタスクを参照、実行できる。"
-
-msgid "For user-type of profiles. To visualize cases started by the user or cases he has worked on"
-msgstr "利用者プロファイル： 彼または彼女が開始した案件、または作業した案件を表示"
-
-msgid "For user-type of profiles. UI Designer page to visualize processes and start cases"
-msgstr "ユーザータイプのプロファイル。UI デザイナーページではプロセスと開始ケースを視覚化します。"
-
-msgid "Groups"
-msgstr "グループ"
-
-msgid "High"
-msgstr "高"
-
-msgid "Highest"
-msgstr "最高"
-
-msgid "Install/Export"
-msgstr "インストール/エクスポート"
-
-msgid "Install/export organization"
-msgstr "組織のインストール/エクスポート"
-
 msgid "Json can't be mapped to "
 msgstr "Json を次にマップできません"
-
-msgid "License"
-msgstr "ライセンス"
 
 msgid "Login failed. No profile has been set up for this user. Contact your administrator."
 msgstr "ログインに失敗しました。この利用者のプロファイルが設定されていません。BPMのシステム管理者に問い合わせてください。"
 
 msgid "Login form"
 msgstr "ログイン フォーム"
-
-msgid "Look and Feel"
-msgstr "ルック＆フィール"
-
-msgid "Low"
-msgstr "低"
-
-msgid "Lowest"
-msgstr "最低"
 
 msgid "MM/dd/yyyy"
 msgstr "yyyy/MM/dd"
@@ -313,36 +187,6 @@ msgstr "yyyy/MM/dd HH:mm"
 
 msgid "MMMM dd, yyyy"
 msgstr "yyyy年MM月dd日"
-
-msgid "Manage BDM"
-msgstr "BDM を管理"
-
-msgid "Manage Look and Feel"
-msgstr "ルック＆フィールの管理"
-
-msgid "Manage applications"
-msgstr "アプリケーションを管理します"
-
-msgid "Manage custom pages"
-msgstr "カスタム ページを管理します"
-
-msgid "Manage groups"
-msgstr "グループを管理"
-
-msgid "Manage roles"
-msgstr "役割を管理"
-
-msgid "Manage users"
-msgstr "ユーザーを管理"
-
-msgid "Monitoring"
-msgstr "モニタリング"
-
-msgid "No description."
-msgstr "説明がありません。"
-
-msgid "Normal"
-msgstr "普通"
 
 msgid "Only the value attribute can be updated"
 msgstr "Value 属性のみを更新することができます"
@@ -377,20 +221,11 @@ msgstr "バージョンのプロセスには、6.xレガシーアーティファ
 msgid "Process definition not found for id %processId%"
 msgstr "ID: %processId% のプロセス定義 が見つかりません"
 
-msgid "Processes"
-msgstr "プロセス"
-
 msgid "Profile member already exists"
 msgstr "プロファイルのメンバーは既に存在します"
 
-msgid "Profiles"
-msgstr "プロファイル"
-
 msgid "Request parameter \"id\" must be set."
 msgstr "リクエスト パラメータ　\"id\"　を設定する必要があります。"
-
-msgid "Roles"
-msgstr "役割"
 
 msgid "Search terms are not supported by this API"
 msgstr "その検索用語は、このAPI ではサポートされていません"
@@ -401,20 +236,11 @@ msgstr "セッションが切れました。再度ログインしてください
 msgid "Sorting is not supported by this API"
 msgstr "この API では、並べ替えはサポートされていません"
 
-msgid "Tasks"
-msgstr "タスク"
-
-msgid "The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task)."
-msgstr "システム管理者は、プロセスのインストール、組織の管理、一部のエラーへの対処（たとえば、タスクの再実行）をすることができます。"
-
 msgid "The only mandatory filter is %name%"
 msgstr "唯一の必須のフィルターは、%name% です。"
 
 msgid "The server is not available"
 msgstr "サーバーは利用できません。"
-
-msgid "The user can view and perform tasks and can start a new case of a process."
-msgstr "ユーザーはタスクを表示して実行することができます。そしてプロセスの新規案件を起案することができます。"
 
 msgid "This category has already been added to this process"
 msgstr "このカテゴリは既にこのプロセスに追加されました"
@@ -436,9 +262,6 @@ msgstr "このサービスは、保守のためオフラインです。後でや
 
 msgid "This user has already been mapped to actor"
 msgstr "このユーザーは既にアクターにアサインされています。"
-
-msgid "UI Designer page to visualize processes and start cases"
-msgstr "プロセスを視覚化してケースを開始するためのUIデザイナーページ"
 
 msgid "Unable to deploy business archive"
 msgstr "ビジネス アーカイブをデプロイすることはできません。"
@@ -470,39 +293,12 @@ msgstr "利用者"
 msgid "User not found"
 msgstr "利用者が見つかりません"
 
-msgid "User privilege settings"
-msgstr "ユーザー権限の設定"
-
-msgid "Users"
-msgstr "ユーザー"
-
 msgid "Welcome to"
 msgstr "ようこそ"
-
-msgid "day"
-msgstr "日"
-
-msgid "hr"
-msgstr "時"
-
-msgid "in %time%"
-msgstr "%time%以内"
 
 msgid "message"
 msgstr "Message"
 
-msgid "min"
-msgstr "分"
-
-msgid "mo"
-msgstr "月"
-
 msgid "or"
 msgstr "または"
-
-msgid "sec"
-msgstr "秒"
-
-msgid "yr"
-msgstr "年"
 
