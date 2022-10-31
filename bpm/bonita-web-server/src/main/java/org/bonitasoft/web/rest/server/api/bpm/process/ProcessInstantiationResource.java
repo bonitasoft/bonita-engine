@@ -30,11 +30,15 @@ import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.restlet.resource.Post;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nicolas Tith
  */
 public class ProcessInstantiationResource extends CommonResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessInstantiationResource.class.getName());
 
     private static final String CASE_ID_ATTRIBUTE = "caseId";
 
@@ -76,8 +80,15 @@ public class ProcessInstantiationResource extends CommonResource {
             final ObjectNode returnedObject = factory.objectNode();
             returnedObject.put(CASE_ID_ATTRIBUTE, processInstanceId);
             return returnedObject.toString();
+        } catch (ProcessExecutionException e) {
+            String errorMessage = "Unable to start the process with ID " + processDefinitionId;
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(errorMessage + " Error: " + e.getMessage());
+            }
+            //Avoid throwing original exception that may contain sensitive information unwanted in the HTTP response
+            throw new ProcessExecutionException(errorMessage + " (consult the logs for more information).");
         } catch (final ContractViolationException e) {
-            manageContractViolationException(e, "Cannot instantiate process task.");
+            manageContractViolationException(e, "Cannot instantiate process.");
             return null;
         }
     }

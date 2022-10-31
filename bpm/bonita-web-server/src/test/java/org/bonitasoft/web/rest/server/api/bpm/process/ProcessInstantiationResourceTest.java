@@ -179,6 +179,8 @@ public class ProcessInstantiationResourceTest extends RestletTest {
         final Response response = request(URL_API_PROCESS_INSTANTIATION_TEST).post(VALID_POST_BODY);
 
         assertThat(response).hasStatus(Status.SERVER_ERROR_INTERNAL);
+        assertThat(response.getEntityAsText()).doesNotContain("aMessage");
+        assertThat(response.getEntityAsText()).contains("Unable to start the process with ID");
         verify(processInstantiationResource.typeConverterUtil, times(0)).deleteTemporaryFiles(anyMap());
     }
 
