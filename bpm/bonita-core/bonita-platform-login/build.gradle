@@ -1,9 +1,9 @@
 
 
 dependencies {
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-platform-session')
-    compile project(':services:bonita-platform-authentication')
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api project(':services:bonita-commons')
+    api project(':services:bonita-platform-session')
+    api project(':services:bonita-platform-authentication')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }

@@ -1,9 +1,9 @@
 
 
 dependencies {
-    compile project(':bpm:bonita-core:bonita-process-engine')
-    compile project(':services:bonita-command')
-    compile project(':bpm:bonita-core:bonita-process-definition')
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api project(':bpm:bonita-core:bonita-process-engine')
+    api project(':services:bonita-command')
+    api project(':bpm:bonita-core:bonita-process-definition')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }

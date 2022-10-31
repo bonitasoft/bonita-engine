@@ -1,7 +1,7 @@
 
 
 dependencies {
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-cache')
-    compile project(':bpm:bonita-synchro-repository:bonita-synchro-service')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-cache')
+    api project(':bpm:bonita-synchro-repository:bonita-synchro-service')
 }

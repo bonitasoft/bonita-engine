@@ -10,16 +10,16 @@ description = ''
 dependencies {
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compile "org.springframework:spring-tx:${Deps.springVersion}"
-    compile "org.springframework:spring-jdbc:${Deps.springVersion}"
-    compile "org.springframework:spring-context:${Deps.springVersion}"
-    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api "org.springframework:spring-tx:${Deps.springVersion}"
+    api "org.springframework:spring-jdbc:${Deps.springVersion}"
+    api "org.springframework:spring-context:${Deps.springVersion}"
+    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
 
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }
 
 

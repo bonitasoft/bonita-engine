@@ -1,7 +1,7 @@
 dependencies {
-    compile "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
-    compile(project(":bpm:bonita-client"))
-    compile(project(":bpm:bonita-common"))
+    api "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
+    api(project(":bpm:bonita-client"))
+    api(project(":bpm:bonita-common"))
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
 }

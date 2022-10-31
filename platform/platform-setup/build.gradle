@@ -12,22 +12,22 @@ configurations {
 }
 
 dependencies {
-    compile "org.apache.commons:commons-text:1.10.0"
-    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    compile(group: 'org.springframework.boot', name: 'spring-boot-starter', version: Deps.springBootVersion) {
+    api "org.apache.commons:commons-text:1.10.0"
+    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api(group: 'org.springframework.boot', name: 'spring-boot-starter', version: Deps.springBootVersion) {
         exclude(module: 'jul-to-slf4j')
         exclude(module: 'log4j-to-slf4j')
         exclude(module: 'snakeyaml')
     }
-    compile "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
-    compile "org.springframework.boot:spring-boot-starter-jdbc:${Deps.springBootVersion}"
-    compile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    compile ("mysql:mysql-connector-java:${Deps.mysqlVersion}") {
+    api "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
+    api "org.springframework.boot:spring-boot-starter-jdbc:${Deps.springBootVersion}"
+    api "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    api ("mysql:mysql-connector-java:${Deps.mysqlVersion}") {
         exclude(module: 'protobuf-java')
     }
-    compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
-    compile "com.h2database:h2:${Deps.h2Version}"
-    compile("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
+    api "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+    api "com.h2database:h2:${Deps.h2Version}"
+    api("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
         exclude(module: "ons")
         exclude(module: "oraclepki")
         exclude(module: "osdt_cert")
@@ -35,18 +35,18 @@ dependencies {
         exclude(module: "ucp")
         exclude(module: "simplefan")
     }
-    compile "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
-    compile(project(":platform:platform-resources"))
-    runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) {
+    api "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
+    api(project(":platform:platform-resources"))
+    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) {
         exclude(module: 'json-path')
     }
-    testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
-    testCompile project(':platform:platform-setup-test')
+    testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    testImplementation project(':platform:platform-setup-test')
 
     inDistrib project(path: ':platform:platform-resources', configuration: 'distributionZip')
 }
@@ -77,7 +77,7 @@ processResources {
 distTar.enabled = false
 distributions {
     main {
-        baseName = "Bonita-platform-setup"
+        distributionBaseName = "Bonita-platform-setup"
         contents {
             includeEmptyDirs = false
             into('/') {
@@ -93,7 +93,7 @@ distributions {
             }
             into('/lib') {
                 from jar
-                from project.configurations.runtime {
+                from project.configurations.runtimeClasspath {
                     exclude(module: 'jul-to-slf4j')
                     exclude(module: 'log4j-over-slf4j')
                     exclude(module: 'commons-logging')

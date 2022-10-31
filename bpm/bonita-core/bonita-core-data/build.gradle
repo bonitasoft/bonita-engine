@@ -1,14 +1,14 @@
 
 
 dependencies {
-    compile project(':bpm:bonita-core:bonita-process-instance')
-    compile project(':services:bonita-data-instance')
-    compile project(':services:bonita-expression')
-    compile project(':services:bonita-commons')
-    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    compile project(':services:bonita-cache')
-    compile project(':services:bonita-persistence')
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api project(':bpm:bonita-core:bonita-process-instance')
+    api project(':services:bonita-data-instance')
+    api project(':services:bonita-expression')
+    api project(':services:bonita-commons')
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api project(':services:bonita-cache')
+    api project(':services:bonita-persistence')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }
