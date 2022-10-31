@@ -158,6 +158,8 @@ public class UserTaskExecutionResourceTest extends RestletTest {
         final Response response = request("/bpm/userTask/2/execution").post(VALID_POST_BODY);
 
         assertThat(response).hasStatus(Status.SERVER_ERROR_INTERNAL);
+        assertThat(response.getEntityAsText()).doesNotContain("aMessage");
+        assertThat(response.getEntityAsText()).contains("Unable to execute the task with ID");
         verify(userTaskExecutionResource.typeConverterUtil, times(0)).deleteTemporaryFiles(anyMap());
     }
 
