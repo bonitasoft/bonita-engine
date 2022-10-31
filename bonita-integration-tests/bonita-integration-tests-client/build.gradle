@@ -4,22 +4,22 @@ plugins {
     id("bonita-tests")
 }
 dependencies {
-    compile project(':bonita-test-api')
-    compile "junit:junit:${Deps.junit4Version}"
-    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
-    compile project(':bpm:bonita-common')
-    compile project(':bpm:bonita-client')
-    compile project(':bonita-integration-tests:bonita-test-utils')
-    compile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    compile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
-    compile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    compile project(':bpm:bonita-util:bonita-common-util-test')
-    compile "net.jodah:concurrentunit:${Deps.concurrentUnitVersion}"
-    runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testCompile project(':bpm:bonita-server')
-    testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
-    testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    api project(':bonita-test-api')
+    api "junit:junit:${Deps.junit4Version}"
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api project(':bpm:bonita-common')
+    api project(':bpm:bonita-client')
+    api project(':bonita-integration-tests:bonita-test-utils')
+    api "org.assertj:assertj-core:${Deps.assertjVersion}"
+    api "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    api "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    api project(':bpm:bonita-util:bonita-common-util-test')
+    api "net.jodah:concurrentunit:${Deps.concurrentUnitVersion}"
+    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation project(':bpm:bonita-server')
+    testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }
 
 test.doFirst {

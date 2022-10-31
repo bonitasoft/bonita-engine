@@ -1,8 +1,11 @@
 allprojects {
-    apply plugin: 'maven'
     apply plugin: 'maven-publish'
     group = 'org.bonitasoft.engine'
 
+	tasks.withType(Copy).all {
+		duplicatesStrategy 'include'
+	 }
+	
     publishing {
         repositories {
             if (project.hasProperty("altDeploymentRepository")) {
@@ -24,7 +27,7 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'com.adarshr.test-logger'
 

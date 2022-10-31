@@ -3,93 +3,93 @@ plugins {
 }
 configurations { schemagen }
 dependencies {
-    compile project(':bpm:bonita-core:bonita-home-server')
-    compile project(':bpm:bonita-core:bonita-actor-mapping')
-    compile project(':bpm:bonita-core:bonita-category')
-    compile project(':bpm:bonita-core:bonita-process-instance')
-    compile project(':bpm:bonita-core:bonita-contract-data')
-    compile project(':bpm:bonita-core:bonita-user-filter')
-    compile project(':bpm:bonita-core:bonita-login')
-    compile project(':bpm:bonita-core:bonita-process-definition')
-    compile project(':bpm:bonita-core:bonita-process-comment')
-    compile project(':bpm:bonita-core:bonita-platform-login')
-    compile project(':bpm:bonita-core:bonita-core-data')
-    compile project(':bpm:bonita-core:bonita-supervisor-mapping')
-    compile project(':bpm:bonita-synchro-repository:bonita-synchro-service')
-    compile project(':services:bonita-builder')
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-archive')
-    compile project(':services:bonita-authentication')
-    compile project(':services:bonita-authorization')
-    compile project(':services:bonita-cache')
-    compile project(':services:bonita-classloader')
-    compile project(':services:bonita-command')
-    compile project(':services:bonita-connector-executor')
-    compile project(':services:bonita-data-definition')
-    compile project(':services:bonita-data-instance')
-    compile project(':services:bonita-events')
-    compile project(':services:bonita-expression')
-    compile project(':services:bonita-external-identity-mapping')
-    compile project(':services:bonita-identity')
-    compile project(':services:bonita-incident')
-    compile project(':services:bonita-lock')
-    compile project(':services:bonita-log')
-    compile project(':services:bonita-page')
-    compile project(':bpm:bonita-core:bonita-parameter')
-    compile project(':services:bonita-persistence')
-    compile project(':services:bonita-platform')
-    compile project(':services:bonita-platform-authentication')
-    compile project(':services:bonita-platform-command')
-    compile project(':services:bonita-platform-session')
-    compile project(':services:bonita-profile')
-    compile project(':services:bonita-scheduler')
-    compile project(':services:bonita-session')
-    compile project(':services:bonita-authorization')
-    compile project(':services:bonita-time-tracker')
-    compile project(':services:bonita-transaction')
-    compile project(':services:bonita-work')
-    compile project(':services:bonita-business-application')
-    compile project(':bpm:bonita-core:bonita-form-mapping')
-    compile project(':services:bonita-business-data:bonita-business-data-api')
-    compile project(':services:bonita-resources')
-    compile "com.fasterxml.jackson.core:jackson-databind"
-    compile project(':platform:platform-resources')
-    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
-    compile "org.springframework:spring-context:${Deps.springVersion}"
-    compile "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-json:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-jmx:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-nio:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-groovysh:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-datetime:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-dateutil:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-docgenerator:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-jsr223:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
-    compile "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
-    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    api project(':bpm:bonita-core:bonita-home-server')
+    api project(':bpm:bonita-core:bonita-actor-mapping')
+    api project(':bpm:bonita-core:bonita-category')
+    api project(':bpm:bonita-core:bonita-process-instance')
+    api project(':bpm:bonita-core:bonita-contract-data')
+    api project(':bpm:bonita-core:bonita-user-filter')
+    api project(':bpm:bonita-core:bonita-login')
+    api project(':bpm:bonita-core:bonita-process-definition')
+    api project(':bpm:bonita-core:bonita-process-comment')
+    api project(':bpm:bonita-core:bonita-platform-login')
+    api project(':bpm:bonita-core:bonita-core-data')
+    api project(':bpm:bonita-core:bonita-supervisor-mapping')
+    api project(':bpm:bonita-synchro-repository:bonita-synchro-service')
+    api project(':services:bonita-builder')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-archive')
+    api project(':services:bonita-authentication')
+    api project(':services:bonita-authorization')
+    api project(':services:bonita-cache')
+    api project(':services:bonita-classloader')
+    api project(':services:bonita-command')
+    api project(':services:bonita-connector-executor')
+    api project(':services:bonita-data-definition')
+    api project(':services:bonita-data-instance')
+    api project(':services:bonita-events')
+    api project(':services:bonita-expression')
+    api project(':services:bonita-external-identity-mapping')
+    api project(':services:bonita-identity')
+    api project(':services:bonita-incident')
+    api project(':services:bonita-lock')
+    api project(':services:bonita-log')
+    api project(':services:bonita-page')
+    api project(':bpm:bonita-core:bonita-parameter')
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-platform')
+    api project(':services:bonita-platform-authentication')
+    api project(':services:bonita-platform-command')
+    api project(':services:bonita-platform-session')
+    api project(':services:bonita-profile')
+    api project(':services:bonita-scheduler')
+    api project(':services:bonita-session')
+    api project(':services:bonita-authorization')
+    api project(':services:bonita-time-tracker')
+    api project(':services:bonita-transaction')
+    api project(':services:bonita-work')
+    api project(':services:bonita-business-application')
+    api project(':bpm:bonita-core:bonita-form-mapping')
+    api project(':services:bonita-business-data:bonita-business-data-api')
+    api project(':services:bonita-resources')
+    api "com.fasterxml.jackson.core:jackson-databind"
+    api project(':platform:platform-resources')
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api "org.springframework:spring-context:${Deps.springVersion}"
+    api "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-json:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-jmx:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-nio:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-groovysh:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-datetime:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-dateutil:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-docgenerator:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-jsr223:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
+    api "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
+    api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
-    compile("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
+    api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
     testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"      // works with Junit4
-    testCompile "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"    // works with Junit5
-    testCompile "org.springframework:spring-test:${Deps.springVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"      // works with Junit4
+    testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"    // works with Junit5
+    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
     compileOnly project(':bpm:bonita-common')
-    testCompile project(':bpm:bonita-common')
-    testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    testImplementation project(':bpm:bonita-common')
+    testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
     schemagen(

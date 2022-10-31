@@ -4,20 +4,20 @@ plugins {
 }
 
 dependencies {
-    compile project(':services:bonita-commons')
-    compile "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
-    compile "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
-    compile "org.springframework:spring-core:${Deps.springVersion}"
-    compile "org.javassist:javassist:${Deps.javassistVersion}"
-    compile project(':bpm:bonita-common')
-    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    compile "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testCompile project(':bpm:bonita-util:bonita-common-util-test')
-    testCompile project(':services:bonita-business-data:bonita-business-data-api')
+    api project(':services:bonita-commons')
+    api "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
+    api "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
+    api "org.springframework:spring-core:${Deps.springVersion}"
+    api "org.javassist:javassist:${Deps.javassistVersion}"
+    api project(':bpm:bonita-common')
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
+    testImplementation project(':services:bonita-business-data:bonita-business-data-api')
 }
 
 group = 'org.bonitasoft.engine.data'

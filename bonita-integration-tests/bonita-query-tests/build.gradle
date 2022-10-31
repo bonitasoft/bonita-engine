@@ -1,16 +1,16 @@
 
 
 dependencies {
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "com.h2database:h2:${Deps.h2Version}"
-    testCompile "org.springframework:spring-beans:${Deps.springVersion}"
-    testCompile "org.springframework:spring-tx:${Deps.springVersion}"
-    testCompile "org.springframework:spring-test:${Deps.springVersion}"
-    testCompile 'org.springframework:spring-orm:4.3.16.RELEASE'
-    testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
-    testCompile 'jakarta.inject:jakarta.inject-api:1.0.5'
-    testCompile project(':bpm:bonita-server')
-    testCompile project(':bpm:bonita-common')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "com.h2database:h2:${Deps.h2Version}"
+    testImplementation "org.springframework:spring-beans:${Deps.springVersion}"
+    testImplementation "org.springframework:spring-tx:${Deps.springVersion}"
+    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
+    testImplementation 'org.springframework:spring-orm:4.3.16.RELEASE'
+    testImplementation "org.springframework:spring-jdbc:${Deps.springVersion}"
+    testImplementation 'jakarta.inject:jakarta.inject-api:1.0.5'
+    testImplementation project(':bpm:bonita-server')
+    testImplementation project(':bpm:bonita-common')
 
 }

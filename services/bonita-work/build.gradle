@@ -1,16 +1,16 @@
 
 
 dependencies {
-    compile project(':services:bonita-session')
-    compile project(':services:bonita-incident')
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-transaction')
-    compile "org.springframework:spring-jdbc:${Deps.springVersion}"
-    compile "org.springframework:spring-context:${Deps.springVersion}"
-    testCompile "junit:junit:${Deps.junit4Version}"
-    testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
-    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    api project(':services:bonita-session')
+    api project(':services:bonita-incident')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-transaction')
+    api "org.springframework:spring-jdbc:${Deps.springVersion}"
+    api "org.springframework:spring-context:${Deps.springVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }
