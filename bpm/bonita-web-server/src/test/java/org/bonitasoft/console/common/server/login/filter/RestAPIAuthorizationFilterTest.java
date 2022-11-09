@@ -40,6 +40,7 @@ import javax.servlet.http.HttpSession;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
+import org.bonitasoft.console.common.server.login.servlet.PlatformLoginServlet;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.session.APISession;
@@ -173,9 +174,10 @@ public class RestAPIAuthorizationFilterTest {
 
     @Test
     public void should_checkValidCondition_check_session_is_platform() throws Exception {
-        doReturn("API/platform/plop").when(request).getRequestURI();
+        doReturn("/API").when(request).getServletPath();
+        doReturn("/platform/plop").when(request).getPathInfo();
         doReturn(mock(PlatformSession.class)).when(httpSession)
-                .getAttribute(RestAPIAuthorizationFilter.PLATFORM_SESSION_PARAM_KEY);
+                .getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
         //when
         restAPIAuthorizationFilter.proceedWithFiltering(request, response, chain);
 
@@ -184,9 +186,10 @@ public class RestAPIAuthorizationFilterTest {
 
     @Test
     public void should_checkValidCondition_check_session_is_platform_with_API_toolkit() throws Exception {
-        doReturn("APIToolkit/platform/plop").when(request).getRequestURI();
+        doReturn("/APIToolkit").when(request).getServletPath();
+        doReturn("/platform/plop").when(request).getPathInfo();
         doReturn(mock(PlatformSession.class)).when(httpSession)
-                .getAttribute(RestAPIAuthorizationFilter.PLATFORM_SESSION_PARAM_KEY);
+                .getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
         //when
         restAPIAuthorizationFilter.proceedWithFiltering(request, response, chain);
 
@@ -195,8 +198,10 @@ public class RestAPIAuthorizationFilterTest {
 
     @Test
     public void should_checkValidCondition_check_unauthorized_if_no_platform_session() throws Exception {
-        doReturn("API/platform/plop").when(request).getRequestURI();
-        doReturn(null).when(httpSession).getAttribute(RestAPIAuthorizationFilter.PLATFORM_SESSION_PARAM_KEY);
+        doReturn("/API").when(request).getServletPath();
+        doReturn("/platform/plop").when(request).getPathInfo();
+        doReturn(null).when(httpSession)
+                .getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
         //when
         restAPIAuthorizationFilter.proceedWithFiltering(request, response, chain);
 
@@ -207,7 +212,8 @@ public class RestAPIAuthorizationFilterTest {
     @Test
     public void should_checkValidCondition_check_unauthorized_if_no_tenant_session() throws Exception {
         doReturn(null).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
-        doReturn("API/bpm/case/15").when(request).getRequestURI();
+        doReturn("/API").when(request).getServletPath();
+        doReturn("/bpm/case/15").when(request).getPathInfo();
         //when
         restAPIAuthorizationFilter.proceedWithFiltering(request, response, chain);
 
@@ -218,7 +224,7 @@ public class RestAPIAuthorizationFilterTest {
     @Test
     public void should_checkValidCondition_check_unauthorized_if_session_is_invalid() throws Exception {
         final RestAPIAuthorizationFilter restAPIAuthorizationFilterSpy = spy(restAPIAuthorizationFilter);
-        doReturn("API/bpm/case/15").when(request).getRequestURI();
+        doReturn("/API").when(request).getServletPath();
         doReturn("/bpm/case/15").when(request).getPathInfo();
         doThrow(InvalidSessionException.class).when(restAPIAuthorizationFilterSpy)
                 .checkPermissions(any(HttpServletRequest.class));
@@ -232,7 +238,7 @@ public class RestAPIAuthorizationFilterTest {
     @Test
     public void should_checkValidCondition_check_permission_if_is_tenant_is_forbidden() throws Exception {
         final RestAPIAuthorizationFilter restAPIAuthorizationFilterSpy = spy(restAPIAuthorizationFilter);
-        doReturn("API/bpm/case/15").when(request).getRequestURI();
+        doReturn("/API").when(request).getServletPath();
         doReturn("/bpm/case/15").when(request).getPathInfo();
         doReturn(false).when(restAPIAuthorizationFilterSpy).checkPermissions(any(HttpServletRequest.class));
 
@@ -246,8 +252,21 @@ public class RestAPIAuthorizationFilterTest {
     @Test
     public void should_checkValidCondition_check_permission_if_is_tenant_is_ok() throws Exception {
         final RestAPIAuthorizationFilter restAPIAuthorizationFilterSpy = spy(restAPIAuthorizationFilter);
-        doReturn("API/bpm/case/15").when(request).getRequestURI();
+        doReturn("/API").when(request).getServletPath();
         doReturn("/bpm/case/15").when(request).getPathInfo();
+        doReturn(true).when(restAPIAuthorizationFilterSpy).checkPermissions(any(HttpServletRequest.class));
+
+        //when
+        restAPIAuthorizationFilterSpy.proceedWithFiltering(request, response, chain);
+
+        verify(chain).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+    }
+
+    @Test
+    public void should_checkValidCondition_check_permission_if_pathInfo_is_null() throws Exception {
+        final RestAPIAuthorizationFilter restAPIAuthorizationFilterSpy = spy(restAPIAuthorizationFilter);
+        doReturn("/API").when(request).getServletPath();
+        doReturn(null).when(request).getPathInfo();
         doReturn(true).when(restAPIAuthorizationFilterSpy).checkPermissions(any(HttpServletRequest.class));
 
         //when

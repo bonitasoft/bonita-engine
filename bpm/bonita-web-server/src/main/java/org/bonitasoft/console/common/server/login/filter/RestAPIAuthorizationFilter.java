@@ -14,6 +14,7 @@
 package org.bonitasoft.console.common.server.login.filter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.filter.ExcludingPatternFilter;
+import org.bonitasoft.console.common.server.login.servlet.PlatformLoginServlet;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
@@ -52,9 +54,8 @@ import org.slf4j.LoggerFactory;
  */
 public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
 
-    private static final String PLATFORM_API_URI_REGEXP = ".*(API|APIToolkit)/platform/.*";
+    public static final String PLATFORM_API_URI_REGEXP = "^/(API|APIToolkit)/platform/.*";
 
-    protected static final String PLATFORM_SESSION_PARAM_KEY = "platformSession";
     protected static final String AUTHORIZATION_FILTER_EXCLUDED_PAGES_PATTERN = "^/(bonita/)?((apps/.+/)|(portal/resource/.+/))?(API|APIToolkit)/system/(i18ntranslation|feature)";
 
     /**
@@ -69,9 +70,11 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
             //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the inputstream twice (in the filter and in the API servlet)
             MultiReadHttpServletRequest httpServletRequest = new MultiReadHttpServletRequest(
                     (HttpServletRequest) request);
+            String pathInfo = Optional.ofNullable(httpServletRequest.getPathInfo()).orElse("");
+            String requestPath = httpServletRequest.getServletPath() + pathInfo;
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
             boolean isAuthorized;
-            if (httpServletRequest.getRequestURI().matches(PLATFORM_API_URI_REGEXP)) {
+            if (requestPath.matches(PLATFORM_API_URI_REGEXP)) {
                 isAuthorized = platformAPIsCheck(httpServletRequest, httpServletResponse);
             } else {
                 isAuthorized = tenantAPIsCheck(httpServletRequest, httpServletResponse);
@@ -117,7 +120,7 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
 
     protected boolean platformAPIsCheck(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse) {
         final PlatformSession platformSession = (PlatformSession) httpRequest.getSession()
-                .getAttribute(PLATFORM_SESSION_PARAM_KEY);
+                .getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
         if (platformSession != null) {
             return true;
         } else {

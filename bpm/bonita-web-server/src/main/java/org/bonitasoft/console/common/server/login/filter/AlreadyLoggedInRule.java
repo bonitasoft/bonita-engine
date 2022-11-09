@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
+import org.bonitasoft.console.common.server.login.servlet.PlatformLoginServlet;
 import org.bonitasoft.console.common.server.utils.LocaleUtils;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.session.APISession;
@@ -42,12 +43,19 @@ public class AlreadyLoggedInRule extends AuthenticationRule {
      * Overridden is Subscription
      */
     protected boolean isUserAlreadyLoggedIn(final HttpServletRequestAccessor request) throws ServletException {
+        HttpServletRequest httpServletRequest = request.asHttpServletRequest();
+        if (httpServletRequest.getPathInfo() != null) {
+            String requestPath = httpServletRequest.getServletPath() + httpServletRequest.getPathInfo();
+            if (requestPath.matches(RestAPIAuthorizationFilter.PLATFORM_API_URI_REGEXP)) {
+                return request.getHttpSession().getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY) != null;
+            }
+        }
         return request.getApiSession() != null;
     }
 
     private void ensureUserSession(final HttpServletRequest request, final HttpSession session,
             final APISession apiSession) {
-        if (session.getAttribute(SessionUtil.USER_SESSION_PARAM_KEY) == null) {
+        if (apiSession != null && session.getAttribute(SessionUtil.USER_SESSION_PARAM_KEY) == null) {
             reCreateUser(request, session, apiSession);
         }
     }
