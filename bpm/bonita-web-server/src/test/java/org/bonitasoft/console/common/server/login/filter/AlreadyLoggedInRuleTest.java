@@ -18,8 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Locale;
@@ -29,8 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
+import org.bonitasoft.console.common.server.login.servlet.PlatformLoginServlet;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.web.rest.model.user.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,9 +45,6 @@ import org.mockito.Spy;
  * Time: 15:00
  */
 public class AlreadyLoggedInRuleTest {
-
-    @Mock
-    private HttpServletRequestAccessor request;
 
     @Mock
     private APISession apiSession;
@@ -63,16 +61,33 @@ public class AlreadyLoggedInRuleTest {
     @Spy
     AlreadyLoggedInRule rule;
 
+    private HttpServletRequestAccessor request;
+
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        doReturn(httpSession).when(request).getHttpSession();
-        doReturn(httpServletRequest).when(request).asHttpServletRequest();
+        doReturn(httpSession).when(httpServletRequest).getSession();
+        request = new HttpServletRequestAccessor(httpServletRequest);
     }
 
     @Test
     public void testIfRuleAuthorizeAlreadyLoggedUser() throws Exception {
-        doReturn(apiSession).when(request).getApiSession();
+        doReturn("/apps").when(httpServletRequest).getServletPath();
+        doReturn("/app/home").when(httpServletRequest).getPathInfo();
+        doReturn(apiSession).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
+        // ensure we won't recreate user session
+        doReturn("").when(httpSession).getAttribute(SessionUtil.USER_SESSION_PARAM_KEY);
+
+        final boolean authorization = rule.doAuthorize(request, response);
+
+        assertThat(authorization, is(true));
+    }
+
+    @Test
+    public void testIfRuleAuthorizeAlreadyLoggedUserWhithNullPathInfo() throws Exception {
+        doReturn("/apps").when(httpServletRequest).getServletPath();
+        doReturn(null).when(httpServletRequest).getPathInfo();
+        doReturn(apiSession).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
         // ensure we won't recreate user session
         doReturn("").when(httpSession).getAttribute(SessionUtil.USER_SESSION_PARAM_KEY);
 
@@ -83,7 +98,8 @@ public class AlreadyLoggedInRuleTest {
 
     @Test
     public void testIfRuleDoesntAuthorizeNullSession() throws Exception {
-        doReturn(null).when(request).getApiSession();
+        doReturn("/apps").when(httpServletRequest).getServletPath();
+        doReturn("/app/home").when(httpServletRequest).getPathInfo();
 
         final boolean authorization = rule.doAuthorize(request, response);
 
@@ -91,8 +107,23 @@ public class AlreadyLoggedInRuleTest {
     }
 
     @Test
+    public void testIfRuleAuthorizeAlreadyLoggedUserIfPlatform() throws Exception {
+        doReturn("/API").when(httpServletRequest).getServletPath();
+        doReturn("/platform/tenant/unusedId").when(httpServletRequest).getPathInfo();
+        doReturn(mock(PlatformSession.class)).when(httpSession)
+                .getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
+
+        final boolean authorization = rule.doAuthorize(request, response);
+
+        assertThat(authorization, is(true));
+    }
+
+    @Test
     public void testIfUserSessionIsRecreatedWhenMissing() throws Exception {
-        doReturn(apiSession).when(request).getApiSession();
+        doReturn("/apps").when(httpServletRequest).getServletPath();
+        doReturn("/app/home").when(httpServletRequest).getPathInfo();
+        doReturn(apiSession).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
+
         doReturn(null).when(httpSession).getAttribute(SessionUtil.USER_SESSION_PARAM_KEY);
         // configure user that will be created
         doReturn(new Locale("en")).when(httpServletRequest).getLocale();
