@@ -78,7 +78,7 @@ public class PlatformLogoutServlet extends HttpServlet {
         final HttpSession session = request.getSession();
 
         final PlatformSession platformSession = (PlatformSession) session
-                .getAttribute(PlatformLoginServlet.PLATFORMSESSION);
+                .getAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
         if (platformSession != null) {
             try {
                 final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
@@ -89,7 +89,7 @@ public class PlatformLogoutServlet extends HttpServlet {
                 }
             }
         }
-        session.removeAttribute(PlatformLoginServlet.PLATFORMSESSION);
+        session.removeAttribute(PlatformLoginServlet.PLATFORM_SESSION_PARAM_KEY);
         session.invalidate();
 
         String redirectStr = request.getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
