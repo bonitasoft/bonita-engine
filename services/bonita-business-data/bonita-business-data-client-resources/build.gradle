@@ -1,3 +1,5 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
 plugins {
     id 'maven-publish'
 }
@@ -15,8 +17,27 @@ dependencies {
 
 group = 'org.bonitasoft.engine.data'
 
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+tasks.register("javadocJar", Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
 publishing {
     publications {
-        mavenJava(MavenPublication) { from project.components.java }
+        mavenJava(MavenPublication) { 
+            from project.components.java 
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            pom { pom ->
+                name = "Bonita Business Data Client Resources"
+                description = "Bonita Business Data Client Resources is a library used in BDM client DAO implementation"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
     }
 }
