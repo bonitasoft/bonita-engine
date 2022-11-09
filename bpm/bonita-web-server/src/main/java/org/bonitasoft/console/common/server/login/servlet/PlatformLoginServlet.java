@@ -39,6 +39,10 @@ import org.slf4j.LoggerFactory;
 public class PlatformLoginServlet extends HttpServlet {
 
     /**
+     * engine PlatformSession atribute name in HTTP session
+     */
+    public static final String PLATFORM_SESSION_PARAM_KEY = "platformSession";
+    /**
      * the request param for the username
      */
     protected static final String USERNAME_PARAM = "username";
@@ -51,10 +55,6 @@ public class PlatformLoginServlet extends HttpServlet {
      */
     protected static final String LOGIN_FAIL_MESSAGE = "loginFailMessage";
 
-    /**
-     * engine PlatformSession atribute name in HTTP session
-     */
-    protected static final String PLATFORMSESSION = "platformSession";
     /**
      * serialVersionUID
      */
@@ -98,7 +98,7 @@ public class PlatformLoginServlet extends HttpServlet {
         try {
             platformLoginAPI = getPlatformLoginAPI();
             platformSession = platformLoginAPI.login(username, password);
-            request.getSession().setAttribute(PLATFORMSESSION, platformSession);
+            request.getSession().setAttribute(PLATFORM_SESSION_PARAM_KEY, platformSession);
             String csrfToken = tokenGenerator.createOrLoadToken(request.getSession());
             portalCookies.addCSRFTokenCookieToResponse(request, response, csrfToken);
 
