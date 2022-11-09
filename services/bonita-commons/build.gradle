@@ -1,3 +1,5 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
 dependencies {
     api(group: 'commons-beanutils', name: 'commons-beanutils', version: Deps.commonsBeanutilsVersion) {
         exclude(module: 'commons-collections')
@@ -32,8 +34,28 @@ test {
     useJUnitPlatform { includeEngines 'junit-jupiter', 'junit-vintage' }
 }
 
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+tasks.register("javadocJar", Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+
 publishing {
     publications {
-        mavenJava(MavenPublication) { from project.components.java }
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            pom { pom ->
+                name = "Bonita Business Data Generator"
+                description = 'Bonita Engine Util Classes'
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
     }
 }
