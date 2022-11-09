@@ -1,4 +1,6 @@
-
+plugins {
+    id 'maven-publish'
+}
 
 dependencies {
     api project(':bpm:bonita-common')
@@ -9,4 +11,12 @@ dependencies {
     testImplementation(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) { exclude(module: 'jboss-transaction-api_1.2_spec') }
     compileOnly project(':bpm:bonita-client')
     testImplementation project(':bpm:bonita-client')
+}
+
+group = 'org.bonitasoft.engine.data'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
 }
