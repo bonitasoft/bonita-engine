@@ -25,7 +25,7 @@ class Deps {
     public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
     public static String httpComponentsVersion = "4.5.13"
     public static String xstreamVersion = "1.4.19"
-    public static String ehcacheVersion = "2.10.10.3.24"
+    public static String ehcacheVersion = "2.10.10.4.43"
     public static String eclipseCompilerVersion = "3.20.0"
     public static String jbcryptVersion = "0.4"
     public static String activationVersion = "1.2.2"
@@ -40,7 +40,7 @@ class Deps {
 
     public static String narayanaVersion = "5.10.6.Final"
     public static String jaxbVersion = "2.3.1"
-    public static String logbackVersion = "1.2.8"
+    public static String logbackVersion = "1.2.11"
     public static String javaxAnnotationsVersion = "1.3.2"
 
     // extensions versions
