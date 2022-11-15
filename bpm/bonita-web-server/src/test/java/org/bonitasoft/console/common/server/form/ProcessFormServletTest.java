@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.console.common.server.form;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessFormServletTest {
@@ -60,14 +60,12 @@ public class ProcessFormServletTest {
         when(hsRequest.getContextPath()).thenReturn("/bonita");
         when(hsRequest.getSession()).thenReturn(httpSession);
         when(httpSession.getAttribute("apiSession")).thenReturn(apiSession);
-        when(apiSession.getUserId()).thenReturn(1L);
     }
 
     @Test
     public void should_get_Bad_Request_when_invalid_parameters() throws Exception {
         when(hsRequest.getPathInfo()).thenReturn("");
         when(hsRequest.getParameter(anyString())).thenReturn(null);
-        when(processFormService.getProcessDefinitionId(apiSession, null, null)).thenReturn(-1L);
         formServlet.doGet(hsRequest, hsResponse);
         verify(hsResponse, times(1)).sendError(400,
                 "Either process name and version are required or process instance Id (with or without task name) or task instance Id.");
@@ -85,7 +83,7 @@ public class ProcessFormServletTest {
         verify(formServlet, times(1)).redirectToPageServlet(hsRequest, hsResponse, apiSession, 1L, -1L, -1L, null);
         verify(hsResponse, times(1))
                 .encodeRedirectURL("/bonita/portal/resource/process/processName/processVersion/content/?id=1");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test
@@ -99,7 +97,7 @@ public class ProcessFormServletTest {
         verify(formServlet, times(1)).redirectToPageServlet(hsRequest, hsResponse, apiSession, 1L, 42L, -1L, null);
         verify(hsResponse, times(1))
                 .encodeRedirectURL("/bonita/portal/resource/processInstance/processName/processVersion/content/?id=42");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test
@@ -116,7 +114,7 @@ public class ProcessFormServletTest {
                 "taskName");
         verify(hsResponse, times(1)).encodeRedirectURL(
                 "/bonita/portal/resource/taskInstance/processName/processVersion/taskName/content/?id=42");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test
@@ -133,7 +131,7 @@ public class ProcessFormServletTest {
         verify(formServlet, times(1)).redirectToPageServlet(hsRequest, hsResponse, apiSession, 2L, 42L, 1L, "taskName");
         verify(hsResponse, times(1)).encodeRedirectURL(
                 "/bonita/portal/resource/taskInstance/processName/processVersion/taskName/content/?id=1");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test
@@ -148,7 +146,7 @@ public class ProcessFormServletTest {
         verify(formServlet, times(1)).redirectToPageServlet(hsRequest, hsResponse, apiSession, 1L, -1L, -1L, null);
         verify(hsResponse, times(1))
                 .encodeRedirectURL("/bonita/portal/resource/process/processus+%C3%A9%2B%C3%B8/%C3%B8/content/?id=1");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test
@@ -165,7 +163,7 @@ public class ProcessFormServletTest {
                 "taskName é+ø");
         verify(hsResponse, times(1)).encodeRedirectURL(
                 "/bonita/portal/resource/taskInstance/processName/processVersion/taskName%20%C3%A9+%C3%B8/content/?id=42");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test
@@ -182,7 +180,7 @@ public class ProcessFormServletTest {
                 "taskName/é+ø");
         verify(hsResponse, times(1)).encodeRedirectURL(
                 "/bonita/portal/resource/taskInstance/processName/processVersion/taskName/%C3%A9+%C3%B8/content/?id=42");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test

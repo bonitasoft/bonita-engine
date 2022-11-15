@@ -17,8 +17,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.web.rest.server.utils.ResponseAssert.assertThat;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
@@ -42,7 +43,7 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ServerResource;
@@ -74,7 +75,6 @@ public class UserTaskExecutionResourceTest extends RestletTest {
     @Before
     public void initializeMocks() {
         userTaskExecutionResource = spy(new UserTaskExecutionResource(processAPI, apiSession));
-        doReturn(null).when(userTaskExecutionResource).getAttribute("assign");
         // this allows us to track method calls on this internal dependency
         userTaskExecutionResource.typeConverterUtil = spy(userTaskExecutionResource.typeConverterUtil);
         when(contractDefinition.getInputs()).thenReturn(emptyList());
@@ -206,24 +206,51 @@ public class UserTaskExecutionResourceTest extends RestletTest {
     }
 
     @Test
-    public void should_call_deleteFiles()
-            throws UserTaskNotFoundException, FileNotFoundException, FlowNodeExecutionException, UpdateException {
+    public void should_call_deleteFiles_after_executeUserTask()
+            throws UserTaskNotFoundException, FileNotFoundException, FlowNodeExecutionException, UpdateException,
+            ContractViolationException {
         //given
-        when(processAPI.getUserTaskContract(1L)).thenReturn(contractDefinition);
-        doReturn(1L).when(userTaskExecutionResource).getTaskIdParameter();
-        doReturn(response).when(userTaskExecutionResource).getResponse();
+        doReturn(null).when(userTaskExecutionResource).getQueryValue("assign");
+        doReturn("1").when(userTaskExecutionResource).getQueryValue("user");
+        doReturn("2").when(userTaskExecutionResource).getAttribute("taskId");
+        doReturn(15L).when(userTaskExecutionResource).getMaxSize();
+        when(processAPI.getUserTaskContract(2L)).thenReturn(contractDefinition);
+
         final Map<String, Serializable> inputs = new HashMap<>();
         inputs.put("testKey", "testValue");
 
         //when
         userTaskExecutionResource.executeTask(inputs);
 
+        verify(processAPI, never()).assignAndExecuteUserTask(1L, 2L, inputs);
+        verify(processAPI, times(1)).executeUserTask(1L, 2L, inputs);
         verify(userTaskExecutionResource.typeConverterUtil, times(1)).deleteTemporaryFiles(anyMap());
     }
 
     @Test
-    public void should_getProcessDefinitionIdParameter_throws_an_exception_when_task_id_parameter_is_null()
-            throws Exception {
+    public void should_call_deleteFiles_after_assignAndExecuteUserTask()
+            throws UserTaskNotFoundException, FileNotFoundException, FlowNodeExecutionException, UpdateException,
+            ContractViolationException {
+        //given
+        doReturn("1").when(userTaskExecutionResource).getQueryValue("user");
+        doReturn("true").when(userTaskExecutionResource).getQueryValue("assign");
+        doReturn("2").when(userTaskExecutionResource).getAttribute("taskId");
+        doReturn(15L).when(userTaskExecutionResource).getMaxSize();
+        when(processAPI.getUserTaskContract(2L)).thenReturn(contractDefinition);
+
+        final Map<String, Serializable> inputs = new HashMap<>();
+        inputs.put("testKey", "testValue");
+
+        //when
+        userTaskExecutionResource.executeTask(inputs);
+
+        verify(processAPI, times(1)).assignAndExecuteUserTask(1L, 2L, inputs);
+        verify(processAPI, never()).executeUserTask(1L, 2L, inputs);
+        verify(userTaskExecutionResource.typeConverterUtil, times(1)).deleteTemporaryFiles(anyMap());
+    }
+
+    @Test
+    public void should_getProcessDefinitionIdParameter_throws_an_exception_when_task_id_parameter_is_null() {
         //given
         doReturn(null).when(userTaskExecutionResource).getAttribute(UserTaskExecutionResource.TASK_ID);
 

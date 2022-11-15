@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PageUploadServletTest {
@@ -46,7 +46,6 @@ public class PageUploadServletTest {
 
         final File zipFile = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
 
-        doReturn(apiSession).when(pageUploadServlet).getAPISession(request);
         doReturn("edit").when(request).getParameter("action");
         final Set<String> permissionsSet = new HashSet<>();
         permissionsSet.add("Organisation visualization");
@@ -64,7 +63,6 @@ public class PageUploadServletTest {
 
         final File zipFile = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
 
-        doReturn(apiSession).when(pageUploadServlet).getAPISession(request);
         doReturn("add").when(request).getParameter("action");
         final Set<String> permissionsSet = new HashSet<>();
         doReturn(permissionsSet).when(pageUploadServlet).getPagePermissions(request, zipFile, true);

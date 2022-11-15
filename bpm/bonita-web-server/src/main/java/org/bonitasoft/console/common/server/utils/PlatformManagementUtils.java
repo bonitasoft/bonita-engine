@@ -86,7 +86,7 @@ public class PlatformManagementUtils {
         }
     }
 
-    private PlatformSession localPlatformLogin()
+    PlatformSession localPlatformLogin()
             throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException,
             InstantiationException {
         final Class<?> api = Class.forName("org.bonitasoft.engine.LocalLoginMechanism");

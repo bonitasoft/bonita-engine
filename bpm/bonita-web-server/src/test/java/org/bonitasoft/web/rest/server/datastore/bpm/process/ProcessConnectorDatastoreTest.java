@@ -17,7 +17,7 @@ import static java.util.Arrays.*;
 import static java.util.Collections.*;
 import static junit.framework.Assert.*;
 import static org.bonitasoft.web.rest.model.bpm.process.ProcessConnectorItem.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.*;
 

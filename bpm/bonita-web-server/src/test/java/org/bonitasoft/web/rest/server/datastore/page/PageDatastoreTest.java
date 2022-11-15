@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.bonitasoft.web.toolkit.client.data.APIID.makeAPIID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -46,12 +46,8 @@ import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.page.ContentType;
-import org.bonitasoft.engine.page.Page;
-import org.bonitasoft.engine.page.PageCreator;
+import org.bonitasoft.engine.page.*;
 import org.bonitasoft.engine.page.PageCreator.PageField;
-import org.bonitasoft.engine.page.PageNotFoundException;
-import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.search.SearchFilterOperation;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.session.APISession;
@@ -71,7 +67,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Fabio Lombardi
@@ -154,7 +150,6 @@ public class PageDatastoreTest extends APITestWithMock {
         when(tenantFolder.getTempFile(PAGE_REST_API_ZIP)).thenReturn(pageZipFile);
 
         when(constantsValue.getTempFolder()).thenReturn(pageZipFile.getParentFile());
-        when(constantsValue.getPagesFolder()).thenReturn(pagesDir);
 
         pageDatastore = spy(new PageDatastore(engineSession, constantsValue, pageAPI, customPageService, tenantFolder));
 
@@ -565,17 +560,18 @@ public class PageDatastoreTest extends APITestWithMock {
     @Test
     public void should_Get_returns_a_page_item_for_a_given_APIID() throws Exception {
         final APIID apiid = makeAPIID(2L);
+        doReturn(mockedPage).when(pageAPI).getPage(apiid.toLong());
+
         pageDatastore.get(apiid);
-        verify(pageAPI, times(1)).getPage(eq(apiid.toLong()));
-        verify(pageDatastore, times(1)).convertEngineToConsoleItem(any(Page.class));
+
+        verify(pageAPI, times(1)).getPage(apiid.toLong());
+        verify(pageDatastore, times(1)).convertEngineToConsoleItem(mockedPage);
     }
 
     @Test
     public void should_ConvertEngineToConsoleItem_return_null_when_null_page_is_given() {
-        //given
-        final Page nullPage = null;
         //when
-        final PageItem testPageItem = pageDatastore.convertEngineToConsoleItem(nullPage);
+        final PageItem testPageItem = pageDatastore.convertEngineToConsoleItem(null);
         //then
         assertThat(testPageItem).isNull();
     }
@@ -591,7 +587,8 @@ public class PageDatastoreTest extends APITestWithMock {
     @Test
     public void should_DeleteTempDirectory_throw_API_Exception_when_an_exception_is_raised() throws Exception {
         //given
-        doThrow(new IOException("to be test")).when(pageDatastore).IOUtilDeleteDir(any(File.class));
+        when(mockedZipFile.isDirectory()).thenReturn(true);
+        doThrow(new IOException("to be test")).when(pageDatastore).IOUtilDeleteDir(mockedZipFile);
 
         //when
         try {

@@ -15,11 +15,11 @@ package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -30,17 +30,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.TimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.web.rest.server.BonitaRestletApplication;
 import org.bonitasoft.web.rest.server.utils.RestletTest;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
@@ -48,7 +43,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Response;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
@@ -59,11 +54,11 @@ public class TimerEventTriggerResourceTest extends RestletTest {
     @Mock
     ProcessAPI processAPI;
 
-    private TimerEventTriggerResource restResource;
+    private TimerEventTriggerResource timerEventTriggerResource;
 
     @Before
     public void initializeMocks() {
-        restResource = spy(new TimerEventTriggerResource(processAPI));
+        timerEventTriggerResource = spy(new TimerEventTriggerResource(processAPI));
     }
 
     @Override
@@ -75,19 +70,19 @@ public class TimerEventTriggerResourceTest extends RestletTest {
     public void searchTimerEventTriggersShouldCallEngine() throws Exception {
         // given:
         final SearchOptions searchOptions = mock(SearchOptions.class);
-        doReturn(1L).when(restResource).getLongParameter(anyString(), anyBoolean());
-        doReturn(1).when(restResource).getIntegerParameter(anyString(), anyBoolean());
+        doReturn(1L).when(timerEventTriggerResource).getLongParameter(anyString(), anyBoolean());
+        doReturn(1).when(timerEventTriggerResource).getIntegerParameter(anyString(), anyBoolean());
         Response mockResponse = mock(Response.class);
-        doReturn(mockResponse).when(restResource).getResponse();
+        doReturn(mockResponse).when(timerEventTriggerResource).getResponse();
         doReturn(mock(Representation.class)).when(mockResponse).getEntity();
-        doReturn(searchOptions).when(restResource).buildSearchOptions();
+        doReturn(searchOptions).when(timerEventTriggerResource).buildSearchOptions();
         SearchResult<TimerEventTriggerInstance> searchResult = mock(SearchResult.class);
         doReturn(Collections.emptyList()).when(searchResult).getResult();
         doReturn(1L).when(searchResult).getCount();
         doReturn(searchResult).when(processAPI).searchTimerEventTriggerInstances(anyLong(), eq(searchOptions));
 
         // when:
-        restResource.searchTimerEventTriggers();
+        timerEventTriggerResource.searchTimerEventTriggers();
 
         // then:
         verify(processAPI).searchTimerEventTriggerInstances(1L, searchOptions);
@@ -96,41 +91,33 @@ public class TimerEventTriggerResourceTest extends RestletTest {
     @Test(expected = APIException.class)
     public void searchTimerEventTriggersShouldThrowExceptionIfParameterNotFound() throws Exception {
         // given:
-        doReturn(null).when(restResource).getParameter(anyString(), anyBoolean());
+        doReturn(null).when(timerEventTriggerResource).getParameter(anyString(), anyBoolean());
 
         // when:
-        restResource.searchTimerEventTriggers();
+        timerEventTriggerResource.searchTimerEventTriggers();
     }
 
     @Test(expected = APIException.class)
     public void updateShouldHandleNullID() throws Exception {
-        doReturn(Collections.EMPTY_MAP).when(restResource).getRequestAttributes();
+        doReturn(Collections.EMPTY_MAP).when(timerEventTriggerResource).getRequestAttributes();
 
-        restResource.updateTimerEventTrigger(null);
+        timerEventTriggerResource.updateTimerEventTrigger(null);
     }
 
     @Test
     public void updateTimerEventTriggersShouldReturnStatusEngineReturnedDate() throws Exception {
-
-        doReturn(mock(HttpServletRequest.class)).when(restResource).getHttpRequest();
-        final HttpSession session = mock(HttpSession.class);
-        doReturn(session).when(restResource).getHttpSession();
-        final APISession apiSession = new APISessionImpl(14L, new Date(), 3000000L, "username", 1L, "default", 1L);
-        doReturn(apiSession).when(session).getAttribute("apiSession");
-        doReturn(0).when(restResource).getIntegerParameter(anyString(), anyBoolean());
-        doReturn(0L).when(restResource).getLongParameter(anyString(), anyBoolean());
-        doReturn("").when(restResource).getParameter(anyString(), anyBoolean());
-        doReturn(Collections.emptyList()).when(restResource).getParameterAsList(anyString());
-
         final long timerEventTriggerId = 1L;
-        doReturn("" + timerEventTriggerId).when(restResource).getAttribute(TimerEventTriggerResource.ID_PARAM_NAME);
         final Date date = new Date();
         final TimerEventTrigger timerEventTrigger = new TimerEventTrigger();
         timerEventTrigger.setExecutionDate(date.getTime());
+
+        doReturn("" + timerEventTriggerId).when(timerEventTriggerResource)
+                .getAttribute(TimerEventTriggerResource.ID_PARAM_NAME);
         doReturn(date).when(processAPI).updateExecutionDateOfTimerEventTriggerInstance(eq(timerEventTriggerId),
                 any(Date.class));
-        assertThat(restResource.updateTimerEventTrigger(timerEventTrigger).getExecutionDate())
-                .isEqualTo(timerEventTrigger.getExecutionDate());
+        TimerEventTrigger eventTriggerActual = timerEventTriggerResource.updateTimerEventTrigger(timerEventTrigger);
+
+        assertThat(eventTriggerActual.getExecutionDate()).isEqualTo(timerEventTrigger.getExecutionDate());
     }
 
     @Test

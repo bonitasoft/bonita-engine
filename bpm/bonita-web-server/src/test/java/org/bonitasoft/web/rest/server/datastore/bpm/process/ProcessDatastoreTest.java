@@ -14,7 +14,7 @@
 package org.bonitasoft.web.rest.server.datastore.bpm.process;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDatastoreTest extends APITestWithMock {
@@ -75,7 +75,6 @@ public class ProcessDatastoreTest extends APITestWithMock {
     public void setUp() throws Exception {
         processDatastore = spy(new ProcessDatastore(engineSession));
         doReturn(tenantFolder).when(processDatastore).getTenantFolder();
-        doReturn(platformManagementUtils).when(processDatastore).getPlatformManagementUtils();
         doReturn(processEngineClient).when(processDatastore).getProcessEngineClient();
         doReturn(customPageService).when(processDatastore).getCustomPageService();
         doReturn(pageAPI).when(processDatastore).getPageAPI();
@@ -85,7 +84,7 @@ public class ProcessDatastoreTest extends APITestWithMock {
     @Test(expected = APIForbiddenException.class)
     public void it_throws_an_exception_adding_a_bar_file_with_unauthorized_path() throws IOException {
         // Given
-        doThrow(new UnauthorizedFolderException("")).when(tenantFolder).getTempFile(any(String.class));
+        doThrow(new UnauthorizedFolderException("")).when(tenantFolder).getTempFile(any());
 
         // When
         processDatastore.add(processItem);
@@ -95,7 +94,7 @@ public class ProcessDatastoreTest extends APITestWithMock {
     @Test(expected = APIException.class)
     public void it_throws_an_exception_adding_a_bar_file_with_ioException() throws IOException {
         // Given
-        doThrow(new IOException("")).when(tenantFolder).getTempFile(any(String.class));
+        doThrow(new IOException("")).when(tenantFolder).getTempFile(any());
 
         // When
         try {
@@ -109,9 +108,7 @@ public class ProcessDatastoreTest extends APITestWithMock {
     public void it_removes_the_pages_when_deleting_a_process() throws IOException {
 
         final Page page1 = mock(Page.class);
-        doReturn("page1").when(page1).getName();
         final Page page2 = mock(Page.class);
-        doReturn("page2").when(page2).getName();
         doReturn(Arrays.asList(page1, page2)).when(searchResult).getResult();
         doReturn(2L).when(searchResult).getCount();
 
@@ -128,7 +125,6 @@ public class ProcessDatastoreTest extends APITestWithMock {
 
         final long nbOfPages = 130L;
         final Page page = mock(Page.class);
-        doReturn("page").when(page).getName();
         final List<Page> pages = new ArrayList<>();
         for (int i = 0; i < nbOfPages; i++) {
             pages.add(page);

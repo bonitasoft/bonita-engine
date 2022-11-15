@@ -16,7 +16,7 @@ package org.bonitasoft.console.common.server.utils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.console.common.server.utils.ContractTypeConverter.ISO_8601_DATE_PATTERNS;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -47,7 +47,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContractTypeConverterTest {
@@ -289,8 +289,6 @@ public class ContractTypeConverterTest {
 
     @Test
     public void should_delete_temporary_files_of_contract_input() throws Exception {
-        final List<InputDefinition> inputDefinition = generateSimpleInputDefinition(true);
-        when(contractDefinition.getInputs()).thenReturn(inputDefinition);
         final String tempFilePath = "tempFile";
         final File tempFile = generateTempFile();
         doReturn(tempFile).when(bonitaHomeFolderAccessor).getTempFile(tempFilePath);

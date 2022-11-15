@@ -16,7 +16,7 @@ package org.bonitasoft.web.rest.server.api.bpm.process;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.web.rest.server.utils.ResponseAssert.assertThat;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.FileNotFoundException;
@@ -47,7 +47,7 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ServerResource;
@@ -233,7 +233,6 @@ public class ProcessInstantiationResourceTest extends RestletTest {
         doReturn(Long.toString(PROCESS_DEFINITION_ID)).when(processInstantiationResource)
                 .getAttribute(ProcessInstantiationResource.PROCESS_DEFINITION_ID);
         doReturn(contractDefinition).when(processAPI).getProcessContract(PROCESS_DEFINITION_ID);
-        doReturn(response).when(processInstantiationResource).getResponse();
         final Map<String, Serializable> inputs = new HashMap<>();
         inputs.put("testKey", "testValue");
         when(processAPI.startProcessWithInputs(PROCESS_DEFINITION_ID, inputs)).thenReturn(processInstance);

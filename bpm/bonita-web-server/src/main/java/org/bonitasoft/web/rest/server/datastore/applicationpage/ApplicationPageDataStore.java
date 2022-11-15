@@ -97,7 +97,7 @@ public class ApplicationPageDataStore extends CommonDatastore<ApplicationPageIte
 
     @Override
     protected ApplicationPageItem convertEngineToConsoleItem(final ApplicationPage item) {
-        return new ApplicationPageItemConverter().toApplicationPageItem(item);
+        return converter.toApplicationPageItem(item);
     }
 
     @Override

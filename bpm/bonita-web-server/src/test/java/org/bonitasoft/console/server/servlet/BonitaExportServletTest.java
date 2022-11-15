@@ -14,8 +14,8 @@
 package org.bonitasoft.console.server.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

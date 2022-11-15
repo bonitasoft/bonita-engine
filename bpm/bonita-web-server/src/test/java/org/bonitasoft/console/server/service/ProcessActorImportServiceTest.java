@@ -22,7 +22,7 @@ import java.io.File;
 import org.bonitasoft.web.toolkit.server.ServiceException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Julien Mege

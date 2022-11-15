@@ -14,7 +14,7 @@
 package org.bonitasoft.web.rest.server.datastore.bpm.cases;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -47,7 +47,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ArchivedCaseDocumentDatastoreTest extends APITestWithMock {
@@ -98,7 +98,8 @@ public class ArchivedCaseDocumentDatastoreTest extends APITestWithMock {
     }
 
     @Test(expected = APIException.class)
-    public void it_should_catch_and_throw_APIException_for_not_find_document() throws Exception {
+    public void it_should_catch_and_throw_APIException_for_not_find_document()
+            throws ArchivedDocumentNotFoundException {
         // Given
         final APIID id = APIID.makeAPIID(1l);
         when(processAPI.getArchivedProcessDocument(id.toLong()))
@@ -109,7 +110,7 @@ public class ArchivedCaseDocumentDatastoreTest extends APITestWithMock {
     }
 
     @Test
-    public void it_should_call_convertEngineToConsole_method() throws Exception {
+    public void it_should_call_convertEngineToConsole_method() {
         // Given
         final APIID id = APIID.makeAPIID(1l);
 
@@ -117,13 +118,13 @@ public class ArchivedCaseDocumentDatastoreTest extends APITestWithMock {
         documentDatastore.get(id);
 
         // Then
-        verify(documentDatastore).convertEngineToConsoleItem(any(ArchivedDocument.class));
+        verify(documentDatastore).convertEngineToConsoleItem(any());
     }
 
     // ---------- CONVERT ITEM TESTS ------------------------------//
 
     @Test
-    public void it_should_convert_item_return_item() throws Exception {
+    public void it_should_convert_item_return_item() {
         // When
         final ArchivedCaseDocumentItem convertedEngineToConsoleItem = documentDatastore
                 .convertEngineToConsoleItem(mockedDocument);
@@ -143,7 +144,7 @@ public class ArchivedCaseDocumentDatastoreTest extends APITestWithMock {
     @Test
     public void it_should_call_buildSearchOptionCreator_method() throws SearchException {
         // Given
-        when(processAPI.searchArchivedDocuments(any(SearchOptions.class))).thenReturn(mockedEngineSearchResults);
+        when(processAPI.searchArchivedDocuments(any())).thenReturn(mockedEngineSearchResults);
         final Map<String, String> filters = new HashMap<>();
         filters.put("submittedBy", "1");
 

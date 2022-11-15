@@ -14,8 +14,8 @@
 package org.bonitasoft.web.rest.server.datastore.applicationmenu;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
-import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
@@ -49,7 +48,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationMenuDataStoreTest extends APITestWithMock {
@@ -83,7 +82,7 @@ public class ApplicationMenuDataStoreTest extends APITestWithMock {
         //given
         final ApplicationMenuItem itemToCreate = new ApplicationMenuItem();
         final ApplicationMenuImpl applicationMenu = new ApplicationMenuImpl("firstMenu", 11L, 14L, 1);
-        given(applicationAPI.createApplicationMenu(any(ApplicationMenuCreator.class))).willReturn(applicationMenu);
+        given(applicationAPI.createApplicationMenu(any())).willReturn(applicationMenu);
 
         given(converter.toApplicationMenuItem(applicationMenu)).willReturn(new ApplicationMenuItem());
         //when
@@ -97,7 +96,7 @@ public class ApplicationMenuDataStoreTest extends APITestWithMock {
     @Test(expected = APIException.class)
     public void should_throw_APIException_when_engine_throws_CreationException_on_add() throws Exception {
         //given
-        given(applicationAPI.createApplicationMenu(any(ApplicationMenuCreator.class)))
+        given(applicationAPI.createApplicationMenu(any()))
                 .willThrow(new CreationException(""));
 
         //when

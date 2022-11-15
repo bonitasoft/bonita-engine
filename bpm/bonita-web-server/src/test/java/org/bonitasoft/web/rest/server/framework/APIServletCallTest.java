@@ -14,17 +14,16 @@
 package org.bonitasoft.web.rest.server.framework;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIIncorrectIdException;
@@ -35,7 +34,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APIServletCallTest {
@@ -57,10 +56,6 @@ public class APIServletCallTest {
 
     @Before
     public void before() {
-        doReturn(httpSession).when(request).getSession();
-        doReturn(apiSession).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
-        doReturn(false).when(apiSession).isTechnicalUser();
-        doReturn("john").when(apiSession).getUserName();
         apiServletCall.api = api;
     }
 
@@ -89,14 +84,20 @@ public class APIServletCallTest {
 
     @Test
     public void doGet_On_Search_Should_Set_Content_Range_Headers_Correctly() throws Exception {
-        doReturn(new ArrayList<String>()).when(apiServletCall).getParameterAsList("d");
-        doReturn(new ArrayList<String>()).when(apiServletCall).getParameterAsList("n");
-        doReturn("0").when(apiServletCall).getParameter("p");
-        doReturn("0").when(apiServletCall).getParameter("c");
-        doReturn("id ASC").when(apiServletCall).getParameter("o");
-        doReturn("").when(apiServletCall).getParameter("s");
-        doReturn(null).when(apiServletCall).getParameterAsList("f");
-        doReturn(new ArrayList<String>()).when(apiServletCall).getParameterAsList("d");
+        String parameterSearchValue = "";
+        String parameterPageValue = "10";
+        String parameterLimitValue = "0";
+        String parameterOrderValue = "id ASC";
+        List<String> parameterDeployValue = new ArrayList<>();
+        List<String> parameterCounterValue = new ArrayList<>();
+
+        doReturn(parameterDeployValue).when(apiServletCall).getParameterAsList("d");
+        doReturn(parameterCounterValue).when(apiServletCall).getParameterAsList("n");
+        doReturn(parameterPageValue).when(apiServletCall).getParameter("p", "0");
+        doReturn(parameterLimitValue).when(apiServletCall).getParameter("c", "10");
+        doReturn(parameterSearchValue).when(apiServletCall).getParameter("s");
+        doReturn(parameterOrderValue).when(apiServletCall).getParameter("o");
+        doReturn(new ArrayList<>()).when(apiServletCall).getParameterAsList("f");
 
         doNothing().when(apiServletCall).head(anyString(), anyString());
         doNothing().when(apiServletCall).output(any(List.class));
@@ -106,11 +107,16 @@ public class APIServletCallTest {
         when(itemSearchResult.getPage()).thenReturn(4);
         when(itemSearchResult.getLength()).thenReturn(8);
         when(itemSearchResult.getTotal()).thenReturn(789L);
-        when(api.runSearch(anyInt(), anyInt(), anyString(), anyString(), any(Map.class), any(List.class),
-                any(List.class))).thenReturn(itemSearchResult);
+
+        when(api.runSearch(Integer.parseInt(parameterPageValue), Integer.parseInt(parameterLimitValue),
+                parameterSearchValue, parameterOrderValue, new HashMap<>(), parameterDeployValue,
+                parameterCounterValue)).thenReturn(itemSearchResult);
 
         apiServletCall.doGet();
-        verify(apiServletCall).head(anyString(), anyString());
+        verify(api, times(1)).runSearch(Integer.parseInt(parameterPageValue), Integer.parseInt(parameterLimitValue),
+                parameterSearchValue, parameterOrderValue, new HashMap<>(), parameterDeployValue,
+                parameterCounterValue);
+        verify(apiServletCall).head("Content-Range", 4 + "-" + 8 + "/" + 789L);
     }
 
 }

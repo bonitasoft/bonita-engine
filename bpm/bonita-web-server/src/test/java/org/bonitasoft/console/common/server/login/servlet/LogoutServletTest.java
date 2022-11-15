@@ -15,8 +15,8 @@ package org.bonitasoft.console.common.server.login.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 import java.net.URISyntaxException;
@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LogoutServletTest {
@@ -107,7 +107,6 @@ public class LogoutServletTest {
 
     @Test
     public void testGetURLToRedirectToFromRequest() throws Exception {
-        doReturn(null).when(authenticationManager).getLoginPageURL(eq(requestAccessor), anyString());
         doReturn("redirectURLFromRequest").when(request).getParameter(AuthenticationManager.LOGIN_URL_PARAM_NAME);
 
         String loginPage = logoutServlet.getURLToRedirectTo(requestAccessor);

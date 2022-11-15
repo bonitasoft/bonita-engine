@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.livingapps;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -37,7 +37,7 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationRouterTest {
@@ -84,11 +84,10 @@ public class ApplicationRouterTest {
     @Test
     public void should_redirect_to_home_page_when_accessing_living_application_root() throws Exception {
         given(applicationModel.getApplicationHomePage()).willReturn("home/");
-        given(applicationModel.getApplicationLayoutName()).willReturn(LAYOUT_PAGE_NAME);
         given(applicationModel.hasProfileMapped()).willReturn(true);
         given(applicationModelFactory.createApplicationModel("HumanResources")).willReturn(applicationModel);
         given(hsRequest.getPathInfo()).willReturn("/HumanResources");
-        given(resourceRenderer.getPathSegments("HumanResources")).willReturn(Arrays.asList("HumanResources"));
+        given(resourceRenderer.getPathSegments("/HumanResources")).willReturn(Arrays.asList("HumanResources"));
 
         applicationRouter.route(hsRequest, hsResponse, apiSession, pageRenderer, resourceRenderer,
                 bonitaHomeFolderAccessor);
@@ -98,12 +97,11 @@ public class ApplicationRouterTest {
     @Test
     public void should_redirect_to_home_page_with_query_parameters() throws Exception {
         given(applicationModel.getApplicationHomePage()).willReturn("home/");
-        given(applicationModel.getApplicationLayoutName()).willReturn(LAYOUT_PAGE_NAME);
         given(applicationModel.hasProfileMapped()).willReturn(true);
         given(applicationModelFactory.createApplicationModel("HumanResources")).willReturn(applicationModel);
         given(hsRequest.getQueryString()).willReturn("time=12:00");
         given(hsRequest.getPathInfo()).willReturn("/HumanResources");
-        given(resourceRenderer.getPathSegments("HumanResources")).willReturn(Arrays.asList("HumanResources"));
+        given(resourceRenderer.getPathSegments("/HumanResources")).willReturn(Arrays.asList("HumanResources"));
 
         applicationRouter.route(hsRequest, hsResponse, apiSession, pageRenderer, resourceRenderer,
                 bonitaHomeFolderAccessor);

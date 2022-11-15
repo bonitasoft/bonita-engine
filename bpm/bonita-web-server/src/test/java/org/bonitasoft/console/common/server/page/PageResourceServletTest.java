@@ -27,7 +27,7 @@ import javax.servlet.http.HttpSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Julien Mege
@@ -52,8 +52,6 @@ public class PageResourceServletTest {
         when(req.getParameter(pageResourceServlet.getResourceParameterName())).thenReturn("name");
         when(req.getMethod()).thenReturn("GET");
 
-        when(req.getSession()).thenReturn(httpSession);
-        when(req.getParameter("tenant")).thenReturn("1");
         when(pageResourceServlet.getResourcesParentFolder()).thenReturn(new File("."));
 
         when(req.getParameter("location")).thenReturn("../../../file.txt");

@@ -17,12 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Vincent Elcrin
@@ -38,7 +39,7 @@ public class BonitaVersionTest {
 
     @Test
     public void should_read_version_stream_to_return_its_content() throws Exception {
-        final InputStream stream = IOUtils.toInputStream("1.0.0\n2021.2-u0\nBonitasoft © 2021");
+        final InputStream stream = IOUtils.toInputStream("1.0.0\n2021.2-u0\nBonitasoft © 2021", StandardCharsets.UTF_8);
         given(file.getStream()).willReturn(stream);
 
         final BonitaVersion version = new BonitaVersion(file);
@@ -62,8 +63,8 @@ public class BonitaVersionTest {
     }
 
     @Test
-    public void should_trim_extra_new_line_character() throws Exception {
-        final InputStream stream = IOUtils.toInputStream("1.0.0\n");
+    public void should_trim_extra_new_line_character() {
+        final InputStream stream = IOUtils.toInputStream("1.0.0\n", StandardCharsets.UTF_8);
         given(file.getStream()).willReturn(stream);
 
         final BonitaVersion version = new BonitaVersion(file);
@@ -73,7 +74,7 @@ public class BonitaVersionTest {
     }
 
     @Test
-    public void should_return_an_empty_version_when_the_stream_is_null() throws Exception {
+    public void should_return_an_empty_version_when_file_is_invalid() {
         given(file.getStream()).willReturn(null);
 
         final BonitaVersion version = new BonitaVersion(file);
@@ -82,14 +83,4 @@ public class BonitaVersionTest {
         assertThat(version.getCopyright()).isEqualTo("");
     }
 
-    @Test
-    public void should_return_an_empty_version_when_it_is_unable_to_read_the_file() throws Exception {
-        given(stream.read()).willThrow(new RuntimeException());
-        given(file.getStream()).willReturn(stream);
-
-        final BonitaVersion version = new BonitaVersion(file);
-
-        assertThat(version.getVersion()).isEqualTo("");
-        assertThat(version.getCopyright()).isEqualTo("");
-    }
 }

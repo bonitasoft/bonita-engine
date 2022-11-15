@@ -36,7 +36,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CustomPageChildFirstClassLoaderTest {
@@ -88,15 +88,12 @@ public class CustomPageChildFirstClassLoaderTest {
     }
 
     @Test
-    public void should__add_bdm_dependencies_in_classloader_before_other_dependencies() throws Exception {
+    public void should_add_bdm_dependencies_in_classloader_before_other_dependencies() throws Exception {
         classLoader = spy(newClassloader());
         final URL[] bdmDependenciesURLs = bdmDependenciesURLs();
         when(bdmDependenciesResolver.getBDMDependencies()).thenReturn(bdmDependenciesURLs);
         when(customPageDependenciesResolver.resolveCustomPageDependencies())
                 .thenReturn(loadedResources("util.jar"));
-        when(bdmDependenciesResolver.isABDMDependency("bdm-model.jar")).thenReturn(true);
-        when(bdmDependenciesResolver.isABDMDependency("bdm-dao.jar")).thenReturn(true);
-        when(bdmDependenciesResolver.isABDMDependency("javassist-3.18.1-GA.jar")).thenReturn(true);
         classLoader.addCustomPageResources();
 
         final InOrder order = inOrder(classLoader, customPageDependenciesResolver);

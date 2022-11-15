@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.process;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -42,7 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Alexis Hassler
@@ -68,6 +67,16 @@ public class APIProcessTest {
     @Mock
     private CaseDatastore caseDatastore;
 
+    @Before
+    public void consoleTestSetUp() throws IOException {
+        ItemDefinitionFactory.setDefaultFactory(new ModelFactory());
+        I18n.getInstance();
+
+        apiProcess = spy(new APIProcess());
+        apiProcess.setCaller(caller);
+        doReturn(caseDatastore).when(apiProcess).getCaseDatastore();
+    }
+
     /**
      * Test method for {@link org.bonitasoft.web.rest.server.api.bpm.process.APIProcess#fillCounters(ProcessItem, List).
      */
@@ -92,19 +101,6 @@ public class APIProcessTest {
 
         // Then
         verify(item).setAttribute(ProcessItem.COUNTER_FAILED_CASES, numberOfFailedCases);
-    }
-
-    @Before
-    public void consoleTestSetUp() throws IOException {
-        ItemDefinitionFactory.setDefaultFactory(new ModelFactory());
-        I18n.getInstance();
-        given(caller.getHttpSession()).willReturn(session);
-        given(session.getAttribute("apiSession")).willReturn(engineSession);
-
-        apiProcess = spy(new APIProcess());
-        apiProcess.setCaller(caller);
-        doReturn(processDatastore).when(apiProcess).getProcessDatastore();
-        doReturn(caseDatastore).when(apiProcess).getCaseDatastore();
     }
 
     /**

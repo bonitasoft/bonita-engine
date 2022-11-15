@@ -14,7 +14,7 @@
 package org.bonitasoft.web.rest.server.api.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ServerResource;
@@ -159,7 +159,7 @@ public class BusinessDataModelResourceTest extends RestletTest {
     }
 
     @Test
-    public void install_should_throw_APIException_if_BusinessDataRepositoryDeploymentException_occurs()
+    public void should_throw_APIException_if_BusinessDataRepositoryDeploymentException_occurs()
             throws Exception {
         final File bdmFile = testBDMFile();
         final BusinessDataModelItem item = new BusinessDataModelItem();
@@ -168,22 +168,7 @@ public class BusinessDataModelResourceTest extends RestletTest {
                 .getCompleteTenantTempFilePath(bdmFile.getName());
         doThrow(new BusinessDataRepositoryDeploymentException("repository deployment exception"))
                 .when(tenantAdministrationAPI)
-                .installBusinessDataModel(any(byte[].class));
-
-        final Response response = request("/tenant/bdm").post(new ObjectMapper().writeValueAsString(item));
-
-        assertThat(response.getStatus()).isEqualTo(Status.SERVER_ERROR_INTERNAL);
-    }
-
-    @Test
-    public void uninstall_should_throw_APIException_if_error_occurs() throws Exception {
-        final File bdmFile = testBDMFile();
-        final BusinessDataModelItem item = new BusinessDataModelItem();
-        item.setFileUpload(bdmFile.getName());
-        doReturn(bdmFile.getAbsolutePath()).when(bonitaHomeFolderAccessor)
-                .getCompleteTenantTempFilePath(bdmFile.getName());
-        doThrow(new BusinessDataRepositoryDeploymentException(new NullPointerException())).when(tenantAdministrationAPI)
-                .uninstallBusinessDataModel();
+                .updateBusinessDataModel(any());
 
         final Response response = request("/tenant/bdm").post(new ObjectMapper().writeValueAsString(item));
 
@@ -195,8 +180,7 @@ public class BusinessDataModelResourceTest extends RestletTest {
         final File bdmFile = testBDMFile();
         final BusinessDataModelItem item = new BusinessDataModelItem();
         item.setFileUpload(bdmFile.getName());
-        doReturn(bdmFile.getAbsolutePath()).when(bonitaHomeFolderAccessor)
-                .getCompleteTenantTempFilePath(bdmFile.getName());
+
         doReturn(false).when(tenantAdministrationAPI).isPaused();
 
         final Response response = request("/tenant/bdm").post(new ObjectMapper().writeValueAsString(item));

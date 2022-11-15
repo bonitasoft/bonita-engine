@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.livingapps;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -45,7 +45,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -126,7 +126,6 @@ public class LivingApplicationPageServletTest {
         hsRequest.setPathInfo("/AppToken/pageToken/content/");
         given(resourceRenderer.getPathSegments("/AppToken/pageToken/content/"))
                 .willReturn(Arrays.asList("AppToken", "pageToken", "content"));
-        given(customPageAuthorizationsHelper.isPageAuthorized("AppToken", "customPageName")).willReturn(true);
 
         doThrow(new InvalidSessionException("invalid session")).when(applicationAPI).getApplicationPage("AppToken",
                 "pageToken");
@@ -217,9 +216,6 @@ public class LivingApplicationPageServletTest {
         final File pageDir = new File(".");
         given(resourceRenderer.getPathSegments("/AppToken/htmlexample/content/css/../../../file.css")).willReturn(
                 Arrays.asList("AppToken", "htmlexample", "content", "css", "..", "..", "..", "file.css"));
-        doReturn(pageResourceProvider).when(pageRenderer).getPageResourceProvider("htmlexample");
-        given(pageResourceProvider.getPageDirectory()).willReturn(pageDir);
-        doReturn(false).when(bonitaHomeFolderAccessor).isInFolder(any(File.class), any(File.class));
 
         doReturn(applicationPage).when(applicationAPI).getApplicationPage("AppToken", "htmlexample");
         doReturn(2L).when(applicationPage).getPageId();
@@ -260,11 +256,6 @@ public class LivingApplicationPageServletTest {
         hsRequest.setPathInfo("/AppToken/htmlexample" + unauthorizedPath);
         given(resourceRenderer.getPathSegments("/AppToken/htmlexample" + unauthorizedPath)).willReturn(
                 Arrays.asList("AppToken", "htmlexample", "theme", "..", "WEB-INF", "web.xml"));
-
-        doReturn(applicationPage).when(applicationAPI).getApplicationPage("AppToken", "htmlexample");
-        doReturn(2L).when(applicationPage).getPageId();
-        doReturn(page).when(pageAPI).getPage(2L);
-        doReturn("customPage_" + "htmlexample").when(page).getName();
 
         servlet.service(hsRequest, hsResponse);
 

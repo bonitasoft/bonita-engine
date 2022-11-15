@@ -27,10 +27,7 @@ import org.bonitasoft.console.common.server.page.extension.PageResourceProviderI
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.livingapps.ApplicationModelFactory;
 import org.slf4j.Logger;
@@ -92,6 +89,8 @@ public class CustomPageServlet extends HttpServlet {
             } else {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "User not Authorized");
             }
+        } catch (UnauthorizedAccessException e) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "User not Authorized");
         } catch (final Exception e) {
             handleException(pageName, e);
         }
@@ -124,7 +123,7 @@ public class CustomPageServlet extends HttpServlet {
                         + getResourcePathWithoutPageName(resourcePath, pageName));
 
         if (!bonitaHomeFolderAccessor.isInFolder(resourceFile, pageResourceProvider.getPageDirectory())) {
-            throw new BonitaException("Unauthorized access to the file " + resourcePath);
+            throw new UnauthorizedAccessException("Unauthorized access to the file " + resourcePath);
         }
         return resourceFile;
     }

@@ -14,8 +14,8 @@
 package org.bonitasoft.web.rest.server.datastore.filter;
 
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;

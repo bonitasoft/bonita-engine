@@ -14,8 +14,8 @@
 package org.bonitasoft.console.common.server.page;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PageMappingServiceTest {
@@ -58,9 +58,7 @@ public class PageMappingServiceTest {
 
     @Before
     public void beforeEach() throws Exception {
-        when(hsRequest.getSession()).thenReturn(httpSession);
         doReturn(pageAPI).when(pageMappingService).getPageAPI(apiSession);
-        when(apiSession.getUserId()).thenReturn(1L);
         when(hsRequest.getContextPath()).thenReturn("/bonita");
         Map<String, String[]> params = new HashMap<>();
         params.put("key", new String[] { "value" });

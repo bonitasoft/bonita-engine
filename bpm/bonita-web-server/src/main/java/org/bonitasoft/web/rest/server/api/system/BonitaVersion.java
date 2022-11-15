@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.web.rest.server.api.system;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,38 +31,28 @@ public class BonitaVersion {
 
     private List<String> metadata;
 
-    private final VersionFile file;
+    private final VersionFile versionFile;
 
     public BonitaVersion(final VersionFile file) {
-        this.file = file;
+        this.versionFile = file;
     }
 
-    private List<String> read(final InputStream stream) {
-        if (stream != null) {
-            try {
-                return IOUtils.readLines(stream, "UTF-8");
-            } catch (final Exception e) {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Unable to read the file VERSION", e);
-                }
-                return Collections.emptyList();
-            } finally {
-                try {
-                    stream.close();
-                } catch (final IOException e) {
-                    if (LOGGER.isWarnEnabled()) {
-                        LOGGER.warn("Unable to close the input stream for file VERSION", e);
-                    }
-                }
+    private List<String> read(VersionFile versionFile) {
+        List<String> result = new ArrayList<>();
+        try (Stream<String> lines = new BufferedReader(new InputStreamReader(versionFile.getStream())).lines()) {
+            result = lines.collect(Collectors.toList());
+        } catch (final Exception e) {
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Unable to read the file VERSION", e);
             }
-        } else {
-            return Collections.emptyList();
         }
+        return result;
+
     }
 
     public String getVersion() {
         if (metadata == null) {
-            metadata = read(file.getStream());
+            metadata = read(versionFile);
         }
         if (metadata.size() > 0) {
             return metadata.get(0).trim();
@@ -79,7 +69,7 @@ public class BonitaVersion {
 
     public String getBrandingVersionWithUpdate() {
         if (metadata == null) {
-            metadata = read(file.getStream());
+            metadata = read(versionFile);
         }
         if (metadata.size() > 1) {
             return metadata.get(1).trim();
@@ -90,7 +80,7 @@ public class BonitaVersion {
 
     public String getCopyright() {
         if (metadata == null) {
-            metadata = read(file.getStream());
+            metadata = read(versionFile);
         }
         if (metadata.size() > 2) {
             return metadata.get(2).trim();

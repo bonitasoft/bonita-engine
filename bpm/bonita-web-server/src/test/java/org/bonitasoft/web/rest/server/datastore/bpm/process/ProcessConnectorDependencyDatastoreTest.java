@@ -16,7 +16,7 @@ package org.bonitasoft.web.rest.server.datastore.bpm.process;
 import static java.util.Arrays.*;
 import static junit.framework.Assert.*;
 import static org.bonitasoft.web.rest.model.bpm.process.ProcessConnectorDependencyItem.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.*;
 

@@ -14,8 +14,8 @@
 package org.bonitasoft.web.rest.server.datastore.applicationpage;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -48,7 +48,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationPageDataStoreTest extends APITestWithMock {
@@ -95,11 +95,14 @@ public class ApplicationPageDataStoreTest extends APITestWithMock {
     @Test(expected = APIException.class)
     public void should_throw_APIException_when_engine_throws_CreationException_on_add() throws Exception {
         //given
-        given(applicationAPI.createApplicationPage(anyLong(), anyLong(), anyString()))
-                .willThrow(new CreationException(""));
-
+        ApplicationPageItem applicationPageItem = new ApplicationPageItem();
+        applicationPageItem.setApplicationId(1L);
+        applicationPageItem.setPageId(1L);
+        applicationPageItem.setToken("token");
+        doThrow(new CreationException("test")).when(applicationAPI).createApplicationPage(anyLong(), anyLong(),
+                anyString());
         //when
-        dataStore.add(new ApplicationPageItem());
+        dataStore.add(applicationPageItem);
 
         //then exception
     }
@@ -160,6 +163,9 @@ public class ApplicationPageDataStoreTest extends APITestWithMock {
         final ApplicationPageImpl appPage = new ApplicationPageImpl(1, 11, "MyAppPage");
         appPage.setId(1);
         final ApplicationPageItem item = new ApplicationPageItem();
+        item.setApplicationId(1L);
+        item.setPageId(1L);
+        item.setToken("MyAppPage");
         given(converter.toApplicationPageItem(appPage)).willReturn(item);
 
         given(applicationAPI.searchApplicationPages(any(SearchOptions.class))).willReturn(
@@ -190,7 +196,10 @@ public class ApplicationPageDataStoreTest extends APITestWithMock {
         final ApplicationPageImpl appPage = new ApplicationPageImpl(1, 11, "MyAppPage");
         appPage.setId(1);
         final ApplicationPageItem item = new ApplicationPageItem();
-        given(converter.toApplicationPageItem(appPage)).willReturn(item);
+        item.setApplicationId(1L);
+        item.setPageId(1L);
+        item.setToken("token");
+        doReturn(item).when(converter).toApplicationPageItem(appPage);
 
         given(applicationAPI.searchApplicationPages(any(SearchOptions.class))).willReturn(
                 new SearchResultImpl<>(2, List.of(appPage)));

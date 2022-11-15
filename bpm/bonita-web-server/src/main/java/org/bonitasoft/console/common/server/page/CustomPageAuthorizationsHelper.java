@@ -19,9 +19,6 @@ import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
@@ -39,8 +36,7 @@ public class CustomPageAuthorizationsHelper {
     private final ApplicationModelFactory applicationFactory;
 
     public CustomPageAuthorizationsHelper(final APISession apiSession, final ApplicationAPI applicationAPI,
-            final PageAPI pageApi, final ApplicationModelFactory applicationModelFactory)
-            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+            final PageAPI pageApi, final ApplicationModelFactory applicationModelFactory) {
         this.applicationAPI = applicationAPI;
         this.pageApi = pageApi;
         this.apiSession = apiSession;

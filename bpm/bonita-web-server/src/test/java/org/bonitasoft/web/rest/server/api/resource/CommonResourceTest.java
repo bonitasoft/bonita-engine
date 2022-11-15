@@ -16,8 +16,8 @@ package org.bonitasoft.web.rest.server.api.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.web.rest.server.utils.ResponseAssert.assertThat;
 import static org.bonitasoft.web.rest.server.utils.RestletAppBuilder.aTestApp;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Application;
 import org.restlet.Response;
 import org.restlet.data.Form;
@@ -59,7 +59,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getParameterShouldNotVerifyNotNullIfNotMandatory() throws Exception {
+    public void getParameterShouldNotVerifyNotNullIfNotMandatory() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         final String parameterName = "any string parameter name";
@@ -74,7 +74,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getParameterShouldVerifyNotNullIfMandatory() throws Exception {
+    public void getParameterShouldVerifyNotNullIfMandatory() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         doReturn(null).when(spy).getRequestParameter(anyString());
@@ -89,7 +89,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getSearchOrderMustRetrieveProperParameter() throws Exception {
+    public void getSearchOrderMustRetrieveProperParameter() {
         final CommonResource spy = spy(new CommonResource());
         doReturn("dummy sort value").when(spy).getParameter(anyString(), anyBoolean());
         spy.getSearchOrder();
@@ -98,7 +98,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getSearchPageNumberMustRetrieveProperParameter() throws Exception {
+    public void getSearchPageNumberMustRetrieveProperParameter() {
         final CommonResource spy = spy(new CommonResource());
         doReturn(new Integer(88)).when(spy).getIntegerParameter(anyString(), anyBoolean());
         spy.getSearchPageNumber();
@@ -107,7 +107,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getSearchPageSizeMustRetrieveProperParameter() throws Exception {
+    public void getSearchPageSizeMustRetrieveProperParameter() {
         final CommonResource spy = spy(new CommonResource());
         doReturn(new Integer(77)).when(spy).getIntegerParameter(anyString(), anyBoolean());
         spy.getSearchPageSize();
@@ -116,7 +116,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getSearchTermMustRetrieveProperParameter() throws Exception {
+    public void getSearchTermMustRetrieveProperParameter() {
         final CommonResource spy = spy(new CommonResource());
         doReturn("lookFor").when(spy).getParameter(anyString(), anyBoolean());
         spy.getSearchTerm();
@@ -125,10 +125,10 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getMandatoryParameterShouldCheckNonNull() throws Exception {
+    public void getMandatoryParameterShouldCheckNonNull() {
         final CommonResource spy = spy(new CommonResource());
         final String parameterName = "name of the parameter";
-        doNothing().when(spy).verifyNotNullParameter(any(Class.class), anyString());
+        doNothing().when(spy).verifyNotNullParameter(any(), any());
         final String objectInParameterMap = "dummyString";
         doReturn(objectInParameterMap).when(spy).getRequestParameter(anyString());
 
@@ -138,23 +138,23 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test(expected = APIException.class)
-    public void nullMandatoryParameterIsForbidden() throws Exception {
+    public void nullMandatoryParameterIsForbidden() {
         new CommonResource().verifyNotNullParameter(null, "unused");
     }
 
     @Test
-    public void notNullMandatoryParameterIsForbidden() throws Exception {
+    public void notNullMandatoryParameterIsForbidden() {
         new CommonResource().verifyNotNullParameter(new Object(), "unused");
         // no Exception
     }
 
     @Test
-    public void parseFilterShoulReturnNullIfListIsNull() throws Exception {
+    public void parseFilterShoulReturnNullIfListIsNull() {
         assertThat(new CommonResource().parseFilters(null)).isNull();
     }
 
     @Test
-    public void parseFilterShouldBuildExpectedMap() throws Exception {
+    public void parseFilterShouldBuildExpectedMap() {
         // given:
         final List<String> filters = Arrays.asList("toto=17", "titi='EN_ECHEC'", "task=task=with=equal=in=name");
 
@@ -169,7 +169,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void parseFilterWithSpecialCharactersShouldBuildExpectedMap() throws Exception {
+    public void parseFilterWithSpecialCharactersShouldBuildExpectedMap() {
         // given:
         final List<String> filters = Arrays.asList("a=b", "c=/d/d,e");
 
@@ -183,7 +183,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void parseFilterShouldBuildMapEvenIfNoValueForParam() throws Exception {
+    public void parseFilterShouldBuildMapEvenIfNoValueForParam() {
         // given:
         final List<String> filters = new ArrayList<>(2);
         filters.add("nomatchingvalue=");
@@ -197,7 +197,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getIntegerParameterShouldReturnNullIfgetParameterReturnsNull() throws Exception {
+    public void getIntegerParameterShouldReturnNullIfgetParameterReturnsNull() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         doReturn(null).when(spy).getParameter(anyString(), anyBoolean());
@@ -208,7 +208,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getLongParameterShouldReturnNullIfgetParameterReturnsNull() throws Exception {
+    public void getLongParameterShouldReturnNullIfgetParameterReturnsNull() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         doReturn(null).when(spy).getParameter(anyString(), anyBoolean());
@@ -219,7 +219,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void buildSearchOptionsShouldCallAllGetxxxSearchParameterMethods() throws Exception {
+    public void buildSearchOptionsShouldCallAllGetxxxSearchParameterMethods() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         doReturn(null).when(spy).getSearchFilters();
@@ -240,7 +240,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getQueryParameter_return_value() throws Exception {
+    public void getQueryParameter_return_value() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         final String parameterName = APIServletCall.PARAMETER_QUERY;
@@ -259,7 +259,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getQueryParameter_return_null() throws Exception {
+    public void getQueryParameter_return_null() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         doReturn(null).when(spy).getRequestParameter(anyString());
@@ -273,7 +273,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test(expected = APIException.class)
-    public void getQueryParameter_throws_Exception() throws Exception {
+    public void getQueryParameter_throws_Exception() {
         // given:
         final CommonResource spy = spy(new CommonResource());
         doReturn(null).when(spy).getRequestParameter(anyString());
@@ -305,7 +305,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getParametersAsList_should_support_value_with_comma() throws Exception {
+    public void getParametersAsList_should_support_value_with_comma() {
         //given
         final CommonResource resource = spy(new CommonResource());
         final Form form = new Form("f=a=b&f=c=d,e");
@@ -319,7 +319,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getParametersAsList_should_support_values_with_slash() throws Exception {
+    public void getParametersAsList_should_support_values_with_slash() {
         //given
         final CommonResource resource = spy(new CommonResource());
         final Form form = new Form("f=a%3Db&f=c%3D%2Fd%2Fd%2Ce");
@@ -333,7 +333,7 @@ public class CommonResourceTest extends RestletTest {
     }
 
     @Test
-    public void getParametersAsList_should_return_emptyList_when_parameter_does_not_exist() throws Exception {
+    public void getParametersAsList_should_return_emptyList_when_parameter_does_not_exist() {
         //given
         final CommonResource resource = spy(new CommonResource());
         final Form form = new Form("f=a=b&f=c=d,e");
