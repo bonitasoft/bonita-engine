@@ -20,7 +20,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Emmanuel Duchastenier

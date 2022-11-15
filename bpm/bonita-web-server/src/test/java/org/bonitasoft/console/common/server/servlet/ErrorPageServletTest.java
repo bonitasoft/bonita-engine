@@ -14,7 +14,7 @@
 package org.bonitasoft.console.common.server.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ErrorPageServletTest {
@@ -112,7 +112,6 @@ public class ErrorPageServletTest {
     public void should_display_error_when_error_code_is_missing() throws Exception {
 
         when(request.getPathInfo()).thenReturn("");
-        when(request.getContextPath()).thenReturn("/bonita");
 
         errorServlet.doGet(request, response);
 
@@ -123,8 +122,7 @@ public class ErrorPageServletTest {
     public void should_forward_request_when_session_is_missing() throws Exception {
 
         when(request.getPathInfo()).thenReturn("/404");
-        when(request.getContextPath()).thenReturn("/bonita");
-        doReturn(false).when(errorServlet).isPlatformHealthy();
+        when(session.getAttribute("apiSession")).thenReturn(null);
 
         errorServlet.doGet(request, response);
 
@@ -135,8 +133,7 @@ public class ErrorPageServletTest {
     public void should_forward_request_when_session_is_missing_forbidden_access() throws Exception {
 
         when(request.getPathInfo()).thenReturn("/403");
-        when(request.getContextPath()).thenReturn("/bonita");
-        doReturn(false).when(errorServlet).isPlatformHealthy();
+        when(session.getAttribute("apiSession")).thenReturn(null);
 
         errorServlet.doGet(request, response);
 
@@ -147,8 +144,7 @@ public class ErrorPageServletTest {
     public void should_forward_request_when_platform_is_down() throws Exception {
 
         when(request.getPathInfo()).thenReturn("/500");
-        when(request.getContextPath()).thenReturn("/bonita");
-        when(session.getAttribute("apiSession")).thenReturn(null);
+        doReturn(false).when(errorServlet).isPlatformHealthy();
 
         errorServlet.doGet(request, response);
 

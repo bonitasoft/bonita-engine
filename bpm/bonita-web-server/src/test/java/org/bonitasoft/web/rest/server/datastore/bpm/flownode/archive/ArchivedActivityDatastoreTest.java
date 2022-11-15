@@ -28,7 +28,7 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Emmanuel Duchastenier
@@ -48,7 +48,7 @@ public class ArchivedActivityDatastoreTest {
 
         doReturn(processAPI).when(abstractArchivedActivityDatastore).getProcessAPI();
         doReturn(new ArchivedCallActivityInstanceImpl("test")).when(processAPI)
-                .getArchivedActivityInstance(id.toLong());
+                .getArchivedFlowNodeInstance(id.toLong());
         doReturn(new ArchivedActivityItem()).when(abstractArchivedActivityDatastore).convertEngineToConsoleItem(any());
 
         ArchivedFlowNodeItem archivedFlowNodeItem = abstractArchivedActivityDatastore.get(id);

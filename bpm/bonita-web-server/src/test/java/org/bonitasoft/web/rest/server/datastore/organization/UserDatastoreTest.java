@@ -15,7 +15,7 @@ package org.bonitasoft.web.rest.server.datastore.organization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -49,7 +49,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Vincent Elcrin
@@ -144,10 +144,6 @@ public class UserDatastoreTest {
         long expected = 1;
         when(engineSearchResults.getCount()).thenReturn(expected);
         User user = mock(User.class);
-        String firstname = "Chuck";
-        when(user.getFirstName()).thenReturn(firstname);
-        String lastname = "Norris";
-        when(user.getLastName()).thenReturn(lastname);
         List<User> userList = Collections.singletonList(user);
         when(engineSearchResults.getResult()).thenReturn(userList);
         when(processAPI.searchUsersWhoCanExecutePendingHumanTask(eq(18L), any(SearchOptions.class)))

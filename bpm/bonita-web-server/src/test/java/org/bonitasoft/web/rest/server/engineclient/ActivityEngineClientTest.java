@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.engineclient;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.*;
 

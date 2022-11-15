@@ -16,8 +16,8 @@ package org.bonitasoft.console.common.server.login.filter;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -137,7 +137,7 @@ public class AlreadyLoggedInRuleTest {
     }
 
     // private static class UserMatcher implements ArgumentMatcher<User> {
-    class UserMatcher extends ArgumentMatcher<User> {
+    class UserMatcher implements ArgumentMatcher<User> {
 
         private final String username;
         private final String local;
@@ -148,10 +148,10 @@ public class AlreadyLoggedInRuleTest {
         }
 
         @Override
-        public boolean matches(final Object arg) {
-            final User user = (User) arg;
+        public boolean matches(User argument) {
+            final User user = argument;
             return username.equals(user.getUsername())
-                    && local.equals(user.getLocale().toString());
+                    && local.equals(user.getLocale());
         }
     }
 }

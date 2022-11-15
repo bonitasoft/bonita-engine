@@ -14,8 +14,8 @@
 package org.bonitasoft.web.rest.server.api.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
@@ -31,7 +31,7 @@ import org.bonitasoft.web.rest.server.utils.RestletTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ServerResource;

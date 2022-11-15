@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.console.common.server.page;
 
-import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -27,9 +26,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,11 +55,10 @@ import org.bonitasoft.web.rest.server.api.extension.ControllerClassName;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CustomPageServiceTest {
@@ -66,9 +66,6 @@ public class CustomPageServiceTest {
     public static final String PAGE_PROPERTIES = "page.properties";
 
     private CustomPageService customPageService;
-
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
 
     @Mock
     APISession apiSession;
@@ -89,9 +86,6 @@ public class CustomPageServiceTest {
     private RestAPIContext restAPIContext;
 
     @Mock
-    private Page mockedPage;
-    @Mock
-
     private final WebBonitaConstantsUtils webBonitaConstantUtils = WebBonitaConstantsUtils.getTenantInstance();
 
     @Rule
@@ -126,9 +120,6 @@ public class CustomPageServiceTest {
                 anyString(),
                 any(CustomPageDependenciesResolver.class), any(BDMClientDependenciesResolver.class));
 
-        when(mockedPage.getLastModificationDate()).thenReturn(new Date(0L));
-        when(pageAPI.getPageByName("")).thenReturn(mockedPage);
-
         // When
         final GroovyClassLoader classloader = customPageService.getPageClassloader(apiSession, pageResourceProvider);
         final Class<?> pageClass = customPageService.registerPage(classloader, pageResourceProvider);
@@ -145,15 +136,11 @@ public class CustomPageServiceTest {
         final File pageDir = pageFile.getParentFile();
         assertThat(pageFile).as("no file " + pageFile.getAbsolutePath()).exists().canRead();
         when(pageResourceProvider.getPageDirectory()).thenReturn(pageDir);
-        doReturn(pageFile).when(customPageService).getPageFile(any(File.class), anyString());
         doReturn(Thread.currentThread().getContextClassLoader()).when(customPageService).getParentClassloader(
                 anyString(),
                 any(CustomPageDependenciesResolver.class),
                 any(BDMClientDependenciesResolver.class));
-        final Page mockedPage = mock(Page.class);
-        when(mockedPage.getLastModificationDate()).thenReturn(new Date(0L));
-        doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
-        when(pageAPI.getPageByName("")).thenReturn(mockedPage);
+
         ControllerClassName controllerClassName = new ControllerClassName("IndexRestApi.groovy", true);
 
         // When
@@ -172,7 +159,6 @@ public class CustomPageServiceTest {
         // Given
         final Page mockedPage = mock(Page.class);
         when(mockedPage.getId()).thenReturn(1L);
-        when(mockedPage.getName()).thenReturn("page1");
         doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
         final byte[] zipFile = IOUtils.toByteArray(getClass().getResourceAsStream("page.zip"));
         when(pageAPI.getPageContent(1L)).thenReturn(zipFile);
@@ -240,7 +226,6 @@ public class CustomPageServiceTest {
 
         final File pagePropertiesFile = File.createTempFile(PAGE_PROPERTIES, ".tmp");
         IOUtils.write(fileContent.getBytes(), new FileOutputStream(pagePropertiesFile));
-        doReturn(emptySet()).when(permissionAPI).getResourcePermissions("GET|unknown/resource");
 
         // When
         final Set<String> customPagePermissions = customPageService.getCustomPagePermissions(
@@ -256,7 +241,6 @@ public class CustomPageServiceTest {
             throws Exception {
         //given
         final boolean checkIfItAlreadyExists = false;
-        doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
         doReturn(new Properties()).when(pageAPI).getPageProperties(any(byte[].class), eq(checkIfItAlreadyExists));
 
         //when
@@ -272,7 +256,6 @@ public class CustomPageServiceTest {
             throws Exception {
         //given
         final boolean checkIfItAlreadyExists = true;
-        doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
         final Properties pageProperties = new Properties();
         final String pageName = "test";
         pageProperties.put(CustomPageService.NAME_PROPERTY, pageName);
@@ -298,7 +281,6 @@ public class CustomPageServiceTest {
             throws Exception {
         //given
         final boolean checkIfItAlreadyExists = true;
-        doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
         final Properties pageProperties = new Properties();
         final String pageName = "test";
         pageProperties.put(CustomPageService.NAME_PROPERTY, pageName);
@@ -321,7 +303,6 @@ public class CustomPageServiceTest {
     public void getPageProperties_should_Retrieve_Properties_Without_Errors() throws Exception {
         //given
         final boolean checkIfItAlreadyExists = true;
-        doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
         final Properties pageProperties = new Properties();
         final String pageName = "test";
         pageProperties.put(CustomPageService.NAME_PROPERTY, pageName);
@@ -347,8 +328,6 @@ public class CustomPageServiceTest {
         // Given
         final Page mockedPage = mock(Page.class);
         when(mockedPage.getId()).thenReturn(1L);
-        when(mockedPage.getName()).thenReturn("page1");
-        doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
         final byte[] zipFile = IOUtils.toByteArray(getClass().getResourceAsStream("page.zip"));
         when(pageAPI.getPageContent(1L)).thenReturn(zipFile);
         when(pageResourceProvider.getPage(pageAPI)).thenReturn(mockedPage);
@@ -402,10 +381,15 @@ public class CustomPageServiceTest {
 
     @Test
     public void should_ensure_page_is_up_to_date_with_empty_folder() throws Exception {
+
         // Given
         File pageDirectory = spy(new File("target/bonita/home/client/tenants/1/pages/page2"));
-        when(pageDirectory.list()).thenReturn(new String[0]);
+        doReturn(new String[0]).when(pageDirectory).list();
+        doReturn(true).when(pageDirectory).exists();
         initializePageMocks(pageDirectory);
+        doNothing().when(customPageService).removePage(pageResourceProvider, true);
+        doNothing().when(customPageService).retrievePageZipContent(apiSession, pageResourceProvider);
+
         customPageService.addPageTimestampToMemoryCache(fullPageName, databaseLastUpdateDate.getTime());
 
         // When
@@ -464,7 +448,6 @@ public class CustomPageServiceTest {
     protected GroovyClassLoader initializePageMocks(File pageDirectory) throws BonitaException, IOException {
         final Page mockedPage = mock(Page.class);
         when(mockedPage.getId()).thenReturn(1L);
-        when(mockedPage.getName()).thenReturn("page2");
         when(mockedPage.getLastModificationDate()).thenReturn(databaseLastUpdateDate);
         doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
         final byte[] zipFile = IOUtils.toByteArray(getClass().getResourceAsStream("pageApiExtension.zip"));
@@ -473,7 +456,10 @@ public class CustomPageServiceTest {
         when(pageResourceProvider.getTempPageFile()).thenReturn(new File("target/bonita/home/client/tenant/1/temp"));
         when(pageResourceProvider.getPageDirectory()).thenReturn(pageDirectory);
         when(customPageService.isPageInDebugMode()).thenReturn(true);
-
+        doReturn(Thread.currentThread().getContextClassLoader()).when(customPageService).getParentClassloader(
+                anyString(),
+                any(CustomPageDependenciesResolver.class),
+                any(BDMClientDependenciesResolver.class));
         return customPageService.getPageClassloader(apiSession, pageResourceProvider);
     }
 
@@ -521,26 +507,23 @@ public class CustomPageServiceTest {
     public void should_generate_thread_safe_page_lock_objects() throws Exception {
         //given
         int nbOfThreads = 300;
-        List<Object> pageLocks = new ArrayList<>();
-        List<Thread> threads = new ArrayList<>();
-        for (int i = 0; i < nbOfThreads; i++) {
-            // All threads try to get the lock for the same page ('fullPageName' each time)
-            threads.add(new Thread(() -> pageLocks.add(customPageService.getPageLock(fullPageName))));
-        }
+        var pageLocks = new ConcurrentLinkedQueue<>();
 
         //when
-        for (Thread thread : threads) {
-            thread.start();
+        var executorService = Executors.newCachedThreadPool();
+        var results = new ArrayList<Future<?>>();
+        for (int i = 0; i < nbOfThreads; i++) {
+            // All runnable try to get the lock for the same page ('fullPageName' each time)
+            results.add(executorService.submit(() -> pageLocks.add(customPageService.getPageLock(fullPageName))));
         }
-        for (Thread thread : threads) {
-            thread.join(5000);
+        for (Future<?> res : results) {
+            res.get();
         }
 
         //then
         //make sure that with many thread in parallel that ask a lock on a page , we have one single unique object created once by page to be used for the lock
         Object pageLock = customPageService.getPageLock(fullPageName);
-        assertThat(pageLocks).hasSize(300);
-        assertThat(pageLocks).containsOnly(pageLock);
+        assertThat(pageLocks).hasSize(nbOfThreads).containsOnly(pageLock);
     }
 
 }

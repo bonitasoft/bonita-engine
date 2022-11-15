@@ -44,11 +44,10 @@ import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APIApplicationTest {
@@ -58,12 +57,9 @@ public class APIApplicationTest {
     }
 
     @Mock
-    private ApplicationDataStoreCreator dataStoreCreator;
-
-    @Mock
     private ApplicationDataStore dataStore;
 
-    @Mock(answer = Answers.RETURNS_MOCKS)
+    @Mock
     private APIServletCall caller;
 
     @Mock
@@ -93,7 +89,6 @@ public class APIApplicationTest {
         apiApplication.setCaller(caller);
         given(caller.getHttpSession()).willReturn(httpSession);
         given(httpSession.getAttribute("apiSession")).willReturn(apiSession);
-        given(dataStoreCreator.create(apiSession)).willReturn(dataStore);
         given(applicationDataStoreFactory.createPageDataStore(apiSession)).willReturn(pageDatastore);
         given(creator.create(apiSession)).willReturn(dataStore);
         doReturn(deployerFactory).when(apiApplication).getDeployerFactory();

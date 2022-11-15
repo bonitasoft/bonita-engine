@@ -15,7 +15,7 @@ package org.bonitasoft.console.common.server.preferences.properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.console.common.server.preferences.properties.ConfigurationFilesManager.getProperties;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta

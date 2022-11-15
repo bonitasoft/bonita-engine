@@ -14,17 +14,14 @@
 package org.bonitasoft.console.common.server.form;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -44,7 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessFormServiceTest {
@@ -56,17 +53,10 @@ public class ProcessFormServiceTest {
     ProcessAPI processAPI;
 
     @Mock
-    HttpServletRequest hsRequest;
-
-    @Mock
-    HttpSession httpSession;
-
-    @Mock
     APISession apiSession;
 
     @Before
     public void beforeEach() throws Exception {
-        when(hsRequest.getSession()).thenReturn(httpSession);
         doReturn(processAPI).when(processFormService).getProcessAPI(apiSession);
         when(apiSession.getUserId()).thenReturn(1L);
     }

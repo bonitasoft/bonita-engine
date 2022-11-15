@@ -14,8 +14,8 @@
 package org.bonitasoft.console.common.server.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Julien Mege
@@ -111,25 +111,19 @@ public class ResourceRendererTest {
 
     @Test
     public void getPathSegments_should_return_expected_token_list() throws UnsupportedEncodingException {
-        when(req.getPathInfo()).thenReturn("a/b");
-
         final List<String> tokens = resourceRenderer.getPathSegments("a/b");
         assertThat(tokens).hasSize(2).containsExactly("a", "b");
     }
 
     @Test
     public void getPathSegments_should_return_expected_token_list_ondouble_slash() throws UnsupportedEncodingException {
-        when(req.getPathInfo()).thenReturn("a//b");
-
         final List<String> tokens = resourceRenderer.getPathSegments("a//b");
         assertThat(tokens).hasSize(2).containsExactly("a", "b");
     }
 
     @Test
     public void getPathSegments_should_return_expected_token_list_if_no_slash() throws UnsupportedEncodingException {
-        when(req.getPathInfo()).thenReturn("a");
-
-        final List<String> tokens = resourceRenderer.getPathSegments("a");
+        List<String> tokens = resourceRenderer.getPathSegments("a");
         assertThat(tokens).hasSize(1).containsExactly("a");
     }
 

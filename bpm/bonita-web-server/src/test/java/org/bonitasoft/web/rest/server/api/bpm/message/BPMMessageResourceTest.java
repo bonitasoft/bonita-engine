@@ -14,9 +14,7 @@
 package org.bonitasoft.web.rest.server.api.bpm.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -44,7 +42,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ServerResource;
@@ -91,14 +89,18 @@ public class BPMMessageResourceTest extends RestletTest {
                 new HashMap<>(), new HashMap<>());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void sendMessage_should_throw_exception_if_engine_throws_SendEventException() throws Exception {
+    @Test(expected = APIException.class)
+    public void sendMessage_should_throw_APIException_if_engine_throws_SendEventException() throws Exception {
+        BPMMessage bpmMessage = new BPMMessage();
+        bpmMessage.setMessageName("test");
+        bpmMessage.setTargetProcess("test");
+        bpmMessage.setTargetFlowNode("test");
         // given:
-        doThrow(SendEventException.class).when(processAPI).sendMessage(anyString(), any(Expression.class),
-                any(Expression.class), any(Map.class), any(Map.class));
+        doThrow(new SendEventException("wrong params")).when(processAPI).sendMessage(eq("test"), any(Expression.class),
+                any(Expression.class), anyMap(), anyMap());
 
         // when:
-        restResource.sendMessage(new BPMMessage());
+        restResource.sendMessage(bpmMessage);
     }
 
     @Test

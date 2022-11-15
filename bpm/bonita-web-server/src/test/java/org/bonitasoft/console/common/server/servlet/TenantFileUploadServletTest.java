@@ -15,8 +15,8 @@ package org.bonitasoft.console.common.server.servlet;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.PrintWriter;
@@ -24,13 +24,11 @@ import java.net.HttpURLConnection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.console.common.server.preferences.properties.ConsoleProperties;
-import org.bonitasoft.engine.session.APISession;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +36,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TenantFileUploadServletTest {
@@ -54,12 +52,8 @@ public class TenantFileUploadServletTest {
     @Before
     public void setUp() throws Exception {
         request = mock(HttpServletRequest.class);
-        final HttpSession session = mock(HttpSession.class);
-        final APISession apiSession = mock(APISession.class);
         consoleProperties = mock(ConsoleProperties.class);
 
-        when(request.getSession()).thenReturn(session);
-        when(session.getAttribute("apiSession")).thenReturn(apiSession);
         doReturn(consoleProperties).when(fileUploadServlet).getConsoleProperties();
         fileUploadServlet.checkUploadedFileSize = false;
         fileUploadServlet.checkUploadedImageSize = false;

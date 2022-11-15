@@ -14,7 +14,6 @@
 package org.bonitasoft.web.rest.server.datastore.bpm.process.helper;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 import java.util.Date;
@@ -37,7 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessItemConverterTest {
@@ -63,36 +62,35 @@ public class ProcessItemConverterTest {
 
     @Test
     public void shouldReadActorInitiatorFromCacheOnSecondCall()
-            throws ActorNotFoundException, ProcessDefinitionNotFoundException {
+            throws ProcessDefinitionNotFoundException, ActorNotFoundException {
 
-        when(processAPI.getActorInitiator(2)).thenReturn(actorInstance2).thenThrow(
-                new IllegalStateException("Not supposed to call engine twice. Value should be red from cache."));
+        when(processAPI.getActorInitiator(3L)).thenReturn(actorInstance2);
         doReturn(6L).when(actorInstance2).getId();
 
-        ProcessDeploymentInfo processDeploymentInfo = new ProcessDeploymentInfoImpl(1, 2, "ProcessName", "Version",
+        ProcessDeploymentInfo processDeploymentInfo = new ProcessDeploymentInfoImpl(1, 3L, "ProcessName", "Version",
                 "Description", new Date(), 3, ActivationState.ENABLED, ConfigurationState.RESOLVED, "displayName",
                 new Date(), "iconPath",
                 "displayDescription");
 
         ProcessItem processItem = processItemConverter.convert(processDeploymentInfo);
 
-        assertNotNull(processItem);
+        //Get 2 ActorInitiatorId from engine then store them in cache
         assertEquals("6", processItem.getActorInitiatorId());
 
         processItem = processItemConverter.convert(processDeploymentInfo);
-        //Assert get value from cache
-        assertEquals("6", processItem.getActorInitiatorId());
 
+        //Get  ActorInitiatorId from cache
+        assertEquals("6", processItem.getActorInitiatorId());
+        //it should call getActorInitiator only one times because the second should be read from the cache
+        verify(processAPI, times(1)).getActorInitiator(3L);
     }
 
     @Test
     public void shouldStoreDifferentActorInitiatorIntoCache()
             throws ActorNotFoundException, ProcessDefinitionNotFoundException {
 
-        when(processAPI.getActorInitiator(1)).thenReturn(actorInstance1).thenThrow(
-                new IllegalStateException("Not supposed to call engine twice. Value should be red from cache."));
-        when(processAPI.getActorInitiator(2)).thenReturn(actorInstance2).thenThrow(
-                new IllegalStateException("Not supposed to call engine twice. Value should be red from cache."));
+        when(processAPI.getActorInitiator(1)).thenReturn(actorInstance1);
+        when(processAPI.getActorInitiator(2)).thenReturn(actorInstance2);
         doReturn(5L).when(actorInstance1).getId();
         doReturn(6L).when(actorInstance2).getId();
 
@@ -118,6 +116,10 @@ public class ProcessItemConverterTest {
         assertEquals("5", processItem.getActorInitiatorId());
         processItem = processItemConverter.convert(secondProcessDeploymentInfo);
         assertEquals("6", processItem.getActorInitiatorId());
+
+        //it should call getActorInitiator only one times because the second should be read from the cache
+        verify(processAPI, times(1)).getActorInitiator(1L);
+        verify(processAPI, times(1)).getActorInitiator(2L);
     }
 
 }

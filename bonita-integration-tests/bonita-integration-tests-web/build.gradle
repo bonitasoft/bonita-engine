@@ -14,7 +14,7 @@ dependencies {
     implementation "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
     implementation "org.springframework:spring-test:${Deps.springVersion}"
     testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
-    testImplementation "org.mockito:mockito-core:1.10.19" // because of many unnecessary Mockito stubbings
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.restlet.jse:org.restlet:${Deps.restletVersion}"
 }

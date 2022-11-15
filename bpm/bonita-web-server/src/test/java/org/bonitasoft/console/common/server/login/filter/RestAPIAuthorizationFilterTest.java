@@ -14,26 +14,13 @@
 package org.bonitasoft.console.common.server.login.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
-import java.util.Collections;
 import java.util.regex.Pattern;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -51,7 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RestAPIAuthorizationFilterTest {
@@ -78,12 +65,9 @@ public class RestAPIAuthorizationFilterTest {
         doReturn(httpSession).when(request).getSession();
         doReturn("").when(request).getQueryString();
         doReturn(apiSession).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
-        doReturn(9L).when(apiSession).getUserId();
         doReturn(false).when(apiSession).isTechnicalUser();
-        doReturn("john").when(apiSession).getUserName();
         when(servletContext.getContextPath()).thenReturn("");
         when(filterConfig.getServletContext()).thenReturn(servletContext);
-        when(filterConfig.getInitParameterNames()).thenReturn(Collections.emptyEnumeration());
         restAPIAuthorizationFilter.init(filterConfig);
     }
 
@@ -225,7 +209,6 @@ public class RestAPIAuthorizationFilterTest {
     public void should_checkValidCondition_check_unauthorized_if_session_is_invalid() throws Exception {
         final RestAPIAuthorizationFilter restAPIAuthorizationFilterSpy = spy(restAPIAuthorizationFilter);
         doReturn("/API").when(request).getServletPath();
-        doReturn("/bpm/case/15").when(request).getPathInfo();
         doThrow(InvalidSessionException.class).when(restAPIAuthorizationFilterSpy)
                 .checkPermissions(any(HttpServletRequest.class));
         //when
@@ -239,7 +222,6 @@ public class RestAPIAuthorizationFilterTest {
     public void should_checkValidCondition_check_permission_if_is_tenant_is_forbidden() throws Exception {
         final RestAPIAuthorizationFilter restAPIAuthorizationFilterSpy = spy(restAPIAuthorizationFilter);
         doReturn("/API").when(request).getServletPath();
-        doReturn("/bpm/case/15").when(request).getPathInfo();
         doReturn(false).when(restAPIAuthorizationFilterSpy).checkPermissions(any(HttpServletRequest.class));
 
         //when
@@ -277,7 +259,7 @@ public class RestAPIAuthorizationFilterTest {
 
     @Test(expected = ServletException.class)
     public void should_checkValidCondition_catch_runtime() throws ServletException {
-        doThrow(new RuntimeException()).when(request).getRequestURI();
+        doThrow(new RuntimeException()).when(request).getServletPath();
 
         //when
         restAPIAuthorizationFilter.proceedWithFiltering(request, response, chain);

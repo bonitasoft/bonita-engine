@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.console.common.server.page;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -32,7 +32,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -82,9 +82,10 @@ public class CustomPageServletTest {
     @Test
     public void should_get_Forbidden_Status_when_page_unAuthorize() throws Exception {
         hsRequest.setPathInfo("/pageToken/");
-        hsRequest.setParameter("applicationId", "1");
+        hsRequest.setParameter("appToken", "myApp");
         given(resourceRenderer.getPathSegments("/pageToken/")).willReturn(Arrays.asList("pageToken"));
-        given(customPageAuthorizationsHelper.isPageAuthorized("1", "pageToken")).willReturn(false);
+        doReturn(false).when(apiSession).isTechnicalUser();
+        given(customPageAuthorizationsHelper.isPageAuthorized("myApp", "pageToken")).willReturn(false);
 
         servlet.doGet(hsRequest, hsResponse);
 
@@ -154,15 +155,17 @@ public class CustomPageServletTest {
     }
 
     @Test
-    public void getResource_should_get_Forbidden_Status_when_unAuthorize() throws Exception {
+    public void should_get_Forbidden_Status_when_we_try_to_access_to_unAuthorize_file_with_pathSegment()
+            throws Exception {
         hsRequest.setPathInfo("/custompage_htmlexample/css/../../../file.css");
         final File pageDir = new File(".");
         given(resourceRenderer.getPathSegments("/custompage_htmlexample/css/../../../file.css")).willReturn(
                 Arrays.asList("custompage_htmlexample", "css", "..", "..", "..", "file.css"));
         doReturn(pageResourceProvider).when(pageRenderer).getPageResourceProvider("custompage_htmlexample");
         given(pageResourceProvider.getPageDirectory()).willReturn(pageDir);
+        given(customPageAuthorizationsHelper.isPageAuthorized(null, "custompage_htmlexample")).willReturn(true);
+        // folder we wants to access is not authorized
         doReturn(false).when(bonitaHomeFolderAccessor).isInFolder(any(File.class), any(File.class));
-        given(customPageAuthorizationsHelper.isPageAuthorized(null, "custompage_htmlexample")).willReturn(false);
 
         servlet.doGet(hsRequest, hsResponse);
         verify(hsResponse).sendError(403, "User not Authorized");

@@ -14,10 +14,8 @@
 package org.bonitasoft.web.rest.server.api.extension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.bonitasoft.console.common.server.page.RestApiRenderer;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -29,17 +27,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Disposition;
 import org.restlet.data.Header;
-import org.restlet.data.Method;
 import org.restlet.data.Range;
 import org.restlet.data.Status;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.util.Series;
 
 /**
@@ -64,8 +60,6 @@ public class ApiExtensionResourceTest {
     @Spy
     ApiExtensionResource apiExtensionResource;
 
-    private Method method;
-
     @Before
     public void before() throws Exception {
         doReturn(request).when(apiExtensionResource).getRequest();
@@ -76,11 +70,9 @@ public class ApiExtensionResourceTest {
     @Test
     public void should_handle_return_result() throws Exception {
         //given
-        method = new Method(GET);
-        doReturn(method).when(request).getMethod();
         final RestApiResponse restApiResponse = new RestApiResponseBuilder().withResponse(RETURN_VALUE).build();
-        doReturn(restApiResponse).when(restApiRenderer).handleRestApiCall(any(HttpServletRequest.class),
-                any(ResourceExtensionResolver.class));
+        doReturn(restApiResponse).when(restApiRenderer).handleRestApiCall(any(),
+                any());
 
         //when
         final Representation representation = apiExtensionResource.doHandle();
@@ -92,11 +84,9 @@ public class ApiExtensionResourceTest {
     @Test
     public void should_handle_return_empty_response() throws Exception {
         //given
-        method = new Method(GET);
-        doReturn(method).when(request).getMethod();
         doReturn(new RestApiResponseBuilder().withResponse("").build()).when(restApiRenderer).handleRestApiCall(
-                any(HttpServletRequest.class),
-                any(ResourceExtensionResolver.class));
+                any(),
+                any());
 
         //when
         final Representation representation = apiExtensionResource.doHandle();
@@ -108,11 +98,9 @@ public class ApiExtensionResourceTest {
     @Test
     public void should_handle_return_no_response() throws Exception {
         //given
-        method = new Method(GET);
-        doReturn(method).when(request).getMethod();
         doReturn(new RestApiResponseBuilder().build()).when(restApiRenderer).handleRestApiCall(
-                any(HttpServletRequest.class),
-                any(ResourceExtensionResolver.class));
+                any(),
+                any());
 
         //when
         final Representation representation = apiExtensionResource.doHandle();
@@ -124,11 +112,8 @@ public class ApiExtensionResourceTest {
     @Test
     public void should_handle_return_null() throws Exception {
         //given
-        method = new Method(GET);
-        doReturn(method).when(request).getMethod();
-
-        doReturn(null).when(restApiRenderer).handleRestApiCall(any(HttpServletRequest.class),
-                any(ResourceExtensionResolver.class));
+        doReturn(null).when(restApiRenderer).handleRestApiCall(any(),
+                any());
 
         //when
         final Representation representation = apiExtensionResource.doHandle();
@@ -141,11 +126,9 @@ public class ApiExtensionResourceTest {
     @Test
     public void should_handle_return_500_error_when_exception_is_thrown() throws Exception {
         //given
-        method = new Method(GET);
-        doReturn(method).when(request).getMethod();
         final BonitaException bonitaException = new BonitaException("error message");
-        doThrow(bonitaException).when(restApiRenderer).handleRestApiCall(any(HttpServletRequest.class),
-                any(ResourceExtensionResolver.class));
+        doThrow(bonitaException).when(restApiRenderer).handleRestApiCall(any(),
+                any());
 
         //when
         final Representation representation = apiExtensionResource.doHandle();
@@ -159,14 +142,11 @@ public class ApiExtensionResourceTest {
     public void should_handle_content_range_and_location_with_restlet_representation() throws Exception {
         //given
         String location = "https://documentation.bonitasoft.com/bonita/7.7/";
-        method = new Method(GET);
-        doReturn(method).when(request).getMethod();
         final RestApiResponse restApiResponse = new RestApiResponseBuilder()
                 .withAdditionalHeader(HeaderConstants.HEADER_CONTENT_RANGE, "1-10/100")
                 .withAdditionalHeader(HeaderConstants.HEADER_LOCATION, location).build();
-        doReturn(restApiResponse).when(restApiRenderer).handleRestApiCall(any(HttpServletRequest.class),
-                any(ResourceExtensionResolver.class));
-        when(response.getEntity()).thenReturn(new StringRepresentation(""));
+        doReturn(restApiResponse).when(restApiRenderer).handleRestApiCall(any(),
+                any());
 
         //when
         final Representation representation = apiExtensionResource.doHandle();
@@ -183,16 +163,12 @@ public class ApiExtensionResourceTest {
 
     @Test
     public void should_handle_content_disposition_with_restlet_range() throws Exception {
-        //given
-        method = new Method(GET);
-        doReturn(method).when(request).getMethod();
         final RestApiResponse restApiResponse = new RestApiResponseBuilder()
                 .withAdditionalHeader(HeaderConstants.HEADER_CONTENT_DISPOSITION,
                         "attachment; filename=\"Mon Fichier.png\"")
                 .build();
-        doReturn(restApiResponse).when(restApiRenderer).handleRestApiCall(any(HttpServletRequest.class),
-                any(ResourceExtensionResolver.class));
-        when(response.getEntity()).thenReturn(new StringRepresentation(""));
+        doReturn(restApiResponse).when(restApiRenderer).handleRestApiCall(any(),
+                any());
 
         //when
         final Representation representation = apiExtensionResource.doHandle();

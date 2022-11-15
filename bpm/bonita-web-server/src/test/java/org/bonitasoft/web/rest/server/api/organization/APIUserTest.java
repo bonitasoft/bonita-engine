@@ -32,7 +32,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APIUserTest {
@@ -63,8 +63,6 @@ public class APIUserTest {
 
     @Test
     public void should_user_be_updated_with_icon_as_submit_by_the_API() throws Exception {
-        //given
-        doReturn(userItem).when(userDatastore).get(USER_ID);
         //when
         apiUser.update(USER_ID, map(UserItem.ATTRIBUTE_ICON, "theAvatar.jpg"));
         //then

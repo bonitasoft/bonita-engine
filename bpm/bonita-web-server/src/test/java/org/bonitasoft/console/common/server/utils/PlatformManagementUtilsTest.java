@@ -14,7 +14,7 @@
 package org.bonitasoft.console.common.server.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Date;
@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
@@ -79,13 +79,14 @@ public class PlatformManagementUtilsTest {
     public void should_login_locally_when_connection_is_local() throws Exception {
         //given
         doReturn(true).when(platformManagementUtils).isLocal();
-        doReturn(new PlatformSessionImpl(1231, new Date(), 54325423, "testUser", 75463)).when(platformManagementUtils)
-                .platformLogin();
+        PlatformSessionImpl toBeReturned = new PlatformSessionImpl(1231, new Date(), 54325423, "testUser", 75463);
+        doReturn(toBeReturned).when(platformManagementUtils)
+                .localPlatformLogin();
         //when
         PlatformSession platformSession = platformManagementUtils.platformLogin();
         //then
         verify(platformLoginAPI, never()).login(anyString(), anyString());
-        assertThat(platformSession).isNotNull();
+        assertThat(platformSession).isEqualTo(toBeReturned);
     }
 
     @Test

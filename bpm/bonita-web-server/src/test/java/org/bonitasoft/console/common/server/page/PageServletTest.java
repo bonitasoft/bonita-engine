@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.console.common.server.page;
 
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -35,7 +34,6 @@ import org.bonitasoft.console.common.server.page.extension.PageResourceProviderI
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.UnauthorizedAccessException;
-import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageNotFoundException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
@@ -46,7 +44,7 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PageServletTest {
@@ -63,9 +61,6 @@ public class PageServletTest {
 
     @Mock
     CustomPageService customPageService;
-
-    @Mock
-    Page page;
 
     @Mock
     BonitaHomeFolderAccessor bonitaHomeFolderAccessor;
@@ -94,7 +89,6 @@ public class PageServletTest {
         when(hsRequest.getContextPath()).thenReturn("/bonita");
         when(hsRequest.getSession()).thenReturn(httpSession);
         when(httpSession.getAttribute("apiSession")).thenReturn(apiSession);
-        when(apiSession.getUserId()).thenReturn(1L);
         locale = new Locale("en");
         when(pageRenderer.getCurrentLocale(hsRequest)).thenReturn(new Locale("en"));
     }
@@ -113,7 +107,6 @@ public class PageServletTest {
     @Test
     public void should_get_Bad_Request_when_invalid_parameters() throws Exception {
         when(hsRequest.getPathInfo()).thenReturn("");
-        when(hsRequest.getParameter(anyString())).thenReturn(null);
         pageServlet.service(hsRequest, hsResponse);
         verify(hsResponse, times(1)).sendError(400,
                 "/content or /theme is expected in the URL after the page mapping key");
@@ -130,7 +123,7 @@ public class PageServletTest {
 
         verify(pageServlet, times(1)).displayExternalPage(hsResponse, "/externalPage");
         verify(hsResponse, times(1)).encodeRedirectURL("/externalPage");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test
@@ -147,13 +140,10 @@ public class PageServletTest {
     @Test
     public void should_display_customPage_resource() throws Exception {
         //given
-        final String pageName = "custompage_name";
         when(hsRequest.getPathInfo()).thenReturn("/process/processName/processVersion/content/path/of/resource.css");
         final PageReference pageReference = new PageReference(PAGE_ID, null);
         when(pageMappingService.getPage(hsRequest, apiSession, "process/processName/processVersion", locale, false))
                 .thenReturn(pageReference);
-        when(customPageService.getPage(apiSession, PAGE_ID)).thenReturn(page);
-        when(page.getName()).thenReturn(pageName);
 
         final PageResourceProviderImpl pageResourceProvider = mock(PageResourceProviderImpl.class);
         final File resourceFile = mock(File.class);
@@ -220,7 +210,7 @@ public class PageServletTest {
 
         verify(hsResponse, times(1))
                 .encodeRedirectURL("/bonita/portal/resource/process/processName/processVersion/content/");
-        verify(hsResponse, times(1)).sendRedirect(anyString());
+        verify(hsResponse, times(1)).sendRedirect(any());
     }
 
     @Test
@@ -242,8 +232,6 @@ public class PageServletTest {
     @Test
     public void should_get_bad_request_when_issue_with_parameters() throws Exception {
         when(hsRequest.getPathInfo()).thenReturn("/process/processName/processVersion/content/");
-        when(pageMappingService.getPage(hsRequest, apiSession, "process/processName/processVersion", locale, true))
-                .thenReturn(new PageReference(PAGE_ID, null));
         final IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
         doThrow(illegalArgumentException).when(pageMappingService).getPage(hsRequest, apiSession,
                 "process/processName/processVersion", locale, true);
@@ -327,7 +315,6 @@ public class PageServletTest {
     public void should_not_redirect_theme_resource_wihout_app_param_for_images() throws Exception {
         when(hsRequest.getPathInfo()).thenReturn("/process/Test/1.0/theme/icon.png");
         when(hsRequest.getParameter("app")).thenReturn(null);
-        when(hsRequest.getQueryString()).thenReturn(null);
         when(hsRequest.getHeader(HttpHeaders.REFERER))
                 .thenReturn("/bonita/resource/process/Test/1.0/theme/theme.css?app=myApp");
         doReturn(12L).when(pageServlet).getThemeId(apiSession, "myApp");
@@ -359,7 +346,6 @@ public class PageServletTest {
     @Test
     public void should_not_authorize_theme_requests_to_other_paths() throws Exception {
         when(hsRequest.getParameter("app")).thenReturn(null);
-        when(hsRequest.getQueryString()).thenReturn(null);
         when(hsRequest.getHeader(HttpHeaders.REFERER)).thenReturn("/bonita/resource/process/Test/1.0/content/");
 
         String unauthorizedPath = "/theme/../WEB-INF/web.xml";

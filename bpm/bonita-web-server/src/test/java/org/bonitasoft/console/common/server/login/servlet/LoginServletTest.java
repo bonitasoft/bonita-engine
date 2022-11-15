@@ -16,8 +16,8 @@ package org.bonitasoft.console.common.server.login.servlet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.startsWith;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -48,7 +48,7 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * Created by Vincent Elcrin
@@ -171,7 +171,6 @@ public class LoginServletTest {
         doReturn(httpSession).when(req).getSession();
         doReturn(apiSession).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
         doReturn("query string").when(req).getQueryString();
-        doReturn(true).when(apiSession).isTechnicalUser();
         doReturn(null).when(req).getParameter(AuthenticationManager.REDIRECT_AFTER_LOGIN_PARAM_NAME);
         doNothing().when(servlet).doLogin(req, resp);
 
@@ -364,8 +363,6 @@ public class LoginServletTest {
     public void testTenantNotInMaintenance() throws Exception {
         final LoginManager loginManager = mock(LoginManager.class);
         final LoginServlet servlet = spy(new LoginServlet());
-        doReturn(httpSession).when(req).getSession();
-        doReturn(apiSession).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
         doReturn(loginManager).when(servlet).getLoginManager();
         doNothing().when(loginManager).login(req, resp);
 

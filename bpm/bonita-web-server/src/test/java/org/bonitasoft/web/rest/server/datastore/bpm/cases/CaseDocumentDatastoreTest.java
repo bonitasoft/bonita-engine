@@ -15,8 +15,8 @@ package org.bonitasoft.web.rest.server.datastore.bpm.cases;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -51,7 +51,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CaseDocumentDatastoreTest extends APITestWithMock {
@@ -120,7 +120,7 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
         documentDatastore.get(id);
 
         // Then
-        verify(documentDatastore).convertEngineToConsoleItem(any(Document.class));
+        verify(documentDatastore).convertEngineToConsoleItem(any());
     }
 
     // ---------- CONVERT ITEM TESTS ------------------------------//
@@ -372,11 +372,7 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
         final Map<String, String> attributes = new HashMap<>();
         attributes.put(CaseDocumentItem.ATTRIBUTE_NAME, "Doc 1");
         final APIID id = APIID.makeAPIID(1L);
-        try {
-            when(processAPI.getDocument(1L)).thenReturn(mockedDocument);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+
         // When
         documentDatastore.update(id, attributes);
     }
@@ -388,12 +384,6 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
         attributes.put(CaseDocumentItem.ATTRIBUTE_NAME, "Doc 1");
         attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, "unexisting.document");
         final APIID id = APIID.makeAPIID(1L);
-        try {
-            when(tenantFolder.getTempFile("invalidDocument")).thenReturn(new File("unexisting.document"));
-            when(processAPI.getDocument(1L)).thenReturn(mockedDocument);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
         try {
             // When
             documentDatastore.update(id, attributes);

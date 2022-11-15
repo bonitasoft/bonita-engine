@@ -14,8 +14,7 @@
 package org.bonitasoft.web.rest.server.api.document;
 
 import static org.junit.Assert.fail;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -38,7 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Julien Mege
@@ -68,10 +67,6 @@ public class APIDocumentTest {
 
     @Before
     public void setup() throws Exception {
-        given(factory.defineItemDefinitions("theme")).willReturn(null);
-        given(caller.getHttpSession()).willReturn(session);
-        given(session.getAttribute("apiSession")).willReturn(engineSession);
-
         ItemDefinitionFactory.setDefaultFactory(factory);
         I18n.getInstance();
         CommonDateFormater.setDateFormater(new ServerDateFormater());

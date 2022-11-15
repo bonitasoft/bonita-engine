@@ -14,11 +14,9 @@
 package org.bonitasoft.web.rest.server.datastore.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,7 +49,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationDataStoreTest extends APITestWithMock {
@@ -147,11 +145,6 @@ public class ApplicationDataStoreTest extends APITestWithMock {
         final ApplicationItem item = new ApplicationItem();
         given(converter.toApplicationItem(application)).willReturn(item);
 
-        given(pageAPI.getPageByName("custompage_home")).willReturn(homePage);
-        given(homePage.getId()).willReturn(1L);
-        given(applicationAPI.createApplicationPage(application.getId(), 1, "custompage_home"))
-                .willReturn(applicationPage);
-
         //when
         final ApplicationItem createdItem = dataStore.update(APIID.makeAPIID(1L), attributesToUpDate);
 
@@ -164,25 +157,26 @@ public class ApplicationDataStoreTest extends APITestWithMock {
 
     @Test(expected = APIException.class)
     public void should_throw_APIException_when_ApplicationAPI_throws_an_exception_on_add() throws Exception {
+        ApplicationItem app = new ApplicationItem();
+        final ApplicationCreator creator = new ApplicationCreator("app", "My application", "1.0");
+
+        given(pageAPI.getPageByName("custompage_home")).willReturn(homePage);
+        given(converter.toApplicationCreator(app)).willReturn(creator);
+
         //given
-        given(applicationAPI.createApplication(any(ApplicationCreator.class))).willThrow(new CreationException(""));
+        when(applicationAPI.createApplication(any())).thenThrow(new CreationException(""));
 
         //when
-        dataStore.add(new ApplicationItem());
-
-        //then exception
+        dataStore.add(app);
     }
 
     @Test(expected = APIException.class)
     public void should_throw_APIException_when_ApplicationAPI_throws_an_exception_on_UpDate() throws Exception {
         //given
-        given(applicationAPI.updateApplication(anyLong(), any(ApplicationUpdater.class)))
-                .willThrow(new UpdateException(""));
+        when(applicationAPI.updateApplication(eq(1L), any())).thenThrow(new UpdateException(""));
 
         //when
         dataStore.update(APIID.makeAPIID(1L), new HashMap<>());
-
-        //then exception
     }
 
     @Test
@@ -251,9 +245,6 @@ public class ApplicationDataStoreTest extends APITestWithMock {
         application.setLastUpdateDate(new Date());
         application.setVisibility(ApplicationVisibility.ALL);
 
-        final ApplicationItem item = new ApplicationItem();
-        given(converter.toApplicationItem(application)).willReturn(item);
-
         given(applicationAPI.searchApplications(any(SearchOptions.class)))
                 .willReturn(new SearchResultImpl<>(2, Arrays.<Application> asList(application)));
 
@@ -293,8 +284,6 @@ public class ApplicationDataStoreTest extends APITestWithMock {
         application.setCreationDate(new Date());
         application.setLastUpdateDate(new Date());
         application.setVisibility(ApplicationVisibility.ALL);
-        final ApplicationItem item = new ApplicationItem();
-        given(converter.toApplicationItem(application)).willReturn(item);
 
         given(applicationAPI.searchApplications(any(SearchOptions.class)))
                 .willReturn(new SearchResultImpl<>(2, Arrays.<Application> asList(application)));

@@ -14,7 +14,7 @@
 package org.bonitasoft.console.common.server.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -33,7 +33,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -43,6 +43,16 @@ import org.springframework.mock.web.MockHttpServletResponse;
 @RunWith(MockitoJUnitRunner.class)
 public class PageRendererTest {
 
+    @Mock
+    ResourceRenderer resourceRenderer;
+
+    @Mock
+    CustomPageService customPageService;
+
+    @Spy
+    @InjectMocks
+    PageRenderer pageRenderer = new PageRenderer(resourceRenderer);
+
     MockHttpServletRequest hsRequest = new MockHttpServletRequest();
 
     MockHttpServletResponse hsResponse = new MockHttpServletResponse();
@@ -51,16 +61,10 @@ public class PageRendererTest {
     HttpSession httpSession;
 
     @Mock
-    APISession apiSession;
-
-    @Mock
-    ResourceRenderer resourceRenderer;
-
-    @Mock
-    CustomPageService customPageService;
-
-    @Mock
     PageResourceProviderImpl pageResourceProvider;
+
+    @Mock
+    APISession apiSession;
 
     @Mock
     Page page;
@@ -68,14 +72,9 @@ public class PageRendererTest {
     @Mock
     PageAPI pageAPI;
 
-    @Spy
-    @InjectMocks
-    PageRenderer pageRenderer = new PageRenderer(resourceRenderer);
-
     @Before
     public void beforeEach() {
         hsRequest.setSession(httpSession);
-        doReturn(apiSession).when(httpSession).getAttribute("apiSession");
     }
 
     @Test
@@ -94,10 +93,6 @@ public class PageRendererTest {
         final File indexFile = new File(pageDir, "resources" + File.separator + "index.html");
         doReturn(pageResourceProvider).when(pageRenderer).getPageResourceProvider(42L, apiSession);
         doReturn(pageDir).when(pageResourceProvider).getPageDirectory();
-        doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
-        doReturn(page).when(pageResourceProvider).getPage(pageAPI);
-        doReturn(pageName).when(page).getName();
-        when(customPageService.getPage(apiSession, 42L)).thenReturn(page);
         when(customPageService.getGroovyPageFile(any(File.class))).thenReturn(new File("none_existing_file"));
         return indexFile;
     }
@@ -110,10 +105,6 @@ public class PageRendererTest {
         final File indexFile = new File(pageDir, "index.html");
         doReturn(pageResourceProvider).when(pageRenderer).getPageResourceProvider(42L, apiSession);
         doReturn(pageDir).when(pageResourceProvider).getPageDirectory();
-        doReturn(pageAPI).when(customPageService).getPageAPI(apiSession);
-        doReturn(page).when(pageResourceProvider).getPage(pageAPI);
-        doReturn(pageName).when(page).getName();
-        when(customPageService.getPage(apiSession, 42L)).thenReturn(page);
         when(customPageService.getGroovyPageFile(any(File.class))).thenReturn(new File("none_existing_file"));
 
         pageRenderer.displayCustomPage(hsRequest, hsResponse, apiSession, 42L);
@@ -139,8 +130,6 @@ public class PageRendererTest {
     public void should_get_pageResourceProvider_by_pageName() throws Exception {
         //given
         final String pageName = "pageName";
-        doReturn(pageName).when(page).getName();
-
         //when
         final PageResourceProviderImpl pageResourceProvider = pageRenderer.getPageResourceProvider(pageName);
 
