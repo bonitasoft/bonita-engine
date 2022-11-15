@@ -23,6 +23,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.filter.ExcludingPatternFilter;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
@@ -35,6 +36,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
  * @author Paul AMAR
  */
 public class TokenValidatorFilter extends ExcludingPatternFilter {
+
+    public static final String BEARER_HEADER_VERIFIED_ATTRIBUTE = "bearerVerified";
 
     private static final String CSRF_TOKEN_PARAM = "CSRFToken";
     private static final String CSRF_TOKEN_HEADER = "X-Bonita-API-Token";
@@ -52,7 +55,8 @@ public class TokenValidatorFilter extends ExcludingPatternFilter {
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        if (isCsrfProtectionEnabled() && !isSafeMethod(httpServletRequest.getMethod())) {
+        if (isCsrfProtectionEnabled() && !isSafeMethod(httpServletRequest.getMethod()) &&
+                !isBearerVerifiedRequest(httpServletRequest.getSession())) {
             //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the inputstream twice (in the filter and in the API servlet)
             MultiReadHttpServletRequest multiReadHttpServletRequest = new MultiReadHttpServletRequest(
                     httpServletRequest);
@@ -71,6 +75,16 @@ public class TokenValidatorFilter extends ExcludingPatternFilter {
         } else {
             chain.doFilter(request, response);
         }
+    }
+
+    protected boolean isBearerVerifiedRequest(HttpSession httpSession) {
+        boolean isBearerVerified = false;
+        Object bearerSessionAttribute = httpSession.getAttribute(BEARER_HEADER_VERIFIED_ATTRIBUTE);
+        if (bearerSessionAttribute != null) {
+            isBearerVerified = Boolean.parseBoolean((String) bearerSessionAttribute);
+            httpSession.removeAttribute(BEARER_HEADER_VERIFIED_ATTRIBUTE);
+        }
+        return isBearerVerified;
     }
 
     // protected for testing
