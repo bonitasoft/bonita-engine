@@ -110,6 +110,8 @@ dependencyManagement {
             exclude "org.restlet.jee:org.restlet"
         }
         dependency "org.restlet.jse:org.restlet.ext.jackson:${Deps.restletVersion}"
+        // Specify woodstox version to override the version pulled by jackson-dataformat-xml (transitive dep of restlet)
+        dependency "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
         dependency "com.googlecode.json-simple:json-simple:${Deps.jsonSimpleVersion}"
         dependency "org.keycloak:keycloak-servlet-filter-adapter:${Deps.keycloakVersion}"
         dependency "org.keycloak:keycloak-saml-servlet-filter-adapter:${Deps.keycloakVersion}"
