@@ -50,6 +50,10 @@ dependencies {
 }
 
 configurations {
+    all {
+        // Specify woodstox version to override the version pulled by jackson-dataformat-xml (transitive dep of restlet)
+        resolutionStrategy.force "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
+    }
     tests
 }
 
