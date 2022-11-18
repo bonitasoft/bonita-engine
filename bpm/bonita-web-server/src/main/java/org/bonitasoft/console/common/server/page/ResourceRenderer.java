@@ -97,8 +97,8 @@ public class ResourceRenderer {
             return Files.readAllBytes(resourceFile.toPath());
         } else {
             final String fileNotFoundMessage = "Cannot find the resource file ";
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn(fileNotFoundMessage + resourceFile.getCanonicalPath());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(fileNotFoundMessage + resourceFile.getCanonicalPath());
             }
             throw new FileNotFoundException(fileNotFoundMessage + resourceFile.getName());
         }
