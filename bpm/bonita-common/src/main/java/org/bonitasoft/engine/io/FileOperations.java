@@ -47,7 +47,7 @@ public class FileOperations {
 
     public static void updateFileContent(File zip, String filePath, InputStream newContent) throws IOException {
         Path zipFilePath = zip.toPath();
-        try (FileSystem fs = FileSystems.newFileSystem(zipFilePath, null)) {
+        try (FileSystem fs = FileSystems.newFileSystem(zipFilePath, (ClassLoader) null)) {
             Path source = fs.getPath(filePath);
             Path temp = fs.getPath("./temp_" + UUID.randomUUID().toString());
             Files.write(temp, readFully(newContent), StandardOpenOption.CREATE_NEW);

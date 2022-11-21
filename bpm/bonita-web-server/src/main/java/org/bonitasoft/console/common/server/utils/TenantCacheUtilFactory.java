@@ -31,4 +31,8 @@ public class TenantCacheUtilFactory {
         }
         return tenantCacheUtil;
     }
+
+    public static void clearTenantCacheUtil() {
+        tenantCacheUtil.clearProcessActorInitiators();
+    }
 }
