@@ -19,6 +19,7 @@ import static org.mockito.Mockito.*;
 import java.util.Date;
 
 import org.bonitasoft.console.common.server.i18n.I18n;
+import org.bonitasoft.console.common.server.utils.TenantCacheUtilFactory;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
@@ -58,6 +59,7 @@ public class ProcessItemConverterTest {
         CommonDateFormater.setDateFormater(new ServerDateFormater());
         ItemDefinitionFactory.setDefaultFactory(new ModelFactory());
         processItemConverter = spy(new ProcessItemConverter(processAPI));
+        TenantCacheUtilFactory.clearTenantCacheUtil();
     }
 
     @Test
@@ -89,8 +91,8 @@ public class ProcessItemConverterTest {
     public void shouldStoreDifferentActorInitiatorIntoCache()
             throws ActorNotFoundException, ProcessDefinitionNotFoundException {
 
-        when(processAPI.getActorInitiator(1)).thenReturn(actorInstance1);
-        when(processAPI.getActorInitiator(2)).thenReturn(actorInstance2);
+        when(processAPI.getActorInitiator(1L)).thenReturn(actorInstance1);
+        when(processAPI.getActorInitiator(2L)).thenReturn(actorInstance2);
         doReturn(5L).when(actorInstance1).getId();
         doReturn(6L).when(actorInstance2).getId();
 

@@ -44,4 +44,8 @@ public class TenantCacheUtil {
         CacheUtil.store(CACHE_DISK_STORE_PATH, PROCESS_ACTOR_INITIATOR_CACHE, processId, actorInitiatorId);
         return actorInitiatorId;
     }
+
+    public void clearProcessActorInitiators() {
+        CacheUtil.clear(CACHE_DISK_STORE_PATH, PROCESS_ACTOR_INITIATOR_CACHE);
+    }
 }
