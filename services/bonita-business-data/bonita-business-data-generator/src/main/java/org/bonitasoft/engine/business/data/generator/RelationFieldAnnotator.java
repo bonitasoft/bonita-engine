@@ -44,7 +44,7 @@ public class RelationFieldAnnotator {
 
     public RelationFieldAnnotator(final CodeGenerator codeGenerator) {
         this.codeGenerator = codeGenerator;
-        this.foreignKeyAnnotator = new ForeignKeyAnnotator(codeGenerator);
+        this.foreignKeyAnnotator = new ForeignKeyAnnotator();
     }
 
     public void annotateRelationField(final JDefinedClass entityClass, final RelationField field,
@@ -80,9 +80,9 @@ public class RelationFieldAnnotator {
             relation = codeGenerator.addAnnotation(fieldVar, OneToOne.class);
             relation.param("orphanRemoval", true);
         }
-        addJoinColumn(fieldVar, field.getName());
+        JAnnotationUse joinColumnAnnotation = addJoinColumn(fieldVar, field.getName());
         relation.param("optional", field.isNullable());
-        foreignKeyAnnotator.annotateForeignKeyName(entityClass, fieldVar, field);
+        foreignKeyAnnotator.annotateForeignKeyName(joinColumnAnnotation, entityClass, fieldVar, field);
         return relation;
     }
 

@@ -13,32 +13,26 @@
  **/
 package org.bonitasoft.engine.business.data.generator;
 
+import javax.persistence.ForeignKey;
+
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
-import org.hibernate.annotations.ForeignKey;
 
 /**
  * @author Laurent Leseigneur
  */
 public class ForeignKeyAnnotator {
 
-    private final CodeGenerator codeGenerator;
-
-    public ForeignKeyAnnotator(CodeGenerator codeGenerator) {
-        this.codeGenerator = codeGenerator;
-    }
-
-    public void annotateForeignKeyName(JDefinedClass entityClass, JFieldVar jFieldVar, RelationField relationField) {
-
-        final JAnnotationUse foreignKey = codeGenerator.addAnnotation(jFieldVar, ForeignKey.class);
+    public void annotateForeignKeyName(JAnnotationUse joinColumn, JDefinedClass entityClass, JFieldVar jFieldVar,
+            RelationField relationField) {
+        JAnnotationUse foreignKey = joinColumn.annotationParam("foreignKey", ForeignKey.class);
 
         StringBuilder uniqueForeignKeyName = new StringBuilder()
                 .append("FK_")
                 .append(getReducedUniqueName(entityClass, jFieldVar, relationField));
         foreignKey.param("name", uniqueForeignKeyName.toString());
-
     }
 
     protected int getReducedUniqueName(JDefinedClass entityClass, JFieldVar jFieldVar, RelationField relationField) {
