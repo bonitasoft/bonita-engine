@@ -811,7 +811,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void assignAndExecuteStep(final long activityInstanceId, final long userId) throws BonitaException {
         getProcessAPI().assignUserTask(activityInstanceId, userId);
-        getProcessAPI().executeFlowNode(activityInstanceId);
+        getProcessAPI().executeUserTask(activityInstanceId, null);
     }
 
     public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final String taskName, final User user)
