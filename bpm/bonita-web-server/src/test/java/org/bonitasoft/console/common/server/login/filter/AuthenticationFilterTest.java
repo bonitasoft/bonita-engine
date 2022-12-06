@@ -37,6 +37,8 @@ import org.assertj.core.api.Condition;
 import org.bonitasoft.console.common.server.auth.AuthenticationManager;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.login.utils.RedirectUrl;
+import org.bonitasoft.console.common.server.utils.SessionUtil;
+import org.bonitasoft.engine.session.APISession;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -56,6 +58,9 @@ public class AuthenticationFilterTest {
 
     @Mock
     private HttpSession httpSession;
+
+    @Mock
+    private APISession apiSession;
 
     @Mock
     private FilterConfig filterConfig;
@@ -133,6 +138,22 @@ public class AuthenticationFilterTest {
 
         verify(firstFailingRule, never()).proceedWithRequest(chain, httpRequest, httpResponse);
         verify(secondFailingRule, never()).proceedWithRequest(chain, httpRequest, httpResponse);
+        verify(authenticationFilter).cleanHttpSession(httpSession);
+        verify(httpResponse).sendRedirect(anyString());
+    }
+
+    @Test
+    public void testIfSessionIsNotInvalidatedWhenCallingPlatformAPIWithAPISession() throws Exception {
+        AuthenticationRule failingRule = spy(createFailingRule());
+        authenticationFilter.addRule(failingRule);
+        when(httpRequest.getServletPath()).thenReturn("/API");
+        when(httpRequest.getPathInfo()).thenReturn("/platform/license");
+        when(httpRequest.getContextPath()).thenReturn("/bonita");
+        when(httpSession.getAttribute(SessionUtil.API_SESSION_PARAM_KEY)).thenReturn(apiSession);
+
+        authenticationFilter.doAuthenticationFiltering(request, httpResponse, chain);
+
+        verify(authenticationFilter, never()).cleanHttpSession(httpSession);
         verify(httpResponse).sendRedirect(anyString());
     }
 
