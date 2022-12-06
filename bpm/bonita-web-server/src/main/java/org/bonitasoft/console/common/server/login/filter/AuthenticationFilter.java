@@ -97,7 +97,11 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
 
         try {
             if (!isAuthorized(requestAccessor, response, chain)) {
-                cleanHttpSession(requestAccessor.getHttpSession());
+                if (!isAccessingPlatformAPIWithAPISession(requestAccessor)) {
+                    //do not invalidate the API session when trying to access platform API without a platform session
+                    //fix RUNTIME-1562
+                    cleanHttpSession(requestAccessor.getHttpSession());
+                }
                 if (redirectWhenUnauthorized && requestAccessor.asHttpServletRequest().getMethod().equals("GET")) {
                     response.sendRedirect(createLoginPageUrl(requestAccessor).getLocation());
                 } else {
@@ -109,6 +113,13 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
         } catch (final EngineUserNotFoundOrInactive e) {
             handleUserNotFoundOrInactiveException(requestAccessor, response, e);
         }
+    }
+
+    protected boolean isAccessingPlatformAPIWithAPISession(final HttpServletRequestAccessor requestAccessor) {
+        String requestPath = requestAccessor.asHttpServletRequest().getServletPath()
+                + requestAccessor.asHttpServletRequest().getPathInfo();
+        return requestPath.matches(RestAPIAuthorizationFilter.PLATFORM_API_URI_REGEXP)
+                && requestAccessor.getApiSession() != null;
     }
 
     /**
