@@ -245,7 +245,8 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     private void addPagePermissions(String pageName, Properties pageProperties, Set<String> customPagePermissions) {
-        if (ContentType.PAGE.equals(pageProperties.getProperty(PROPERTY_CONTENT_TYPE))) {
+        if (ContentType.PAGE.equals(pageProperties.getProperty(PROPERTY_CONTENT_TYPE))
+                || ContentType.LAYOUT.equals(pageProperties.getProperty(PROPERTY_CONTENT_TYPE))) {
             compoundPermissionsMapping.setInternalPropertyAsSet(pageName, customPagePermissions);
         }
     }
