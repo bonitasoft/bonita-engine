@@ -21,6 +21,7 @@ import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -56,4 +57,8 @@ public class EngineConfiguration {
         return new NoOpExecutorServiceMetricsProvider();
     }
 
+    @Bean
+    public ApplicationEventPublisher applicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        return eventPublisher;
+    }
 }

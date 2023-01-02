@@ -19,9 +19,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
@@ -33,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.ApplicationEventPublisher;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EngineInitializerTest {
@@ -47,7 +50,11 @@ public class EngineInitializerTest {
     @Mock
     private ServiceAccessorFactory serviceAccessorFactory;
     @Mock
+    private PlatformServiceAccessor platformService;
+    @Mock
     private PlatformSessionService platformSessionService;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
     @Mock
     private SPlatformSession sPlatformSession;
 
@@ -58,8 +65,10 @@ public class EngineInitializerTest {
     public void before() throws Exception {
         doReturn(platformAPI).when(engineInitializer).getPlatformAPI();
         doReturn(sessionAccessor).when(engineInitializer).getSessionAccessor();
-        doReturn(platformSessionService).when(engineInitializer).getPlatformSessionService();
         doReturn(serviceAccessorFactory).when(engineInitializer).getServiceAccessorFactory();
+        doReturn(platformService).when(engineInitializer).getPlatformService();
+        doReturn(applicationEventPublisher).when(platformService).getApplicationEventPublisher();
+        doReturn(platformSessionService).when(platformService).getPlatformSessionService();
         doReturn(sPlatformSession).when(platformSessionService).createSession(anyString());
     }
 
@@ -69,16 +78,15 @@ public class EngineInitializerTest {
         doReturn(true).when(platformAPI).isPlatformCreated();
         doReturn(true).when(platformAPI).isPlatformInitialized();
         systemOutRule.clearLog();
+        final PlatformStartedEvent platformStartEvent = new PlatformStartedEvent();
 
         // when
         engineInitializer.initializeEngine();
 
         //then
         verify(platformAPI).startNode();
-        // This message below is a line of the "Bonita Community" message:
-        assertThat(systemOutRule.getLog()).contains(
-                "|____/ \\___/|_| |_|_|\\__\\__,_|  \\_____\\___/|_| |_| |_|_| |_| |_|\\__,_|_| |_|_|\\__|\\__, |");
-
+        assertThat(systemOutRule.getLog()).contains("Initialization of Bonita Engine done!");
+        verify(applicationEventPublisher).publishEvent(platformStartEvent);
     }
 
     @Test
@@ -111,7 +119,7 @@ public class EngineInitializerTest {
         engineInitializer.unloadEngine();
 
         verify(platformAPI).stopNode();
-        verify(serviceAccessorFactory, times(1)).destroyAccessors();
+        verify(serviceAccessorFactory).destroyAccessors();
     }
 
     @Test
@@ -128,7 +136,7 @@ public class EngineInitializerTest {
     public void should_destroy_accessor_if_exception() throws Exception {
         engineInitializer.unloadEngine();
 
-        verify(serviceAccessorFactory, times(1)).destroyAccessors();
+        verify(serviceAccessorFactory).destroyAccessors();
     }
 
 }
