@@ -531,6 +531,21 @@ public class PermissionServiceImplTest {
     }
 
     @Test
+    public void addPermissions_should_update_compound_permissions_for_layouts() {
+        // given:
+        Properties properties = new Properties();
+        properties.put("name", "myLayout");
+        properties.put(PermissionServiceImpl.PROPERTY_CONTENT_TYPE, ContentType.LAYOUT);
+        properties.put(PermissionServiceImpl.RESOURCES_PROPERTY, "[]");
+
+        // when:
+        permissionService.addPermissions("myLayout", properties);
+
+        // then:
+        verify(compoundPermissionsMapping).setInternalPropertyAsSet(eq("myLayout"), anySet());
+    }
+
+    @Test
     public void addPermissions_should_not_update_compound_permissions_for_forms() {
         // given:
         Properties properties = new Properties();
