@@ -26,6 +26,7 @@ import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * Accessor for tenant level engine services.
@@ -73,4 +74,6 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     <T> T lookup(String serviceName) throws NotFoundException;
 
     ServicesResolver getServicesResolver();
+
+    ApplicationEventPublisher getApplicationEventPublisher();
 }
