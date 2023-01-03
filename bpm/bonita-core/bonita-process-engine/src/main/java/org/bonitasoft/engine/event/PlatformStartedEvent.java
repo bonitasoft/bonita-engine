@@ -15,6 +15,15 @@ package org.bonitasoft.engine.event;
 
 import lombok.Data;
 
+/**
+ * Spring event published when the Bonita Platform has finished to start.
+ * <p>This event can be listened using Spring standards, for instance:
+ *
+ * <pre>
+ * &#64;EventListener
+ * public void handlePlatformStarted(PlatformStartedEvent event) { ... }
+ * </pre>
+ */
 @Data
 public class PlatformStartedEvent {
 }
