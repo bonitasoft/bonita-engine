@@ -17,8 +17,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * Spring listener example of the event {@link PlatformStartedEvent}.
+ *
+ * @deprecated class used to ensure the proper publishing of this event and should be removed as soon as an official
+ *             implementation is made.
+ */
 @Component
 @Slf4j
+@Deprecated(forRemoval = true, since = "7.16.0")
 public class PlatformStartedListener {
 
     @EventListener
