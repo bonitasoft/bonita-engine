@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.exception;
 
-public class ApplicationDeploymentException extends Exception {
+public class ApplicationInstallationException extends Exception {
 
-    public ApplicationDeploymentException(String message, Throwable cause) {
+    public ApplicationInstallationException(String message, Throwable cause) {
         super(message, cause);
     }
 

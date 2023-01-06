@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application.deployer;
+package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -58,7 +58,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.ApplicationDeploymentException;
+import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ImportException;
@@ -79,56 +79,56 @@ import org.bonitasoft.engine.search.SearchResult;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
-public class Deployer {
+public class ApplicationInstaller {
 
     private final ApplicationArchiveReader applicationArchiveReader;
     private final PageAPI pageAPI;
     private final ApplicationAPI livingApplicationAPI;
     private final ProcessAPI processAPI;
 
-    public ExecutionResult deploy(byte[] applicationArchiveFile) throws ApplicationDeploymentException {
+    public ExecutionResult install(byte[] applicationArchiveFile) throws ApplicationInstallationException {
         ApplicationArchive applicationArchive = readApplicationArchiveFile(applicationArchiveFile);
-        return deploy(applicationArchive);
+        return install(applicationArchive);
     }
 
     @VisibleForTesting
-    ExecutionResult deploy(ApplicationArchive applicationArchive) throws ApplicationDeploymentException {
+    ExecutionResult install(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
         try {
             final ExecutionResult executionResult = new ExecutionResult();
             final long startPoint = System.currentTimeMillis();
             log.info("Starting Application Archive deployment...");
-            deployRestApiExtensions(applicationArchive, executionResult);
-            deployPages(applicationArchive, executionResult);
-            deployLayouts(applicationArchive, executionResult);
-            deployThemes(applicationArchive, executionResult);
-            deployLivingApplications(applicationArchive, executionResult);
-            deployProcesses(applicationArchive, executionResult);
+            installRestApiExtensions(applicationArchive, executionResult);
+            installPages(applicationArchive, executionResult);
+            installLayouts(applicationArchive, executionResult);
+            installThemes(applicationArchive, executionResult);
+            installLivingApplications(applicationArchive, executionResult);
+            installProcesses(applicationArchive, executionResult);
 
-            log.info("The Application Archive has been deployed successfully in {} ms.",
+            log.info("The Application Archive has been installed successfully in {} ms.",
                     (System.currentTimeMillis() - startPoint));
             return executionResult;
         } catch (Exception e) {
-            throw new ApplicationDeploymentException("The Application Archive deploy operation has been aborted", e);
+            throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
         }
     }
 
     private ApplicationArchive readApplicationArchiveFile(byte[] applicationArchiveFile)
-            throws ApplicationDeploymentException {
+            throws ApplicationInstallationException {
         ApplicationArchive applicationArchive;
         try {
             applicationArchive = applicationArchiveReader.read(applicationArchiveFile);
         } catch (IOException e) {
-            throw new ApplicationDeploymentException("Unable to read application archive", e);
+            throw new ApplicationInstallationException("Unable to read application archive", e);
         }
         return applicationArchive;
     }
 
-    private void deployLivingApplications(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    private void installLivingApplications(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws AlreadyExistsException,
             ImportException {
         List<FileAndContent> applications = applicationArchive.getApplications();
         for (FileAndContent applicationArchiveFile : applications) {
-            log.info("Deploying / updating Living Application from file '{}'", applicationArchiveFile.getFileName());
+            log.info("Installing / updating Living Application from file '{}'", applicationArchiveFile.getFileName());
             final List<ImportStatus> importStatusList = livingApplicationAPI.importApplications(
                     applicationArchiveFile.getContent(), ApplicationImportPolicy.REPLACE_DUPLICATES);
 
@@ -189,38 +189,38 @@ public class Deployer {
                 context);
     }
 
-    private void deployPages(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    private void installPages(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
         for (FileAndContent pageFile : applicationArchive.getPages()) {
-            deployUnitPage(pageFile, "page", executionResult);
+            installUnitPage(pageFile, "page", executionResult);
         }
     }
 
-    private void deployLayouts(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    private void installLayouts(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
         for (FileAndContent layoutFile : applicationArchive.getLayouts()) {
-            deployUnitPage(layoutFile, "layout", executionResult);
+            installUnitPage(layoutFile, "layout", executionResult);
         }
     }
 
-    private void deployThemes(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    private void installThemes(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
         for (FileAndContent pageFile : applicationArchive.getThemes()) {
-            deployUnitPage(pageFile, "theme", executionResult);
+            installUnitPage(pageFile, "theme", executionResult);
         }
     }
 
-    private void deployRestApiExtensions(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    private void installRestApiExtensions(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
         for (FileAndContent pageFile : applicationArchive.getRestAPIExtensions()) {
-            deployUnitPage(pageFile, "REST API extension", executionResult);
+            installUnitPage(pageFile, "REST API extension", executionResult);
         }
     }
 
     /**
      * From the Engine perspective, all custom pages, layouts, themes, custom Rest APIs are of type <code>Page</code>
      */
-    private void deployUnitPage(FileAndContent pageFile, String precisePageType, ExecutionResult executionResult)
+    private void installUnitPage(FileAndContent pageFile, String precisePageType, ExecutionResult executionResult)
             throws IOException, BonitaException {
         String pageToken = getPageToken(pageFile);
         org.bonitasoft.engine.page.Page existingPage = getPage(pageToken);
@@ -237,12 +237,12 @@ public class Deployer {
                     format("Existing %s '%s' has been updated", precisePageType, getPageName(existingPage)),
                     context));
         } else {
-            // page do not exists, we create it:
+            // page does not exist, we create it:
             final Page page = pageAPI.createPage(pageToken, pageFile.getContent());
             log.info("Creating new {} '{}'", precisePageType, getPageName(page));
 
             executionResult.addStatus(infoStatus(PAGE_DEPLOYMENT_CREATE_NEW,
-                    format("New %s '%s' has been deployed", precisePageType, getPageName(page)),
+                    format("New %s '%s' has been installed", precisePageType, getPageName(page)),
                     context));
         }
     }
@@ -265,7 +265,7 @@ public class Deployer {
         return name;
     }
 
-    private void deployProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    private void installProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws InvalidBusinessArchiveFormatException, IOException, ProcessDeployException {
 
         for (FileAndContent process : applicationArchive.getProcesses()) {
@@ -283,7 +283,7 @@ public class Deployer {
                 // Let's try to deploy the process, even if it already exists:
                 processDefinition = processAPI.deploy(businessArchive);
                 executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_CREATE_NEW,
-                        format("New process %s (%s) has been deployed successfully", processName, processVersion),
+                        format("New process %s (%s) has been installed successfully", processName, processVersion),
                         context));
             } catch (AlreadyExistsException e) {
                 log.info("{} Replacing the process with the new version.", e.getMessage());
@@ -293,7 +293,7 @@ public class Deployer {
                             processVersion);
                     deleteExistingProcess(existingProcessDefinitionId, processName, processVersion);
                     processDefinition = processAPI.deploy(businessArchive);
-                    log.info("Process {} ({}) has been deployed successfully.", processName, processVersion);
+                    log.info("Process {} ({}) has been installed successfully.", processName, processVersion);
 
                     executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_REPLACE_EXISTING,
                             format("Existing process %s (%s) has been replaced successfully",

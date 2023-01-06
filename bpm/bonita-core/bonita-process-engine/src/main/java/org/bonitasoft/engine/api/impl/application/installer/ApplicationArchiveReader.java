@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application.deployer;
+package org.bonitasoft.engine.api.impl.application.installer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.bonitasoft.engine.api.impl.application.deployer.detector.ArtifactTypeDetectorFactory;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetectorFactory;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 
 /**
