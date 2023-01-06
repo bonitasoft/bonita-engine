@@ -11,21 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application.deployer;
+package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.util.Collections.emptyList;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,12 +56,12 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @author Baptiste Mesta.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class DeployerTest {
+public class ApplicationInstallerTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private ApplicationArchiveReader applicationArchiveReader = spy(new ApplicationArchiveReader());
+    private final ApplicationArchiveReader applicationArchiveReader = spy(new ApplicationArchiveReader());
 
     @Mock
     private PageAPI pageAPI;
@@ -77,11 +70,11 @@ public class DeployerTest {
     @Mock
     private ProcessAPI processAPI;
 
-    private Deployer deployer;
+    private ApplicationInstaller applicationInstaller;
 
     @Before
     public void before() throws Exception {
-        deployer = new Deployer.DeployerBuilder()
+        applicationInstaller = new ApplicationInstaller.ApplicationInstallerBuilder()
                 .pageAPI(pageAPI)
                 .livingApplicationAPI(livingApplicationAPI)
                 .processAPI(processAPI)
@@ -91,7 +84,7 @@ public class DeployerTest {
     }
 
     @Test
-    public void should_deploy_application_containing_all_kind_of_custom_pages() throws Exception {
+    public void should_install_application_containing_all_kind_of_custom_pages() throws Exception {
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .page(new FileAndContent("page.zip", zip(file("page.properties", "name=page"))))
                 .layout(new FileAndContent("layout.zip", zip(file("page.properties", "name=layout"))))
@@ -101,7 +94,7 @@ public class DeployerTest {
                 .build();
         doReturn(mock(Page.class)).when(pageAPI).createPage(anyString(), any(byte[].class));
 
-        deployer.deploy(applicationArchive);
+        applicationInstaller.install(applicationArchive);
 
         verify(pageAPI).createPage("page", zip(file("page.properties", "name=page")));
         verify(pageAPI).createPage("layout", zip(file("page.properties", "name=layout")));
@@ -110,18 +103,18 @@ public class DeployerTest {
     }
 
     @Test
-    public void should_deploy_application_containing_living_applications() throws Exception {
+    public void should_install_application_containing_living_applications() throws Exception {
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .application(new FileAndContent("application.xml", "content".getBytes())).build();
 
-        deployer.deploy(applicationArchive);
+        applicationInstaller.install(applicationArchive);
 
         verify(livingApplicationAPI).importApplications("content".getBytes(),
                 ApplicationImportPolicy.REPLACE_DUPLICATES);
     }
 
     @Test
-    public void should_deploy_and_enable_resolved_process() throws Exception {
+    public void should_install_and_enable_resolved_process() throws Exception {
         byte[] barContent = createValidBusinessArchive();
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .process(new FileAndContent("process.bar", barContent)).build();
@@ -129,7 +122,7 @@ public class DeployerTest {
         doReturn(myProcess).when(processAPI).deploy(any(BusinessArchive.class));
         hasConfigurationState(myProcess, ConfigurationState.RESOLVED);
 
-        deployer.deploy(applicationArchive);
+        applicationInstaller.install(applicationArchive);
 
         verify(processAPI).deploy(ArgumentMatchers
                 .<BusinessArchive> argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
@@ -137,7 +130,7 @@ public class DeployerTest {
     }
 
     @Test
-    public void should_deploy_only_unresolved_process() throws Exception {
+    public void should_install_only_unresolved_process() throws Exception {
         byte[] barContent = createValidBusinessArchive();
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .process(new FileAndContent("process.bar", barContent)).build();
@@ -145,7 +138,7 @@ public class DeployerTest {
         doReturn(myProcess).when(processAPI).deploy(any(BusinessArchive.class));
         hasConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
 
-        deployer.deploy(applicationArchive);
+        applicationInstaller.install(applicationArchive);
 
         verify(processAPI).deploy(ArgumentMatchers
                 .<BusinessArchive> argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
@@ -165,7 +158,7 @@ public class DeployerTest {
         doReturn(new SearchResultImpl<>(0, emptyList())).when(processAPI).searchProcessInstances(any());
         doReturn(new SearchResultImpl<>(0, emptyList())).when(processAPI).searchArchivedProcessInstances(any());
 
-        deployer.deploy(applicationArchive);
+        applicationInstaller.install(applicationArchive);
 
         verify(processAPI).disableProcess(456L);
         verify(processAPI).deleteProcessDefinition(456L);

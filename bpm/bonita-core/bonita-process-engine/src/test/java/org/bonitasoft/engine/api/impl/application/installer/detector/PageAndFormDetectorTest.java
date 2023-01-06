@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application.deployer.detector;
+package org.bonitasoft.engine.api.impl.application.installer.detector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
@@ -25,52 +25,65 @@ import org.junit.rules.TemporaryFolder;
 /**
  * @author Emmanuel Duchastenier
  */
-public class LayoutDetectorTest {
+public class PageAndFormDetectorTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
-    public void isCompliant_should_reject_layout_if_contentType_is_not_layout() throws Exception {
+    public void isCompliant_should_reject_page_if_contentType_is_not_layout() throws Exception {
         // given:
-        final LayoutDetector detector = new LayoutDetector();
+        final PageAndFormDetector detector = new PageAndFormDetector();
         byte[] zip = zip(
                 file("page.properties", "contentType=toto"),
                 file("resources/index.html", "anything"));
 
         // when:
-        final boolean compliant = detector.isCompliant(new FileAndContent("myLayout.zip", zip));
+        final boolean compliant = detector.isCompliant(new FileAndContent("myPage.zip", zip));
 
         // then:
         assertThat(compliant).isFalse();
     }
 
     @Test
-    public void isCompliant_should_reject_layout_if_index_page_not_present() throws Exception {
+    public void isCompliant_should_reject_page_if_index_page_not_present() throws Exception {
         // given:
-        final LayoutDetector detector = new LayoutDetector();
+        final PageAndFormDetector detector = new PageAndFormDetector();
+        byte[] zip = zip(file("page.properties", "contentType=layout"));
+
+        // when:
+        final boolean compliant = detector.isCompliant(new FileAndContent("myPage.zip", zip));
+
+        // then:
+        assertThat(compliant).isFalse();
+    }
+
+    @Test
+    public void isCompliant_should_accept_valid_page() throws Exception {
+        // given:
         byte[] zip = zip(
-                file("page.properties", "contentType=layout"),
-                file("resources/toto.html", "anything"));
+                file("page.properties", "contentType=page"),
+                file("resources/index.html", "some HTML content"));
 
         // when:
-        final boolean compliant = detector.isCompliant(new FileAndContent("myLayout.zip", zip));
-
-        // then:
-        assertThat(compliant).isFalse();
-    }
-
-    @Test
-    public void isCompliant_should_accept_valid_layout() throws Exception {
-        // given:
-        final FileAndContent file = file("layout.zip",
-                zip(file("page.properties", "name=custompage_test1\ncontentType=layout"),
-                        file("resources/index.html", "someContent")));
-
-        // when:
-        final boolean compliant = new LayoutDetector().isCompliant(file);
+        final boolean compliant = new PageAndFormDetector().isCompliant(new FileAndContent("myPage.zip", zip));
 
         // then:
         assertThat(compliant).isTrue();
     }
+
+    @Test
+    public void isCompliant_should_accept_valid_form() throws Exception {
+        // given:
+        byte[] zip = zip(
+                file("page.properties", "contentType=form"),
+                file("resources/Index.groovy", "some Groovy content"));
+
+        // when:
+        final boolean compliant = new PageAndFormDetector().isCompliant(new FileAndContent("myGroovyForm.zip", zip));
+
+        // then:
+        assertThat(compliant).isTrue();
+    }
+
 }

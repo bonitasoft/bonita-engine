@@ -8,7 +8,7 @@
     </appender>
 
     <logger name="org.bonitasoft" level="INFO" />
-    <logger name="org.bonitasoft.engine.api.impl.application.deployer" level="INFO" />
+    <logger name="org.bonitasoft.engine.api.impl.application.installer" level="INFO" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />
