@@ -168,7 +168,8 @@ public class ProcessPermissionRuleTest {
         //given
         havingResourceId(15)
         doReturn(new SearchResultImpl(1, [])).when(processAPI).searchProcessDeploymentInfosCanBeStartedBy(eq(currentUserId), Mockito.any(SearchOptions.class))
-        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(Mockito.any(SearchOptions.class))
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(eq(currentUserId), Mockito.any(SearchOptions.class))
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), Mockito.any(SearchOptions.class))
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -180,7 +181,8 @@ public class ProcessPermissionRuleTest {
         //given
         havingResourceId(15)
         doReturn(new SearchResultImpl(0, [])).when(processAPI).searchProcessDeploymentInfosCanBeStartedBy(eq(currentUserId), Mockito.any(SearchOptions.class))
-        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(Mockito.any(SearchOptions.class))
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(eq(currentUserId), Mockito.any(SearchOptions.class))
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), Mockito.any(SearchOptions.class))
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -192,7 +194,21 @@ public class ProcessPermissionRuleTest {
         //given
         havingResourceId(15)
         doReturn(new SearchResultImpl(0, [])).when(processAPI).searchProcessDeploymentInfosCanBeStartedBy(eq(currentUserId), Mockito.any(SearchOptions.class))
-        doReturn(new SearchResultImpl(1, [])).when(processAPI).searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(Mockito.any(SearchOptions.class))
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(eq(currentUserId), Mockito.any(SearchOptions.class))
+        doReturn(new SearchResultImpl(1, [])).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), Mockito.any(SearchOptions.class))
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        Assertions.assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void should_check_verify_resourceId_isInvolved_in_subprocesses_on_GET() {
+        //given
+        havingResourceId(15)
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchProcessDeploymentInfosCanBeStartedBy(eq(currentUserId), Mockito.any(SearchOptions.class))
+        doReturn(new SearchResultImpl(1, [])).when(processAPI).searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(eq(currentUserId), Mockito.any(SearchOptions.class))
+        doReturn(new SearchResultImpl(0, [])).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), Mockito.any(SearchOptions.class))
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
