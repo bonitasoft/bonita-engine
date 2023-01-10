@@ -23,6 +23,7 @@ import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor
 import org.bonitasoft.engine.search.SearchOptionsBuilder
 import org.bonitasoft.engine.session.APISession
 
@@ -73,14 +74,21 @@ class ProcessPermissionRule implements PermissionRule {
                 logger.debug("can start the process, so can get it")
                 return true
             }
-            def hasTasks = processAPI.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(new SearchOptionsBuilder(0, 0).filter(ProcessDeploymentInfoSearchDescriptor.PROCESS_ID, processDefinition.getProcessId()).done())
-            if (hasTasks.getCount() > 0) {
-                logger.debug("can execute process tasks, so can get the process")
+            // look for available tasks with this direct process ID including processes which are started by call activities (subprocesses)
+            def canExecuteTask = processAPI.searchMyAvailableHumanTasks(currentUserId, new SearchOptionsBuilder(0, 0).filter(HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processId).done())
+            if(canExecuteTask.getCount() > 0) {
+                logger.debug("has at least one task on process, so can get it")
                 return true
             }
             def isSupervisor = processAPI.isUserProcessSupervisor(processId, currentUserId)
             if (isSupervisor) {
                 logger.debug("is supervisor of the process")
+                return true
+            }
+            // look for available tasks with root process ID including the subprocesses of the process with this ID
+            def hasTasksInRootOrSubprocesses = processAPI.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(currentUserId, new SearchOptionsBuilder(0, 0).filter(ProcessDeploymentInfoSearchDescriptor.PROCESS_ID, processDefinition.getProcessId()).done())
+            if (hasTasksInRootOrSubprocesses.getCount() > 0) {
+                logger.debug("can execute process tasks, so can get the process")
                 return true
             }
             return false
