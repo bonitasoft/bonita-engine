@@ -20,7 +20,7 @@ dependencies {
 }
 
 configurations {
-    all {
+    configureEach {
         resolutionStrategy.force "org.codehaus.woodstox:stax2-api:${Deps.woodstoxStax2ApiVersion}"
     }
 }

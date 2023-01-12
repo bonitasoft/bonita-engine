@@ -160,7 +160,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
             TenantStateManager tenantStateManager = tenantAccessor.getTenantStateManager();
             String bdm_version = tenantStateManager.executeTenantManagementOperation("BDM Installation",
-                    () -> bdmRepository.install(zip, tenantAccessor.getTenantId(), userId));
+                    () -> bdmRepository.install(zip, userId));
             log.info("Installation of the BDM completed.");
             return bdm_version;
         } catch (final SBusinessDataRepositoryDeploymentException e) {

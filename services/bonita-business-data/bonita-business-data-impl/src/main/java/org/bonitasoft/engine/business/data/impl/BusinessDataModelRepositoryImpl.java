@@ -157,7 +157,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     @Override
-    public String install(final byte[] bdmZip, final long tenantId, long userId)
+    public String install(final byte[] bdmZip, long userId)
             throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 

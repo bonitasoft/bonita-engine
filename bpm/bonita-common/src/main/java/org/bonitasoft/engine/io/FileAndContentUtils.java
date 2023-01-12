@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.io;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
@@ -26,8 +25,7 @@ import java.util.zip.ZipOutputStream;
 public class FileAndContentUtils {
 
     public static byte[] zip(FileAndContent... files) throws IOException {
-        try (
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ZipOutputStream zos = new ZipOutputStream(baos)) {
             for (FileAndContent file : files) {
                 ZipEntry e = new ZipEntry(file.getFileName());
@@ -48,10 +46,6 @@ public class FileAndContentUtils {
 
     public static FileAndContent file(String fileName, byte[] content) {
         return new FileAndContent(fileName, content);
-    }
-
-    public static FileAndContent fromFile(File file) throws IOException {
-        return new FileAndContent(file.getName(), FileOperations.readFully(file));
     }
 
     public static FileAndContent directory(String fileName) {
