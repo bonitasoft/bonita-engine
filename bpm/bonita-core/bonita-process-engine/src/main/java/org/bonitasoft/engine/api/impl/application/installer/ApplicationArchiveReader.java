@@ -20,7 +20,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetectorFactory;
-import org.bonitasoft.engine.api.utils.VisibleForTesting;
 
 /**
  * @author Baptiste Mesta.
@@ -33,8 +32,7 @@ public class ApplicationArchiveReader {
         }
     }
 
-    @VisibleForTesting
-    ApplicationArchive read(InputStream inputStream) throws IOException {
+    public ApplicationArchive read(InputStream inputStream) throws IOException {
         ApplicationArchive.ApplicationArchiveBuilder builder = ApplicationArchive.builder();
         ZipInputStream zipInputStream = new ZipInputStream(inputStream);
         ZipEntry zipEntry;

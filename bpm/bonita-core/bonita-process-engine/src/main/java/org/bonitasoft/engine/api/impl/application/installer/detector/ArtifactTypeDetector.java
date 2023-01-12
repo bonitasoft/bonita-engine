@@ -29,6 +29,8 @@ public class ArtifactTypeDetector {
     private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.0";
     private static final String REST_API_EXTENSION_CONTENT_TYPE = "apiExtension";
 
+    private final BdmDetector bdmDetector;
+
     private final XmlDetector xmlDetector;
     private final CustomPageDetector customPageDetector;
     private final ProcessDetector processDetector;
@@ -36,9 +38,10 @@ public class ArtifactTypeDetector {
     private final PageAndFormDetector pageAndFormDetector;
     private final LayoutDetector layoutDetector;
 
-    public ArtifactTypeDetector(XmlDetector xmlDetector, CustomPageDetector customPageDetector,
-            ProcessDetector processDetector,
-            ThemeDetector themeDetector, PageAndFormDetector pageAndFormDetector, LayoutDetector layoutDetector) {
+    public ArtifactTypeDetector(BdmDetector bdmDetector, XmlDetector xmlDetector, CustomPageDetector customPageDetector,
+            ProcessDetector processDetector, ThemeDetector themeDetector, PageAndFormDetector pageAndFormDetector,
+            LayoutDetector layoutDetector) {
+        this.bdmDetector = bdmDetector;
         this.xmlDetector = xmlDetector;
         this.customPageDetector = customPageDetector;
         this.processDetector = processDetector;
@@ -67,6 +70,10 @@ public class ArtifactTypeDetector {
         return themeDetector.isCompliant(file);
     }
 
+    public boolean isBdm(FileAndContent file) {
+        return bdmDetector.isCompliant(file);
+    }
+
     public boolean isProcess(FileAndContent file) {
         return processDetector.isCompliant(file);
     }
@@ -74,6 +81,7 @@ public class ArtifactTypeDetector {
     public void detectAndStore(String fileName, InputStream content,
             ApplicationArchive.ApplicationArchiveBuilder builder) throws IOException {
         FileAndContent file = FileAndContentUtils.file(fileName.substring(fileName.lastIndexOf('/') + 1), content);
+        logger.debug("Treating file {}", file.getFileName());
         if (isApplication(file)) {
             logger.info("Found application file: '{}'. ", file.getFileName());
             builder.application(file);
@@ -92,6 +100,9 @@ public class ArtifactTypeDetector {
         } else if (isRestApiExtension(file)) {
             logger.info("Found rest api extension file: '{}'. ", file.getFileName());
             builder.restAPIExtension(file);
+        } else if (isBdm(file)) {
+            logger.info("Found business data model file: '{}'. ", file.getFileName());
+            builder.bdm(file);
         } else {
             logger.warn("Ignoring file '{}'.", fileName);
         }

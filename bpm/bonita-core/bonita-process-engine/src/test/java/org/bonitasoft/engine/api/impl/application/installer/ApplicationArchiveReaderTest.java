@@ -28,7 +28,7 @@ import org.junit.Test;
  */
 public class ApplicationArchiveReaderTest {
 
-    private ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader();
+    private final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader();
 
     @Test
     public void should_read_application_archive_with_a_live_application() throws Exception {

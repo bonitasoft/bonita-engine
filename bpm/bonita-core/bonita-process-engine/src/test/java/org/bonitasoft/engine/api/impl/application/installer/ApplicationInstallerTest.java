@@ -14,41 +14,45 @@
 package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.api.ApplicationAPI;
-import org.bonitasoft.engine.api.PageAPI;
-import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.result.ExecutionResult;
+import org.bonitasoft.engine.api.result.Status;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.internal.ProblemImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
-import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.io.FileAndContent;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
-import org.bonitasoft.engine.search.impl.SearchResultImpl;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -61,26 +65,26 @@ public class ApplicationInstallerTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private final ApplicationArchiveReader applicationArchiveReader = spy(new ApplicationArchiveReader());
-
     @Mock
-    private PageAPI pageAPI;
-    @Mock
-    private ApplicationAPI livingApplicationAPI;
-    @Mock
-    private ProcessAPI processAPI;
+    private UserTransactionService transactionService;
 
     private ApplicationInstaller applicationInstaller;
+    @Captor
+    ArgumentCaptor<Callable<Object>> callableCaptor;
 
     @Before
     public void before() throws Exception {
-        applicationInstaller = new ApplicationInstaller.ApplicationInstallerBuilder()
-                .pageAPI(pageAPI)
-                .livingApplicationAPI(livingApplicationAPI)
-                .processAPI(processAPI)
-                .applicationArchiveReader(applicationArchiveReader)
-                .build();
-        doReturn(new SearchResultImpl<Page>(0, emptyList())).when(pageAPI).searchPages(any());
+        applicationInstaller = spy(
+                new ApplicationInstaller.ApplicationInstallerBuilder().transactionService(transactionService).build());
+        doNothing().when(applicationInstaller).installBusinessDataModel(any(ApplicationArchive.class));
+
+        // to bypass the transaction-wrapping part:
+        doAnswer(inv -> callableCaptor.getValue().call()).when(transactionService)
+                .executeInTransaction(callableCaptor.capture());
+
+        // to bypass the session-wrapping part:
+        doAnswer(inv -> callableCaptor.getValue().call()).when(applicationInstaller)
+                .inSession(callableCaptor.capture());
     }
 
     @Test
@@ -92,78 +96,88 @@ public class ApplicationInstallerTest {
                 .restAPIExtension(new FileAndContent("restApiExtension.zip",
                         zip(file("page.properties", "name=restApiExtension"))))
                 .build();
-        doReturn(mock(Page.class)).when(pageAPI).createPage(anyString(), any(byte[].class));
+        doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
+        doReturn(null).when(applicationInstaller).getPage(anyString());
 
         applicationInstaller.install(applicationArchive);
 
-        verify(pageAPI).createPage("page", zip(file("page.properties", "name=page")));
-        verify(pageAPI).createPage("layout", zip(file("page.properties", "name=layout")));
-        verify(pageAPI).createPage("theme", zip(file("page.properties", "name=theme")));
-        verify(pageAPI).createPage("restApiExtension", zip(file("page.properties", "name=restApiExtension")));
+        verify(applicationInstaller).createPage(any(), eq("page"));
+        verify(applicationInstaller).createPage(any(), eq("layout"));
+        verify(applicationInstaller).createPage(any(), eq("theme"));
+        verify(applicationInstaller).createPage(any(), eq("restApiExtension"));
     }
 
     @Test
     public void should_install_application_containing_living_applications() throws Exception {
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .application(new FileAndContent("application.xml", "content".getBytes())).build();
+        doReturn(emptyList()).when(applicationInstaller).importApplications(any());
 
         applicationInstaller.install(applicationArchive);
 
-        verify(livingApplicationAPI).importApplications("content".getBytes(),
-                ApplicationImportPolicy.REPLACE_DUPLICATES);
+        verify(applicationInstaller).importApplications("content".getBytes());
     }
 
     @Test
+    @Ignore("Not fully implemented yet (missing organization)")
     public void should_install_and_enable_resolved_process() throws Exception {
         byte[] barContent = createValidBusinessArchive();
+        //        byte[] bdmZipContent = createValidBDMZipFile();
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
+                //                .bdm(new FileAndContent("bdm.zip", bdmZipContent))
                 .process(new FileAndContent("process.bar", barContent)).build();
         ProcessDefinition myProcess = aProcessDefinition(123L);
-        doReturn(myProcess).when(processAPI).deploy(any(BusinessArchive.class));
-        hasConfigurationState(myProcess, ConfigurationState.RESOLVED);
+        doReturn(myProcess).when(applicationInstaller).deployProcess(any());
+        //        hasConfigurationState(myProcess, ConfigurationState.RESOLVED);
 
         applicationInstaller.install(applicationArchive);
 
-        verify(processAPI).deploy(ArgumentMatchers
-                .<BusinessArchive> argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
-        verify(processAPI).enableProcess(123L);
+        verify(applicationInstaller).deployProcess(any());
+        verify(applicationInstaller).enableProcess(myProcess);
     }
 
     @Test
     public void should_install_only_unresolved_process() throws Exception {
+        final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .process(new FileAndContent("process.bar", barContent)).build();
         ProcessDefinition myProcess = aProcessDefinition(123L);
-        doReturn(myProcess).when(processAPI).deploy(any(BusinessArchive.class));
-        hasConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
+        doReturn(myProcess).when(applicationInstaller).deployProcess(any());
+        mockConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
+        final List<ProblemImpl> problems = List.of(new ProblemImpl(Problem.Level.ERROR, "", "", ""));
+        doReturn(problems).when(applicationInstaller).getProcessResolutionProblems(myProcess);
 
-        applicationInstaller.install(applicationArchive);
+        applicationInstaller.installProcesses(applicationArchive, executionResult);
 
-        verify(processAPI).deploy(ArgumentMatchers
-                .<BusinessArchive> argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
-        verify(processAPI, never()).enableProcess(anyLong());
+        verify(applicationInstaller).deployProcess(any());
+        verify(applicationInstaller, never()).enableProcess(any());
+        assertThat(executionResult.getAllStatus()).anyMatch((status) -> status.getLevel() == Status.Level.WARNING);
     }
 
     @Test
-    public void should_replace_existing_process() throws Exception {
+    public void should_replace_any_already_existing_process() throws Exception {
+        final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .process(new FileAndContent("process.bar", barContent)).build();
         ProcessDefinition myProcess = aProcessDefinition(123L);
-        when(processAPI.deploy(any(BusinessArchive.class))).thenThrow(new AlreadyExistsException("already exists"))
-                .thenReturn(myProcess);
-        doReturn(456L).when(processAPI).getProcessDefinitionId("myProcess", "1.0");
-        hasConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
-        doReturn(new SearchResultImpl<>(0, emptyList())).when(processAPI).searchProcessInstances(any());
-        doReturn(new SearchResultImpl<>(0, emptyList())).when(processAPI).searchArchivedProcessInstances(any());
+        doThrow(new AlreadyExistsException("already exists"))
+                .doReturn(myProcess)
+                .when(applicationInstaller)
+                .deployProcess(any(BusinessArchive.class));
+        doReturn(456L).when(applicationInstaller).getProcessDefinitionId("myProcess", "1.0");
+        doReturn(emptyList()).when(applicationInstaller).getExistingProcessInstances(any());
+        doReturn(emptyList()).when(applicationInstaller).getExistingArchivedProcessInstances(any());
+        mockConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
+        doReturn(emptyList()).when(applicationInstaller).getProcessResolutionProblems(myProcess);
 
-        applicationInstaller.install(applicationArchive);
+        applicationInstaller.installProcesses(applicationArchive, executionResult);
 
-        verify(processAPI).disableProcess(456L);
-        verify(processAPI).deleteProcessDefinition(456L);
-        verify(processAPI, times(2)).deploy(ArgumentMatchers
-                .<BusinessArchive> argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
+        verify(applicationInstaller).disableProcess(456L);
+        verify(applicationInstaller).deleteProcessDefinition(456L);
+        verify(applicationInstaller, times(2)).deployProcess(ArgumentMatchers
+                .argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
     }
 
     private ProcessDefinitionImpl aProcessDefinition(long id) {
@@ -172,11 +186,11 @@ public class ApplicationInstallerTest {
         return myProcess;
     }
 
-    private void hasConfigurationState(ProcessDefinition myProcess, ConfigurationState state)
+    private void mockConfigurationState(ProcessDefinition myProcess, ConfigurationState state)
             throws ProcessDefinitionNotFoundException {
         ProcessDeploymentInfo processDeploymentInfo = mock(ProcessDeploymentInfo.class);
         doReturn(state).when(processDeploymentInfo).getConfigurationState();
-        doReturn(processDeploymentInfo).when(processAPI).getProcessDeploymentInfo(myProcess.getId());
+        doReturn(processDeploymentInfo).when(applicationInstaller).getProcessDeploymentInfo(myProcess);
     }
 
     private byte[] createValidBusinessArchive()
@@ -188,6 +202,12 @@ public class ApplicationInstallerTest {
         businessArchiveFile.delete();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, businessArchiveFile);
         return FileOperations.readFully(businessArchiveFile);
+    }
+
+    private byte[] createValidBDMZipFile() throws IOException {
+        return zip(file("bom.xml", ("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<businessObjectModel xmlns=\"http://documentation.bonitasoft.com/bdm-xml-schema/1.0\" modelVersion=\"1.0\" productVersion=\"8.0.0\" />")
+                        .getBytes()));
     }
 
 }

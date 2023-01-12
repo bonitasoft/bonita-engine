@@ -38,7 +38,8 @@ public class ArtifactTypeDetectorFactory {
             documentBuilderFactory.setNamespaceAware(true);
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             XmlDetector xmlDetector = new XmlDetector(documentBuilder);
-            return new ArtifactTypeDetector(xmlDetector, new CustomPageDetector(), new ProcessDetector(xmlDetector),
+            return new ArtifactTypeDetector(new BdmDetector(), xmlDetector, new CustomPageDetector(),
+                    new ProcessDetector(xmlDetector),
                     new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector());
         } catch (ParserConfigurationException e) {
             // should never occur as we use a simple configuration which can always be honored

@@ -15,14 +15,22 @@ package org.bonitasoft.engine.exception;
 
 public class ApplicationInstallationException extends Exception {
 
+    public ApplicationInstallationException(String message) {
+        super(message);
+    }
+
     public ApplicationInstallationException(String message, Throwable cause) {
         super(message, cause);
     }
 
     @Override
     public String getMessage() {
+        String message = super.getMessage();
         Throwable cause = getCause();
-        return super.getMessage() + " - cause: " + cause.getClass().getSimpleName() + " - " + cause.getMessage();
+        if (cause != null) {
+            message += " - cause: " + cause.getClass().getSimpleName() + " - " + cause.getMessage();
+        }
+        return message;
     }
 
     @Override
