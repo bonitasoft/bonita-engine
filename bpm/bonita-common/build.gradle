@@ -37,7 +37,7 @@ dependencies {
             "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
 }
 
-def generateInfoProperties = task("generateInfoProperties") {
+def generateInfoProperties = tasks.register("generateInfoProperties") {
     doFirst {
         project.file("build/generated/main/resources").mkdirs()
         project.file("build/generated/main/resources/info.properties").text = "version $project.version"
@@ -85,7 +85,7 @@ publishing {
     }
 }
 
-task('schemagen') {
+tasks.register('schemagen') {
     def destDir = file("$buildDir/schemas")
     doLast {
         destDir.mkdirs()
