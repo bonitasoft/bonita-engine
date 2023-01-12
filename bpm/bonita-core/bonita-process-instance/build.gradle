@@ -37,7 +37,7 @@ dependencies {
             "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
 }
 
-task('schemagen') {
+tasks.register('schemagen') {
     def destDir = file("$buildDir/schemas")
     doLast {
         destDir.mkdirs()
