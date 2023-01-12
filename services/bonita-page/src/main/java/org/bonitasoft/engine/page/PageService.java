@@ -16,6 +16,7 @@ package org.bonitasoft.engine.page;
 import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -142,4 +143,25 @@ public interface PageService extends TenantLifecycleService {
     void updatePageContent(long pageId, byte[] content, String contentName, SPageUpdateBuilder pageUpdateBuilder)
             throws SObjectAlreadyExistsException, SObjectModificationException, SInvalidPageZipException,
             SInvalidPageTokenException;
+
+    /**
+     * Import a provided page to the database.
+     *
+     * @param pageZipName the content name of the page
+     * @param providedPageContent the content of the page as a byte array
+     * @param removable if the page is removable
+     * @param editable if the page is editable
+     * @param addIfMissing import the page if it is missing (skipped otherwise)
+     * @return the import status of the page depending on the import strategy
+     * @throws SBonitaException if an error occurred during the import
+     */
+    ImportStatus importProvidedPage(String pageZipName, final byte[] providedPageContent,
+            boolean removable, boolean editable, boolean addIfMissing) throws SBonitaException;
+
+    /**
+     * Configure the page service to import provided removable pages if there are missing.
+     *
+     * @param addRemovableIfMissing <code>true</code> to import provided removable pages
+     */
+    void setAddRemovableIfMissing(boolean addRemovableIfMissing);
 }

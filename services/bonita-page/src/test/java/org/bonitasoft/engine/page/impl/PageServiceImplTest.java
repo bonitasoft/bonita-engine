@@ -315,12 +315,10 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void init_should_import_all_provided_page_if_is_the_first_run() throws SBonitaException {
+    public void init_should_import_all_editable_provided_pages_if_is_the_first_run() throws SBonitaException {
         // given
         // resource in the classpath bonita-groovy-example-page.zip
         final Map<String, String> map = new HashMap<>();
-        map.put("custompage_htmlexample_editonly", "page");
-        map.put("custompage_htmlexample_final", "page");
         map.put(DEFAULT_LAYOUT_NAME, "layout");
         map.put("custompage_htmlexample", "page");
         map.put("custompage_groovyexample", "page");
@@ -330,33 +328,26 @@ public class PageServiceImplTest {
         doAnswer(invocation -> invocation.getArguments()[0]).when(pageServiceImpl)
                 .insertPage(pageArgumentCaptor.capture(), any());
 
+        // to simulate a first run:
+        pageServiceImpl.setAddRemovableIfMissing(true);
+
         // when
         pageServiceImpl.init();
 
         // then
         List<SPage> insertedPages = pageArgumentCaptor.getAllValues();
         assertThat(insertedPages)
-                .hasSize(8)
+                .hasSize(6)
                 .allSatisfy(insertedPage -> {
                     String name = insertedPage.getName();
                     assertThat(name).isIn(map.keySet());
                     assertThat(insertedPage.getContentType()).isEqualTo(map.get(name));
                     assertThat(insertedPage.getPageHash()).isEqualTo(getHashOfContent(name));
-                    if (insertedPage.getName().equals("custompage_htmlexample_editonly")) {
-                        assertThat(insertedPage.isEditable()).isTrue();
-                        assertThat(insertedPage.isProvided()).isTrue();
-                        assertThat(insertedPage.isRemovable()).isFalse();
-                    } else if (insertedPage.getName().equals("custompage_htmlexample_final")) {
-                        assertThat(insertedPage.isEditable()).isFalse();
-                        assertThat(insertedPage.isProvided()).isTrue();
-                        assertThat(insertedPage.isRemovable()).isFalse();
-                    } else {
-                        assertThat(insertedPage.isProvided()).isTrue();
-                        assertThat(insertedPage.isEditable()).isTrue();
-                        assertThat(insertedPage.isRemovable()).isTrue();
-                        assertThat(insertedPage.getContentType()).isEqualTo(map.get(name));
-                        assertThat(insertedPage.getPageHash()).isEqualTo(getHashOfContent(name));
-                    }
+                    assertThat(insertedPage.isProvided()).isTrue();
+                    assertThat(insertedPage.isEditable()).isTrue();
+                    assertThat(insertedPage.isRemovable()).isTrue();
+                    assertThat(insertedPage.getContentType()).isEqualTo(map.get(name));
+                    assertThat(insertedPage.getPageHash()).isEqualTo(getHashOfContent(name));
                 });
 
         verify(pageServiceImpl, never()).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
@@ -488,13 +479,7 @@ public class PageServiceImplTest {
 
     @Test
     public void init_should_not_insert_not_removable_provided_page_if_is_not_first_run() throws Exception {
-        ImportStatus importStatus = new ImportStatus("custompage_htmlexample_final");
-        importStatus.setStatus(ImportStatus.Status.SKIPPED);
-        doReturn(importStatus).when(pageServiceImpl).importProvidedPage(eq("bonita-html-page-example-final.zip"),
-                any(byte[].class), eq(false), eq(false), eq(true));
-        doReturn(importStatus).when(pageServiceImpl).importProvidedPage(eq("bonita-html-page-example-editonly.zip"),
-                any(byte[].class), eq(false), eq(true), eq(true));
-
+        // given
         final Map<String, String> removablePage = new HashMap<>();
         removablePage.put(DEFAULT_LAYOUT_NAME, "layout");
         removablePage.put("custompage_htmlexample", "page");
@@ -502,6 +487,9 @@ public class PageServiceImplTest {
         removablePage.put("custompage_home", "page");
         removablePage.put("custompage_tenantStatusBonita", "page");
         removablePage.put(DEFAULT_THEME_NAME, "theme");
+
+        // to simulate a subsequent run:
+        pageServiceImpl.setAddRemovableIfMissing(false);
 
         // when
         pageServiceImpl.init();
@@ -511,44 +499,15 @@ public class PageServiceImplTest {
                 any(byte[].class));
     }
 
-    @Test
-    public void init_should_not_insert_anything_if_exception_happened_on_import_final_page() throws Exception {
-        final Map<String, String> notImportedPages = new HashMap<>();
-        notImportedPages.put("bonita-default-layout.zip", "layout");
-        notImportedPages.put("bonita-html-page-example.zip", "page");
-        notImportedPages.put("bonita-groovy-page-example.zip", "page");
-        notImportedPages.put("bonita-home-page.zip", "page");
-        notImportedPages.put("page-tenant-status.zip", "page");
-        notImportedPages.put("bonita-html-page-example-editonly.zip", "theme");
-        notImportedPages.put("bonita-theme.zip", "theme");
-
-        doThrow(new SBonitaReadException("ouch")).when(pageServiceImpl)
-                .importProvidedPage(eq("bonita-html-page-example-final.zip"), any(byte[].class), eq(false), eq(false),
-                        eq(true));
-
-        pageServiceImpl.init();
-
-        verify(pageServiceImpl, never()).importProvidedPage(
-                argThat(pageZipName -> notImportedPages.keySet().contains(pageZipName)),
-                any(byte[].class), eq(true), eq(true), anyBoolean());
-        verify(pageServiceImpl, never()).importProvidedPage(
-                argThat(pageZipName -> notImportedPages.keySet().contains(pageZipName)),
-                any(byte[].class), eq(false), eq(true), anyBoolean());
-    }
-
     private String getHashOfContent(String name) {
         final Map<String, String> map = new HashMap<>();
         map.put(DEFAULT_LAYOUT_NAME, "/org/bonitasoft/web/page/bonita-default-layout.zip");
         map.put("custompage_htmlexample", "/org/bonitasoft/web/page/bonita-html-page-example.zip");
-        map.put("custompage_htmlexample_editonly",
-                "/org/bonitasoft/web/page/editonly/bonita-html-page-example-editonly.zip");
-        map.put("custompage_htmlexample_final", "/org/bonitasoft/web/page/final/bonita-html-page-example-final.zip");
         map.put("custompage_groovyexample", "/org/bonitasoft/web/page/bonita-groovy-page-example.zip");
         map.put("custompage_home", "/org/bonitasoft/web/page/bonita-home-page.zip");
         map.put("custompage_tenantStatusBonita", "/org/bonitasoft/web/page/page-tenant-status.zip");
         map.put(DEFAULT_THEME_NAME, "/org/bonitasoft/web/page/bonita-theme.zip");
-        try {
-            InputStream resourceAsStream = this.getClass().getResourceAsStream(map.get(name));
+        try (InputStream resourceAsStream = this.getClass().getResourceAsStream(map.get(name))) {
             if (resourceAsStream == null) {
                 throw new AssertionError("No content found for page " + name + " in classpath: " + map.get(name));
             }
@@ -556,54 +515,6 @@ public class PageServiceImplTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Test
-    public void init_should_update_final_page_if_is_different() throws SBonitaException {
-        // given
-        // resource in the classpath provided-page.properties and provided-page.zip
-        final SPage currentGroovyPage = new SPage("custompage_htmlexample_final", "example", "example",
-                System.currentTimeMillis(), -1, true,
-                System.currentTimeMillis(),
-                -1,
-                CONTENT_NAME);
-        currentGroovyPage.setId(12L);
-        currentGroovyPage.setRemovable(false);
-        currentGroovyPage.setEditable(false);
-
-        doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_htmlexample_final");
-        doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
-
-        // when
-        pageServiceImpl.init();
-
-        // then
-        verify(pageServiceImpl).updatePageContent(eq(12L), any(byte[].class),
-                eq("bonita-html-page-example-final.zip"));
-    }
-
-    @Test
-    public void init_should_update_edit_only_page_if_is_different() throws SBonitaException {
-        // given
-        // resource in the classpath provided-page.properties and provided-page.zip
-        final SPage currentGroovyPage = new SPage("custompage_htmlexample_editonly", "example", "example",
-                System.currentTimeMillis(), -1, true,
-                System.currentTimeMillis(),
-                -1,
-                CONTENT_NAME);
-        currentGroovyPage.setId(12L);
-        currentGroovyPage.setRemovable(false);
-        currentGroovyPage.setEditable(true);
-
-        doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_htmlexample_editonly");
-        doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
-
-        // when
-        pageServiceImpl.init();
-
-        // then
-        verify(pageServiceImpl).updatePageContent(eq(12L), any(byte[].class),
-                eq("bonita-html-page-example-editonly.zip"));
     }
 
     @Test
@@ -695,31 +606,6 @@ public class PageServiceImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void should_getPageContent_throw_not_found() throws SBonitaException {
         pageServiceImpl.getPageContent(12);
-    }
-
-    @Test
-    public void init_should_do_nothing_if_non_editable_non_removable_already_here_and_the_same()
-            throws SBonitaException {
-        final SPage currentHomePage = new SPage("custompage_htmlexample_editonly", "example", "example",
-                System.currentTimeMillis(), -1,
-                true,
-                System.currentTimeMillis(),
-                -1,
-                CONTENT_NAME);
-        currentHomePage.setId(14);
-        currentHomePage.setEditable(false);
-        currentHomePage.setRemovable(false);
-        currentHomePage.setPageHash(getHashOfContent("custompage_htmlexample_editonly"));
-        doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_htmlexample_editonly");
-
-        // when
-        pageServiceImpl.init();
-        // then
-        verify(pageServiceImpl, never()).insertPage(
-                argThat(sPage -> sPage.getName().equals("custompage_htmlexample_editonly")),
-                any(byte[].class));
-        verify(pageServiceImpl, never()).updatePage(eq(14), any(EntityUpdateDescriptor.class));
-        verify(pageServiceImpl, never()).updatePageContent(eq(14), any(byte[].class), anyString());
     }
 
     @Test
