@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.authorization.PermissionService;
@@ -93,7 +94,7 @@ import org.springframework.util.DigestUtils;
 @Slf4j
 @Service("pageService")
 //must be initialized before ApplicationImporter
-@Order(4)
+@Order(5)
 public class PageServiceImpl implements PageService {
 
     private static final String QUERY_GET_PAGE_BY_NAME = "getPageByName";
@@ -128,12 +129,6 @@ public class PageServiceImpl implements PageService {
 
     private static final String EDITABLE_REMOVABLE_RESOURCES_PATH = "org/bonitasoft/web/page";
 
-    private static final String NON_EDITABLE_NON_REMOVABLE_RESOURCES_PATH = "org/bonitasoft/web/page/final";
-
-    private static final String EDITABLE_NON_REMOVABLE_RESOURCES_PATH = "org/bonitasoft/web/page/editonly";
-
-    private static final String TENANT_STATUS_PAGE_NAME = "custompage_tenantStatusBonita";
-
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -153,6 +148,10 @@ public class PageServiceImpl implements PageService {
 
     // Used only in tests
     private boolean initialized = false;
+
+    /** Boolean used to import provided removable pages if there are missing (mostly when it is a first install) */
+    @Setter
+    private boolean addRemovableIfMissing;
 
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final QueriableLoggerService queriableLoggerService, ReadSessionAccessor sessionAccessor,
@@ -311,7 +310,7 @@ public class PageServiceImpl implements PageService {
         return Objects.equals(SContentType.API_EXTENSION, pageProperties.get(PageService.PROPERTIES_CONTENT_TYPE));
     }
 
-    SPage insertPage(final SPage page, final byte[] content)
+    public SPage insertPage(final SPage page, final byte[] content)
             throws SObjectAlreadyExistsException, SObjectCreationException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED,
                 "Adding a new page with name " + page.getName());
@@ -639,18 +638,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public void init() throws SBonitaException {
         try {
-            List<ImportStatus> importFinalPagesStatuses = importProvidedNonRemovableNonEditablePagesFromClasspath();
-
-            List<ImportStatus> importStatuses = new ArrayList<>(importFinalPagesStatuses);
-            importStatuses.addAll(importProvidedNonRemovableEditablePagesFromClasspath());
-
-            boolean addRemovableIfMissing = importFinalPagesStatuses.stream().map(ImportStatus::getStatus)
-                    .allMatch(importStatus -> importStatus == ImportStatus.Status.ADDED);
-            if (addRemovableIfMissing) {
-                log.info(
-                        "Detected a first run (a tenant creation or an installation from scratch), importing provided removable pages");
-            }
-            importStatuses.addAll(importProvidedRemovablePagesFromClasspath(addRemovableIfMissing));
+            List<ImportStatus> importStatuses = importProvidedRemovablePages();
 
             List<String> createdOrReplaced = importStatuses.stream()
                     .filter(importStatus -> importStatus.getStatus() != ImportStatus.Status.SKIPPED)
@@ -669,33 +657,22 @@ public class PageServiceImpl implements PageService {
         initialized = true;
     }
 
-    private List<ImportStatus> importProvidedNonRemovableNonEditablePagesFromClasspath()
-            throws BonitaException, IOException {
-        return importProvidedPagesFromResourcePattern(true, false, false, NON_EDITABLE_NON_REMOVABLE_RESOURCES_PATH);
-    }
-
-    private List<ImportStatus> importProvidedNonRemovableEditablePagesFromClasspath()
+    private List<ImportStatus> importProvidedRemovablePages()
             throws IOException, BonitaException {
-        return importProvidedPagesFromResourcePattern(true, false, true, EDITABLE_NON_REMOVABLE_RESOURCES_PATH);
-    }
-
-    private List<ImportStatus> importProvidedRemovablePagesFromClasspath(boolean addIfMissing)
-            throws IOException, BonitaException {
-        return importProvidedPagesFromResourcePattern(addIfMissing, true, true, EDITABLE_REMOVABLE_RESOURCES_PATH);
-    }
-
-    private List<ImportStatus> importProvidedPagesFromResourcePattern(boolean addIfMissing, boolean removable,
-            boolean editable, String resourcesPath) throws IOException, BonitaException {
+        if (addRemovableIfMissing) {
+            log.info("Detected a first run (a tenant creation or an installation from scratch), "
+                    + "importing provided removable pages");
+        }
         List<ImportStatus> importStatuses = new ArrayList<>();
-        Resource[] resources = cpResourceResolver
-                .getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + resourcesPath + "/*.zip");
+        Resource[] resources = cpResourceResolver.getResources(
+                ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + EDITABLE_REMOVABLE_RESOURCES_PATH + "/*.zip");
         for (Resource resource : resources) {
             if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
                 String resourceName = resource.getFilename();
                 try (InputStream resourceAsStream = resource.getInputStream()) {
                     log.debug("Found provided page '{}' in classpath", resourceName);
                     final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
-                    importStatuses.add(importProvidedPage(resourceName, content, removable, editable, addIfMissing));
+                    importStatuses.add(importProvidedPage(resourceName, content, true, true, addRemovableIfMissing));
                 } catch (IOException | SBonitaException e) {
                     throw new BonitaException("Unable to import the page " + resourceName, e);
                 }
@@ -707,7 +684,8 @@ public class PageServiceImpl implements PageService {
         return importStatuses;
     }
 
-    ImportStatus importProvidedPage(String pageZipName, final byte[] providedPageContent,
+    @Override
+    public ImportStatus importProvidedPage(String pageZipName, final byte[] providedPageContent,
             boolean removable, boolean editable, boolean addIfMissing) throws SBonitaException {
 
         SPage page = buildPage(providedPageContent, pageZipName, -1, true, removable, editable);
