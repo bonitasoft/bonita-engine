@@ -22,7 +22,8 @@ import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.anyMap;
+
+import java.util.regex.Pattern;
 
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
@@ -89,7 +90,8 @@ public class ContractConstraintsValidatorTest {
 
         //then
         String[] log = systemOutRule.getLog().split("\n");
-        assertThat(log).anyMatch(l -> l.matches(".*DEBUG.*Evaluating constraint.*"));
+        // String.matches() has a different behaviour on windows so use Pattern and Matcher instead
+        assertThat(log).anyMatch(l -> Pattern.compile(".*DEBUG.*Evaluating constraint.*").matcher(l).find());
         assertThat(systemOutRule.getLog()).doesNotContain("WARN");
     }
 
