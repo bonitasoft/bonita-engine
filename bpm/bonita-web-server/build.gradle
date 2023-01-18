@@ -26,13 +26,6 @@ dependencies {
         exclude(group: "org.restlet.jee", module: "org.restlet")
     }
     implementation "org.restlet.jse:org.restlet.ext.jackson:${Deps.restletVersion}"
-    implementation "com.fasterxml.jackson.core:jackson-databind:${Deps.restletVersion}"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${Deps.restletVersion}"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:${Deps.restletVersion}"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${Deps.restletVersion}"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${Deps.restletVersion}"
-    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${Deps.restletVersion}"
-    implementation "com.fasterxml.jackson.module:jackson-module-jsonSchema:${Deps.restletVersion}"
     implementation "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
     implementation "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
     implementation "org.springframework:spring-web:${Deps.springVersion}"
