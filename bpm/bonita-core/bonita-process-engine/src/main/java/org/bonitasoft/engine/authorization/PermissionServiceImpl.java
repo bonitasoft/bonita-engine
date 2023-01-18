@@ -256,10 +256,8 @@ public class PermissionServiceImpl implements PermissionService {
         for (final String pageRestResource : pageRestResources) {
             final Set<String> resourcePermissions = resourcesPermissionsMapping.getPropertyAsSet(pageRestResource);
             if (resourcePermissions.isEmpty()) {
-                if (log.isWarnEnabled()) {
-                    log.warn("Error while getting resources permissions. Unknown resource: " + pageRestResource
-                            + " defined in page.properties");
-                }
+                log.warn("Error while getting resources permissions. Unknown resource: {} defined in page.properties",
+                        pageRestResource);
             }
             permissions.addAll(resourcePermissions);
         }
@@ -270,9 +268,8 @@ public class PermissionServiceImpl implements PermissionService {
             final Properties pageProperties) {
         final Map<String, String> permissionsMapping = getApiExtensionResourcesPermissionsMapping(
                 pageProperties);
-        for (final String key : permissionsMapping.keySet()) {
-            resourcesPermissionsMapping.setInternalProperty(key, permissionsMapping.get(key));
-        }
+        permissionsMapping.keySet()
+                .forEach(key -> resourcesPermissionsMapping.setInternalProperty(key, permissionsMapping.get(key)));
     }
 
     private Map<String, String> getApiExtensionResourcesPermissionsMapping(Properties pageProperties) {
@@ -284,8 +281,12 @@ public class PermissionServiceImpl implements PermissionService {
             for (final String apiExtension : apiExtensions) {
                 final String method = propertiesWithSet
                         .getProperty(String.format(PROPERTY_METHOD_MASK, apiExtension.trim()));
-                final String pathTemplate = propertiesWithSet
+                String pathTemplate = propertiesWithSet
                         .getProperty(String.format(PROPERTY_PATH_TEMPLATE_MASK, apiExtension.trim()));
+                // Remove '/' prefix if declared in page.properties
+                if (pathTemplate != null && pathTemplate.startsWith("/")) {
+                    pathTemplate = pathTemplate.substring(1);
+                }
                 final String permissions = propertiesWithSet
                         .getProperty(String.format(PROPERTY_PERMISSIONS_MASK, apiExtension.trim()));
                 permissionsMap.put(String.format(RESOURCE_PERMISSION_KEY_MASK, method, pathTemplate),

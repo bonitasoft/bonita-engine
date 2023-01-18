@@ -459,6 +459,23 @@ public class PermissionServiceImplTest {
     }
 
     @Test
+    public void should_add_api_extension_permissions_for_absolute_pathTemplate() {
+        //given
+        Properties properties = new Properties();
+        properties.put(PermissionServiceImpl.PROPERTY_CONTENT_TYPE, ContentType.API_EXTENSION);
+        properties.put(PermissionServiceImpl.PROPERTY_API_EXTENSIONS, "restResource1,restResource2");
+        properties.put("restResource1.method", "GET");
+        properties.put("restResource1.pathTemplate", "/restApiGet");
+        properties.put("restResource1.permissions", "permission1");
+
+        //when
+        permissionService.addRestApiExtensionPermissions(resourcesPermissionsMapping, properties);
+
+        //then
+        verify(resourcesPermissionsMapping).setInternalProperty("GET|extension/restApiGet", "[permission1]");
+    }
+
+    @Test
     public void should_not_add_non_api_extension_permissions_to_resource_permission_mapping() {
         //given
         Properties properties = new Properties();
