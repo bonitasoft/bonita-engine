@@ -105,6 +105,31 @@ public class ApiExtensionPageServiceListenerImplTest {
     }
 
     @Test
+    public void pageInserted_should_add_api_resources_with_absolute_path() throws Exception {
+        final long pageId = 1983L;
+        final SPage page = buildPage(pageId);
+        final byte[] content = new byte[] { 1, 0, 0 };
+        final Properties properties = new Properties();
+        properties.setProperty("apiExtensions", "employee, address");
+        properties.setProperty("employee.method", "GET");
+        properties.setProperty("employee.pathTemplate", "employees");
+        properties.setProperty("employee.className", "com.company.Index");
+        properties.setProperty("employee.permissions", "myPermission");
+        properties.setProperty("address.method", "GET");
+        properties.setProperty("address.pathTemplate", "/employees/{employeeId}/address");
+        properties.setProperty("address.className", "com.company.Index1");
+        properties.setProperty("address.permissions", "myPermission");
+        when(helper.loadPageProperties(content)).thenReturn(properties);
+
+        listener.pageInserted(page, content);
+
+        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String> emptyList());
+        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId,
+                Collections.<String> emptyList());
+        verifyNoMoreInteractions(pageMappingService);
+    }
+
+    @Test
     public void pageInserted_should_add_api_resources_in_legacy_mode() throws Exception {
         final long pageId = 1983L;
         final SPage page = buildPage(pageId);
