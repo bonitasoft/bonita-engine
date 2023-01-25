@@ -102,8 +102,8 @@ public class ResourceExtensionResolver {
         for (final String apiExtension : apiExtensions) {
             final String method = (String) properties.get(String.format("%s.method", apiExtension.trim()));
             String pathTemplate = (String) properties.get(String.format("%s.pathTemplate", apiExtension.trim()));
-            if(pathTemplate != null && pathTemplate.startsWith("/")) {
-               pathTemplate = pathTemplate.substring(1);
+            if (pathTemplate != null && pathTemplate.startsWith("/")) {
+                pathTemplate = pathTemplate.substring(1);
             }
             final String className = (String) properties.get(String.format("%s.className", apiExtension.trim()));
             final String classFileName = (String) properties
