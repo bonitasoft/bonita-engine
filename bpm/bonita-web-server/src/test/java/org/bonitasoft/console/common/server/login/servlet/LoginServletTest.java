@@ -79,63 +79,49 @@ public class LoginServletTest {
 
     @Test
     public void testPasswordIsDroppedWhenParameterIsLast() throws Exception {
-        final LoginServlet servlet = new LoginServlet();
-
-        final String cleanQueryString = servlet.dropPassword("?username=walter.bates&password=bpm");
+        final String cleanQueryString = LoginServlet.dropPassword("?username=walter.bates&password=bpm");
 
         assertThat(cleanQueryString, is("?username=walter.bates"));
     }
 
     @Test
     public void testPasswordIsDroppedWhenParameterIsBeforeHash() throws Exception {
-        final LoginServlet servlet = new LoginServlet();
-
-        final String cleanQueryString = servlet.dropPassword("?username=walter.bates&password=bpm#hash");
+        final String cleanQueryString = LoginServlet.dropPassword("?username=walter.bates&password=bpm#hash");
 
         assertThat(cleanQueryString, is("?username=walter.bates#hash"));
     }
 
     @Test
     public void testUrlIsDroppedWhenParameterIsFirstAndBeforeHash() throws Exception {
-        final LoginServlet servlet = new LoginServlet();
-
-        final String cleanQueryString = servlet.dropPassword("?username=walter.bates&password=bpm#hash");
+        final String cleanQueryString = LoginServlet.dropPassword("?username=walter.bates&password=bpm#hash");
 
         assertThat(cleanQueryString, is("?username=walter.bates#hash"));
     }
 
     @Test
     public void testUrlStayTheSameIfNoPasswordArePresent() throws Exception {
-        final LoginServlet servlet = new LoginServlet();
-
-        final String cleanQueryString = servlet.dropPassword("?param=value#dhash");
+        final String cleanQueryString = LoginServlet.dropPassword("?param=value#dhash");
 
         assertThat(cleanQueryString, is("?param=value#dhash"));
     }
 
     @Test
     public void testPasswordIsDroppedEvenIfQueryMarkUpIsntThere() throws Exception {
-        final LoginServlet servlet = new LoginServlet();
-
-        final String cleanQueryString = servlet.dropPassword("password=bpm#dhash1&dhash2");
+        final String cleanQueryString = LoginServlet.dropPassword("password=bpm#dhash1&dhash2");
 
         assertThat(cleanQueryString, is("#dhash1&dhash2"));
     }
 
     @Test
     public void testUrlStayEmptyIfParameterIsEmpty() throws Exception {
-        final LoginServlet servlet = new LoginServlet();
-
-        final String cleanQueryString = servlet.dropPassword("");
+        final String cleanQueryString = LoginServlet.dropPassword("");
 
         assertThat(cleanQueryString, is(""));
     }
 
     @Test
     public void testDropPasswordOnRealUrl() throws Exception {
-        final LoginServlet servlet = new LoginServlet();
-
-        final String cleanUrl = servlet
+        final String cleanUrl = LoginServlet
                 .dropPassword(
                         "?username=walter.bates&password=bpm&redirectUrl=http%3A%2F%2Flocalhost%3A8080%2Fbonita%2Fapps%2FappDirectoryBonita%3Flocale%3Den%23form%3DPool-\n"
                                 +
@@ -151,7 +137,7 @@ public class LoginServletTest {
     public void testDoGetShouldDropPassowrdWhenLoggingQueryString() throws Exception {
         //given
         final LoginServlet servlet = spy(new LoginServlet());
-        doReturn("query string").when(req).getQueryString();
+        doReturn("password=123&username=john").when(req).getQueryString();
         doNothing().when(servlet).doPost(req, resp);
 
         systemOutRule.clearLog();
@@ -159,8 +145,10 @@ public class LoginServletTest {
         servlet.doGet(req, resp);
 
         //then
-        assertThat(systemOutRule.getLog()).containsPattern(".*TRACE.*.query string : " + req.getQueryString());
-        verify(servlet).dropPassword(anyString());
+        assertThat(systemOutRule.getLog())
+                .containsPattern(".*TRACE.*.username=john")
+                .doesNotContain("password")
+                .doesNotContain("123");
     }
 
     @Test

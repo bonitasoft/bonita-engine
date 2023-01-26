@@ -75,8 +75,12 @@ public class LoginServlet extends HttpServlet {
 
     /**
      * Necessary studio integration (username and password are passed in the URL in development mode)
+     *
+     * @deprecated
+     *             use {@link #doPost(HttpServletRequest, HttpServletResponse)} instead
      */
     @Override
+    @Deprecated(since = "8.0", forRemoval = true)
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         if (LOGGER.isTraceEnabled()) {
@@ -224,7 +228,7 @@ public class LoginServlet extends HttpServlet {
         return new LoginManager();
     }
 
-    public String dropPassword(final String content) {
+    static String dropPassword(final String content) {
         String tmp = content;
         if (content != null && content.contains("password")) {
             tmp = tmp.replaceAll("[&]?password=([^&|#]*)?", "");
