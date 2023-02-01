@@ -14,27 +14,14 @@
 package org.bonitasoft.engine.business.application.importer;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.business.application.xml.ApplicationNode;
-import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.commons.ExceptionUtils;
-import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
-import org.bonitasoft.engine.session.SessionService;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
@@ -46,10 +33,8 @@ import org.springframework.stereotype.Component;
  * </ul>
  */
 @Component
-@Order(4)
 @Slf4j
-@RequiredArgsConstructor
-public class MandatoryLivingApplicationImporter implements TenantLifecycleService {
+public class MandatoryLivingApplicationImporter extends LivingApplicationImporter {
 
     private static final String NON_EDITABLE_NON_REMOVABLE_PAGES_PATH = "org/bonitasoft/web/page/final";
 
@@ -57,22 +42,26 @@ public class MandatoryLivingApplicationImporter implements TenantLifecycleServic
 
     private static final String PROVIDED_FINAL_APPLICATIONS_PATH = "org/bonitasoft/web/application/final";
 
-    private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
-            MandatoryLivingApplicationImporter.class.getClassLoader());
+    private final DefaultLivingApplicationImporter defaultLivingApplicationImporter;
 
-    private final PageService pageService;
-
-    private final ApplicationImporter applicationImporter;
+    public MandatoryLivingApplicationImporter(final PageService pageService,
+            final ApplicationImporter applicationImporter,
+            final DefaultLivingApplicationImporter defaultLivingApplicationImporter) {
+        super(pageService, applicationImporter);
+        this.defaultLivingApplicationImporter = defaultLivingApplicationImporter;
+    }
 
     @Override
     public void init() throws SBonitaException {
         // Step 1: import mandatory pages
         log.info("Importing Bonita mandatory pages");
         importMandatoryPages();
+        log.info("Import of Bonita mandatory pages completed");
 
         // Step 2: import mandatory living apps
         log.info("Importing Bonita mandatory applications");
         importMandatoryApplications();
+        log.info("Import of Bonita mandatory applications completed");
     }
 
     private void importMandatoryPages() {
@@ -81,117 +70,62 @@ public class MandatoryLivingApplicationImporter implements TenantLifecycleServic
 
             boolean firstRun = importStatuses.stream().map(ImportStatus::getStatus)
                     .allMatch(importStatus -> importStatus == ImportStatus.Status.ADDED);
-            pageService.setAddRemovableIfMissing(firstRun);
+            defaultLivingApplicationImporter.setAddRemovablePagesIfMissing(firstRun);
 
             importStatuses.addAll(importProvidedNonRemovableEditablePagesFromClasspath());
 
-            List<String> createdOrReplaced = importStatuses.stream()
-                    .filter(importStatus -> importStatus.getStatus() != ImportStatus.Status.SKIPPED)
-                    .map(importStatus -> importStatus.getName() + " " + importStatus.getStatus())
-                    .collect(Collectors.toList());
+            List<String> createdOrReplaced = getNonSkippedImportedResources(importStatuses);
             if (createdOrReplaced.isEmpty()) {
-                log.info("No page updated");
+                log.info("No mandatory pages updated");
             } else {
-                log.info("Page updated or created : {}", createdOrReplaced);
+                log.info("Mandatory pages updated or created: {}", createdOrReplaced);
             }
         } catch (BonitaException | IOException e) {
-            log.error(
-                    ExceptionUtils.printLightWeightStacktrace(e));
+            log.error(ExceptionUtils.printLightWeightStacktrace(e));
             log.debug("Stacktrace of the import issue is:", e);
         }
     }
 
     private List<ImportStatus> importProvidedNonRemovableNonEditablePagesFromClasspath()
             throws BonitaException, IOException {
-        return importProvidedPagesFromResourcePattern(false, NON_EDITABLE_NON_REMOVABLE_PAGES_PATH);
+        // import the provided pages as non-removable, non-editable and add them if they are missing
+        return importProvidedPagesFromClasspath(
+                ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/"
+                        + NON_EDITABLE_NON_REMOVABLE_PAGES_PATH + "/*.zip",
+                false, false, true);
     }
 
     private List<ImportStatus> importProvidedNonRemovableEditablePagesFromClasspath()
             throws IOException, BonitaException {
-        return importProvidedPagesFromResourcePattern(true, EDITABLE_NON_REMOVABLE_PAGES_PATH);
-    }
-
-    private List<ImportStatus> importProvidedPagesFromResourcePattern(boolean editable, String resourcesPath)
-            throws IOException, BonitaException {
-        List<ImportStatus> importStatuses = new ArrayList<>();
-        Resource[] resources = cpResourceResolver
-                .getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + resourcesPath + "/*.zip");
-        for (Resource resource : resources) {
-            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                String resourceName = resource.getFilename();
-                try (InputStream resourceAsStream = resource.getInputStream()) {
-                    log.debug("Found provided page '{}' in classpath", resourceName);
-                    final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
-                    importStatuses.add(pageService.importProvidedPage(resourceName, content, false, editable, true));
-                } catch (IOException | SBonitaException e) {
-                    throw new BonitaException("Unable to import the page " + resourceName, e);
-                }
-            } else {
-                throw new BonitaException(
-                        "A resource " + resource.getDescription() + " could not be read when loading default pages");
-            }
-        }
-        return importStatuses;
+        // import the provided pages as non-removable, editable and add them if they are missing
+        return importProvidedPagesFromClasspath(
+                ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/"
+                        + EDITABLE_NON_REMOVABLE_PAGES_PATH + "/*.zip",
+                false, true, true);
     }
 
     private void importMandatoryApplications() {
         try {
-            List<ImportStatus> importStatuses = importProvidedApplicationsFromClasspath();
+            // import the provided applications as non-editable and add them if they are missing
+            List<ImportStatus> importStatuses = importProvidedApplicationsFromClasspath(
+                    ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/"
+                            + PROVIDED_FINAL_APPLICATIONS_PATH + "/*.zip",
+                    false, true);
 
-            boolean addIfMissing = importStatuses.stream().map(ImportStatus::getStatus)
+            boolean firstRun = importStatuses.stream().map(ImportStatus::getStatus)
                     .allMatch(status -> status != ImportStatus.Status.SKIPPED);
-            applicationImporter.setAddIfMissing(addIfMissing);
+            defaultLivingApplicationImporter.setAddEditableApplicationsIfMissing(firstRun);
 
-            List<String> createdOrReplaced = importStatuses.stream()
-                    .filter(importStatus -> importStatus.getStatus() != ImportStatus.Status.SKIPPED)
-                    .map(importStatus -> importStatus.getName() + " " + importStatus.getStatus())
-                    .collect(Collectors.toList());
+            List<String> createdOrReplaced = getNonSkippedImportedResources(importStatuses);
             if (createdOrReplaced.isEmpty()) {
-                log.info("No applications updated");
+                log.info("No mandatory applications updated");
             } else {
-                log.info("Application updated or created : {}", createdOrReplaced);
+                log.info("Mandatory applications updated or created: {}", createdOrReplaced);
             }
         } catch (Exception e) {
-            log.error("Cannot load provided applications at startup. Root cause: {}",
+            log.error("Cannot load provided mandatory applications at startup. Root cause: {}",
                     ExceptionUtils.printRootCauseOnly(e));
-            log.debug("Full stack : ", e);
+            log.debug("Full stack:", e);
         }
     }
-
-    private List<ImportStatus> importProvidedApplicationsFromClasspath()
-            throws IOException, ImportException {
-        List<ImportStatus> importStatuses = new ArrayList<>();
-        Resource[] resources = cpResourceResolver.getResources(
-                ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + PROVIDED_FINAL_APPLICATIONS_PATH + "/*.zip");
-        for (Resource resource : resources) {
-            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                String resourceName = resource.getFilename();
-                log.debug("Found provided applications '{}' in classpath", resourceName);
-                try (InputStream resourceAsStream = resource.getInputStream()) {
-                    ApplicationZipContent zipContent = ApplicationZipContent.getApplicationZipContent(resourceName,
-                            resourceAsStream);
-                    importStatuses.addAll(importDefaultApplications(zipContent.getXmlRaw(), zipContent.getIconRaw(),
-                            zipContent.getPngName()));
-                } catch (IOException | ImportException | AlreadyExistsException e) {
-                    throw new ImportException(e);
-                }
-            } else {
-                throw new ImportException(
-                        "A resource " + resource + "could not be read when loading default applications");
-            }
-        }
-        return importStatuses;
-    }
-
-    private List<ImportStatus> importDefaultApplications(final byte[] xmlContent, byte[] iconContent,
-            String iconMimeType) throws ImportException, AlreadyExistsException {
-        List<ImportStatus> importStatuses = new ArrayList<>();
-        ApplicationNodeContainer applicationNodeContainer = applicationImporter.getApplicationNodeContainer(xmlContent);
-        for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
-            importStatuses.add(applicationImporter.importApplication(applicationNode, false, SessionService.SYSTEM_ID,
-                    iconContent, iconMimeType, true, new UpdateNewerNonEditableApplicationStrategy()));
-        }
-        return importStatuses;
-    }
-
 }

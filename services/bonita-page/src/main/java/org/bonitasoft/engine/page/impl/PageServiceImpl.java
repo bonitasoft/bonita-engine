@@ -15,8 +15,6 @@ package org.bonitasoft.engine.page.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,22 +22,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.ExceptionUtils;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.page.AbstractSPage;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.PageServiceListener;
@@ -80,10 +72,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -93,8 +81,6 @@ import org.springframework.util.DigestUtils;
  */
 @Slf4j
 @Service("pageService")
-//must be initialized before ApplicationImporter
-@Order(5)
 public class PageServiceImpl implements PageService {
 
     private static final String QUERY_GET_PAGE_BY_NAME = "getPageByName";
@@ -127,8 +113,6 @@ public class PageServiceImpl implements PageService {
 
     private static final String THEME_CSS = "resources/theme.css";
 
-    private static final String EDITABLE_REMOVABLE_RESOURCES_PATH = "org/bonitasoft/web/page";
-
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -139,19 +123,9 @@ public class PageServiceImpl implements PageService {
     private final SessionService sessionService;
     private final PermissionService permissionService;
 
-    private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
-            PageServiceImpl.class.getClassLoader());
-
     private final SPageContentHelper helper;
 
     private List<PageServiceListener> pageServiceListeners;
-
-    // Used only in tests
-    private boolean initialized = false;
-
-    /** Boolean used to import provided removable pages if there are missing (mostly when it is a first install) */
-    @Setter
-    private boolean addRemovableIfMissing;
 
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final QueriableLoggerService queriableLoggerService, ReadSessionAccessor sessionAccessor,
@@ -217,7 +191,8 @@ public class PageServiceImpl implements PageService {
                         queryOptions));
     }
 
-    private SPage buildPage(final byte[] content, final String contentName, final long userId, final boolean provided,
+    @Override
+    public SPage buildPage(final byte[] content, final String contentName, final long userId, final boolean provided,
             boolean removable, boolean editable) throws SInvalidPageZipException,
             SInvalidPageTokenException {
         final Properties pageProperties = readPageZip(content, provided);
@@ -310,6 +285,7 @@ public class PageServiceImpl implements PageService {
         return Objects.equals(SContentType.API_EXTENSION, pageProperties.get(PageService.PROPERTIES_CONTENT_TYPE));
     }
 
+    @Override
     public SPage insertPage(final SPage page, final byte[] content)
             throws SObjectAlreadyExistsException, SObjectCreationException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED,
@@ -339,7 +315,8 @@ public class PageServiceImpl implements PageService {
 
     }
 
-    private SPage checkIfPageAlreadyExists(final SPage page) throws SBonitaReadException {
+    @Override
+    public SPage checkIfPageAlreadyExists(final SPage page) throws SBonitaReadException {
         SPage existingPage;
         if (page.getProcessDefinitionId() > 0) {
             existingPage = getPageByNameAndProcessDefinitionId(page.getName(), page.getProcessDefinitionId());
@@ -633,92 +610,6 @@ public class PageServiceImpl implements PageService {
 
     Properties getPreviousPageProperties(byte[] content) throws IOException, SInvalidPageZipMissingPropertiesException {
         return helper.loadPageProperties(content);
-    }
-
-    @Override
-    public void init() throws SBonitaException {
-        try {
-            List<ImportStatus> importStatuses = importProvidedRemovablePages();
-
-            List<String> createdOrReplaced = importStatuses.stream()
-                    .filter(importStatus -> importStatus.getStatus() != ImportStatus.Status.SKIPPED)
-                    .map(importStatus -> importStatus.getName() + " " + importStatus.getStatus())
-                    .collect(Collectors.toList());
-            if (createdOrReplaced.isEmpty()) {
-                log.info("No page updated");
-            } else {
-                log.info("Page updated or created : {}", createdOrReplaced);
-            }
-        } catch (BonitaException | IOException e) {
-            log.error(
-                    ExceptionUtils.printLightWeightStacktrace(e));
-            log.debug("Stacktrace of the import issue is:", e);
-        }
-        initialized = true;
-    }
-
-    private List<ImportStatus> importProvidedRemovablePages()
-            throws IOException, BonitaException {
-        if (addRemovableIfMissing) {
-            log.info("Detected a first run (a tenant creation or an installation from scratch), "
-                    + "importing provided removable pages");
-        }
-        List<ImportStatus> importStatuses = new ArrayList<>();
-        Resource[] resources = cpResourceResolver.getResources(
-                ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + EDITABLE_REMOVABLE_RESOURCES_PATH + "/*.zip");
-        for (Resource resource : resources) {
-            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                String resourceName = resource.getFilename();
-                try (InputStream resourceAsStream = resource.getInputStream()) {
-                    log.debug("Found provided page '{}' in classpath", resourceName);
-                    final byte[] content = org.apache.commons.io.IOUtils.toByteArray(resourceAsStream);
-                    importStatuses.add(importProvidedPage(resourceName, content, true, true, addRemovableIfMissing));
-                } catch (IOException | SBonitaException e) {
-                    throw new BonitaException("Unable to import the page " + resourceName, e);
-                }
-            } else {
-                throw new BonitaException(
-                        "A resource " + resource.getDescription() + " could not be read when loading default pages");
-            }
-        }
-        return importStatuses;
-    }
-
-    @Override
-    public ImportStatus importProvidedPage(String pageZipName, final byte[] providedPageContent,
-            boolean removable, boolean editable, boolean addIfMissing) throws SBonitaException {
-
-        SPage page = buildPage(providedPageContent, pageZipName, -1, true, removable, editable);
-        ImportStatus importStatus = new ImportStatus(page.getName());
-        SPage sPageInDb = checkIfPageAlreadyExists(page);
-        if (sPageInDb == null && addIfMissing) {
-            log.debug("Provided page {} does not exist yet, importing it.", page.getName());
-            page.setPageHash(DigestUtils.md5DigestAsHex(providedPageContent));
-            insertPage(page, providedPageContent);
-        } else if (sPageInDb == null) {
-            log.debug("Provided page {} has been deleted by the user, and will not be imported", page.getName());
-            importStatus.setStatus(ImportStatus.Status.SKIPPED);
-        } else if (sPageInDb.isProvided()) {
-            String md5Sum = DigestUtils.md5DigestAsHex(providedPageContent);
-            if (Objects.equals(sPageInDb.getPageHash(), md5Sum)) {
-                log.debug("Provided page exists and is up to date, nothing to do");
-                importStatus.setStatus(ImportStatus.Status.SKIPPED);
-            } else {
-                log.info("Provided page {} exists but the content is not up to date, updating it.", page.getName());
-                updatePageContent(sPageInDb.getId(), providedPageContent, pageZipName);
-                importStatus.setStatus(ImportStatus.Status.REPLACED);
-            }
-        } else {
-            log.debug("Page {} was updated by the user, and will not be updated", page.getName());
-            importStatus.setStatus(ImportStatus.Status.SKIPPED);
-        }
-        return importStatus;
-    }
-
-    @Override
-    public boolean initialized() {
-        // Used only in tests
-        return initialized;
     }
 
     @Autowired
