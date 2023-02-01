@@ -399,38 +399,4 @@ public class ApplicationImporterTest {
 
         //then exception
     }
-
-    @Test
-    public void should_import_editable_default_applications_on_first_run() throws Exception {
-        //given
-        SApplicationWithIcon editableApp = new SApplicationWithIcon();
-        editableApp.setId(3);
-        editableApp.setToken("default_app_3");
-
-        applicationImporter.setAddIfMissing(true);
-
-        //when
-        applicationImporter.init();
-
-        //then
-        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(editableApp.getToken())),
-                eq(true), anyLong(), any(byte[].class), any(), eq(true), any());
-    }
-
-    @Test
-    public void should_not_import_editable_default_applications_if_not_first_run() throws Exception {
-        //given
-        SApplicationWithIcon editableApp = new SApplicationWithIcon();
-        editableApp.setId(3);
-        editableApp.setToken("default_app_3");
-
-        applicationImporter.setAddIfMissing(false);
-
-        //when
-        applicationImporter.init();
-
-        //then
-        verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(editableApp.getToken())),
-                eq(true), anyLong(), any(byte[].class), any(), eq(false), any());
-    }
 }

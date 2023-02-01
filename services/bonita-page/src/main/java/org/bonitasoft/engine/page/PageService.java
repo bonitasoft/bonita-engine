@@ -16,8 +16,6 @@ package org.bonitasoft.engine.page;
 import java.util.List;
 import java.util.Properties;
 
-import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -31,7 +29,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  * @author Baptiste Mesta
  * @author Laurent Leseigneur
  */
-public interface PageService extends TenantLifecycleService {
+public interface PageService {
 
     String PROPERTIES_FILE_NAME = "page.properties";
 
@@ -60,9 +58,16 @@ public interface PageService extends TenantLifecycleService {
             throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidPageZipException,
             SInvalidPageTokenException;
 
+    SPage insertPage(SPage page, byte[] content) throws SObjectAlreadyExistsException, SObjectCreationException;
+
+    SPage checkIfPageAlreadyExists(SPage page) throws SBonitaReadException;
+
     SPage getPage(long pageId) throws SBonitaReadException, SObjectNotFoundException;
 
     SPage getPageByName(String pageName) throws SBonitaReadException;
+
+    SPage buildPage(byte[] content, String contentName, long userId, boolean provided, boolean removable,
+            boolean editable) throws SInvalidPageZipException, SInvalidPageTokenException;
 
     /**
      * Read the content of a page in a zip
@@ -135,33 +140,7 @@ public interface PageService extends TenantLifecycleService {
     List<SPage> getPageByProcessDefinitionId(long processDefinitionId, int fromIndex, int numberOfResults)
             throws SBonitaReadException;
 
-    /**
-     * @return true if the service has been started again since it was last paused/stopped
-     */
-    boolean initialized();
-
     void updatePageContent(long pageId, byte[] content, String contentName, SPageUpdateBuilder pageUpdateBuilder)
             throws SObjectAlreadyExistsException, SObjectModificationException, SInvalidPageZipException,
             SInvalidPageTokenException;
-
-    /**
-     * Import a provided page to the database.
-     *
-     * @param pageZipName the content name of the page
-     * @param providedPageContent the content of the page as a byte array
-     * @param removable if the page is removable
-     * @param editable if the page is editable
-     * @param addIfMissing import the page if it is missing (skipped otherwise)
-     * @return the import status of the page depending on the import strategy
-     * @throws SBonitaException if an error occurred during the import
-     */
-    ImportStatus importProvidedPage(String pageZipName, final byte[] providedPageContent,
-            boolean removable, boolean editable, boolean addIfMissing) throws SBonitaException;
-
-    /**
-     * Configure the page service to import provided removable pages if there are missing.
-     *
-     * @param addRemovableIfMissing <code>true</code> to import provided removable pages
-     */
-    void setAddRemovableIfMissing(boolean addRemovableIfMissing);
 }

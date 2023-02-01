@@ -13,14 +13,10 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
@@ -32,18 +28,11 @@ import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
-import org.bonitasoft.engine.commons.ExceptionUtils;
-import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.io.IOUtils;
-import org.bonitasoft.engine.session.SessionService;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,23 +40,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-//must be initialized after PageService
-@Order(6)
-public class ApplicationImporter implements TenantLifecycleService {
+public class ApplicationImporter {
 
-    public static final String PROVIDED_APPLICATIONS_PATH = "org/bonitasoft/web/application";
     private final ApplicationService applicationService;
     private final NodeToApplicationConverter nodeToApplicationConverter;
     private final ApplicationPageImporter applicationPageImporter;
     private final ApplicationMenuImporter applicationMenuImporter;
-    private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
-            ApplicationImporter.class.getClassLoader());
-
-    /**
-     * Boolean used to import provided editable applications if there are missing (mostly when it is a first install)
-     */
-    @Setter
-    private boolean addIfMissing;
 
     public ApplicationImporter(ApplicationService applicationService,
             NodeToApplicationConverter nodeToApplicationConverter, ApplicationPageImporter applicationPageImporter,
@@ -95,9 +73,8 @@ public class ApplicationImporter implements TenantLifecycleService {
         }
     }
 
-    ImportStatus importApplication(ApplicationNode applicationNode, boolean editable,
-            long createdBy, byte[] iconContent,
-            String iconMimeType, boolean addIfMissing, ApplicationImportStrategy strategy)
+    ImportStatus importApplication(ApplicationNode applicationNode, boolean editable, long createdBy,
+            byte[] iconContent, String iconMimeType, boolean addIfMissing, ApplicationImportStrategy strategy)
             throws ImportException, AlreadyExistsException {
         try {
             ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, iconContent,
@@ -155,20 +132,6 @@ public class ApplicationImporter implements TenantLifecycleService {
         return importStatus;
     }
 
-    private List<ImportStatus> importProvidedEditableApplications(final byte[] xmlContent, byte[] iconContent,
-            String iconMimeType, boolean addIfMissing) throws ImportException, AlreadyExistsException {
-        List<ImportStatus> importStatuses = new ArrayList<>();
-        ApplicationNodeContainer applicationNodeContainer = getApplicationNodeContainer(xmlContent);
-        for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
-            // import the provided application as editable and set the strategy to skip it if a version already exists
-            importStatuses.add(
-                    importApplication(applicationNode, true, SessionService.SYSTEM_ID, iconContent, iconMimeType,
-                            addIfMissing,
-                            new UpdateNewerNonEditableApplicationStrategy()));
-        }
-        return importStatuses;
-    }
-
     public ApplicationNodeContainer getApplicationNodeContainer(byte[] xmlContent) throws ImportException {
         ApplicationNodeContainer result;
         final URL resource = ApplicationNodeContainer.class.getResource("/application.xsd");
@@ -178,56 +141,5 @@ public class ApplicationImporter implements TenantLifecycleService {
             throw new ImportException(e);
         }
         return result;
-    }
-
-    @Override
-    public void init() throws SBonitaException {
-        try {
-            List<ImportStatus> importStatuses = importProvidedEditableApplicationsFromClasspath();
-
-            List<String> createdOrReplaced = importStatuses.stream()
-                    .filter(importStatus -> importStatus.getStatus() != ImportStatus.Status.SKIPPED)
-                    .map(importStatus -> importStatus.getName() + " " + importStatus.getStatus())
-                    .collect(Collectors.toList());
-            if (createdOrReplaced.isEmpty()) {
-                log.info("No applications updated");
-            } else {
-                log.info("Application updated or created : {}", createdOrReplaced);
-            }
-        } catch (Exception e) {
-            log.error("Cannot load provided applications at startup. Root cause: {}",
-                    ExceptionUtils.printRootCauseOnly(e));
-            log.debug("Full stack : ", e);
-        }
-    }
-
-    private List<ImportStatus> importProvidedEditableApplicationsFromClasspath() throws IOException, ImportException {
-        if (addIfMissing) {
-            log.info("Detected a first run since a Bonita update, a Bonita upgrade, " +
-                    "a tenant creation or an installation from scratch. Importing default applications");
-        }
-        List<ImportStatus> importStatuses = new ArrayList<>();
-        Resource[] resources = cpResourceResolver
-                .getResources(
-                        ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + PROVIDED_APPLICATIONS_PATH + "/*.zip");
-        for (Resource resource : resources) {
-            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                String resourceName = resource.getFilename();
-                log.debug("Found provided applications '{}' in classpath", resourceName);
-                try (InputStream resourceAsStream = resource.getInputStream()) {
-                    ApplicationZipContent zipContent = ApplicationZipContent.getApplicationZipContent(resourceName,
-                            resourceAsStream);
-                    importStatuses
-                            .addAll(importProvidedEditableApplications(zipContent.getXmlRaw(), zipContent.getIconRaw(),
-                                    zipContent.getPngName(), addIfMissing));
-                } catch (IOException | ImportException | AlreadyExistsException e) {
-                    throw new ImportException(e);
-                }
-            } else {
-                throw new ImportException(
-                        "A resource " + resource + " could not be read when loading default applications");
-            }
-        }
-        return importStatuses;
     }
 }
