@@ -96,6 +96,7 @@ public class ApplicationInstallerTest {
                 .restAPIExtension(new FileAndContent("restApiExtension.zip",
                         zip(file("page.properties", "name=restApiExtension"))))
                 .build();
+        doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
         doReturn(null).when(applicationInstaller).getPage(anyString());
 
@@ -111,6 +112,7 @@ public class ApplicationInstallerTest {
     public void should_install_application_containing_living_applications() throws Exception {
         ApplicationArchive applicationArchive = ApplicationArchive.builder()
                 .application(new FileAndContent("application.xml", "content".getBytes())).build();
+        doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(emptyList()).when(applicationInstaller).importApplications(any());
 
         applicationInstaller.install(applicationArchive);

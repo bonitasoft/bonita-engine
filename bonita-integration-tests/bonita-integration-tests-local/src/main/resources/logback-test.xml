@@ -1,4 +1,4 @@
-<configuration debug="false" scan="true" scanPeriod="30 seconds">
+<configuration debug="false" scan="false">
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
@@ -9,6 +9,7 @@
 
     <logger name="org.bonitasoft" level="INFO" />
     <logger name="org.bonitasoft.engine.api.impl.application.installer" level="INFO" />
+    <logger name="org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector" level="DEBUG" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

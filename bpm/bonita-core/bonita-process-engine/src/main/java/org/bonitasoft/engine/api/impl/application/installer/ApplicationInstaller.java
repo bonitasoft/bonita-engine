@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.bonitasoft.engine.api.result.Status.*;
 import static org.bonitasoft.engine.api.result.StatusCode.*;
@@ -29,12 +30,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import javax.xml.bind.JAXBException;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
 import org.bonitasoft.engine.api.impl.page.PageAPIDelegate;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
@@ -59,6 +63,7 @@ import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.V6FormDeployException;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -87,6 +92,11 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
+import org.bonitasoft.engine.identity.ImportOrganization;
+import org.bonitasoft.engine.identity.ImportPolicy;
+import org.bonitasoft.engine.identity.InvalidOrganizationFileFormatException;
+import org.bonitasoft.engine.identity.OrganizationImportException;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
 import org.bonitasoft.engine.io.FileAndContent;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
@@ -152,11 +162,21 @@ public class ApplicationInstaller {
     }
 
     public ExecutionResult install(InputStream applicationZipFileStream) throws ApplicationInstallationException {
-        return install(readApplicationArchiveFile(applicationZipFileStream));
+        final ExecutionResult result = install(readApplicationArchiveFile(applicationZipFileStream));
+        logInstallationResult(result);
+        return result;
     }
 
     public ExecutionResult install(byte[] applicationArchiveFile) throws ApplicationInstallationException {
         return install(readApplicationArchiveFile(applicationArchiveFile));
+    }
+
+    private static void logInstallationResult(ExecutionResult result) {
+        log.info("Result of the installation of the application:");
+        for (Status s : result.getAllStatus()) {
+            log.info("[{}] - {} - {} - {}", s.getLevel(), s.getCode(), s.getMessage(),
+                    s.getContext().toString());
+        }
     }
 
     @VisibleForTesting
@@ -167,7 +187,7 @@ public class ApplicationInstaller {
             log.info("Starting Application Archive installation...");
             installBusinessDataModel(applicationArchive);
             inSession(() -> inTransaction(() -> {
-                // installOrganization(applicationArchive, executionResult);
+                installOrganization(applicationArchive, executionResult);
                 // Move to SP: installProfiles(applicationArchive, executionResult);
                 installRestApiExtensions(applicationArchive, executionResult);
                 installPages(applicationArchive, executionResult);
@@ -185,23 +205,27 @@ public class ApplicationInstaller {
         }
     }
 
-    //    private void installOrganization(ApplicationArchive applicationArchive, ExecutionResult executionResult) {
-    //        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-    //        try {
-    //            final SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory
-    //                    .get(SCustomUserInfoValueUpdateBuilderFactory.class);
-    //            final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(
-    //                    tenantAccessor.getIdentityService(),
-    //                    updaterFactor);
-    //            ImportOrganization importedOrganization = new ImportOrganization(tenantAccessor, applicationArchive.get,
-    //                    policy, customUserInfoValueAPI);
-    //            return importedOrganization.execute();
-    //        } catch (JAXBException e) {
-    //            throw new InvalidOrganizationFileFormatException(e);
-    //        } catch (final SBonitaException e) {
-    //            throw new OrganizationImportException(e);
-    //        }
-    //    }
+    void installOrganization(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+            throws OrganizationImportException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final SCustomUserInfoValueUpdateBuilderFactory updaterFactory = BuilderFactory
+                    .get(SCustomUserInfoValueUpdateBuilderFactory.class);
+            final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(
+                    tenantAccessor.getIdentityService(), updaterFactory);
+            final List<String> warnings = new ImportOrganization(tenantAccessor,
+                    new String(applicationArchive.getOrganization().getContent(), UTF_8),
+                    ImportPolicy.MERGE_DUPLICATES, customUserInfoValueAPI).execute();
+            for (String warning : warnings) {
+                executionResult.addStatus(warningStatus(ORGANIZATION_IMPORT_WARNING, warning));
+            }
+            executionResult.addStatus(okStatus());
+        } catch (JAXBException e) {
+            throw new InvalidOrganizationFileFormatException(e);
+        } catch (final SBonitaException e) {
+            throw new OrganizationImportException(e);
+        }
+    }
 
     void installBusinessDataModel(ApplicationArchive applicationArchive) throws Exception {
         if (applicationArchive.getBdm() != null) {
@@ -735,7 +759,6 @@ public class ApplicationInstaller {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        log.info("TenantId: {}", tenantId); // FIXME remove this before merging
         return TenantServiceSingleton.getInstance();
     }
 

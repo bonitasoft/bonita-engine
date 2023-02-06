@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
 
 public class XmlDetector {
 
-    private DocumentBuilder documentBuilder;
+    private final DocumentBuilder documentBuilder;
 
     XmlDetector(DocumentBuilder documentBuilder) {
         this.documentBuilder = documentBuilder;

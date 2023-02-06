@@ -20,7 +20,11 @@ import java.io.InputStream;
 
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationInstaller;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.junit.After;
 import org.junit.Before;
@@ -55,28 +59,32 @@ public class ApplicationInstallerIT extends CommonAPIIT {
                 .lookup(ApplicationInstaller.class);
 
         // when:
-
         applicationInstaller.install(applicationAsStream);
 
         // then:
+
+        // Organization has been installed:
+        final User captainBonita = getIdentityAPI().getUserByUserName("captainBonita");
+        assertThat(captainBonita).isNotNull();
+        assertThat(getIdentityAPI().getRoleByName("appsManager")).isNotNull();
+        assertThat(getIdentityAPI().getGroupByPath("/appsManagement")).isNotNull();
+
         assertThat(getApplicationAPI().getApplicationByToken("appsManagerBonita").getDisplayName())
                 .isEqualTo("Application manager");
-        //        final long processDefinitionId = getProcessAPI().getProcessDefinitionId("CallHealthCheck", "1.0");
-        //        final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
-        //        assertThat(deploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
-        //        assertThat(deploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
+        final long processDefinitionId = getProcessAPI().getProcessDefinitionId("CallHealthCheck", "1.0");
+        final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
+        assertThat(deploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
+        assertThat(deploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
+
         // Rest API Extension is there:
         assertThat(getPageAPI().getPageByName("custompage_processStarter")).isNotNull();
+
         // Pages are there:
         assertThat(getPageAPI().getPageByName("custompage_HealthPage")).isNotNull();
+
         // Layouts are there:
         assertThat(getPageAPI().getPageByName("custompage_pmLayout")).isNotNull();
-        // Organization has been installed:
-        // NOT YET IMPLEMENTED
-        //        final User captainBonita = getIdentityAPI().getUserByUserName("captainBonita");
-        //        assertThat(captainBonita).isNotNull();
-        //        assertThat(getIdentityAPI().getRoleByName("appsManager")).isNotNull();
-        //        assertThat(getIdentityAPI().getGroupByPath("/appsManagement")).isNotNull();
+
         // Profiles have been installed:
         // SP-only: assertThat(getProfileAPI().searchProfiles(profilesWithName("userAm")).getResult()).hasSize(1);
         //        logoutOnTenant();
