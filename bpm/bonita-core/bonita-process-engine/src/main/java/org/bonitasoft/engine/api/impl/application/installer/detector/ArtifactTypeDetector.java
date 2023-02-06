@@ -27,6 +27,7 @@ public class ArtifactTypeDetector {
     private static final Logger logger = LoggerFactory.getLogger(ArtifactTypeDetector.class);
 
     private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.0";
+    private static final String ORGANIZATION_NAMESPACE = "http://documentation.bonitasoft.com/organization-xml-schema";
     private static final String REST_API_EXTENSION_CONTENT_TYPE = "apiExtension";
 
     private final BdmDetector bdmDetector;
@@ -52,6 +53,10 @@ public class ArtifactTypeDetector {
 
     public boolean isApplication(FileAndContent file) {
         return xmlDetector.isCompliant(file, APPLICATION_NAMESPACE);
+    }
+
+    public boolean isOrganization(FileAndContent file) {
+        return xmlDetector.isCompliant(file, ORGANIZATION_NAMESPACE);
     }
 
     public boolean isRestApiExtension(FileAndContent file) {
@@ -88,6 +93,9 @@ public class ArtifactTypeDetector {
         } else if (isProcess(file)) {
             logger.info("Found process file: '{}'. ", file.getFileName());
             builder.process(file);
+        } else if (isOrganization(file)) {
+            logger.info("Found organization file: '{}'. ", file.getFileName());
+            builder.organization(file);
         } else if (isPage(file)) {
             logger.info("Found page file: '{}'. ", file.getFileName());
             builder.page(file);

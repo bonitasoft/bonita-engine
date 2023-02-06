@@ -32,6 +32,7 @@ public class ApplicationArchive {
     public static class ApplicationArchiveBuilder {
     }
 
+    private FileAndContent organization;
     private FileAndContent bdm;
     @Singular
     private List<FileAndContent> processes;
