@@ -30,15 +30,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import javax.xml.bind.JAXBException;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
+import org.bonitasoft.engine.api.impl.organization.OrganizationAPIDelegate;
 import org.bonitasoft.engine.api.impl.page.PageAPIDelegate;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
@@ -63,7 +61,6 @@ import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.V6FormDeployException;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -92,11 +89,8 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.identity.ImportOrganization;
 import org.bonitasoft.engine.identity.ImportPolicy;
-import org.bonitasoft.engine.identity.InvalidOrganizationFileFormatException;
 import org.bonitasoft.engine.identity.OrganizationImportException;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
 import org.bonitasoft.engine.io.FileAndContent;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
@@ -132,6 +126,7 @@ public class ApplicationInstaller {
 
     private final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader();
     private PageAPIDelegate pageAPIDelegate;
+    private OrganizationAPIDelegate organizationImporter;
     private BusinessDataModelRepository bdmRepository;
     private UserTransactionService transactionService;
     private TenantStateManager tenantStateManager;
@@ -159,6 +154,13 @@ public class ApplicationInstaller {
             pageAPIDelegate = new PageAPIDelegate(getTenantAccessor(), SessionService.SYSTEM_ID);
         }
         return pageAPIDelegate;
+    }
+
+    private OrganizationAPIDelegate getOrganizationImporter() {
+        if (organizationImporter == null) {
+            organizationImporter = new OrganizationAPIDelegate(getTenantAccessor());
+        }
+        return organizationImporter;
     }
 
     public ExecutionResult install(InputStream applicationZipFileStream) throws ApplicationInstallationException {
@@ -207,24 +209,13 @@ public class ApplicationInstaller {
 
     void installOrganization(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws OrganizationImportException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        try {
-            final SCustomUserInfoValueUpdateBuilderFactory updaterFactory = BuilderFactory
-                    .get(SCustomUserInfoValueUpdateBuilderFactory.class);
-            final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(
-                    tenantAccessor.getIdentityService(), updaterFactory);
-            final List<String> warnings = new ImportOrganization(tenantAccessor,
-                    new String(applicationArchive.getOrganization().getContent(), UTF_8),
-                    ImportPolicy.MERGE_DUPLICATES, customUserInfoValueAPI).execute();
-            for (String warning : warnings) {
-                executionResult.addStatus(warningStatus(ORGANIZATION_IMPORT_WARNING, warning));
-            }
-            executionResult.addStatus(okStatus());
-        } catch (JAXBException e) {
-            throw new InvalidOrganizationFileFormatException(e);
-        } catch (final SBonitaException e) {
-            throw new OrganizationImportException(e);
+        final List<String> warnings = getOrganizationImporter().importOrganizationWithWarnings(
+                new String(applicationArchive.getOrganization().getContent(), UTF_8),
+                ImportPolicy.MERGE_DUPLICATES);
+        for (String warning : warnings) {
+            executionResult.addStatus(warningStatus(ORGANIZATION_IMPORT_WARNING, warning));
         }
+        executionResult.addStatus(okStatus());
     }
 
     void installBusinessDataModel(ApplicationArchive applicationArchive) throws Exception {
