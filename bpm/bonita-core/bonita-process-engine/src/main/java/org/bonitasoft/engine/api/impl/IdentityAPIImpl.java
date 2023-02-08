@@ -21,12 +21,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
-
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.impl.organization.OrganizationAPIDelegate;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMembership;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMemberships;
@@ -78,9 +77,7 @@ import org.bonitasoft.engine.identity.GroupUpdater;
 import org.bonitasoft.engine.identity.GroupUpdater.GroupField;
 import org.bonitasoft.engine.identity.Icon;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.ImportOrganization;
 import org.bonitasoft.engine.identity.ImportPolicy;
-import org.bonitasoft.engine.identity.InvalidOrganizationFileFormatException;
 import org.bonitasoft.engine.identity.MembershipNotFoundException;
 import org.bonitasoft.engine.identity.OrganizationExportException;
 import org.bonitasoft.engine.identity.OrganizationImportException;
@@ -159,6 +156,10 @@ public class IdentityAPIImpl implements IdentityAPI {
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
+    }
+
+    protected OrganizationAPIDelegate getOrganizationAPIDelegate() {
+        return new OrganizationAPIDelegate(getTenantAccessor());
     }
 
     @Override
@@ -1539,21 +1540,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy)
             throws OrganizationImportException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        try {
-            final SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory
-                    .get(SCustomUserInfoValueUpdateBuilderFactory.class);
-            final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(
-                    tenantAccessor.getIdentityService(),
-                    updaterFactor);
-            ImportOrganization importedOrganization = new ImportOrganization(tenantAccessor, organizationContent,
-                    policy, customUserInfoValueAPI);
-            return importedOrganization.execute();
-        } catch (JAXBException e) {
-            throw new InvalidOrganizationFileFormatException(e);
-        } catch (final SBonitaException e) {
-            throw new OrganizationImportException(e);
-        }
+        return getOrganizationAPIDelegate().importOrganizationWithWarnings(organizationContent, policy);
     }
 
     @Override
