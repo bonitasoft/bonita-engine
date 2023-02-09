@@ -132,7 +132,7 @@ public class ConfigurationFileTest {
                 new ResourcesPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
         final Properties props = new Properties();
         doReturn(props).when(configurationFilesManager).getTenantProperties("resources-permissions-mapping.properties",
-                TENANT_ID);
+                TENANT_ID, false);
 
         // when:
         configFile.getTenantProperties();
