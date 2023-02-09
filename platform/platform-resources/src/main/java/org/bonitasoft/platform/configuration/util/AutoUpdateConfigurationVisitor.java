@@ -41,7 +41,9 @@ public class AutoUpdateConfigurationVisitor extends SimpleFileVisitor<Path> {
 
     private static final List<String> AUTO_UPDATE_CONFIGURATION_FILES = Arrays.asList(
             "compound-permissions-mapping.properties",
-            "dynamic-permissions-checks.properties", "resources-permissions-mapping.properties");
+            "dynamic-permissions-checks.properties",
+            "resources-permissions-mapping.properties",
+            "user-creation-attribute-mapping.properties");
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attributes) {
