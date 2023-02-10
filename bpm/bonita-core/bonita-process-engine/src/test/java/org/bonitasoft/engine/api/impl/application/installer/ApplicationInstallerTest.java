@@ -85,13 +85,13 @@ public class ApplicationInstallerTest {
 
     @Test
     public void should_install_application_containing_all_kind_of_custom_pages() throws Exception {
-        ApplicationArchive applicationArchive = ApplicationArchive.builder()
-                .page(new FileAndContent("page.zip", zip(file("page.properties", "name=page"))))
-                .layout(new FileAndContent("layout.zip", zip(file("page.properties", "name=layout"))))
-                .theme(new FileAndContent("theme.zip", zip(file("page.properties", "name=theme"))))
-                .restAPIExtension(new FileAndContent("restApiExtension.zip",
-                        zip(file("page.properties", "name=restApiExtension"))))
-                .build();
+        ApplicationArchive applicationArchive = new ApplicationArchive();
+        applicationArchive.addPage(new FileAndContent("page.zip", zip(file("page.properties", "name=page"))))
+                .addLayout(new FileAndContent("layout.zip", zip(file("page.properties", "name=layout"))))
+                .addTheme(new FileAndContent("theme.zip", zip(file("page.properties", "name=theme"))))
+                .addRestAPIExtension(new FileAndContent("restApiExtension.zip",
+                        zip(file("page.properties", "name=restApiExtension"))));
+
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
         doReturn(null).when(applicationInstaller).getPage(anyString());
@@ -106,8 +106,8 @@ public class ApplicationInstallerTest {
 
     @Test
     public void should_install_application_containing_living_applications() throws Exception {
-        ApplicationArchive applicationArchive = ApplicationArchive.builder()
-                .application(new FileAndContent("application.xml", "content".getBytes())).build();
+        ApplicationArchive applicationArchive = new ApplicationArchive()
+                .addApplication(new FileAndContent("application.xml", "content".getBytes()));
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(emptyList()).when(applicationInstaller).importApplications(any());
 
@@ -121,9 +121,9 @@ public class ApplicationInstallerTest {
     public void should_install_and_enable_resolved_process() throws Exception {
         byte[] barContent = createValidBusinessArchive();
         //        byte[] bdmZipContent = createValidBDMZipFile();
-        ApplicationArchive applicationArchive = ApplicationArchive.builder()
+        ApplicationArchive applicationArchive = new ApplicationArchive()
                 //                .bdm(new FileAndContent("bdm.zip", bdmZipContent))
-                .process(new FileAndContent("process.bar", barContent)).build();
+                .addProcess(new FileAndContent("process.bar", barContent));
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doReturn(myProcess).when(applicationInstaller).deployProcess(any());
         //        hasConfigurationState(myProcess, ConfigurationState.RESOLVED);
@@ -138,8 +138,8 @@ public class ApplicationInstallerTest {
     public void should_install_only_unresolved_process() throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
-        ApplicationArchive applicationArchive = ApplicationArchive.builder()
-                .process(new FileAndContent("process.bar", barContent)).build();
+        ApplicationArchive applicationArchive = new ApplicationArchive()
+                .addProcess(new FileAndContent("process.bar", barContent));
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doReturn(myProcess).when(applicationInstaller).deployProcess(any());
         mockConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
@@ -157,8 +157,8 @@ public class ApplicationInstallerTest {
     public void should_replace_any_already_existing_process() throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
-        ApplicationArchive applicationArchive = ApplicationArchive.builder()
-                .process(new FileAndContent("process.bar", barContent)).build();
+        ApplicationArchive applicationArchive = new ApplicationArchive()
+                .addProcess(new FileAndContent("process.bar", barContent));
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doThrow(new AlreadyExistsException("already exists"))
                 .doReturn(myProcess)
