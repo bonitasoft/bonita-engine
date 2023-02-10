@@ -55,11 +55,11 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         // given:
         // name is NOT the default one so that it is not deployed automatically for the whole test suite at startup:
         final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
-        ApplicationInstaller applicationInstaller = TenantServiceSingleton.getInstance()
+        ApplicationInstaller applicationInstallerImpl = TenantServiceSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
 
         // when:
-        applicationInstaller.install(applicationAsStream);
+        applicationInstallerImpl.install(applicationAsStream);
 
         // then:
 

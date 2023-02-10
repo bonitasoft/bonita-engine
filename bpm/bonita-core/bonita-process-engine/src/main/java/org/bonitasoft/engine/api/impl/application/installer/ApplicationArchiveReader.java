@@ -19,12 +19,22 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetectorFactory;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Baptiste Mesta.
  */
+@Component
+@ConditionalOnSingleCandidate(ApplicationArchiveReader.class)
 public class ApplicationArchiveReader {
+
+    private final ArtifactTypeDetector artifactTypeDetector;
+
+    protected ApplicationArchiveReader(ArtifactTypeDetector artifactTypeDetector) {
+        this.artifactTypeDetector = artifactTypeDetector;
+    }
 
     public ApplicationArchive read(byte[] applicationArchiveFile) throws IOException {
         try (InputStream inputStream = new ByteArrayInputStream(applicationArchiveFile)) {
@@ -33,16 +43,18 @@ public class ApplicationArchiveReader {
     }
 
     public ApplicationArchive read(InputStream inputStream) throws IOException {
-        ApplicationArchive.ApplicationArchiveBuilder builder = ApplicationArchive.builder();
+        ApplicationArchive.ApplicationArchiveBuilder builder = getBuilder();
         ZipInputStream zipInputStream = new ZipInputStream(inputStream);
         ZipEntry zipEntry;
         while ((zipEntry = zipInputStream.getNextEntry()) != null) {
             if (!zipEntry.isDirectory()) {
-                ArtifactTypeDetectorFactory.artifactTypeDetector()
-                        .detectAndStore(zipEntry.getName(), zipInputStream, builder);
+                this.artifactTypeDetector.detectAndStore(zipEntry.getName(), zipInputStream, builder);
             }
         }
         return builder.build();
     }
 
+    public ApplicationArchive.ApplicationArchiveBuilder getBuilder() {
+        return ApplicationArchive.builder();
+    }
 }

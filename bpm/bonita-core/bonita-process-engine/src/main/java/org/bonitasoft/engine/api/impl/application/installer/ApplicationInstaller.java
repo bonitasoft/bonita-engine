@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
@@ -111,6 +109,7 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -118,28 +117,29 @@ import org.springframework.stereotype.Component;
  *
  * @author Baptiste Mesta.
  */
-@Builder
-@AllArgsConstructor
+
 @Slf4j
 @Component
+@ConditionalOnSingleCandidate(ApplicationInstaller.class)
 public class ApplicationInstaller {
 
-    private final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader();
+    private ApplicationArchiveReader applicationArchiveReader;
     private PageAPIDelegate pageAPIDelegate;
-    private OrganizationAPIDelegate organizationImporter;
     private BusinessDataModelRepository bdmRepository;
     private UserTransactionService transactionService;
     private TenantStateManager tenantStateManager;
     private SessionAccessor sessionAccessor;
     private SessionService sessionService;
     private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
+    private OrganizationAPIDelegate organizationImporter;
     private Long tenantId;
 
     @Autowired
     public ApplicationInstaller(@Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
             UserTransactionService transactionService, @Value("${tenantId}") Long tenantId,
             SessionAccessor sessionAccessor, SessionService sessionService, TenantStateManager tenantStateManager,
-            @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager) {
+            @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager,
+            ApplicationArchiveReader applicationArchiveReader) {
         this.bdmRepository = bdmRepository;
         this.transactionService = transactionService;
         this.tenantId = tenantId;
@@ -147,6 +147,7 @@ public class ApplicationInstaller {
         this.sessionService = sessionService;
         this.tenantStateManager = tenantStateManager;
         this.businessArchiveArtifactsManager = businessArchiveArtifactsManager;
+        this.applicationArchiveReader = applicationArchiveReader;
     }
 
     private PageAPIDelegate getPageAPIDelegate() {
@@ -173,30 +174,14 @@ public class ApplicationInstaller {
         return install(readApplicationArchiveFile(applicationArchiveFile));
     }
 
-    private static void logInstallationResult(ExecutionResult result) {
-        log.info("Result of the installation of the application:");
-        for (Status s : result.getAllStatus()) {
-            log.info("[{}] - {} - {} - {}", s.getLevel(), s.getCode(), s.getMessage(),
-                    s.getContext().toString());
-        }
-    }
-
-    @VisibleForTesting
-    ExecutionResult install(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
+    public ExecutionResult install(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
         try {
             final ExecutionResult executionResult = new ExecutionResult();
             final long startPoint = System.currentTimeMillis();
             log.info("Starting Application Archive installation...");
             installBusinessDataModel(applicationArchive);
             inSession(() -> inTransaction(() -> {
-                installOrganization(applicationArchive, executionResult);
-                // Move to SP: installProfiles(applicationArchive, executionResult);
-                installRestApiExtensions(applicationArchive, executionResult);
-                installPages(applicationArchive, executionResult);
-                installLayouts(applicationArchive, executionResult);
-                installThemes(applicationArchive, executionResult);
-                installLivingApplications(applicationArchive, executionResult);
-                installProcesses(applicationArchive, executionResult);
+                installArtifacts(applicationArchive, executionResult);
                 return null;
             }));
             log.info("The Application Archive has been installed successfully in {} ms.",
@@ -205,9 +190,21 @@ public class ApplicationInstaller {
         } catch (Exception e) {
             throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
         }
+
     }
 
-    void installOrganization(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    protected void installArtifacts(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+            throws Exception {
+        installOrganization(applicationArchive, executionResult);
+        installRestApiExtensions(applicationArchive, executionResult);
+        installPages(applicationArchive, executionResult);
+        installLayouts(applicationArchive, executionResult);
+        installThemes(applicationArchive, executionResult);
+        installLivingApplications(applicationArchive, executionResult);
+        installProcesses(applicationArchive, executionResult);
+    }
+
+    public void installOrganization(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws OrganizationImportException {
         final List<String> warnings = getOrganizationImporter().importOrganizationWithWarnings(
                 new String(applicationArchive.getOrganization().getContent(), UTF_8),
@@ -250,7 +247,7 @@ public class ApplicationInstaller {
         businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(tenantAccessor);
     }
 
-    private String updateBusinessDataModel(ApplicationArchive applicationArchive)
+    public String updateBusinessDataModel(ApplicationArchive applicationArchive)
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         String bdmVersion;
         try {
@@ -327,7 +324,7 @@ public class ApplicationInstaller {
         return applicationArchive;
     }
 
-    private void installLivingApplications(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    public void installLivingApplications(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws AlreadyExistsException, ImportException {
         List<FileAndContent> applications = applicationArchive.getApplications();
         for (FileAndContent applicationArchiveFile : applications) {
@@ -397,28 +394,28 @@ public class ApplicationInstaller {
                 context);
     }
 
-    private void installPages(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    public void installPages(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
         for (FileAndContent pageFile : applicationArchive.getPages()) {
             installUnitPage(pageFile, "page", executionResult);
         }
     }
 
-    private void installLayouts(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    public void installLayouts(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
         for (FileAndContent layoutFile : applicationArchive.getLayouts()) {
             installUnitPage(layoutFile, "layout", executionResult);
         }
     }
 
-    private void installThemes(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    public void installThemes(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
         for (FileAndContent pageFile : applicationArchive.getThemes()) {
             installUnitPage(pageFile, "theme", executionResult);
         }
     }
 
-    private void installRestApiExtensions(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    public void installRestApiExtensions(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
         for (FileAndContent pageFile : applicationArchive.getRestAPIExtensions()) {
             installUnitPage(pageFile, "REST API extension", executionResult);
@@ -428,7 +425,7 @@ public class ApplicationInstaller {
     /**
      * From the Engine perspective, all custom pages, layouts, themes, custom Rest APIs are of type <code>Page</code>
      */
-    private void installUnitPage(FileAndContent pageFile, String precisePageType, ExecutionResult executionResult)
+    public void installUnitPage(FileAndContent pageFile, String precisePageType, ExecutionResult executionResult)
             throws IOException, BonitaException {
         String pageToken = getPageToken(pageFile);
         org.bonitasoft.engine.page.Page existingPage = getPage(pageToken);
@@ -455,7 +452,7 @@ public class ApplicationInstaller {
         }
     }
 
-    Page createPage(FileAndContent pageFile, String pageToken) throws CreationException {
+    public Page createPage(FileAndContent pageFile, String pageToken) throws CreationException {
         return getPageAPIDelegate().createPage(pageToken, pageFile.getContent());
     }
 
@@ -481,7 +478,7 @@ public class ApplicationInstaller {
         return name;
     }
 
-    void installProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    protected void installProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws InvalidBusinessArchiveFormatException, IOException, ProcessDeployException {
 
         for (FileAndContent process : applicationArchive.getProcesses()) {
@@ -734,7 +731,7 @@ public class ApplicationInstaller {
     }
 
     org.bonitasoft.engine.page.Page getPage(String urlToken) throws SearchException {
-        final SearchResult<org.bonitasoft.engine.page.Page> pages = getPageAPIDelegate()
+        final SearchResult<Page> pages = getPageAPIDelegate()
                 .searchPages(new SearchOptionsBuilder(0, 1).filter(PageSearchDescriptor.NAME, urlToken).done());
         if (pages.getCount() == 0) {
             log.debug("Can't find any existing page with the token '{}'.", urlToken);
@@ -744,17 +741,8 @@ public class ApplicationInstaller {
         return pages.getResult().get(0);
     }
 
-    private TenantServiceAccessor getTenantAccessor() {
-        try {
-            ServiceAccessorFactory.getInstance().createSessionAccessor();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return TenantServiceSingleton.getInstance();
-    }
-
     @VisibleForTesting
-    protected <T> T inSession(Callable<T> callable) throws Exception {
+    public <T> T inSession(Callable<T> callable) throws Exception {
         final SSession session = sessionService.createSession(tenantId, SessionService.SYSTEM);
         final long sessionId = session.getId();
         log.info("Created new session with id {}", sessionId);
@@ -769,7 +757,7 @@ public class ApplicationInstaller {
         }
     }
 
-    private <T> T inTransaction(Callable<T> callable) throws ApplicationInstallationException {
+    public <T> T inTransaction(Callable<T> callable) throws ApplicationInstallationException {
         try {
             return transactionService.executeInTransaction(callable);
         } catch (Exception e) {
@@ -777,4 +765,20 @@ public class ApplicationInstaller {
         }
     }
 
+    private TenantServiceAccessor getTenantAccessor() {
+        try {
+            ServiceAccessorFactory.getInstance().createSessionAccessor();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return TenantServiceSingleton.getInstance();
+    }
+
+    private static void logInstallationResult(ExecutionResult result) {
+        log.info("Result of the installation of the application:");
+        for (Status s : result.getAllStatus()) {
+            log.info("[{}] - {} - {} - {}", s.getLevel(), s.getCode(), s.getMessage(),
+                    s.getContext().toString());
+        }
+    }
 }

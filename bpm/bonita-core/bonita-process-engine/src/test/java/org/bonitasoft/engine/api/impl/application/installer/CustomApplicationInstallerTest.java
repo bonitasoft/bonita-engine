@@ -51,7 +51,8 @@ public class CustomApplicationInstallerTest {
                 return new CustomOrDefaultApplicationInstaller(new ApplicationInstaller(
                         mock(BusinessDataModelRepository.class),
                         mock(TransactionService.class), 1L, mock(SessionAccessor.class), mock(SessionService.class),
-                        mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class)));
+                        mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class),
+                        mock(ApplicationArchiveReader.class)));
             }
         }
     }

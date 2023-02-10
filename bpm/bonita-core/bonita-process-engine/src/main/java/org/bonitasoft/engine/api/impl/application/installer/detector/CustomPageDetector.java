@@ -23,7 +23,9 @@ import java.util.Optional;
 import java.util.Properties;
 
 import org.bonitasoft.engine.io.FileAndContent;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CustomPageDetector {
 
     private static final String CONTENT_TYPE_PROPERTY = "contentType";
