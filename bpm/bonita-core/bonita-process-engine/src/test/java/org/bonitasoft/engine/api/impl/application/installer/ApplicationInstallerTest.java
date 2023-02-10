@@ -50,10 +50,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -68,16 +65,15 @@ public class ApplicationInstallerTest {
     @Mock
     private UserTransactionService transactionService;
 
-    private ApplicationInstaller applicationInstaller;
     @Captor
     ArgumentCaptor<Callable<Object>> callableCaptor;
 
+    @InjectMocks
+    @Spy
+    private ApplicationInstaller applicationInstaller;
+
     @Before
     public void before() throws Exception {
-        applicationInstaller = spy(
-                new ApplicationInstaller.ApplicationInstallerBuilder().transactionService(transactionService).build());
-        doNothing().when(applicationInstaller).installBusinessDataModel(any(ApplicationArchive.class));
-
         // to bypass the transaction-wrapping part:
         doAnswer(inv -> callableCaptor.getValue().call()).when(transactionService)
                 .executeInTransaction(callableCaptor.capture());

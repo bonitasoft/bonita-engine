@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,22 +13,14 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
-import org.bonitasoft.engine.io.FileAndContent;
 import org.springframework.stereotype.Component;
 
-/**
- * @author Emmanuel Duchastenier
- */
 @Component
-public class LayoutDetector extends CustomPageDetector {
+public class OrganizationDetector extends XmlDetector implements ArtifactDetector {
 
-    private static final String INDEX_GROOVY = "resources/Index.groovy";
-    private static final String INDEX_HTML = "resources/index.html";
+    private static final String ORGANIZATION_NAMESPACE = "http://documentation.bonitasoft.com/organization-xml-schema";
 
-    private static final String LAYOUT_CONTENT_TYPE = "layout";
-
-    public boolean isCompliant(FileAndContent file) {
-        return super.isCompliant(file, LAYOUT_CONTENT_TYPE)
-                && (isFilePresent(file, INDEX_HTML) || isFilePresent(file, INDEX_GROOVY));
+    public OrganizationDetector() {
+        super(ORGANIZATION_NAMESPACE);
     }
 }

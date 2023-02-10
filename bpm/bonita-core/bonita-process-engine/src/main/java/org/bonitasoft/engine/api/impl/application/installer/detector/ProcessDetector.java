@@ -19,25 +19,23 @@ import static org.bonitasoft.engine.io.FileOperations.isBarFile;
 import java.io.IOException;
 
 import org.bonitasoft.engine.io.FileAndContent;
+import org.springframework.stereotype.Component;
 
-public class ProcessDetector {
+@Component
+public class ProcessDetector extends XmlDetector {
 
     private static final String PROCESS_DEFINITION_NAMESPACE = "http://www.bonitasoft.org/ns/process/client/";
     private static final String PROCESS_DESIGN_DEFINITION = "process-design.xml";
 
-    private XmlDetector xmlDetector;
-
-    public ProcessDetector(XmlDetector xmlDetector) {
-        this.xmlDetector = xmlDetector;
+    public ProcessDetector() {
+        super(PROCESS_DEFINITION_NAMESPACE);
     }
 
     public boolean isCompliant(FileAndContent file) {
         if (isBarFile(file.getFileName())) {
             try {
-                byte[] processDesignContent = getFileFromZip(file.getContent(), PROCESS_DESIGN_DEFINITION);
-                return xmlDetector.isCompliant(processDesignContent, PROCESS_DEFINITION_NAMESPACE);
-            } catch (IOException e) {
-                // ignore
+                return super.isCompliant(getFileFromZip(file.getContent(), PROCESS_DESIGN_DEFINITION));
+            } catch (IOException ignored) {
             }
         }
         return false;

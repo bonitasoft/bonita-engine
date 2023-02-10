@@ -20,9 +20,12 @@ import java.io.IOException;
 
 import org.bonitasoft.engine.io.FileAndContent;
 import org.bonitasoft.engine.io.FileOperations;
+import org.springframework.stereotype.Component;
 
-public class BdmDetector {
+@Component
+public class BdmDetector implements ArtifactDetector {
 
+    @Override
     public boolean isCompliant(FileAndContent file) {
         byte[] bdm;
         try {

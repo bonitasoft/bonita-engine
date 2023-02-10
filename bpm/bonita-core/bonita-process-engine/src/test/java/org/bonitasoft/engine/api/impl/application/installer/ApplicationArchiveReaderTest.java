@@ -21,6 +21,7 @@ import static org.bonitasoft.engine.io.FileOperations.asInputStream;
 import java.io.IOException;
 
 import org.assertj.core.groups.Tuple;
+import org.bonitasoft.engine.api.impl.application.installer.detector.*;
 import org.junit.Test;
 
 /**
@@ -28,7 +29,11 @@ import org.junit.Test;
  */
 public class ApplicationArchiveReaderTest {
 
-    private final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader();
+    ArtifactTypeDetector artifactTypeDetector = new ArtifactTypeDetectorImpl(new BdmDetector(),
+            new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
+            new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector());
+    private final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
+            artifactTypeDetector);
 
     @Test
     public void should_read_application_archive_with_a_live_application() throws Exception {

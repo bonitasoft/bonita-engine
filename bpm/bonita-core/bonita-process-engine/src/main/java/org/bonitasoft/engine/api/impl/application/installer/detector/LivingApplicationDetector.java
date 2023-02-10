@@ -13,22 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
-import org.bonitasoft.engine.io.FileAndContent;
 import org.springframework.stereotype.Component;
 
-/**
- * @author Emmanuel Duchastenier
- */
 @Component
-public class LayoutDetector extends CustomPageDetector {
+public class LivingApplicationDetector extends XmlDetector implements ArtifactDetector {
 
-    private static final String INDEX_GROOVY = "resources/Index.groovy";
-    private static final String INDEX_HTML = "resources/index.html";
+    private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.0";
 
-    private static final String LAYOUT_CONTENT_TYPE = "layout";
-
-    public boolean isCompliant(FileAndContent file) {
-        return super.isCompliant(file, LAYOUT_CONTENT_TYPE)
-                && (isFilePresent(file, INDEX_HTML) || isFilePresent(file, INDEX_GROOVY));
+    public LivingApplicationDetector() {
+        super(APPLICATION_NAMESPACE);
     }
+
 }

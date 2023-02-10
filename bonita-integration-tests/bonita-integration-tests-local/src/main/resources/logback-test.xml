@@ -9,7 +9,7 @@
 
     <logger name="org.bonitasoft" level="INFO" />
     <logger name="org.bonitasoft.engine.api.impl.application.installer" level="INFO" />
-    <logger name="org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector" level="DEBUG" />
+    <logger name="org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetectorImpl" level="DEBUG" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

@@ -14,10 +14,12 @@
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
 import org.bonitasoft.engine.io.FileAndContent;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Component
 public class ThemeDetector extends CustomPageDetector {
 
     private static final String THEME_CSS = "resources/theme.css";

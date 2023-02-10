@@ -19,32 +19,56 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.bonitasoft.engine.io.FileAndContent;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public class XmlDetector {
+public abstract class XmlDetector implements ArtifactDetector {
 
-    private final DocumentBuilder documentBuilder;
+    protected DocumentBuilder documentBuilder;
 
-    XmlDetector(DocumentBuilder documentBuilder) {
-        this.documentBuilder = documentBuilder;
+    private final String namespace;
+
+    XmlDetector(String namespace) {
+        this.namespace = namespace;
+        initDocumentBuilder();
     }
 
-    public boolean isCompliant(FileAndContent file, String namespace) {
+    private void initDocumentBuilder() {
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            try {
+                documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // security-compliant
+                documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // security-compliant
+            } catch (IllegalArgumentException e) {
+                //ignored, if not supported by the implementation
+            }
+            documentBuilderFactory.setNamespaceAware(true);
+            this.documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            // should never occur as we use a simple configuration which can always be honored
+            throw new IllegalStateException("Unable to create a document builder during XmlValidator creation", e);
+        }
+    }
+
+    @Override
+    public boolean isCompliant(FileAndContent file) {
         if (isXmlFile(file.getFileName())) {
-            return isCompliant(file.getContent(), namespace);
+            return isCompliant(file.getContent());
         }
         return false;
     }
 
-    protected boolean isCompliant(byte[] fileContentBytes, String namespace) {
+    protected boolean isCompliant(byte[] fileContentBytes) {
         try (InputStream is = new ByteArrayInputStream(fileContentBytes)) {
             final Element documentElement = documentBuilder.parse(is).getDocumentElement();
             // it should be an equals,
-            // but it seems that some organization files have a /1.1 at the end and some others no ...
+            // but it seems that some organization files have a /1.1 at the end and some other no ...
             // same for process definition as version depends on Bonita version
             return documentElement.getNamespaceURI() != null && documentElement.getNamespaceURI().contains(namespace);
         } catch (SAXException | IOException e) {

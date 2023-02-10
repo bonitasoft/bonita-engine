@@ -16,21 +16,19 @@ package org.bonitasoft.engine.api.impl.application.installer;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.io.FileAndContent;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class ApplicationArchive {
 
     // class must be present for the javadoc generation
-    public static class ApplicationArchiveBuilder {
-    }
 
     private FileAndContent organization;
     private FileAndContent bdm;
