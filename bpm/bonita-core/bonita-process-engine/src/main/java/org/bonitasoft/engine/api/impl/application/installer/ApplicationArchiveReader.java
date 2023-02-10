@@ -43,18 +43,19 @@ public class ApplicationArchiveReader {
     }
 
     public ApplicationArchive read(InputStream inputStream) throws IOException {
-        ApplicationArchive.ApplicationArchiveBuilder builder = getBuilder();
+        final ApplicationArchive applicationArchive = createNewApplicationArchive();
         ZipInputStream zipInputStream = new ZipInputStream(inputStream);
         ZipEntry zipEntry;
         while ((zipEntry = zipInputStream.getNextEntry()) != null) {
             if (!zipEntry.isDirectory()) {
-                this.artifactTypeDetector.detectAndStore(zipEntry.getName(), zipInputStream, builder);
+                this.artifactTypeDetector.detectAndStore(zipEntry.getName(), zipInputStream, applicationArchive);
             }
         }
-        return builder.build();
+        return applicationArchive;
     }
 
-    public ApplicationArchive.ApplicationArchiveBuilder getBuilder() {
-        return ApplicationArchive.builder();
+    protected ApplicationArchive createNewApplicationArchive() {
+        return new ApplicationArchive();
     }
+
 }

@@ -13,36 +13,55 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
-import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.io.FileAndContent;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 public class ApplicationArchive {
-
-    // class must be present for the javadoc generation
 
     private FileAndContent organization;
     private FileAndContent bdm;
-    @Singular
-    private List<FileAndContent> processes;
-    @Singular
-    private List<FileAndContent> restAPIExtensions;
-    @Singular
-    private List<FileAndContent> pages;
-    @Singular
-    private List<FileAndContent> layouts;
-    @Singular
-    private List<FileAndContent> themes;
-    @Singular
-    private List<FileAndContent> applications;
+    private List<FileAndContent> processes = new ArrayList<>();
+    private List<FileAndContent> restAPIExtensions = new ArrayList<>();
+    private List<FileAndContent> pages = new ArrayList<>();
+    private List<FileAndContent> layouts = new ArrayList<>();
+    private List<FileAndContent> themes = new ArrayList<>();
+    private List<FileAndContent> applications = new ArrayList<>();
 
+    public ApplicationArchive addPage(FileAndContent page) {
+        pages.add(page);
+        return this;
+    }
+
+    public ApplicationArchive addLayout(FileAndContent layout) {
+        layouts.add(layout);
+        return this;
+    }
+
+    public ApplicationArchive addTheme(FileAndContent theme) {
+        themes.add(theme);
+        return this;
+    }
+
+    public ApplicationArchive addRestAPIExtension(FileAndContent extension) {
+        restAPIExtensions.add(extension);
+        return this;
+    }
+
+    public ApplicationArchive addApplication(FileAndContent livingApplication) {
+        applications.add(livingApplication);
+        return this;
+    }
+
+    public ApplicationArchive addProcess(FileAndContent process) {
+        processes.add(process);
+        return this;
+    }
 }
