@@ -19,6 +19,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.ExceptionUtils;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.page.PageService;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class MandatoryLivingApplicationImporter extends LivingApplicationImporter {
+public class MandatoryLivingApplicationImporter extends LivingApplicationImporter implements TenantLifecycleService {
 
     private static final String NON_EDITABLE_NON_REMOVABLE_PAGES_PATH = "org/bonitasoft/web/page/final";
 

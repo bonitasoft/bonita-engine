@@ -66,9 +66,8 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         // when: we stop and start the node
         stopAndStartPlatform();
 
-        // assert the page service has been restarted even though the tenant is paused, and that provided pages have been re-imported
+        // assert that provided mandatory pages have re-imported again even though the tenant is paused
         assertTrue(systemOutRule.getLog().contains("Import of Bonita mandatory pages completed"));
-        assertTrue(systemOutRule.getLog().contains("Import of Bonita default pages completed"));
         // then: work service is not running
         workService = getTenantAccessor().getWorkService();
         assertTrue(workService.isStopped());

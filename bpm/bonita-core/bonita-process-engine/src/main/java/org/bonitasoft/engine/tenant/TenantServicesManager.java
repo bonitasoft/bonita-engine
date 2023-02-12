@@ -104,13 +104,13 @@ public class TenantServicesManager {
     }
 
     public void initServices() throws Exception {
-        inTenantSession(() -> transactionService.executeInTransaction((Callable<Void>) () -> {
+        inTenantSessionTransaction(() -> {
             for (TenantLifecycleService tenantService : services) {
                 LOGGER.info("Initializing service {} of tenant {}", tenantService.getClass().getName(), tenantId);
                 tenantService.init();
             }
             return null;
-        }));
+        });
     }
 
     private void doStart(ServiceAction startAction) throws Exception {
@@ -245,5 +245,9 @@ public class TenantServicesManager {
                 sessionAccessor.setSessionInfo(currentSessionId, -1);
             }
         }
+    }
+
+    public <T> void inTenantSessionTransaction(final Callable<T> callable) throws Exception {
+        inTenantSession(() -> transactionService.executeInTransaction(callable));
     }
 }

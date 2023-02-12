@@ -138,7 +138,7 @@ public class DefaultLivingApplicationImporterTest {
         defaultLivingApplicationImporter.setAddRemovablePagesIfMissing(true);
 
         // when
-        defaultLivingApplicationImporter.init();
+        defaultLivingApplicationImporter.execute();
 
         // then
         List<SPage> insertedPages = pageArgumentCaptor.getAllValues();
@@ -175,7 +175,7 @@ public class DefaultLivingApplicationImporterTest {
         defaultLivingApplicationImporter.setAddRemovablePagesIfMissing(false);
 
         // when
-        defaultLivingApplicationImporter.init();
+        defaultLivingApplicationImporter.execute();
 
         // then
         verify(defaultLivingApplicationImporter, times(6)).importProvidedPage(any(), any(byte[].class), eq(true),
@@ -345,7 +345,7 @@ public class DefaultLivingApplicationImporterTest {
         defaultLivingApplicationImporter.setAddEditableApplicationsIfMissing(true);
 
         //when
-        defaultLivingApplicationImporter.init();
+        defaultLivingApplicationImporter.execute();
 
         //then
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(editableApp.getToken())),
@@ -363,7 +363,7 @@ public class DefaultLivingApplicationImporterTest {
         defaultLivingApplicationImporter.setAddEditableApplicationsIfMissing(false);
 
         //when
-        defaultLivingApplicationImporter.init();
+        defaultLivingApplicationImporter.execute();
 
         //then
         verify(applicationImporter).importApplication(argThat(node -> node.getToken().equals(editableApp.getToken())),

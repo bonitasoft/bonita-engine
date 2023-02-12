@@ -19,8 +19,11 @@ import java.io.InputStream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.api.utils.VisibleForTesting;
+import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
 import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
+import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -29,19 +32,27 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 /**
- * Spring listener of the event {@link PlatformStartedEvent}.
+ * Install custom application if one exists under a specific folder. If none, install default provided applications.
+ * <br>
+ * This installer listens to the event {@link PlatformStartedEvent} to ensure the platform is started before launching
+ * any application installation.
  */
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class CustomOrDefaultApplicationInstaller {
 
-    private static final String CUSTOM_APPLICATION_DEFAULT_FOLDER = "my-application";
+    public static final String CUSTOM_APPLICATION_DEFAULT_FOLDER = "my-application";
 
     @Value("${bonita.runtime.custom-application.install-folder:" + CUSTOM_APPLICATION_DEFAULT_FOLDER + "}")
     @Getter
     private String applicationInstallFolder;
+
     private final ApplicationInstaller applicationInstaller;
+
+    private final DefaultLivingApplicationImporter defaultLivingApplicationImporter;
+
+    private final TenantServicesManager tenantServicesManager;
 
     private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
             CustomOrDefaultApplicationInstaller.class.getClassLoader());
@@ -49,52 +60,89 @@ public class CustomOrDefaultApplicationInstaller {
     @EventListener
     public void autoDeployDetectedCustomApplication(PlatformStartedEvent event)
             throws ApplicationInstallationException, IOException {
-        log.info("Trying to detect custom application (.zip file from folder {})", applicationInstallFolder);
 
-        Resource[] resources = cpResourceResolver
-                .getResources(
-                        ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + applicationInstallFolder + "/*.zip");
+        // check under custom application default folder if an application is found, and retrieve it
+        final Resource customApplication = detectCustomApplication();
 
-        ensureNoMoreThanOneApplicationDetected(resources);
-
-        boolean foundAndDeployedOneApplication = false;
-        for (Resource resource : resources) {
-            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                String resourceName = resource.getFilename();
-                try (InputStream applicationZipFileStream = resource.getInputStream()) {
-                    log.info(
-                            "Custom application detected with name '{}' at the root of the classpath." +
-                                    " Bonita now tries to install it automatically...",
-                            resourceName);
-                    applicationInstaller.install(applicationZipFileStream);
-                    foundAndDeployedOneApplication = true;
-                    break;
-                } catch (IOException e) {
-                    throw new ApplicationInstallationException("Unable to install the page " + resourceName, e);
-                }
-            } else {
-                log.warn("Zip file '{}' was detected in /{} but could not be read.", resource.getDescription(),
-                        applicationInstallFolder);
-            }
-        }
-
-        if (!foundAndDeployedOneApplication) {
-            log.info(
-                    "No custom application detected at the root of the classpath. Continuing with default Bonita startup.");
+        if (customApplication != null) {
+            // install application if it exists
+            installCustomApplication(customApplication);
+        } else {
+            // install default provided applications if custom application does not exist
+            installDefaultProvidedApplications();
         }
     }
 
-    private static void ensureNoMoreThanOneApplicationDetected(Resource[] resources)
-            throws IOException, ApplicationInstallationException {
+    /**
+     * @return custom application resource if one is found, <code>null</code> if none
+     * @throws IOException if a resource cannot be resolved
+     * @throws ApplicationInstallationException if more than one application is detected
+     */
+    @VisibleForTesting
+    Resource detectCustomApplication() throws IOException, ApplicationInstallationException {
+        log.info("Trying to detect custom application (.zip file from folder {})", applicationInstallFolder);
+
+        Resource[] resources = getResourcesFromClasspath();
+
+        // loop over resources to find an existing, readable and not empty resource
+        Resource customApplicationResource = null;
         var nbZipApplication = 0;
         for (Resource resource : resources) {
             if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
                 nbZipApplication++;
+                customApplicationResource = resource;
+            } else {
+                log.info("A zip file '{}' is found but it cannot be read. It will be ignored.", resource.getFilename());
             }
         }
+        // if more than one application detected, stop execution by raising an exception
         if (nbZipApplication > 1) {
-            throw new ApplicationInstallationException("More than one application detected. Abandoning.");
+            throw new ApplicationInstallationException("More than one application detected. Abort startup.");
+        }
+
+        return customApplicationResource;
+    }
+
+    @VisibleForTesting
+    Resource[] getResourcesFromClasspath() throws IOException {
+        return cpResourceResolver
+                .getResources(
+                        ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + applicationInstallFolder + "/*.zip");
+    }
+
+    /**
+     * @param customApplication custom application resource
+     * @throws ApplicationInstallationException if unable to install the application
+     */
+    @VisibleForTesting
+    void installCustomApplication(final Resource customApplication) throws ApplicationInstallationException {
+        String resourceName = customApplication.getFilename();
+        try (final InputStream applicationZipFileStream = customApplication.getInputStream()) {
+            log.info(
+                    "No custom application detected under folder {}. Continuing with default Bonita startup.",
+                    applicationInstallFolder);
+            log.info(
+                    "Custom application detected with name '{}' under folder '{}'."
+                            + " Bonita now tries to install it automatically...",
+                    resourceName, applicationInstallFolder);
+            applicationInstaller.install(applicationZipFileStream);
+        } catch (IOException | ApplicationInstallationException e) {
+            throw new ApplicationInstallationException("Unable to install the application " + resourceName, e);
         }
     }
 
+    @VisibleForTesting
+    void installDefaultProvidedApplications() throws ApplicationInstallationException {
+        log.info("No custom application detected under folder {}. Continuing with default Bonita startup.",
+                applicationInstallFolder);
+        try {
+            // default app importer requires a tenant session and to be executed inside a transaction
+            tenantServicesManager.inTenantSessionTransaction(() -> {
+                defaultLivingApplicationImporter.execute();
+                return null;
+            });
+        } catch (Exception e) {
+            throw new ApplicationInstallationException("Unable to import default living applications", e);
+        }
+    }
 }

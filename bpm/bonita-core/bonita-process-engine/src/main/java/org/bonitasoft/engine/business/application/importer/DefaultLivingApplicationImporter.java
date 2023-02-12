@@ -20,7 +20,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.ExceptionUtils;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.page.PageService;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -56,8 +55,10 @@ public class DefaultLivingApplicationImporter extends LivingApplicationImporter 
         super(pageService, applicationImporter);
     }
 
-    @Override
-    public void init() throws SBonitaException {
+    /**
+     * Main function to import default living applications with their associated pages.
+     */
+    public void execute() {
         // Step 1: import default pages
         log.info("Importing Bonita default pages");
         importDefaultPages();
