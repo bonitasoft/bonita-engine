@@ -26,7 +26,6 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
-import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -44,7 +43,7 @@ import org.springframework.util.DigestUtils;
  */
 @RequiredArgsConstructor
 @Slf4j
-public abstract class LivingApplicationImporter implements TenantLifecycleService {
+public abstract class LivingApplicationImporter {
 
     protected final PageService pageService;
 

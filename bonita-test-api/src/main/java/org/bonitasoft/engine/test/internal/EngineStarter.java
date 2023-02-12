@@ -36,6 +36,7 @@ import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
@@ -43,6 +44,7 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
@@ -102,6 +104,10 @@ public class EngineStarter {
             deployCommandsOnDefaultTenant();
             LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000
                     + "s)  ===");
+
+            LOGGER.debug("Publishing platform started event");
+            ServiceAccessorFactory.getInstance().createPlatformServiceAccessor().getApplicationEventPublisher()
+                    .publishEvent(new PlatformStartedEvent());
         } catch (Exception e) {
             hasFailed = true;
             throw e;
