@@ -230,7 +230,8 @@ public class ApplicationInstaller {
         }
     }
 
-    private void resumeTenant() throws UpdateException {
+    @VisibleForTesting
+    void resumeTenant() throws UpdateException {
         try {
             tenantStateManager.resume();
             transactionService.executeInTransaction(() -> {
@@ -247,7 +248,8 @@ public class ApplicationInstaller {
         businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(tenantAccessor);
     }
 
-    public String updateBusinessDataModel(ApplicationArchive applicationArchive)
+    @VisibleForTesting
+    String updateBusinessDataModel(ApplicationArchive applicationArchive)
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         String bdmVersion;
         try {
@@ -294,7 +296,8 @@ public class ApplicationInstaller {
         }
     }
 
-    private void pauseTenant() throws UpdateException {
+    @VisibleForTesting
+    void pauseTenant() throws UpdateException {
         try {
             tenantStateManager.pause();
         } catch (Exception e) {
@@ -479,7 +482,6 @@ public class ApplicationInstaller {
 
     protected void installProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws InvalidBusinessArchiveFormatException, IOException, ProcessDeployException {
-
         for (FileAndContent process : applicationArchive.getProcesses()) {
             final BusinessArchive businessArchive = BusinessArchiveFactory
                     .readBusinessArchive(new ByteArrayInputStream(process.getContent()));
