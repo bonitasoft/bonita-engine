@@ -106,7 +106,7 @@ public class EngineStarter {
                     + "s)  ===");
 
             LOGGER.debug("Publishing platform started event");
-            ServiceAccessorFactory.getInstance().createPlatformServiceAccessor().getApplicationEventPublisher()
+            ServiceAccessorFactory.getInstance().createPlatformServiceAccessor()
                     .publishEvent(new PlatformStartedEvent());
         } catch (Exception e) {
             hasFailed = true;

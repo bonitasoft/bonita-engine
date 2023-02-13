@@ -35,7 +35,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.context.ApplicationEventPublisher;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EngineInitializerTest {
@@ -54,8 +53,6 @@ public class EngineInitializerTest {
     @Mock
     private PlatformSessionService platformSessionService;
     @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
-    @Mock
     private SPlatformSession sPlatformSession;
 
     @Rule
@@ -67,7 +64,6 @@ public class EngineInitializerTest {
         doReturn(sessionAccessor).when(engineInitializer).getSessionAccessor();
         doReturn(serviceAccessorFactory).when(engineInitializer).getServiceAccessorFactory();
         doReturn(platformService).when(engineInitializer).getPlatformService();
-        doReturn(applicationEventPublisher).when(platformService).getApplicationEventPublisher();
         doReturn(platformSessionService).when(platformService).getPlatformSessionService();
         doReturn(sPlatformSession).when(platformSessionService).createSession(anyString());
     }
@@ -86,7 +82,7 @@ public class EngineInitializerTest {
         //then
         verify(platformAPI).startNode();
         assertThat(systemOutRule.getLog()).contains("Initialization of Bonita Engine done!");
-        verify(applicationEventPublisher).publishEvent(platformStartEvent);
+        verify(platformService).publishEvent(platformStartEvent);
     }
 
     @Test

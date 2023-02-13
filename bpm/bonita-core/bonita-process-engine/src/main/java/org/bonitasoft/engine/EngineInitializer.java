@@ -74,7 +74,7 @@ public class EngineInitializer {
             LOGGER.info("Initialization of Bonita Engine done! (took " + (after - before) + "ms)");
 
             LOGGER.debug("Publishing platform started event");
-            platformService.getApplicationEventPublisher().publishEvent(new PlatformStartedEvent());
+            platformService.publishEvent(new PlatformStartedEvent());
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
