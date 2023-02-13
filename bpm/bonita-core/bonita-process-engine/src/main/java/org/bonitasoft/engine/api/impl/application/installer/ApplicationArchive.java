@@ -64,4 +64,9 @@ public class ApplicationArchive {
         processes.add(process);
         return this;
     }
+
+    public ApplicationArchive setBdm(FileAndContent bdm) {
+        this.bdm = bdm;
+        return this;
+    }
 }

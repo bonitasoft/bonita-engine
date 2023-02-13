@@ -138,6 +138,23 @@ public class ApplicationInstallerTest {
     }
 
     @Test
+    public void should_install_bdm() throws Exception {
+        byte[] bdmZipContent = createValidBDMZipFile();
+        ApplicationArchive applicationArchive = new ApplicationArchive()
+                .setBdm(new FileAndContent("bdm.zip", bdmZipContent));
+        doNothing().when(applicationInstaller).installOrganization(any(), any());
+        doNothing().when(applicationInstaller).pauseTenant();
+        doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
+        doNothing().when(applicationInstaller).resumeTenant();
+
+        applicationInstaller.install(applicationArchive);
+
+        verify(applicationInstaller).pauseTenant();
+        verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
+        verify(applicationInstaller).resumeTenant();
+    }
+
+    @Test
     public void should_install_only_unresolved_process() throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
