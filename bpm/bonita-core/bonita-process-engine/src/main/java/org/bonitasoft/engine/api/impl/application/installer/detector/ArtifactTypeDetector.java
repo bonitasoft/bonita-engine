@@ -42,8 +42,6 @@ public class ArtifactTypeDetector {
     private final PageAndFormDetector pageAndFormDetector;
     private final LayoutDetector layoutDetector;
 
-    protected FileAndContent file;
-
     public ArtifactTypeDetector(BdmDetector bdmDetector, LivingApplicationDetector livingApplicationDetector,
             OrganizationDetector organizationDetector, CustomPageDetector customPageDetector,
             ProcessDetector processDetector, ThemeDetector themeDetector, PageAndFormDetector pageAndFormDetector,
@@ -92,8 +90,10 @@ public class ArtifactTypeDetector {
 
     public void detectAndStore(String fileName, InputStream content, ApplicationArchive applicationArchive)
             throws IOException {
-        this.file = getFileAndContent(fileName, content);
-        logger.debug("Treating file {}", file.getFileName());
+        checkFile(getFileAndContent(fileName, content), applicationArchive);
+    }
+
+    protected void checkFile(FileAndContent file, ApplicationArchive applicationArchive) {
         if (isApplication(file)) {
             logger.info("Found application file: '{}'. ", file.getFileName());
             applicationArchive.addApplication(file);
@@ -119,11 +119,11 @@ public class ArtifactTypeDetector {
             logger.info("Found business data model file: '{}'. ", file.getFileName());
             applicationArchive.setBdm(file);
         } else {
-            logger.warn("Ignoring file '{}'.", fileName);
+            logger.warn("Ignoring file '{}'.", file.getFileName());
         }
     }
 
-    private static FileAndContent getFileAndContent(String fileName, InputStream content) throws IOException {
+    protected static FileAndContent getFileAndContent(String fileName, InputStream content) throws IOException {
         return FileAndContentUtils.file(fileName.substring(fileName.lastIndexOf('/') + 1), content);
     }
 }

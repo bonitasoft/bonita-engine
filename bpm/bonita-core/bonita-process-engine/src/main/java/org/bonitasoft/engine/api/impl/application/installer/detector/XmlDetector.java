@@ -34,7 +34,7 @@ public abstract class XmlDetector implements ArtifactDetector {
 
     private final String namespace;
 
-    XmlDetector(String namespace) {
+    protected XmlDetector(String namespace) {
         this.namespace = namespace;
         initDocumentBuilder();
     }
