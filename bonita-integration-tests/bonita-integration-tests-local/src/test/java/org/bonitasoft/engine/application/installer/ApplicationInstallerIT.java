@@ -84,15 +84,6 @@ public class ApplicationInstallerIT extends CommonAPIIT {
 
         // Layouts are there:
         assertThat(getPageAPI().getPageByName("custompage_pmLayout")).isNotNull();
-
-        // Profiles have been installed:
-        // SP-only: assertThat(getProfileAPI().searchProfiles(profilesWithName("userAm")).getResult()).hasSize(1);
-        //        logoutOnTenant();
     }
 
-    //    private SearchOptions profilesWithName(String name) {
-    //        return new SearchOptionsBuilder(0, 10)
-    //                .filter(ProfileSearchDescriptor.NAME, name)
-    //                .done();
-    //    }
 }
