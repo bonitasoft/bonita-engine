@@ -45,12 +45,16 @@ import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -117,16 +121,15 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    @Ignore("Not fully implemented yet (missing organization)")
     public void should_install_and_enable_resolved_process() throws Exception {
         byte[] barContent = createValidBusinessArchive();
-        //        byte[] bdmZipContent = createValidBDMZipFile();
         ApplicationArchive applicationArchive = new ApplicationArchive()
-                //                .bdm(new FileAndContent("bdm.zip", bdmZipContent))
                 .addProcess(new FileAndContent("process.bar", barContent));
+        doNothing().when(applicationInstaller).installOrganization(any(), any());
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doReturn(myProcess).when(applicationInstaller).deployProcess(any());
-        //        hasConfigurationState(myProcess, ConfigurationState.RESOLVED);
+        doNothing().when(applicationInstaller).enableProcess(myProcess);
+        mockConfigurationState(myProcess, ConfigurationState.RESOLVED);
 
         applicationInstaller.install(applicationArchive);
 

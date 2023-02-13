@@ -326,10 +326,9 @@ public class ApplicationInstaller {
 
     public void installLivingApplications(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws AlreadyExistsException, ImportException {
-        List<FileAndContent> applications = applicationArchive.getApplications();
-        for (FileAndContent applicationArchiveFile : applications) {
-            log.info("Installing / updating Living Application from file '{}'", applicationArchiveFile.getFileName());
-            final List<ImportStatus> importStatusList = importApplications(applicationArchiveFile.getContent());
+        for (FileAndContent livingApplication : applicationArchive.getApplications()) {
+            log.info("Installing / updating Living Application from file '{}'", livingApplication.getFileName());
+            final List<ImportStatus> importStatusList = importApplications(livingApplication.getContent());
             convertResultOfLivingApplicationImport(importStatusList, executionResult);
         }
     }
