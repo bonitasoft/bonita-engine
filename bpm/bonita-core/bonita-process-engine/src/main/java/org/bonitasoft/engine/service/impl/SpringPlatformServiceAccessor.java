@@ -28,7 +28,6 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.*;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * Uses spring to access platform services
@@ -133,7 +132,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public ApplicationEventPublisher getApplicationEventPublisher() {
-        return beanAccessor.getService(ApplicationEventPublisher.class);
+    public void publishEvent(final Object event) {
+        beanAccessor.getContext().publishEvent(event);
     }
 }
