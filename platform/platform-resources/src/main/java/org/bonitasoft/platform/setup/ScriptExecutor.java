@@ -85,14 +85,22 @@ public class ScriptExecutor {
         }
     }
 
-    public void createAndInitializePlatformIfNecessary() throws PlatformException {
+    /**
+     * Creates and initializes the platform if it is not already done. It creates database tables and populates it.
+     *
+     * @return <code>true</code> if it is a first initialization of the platform.
+     * @throws PlatformException if it fails to create or initialize tables.
+     */
+    public boolean createAndInitializePlatformIfNecessary() throws PlatformException {
         if (!isPlatformAlreadyCreated()) {
             createTables();
             initializePlatformStructure();
             insertPlatform();
             insertTenant();
+            return true;
         } else {
             logger.info("Bonita platform already exists. Nothing to do. Stopping.");
+            return false;
         }
     }
 
@@ -116,7 +124,6 @@ public class ScriptExecutor {
 
     public boolean isPlatformAlreadyCreated() {
         try {
-            // FIXME: 18/05/2022 should be update to check if tenant is created .
             return new JdbcTemplate(datasource).queryForObject("select count(*) from sequence", Integer.class) > 0;
         } catch (DataAccessException e) {
             return false;
