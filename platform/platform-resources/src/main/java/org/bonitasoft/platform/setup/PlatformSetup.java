@@ -70,6 +70,11 @@ public class PlatformSetup {
 
     public static final String BONITA_CLIENT_HOME_FOLDER = "bonita.client.home";
 
+    /**
+     * Indicates if it is a first initialization of the Bonita Platform.
+     */
+    public static boolean isFirstInitialization = false;
+
     @Autowired
     private ScriptExecutor scriptExecutor;
 
@@ -323,7 +328,7 @@ public class PlatformSetup {
     }
 
     private void initializePlatform() throws PlatformException {
-        scriptExecutor.createAndInitializePlatformIfNecessary();
+        isFirstInitialization = scriptExecutor.createAndInitializePlatformIfNecessary();
     }
 
     void initProperties() {
