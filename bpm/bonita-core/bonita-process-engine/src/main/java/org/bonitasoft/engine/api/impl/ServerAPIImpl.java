@@ -312,8 +312,8 @@ public class ServerAPIImpl implements ServerAPI {
         if (lockKey.isPresent()) {
             // try and acquire a lock with this scope
             final long tenantId = (session instanceof APISession) ? ((APISession) session).getTenantId() : 1L;
-            LockService lockService = getServiceAccessorFactoryInstance().createTenantServiceAccessor(tenantId)
-                    .getLockService();
+			LockService lockService = getServiceAccessorFactoryInstance().createTenantServiceAccessor()
+					.getLockService();
             BonitaLock lock = lockService.tryLock(1L, lockKey.get(), 1L, TimeUnit.MILLISECONDS, tenantId);
             if (lock == null) {
                 // timeout expired, we should not pursue this way
