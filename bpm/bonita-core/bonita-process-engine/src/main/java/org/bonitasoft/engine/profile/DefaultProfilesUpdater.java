@@ -95,7 +95,7 @@ public class DefaultProfilesUpdater implements TenantLifecycleService {
                     ImportPolicy.UPDATE_DEFAULTS, SessionService.SYSTEM_ID);
             log.info(
                     "Updated default profiles " + importStatuses);
-            if (md5File != null) {
+            if (md5File != null) { // but may not exist
                 IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
             }
         } catch (ExecutionException e) {

@@ -15,15 +15,10 @@ package org.bonitasoft.engine.api.impl;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.anyListOf;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyList;
@@ -31,19 +26,9 @@ import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anySetOf;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.nullable;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,8 +50,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
@@ -80,7 +63,6 @@ import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
@@ -1398,37 +1380,6 @@ public class ProcessAPIImplTest {
         when(processDefinitionService.getDesignProcessDefinition(processDefinitionId)).thenThrow(
                 new SProcessDefinitionNotFoundException("impossible to found given process definition"));
         processAPI.getDesignProcessDefinition(processDefinitionId);
-    }
-
-    @Test
-    public void validateBusinessArchive_should_throw_exception_if_empty_file_detected() throws Exception {
-        try (final InputStream resourceAsStream = this.getClass().getResourceAsStream("EmptyDocument--1.0.bar")) {
-            final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(resourceAsStream);
-
-            expectedEx.expect(ProcessDeployException.class);
-            expectedEx.expectMessage(
-                    "The BAR file you are trying to deploy contains an empty file: resources/forms/resources/emptyDocument2.pdf. The process cannot be deployed. Fix it or remove it from the BAR.");
-
-            processAPI.validateBusinessArchive(businessArchive);
-        }
-    }
-
-    @Test
-    public void deploy_should_not_call_service_deploy_if_bar_validation_failed() throws Exception {
-        // given:
-        doThrow(ProcessDeployException.class).when(processAPI).validateBusinessArchive(any(BusinessArchive.class));
-        final BusinessArchive businessArchive = mock(BusinessArchive.class);
-
-        // when:
-        try {
-            processAPI.deploy(businessArchive);
-            fail("Deploy should throw Exception");
-        } catch (ProcessDeployException e) {
-            // ok
-        }
-
-        // then:
-        verifyZeroInteractions(businessArchiveService);
     }
 
     @Test

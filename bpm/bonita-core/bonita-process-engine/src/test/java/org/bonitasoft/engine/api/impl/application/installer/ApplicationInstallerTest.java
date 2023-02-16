@@ -14,30 +14,25 @@
 package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.result.ExecutionResult;
-import org.bonitasoft.engine.api.result.Status;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessDeployException;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.internal.ProblemImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.io.FileAndContent;
@@ -127,14 +122,11 @@ public class ApplicationInstallerTest {
                 .addProcess(new FileAndContent("process.bar", barContent));
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         ProcessDefinition myProcess = aProcessDefinition(123L);
-        doReturn(myProcess).when(applicationInstaller).deployProcess(any());
-        doNothing().when(applicationInstaller).enableProcess(myProcess);
-        mockConfigurationState(myProcess, ConfigurationState.RESOLVED);
+        doReturn(myProcess).when(applicationInstaller).deployAndEnableProcess(any());
 
         applicationInstaller.install(applicationArchive);
 
-        verify(applicationInstaller).deployProcess(any());
-        verify(applicationInstaller).enableProcess(myProcess);
+        verify(applicationInstaller).deployAndEnableProcess(any());
     }
 
     @Test
@@ -155,46 +147,39 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_only_unresolved_process() throws Exception {
+    public void should_fail_to_install_unresolved_process() throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
         ApplicationArchive applicationArchive = new ApplicationArchive()
                 .addProcess(new FileAndContent("process.bar", barContent));
-        ProcessDefinition myProcess = aProcessDefinition(123L);
-        doReturn(myProcess).when(applicationInstaller).deployProcess(any());
-        mockConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
-        final List<ProblemImpl> problems = List.of(new ProblemImpl(Problem.Level.ERROR, "", "", ""));
-        doReturn(problems).when(applicationInstaller).getProcessResolutionProblems(myProcess);
+        doThrow(new ProcessEnablementException("Process not resolved")).when(applicationInstaller)
+                .deployAndEnableProcess(any());
 
-        applicationInstaller.installProcesses(applicationArchive, executionResult);
+        assertThatExceptionOfType(ProcessDeployException.class)
+                .isThrownBy(() -> applicationInstaller.installProcesses(applicationArchive, executionResult))
+                .withMessageContaining("Failed to enable process");
 
-        verify(applicationInstaller).deployProcess(any());
-        verify(applicationInstaller, never()).enableProcess(any());
-        assertThat(executionResult.getAllStatus()).anyMatch((status) -> status.getLevel() == Status.Level.WARNING);
+        verify(applicationInstaller).deployAndEnableProcess(any());
     }
 
     @Test
-    public void should_replace_any_already_existing_process() throws Exception {
+    public void should_throw_exception_if_already_existing_process() throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
         ApplicationArchive applicationArchive = new ApplicationArchive()
                 .addProcess(new FileAndContent("process.bar", barContent));
-        ProcessDefinition myProcess = aProcessDefinition(123L);
+        ProcessDefinition myProcess = aProcessDefinition(1193L);
         doThrow(new AlreadyExistsException("already exists"))
                 .doReturn(myProcess)
                 .when(applicationInstaller)
-                .deployProcess(any(BusinessArchive.class));
-        doReturn(456L).when(applicationInstaller).getProcessDefinitionId("myProcess", "1.0");
-        doReturn(emptyList()).when(applicationInstaller).getExistingProcessInstances(any());
-        doReturn(emptyList()).when(applicationInstaller).getExistingArchivedProcessInstances(any());
-        mockConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
-        doReturn(emptyList()).when(applicationInstaller).getProcessResolutionProblems(myProcess);
+                .deployAndEnableProcess(any(BusinessArchive.class));
 
-        applicationInstaller.installProcesses(applicationArchive, executionResult);
+        // when
+        assertThatExceptionOfType(ProcessDeployException.class).isThrownBy(
+                () -> applicationInstaller.installProcesses(applicationArchive, executionResult))
+                .withMessageContaining("Process myProcess - 1.0 already exists");
 
-        verify(applicationInstaller).disableProcess(456L);
-        verify(applicationInstaller).deleteProcessDefinition(456L);
-        verify(applicationInstaller, times(2)).deployProcess(ArgumentMatchers
+        verify(applicationInstaller).deployAndEnableProcess(ArgumentMatchers
                 .argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
     }
 
@@ -204,20 +189,13 @@ public class ApplicationInstallerTest {
         return myProcess;
     }
 
-    private void mockConfigurationState(ProcessDefinition myProcess, ConfigurationState state)
-            throws ProcessDefinitionNotFoundException {
-        ProcessDeploymentInfo processDeploymentInfo = mock(ProcessDeploymentInfo.class);
-        doReturn(state).when(processDeploymentInfo).getConfigurationState();
-        doReturn(processDeploymentInfo).when(applicationInstaller).getProcessDeploymentInfo(myProcess);
-    }
-
     private byte[] createValidBusinessArchive()
             throws InvalidBusinessArchiveFormatException, InvalidProcessDefinitionException, IOException {
         BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").done())
                 .done();
         File businessArchiveFile = temporaryFolder.newFile();
-        businessArchiveFile.delete();
+        assert businessArchiveFile.delete();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, businessArchiveFile);
         return FileOperations.readFully(businessArchiveFile);
     }

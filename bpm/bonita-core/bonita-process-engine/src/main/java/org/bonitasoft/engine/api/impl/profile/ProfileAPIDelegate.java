@@ -97,8 +97,8 @@ public class ProfileAPIDelegate {
     public Map<Long, Long> getNumberOfProfileMembers(final List<Long> profileIds) {
         try {
             final List<SProfileMember> listOfProfileMembers = profileService.getProfileMembers(profileIds);
-            final Map<Long, SProfileMember> profileMembers = new HashMap<Long, SProfileMember>();
-            final Map<Long, Long> result = new HashMap<Long, Long>();
+            final Map<Long, SProfileMember> profileMembers = new HashMap<>();
+            final Map<Long, Long> result = new HashMap<>();
             for (final SProfileMember p : listOfProfileMembers) {
                 profileMembers.put(p.getProfileId(), p);
             }
@@ -165,8 +165,7 @@ public class ProfileAPIDelegate {
     }
 
     public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId,
-            final Long roleId)
-            throws CreationException, AlreadyExistsException {
+            final Long roleId) throws CreationException, AlreadyExistsException {
 
         try {
             final MemberType memberType = getMemberType(userId, groupId, roleId);
@@ -268,7 +267,7 @@ public class ProfileAPIDelegate {
     }
 
     public MemberType getMemberType(final Long userId, final Long groupId, final Long roleId) throws CreationException {
-        MemberType memberType = null;
+        MemberType memberType;
         if (isPositiveLong(userId)) {
             memberType = MemberType.USER;
         } else if (isPositiveLong(groupId) && !isPositiveLong(roleId)) {
@@ -278,13 +277,8 @@ public class ProfileAPIDelegate {
         } else if (isPositiveLong(roleId) && isPositiveLong(groupId)) {
             memberType = MemberType.MEMBERSHIP;
         } else {
-            final StringBuilder stb = new StringBuilder("Parameters map must contain at least one of entries: ");
-            stb.append(ProfileMemberUtils.USER_ID);
-            stb.append(", ");
-            stb.append(ProfileMemberUtils.GROUP_ID);
-            stb.append(", ");
-            stb.append(ProfileMemberUtils.ROLE_ID);
-            throw new CreationException(stb.toString());
+            throw new CreationException(String.format("Parameters map must contain at least one of entries: %s, %s, %s",
+                    ProfileMemberUtils.USER_ID, ProfileMemberUtils.GROUP_ID, ProfileMemberUtils.ROLE_ID));
         }
         return memberType;
     }

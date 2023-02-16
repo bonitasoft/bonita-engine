@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonMap;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 import static org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance.EXECUTION_DATE;
@@ -22,7 +23,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,7 +81,6 @@ import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressions
 import org.bonitasoft.engine.api.impl.transaction.flownode.SetExpectedEndDate;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.AddProcessDefinitionToCategory;
-import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLatestProcessDefinitionId;
@@ -104,7 +103,6 @@ import org.bonitasoft.engine.api.impl.transaction.task.GetHumanTaskInstance;
 import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOpenTasksForUsers;
 import org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
@@ -196,7 +194,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.SupervisorNotFoundException;
@@ -204,11 +201,8 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.ExceptionUtils;
-import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.commons.exceptions.SV6FormsDeployException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.category.CategoryService;
@@ -364,7 +358,6 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -432,8 +425,6 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
-import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -465,11 +456,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     private final DocumentAPI documentAPI;
     private final TaskInvolvementDelegate taskInvolvementDelegate;
     private final ProcessInvolvementDelegate processInvolvementDelegate;
+    private final ProcessDeploymentAPIDelegate processDeploymentAPIDelegate;
 
     public ProcessAPIImpl() {
         this(new ProcessManagementAPIImplDelegate(), new DocumentAPIImpl(), new ProcessConfigurationAPIImpl(),
-                new TaskInvolvementDelegate(),
-                new ProcessInvolvementDelegate());
+                new TaskInvolvementDelegate(), new ProcessInvolvementDelegate());
     }
 
     public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate,
@@ -481,6 +472,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         this.processConfigurationAPI = processConfigurationAPI;
         this.taskInvolvementDelegate = taskInvolvementDelegate;
         this.processInvolvementDelegate = processInvolvementDelegate;
+        this.processDeploymentAPIDelegate = ProcessDeploymentAPIDelegate.getInstance();
     }
 
     @Override
@@ -563,15 +555,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDefinition deployAndEnableProcess(final BusinessArchive businessArchive)
-            throws ProcessDeployException, ProcessEnablementException,
-            AlreadyExistsException {
-        final ProcessDefinition processDefinition = deploy(businessArchive);
-        try {
-            enableProcess(processDefinition.getId());
-        } catch (final ProcessDefinitionNotFoundException e) {
-            throw new ProcessEnablementException(e.getMessage());
-        }
-        return processDefinition;
+            throws ProcessDeployException, ProcessEnablementException, AlreadyExistsException {
+        return processDeploymentAPIDelegate.deployAndEnableProcess(businessArchive);
     }
 
     @Override
@@ -590,37 +575,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessDefinition deploy(final BusinessArchive businessArchive)
             throws ProcessDeployException, AlreadyExistsException {
-        validateBusinessArchive(businessArchive);
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final BusinessArchiveService businessArchiveService = tenantAccessor.getBusinessArchiveService();
-        try {
-            return ModelConvertor.toProcessDefinition(businessArchiveService.deploy(businessArchive));
-        } catch (SV6FormsDeployException e) {
-            throw new V6FormDeployException(e);
-        } catch (SObjectCreationException e) {
-            throw new ProcessDeployException(e);
-        } catch (SAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
-        }
-    }
-
-    void validateBusinessArchive(BusinessArchive businessArchive) throws ProcessDeployException {
-        for (Map.Entry<String, byte[]> resource : businessArchive.getResources().entrySet()) {
-            final byte[] resourceContent = resource.getValue();
-            if (resourceContent == null || resourceContent.length == 0) {
-                throw new ProcessDeployException(
-                        "The BAR file you are trying to deploy contains an empty file: " + resource.getKey()
-                                + ". The process cannot be deployed. Fix it or remove it from the BAR.");
-            }
-        }
+        return processDeploymentAPIDelegate.deploy(businessArchive);
     }
 
     @Override
     public void importActorMapping(final long pDefinitionId, final byte[] actorMappingXML)
             throws ActorMappingImportException {
         if (actorMappingXML != null) {
-            final String actorMapping = new String(actorMappingXML, Charset.forName("UTF-8"));
-            importActorMapping(pDefinitionId, actorMapping);
+            importActorMapping(pDefinitionId, new String(actorMappingXML, UTF_8));
         }
     }
 
@@ -665,21 +627,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void enableProcess(final long processDefinitionId)
             throws ProcessDefinitionNotFoundException, ProcessEnablementException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
-        final ProcessResourcesService processResourcesService = tenantAccessor.getProcessResourcesService();
-        try {
-            final ConfigurationService configurationService = PlatformSetupAccessor.getConfigurationService();
-            final EnableProcess enableProcess = new EnableProcess(processDefinitionService,
-                    processDefinitionId,
-                    eventsHandler, getUserNameFromSession());
-            enableProcess.execute();
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final Exception e) {
-            throw new ProcessEnablementException(e);
-        }
+        processDeploymentAPIDelegate.enableProcess(processDefinitionId);
     }
 
     SSession getSession() {
@@ -771,16 +719,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessDeploymentInfo getProcessDeploymentInfo(final long processDefinitionId)
             throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            return ModelConvertor
-                    .toProcessDeploymentInfo(processDefinitionService.getProcessDeploymentInfo(processDefinitionId));
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        }
+        return processDeploymentAPIDelegate.getProcessDeploymentInfo(processDefinitionId);
     }
 
     private void logError(final TenantServiceAccessor tenantAccessor, final Exception e) {
@@ -3004,15 +2943,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public long getProcessDefinitionId(final String name, final String version)
             throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            return processDefinitionService.getProcessDefinitionId(name, version);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        }
+        return processDeploymentAPIDelegate.getProcessDefinitionId(name, version);
     }
 
     @Override
@@ -5540,14 +5471,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Problem> getProcessResolutionProblems(final long processDefinitionId)
             throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            return tenantAccessor.getBusinessArchiveArtifactsManager().getProcessResolutionProblems(processDefinition);
-        } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        }
+        return processDeploymentAPIDelegate.getProcessResolutionProblems(processDefinitionId);
     }
 
     @Override

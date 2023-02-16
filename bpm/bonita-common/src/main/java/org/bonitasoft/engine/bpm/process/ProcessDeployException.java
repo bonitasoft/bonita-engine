@@ -16,23 +16,18 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a process fails to deploy. <br>
- * It also gives access to the ID of the process Definition that tried to be deployed, through method
- * {@link #getProcessDefinitionId()}.
+ * Thrown when a process fails to deploy.
  *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
- * @see #getProcessDefinitionId()
  * @version 6.3.5
  * @since 6.0.0
  */
 public class ProcessDeployException extends ExecutionException {
 
     private static final long serialVersionUID = 3104389074405599228L;
-
-    private Long processDefinitionId;
 
     /**
      * Constructs a new exception with the specified detail message.
@@ -42,6 +37,10 @@ public class ProcessDeployException extends ExecutionException {
      */
     public ProcessDeployException(final String message) {
         super(message);
+    }
+
+    public ProcessDeployException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
     /**
@@ -60,9 +59,11 @@ public class ProcessDeployException extends ExecutionException {
      * Get the identifier of the process definition who failed.
      *
      * @return The identifier of the process definition who failed.
+     * @deprecated always return 0, as the processDefinitionId cannot be determined if process failed to deploy
      */
+    @Deprecated(forRemoval = true, since = "8.0")
     public Long getProcessDefinitionId() {
-        return processDefinitionId;
+        return 0L;
     }
 
 }
