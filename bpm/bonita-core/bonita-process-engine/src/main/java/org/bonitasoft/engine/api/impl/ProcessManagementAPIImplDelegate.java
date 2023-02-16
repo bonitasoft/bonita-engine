@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.naming.NamingException;
-
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
@@ -34,7 +32,6 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDisablementException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -52,8 +49,6 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 
 /**
  * @author Matthieu Chaffotte
@@ -102,15 +97,6 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         disableProcess.execute();
     }
 
-    public ConfigurationService getConfigurationService() throws SProcessDisablementException {
-        try {
-            return PlatformSetupAccessor.getConfigurationService();
-        } catch (NamingException e) {
-            throw new SProcessDisablementException(e);
-        }
-
-    }
-
     public void purgeClassLoader(final long processDefinitionId)
             throws ProcessDefinitionNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -138,8 +124,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex,
-            final int maxResults,
-            final ParameterCriterion sort) {
+            final int maxResults, final ParameterCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -161,7 +146,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             }
             final List<SParameter> parameters = parameterService.get(processDefinitionId, startIndex, maxResults,
                     order);
-            final List<ParameterInstance> paramterInstances = new ArrayList<>();
+            final List<ParameterInstance> parameterInstances = new ArrayList<>();
             for (int i = 0; i < parameters.size(); i++) {
                 final SParameter parameter = parameters.get(i);
                 final String name = parameter.getName();
@@ -169,9 +154,9 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
                 final SParameterDefinition parameterDefinition = sProcessDefinition.getParameter(name);
                 final String description = parameterDefinition.getDescription();
                 final String type = parameterDefinition.getType();
-                paramterInstances.add(new ParameterImpl(name, description, value, type));
+                parameterInstances.add(new ParameterImpl(name, description, value, type));
             }
-            return paramterInstances;
+            return parameterInstances;
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }

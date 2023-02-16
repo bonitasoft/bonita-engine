@@ -36,7 +36,7 @@ public class BonitaException extends Exception implements BonitaContextException
 
     private static final long serialVersionUID = -5413586694735909486L;
 
-    private final Map<ExceptionContext, Serializable> context = new TreeMap<ExceptionContext, Serializable>();
+    private final Map<ExceptionContext, Serializable> context = new TreeMap<>();
 
     private String userName = "";
 

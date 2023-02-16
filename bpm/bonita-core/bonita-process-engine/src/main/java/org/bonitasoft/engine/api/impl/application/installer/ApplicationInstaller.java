@@ -34,31 +34,20 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.impl.ProcessDeploymentAPIDelegate;
 import org.bonitasoft.engine.api.impl.organization.OrganizationAPIDelegate;
 import org.bonitasoft.engine.api.impl.page.PageAPIDelegate;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
 import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.api.result.Status;
 import org.bonitasoft.engine.api.result.StatusCode;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
-import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -66,38 +55,22 @@ import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentExcep
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.commons.exceptions.SV6FormsDeployException;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.io.FileAndContent;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -123,16 +96,17 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(ApplicationInstaller.class)
 public class ApplicationInstaller {
 
-    private ApplicationArchiveReader applicationArchiveReader;
+    private final ApplicationArchiveReader applicationArchiveReader;
     private PageAPIDelegate pageAPIDelegate;
-    private BusinessDataModelRepository bdmRepository;
-    private UserTransactionService transactionService;
-    private TenantStateManager tenantStateManager;
-    private SessionAccessor sessionAccessor;
-    private SessionService sessionService;
-    private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
+    private final ProcessDeploymentAPIDelegate processDeployer = ProcessDeploymentAPIDelegate.getInstance();
     private OrganizationAPIDelegate organizationImporter;
-    private Long tenantId;
+    private final BusinessDataModelRepository bdmRepository;
+    private final UserTransactionService transactionService;
+    private final TenantStateManager tenantStateManager;
+    private final SessionAccessor sessionAccessor;
+    private final SessionService sessionService;
+    private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
+    private final Long tenantId;
 
     @Autowired
     public ApplicationInstaller(@Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
@@ -190,7 +164,6 @@ public class ApplicationInstaller {
         } catch (Exception e) {
             throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
         }
-
     }
 
     protected void installArtifacts(ApplicationArchive applicationArchive, ExecutionResult executionResult)
@@ -208,7 +181,7 @@ public class ApplicationInstaller {
             throws OrganizationImportException {
         final List<String> warnings = getOrganizationImporter().importOrganizationWithWarnings(
                 new String(applicationArchive.getOrganization().getContent(), UTF_8),
-                ImportPolicy.MERGE_DUPLICATES);
+                ImportPolicy.FAIL_ON_DUPLICATES);
         for (String warning : warnings) {
             executionResult.addStatus(warningStatus(ORGANIZATION_IMPORT_WARNING, warning));
         }
@@ -235,17 +208,12 @@ public class ApplicationInstaller {
         try {
             tenantStateManager.resume();
             transactionService.executeInTransaction(() -> {
-                resolveDependenciesForAllProcesses();
+                businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getTenantAccessor());
                 return null;
             });
         } catch (Exception e) {
             throw new UpdateException(e);
         }
-    }
-
-    private void resolveDependenciesForAllProcesses() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(tenantAccessor);
     }
 
     @VisibleForTesting
@@ -487,7 +455,6 @@ public class ApplicationInstaller {
                     .readBusinessArchive(new ByteArrayInputStream(process.getContent()));
             final String processName = businessArchive.getProcessDefinition().getName();
             final String processVersion = businessArchive.getProcessDefinition().getVersion();
-            ProcessDefinition processDefinition;
 
             final Map<String, Serializable> context = new HashMap<>();
             context.put(PROCESS_NAME_KEY, processName);
@@ -495,240 +462,33 @@ public class ApplicationInstaller {
 
             try {
                 // Let's try to deploy the process, even if it already exists:
-                processDefinition = deployProcess(businessArchive);
+                deployAndEnableProcess(businessArchive);
+                log.info("Process {} ({}) has been enabled.", processName, processVersion);
                 executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_CREATE_NEW,
                         format("New process %s (%s) has been installed successfully", processName, processVersion),
                         context));
+                executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_ENABLEMENT_OK,
+                        format("Process %s (%s) has been enabled successfully", processName, processVersion),
+                        context));
             } catch (AlreadyExistsException e) {
-                log.info("{} Replacing the process with the new version.", e.getMessage());
-                try {
-                    // if it already exists, replace it with the new version:
-                    final long existingProcessDefinitionId = getProcessDefinitionId(processName, processVersion);
-                    deleteExistingProcess(existingProcessDefinitionId, processName, processVersion);
-                    processDefinition = deployProcess(businessArchive);
-                    log.info("Process {} ({}) has been installed successfully.", processName, processVersion);
-
-                    executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_REPLACE_EXISTING,
-                            format("Existing process %s (%s) has been replaced successfully",
-                                    processName, processVersion),
-                            context));
-
-                } catch (ProcessDefinitionNotFoundException | DeletionException | AlreadyExistsException
-                        | SearchException ex) {
-                    log.info("Cannot properly replace process {} ({}) because {}. Skipping.", processName,
-                            processVersion, ex.getMessage());
-
-                    context.put(PROCESS_DEPLOYMENT_FAILURE_REASON_KEY, e.getMessage());
-                    executionResult.addStatus(errorStatus(PROCESS_DEPLOYMENT_REPLACE_EXISTING,
-                            format("Failed to replace existing process %s (%s): %s",
-                                    processName, processVersion, e.getMessage()),
-                            context));
-                    return;
-                }
-            }
-
-            try {
-                // Then let's try to enable it, if it is resolved:
-                final ProcessDeploymentInfo deploymentInfo = getProcessDeploymentInfo(processDefinition);
-                if (deploymentInfo.getConfigurationState() == ConfigurationState.RESOLVED) {
-                    enableProcess(processDefinition);
-                    log.info("Process {} ({}) has been enabled.", processName, processVersion);
-
-                    executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_ENABLEMENT_OK,
-                            format("Process %s (%s) has been enabled successfully",
-                                    processName, processVersion),
-                            context));
-                } else {
-                    log.info("Process {} ({}) is not resolved and cannot be enabled. Here are the resolution problems:",
-                            processName, processVersion);
-                    executionResult.addStatus(warningStatus(PROCESS_DEPLOYMENT_IMPOSSIBLE_UNRESOLVED,
-                            format("Process %s (%s) cannot be enabled as it is not resolved",
-                                    processName, processVersion),
-                            context));
-
-                    for (Problem problem : getProcessResolutionProblems(processDefinition)) {
-
-                        log.info(problem.getDescription());
-
-                        final Map<String, Serializable> unresolvedProcessContext = new HashMap<>();
-                        unresolvedProcessContext.put(PROCESS_NAME_KEY, processName);
-                        unresolvedProcessContext.put(PROCESS_VERSION_KEY, processVersion);
-                        unresolvedProcessContext.put(PROCESS_RESOLUTION_PROBLEM_RESOURCE_TYPE_KEY,
-                                problem.getResource());
-                        unresolvedProcessContext.put(PROCESS_RESOLUTION_PROBLEM_RESOURCE_ID_KEY,
-                                problem.getResourceId());
-                        unresolvedProcessContext.put(PROCESS_RESOLUTION_PROBLEM_DESCRIPTION_KEY,
-                                problem.getDescription());
-                        executionResult.addStatus(
-                                warningStatus(PROCESS_DEPLOYMENT_IMPOSSIBLE_UNRESOLVED,
-                                        format("Process %s (%s) is not resolved for the following reasons",
-                                                processName, processVersion),
-                                        unresolvedProcessContext));
-                    }
-                }
-            } catch (ProcessEnablementException | ProcessDefinitionNotFoundException e) {
+                final String message = format("Process %s - %s already exists. Abandoning.", processName,
+                        processVersion);
+                log.error(message);
+                throw new ProcessDeployException(message);
+            } catch (ProcessEnablementException e) {
                 log.info("Failed to enable process {} ({}).", processName, processVersion);
                 log.info("This is certainly due to configuration issues, see details below.", e);
-
-                context.put(PROCESS_DEPLOYMENT_FAILURE_REASON_KEY, e.getMessage());
-                executionResult.addStatus(warningStatus(PROCESS_DEPLOYMENT_ENABLEMENT_KO,
-                        format("Failed to enable process %s (%s): %s",
-                                processName, processVersion, e.getMessage()),
-                        context));
+                throw new ProcessDeployException(
+                        format("Failed to enable process %s (%s). Process is not resolved",
+                                processName, processVersion),
+                        e);
             }
         }
     }
 
-    protected ProcessDeploymentInfo getProcessDeploymentInfo(ProcessDefinition processDefinition)
-            throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            return ModelConvertor.toProcessDeploymentInfo(
-                    processDefinitionService.getProcessDeploymentInfo(processDefinition.getId()));
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        }
-    }
-
-    protected void enableProcess(ProcessDefinition processDefinition)
-            throws ProcessDefinitionNotFoundException, ProcessEnablementException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
-        try {
-            new EnableProcess(processDefinitionService,
-                    processDefinition.getId(), eventsHandler, SessionService.SYSTEM).execute();
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final Exception e) {
-            throw new ProcessEnablementException(e);
-        }
-    }
-
-    List<Problem> getProcessResolutionProblems(ProcessDefinition processDefinition)
-            throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            SProcessDefinition sProcessDefinition = processDefinitionService
-                    .getProcessDefinition(processDefinition.getId());
-            return businessArchiveArtifactsManager.getProcessResolutionProblems(sProcessDefinition);
-        } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        }
-    }
-
-    long getProcessDefinitionId(String processName, String processVersion)
-            throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            return processDefinitionService.getProcessDefinitionId(processName, processVersion);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        }
-    }
-
-    protected ProcessDefinition deployProcess(BusinessArchive businessArchive)
-            throws AlreadyExistsException, ProcessDeployException {
-        validateBusinessArchive(businessArchive);
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final BusinessArchiveService businessArchiveService = tenantAccessor.getBusinessArchiveService();
-        try {
-            return ModelConvertor.toProcessDefinition(businessArchiveService.deploy(businessArchive));
-        } catch (SV6FormsDeployException e) {
-            throw new V6FormDeployException(e);
-        } catch (SObjectCreationException e) {
-            throw new ProcessDeployException(e);
-        } catch (SAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
-        }
-    }
-
-    void validateBusinessArchive(BusinessArchive businessArchive) throws ProcessDeployException {
-        for (Map.Entry<String, byte[]> resource : businessArchive.getResources().entrySet()) {
-            final byte[] resourceContent = resource.getValue();
-            if (resourceContent == null || resourceContent.length == 0) {
-                throw new ProcessDeployException("The BAR file you are trying to deploy contains an empty file: "
-                        + resource.getKey() + ". The process cannot be deployed. Fix it or remove it from the BAR.");
-            }
-        }
-    }
-
-    private void deleteExistingProcess(long processDefinitionId, String processName, String processVersion)
-            throws DeletionException, SearchException, ProcessDefinitionNotFoundException {
-        try {
-            disableProcess(processDefinitionId);
-        } catch (ProcessActivationException e) {
-            log.debug("Process {} ({}) is disabled.", processName, processVersion);
-        }
-
-        final SearchOptions options = new SearchOptionsBuilder(0, 100)
-                .filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId).done();
-        List<ProcessInstance> processInstances;
-        while (!(processInstances = getExistingProcessInstances(options)).isEmpty()) {
-            for (final ProcessInstance processInstance : processInstances) {
-                deleteProcessInstance(processInstance);
-            }
-        }
-
-        final SearchOptions archivedOptions = new SearchOptionsBuilder(0, 100)
-                .filter(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId).done();
-        List<ArchivedProcessInstance> archivedProcessInstances;
-        while (!(archivedProcessInstances = getExistingArchivedProcessInstances(archivedOptions))
-                .isEmpty()) {
-            for (final ArchivedProcessInstance archivedProcessInstance : archivedProcessInstances) {
-                deleteArchivedProcessInstancesInAllStates(archivedProcessInstance);
-            }
-        }
-
-        deleteProcessDefinition(processDefinitionId);
-
-    }
-
-    void deleteProcessDefinition(long processDefinitionId) throws DeletionException {
-        //        processAPI.deleteProcessDefinition(processDefinitionId);
-    }
-
-    private void deleteArchivedProcessInstancesInAllStates(ArchivedProcessInstance archivedProcessInstance)
-            throws DeletionException {
-        if (archivedProcessInstance == null) {
-            throw new IllegalArgumentException(
-                    "The identifier of the archived process instances to deleted are missing !!");
-        }
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-
-        try {
-            processInstanceService.deleteArchivedProcessInstances(List.of(archivedProcessInstance.getSourceObjectId()));
-        } catch (final SProcessInstanceHierarchicalDeletionException e) {
-            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
-    }
-
-    List<ArchivedProcessInstance> getExistingArchivedProcessInstances(SearchOptions archivedOptions)
-            throws SearchException {
-        return null; // processAPI.searchArchivedProcessInstances(archivedOptions).getResult();
-    }
-
-    private void deleteProcessInstance(ProcessInstance processInstance) throws DeletionException {
-        //        processAPI.deleteProcessInstance(processInstance.getId());
-    }
-
-    List<ProcessInstance> getExistingProcessInstances(SearchOptions options) throws SearchException {
-        return null; // processAPI.searchProcessInstances(options).getResult();
-    }
-
-    void disableProcess(long processDefinitionId)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException {
-        //        processAPI.disableProcess(processDefinitionId);
+    protected ProcessDefinition deployAndEnableProcess(BusinessArchive businessArchive)
+            throws AlreadyExistsException, ProcessDeployException, ProcessEnablementException {
+        return processDeployer.deployAndEnableProcess(businessArchive);
     }
 
     org.bonitasoft.engine.page.Page getPage(String urlToken) throws SearchException {
