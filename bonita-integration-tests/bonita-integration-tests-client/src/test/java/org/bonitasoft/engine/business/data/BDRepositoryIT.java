@@ -17,8 +17,16 @@ import static java.util.Collections.singletonList;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.test.BDMTestUtil.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.fail;
+import static org.bonitasoft.engine.test.BDMTestUtil.buildSimpleBom;
+import static org.bonitasoft.engine.test.BDMTestUtil.businessObject;
+import static org.bonitasoft.engine.test.BDMTestUtil.businessObjectModel;
+import static org.bonitasoft.engine.test.BDMTestUtil.getZip;
+import static org.bonitasoft.engine.test.BDMTestUtil.stringField;
 import static org.bonitasoft.engine.test.BuildTestUtil.generateConnectorImplementation;
 
 import java.io.ByteArrayInputStream;
@@ -39,6 +47,8 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -89,6 +99,7 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.UnavailableLockException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -2219,6 +2230,67 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // process should be ok
         assertThat(getProcessAPI().getProcessResolutionProblems(deploy.getId())).isEmpty();
+    }
+
+    /**
+     * In case the users call the install BDM multiple times, the API must handle correctly consecutive calls.
+     */
+    @Test
+    public void should_handle_consecutive_calls() throws Exception {
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        getTenantAdministrationAPI().resume();
+
+        final byte[] zip = getZip(businessObjectModel(bom -> {
+            IntStream.range(1, 8).forEach(i -> {
+                bom.addBusinessObject(businessObject("com.acme.Dwarf" + i, bo -> {
+                    bo.addField(stringField("name"));
+                    bo.addField(stringField("personality"));
+                    bo.addField(stringField("color"));
+                    bo.addQuery("findDwarf" + i + "ByColor",
+                            "SELECT d from com.acme.Dwarf" + i + " d WHERE d.color = :color", "com.acme.Dwarf" + i);
+                }));
+            });
+        }));
+        // pause only once
+        getTenantAdministrationAPI().pause();
+        //install the BDM twice with concurrent calls
+        AtomicReference<Exception> firstException = new AtomicReference<>();
+        Thread first = new Thread(() -> {
+            try {
+                final String businessDataModelVersion = getTenantAdministrationAPI().updateBusinessDataModel(zip);
+                assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
+            } catch (Exception e) {
+                firstException.set(e);
+            }
+        });
+        AtomicReference<Exception> secondException = new AtomicReference<>(null);
+        Thread second = new Thread(() -> {
+            try {
+                Thread.sleep(200);
+                final String businessDataModelVersion = getTenantAdministrationAPI().updateBusinessDataModel(zip);
+                assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
+            } catch (Exception e) {
+                secondException.set(e);
+            }
+        });
+        first.start();
+        second.start();
+        first.join();
+        second.join();
+        // resume and check deployment
+        getTenantAdministrationAPI().resume();
+        verifyBdmIsWellDeployed();
+        Exception e1 = firstException.get();
+        if (e1 != null) {
+            throw e1;
+        }
+        Exception e2 = secondException.get();
+        // 2nd request should throw an update exception and operation should abort before starting a transaction
+        assertThat(e2).isNotNull();
+        assertThat(e2).satisfiesAnyOf(
+                eParam -> assertThat(eParam).isInstanceOf(UnavailableLockException.class),
+                eParam -> assertThat(eParam).getCause().isInstanceOf(UnavailableLockException.class));
     }
 
     @Test
