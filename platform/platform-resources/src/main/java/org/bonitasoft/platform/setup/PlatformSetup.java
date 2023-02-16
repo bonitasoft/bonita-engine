@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
@@ -73,7 +74,8 @@ public class PlatformSetup {
     /**
      * Indicates if it is a first initialization of the Bonita Platform.
      */
-    public static boolean isFirstInitialization = false;
+    @Getter
+    private boolean isFirstInitialization = false;
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -328,7 +330,10 @@ public class PlatformSetup {
     }
 
     private void initializePlatform() throws PlatformException {
-        isFirstInitialization = scriptExecutor.createAndInitializePlatformIfNecessary();
+        boolean isFirstInit = scriptExecutor.createAndInitializePlatformIfNecessary();
+        // if initializePlatform is called again we do not want to update isFirstInitialization if it has been changed
+        // before
+        isFirstInitialization = isFirstInitialization || isFirstInit;
     }
 
     void initProperties() {

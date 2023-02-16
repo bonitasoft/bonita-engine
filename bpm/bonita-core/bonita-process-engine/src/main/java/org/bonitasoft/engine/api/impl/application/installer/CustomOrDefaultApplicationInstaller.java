@@ -16,6 +16,8 @@ package org.bonitasoft.engine.api.impl.application.installer;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.naming.NamingException;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicat
 import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
+import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -64,12 +67,21 @@ public class CustomOrDefaultApplicationInstaller {
         // check under custom application default folder if an application is found, and retrieve it
         final Resource customApplication = detectCustomApplication();
 
-        if (customApplication != null) {
-            // install application if it exists
+        if (customApplication != null && isPlatformFirstInitialization()) {
+            // install application if it exists and if it is a first init of the platform
             installCustomApplication(customApplication);
         } else {
             // install default provided applications if custom application does not exist
             installDefaultProvidedApplications();
+        }
+    }
+
+    boolean isPlatformFirstInitialization() {
+        try {
+            return PlatformSetupAccessor.getPlatformSetup().isFirstInitialization();
+        } catch (NamingException e) {
+            log.warn("Failed to retrieve platform setup configuration.", e);
+            return false;
         }
     }
 

@@ -15,6 +15,8 @@ package org.bonitasoft.engine.api.impl.application.installer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -31,202 +33,169 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Emmanuel Duchastenier
  */
 public class CustomOrDefaultApplicationInstallerTest {
 
-    @RunWith(SpringRunner.class)
-    @ContextConfiguration(classes = CustomApplicationInstallerConfigurationTest.TextConfiguration.class)
-    abstract static class CustomApplicationInstallerConfigurationTest {
+    private CustomOrDefaultApplicationInstaller installer;
+    private ApplicationInstaller applicationInstaller;
 
-        @Autowired
-        protected CustomOrDefaultApplicationInstaller listener;
-
-        protected static ApplicationInstaller applicationInstaller;
-
-        @Configuration
-        static class TextConfiguration {
-
-            @Bean
-            public CustomOrDefaultApplicationInstaller listener() {
-                applicationInstaller = spy(new ApplicationInstaller(mock(BusinessDataModelRepository.class),
-                        mock(TransactionService.class), 1L, mock(SessionAccessor.class), mock(SessionService.class),
-                        mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class),
-                        mock(ApplicationArchiveReader.class)));
-                return new CustomOrDefaultApplicationInstaller(applicationInstaller,
-                        mock(DefaultLivingApplicationImporter.class), mock(TenantServicesManager.class));
-            }
-        }
+    @Before
+    public void before() {
+        applicationInstaller = spy(new ApplicationInstaller(mock(BusinessDataModelRepository.class),
+                mock(TransactionService.class), 1L, mock(SessionAccessor.class), mock(SessionService.class),
+                mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class),
+                mock(ApplicationArchiveReader.class)));
+        installer = spy(new CustomOrDefaultApplicationInstaller(applicationInstaller,
+                mock(DefaultLivingApplicationImporter.class), mock(TenantServicesManager.class)));
     }
 
-    public static class DefaultCustomOrDefaultApplicationInstallerTest
-            extends CustomApplicationInstallerConfigurationTest {
+    @Test
+    public void should_detect_one_custom_application() throws Exception {
+        //given
+        Resource resource1 = mockResource("resource1", true, true, 1L);
 
-        @Test
-        public void should_application_install_folder_have_default_value() {
-            assertThat(listener.getApplicationInstallFolder()).isEqualTo("my-application");
-        }
+        doReturn(new Resource[] { resource1 })
+                .when(installer)
+                .getResourcesFromClasspath();
 
-        @Test
-        public void should_detect_one_custom_application() throws Exception {
-            //given
-            var spyListener = spy(listener);
+        //when
+        Resource result = installer.detectCustomApplication();
 
-            Resource resource1 = mockResource("resource1", true, true, 1L);
-
-            doReturn(new Resource[] { resource1 })
-                    .when(spyListener)
-                    .getResourcesFromClasspath();
-
-            //when
-            Resource result = spyListener.detectCustomApplication();
-
-            //then
-            assertThat(result).isNotNull();
-            assertThat(result.getFilename()).isEqualTo("resource1");
-        }
-
-        @Test
-        public void should_raise_exception_if_more_than_one_application() throws Exception {
-            //given
-            var spyListener = spy(listener);
-
-            Resource resource1 = mockResource("resource1", true, true, 1L);
-            Resource resource2 = mockResource("resource2", true, true, 1L);
-
-            doReturn(new Resource[] { resource1, resource2 })
-                    .when(spyListener)
-                    .getResourcesFromClasspath();
-
-            //then
-            assertThatExceptionOfType(ApplicationInstallationException.class)
-                    .isThrownBy(spyListener::detectCustomApplication)
-                    .withMessage("More than one application detected. Abort startup.");
-        }
-
-        @Test
-        public void should_ignore_non_existing_zip_file() throws Exception {
-            //given
-            var spyListener = spy(listener);
-
-            Resource resource1 = mockResource("resource1", false, true, 1L);
-
-            doReturn(new Resource[] { resource1 })
-                    .when(spyListener)
-                    .getResourcesFromClasspath();
-
-            //when
-            Resource result = spyListener.detectCustomApplication();
-
-            //then
-            assertThat(result).isNull();
-        }
-
-        @Test
-        public void should_ignore_non_readable_zip_file() throws Exception {
-            //given
-            var spyListener = spy(listener);
-
-            Resource resource1 = mockResource("resource1", true, false, 1L);
-
-            doReturn(new Resource[] { resource1 })
-                    .when(spyListener)
-                    .getResourcesFromClasspath();
-
-            //when
-            Resource result = spyListener.detectCustomApplication();
-
-            //then
-            assertThat(result).isNull();
-        }
-
-        @Test
-        public void should_ignore_empty_zip_file() throws Exception {
-            //given
-            var spyListener = spy(listener);
-
-            Resource resource1 = mockResource("resource1", true, true, 0L);
-
-            doReturn(new Resource[] { resource1 })
-                    .when(spyListener)
-                    .getResourcesFromClasspath();
-
-            //when
-            Resource result = spyListener.detectCustomApplication();
-
-            //then
-            assertThat(result).isNull();
-        }
-
-        @Test
-        public void should_install_custom_application_if_detected() throws Exception {
-            //given
-            var spyListener = spy(listener);
-
-            Resource resource1 = mockResource("resource1", true, true, 0L);
-            InputStream resourceStream1 = mock(InputStream.class);
-
-            doReturn(resource1).when(spyListener).detectCustomApplication();
-            doReturn(resourceStream1).when(resource1).getInputStream();
-            doReturn(mock(ExecutionResult.class)).when(applicationInstaller).install(any(InputStream.class));
-
-            //when
-            spyListener.autoDeployDetectedCustomApplication(any());
-
-            //then
-            verify(spyListener).installCustomApplication(eq(resource1));
-            verify(applicationInstaller).install(eq(resourceStream1));
-            verify(spyListener, never()).installDefaultProvidedApplications();
-        }
-
-        @Test
-        public void should_install_default_applications_if_no_custom_app_detected() throws Exception {
-            //given
-            var spyListener = spy(listener);
-
-            doReturn(null).when(spyListener).detectCustomApplication();
-
-            //when
-            spyListener.autoDeployDetectedCustomApplication(any());
-
-            //then
-            verify(spyListener, never()).installCustomApplication(any());
-            verify(applicationInstaller, never()).install(any(InputStream.class));
-            verify(spyListener).installDefaultProvidedApplications();
-        }
-
-        private Resource mockResource(String filename, boolean exists, boolean isReadable, long contentLength)
-                throws IOException {
-            Resource resource = spy(new FileSystemResource(mock(File.class)));
-            doReturn(exists).when(resource).exists();
-            doReturn(isReadable).when(resource).isReadable();
-            doReturn(contentLength).when(resource).contentLength();
-            doReturn(filename).when(resource).getFilename();
-            return resource;
-        }
+        //then
+        assertThat(result).isNotNull();
+        assertThat(result.getFilename()).isEqualTo("resource1");
     }
 
-    @TestPropertySource(properties = {
-            "bonita.runtime.custom-application.install-folder=my-carpeta-personalizada",
-    })
-    public static class OverwrittenCustomOrDefaultApplicationInstallerTest
-            extends CustomApplicationInstallerConfigurationTest {
+    @Test
+    public void should_raise_exception_if_more_than_one_application() throws Exception {
+        //given
+        Resource resource1 = mockResource("resource1", true, true, 1L);
+        Resource resource2 = mockResource("resource2", true, true, 1L);
 
-        @Test
-        public void should_support_application_install_folder_overwrite() {
-            assertThat(listener.getApplicationInstallFolder()).isEqualTo("my-carpeta-personalizada");
-        }
+        doReturn(new Resource[] { resource1, resource2 })
+                .when(installer)
+                .getResourcesFromClasspath();
+
+        //then
+        assertThatExceptionOfType(ApplicationInstallationException.class)
+                .isThrownBy(installer::detectCustomApplication)
+                .withMessage("More than one application detected. Abort startup.");
+    }
+
+    @Test
+    public void should_ignore_non_existing_zip_file() throws Exception {
+        //given
+        Resource resource1 = mockResource("resource1", false, true, 1L);
+
+        doReturn(new Resource[] { resource1 })
+                .when(installer)
+                .getResourcesFromClasspath();
+
+        //when
+        Resource result = installer.detectCustomApplication();
+
+        //then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void should_ignore_non_readable_zip_file() throws Exception {
+        //given
+        Resource resource1 = mockResource("resource1", true, false, 1L);
+
+        doReturn(new Resource[] { resource1 })
+                .when(installer)
+                .getResourcesFromClasspath();
+
+        //when
+        Resource result = installer.detectCustomApplication();
+
+        //then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void should_ignore_empty_zip_file() throws Exception {
+        //given
+        Resource resource1 = mockResource("resource1", true, true, 0L);
+
+        doReturn(new Resource[] { resource1 })
+                .when(installer)
+                .getResourcesFromClasspath();
+
+        //when
+        Resource result = installer.detectCustomApplication();
+
+        //then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void should_install_custom_application_if_detected_and_platform_first_init() throws Exception {
+        //given
+        Resource resource1 = mockResource("resource1", true, true, 0L);
+        InputStream resourceStream1 = mock(InputStream.class);
+
+        doReturn(resource1).when(installer).detectCustomApplication();
+        doReturn(resourceStream1).when(resource1).getInputStream();
+        doReturn(mock(ExecutionResult.class)).when(applicationInstaller).install(any(InputStream.class));
+        doReturn(true).when(installer).isPlatformFirstInitialization();
+
+        //when
+        installer.autoDeployDetectedCustomApplication(any());
+
+        //then
+        verify(installer).installCustomApplication(eq(resource1));
+        verify(applicationInstaller).install(eq(resourceStream1));
+        verify(installer, never()).installDefaultProvidedApplications();
+    }
+
+    @Test
+    public void should_install_default_applications_if_no_custom_app_detected_and_platform_first_init()
+            throws Exception {
+        //given
+        doReturn(null).when(installer).detectCustomApplication();
+        doReturn(true).when(installer).isPlatformFirstInitialization();
+
+        //when
+        installer.autoDeployDetectedCustomApplication(any());
+
+        //then
+        verify(installer, never()).installCustomApplication(any());
+        verify(applicationInstaller, never()).install(any(InputStream.class));
+        verify(installer).installDefaultProvidedApplications();
+    }
+
+    @Test
+    public void should_install_default_applications_if_no_custom_app_detected_and_not_platform_first_init()
+            throws Exception {
+        //given
+        doReturn(null).when(installer).detectCustomApplication();
+        doReturn(false).when(installer).isPlatformFirstInitialization();
+
+        //when
+        installer.autoDeployDetectedCustomApplication(any());
+
+        //then
+        verify(installer, never()).installCustomApplication(any());
+        verify(applicationInstaller, never()).install(any(InputStream.class));
+        verify(installer).installDefaultProvidedApplications();
+    }
+
+    private Resource mockResource(String filename, boolean exists, boolean isReadable, long contentLength)
+            throws IOException {
+        Resource resource = spy(new FileSystemResource(mock(File.class)));
+        doReturn(exists).when(resource).exists();
+        doReturn(isReadable).when(resource).isReadable();
+        doReturn(contentLength).when(resource).contentLength();
+        doReturn(filename).when(resource).getFilename();
+        return resource;
     }
 }
