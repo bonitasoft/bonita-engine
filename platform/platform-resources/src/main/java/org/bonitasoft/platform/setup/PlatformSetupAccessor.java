@@ -33,13 +33,18 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 public class PlatformSetupAccessor {
 
+    private static PlatformSetup _INSTANCE;
+
     public static PlatformSetup getPlatformSetup() throws NamingException {
-        final DataSource dataSource = lookupDataSource();
-        String dbVendor = System.getProperty("sysprop.bonita.db.vendor");
-        return getPlatformSetup(dataSource, dbVendor);
+        if (_INSTANCE == null) {
+            _INSTANCE = createPlatformSetup();
+        }
+        return _INSTANCE;
     }
 
-    public static PlatformSetup getPlatformSetup(DataSource dataSource, String dbVendor) {
+    private static PlatformSetup createPlatformSetup() throws NamingException {
+        DataSource dataSource = lookupDataSource();
+        String dbVendor = System.getProperty("sysprop.bonita.db.vendor");
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
