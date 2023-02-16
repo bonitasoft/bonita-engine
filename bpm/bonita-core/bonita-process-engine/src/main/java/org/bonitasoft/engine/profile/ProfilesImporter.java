@@ -78,6 +78,8 @@ public class ProfilesImporter {
                 return new ReplaceDuplicateImportStrategy(profileService);
             case UPDATE_DEFAULTS:
                 return new UpdateDefaultsImportStrategy(profileService);
+            case UPDATE_DEFAULTS_AND_CREATE_NEW:
+                return new UpdateDefaultsAndCreateNewImportStrategy(profileService);
             default:
                 throw new IllegalStateException("No strategy defined for policy: " + policy);
         }
