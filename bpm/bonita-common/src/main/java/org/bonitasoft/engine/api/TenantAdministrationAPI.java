@@ -27,6 +27,9 @@ import org.bonitasoft.engine.tenant.TenantResource;
  */
 public interface TenantAdministrationAPI {
 
+    /** A String key to designate the functional scope of updating the BDM */
+    public static final String UPDATE_BDM = "UpdateBDM";
+
     /**
      * @return
      *         true if the tenant is paused.

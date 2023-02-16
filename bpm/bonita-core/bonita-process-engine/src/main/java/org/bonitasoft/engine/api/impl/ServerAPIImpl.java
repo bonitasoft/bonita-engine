@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.bonitasoft.engine.api.NoSessionRequired;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -46,6 +48,9 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.TenantStatusException;
+import org.bonitasoft.engine.exception.UnavailableLockException;
+import org.bonitasoft.engine.lock.BonitaLock;
+import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.PlatformState;
@@ -267,17 +272,58 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private Object invokeAPI(Object api, String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues,
-            final Session session) throws Throwable {
+            final List<String> classNameParameters, final Object[] parametersValues, final Session session)
+            throws Throwable {
         final Class<?>[] parameterTypes = getParameterTypes(classNameParameters);
 
         final Method method = ClassReflector.getMethod(api.getClass(), methodName, parameterTypes);
-        // No session required means that there is no transaction
-        if (method.isAnnotationPresent(CustomTransactions.class)
-                || Class.forName(apiInterfaceName).isAnnotationPresent(NoSessionRequired.class)) {
-            return invokeAPIOutsideTransaction(parametersValues, api, method, apiInterfaceName, session);
+        // first, check if a lock is needed before opening any transaction
+        // and get the key which defines the functional scope
+        Optional<String> lockKey = Optional.ofNullable(method.getAnnotation(WithLock.class)).map(WithLock::key);
+        // try and acquire a lock with this scope if necessary
+        Supplier<String> failureMessage = () -> MessageFormat.format(
+                "Operation ''{0}.{1}'' requires exclusive access. Another operation is already launched with the same ''{2}'' access scope. You may try again after the other operation has finished.",
+                apiInterfaceName, methodName, lockKey.orElse(""));
+        try (AutoCloseable functionalLock = withEventualLock(lockKey, session, failureMessage)) {
+            // No session required means that there is no transaction
+            if (method.isAnnotationPresent(CustomTransactions.class)
+                    || Class.forName(apiInterfaceName).isAnnotationPresent(NoSessionRequired.class)) {
+                return invokeAPIOutsideTransaction(parametersValues, api, method, apiInterfaceName, session);
+            } else {
+                return invokeAPIInTransaction(parametersValues, api, method, session, apiInterfaceName);
+            }
+        }
+    }
+
+    /**
+     * Eventually get a functional lock auto-closeable resource.
+     *
+     * @param lockKey the functional key for the lock scope or an empty
+     *        optional when no lock is necessary
+     * @param session the user session
+     * @param failureMessage builds the failure message when lock is already taken
+     * @return the auto-closeable resource or a stub ineffective resource when
+     *         lockKey is empty
+     * @throws UnavailableLockException error with built message when
+     *         lock is already taken.
+     */
+    private AutoCloseable withEventualLock(final Optional<String> lockKey, final Session session,
+            Supplier<String> failureMessage) throws Throwable {
+        if (lockKey.isPresent()) {
+            // try and acquire a lock with this scope
+            final long tenantId = (session instanceof APISession) ? ((APISession) session).getTenantId() : 1L;
+            LockService lockService = getServiceAccessorFactoryInstance().createTenantServiceAccessor(tenantId)
+                    .getLockService();
+            BonitaLock lock = lockService.tryLock(1L, lockKey.get(), 1L, TimeUnit.MILLISECONDS, tenantId);
+            if (lock == null) {
+                // timeout expired, we should not pursue this way
+                throw new UnavailableLockException(failureMessage.get());
+            }
+            return () -> lockService.unlock(lock, tenantId);
         } else {
-            return invokeAPIInTransaction(parametersValues, api, method, session, apiInterfaceName);
+            // ineffective resource
+            return () -> {
+            };
         }
     }
 
