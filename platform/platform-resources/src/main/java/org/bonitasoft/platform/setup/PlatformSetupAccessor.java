@@ -43,8 +43,19 @@ public class PlatformSetupAccessor {
     }
 
     private static PlatformSetup createPlatformSetup() throws NamingException {
-        DataSource dataSource = lookupDataSource();
+        final DataSource dataSource = lookupDataSource();
         String dbVendor = System.getProperty("sysprop.bonita.db.vendor");
+        return createNewPlatformSetup(dataSource, dbVendor);
+    }
+
+    /**
+     * WARNING: for internal use only. In normal cases, you should use PlatformSetupAccessor.getPlatformSetup() !
+     *
+     * @param dataSource the datasource to use to access the database
+     * @param dbVendor the Database vendor (default H2) to point at
+     * @return a NEW instance of Platform Setup
+     */
+    public static PlatformSetup createNewPlatformSetup(DataSource dataSource, String dbVendor) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
