@@ -67,12 +67,21 @@ public class CustomOrDefaultApplicationInstaller {
         // check under custom application default folder if an application is found, and retrieve it
         final Resource customApplication = detectCustomApplication();
 
-        if (customApplication != null && isPlatformFirstInitialization()) {
-            // install application if it exists and if it is a first init of the platform
-            installCustomApplication(customApplication);
-        } else {
+        if (customApplication == null) {
             // install default provided applications if custom application does not exist
+            log.info("No custom application detected under folder {}. Continuing with default Bonita startup.",
+                    applicationInstallFolder);
             installDefaultProvidedApplications();
+        } else {
+            log.info("Custom application detected with name '{}' under folder '{}'", customApplication.getFilename(),
+                    applicationInstallFolder);
+            if (isPlatformFirstInitialization()) {
+                // install application if it exists and if it is the first init of the platform
+                log.info("Bonita now tries to install it automatically...");
+                installCustomApplication(customApplication);
+            } else {
+                log.info("Update of custom application not yet implemented. Ignored.");
+            }
         }
     }
 
@@ -130,13 +139,6 @@ public class CustomOrDefaultApplicationInstaller {
     void installCustomApplication(final Resource customApplication) throws ApplicationInstallationException {
         String resourceName = customApplication.getFilename();
         try (final InputStream applicationZipFileStream = customApplication.getInputStream()) {
-            log.info(
-                    "No custom application detected under folder {}. Continuing with default Bonita startup.",
-                    applicationInstallFolder);
-            log.info(
-                    "Custom application detected with name '{}' under folder '{}'."
-                            + " Bonita now tries to install it automatically...",
-                    resourceName, applicationInstallFolder);
             applicationInstaller.install(applicationZipFileStream);
         } catch (IOException | ApplicationInstallationException e) {
             throw new ApplicationInstallationException("Unable to install the application " + resourceName, e);
@@ -145,8 +147,6 @@ public class CustomOrDefaultApplicationInstaller {
 
     @VisibleForTesting
     void installDefaultProvidedApplications() throws ApplicationInstallationException {
-        log.info("No custom application detected under folder {}. Continuing with default Bonita startup.",
-                applicationInstallFolder);
         try {
             // default app importer requires a tenant session and to be executed inside a transaction
             tenantServicesManager.inTenantSessionTransaction(() -> {
