@@ -91,16 +91,14 @@ public class ScriptExecutor {
      * @return <code>true</code> if it is a first initialization of the platform.
      * @throws PlatformException if it fails to create or initialize tables.
      */
-    public boolean createAndInitializePlatformIfNecessary() throws PlatformException {
+    public void createAndInitializePlatformIfNecessary() throws PlatformException {
         if (!isPlatformAlreadyCreated()) {
             createTables();
             initializePlatformStructure();
             insertPlatform();
             insertTenant();
-            return true;
         } else {
             logger.info("Bonita platform already exists. Nothing to do. Stopping.");
-            return false;
         }
     }
 

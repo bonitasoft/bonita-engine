@@ -16,6 +16,7 @@ package org.bonitasoft.engine.business.application.importer;
 import java.io.IOException;
 import java.util.List;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.ExceptionUtils;
@@ -45,6 +46,9 @@ public class MandatoryLivingApplicationImporter extends LivingApplicationImporte
 
     private final DefaultLivingApplicationImporter defaultLivingApplicationImporter;
 
+    @Getter
+    private boolean firstRun;
+
     public MandatoryLivingApplicationImporter(final PageService pageService,
             final ApplicationImporter applicationImporter,
             final DefaultLivingApplicationImporter defaultLivingApplicationImporter) {
@@ -72,6 +76,8 @@ public class MandatoryLivingApplicationImporter extends LivingApplicationImporte
             boolean firstRun = importStatuses.stream().map(ImportStatus::getStatus)
                     .allMatch(importStatus -> importStatus == ImportStatus.Status.ADDED);
             defaultLivingApplicationImporter.setAddRemovablePagesIfMissing(firstRun);
+
+            this.firstRun = firstRun;
 
             importStatuses.addAll(importProvidedNonRemovableEditablePagesFromClasspath());
 
