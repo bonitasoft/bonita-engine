@@ -14,13 +14,8 @@
 package org.bonitasoft.engine.api.impl.page;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
@@ -33,48 +28,17 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.InvalidPageTokenException;
-import org.bonitasoft.engine.exception.InvalidPageZipContentException;
-import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
-import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
-import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
-import org.bonitasoft.engine.exception.InvalidPageZipMissingPropertiesException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
-import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
-import org.bonitasoft.engine.page.Page;
-import org.bonitasoft.engine.page.PageCreator;
-import org.bonitasoft.engine.page.PageMappingService;
-import org.bonitasoft.engine.page.PageNotFoundException;
+import org.bonitasoft.engine.page.*;
 import org.bonitasoft.engine.page.PageNotFoundException.PageAttribute;
-import org.bonitasoft.engine.page.PageService;
-import org.bonitasoft.engine.page.PageUpdater;
-import org.bonitasoft.engine.page.SInvalidPageTokenException;
-import org.bonitasoft.engine.page.SInvalidPageZipException;
-import org.bonitasoft.engine.page.SInvalidPageZipInconsistentException;
-import org.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
-import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
-import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
-import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.SPageMapping;
-import org.bonitasoft.engine.page.SPageUpdateBuilder;
-import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 
 /**
  * @author Emmanuel Duchastenier
@@ -82,22 +46,38 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 @Slf4j
 public class PageAPIDelegate {
 
-    private final TenantServiceAccessor tenantAccessor;
-    private final long userIdFromSession;
+    private static PageAPIDelegate pageAPIDelegate = null;
+
     private final PageService pageService;
     private final SearchEntitiesDescriptor searchEntitiesDescriptor;
+    private final TenantServiceAccessor tenantAccessor;
     private final PageMappingService pageMappingService;
     private final FormMappingService formMappingService;
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
 
-    public PageAPIDelegate(final TenantServiceAccessor tenantAccessor, final long userIdFromSession) {
-        this.tenantAccessor = tenantAccessor;
-        businessArchiveArtifactsManager = tenantAccessor.getBusinessArchiveArtifactsManager();
-        this.userIdFromSession = userIdFromSession;
-        pageService = tenantAccessor.getPageService();
-        pageMappingService = tenantAccessor.getPageMappingService();
-        formMappingService = tenantAccessor.getFormMappingService();
-        searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+    private PageAPIDelegate(TenantServiceAccessor serviceAccessor,
+            BusinessArchiveArtifactsManager businessArchiveArtifactsManager,
+            PageService pageService, PageMappingService pageMappingService,
+            FormMappingService formMappingService, SearchEntitiesDescriptor searchEntitiesDescriptor) {
+        this.tenantAccessor = serviceAccessor;
+        this.businessArchiveArtifactsManager = businessArchiveArtifactsManager;
+        this.pageService = pageService;
+        this.pageMappingService = pageMappingService;
+        this.formMappingService = formMappingService;
+        this.searchEntitiesDescriptor = searchEntitiesDescriptor;
+    }
+
+    public static PageAPIDelegate getInstance() {
+        if (pageAPIDelegate == null) {
+            TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance();
+            pageAPIDelegate = new PageAPIDelegate(tenantAccessor,
+                    tenantAccessor.getBusinessArchiveArtifactsManager(),
+                    tenantAccessor.getPageService(),
+                    tenantAccessor.getPageMappingService(),
+                    tenantAccessor.getFormMappingService(),
+                    tenantAccessor.getSearchEntitiesDescriptor());
+        }
+        return pageAPIDelegate;
     }
 
     public Page getPage(final long pageId) throws PageNotFoundException {
@@ -135,7 +115,7 @@ public class PageAPIDelegate {
         return new SearchPages(pageService, searchEntitiesDescriptor.getSearchPageDescriptor(), searchOptions);
     }
 
-    public Page createPage(final PageCreator pageCreator, final byte[] content)
+    public Page createPage(final PageCreator pageCreator, final byte[] content, long userIdFromSession)
             throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException {
         final SPage sPage = constructPage(pageCreator, userIdFromSession);
@@ -154,7 +134,7 @@ public class PageAPIDelegate {
         }
     }
 
-    public Page createPage(final String contentName, final byte[] content)
+    public Page createPage(final String contentName, final byte[] content, long userIdFromSession)
             throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException {
         try {
@@ -227,7 +207,7 @@ public class PageAPIDelegate {
         }
     }
 
-    public Page updatePage(final long pageId, final PageUpdater pageUpdater)
+    public Page updatePage(final long pageId, final PageUpdater pageUpdater, long userIdFromSession)
             throws UpdateException, AlreadyExistsException,
             UpdatingWithInvalidPageTokenException, UpdatingWithInvalidPageZipContentException {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
@@ -276,7 +256,7 @@ public class PageAPIDelegate {
         }
     }
 
-    public void updatePageContent(final long pageId, final byte[] content)
+    public void updatePageContent(final long pageId, final byte[] content, long userIdFromSession)
             throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException {
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();

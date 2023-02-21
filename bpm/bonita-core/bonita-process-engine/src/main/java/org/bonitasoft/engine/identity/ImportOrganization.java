@@ -39,7 +39,6 @@ import org.bonitasoft.engine.identity.xml.ExportedUser;
 import org.bonitasoft.engine.identity.xml.ExportedUserMembership;
 import org.bonitasoft.engine.identity.xml.Organization;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
@@ -58,16 +57,13 @@ public class ImportOrganization {
 
     private final ImportOrganizationStrategy strategy;
 
-    private final TenantServiceAccessor serviceAccessor;
-
     private final SCustomUserInfoValueAPI userInfoValueAPI;
 
-    public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent,
+    public ImportOrganization(IdentityService identityService, final String organizationContent,
             final ImportPolicy policy, final SCustomUserInfoValueAPI userInfoValueAPI)
             throws OrganizationImportException {
-        this.serviceAccessor = serviceAccessor;
         this.userInfoValueAPI = userInfoValueAPI;
-        identityService = serviceAccessor.getIdentityService();
+        this.identityService = identityService;
         this.organizationContent = updateNamespace(organizationContent);
         warnings = new ArrayList<>();
         switch (policy) {
@@ -83,6 +79,7 @@ public class ImportOrganization {
             default:
                 throw new OrganizationImportException("No import strategy found for " + policy);
         }
+
     }
 
     private void excludeGroupsWithInvalidCharactersInName(List<ExportedGroup> groups)
@@ -140,7 +137,7 @@ public class ImportOrganization {
     private Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(
             final List<ExportedCustomUserInfoDefinition> customUserInfoDefinitionCreators)
             throws SIdentityException, ImportDuplicateInOrganizationException {
-        final CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(serviceAccessor,
+        final CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(identityService,
                 strategy);
         return importer.importCustomUserInfoDefinitions(customUserInfoDefinitionCreators);
     }
@@ -291,7 +288,7 @@ public class ImportOrganization {
             throws SBonitaException {
         final CustomUserInfoValueImporter userInfoValueImporter = new CustomUserInfoValueImporter(userInfoValueAPI,
                 customUserInfoDefinitions);
-        final UserImporter userImporter = new UserImporter(serviceAccessor, strategy,
+        final UserImporter userImporter = new UserImporter(identityService, strategy,
                 SessionInfos.getUserIdFromSession(), userInfoValueImporter);
         return userImporter.importUsers(users);
     }

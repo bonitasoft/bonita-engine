@@ -67,14 +67,14 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -89,7 +89,7 @@ public class PageAPIDelegateTest {
     @Mock
     SearchPages searchPages;
     @Mock
-    TenantServiceAccessor serviceAccessor;
+    TenantServiceAccessor tenantAccessor;
     @Mock
     SPage sPage;
     @Mock
@@ -100,7 +100,7 @@ public class PageAPIDelegateTest {
     private SPageUpdateBuilder sPageUpdateBuilder;
     @Mock
     private SPageUpdateContentBuilder sPageUpdateContentBuilder;
-    private PageAPIDelegate pageAPIDelegate;
+
     @Mock
     private PageService pageService;
     @Mock
@@ -110,15 +110,9 @@ public class PageAPIDelegateTest {
     @Mock
     private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
 
-    @Before
-    public void before() {
-        doReturn(pageService).when(serviceAccessor).getPageService();
-        doReturn(pageMappingService).when(serviceAccessor).getPageMappingService();
-        doReturn(formMappingService).when(serviceAccessor).getFormMappingService();
-        doReturn(businessArchiveArtifactsManager).when(serviceAccessor).getBusinessArchiveArtifactsManager();
-        doReturn(mock(SearchEntitiesDescriptor.class)).when(serviceAccessor).getSearchEntitiesDescriptor();
-        pageAPIDelegate = spy(new PageAPIDelegate(serviceAccessor, userId));
-    }
+    @Spy
+    @InjectMocks
+    private PageAPIDelegate pageAPIDelegate;
 
     @Test
     public void testSearchPages() throws Exception {
@@ -142,7 +136,7 @@ public class PageAPIDelegateTest {
         doReturn(page).when(pageAPIDelegate).convertToPage(nullable(SPage.class));
 
         // when
-        pageAPIDelegate.createPage(pageCreator, content);
+        pageAPIDelegate.createPage(pageCreator, content, userId);
 
         // then
         verify(pageService, times(1)).addPage(sPage, content);
@@ -157,7 +151,7 @@ public class PageAPIDelegateTest {
         doReturn(page).when(pageAPIDelegate).convertToPage(nullable(SPage.class));
 
         // when
-        pageAPIDelegate.createPage(contentName, content);
+        pageAPIDelegate.createPage(contentName, content, userId);
 
         // then
         verify(pageService, times(1)).addPage(content, contentName, userId);
@@ -197,8 +191,8 @@ public class PageAPIDelegateTest {
 
         pageAPIDelegate.deletePage(PAGE_ID);
 
-        verify(businessArchiveArtifactsManager).resolveDependencies(PROCESS_ID_1, serviceAccessor);
-        verify(businessArchiveArtifactsManager).resolveDependencies(PROCESS_ID_2, serviceAccessor);
+        verify(businessArchiveArtifactsManager).resolveDependencies(PROCESS_ID_1, tenantAccessor);
+        verify(businessArchiveArtifactsManager).resolveDependencies(PROCESS_ID_2, tenantAccessor);
     }
 
     private SFormMapping formMapping(Long processId) {
@@ -263,7 +257,7 @@ public class PageAPIDelegateTest {
         doReturn(map).when(pageUpdater).getFields();
 
         // when
-        pageAPIDelegate.updatePage(1, pageUpdater);
+        pageAPIDelegate.updatePage(1, pageUpdater, userId);
 
         // then
         verify(pageService, times(1)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
@@ -281,7 +275,7 @@ public class PageAPIDelegateTest {
         final long pageId = 1;
 
         // when
-        pageAPIDelegate.updatePageContent(pageId, content);
+        pageAPIDelegate.updatePageContent(pageId, content, userId);
 
         // then
         verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), nullable(String.class),
@@ -303,7 +297,7 @@ public class PageAPIDelegateTest {
         map.put(PageUpdateField.CONTENT_NAME, "content.zip");
 
         // when
-        pageAPIDelegate.updatePage(1, pageUpdater);
+        pageAPIDelegate.updatePage(1, pageUpdater, userId);
 
         // then
         verify(pageService, times(1)).updatePage(anyLong(), nullable(EntityUpdateDescriptor.class));
@@ -330,7 +324,7 @@ public class PageAPIDelegateTest {
         doThrow(SObjectAlreadyExistsException.class).when(pageService).addPage(sPage, content);
 
         // when
-        pageAPIDelegate.createPage(pageCreator, content);
+        pageAPIDelegate.createPage(pageCreator, content, userId);
 
         // then
         // AlreadyExistsException

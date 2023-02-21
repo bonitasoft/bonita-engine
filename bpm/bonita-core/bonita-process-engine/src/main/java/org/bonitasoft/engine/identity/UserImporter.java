@@ -26,7 +26,6 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -41,13 +40,13 @@ public class UserImporter {
 
     private final CustomUserInfoValueImporter infoValueImporter;
 
-    public UserImporter(TenantServiceAccessor serviceAccessor, final ImportOrganizationStrategy strategy,
+    public UserImporter(IdentityService identityService, final ImportOrganizationStrategy strategy,
             long userIdFromSession,
             CustomUserInfoValueImporter infoValueImporter) {
         this.strategy = strategy;
         this.userIdFromSession = userIdFromSession;
         this.infoValueImporter = infoValueImporter;
-        identityService = serviceAccessor.getIdentityService();
+        this.identityService = identityService;
     }
 
     public Map<String, SUser> importUsers(final List<ExportedUser> usersToImport) throws SBonitaException {

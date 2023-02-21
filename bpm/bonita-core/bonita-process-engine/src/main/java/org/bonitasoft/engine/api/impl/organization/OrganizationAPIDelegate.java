@@ -20,22 +20,28 @@ import javax.xml.bind.JAXBException;
 import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.identity.ImportOrganization;
-import org.bonitasoft.engine.identity.ImportPolicy;
-import org.bonitasoft.engine.identity.InvalidOrganizationFileFormatException;
-import org.bonitasoft.engine.identity.OrganizationImportException;
+import org.bonitasoft.engine.identity.*;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 
 /**
  * @author Emmanuel Duchastenier
  */
 public class OrganizationAPIDelegate {
 
-    private final TenantServiceAccessor tenantAccessor;
+    private static OrganizationAPIDelegate organizationAPIDelegate = null;
+    private final IdentityService identityService;
 
-    public OrganizationAPIDelegate(TenantServiceAccessor tenantAccessor) {
-        this.tenantAccessor = tenantAccessor;
+    private OrganizationAPIDelegate(IdentityService identityService) {
+        this.identityService = identityService;
+    }
+
+    public static OrganizationAPIDelegate getInstance() {
+        if (organizationAPIDelegate == null) {
+            organizationAPIDelegate = new OrganizationAPIDelegate(TenantServiceSingleton.getInstance()
+                    .getIdentityService());
+        }
+        return organizationAPIDelegate;
     }
 
     public List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy)
@@ -44,8 +50,8 @@ public class OrganizationAPIDelegate {
             final SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory
                     .get(SCustomUserInfoValueUpdateBuilderFactory.class);
             final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(
-                    tenantAccessor.getIdentityService(), updaterFactor);
-            ImportOrganization importedOrganization = new ImportOrganization(tenantAccessor, organizationContent,
+                    identityService, updaterFactor);
+            ImportOrganization importedOrganization = new ImportOrganization(identityService, organizationContent,
                     policy, customUserInfoValueAPI);
             return importedOrganization.execute();
         } catch (JAXBException e) {
