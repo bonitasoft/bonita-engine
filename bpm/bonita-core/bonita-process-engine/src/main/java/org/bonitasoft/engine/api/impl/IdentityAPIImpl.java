@@ -159,7 +159,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     protected OrganizationAPIDelegate getOrganizationAPIDelegate() {
-        return new OrganizationAPIDelegate(getTenantAccessor());
+        return OrganizationAPIDelegate.getInstance();
     }
 
     @Override

@@ -58,8 +58,7 @@ public class CustomUserInfoDefinitionImporterTest {
 
     @Before
     public void setUp() {
-        doReturn(identityService).when(serviceAccessor).getIdentityService();
-        importer = new CustomUserInfoDefinitionImporter(serviceAccessor, strategy);
+        importer = new CustomUserInfoDefinitionImporter(identityService, strategy);
     }
 
     @Test

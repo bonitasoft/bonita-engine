@@ -97,9 +97,6 @@ import org.springframework.stereotype.Component;
 public class ApplicationInstaller {
 
     private final ApplicationArchiveReader applicationArchiveReader;
-    private PageAPIDelegate pageAPIDelegate;
-    private final ProcessDeploymentAPIDelegate processDeployer = ProcessDeploymentAPIDelegate.getInstance();
-    private OrganizationAPIDelegate organizationImporter;
     private final BusinessDataModelRepository bdmRepository;
     private final UserTransactionService transactionService;
     private final TenantStateManager tenantStateManager;
@@ -125,17 +122,11 @@ public class ApplicationInstaller {
     }
 
     private PageAPIDelegate getPageAPIDelegate() {
-        if (pageAPIDelegate == null) {
-            pageAPIDelegate = new PageAPIDelegate(getTenantAccessor(), SessionService.SYSTEM_ID);
-        }
-        return pageAPIDelegate;
+        return PageAPIDelegate.getInstance();
     }
 
     private OrganizationAPIDelegate getOrganizationImporter() {
-        if (organizationImporter == null) {
-            organizationImporter = new OrganizationAPIDelegate(getTenantAccessor());
-        }
-        return organizationImporter;
+        return OrganizationAPIDelegate.getInstance();
     }
 
     public ExecutionResult install(InputStream applicationZipFileStream) throws ApplicationInstallationException {
@@ -423,11 +414,11 @@ public class ApplicationInstaller {
     }
 
     public Page createPage(FileAndContent pageFile, String pageToken) throws CreationException {
-        return getPageAPIDelegate().createPage(pageToken, pageFile.getContent());
+        return getPageAPIDelegate().createPage(pageToken, pageFile.getContent(), SessionService.SYSTEM_ID);
     }
 
     void updatePageContent(FileAndContent pageFile, Page existingPage) throws UpdateException {
-        getPageAPIDelegate().updatePageContent(existingPage.getId(), pageFile.getContent());
+        getPageAPIDelegate().updatePageContent(existingPage.getId(), pageFile.getContent(), SessionService.SYSTEM_ID);
     }
 
     private String getPageName(Page page) {
@@ -488,7 +479,7 @@ public class ApplicationInstaller {
 
     protected ProcessDefinition deployAndEnableProcess(BusinessArchive businessArchive)
             throws AlreadyExistsException, ProcessDeployException, ProcessEnablementException {
-        return processDeployer.deployAndEnableProcess(businessArchive);
+        return ProcessDeploymentAPIDelegate.getInstance().deployAndEnableProcess(businessArchive);
     }
 
     org.bonitasoft.engine.page.Page getPage(String urlToken) throws SearchException {

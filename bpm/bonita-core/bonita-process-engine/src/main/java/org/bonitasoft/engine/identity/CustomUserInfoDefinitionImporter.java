@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -29,10 +28,10 @@ public class CustomUserInfoDefinitionImporter {
     private final IdentityService identityService;
     private final ImportOrganizationStrategy strategy;
 
-    public CustomUserInfoDefinitionImporter(TenantServiceAccessor serviceAccessor,
+    public CustomUserInfoDefinitionImporter(IdentityService identityService,
             final ImportOrganizationStrategy strategy) {
         this.strategy = strategy;
-        identityService = serviceAccessor.getIdentityService();
+        this.identityService = identityService;
     }
 
     public Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(
