@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
+import org.bonitasoft.engine.business.application.importer.MandatoryLivingApplicationImporter;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +43,9 @@ public class CustomOrDefaultApplicationInstallerConfigTest {
             @Bean
             public CustomOrDefaultApplicationInstaller installer() {
                 return new CustomOrDefaultApplicationInstaller(mock(ApplicationInstaller.class),
-                        mock(DefaultLivingApplicationImporter.class), mock(TenantServicesManager.class));
+                        mock(DefaultLivingApplicationImporter.class),
+                        mock(MandatoryLivingApplicationImporter.class),
+                        mock(TenantServicesManager.class));
             }
         }
     }

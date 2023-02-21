@@ -16,17 +16,15 @@ package org.bonitasoft.engine.api.impl.application.installer;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.naming.NamingException;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
+import org.bonitasoft.engine.business.application.importer.MandatoryLivingApplicationImporter;
 import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
-import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -54,6 +52,7 @@ public class CustomOrDefaultApplicationInstaller {
     private final ApplicationInstaller applicationInstaller;
 
     private final DefaultLivingApplicationImporter defaultLivingApplicationImporter;
+    private final MandatoryLivingApplicationImporter mandatoryLivingApplicationImporter;
 
     private final TenantServicesManager tenantServicesManager;
 
@@ -86,12 +85,7 @@ public class CustomOrDefaultApplicationInstaller {
     }
 
     boolean isPlatformFirstInitialization() {
-        try {
-            return PlatformSetupAccessor.getPlatformSetup().isFirstInitialization();
-        } catch (NamingException e) {
-            log.warn("Failed to retrieve platform setup configuration.", e);
-            return false;
-        }
+        return mandatoryLivingApplicationImporter.isFirstRun();
     }
 
     /**
