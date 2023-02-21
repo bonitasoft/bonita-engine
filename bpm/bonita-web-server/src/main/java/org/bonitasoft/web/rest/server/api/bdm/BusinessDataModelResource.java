@@ -21,6 +21,7 @@ import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.exception.UnavailableLockException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.web.rest.model.bdm.BusinessDataModelItem;
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
@@ -66,6 +67,16 @@ public class BusinessDataModelResource extends CommonResource {
             return null;
         } catch (final BusinessDataRepositoryDeploymentException e) {
             throw new APIException("An error has occurred when deploying Business Data Model.", e);
+        } catch (Exception e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof UnavailableLockException) {
+                // this request may be long and should make use of 202 status instead of 200
+                // we return a 406 status here in order to prepare for this future API change
+                setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE, cause, cause.getMessage());
+                return null;
+            } else {
+                throw e;
+            }
         }
     }
 
