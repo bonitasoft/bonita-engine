@@ -98,7 +98,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
 
     private String updateBonitaXmlFile(String content, DatabaseConfiguration configuration,
             final String datasourceAlias) {
-        Map<String, String> replacements = new HashMap<>(5);
+        Map<String, String> replacements = new HashMap<>(15);
         replacements.put("@@" + datasourceAlias + ".database_connection_user@@",
                 Matcher.quoteReplacement(configuration.getDatabaseUser()));
         replacements.put("@@" + datasourceAlias + ".database_connection_password@@",
@@ -113,6 +113,14 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         replacements.put("@@" + datasourceAlias + "_database_database_name@@",
                 Matcher.quoteReplacement(configuration.getDatabaseName()));
         replacements.put("@@" + datasourceAlias + ".database_test_query@@", configuration.getTestQuery());
+        replacements.put("@@" + datasourceAlias + "_connection_pool_initialSize@@",
+                String.valueOf(configuration.getConnectionPoolInitialSize()));
+        replacements.put("@@" + datasourceAlias + "_connection_pool_maxTotal@@",
+                String.valueOf(configuration.getConnectionPoolMaxTotal()));
+        replacements.put("@@" + datasourceAlias + "_connection_pool_minIdle@@",
+                String.valueOf(configuration.getConnectionPoolMinIdle()));
+        replacements.put("@@" + datasourceAlias + "_connection_pool_maxIdle@@",
+                String.valueOf(configuration.getConnectionPoolMaxIdle()));
         return replaceValues(content, replacements);
     }
 

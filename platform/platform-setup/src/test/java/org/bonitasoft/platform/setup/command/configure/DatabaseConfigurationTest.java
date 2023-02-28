@@ -14,11 +14,13 @@
 package org.bonitasoft.platform.setup.command.configure;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
 
+import org.bonitasoft.platform.exception.PlatformException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
@@ -164,6 +166,28 @@ public class DatabaseConfigurationTest {
                         + rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath().normalize().toString()
                                 .replace("\\", "/")
                         + "/bonita;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
+    }
+
+    @Test
+    public void jdbc_pool_size_values_must_be_integers() throws Exception {
+        // given:
+        final Properties properties = new Properties();
+        properties.load(this.getClass().getResourceAsStream("/internal.properties"));
+
+        System.setProperty("bdm.db.vendor", "postgres");
+        System.setProperty("bdm.db.server.name", "myServer");
+        System.setProperty("bdm.db.server.port", "1111");
+        System.setProperty("bdm.db.database.name", "internal_database");
+        System.setProperty("bdm.db.user", "_user_");
+        System.setProperty("bdm.db.password", "_pwd_");
+
+        System.setProperty("bdm.connection-pool.maxIdle", "ten");
+
+        // expect:
+        assertThatThrownBy(
+                () -> new DatabaseConfiguration("bdm.", properties, null))
+                        .isExactlyInstanceOf(PlatformException.class)
+                        .hasMessage("Invalid integer value 'ten' for property 'bdm.connection-pool.maxIdle'");
     }
 
 }
