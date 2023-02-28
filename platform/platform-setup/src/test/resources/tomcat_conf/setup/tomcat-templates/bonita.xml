@@ -39,6 +39,10 @@
               factory="org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory"
               transactionManager="TransactionManager"
               type="javax.sql.XADataSource"
+              initialSize="@@ds1_connection_pool_initialSize@@"
+              maxTotal="@@ds1_connection_pool_maxTotal@@"
+              minIdle="@@ds1_connection_pool_minIdle@@"
+              maxIdle="@@ds1_connection_pool_maxIdle@@"
               xaDataSource="RawBonitaDS" />
 
     <Resource name="bonitaSequenceManagerDS"
@@ -89,10 +93,15 @@
             name="BusinessDataDS"
             uniqueName="jdbc/bonitaDSXA"
             auth="Container"
-            jmxEnabled="true" jmxName="org.bonitasoft:name=BusinessDataDS"
+            jmxEnabled="true" 
+            jmxName="org.bonitasoft:name=BusinessDataDS"
             factory="org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory"
             transactionManager="TransactionManager"
             type="javax.sql.XADataSource"
+            initialSize="@@ds2_connection_pool_initialSize@@"
+            maxTotal="@@ds2_connection_pool_maxTotal@@"
+            minIdle="@@ds2_connection_pool_minIdle@@"
+            maxIdle="@@ds2_connection_pool_maxIdle@@"
             xaDataSource="RawBusinessDataDS" />
 
     <Resource name="NotManagedBizDataDS"
