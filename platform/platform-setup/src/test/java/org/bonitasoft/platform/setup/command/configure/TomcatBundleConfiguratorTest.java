@@ -17,7 +17,13 @@ import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -141,6 +147,11 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "type=\"org.postgresql.xa.PGXADataSource\"",
                 "class=\"org.postgresql.xa.PGXADataSource\"", "factory=\"org.postgresql.xa.PGXADataSourceFactory\"",
                 "serverName=\"localhost\"", "portNumber=\"5432\"", "port=\"5432\"", "databaseName=\"bonita\"");
+        checkFileContains(bonita_xml, "initialSize=\"8\"",
+                // maxTotal value overridden in database.properties
+                "maxTotal=\"200\"",
+                "minIdle=\"8\"",
+                "maxIdle=\"16\"");
 
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
     }
