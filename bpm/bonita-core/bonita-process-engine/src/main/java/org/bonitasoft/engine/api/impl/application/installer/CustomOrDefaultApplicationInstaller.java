@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -26,6 +28,7 @@ import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -41,23 +44,25 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnSingleCandidate(CustomOrDefaultApplicationInstaller.class)
 public class CustomOrDefaultApplicationInstaller {
 
     public static final String CUSTOM_APPLICATION_DEFAULT_FOLDER = "my-application";
 
     @Value("${bonita.runtime.custom-application.install-folder:" + CUSTOM_APPLICATION_DEFAULT_FOLDER + "}")
     @Getter
-    private String applicationInstallFolder;
+    protected String applicationInstallFolder;
 
-    private final ApplicationInstaller applicationInstaller;
+    protected final ApplicationInstaller applicationInstaller;
 
     private final DefaultLivingApplicationImporter defaultLivingApplicationImporter;
     private final MandatoryLivingApplicationImporter mandatoryLivingApplicationImporter;
 
     private final TenantServicesManager tenantServicesManager;
 
-    private final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
+    protected final ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
             CustomOrDefaultApplicationInstaller.class.getClassLoader());
+    private final ApplicationArchiveReader applicationArchiveReader;
 
     @EventListener
     public void autoDeployDetectedCustomApplication(PlatformStartedEvent event)
@@ -96,30 +101,33 @@ public class CustomOrDefaultApplicationInstaller {
     @VisibleForTesting
     Resource detectCustomApplication() throws IOException, ApplicationInstallationException {
         log.info("Trying to detect custom application (.zip file from folder {})", applicationInstallFolder);
+        return getResourceFromClasspath(getCustomAppResourcesFromClasspath(), "application zip");
+    }
 
-        Resource[] resources = getResourcesFromClasspath();
-
+    protected static Resource getResourceFromClasspath(Resource[] resources, String type)
+            throws IOException, ApplicationInstallationException {
         // loop over resources to find an existing, readable and not empty resource
-        Resource customApplicationResource = null;
+        Resource customRsource = null;
         var nbZipApplication = 0;
         for (Resource resource : resources) {
             if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
                 nbZipApplication++;
-                customApplicationResource = resource;
+                customRsource = resource;
             } else {
-                log.info("A zip file '{}' is found but it cannot be read. It will be ignored.", resource.getFilename());
+                log.info("A custom resource file '{}' is found but it cannot be read. It will be ignored.",
+                        resource.getFilename());
             }
         }
         // if more than one application detected, stop execution by raising an exception
         if (nbZipApplication > 1) {
-            throw new ApplicationInstallationException("More than one application detected. Abort startup.");
+            throw new ApplicationInstallationException(
+                    format("More than one resource of type %s detected. Abort startup.", type));
         }
-
-        return customApplicationResource;
+        return customRsource;
     }
 
     @VisibleForTesting
-    Resource[] getResourcesFromClasspath() throws IOException {
+    Resource[] getCustomAppResourcesFromClasspath() throws IOException {
         return cpResourceResolver
                 .getResources(
                         ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + applicationInstallFolder + "/*.zip");
@@ -129,13 +137,21 @@ public class CustomOrDefaultApplicationInstaller {
      * @param customApplication custom application resource
      * @throws ApplicationInstallationException if unable to install the application
      */
-    @VisibleForTesting
-    void installCustomApplication(final Resource customApplication) throws ApplicationInstallationException {
-        String resourceName = customApplication.getFilename();
+    protected void installCustomApplication(final Resource customApplication) throws ApplicationInstallationException {
         try (final InputStream applicationZipFileStream = customApplication.getInputStream()) {
-            applicationInstaller.install(applicationZipFileStream);
+            applicationInstaller.install(getApplicationArchive(applicationZipFileStream));
         } catch (IOException | ApplicationInstallationException e) {
-            throw new ApplicationInstallationException("Unable to install the application " + resourceName, e);
+            throw new ApplicationInstallationException(
+                    "Unable to install the application " + customApplication.getFilename(), e);
+        }
+    }
+
+    protected ApplicationArchive getApplicationArchive(InputStream applicationZipFileStream)
+            throws ApplicationInstallationException {
+        try {
+            return applicationArchiveReader.read(applicationZipFileStream);
+        } catch (IOException e) {
+            throw new ApplicationInstallationException("Unable to read application archive", e);
         }
     }
 

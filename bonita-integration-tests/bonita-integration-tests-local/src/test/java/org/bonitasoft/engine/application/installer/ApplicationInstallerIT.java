@@ -19,7 +19,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import java.io.InputStream;
 
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchiveReader;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationInstaller;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.BdmDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.CustomPageDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.LayoutDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.LivingApplicationDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.OrganizationDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.PageAndFormDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ProcessDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.ThemeDetector;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -47,19 +57,21 @@ public class ApplicationInstallerIT extends CommonAPIIT {
 
     @Test
     public void custom_application_should_be_deployed_entirely() throws Exception {
-
         // ensure application did not exist initially:
         assertThatThrownBy(() -> getApplicationAPI().getApplicationByToken("appsManagerBonita"))
                 .isInstanceOf(ApplicationNotFoundException.class);
-        //        logoutOnTenant();
+
         // given:
-        // name is NOT the default one so that it is not deployed automatically for the whole test suite at startup:
         final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
         ApplicationInstaller applicationInstallerImpl = TenantServiceSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
+        final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
+                new ArtifactTypeDetector(new BdmDetector(),
+                        new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
+                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector()));
 
         // when:
-        applicationInstallerImpl.install(applicationAsStream);
+        applicationInstallerImpl.install(applicationArchiveReader.read(applicationAsStream));
 
         // then:
 
