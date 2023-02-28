@@ -36,6 +36,8 @@ dependencies {
         exclude(module: "simplefan")
     }
     compile "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     compile(project(":platform:platform-resources"))
     runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
