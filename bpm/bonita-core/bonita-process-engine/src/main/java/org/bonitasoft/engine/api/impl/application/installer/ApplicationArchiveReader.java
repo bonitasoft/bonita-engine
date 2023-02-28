@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
@@ -26,13 +27,14 @@ import org.springframework.stereotype.Component;
 /**
  * @author Baptiste Mesta.
  */
+@Slf4j
 @Component
 @ConditionalOnSingleCandidate(ApplicationArchiveReader.class)
 public class ApplicationArchiveReader {
 
     private final ArtifactTypeDetector artifactTypeDetector;
 
-    protected ApplicationArchiveReader(ArtifactTypeDetector artifactTypeDetector) {
+    public ApplicationArchiveReader(ArtifactTypeDetector artifactTypeDetector) {
         this.artifactTypeDetector = artifactTypeDetector;
     }
 

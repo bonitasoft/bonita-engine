@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.MandatoryLivingApplicationImporter;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -44,19 +43,17 @@ import org.springframework.core.io.Resource;
  */
 public class CustomOrDefaultApplicationInstallerTest {
 
-    private CustomOrDefaultApplicationInstaller installer;
+    private CustomOrDefaultApplicationInstaller listener;
     private ApplicationInstaller applicationInstaller;
 
     @Before
     public void before() {
         applicationInstaller = spy(new ApplicationInstaller(mock(BusinessDataModelRepository.class),
                 mock(TransactionService.class), 1L, mock(SessionAccessor.class), mock(SessionService.class),
-                mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class),
-                mock(ApplicationArchiveReader.class)));
-        installer = spy(new CustomOrDefaultApplicationInstaller(applicationInstaller,
-                mock(DefaultLivingApplicationImporter.class),
-                mock(MandatoryLivingApplicationImporter.class),
-                mock(TenantServicesManager.class)));
+                mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class)));
+        listener = spy(new CustomOrDefaultApplicationInstaller(applicationInstaller,
+                mock(DefaultLivingApplicationImporter.class), mock(MandatoryLivingApplicationImporter.class),
+                mock(TenantServicesManager.class), mock(ApplicationArchiveReader.class)));
     }
 
     @Test
@@ -65,11 +62,11 @@ public class CustomOrDefaultApplicationInstallerTest {
         Resource resource1 = mockResource("resource1", true, true, 1L);
 
         doReturn(new Resource[] { resource1 })
-                .when(installer)
-                .getResourcesFromClasspath();
+                .when(listener)
+                .getCustomAppResourcesFromClasspath();
 
         //when
-        Resource result = installer.detectCustomApplication();
+        Resource result = listener.detectCustomApplication();
 
         //then
         assertThat(result).isNotNull();
@@ -83,13 +80,13 @@ public class CustomOrDefaultApplicationInstallerTest {
         Resource resource2 = mockResource("resource2", true, true, 1L);
 
         doReturn(new Resource[] { resource1, resource2 })
-                .when(installer)
-                .getResourcesFromClasspath();
+                .when(listener)
+                .getCustomAppResourcesFromClasspath();
 
         //then
         assertThatExceptionOfType(ApplicationInstallationException.class)
-                .isThrownBy(installer::detectCustomApplication)
-                .withMessage("More than one application detected. Abort startup.");
+                .isThrownBy(listener::detectCustomApplication)
+                .withMessage("More than one resource of type application zip detected. Abort startup.");
     }
 
     @Test
@@ -98,11 +95,11 @@ public class CustomOrDefaultApplicationInstallerTest {
         Resource resource1 = mockResource("resource1", false, true, 1L);
 
         doReturn(new Resource[] { resource1 })
-                .when(installer)
-                .getResourcesFromClasspath();
+                .when(listener)
+                .getCustomAppResourcesFromClasspath();
 
         //when
-        Resource result = installer.detectCustomApplication();
+        Resource result = listener.detectCustomApplication();
 
         //then
         assertThat(result).isNull();
@@ -114,11 +111,11 @@ public class CustomOrDefaultApplicationInstallerTest {
         Resource resource1 = mockResource("resource1", true, false, 1L);
 
         doReturn(new Resource[] { resource1 })
-                .when(installer)
-                .getResourcesFromClasspath();
+                .when(listener)
+                .getCustomAppResourcesFromClasspath();
 
         //when
-        Resource result = installer.detectCustomApplication();
+        Resource result = listener.detectCustomApplication();
 
         //then
         assertThat(result).isNull();
@@ -130,11 +127,11 @@ public class CustomOrDefaultApplicationInstallerTest {
         Resource resource1 = mockResource("resource1", true, true, 0L);
 
         doReturn(new Resource[] { resource1 })
-                .when(installer)
-                .getResourcesFromClasspath();
+                .when(listener)
+                .getCustomAppResourcesFromClasspath();
 
         //when
-        Resource result = installer.detectCustomApplication();
+        Resource result = listener.detectCustomApplication();
 
         //then
         assertThat(result).isNull();
@@ -146,50 +143,52 @@ public class CustomOrDefaultApplicationInstallerTest {
         Resource resource1 = mockResource("resource1", true, true, 0L);
         InputStream resourceStream1 = mock(InputStream.class);
 
-        doReturn(resource1).when(installer).detectCustomApplication();
+        doReturn(resource1).when(listener).detectCustomApplication();
         doReturn(resourceStream1).when(resource1).getInputStream();
-        doReturn(mock(ExecutionResult.class)).when(applicationInstaller).install(any(InputStream.class));
-        doReturn(true).when(installer).isPlatformFirstInitialization();
+        final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
+        doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
+        doNothing().when(applicationInstaller).install(any());
+        doReturn(true).when(listener).isPlatformFirstInitialization();
 
         //when
-        installer.autoDeployDetectedCustomApplication(any());
+        listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(installer).installCustomApplication(eq(resource1));
-        verify(applicationInstaller).install(eq(resourceStream1));
-        verify(installer, never()).installDefaultProvidedApplications();
+        verify(listener).installCustomApplication(eq(resource1));
+        verify(applicationInstaller).install(eq(applicationArchive));
+        verify(listener, never()).installDefaultProvidedApplications();
     }
 
     @Test
     public void should_install_default_applications_if_no_custom_app_detected_and_platform_first_init()
             throws Exception {
         //given
-        doReturn(null).when(installer).detectCustomApplication();
-        doReturn(true).when(installer).isPlatformFirstInitialization();
+        doReturn(null).when(listener).detectCustomApplication();
+        doReturn(true).when(listener).isPlatformFirstInitialization();
 
         //when
-        installer.autoDeployDetectedCustomApplication(any());
+        listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(installer, never()).installCustomApplication(any());
-        verify(applicationInstaller, never()).install(any(InputStream.class));
-        verify(installer).installDefaultProvidedApplications();
+        verify(listener, never()).installCustomApplication(any());
+        verify(applicationInstaller, never()).install(any());
+        verify(listener).installDefaultProvidedApplications();
     }
 
     @Test
     public void should_install_default_applications_if_no_custom_app_detected_and_not_platform_first_init()
             throws Exception {
         //given
-        doReturn(null).when(installer).detectCustomApplication();
-        doReturn(false).when(installer).isPlatformFirstInitialization();
+        doReturn(null).when(listener).detectCustomApplication();
+        doReturn(false).when(listener).isPlatformFirstInitialization();
 
         //when
-        installer.autoDeployDetectedCustomApplication(any());
+        listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(installer, never()).installCustomApplication(any());
-        verify(applicationInstaller, never()).install(any(InputStream.class));
-        verify(installer).installDefaultProvidedApplications();
+        verify(listener, never()).installCustomApplication(any());
+        verify(applicationInstaller, never()).install(any());
+        verify(listener).installDefaultProvidedApplications();
     }
 
     private Resource mockResource(String filename, boolean exists, boolean isReadable, long contentLength)

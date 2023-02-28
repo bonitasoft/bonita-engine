@@ -22,7 +22,6 @@ import static org.bonitasoft.engine.api.result.StatusContext.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -96,7 +95,6 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(ApplicationInstaller.class)
 public class ApplicationInstaller {
 
-    private final ApplicationArchiveReader applicationArchiveReader;
     private final BusinessDataModelRepository bdmRepository;
     private final UserTransactionService transactionService;
     private final TenantStateManager tenantStateManager;
@@ -109,8 +107,7 @@ public class ApplicationInstaller {
     public ApplicationInstaller(@Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
             UserTransactionService transactionService, @Value("${tenantId}") Long tenantId,
             SessionAccessor sessionAccessor, SessionService sessionService, TenantStateManager tenantStateManager,
-            @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager,
-            ApplicationArchiveReader applicationArchiveReader) {
+            @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager) {
         this.bdmRepository = bdmRepository;
         this.transactionService = transactionService;
         this.tenantId = tenantId;
@@ -118,7 +115,6 @@ public class ApplicationInstaller {
         this.sessionService = sessionService;
         this.tenantStateManager = tenantStateManager;
         this.businessArchiveArtifactsManager = businessArchiveArtifactsManager;
-        this.applicationArchiveReader = applicationArchiveReader;
     }
 
     private PageAPIDelegate getPageAPIDelegate() {
@@ -129,17 +125,7 @@ public class ApplicationInstaller {
         return OrganizationAPIDelegate.getInstance();
     }
 
-    public ExecutionResult install(InputStream applicationZipFileStream) throws ApplicationInstallationException {
-        final ExecutionResult result = install(readApplicationArchiveFile(applicationZipFileStream));
-        logInstallationResult(result);
-        return result;
-    }
-
-    public ExecutionResult install(byte[] applicationArchiveFile) throws ApplicationInstallationException {
-        return install(readApplicationArchiveFile(applicationArchiveFile));
-    }
-
-    public ExecutionResult install(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
+    public void install(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
         try {
             final ExecutionResult executionResult = new ExecutionResult();
             final long startPoint = System.currentTimeMillis();
@@ -151,7 +137,7 @@ public class ApplicationInstaller {
             }));
             log.info("The Application Archive has been installed successfully in {} ms.",
                     (System.currentTimeMillis() - startPoint));
-            return executionResult;
+            logInstallationResult(executionResult);
         } catch (Exception e) {
             throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
         }
@@ -179,7 +165,8 @@ public class ApplicationInstaller {
         executionResult.addStatus(okStatus());
     }
 
-    void installBusinessDataModel(ApplicationArchive applicationArchive) throws Exception {
+    @VisibleForTesting
+    public void installBusinessDataModel(ApplicationArchive applicationArchive) throws Exception {
         if (applicationArchive.getBdm() != null) {
             inSession(() -> {
                 pauseTenant();
@@ -262,28 +249,6 @@ public class ApplicationInstaller {
         } catch (Exception e) {
             throw new UpdateException(e);
         }
-    }
-
-    private ApplicationArchive readApplicationArchiveFile(InputStream applicationArchiveFile)
-            throws ApplicationInstallationException {
-        ApplicationArchive applicationArchive;
-        try {
-            applicationArchive = applicationArchiveReader.read(applicationArchiveFile);
-        } catch (IOException e) {
-            throw new ApplicationInstallationException("Unable to read application archive", e);
-        }
-        return applicationArchive;
-    }
-
-    private ApplicationArchive readApplicationArchiveFile(byte[] applicationArchiveFile)
-            throws ApplicationInstallationException {
-        ApplicationArchive applicationArchive;
-        try {
-            applicationArchive = applicationArchiveReader.read(applicationArchiveFile);
-        } catch (IOException e) {
-            throw new ApplicationInstallationException("Unable to read application archive", e);
-        }
-        return applicationArchive;
     }
 
     public void installLivingApplications(ApplicationArchive applicationArchive, ExecutionResult executionResult)
