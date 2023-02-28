@@ -5,7 +5,7 @@ class Deps {
     public static String commonsIOVersion = "2.8.0"
     //fileupload 1.4 does not work on web-side.
     public static String commonscodec = "1.15"
-    public static String commonsFileupload = "1.3.3"
+    public static String commonsFileupload = "1.5"
     public static String commonsBeanutilsVersion = "1.9.4"
     public static String commonsCollections4Version = "4.4"
     public static String commonsLangVersion = "3.11"
