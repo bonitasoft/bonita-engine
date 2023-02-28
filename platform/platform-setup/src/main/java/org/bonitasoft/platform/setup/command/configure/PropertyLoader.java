@@ -32,7 +32,7 @@ public class PropertyLoader {
     }
 
     public PropertyLoader() {
-        this("/database.properties", "/internal.properties");
+        this("/internal.properties", "/database.properties");
     }
 
     public Properties loadProperties() throws PlatformException {
