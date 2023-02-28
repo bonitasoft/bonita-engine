@@ -36,6 +36,8 @@ dependencies {
         exclude(module: "simplefan")
     }
     api "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     api(project(":platform:platform-resources"))
     runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"

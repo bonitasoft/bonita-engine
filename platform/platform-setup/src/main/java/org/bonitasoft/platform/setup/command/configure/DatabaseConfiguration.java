@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import lombok.Getter;
 import org.bonitasoft.platform.exception.PlatformException;
 
 /**
@@ -27,17 +28,36 @@ public class DatabaseConfiguration {
     public static final String H2_DB_VENDOR = "h2";
     private static final String H2_DATABASE_DIR = "${h2.database.dir}";
 
+    @Getter
     private String dbVendor;
+    @Getter
     private String nonXaDriverClassName;
+    @Getter
     private String xaDriverClassName;
+    @Getter
     private String xaDataSourceFactory;
+    @Getter
     private String databaseUser;
+    @Getter
     private String databasePassword;
+    @Getter
     private String databaseName;
-    private String serverName;
-    private String serverPort;
+    @Getter
+    private String serverName = "";
+    @Getter
+    private String serverPort = "";
+    @Getter
     private String url;
+    @Getter
     private String testQuery;
+    @Getter
+    private Integer connectionPoolInitialSize;
+    @Getter
+    private Integer connectionPoolMaxTotal;
+    @Getter
+    private Integer connectionPoolMaxIdle;
+    @Getter
+    private Integer connectionPoolMinIdle;
     private PropertyReader propertyReader;
 
     public DatabaseConfiguration(String prefix, Properties properties, Path rootPath) throws PlatformException {
@@ -72,54 +92,23 @@ public class DatabaseConfiguration {
         databaseUser = getMandatoryProperty(prefix + "db.user");
         databasePassword = getMandatoryProperty(prefix + "db.password");
         testQuery = getMandatoryProperty(dbVendor + "." + prefix + "testQuery");
-    }
-
-    public String getDbVendor() {
-        return dbVendor;
-    }
-
-    public String getNonXaDriverClassName() {
-        return nonXaDriverClassName;
-    }
-
-    String getXaDriverClassName() {
-        return xaDriverClassName;
-    }
-
-    public String getXaDataSourceFactory() {
-        return xaDataSourceFactory;
-    }
-
-    String getDatabaseUser() {
-        return databaseUser;
-    }
-
-    String getDatabasePassword() {
-        return databasePassword;
-    }
-
-    String getDatabaseName() {
-        return databaseName;
-    }
-
-    String getServerName() {
-        return serverName != null ? serverName : "";
-    }
-
-    String getServerPort() {
-        return serverPort != null ? serverPort : "";
-    }
-
-    String getUrl() {
-        return url;
-    }
-
-    String getTestQuery() {
-        return testQuery;
+        connectionPoolInitialSize = getMandatoryIntegerProperty(prefix + "connection-pool.initialSize");
+        connectionPoolMaxTotal = getMandatoryIntegerProperty(prefix + "connection-pool.maxTotal");
+        connectionPoolMaxIdle = getMandatoryIntegerProperty(prefix + "connection-pool.maxIdle");
+        connectionPoolMinIdle = getMandatoryIntegerProperty(prefix + "connection-pool.minIdle");
     }
 
     private String getMandatoryProperty(String s) throws PlatformException {
         return propertyReader.getPropertyAndFailIfNull(s);
+    }
+
+    private Integer getMandatoryIntegerProperty(String s) throws PlatformException {
+        var value = propertyReader.getPropertyAndFailIfNull(s);
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new PlatformException(String.format("Invalid integer value '%s' for property '%s'", value, s));
+        }
     }
 
 }
