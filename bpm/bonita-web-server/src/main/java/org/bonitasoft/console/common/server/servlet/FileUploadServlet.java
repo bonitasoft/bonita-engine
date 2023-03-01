@@ -179,7 +179,7 @@ public abstract class FileUploadServlet extends HttpServlet {
                 // Response
                 final String responseString;
                 if (JSON_CONTENT_TYPE.equals(responseContentType)) {
-                    responseString = generateResponseJson(fileName, item.getContentType(), uploadedFile);
+                    responseString = generateResponseJson(request, fileName, item.getContentType(), uploadedFile);
                 } else if (TEXT_CONTENT_TYPE.equals(responseContentType)) {
                     responseString = generateResponseString(request, fileName, uploadedFile);
                 } else {
@@ -246,9 +246,16 @@ public abstract class FileUploadServlet extends HttpServlet {
         return responseString;
     }
 
-    protected String generateResponseJson(final String fileName, String contentType, final File uploadedFile)
-            throws JsonProcessingException {
-        final Map<String, String> responseMap = new HashMap<>();
+    protected String generateResponseJson(final HttpServletRequest request, final String fileName, String contentType,
+            final File uploadedFile) throws Exception {
+        final Map<String, Serializable> responseMap = new HashMap<>();
+        fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFile);
+        return objectMapper.writeValueAsString(responseMap);
+    }
+
+    protected void fillJsonResponseMap(HttpServletRequest request, final Map<String, Serializable> responseMap,
+            final String fileName,
+            final String contentType, final File uploadedFile) {
         if (alsoReturnOriginalFilename) {
             responseMap.put(FILE_NAME_RESPONSE_ATTRIBUTE, getFilenameLastSegment(fileName));
         }
@@ -258,7 +265,6 @@ public abstract class FileUploadServlet extends HttpServlet {
             responseMap.put(TEMP_PATH_RESPONSE_ATTRIBUTE, uploadedFile.getName());
         }
         responseMap.put(CONTENT_TYPE_ATTRIBUTE, contentType);
-        return objectMapper.writeValueAsString(responseMap);
     }
 
     protected File makeUniqueFilename(final File targetDirectory, final String fileName) throws IOException {

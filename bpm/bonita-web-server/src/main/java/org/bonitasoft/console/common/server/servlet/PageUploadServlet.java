@@ -15,6 +15,8 @@ package org.bonitasoft.console.common.server.servlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -45,35 +47,43 @@ public class PageUploadServlet extends TenantFileUploadServlet {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(PageUploadServlet.class.getName());
 
+    protected static final String PERMISSIONS_RESPONSE_ATTRIBUTE = "permissions";
+
     @Override
     protected String generateResponseString(final HttpServletRequest request, final String fileName,
             final File uploadedFile) throws Exception {
 
         final String responseString = super.generateResponseString(request, fileName, uploadedFile);
-        final String permissions = getPermissions(request, uploadedFile);
-        return responseString + RESPONSE_SEPARATOR + permissions;
+        String permissionString;
+        try {
+            final String[] permissions = getPermissions(request, uploadedFile);
+            permissionString = "[" + String.join(",", permissions) + "]";
+        } catch (final Exception e) {
+            permissionString = getPermissionsError(e);
+        }
+        return responseString + RESPONSE_SEPARATOR + permissionString;
     }
 
-    protected String getPermissions(final HttpServletRequest request, final File uploadedFile)
-            throws IOException, BonitaException {
+    @Override
+    protected void fillJsonResponseMap(final HttpServletRequest request, final Map<String, Serializable> responseMap,
+            final String fileName, final String contentType, final File uploadedFile) {
+        super.fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFile);
+        // also add the permissions to the map
+        try {
+            final String[] permissions = getPermissions(request, uploadedFile);
+            responseMap.put(PERMISSIONS_RESPONSE_ATTRIBUTE, permissions);
+        } catch (final Exception e) {
+            responseMap.put(PERMISSIONS_RESPONSE_ATTRIBUTE, getPermissionsError(e));
+        }
+    }
 
+    protected String[] getPermissions(final HttpServletRequest request, final File uploadedFile)
+            throws InvalidPageZipContentException, InvalidPageTokenException, AlreadyExistsException, BonitaException,
+            IOException {
         final String action = request.getParameter(ACTION_PARAM_NAME);
         final boolean checkIfItAlreadyExists = ADD_ACTION.equals(action);
-        String permissions;
-        try {
-            final Set<String> permissionsSet = getPagePermissions(request, uploadedFile, checkIfItAlreadyExists);
-            permissions = permissionsSet.toString();
-        } catch (final InvalidPageZipContentException e) {
-            permissions = getPermissionsError(e);
-        } catch (final InvalidPageTokenException e) {
-            permissions = getPermissionsError(e);
-        } catch (final AlreadyExistsException e) {
-            permissions = getPermissionsError(e);
-        }
-        if (permissions == null) {
-            permissions = "[]";
-        }
-        return permissions;
+        final Set<String> permissionsSet = getPagePermissions(request, uploadedFile, checkIfItAlreadyExists);
+        return permissionsSet != null ? permissionsSet.toArray(new String[permissionsSet.size()]) : new String[0];
     }
 
     protected String getPermissionsError(final Exception e) {

@@ -13,16 +13,21 @@
  **/
 package org.bonitasoft.console.common.server.servlet;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.bonitasoft.engine.session.APISession;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -52,10 +57,9 @@ public class PageUploadServletTest {
         permissionsSet.add("Organisation management");
         doReturn(permissionsSet).when(pageUploadServlet).getPagePermissions(request, zipFile, false);
 
-        final String permissions = pageUploadServlet.getPermissions(request, zipFile);
+        final String[] permissions = pageUploadServlet.getPermissions(request, zipFile);
 
-        Assert.assertTrue("[Organisation visualization, Organisation management]".equals(permissions)
-                || "[Organisation management, Organisation visualization]".equals(permissions));
+        assertThat(permissions).containsExactlyInAnyOrder("Organisation visualization", "Organisation management");
     }
 
     @Test
@@ -67,20 +71,40 @@ public class PageUploadServletTest {
         final Set<String> permissionsSet = new HashSet<>();
         doReturn(permissionsSet).when(pageUploadServlet).getPagePermissions(request, zipFile, true);
 
-        final String permissions = pageUploadServlet.getPermissions(request, zipFile);
+        final String[] permissions = pageUploadServlet.getPermissions(request, zipFile);
 
-        Assert.assertEquals("[]", permissions);
+        assertThat(permissions).isNotNull().isEmpty();
     }
 
     @Test
     public void should_generateResponseString_work_with_permissions() throws Exception {
 
         final File zipFile = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
-        final String permissions = "[Organisation visualization,Organisation management]";
+        final String[] permissions = new String[] { "Organisation visualization", "Organisation management" };
         doReturn(permissions).when(pageUploadServlet).getPermissions(request, zipFile);
 
         final String responseString = pageUploadServlet.generateResponseString(request, "fileName", zipFile);
 
-        Assert.assertEquals(zipFile.getName() + "::" + permissions, responseString);
+        assertThat(responseString)
+                .isEqualTo(zipFile.getName() + "::[Organisation visualization,Organisation management]");
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void should_generateResponseJson_work_with_permissions() throws Exception {
+
+        final File zipFile = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
+        final String[] permissions = new String[] { "Organisation visualization", "Organisation management" };
+        doReturn(permissions).when(pageUploadServlet).getPermissions(request, zipFile);
+
+        final String responseString = pageUploadServlet.generateResponseJson(request, "fileName", "application/zip",
+                zipFile);
+
+        ObjectReader reader = new ObjectMapper().readerFor(Map.class);
+        Map<String, Serializable> responseMap = reader.readValue(responseString);
+
+        //jackson deserializes array to list by default
+        assertThat((List<String>) responseMap.get(PageUploadServlet.PERMISSIONS_RESPONSE_ATTRIBUTE))
+                .containsExactlyInAnyOrder("Organisation visualization", "Organisation management");
     }
 }
