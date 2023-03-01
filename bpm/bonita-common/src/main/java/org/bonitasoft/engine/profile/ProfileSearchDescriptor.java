@@ -29,32 +29,17 @@ public final class ProfileSearchDescriptor {
 
     /**
      * Used to filter or order by the {@link Profile} identifier
-     *
-     * @see ProfileEntry
      */
     public static final String ID = "id";
 
     /**
      * Used to filter or order by the {@link Profile} name
-     *
-     * @see ProfileEntry
      */
     public static final String NAME = "name";
 
     /**
      * Used to filter or order by the flag {@link Profile#isDefault()}
-     *
-     * @see ProfileEntry
      */
     public static final String IS_DEFAULT = "isDefault";
-
-    /**
-     * Used to filter or order by the flag {@link ProfileEntry#getName()}
-     *
-     * @see ProfileEntry
-     * @deprecated since 7.13.0, use {@link org.bonitasoft.engine.business.application.Application} instead
-     */
-    @Deprecated(since = "7.13.0", forRemoval = true)
-    public static final String PROFILE_ENTRY_NAME = "profileentry.name";
 
 }

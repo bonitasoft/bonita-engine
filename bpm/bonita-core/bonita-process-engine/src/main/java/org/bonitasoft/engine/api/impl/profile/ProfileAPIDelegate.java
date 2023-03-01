@@ -27,12 +27,22 @@ import org.bonitasoft.engine.command.SRoleProfileMemberAlreadyExistsException;
 import org.bonitasoft.engine.command.SUserMembershipProfileMemberAlreadyExistsException;
 import org.bonitasoft.engine.command.SUserProfileMemberAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.profile.*;
+import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileCriterion;
+import org.bonitasoft.engine.profile.ProfileMember;
+import org.bonitasoft.engine.profile.ProfileMemberNotFoundException;
+import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
+import org.bonitasoft.engine.profile.ProfileNotFoundException;
+import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -124,16 +134,6 @@ public class ProfileAPIDelegate {
             return ModelConvertor.toProfile(profileService.getProfile(id));
         } catch (final SProfileNotFoundException e) {
             throw new ProfileNotFoundException(e);
-        }
-    }
-
-    @Deprecated
-    public List<Profile> getProfilesForUser(final long userId) {
-        try {
-            return ModelConvertor
-                    .toProfiles(profileService.searchProfilesOfUser(userId, 0, 1000, "name", OrderByType.ASC));
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
         }
     }
 

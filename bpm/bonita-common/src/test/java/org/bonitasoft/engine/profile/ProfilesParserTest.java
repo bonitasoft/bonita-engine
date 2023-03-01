@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
@@ -69,14 +68,12 @@ public class ProfilesParserTest {
         profileMapping.setMemberships(asList(
                 new MembershipNode("g4", "r4"),
                 new MembershipNode("g5", "r5")));
-        myCustomProfile.setParentProfileEntries(singletonList(
-                new ParentProfileEntryNode("someNode")));
 
         String convert = profilesParser.convert(model);
 
-        // xml exported without <profileEntries> node
+        // xml exported
         XMLAssert.assertXMLEqual("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<profiles:profiles xmlns:profiles=\"http://www.bonitasoft.org/ns/profile/6.1\">\n" +
+                "<profiles:profiles xmlns:profiles=\"http://documentation.bonitasoft.com/profile-xml-schema/1.0\">\n" +
                 "    <profile name=\"myCustomProfile\" isDefault=\"false\">\n" +
                 "        <description>This is my custom profile</description>\n" +
                 "        <profileMapping>\n" +

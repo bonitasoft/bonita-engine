@@ -48,7 +48,7 @@ import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.springframework.stereotype.Component;
 
 /**
- * Import profiles with mapping and entries using Policy
+ * Import profiles with mapping using Policy
  *
  * @author Baptiste Mesta
  */
