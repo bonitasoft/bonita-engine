@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,11 +24,14 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.MemberType;
-import org.bonitasoft.engine.profile.*;
+import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileCriterion;
+import org.bonitasoft.engine.profile.ProfileMember;
+import org.bonitasoft.engine.profile.ProfileMemberCreator;
+import org.bonitasoft.engine.profile.ProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.search.impl.SearchResultImpl;
 import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
@@ -50,21 +52,9 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    @Deprecated
-    public List<Profile> getProfilesForUser(final long userId) {
-        return getProfileAPIDelegate().getProfilesForUser(userId);
-    }
-
-    @Override
     public List<Profile> getProfilesForUser(final long userId, final int startIndex, final int maxResults,
             final ProfileCriterion criterion) {
         return getProfileAPIDelegate().getProfilesForUser(userId, startIndex, maxResults, criterion);
-    }
-
-    @Override
-    public List<Profile> getProfilesWithNavigationForUser(final long userId, final int startIndex, final int maxResults,
-            final ProfileCriterion criterion) {
-        return Collections.emptyList();
     }
 
     @Override
@@ -81,21 +71,6 @@ public class ProfileAPIImpl implements ProfileAPI {
     public SearchResult<ProfileMember> searchProfileMembers(final String memberType, final SearchOptions options)
             throws SearchException {
         return getProfileAPIDelegate().searchProfileMembers(memberType, options);
-    }
-
-    @Override
-    public SearchResult<ProfileEntry> searchProfileEntries(final SearchOptions options) throws SearchException {
-        return new SearchResultImpl<>(0, Collections.emptyList());
-    }
-
-    @Override
-    public List<ProfileEntry> getProfileEntries(String profileName) throws ProfileNotFoundException {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public ProfileEntry getProfileEntry(final long id) throws ProfileEntryNotFoundException {
-        return null;
     }
 
     @Override

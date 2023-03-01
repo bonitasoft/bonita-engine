@@ -13,15 +13,12 @@
  **/
 package org.bonitasoft.engine.profile.xml;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -39,24 +36,15 @@ public class ProfileNode {
     @XmlElement
     private String description;
 
-    /**
-     * @deprecated since 7.13.0 the profile entries are not imported by the engine and will not be exported anymore in
-     *             the xml
-     */
-    @XmlElementWrapper(name = "profileEntries")
-    @XmlElement(name = "parentProfileEntry")
-    private List<ParentProfileEntryNode> parentProfileEntries;
     @XmlElement(name = "profileMapping")
     private ProfileMappingNode profileMapping;
 
     public ProfileNode() {
-        parentProfileEntries = new ArrayList<>();
     }
 
     public ProfileNode(final String name, final boolean isDefault) {
         this.name = name;
         this.isDefault = isDefault;
-        parentProfileEntries = new ArrayList<>();
         profileMapping = new ProfileMappingNode();
     }
 
@@ -76,24 +64,6 @@ public class ProfileNode {
         this.description = description;
     }
 
-    /**
-     * @deprecated since 7.13.0 the profile entries are not imported by the engine and will not be exported anymore in
-     *             the xml
-     */
-    @Deprecated(since = "7.13.0")
-    public List<ParentProfileEntryNode> getParentProfileEntries() {
-        return parentProfileEntries;
-    }
-
-    /**
-     * @deprecated since 7.13.0 the profile entries are not imported by the engine and will not be exported anymore in
-     *             the xml
-     */
-    @Deprecated(since = "7.13.0")
-    public void setParentProfileEntries(final List<ParentProfileEntryNode> parentProfileEntries) {
-        this.parentProfileEntries = parentProfileEntries;
-    }
-
     public ProfileMappingNode getProfileMapping() {
         return profileMapping;
     }
@@ -111,14 +81,7 @@ public class ProfileNode {
     }
 
     public boolean hasCustomPages() {
-        if (parentProfileEntries != null) {
-            for (final ParentProfileEntryNode parentProfileEntry : parentProfileEntries) {
-                if (parentProfileEntry.hasCustomPages()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return false; //FIXME: remove this method and all that is linked (profile auto-update at startup)
     }
 
     @Override
@@ -131,13 +94,12 @@ public class ProfileNode {
         return isDefault == that.isDefault &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description) &&
-                Objects.equals(parentProfileEntries, that.parentProfileEntries) &&
                 Objects.equals(profileMapping, that.profileMapping);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, isDefault, description, parentProfileEntries, profileMapping);
+        return Objects.hash(name, isDefault, description, profileMapping);
     }
 
     @Override
@@ -146,7 +108,6 @@ public class ProfileNode {
                 "name='" + name + '\'' +
                 ", isDefault=" + isDefault +
                 ", description='" + description + '\'' +
-                ", parentProfileEntries=" + parentProfileEntries +
                 ", profileMapping=" + profileMapping +
                 '}';
     }

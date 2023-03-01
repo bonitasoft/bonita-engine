@@ -11,8 +11,8 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
-@XmlSchema(namespace = "http://www.bonitasoft.org/ns/profile/6.1", elementFormDefault = XmlNsForm.UNSET, xmlns = {
-        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://www.bonitasoft.org/ns/profile/6.1", prefix = "profiles") })
+@XmlSchema(namespace = "http://documentation.bonitasoft.com/profile-xml-schema/1.0", elementFormDefault = XmlNsForm.UNSET, xmlns = {
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://documentation.bonitasoft.com/profile-xml-schema/1.0", prefix = "profiles") })
 package org.bonitasoft.engine.profile.xml;
 
 import javax.xml.bind.annotation.XmlNsForm;

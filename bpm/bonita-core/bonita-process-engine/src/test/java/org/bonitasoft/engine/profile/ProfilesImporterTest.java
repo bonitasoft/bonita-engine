@@ -15,13 +15,7 @@ package org.bonitasoft.engine.profile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,8 +35,6 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
@@ -192,26 +184,6 @@ public class ProfilesImporterTest {
         final ImportStatus expected = new ImportStatus(name);
         expected.setStatus(status);
         return expected;
-    }
-
-    private ParentProfileEntryNode createParent(final String name, final String pageName, final boolean custom) {
-        final ParentProfileEntryNode parentProfileEntry = new ParentProfileEntryNode(name);
-        parentProfileEntry.setPage(pageName);
-        parentProfileEntry.setCustom(custom);
-        return parentProfileEntry;
-    }
-
-    private ParentProfileEntryNode createParent(final String name, final ProfileEntryNode... children) {
-        final ParentProfileEntryNode parentProfileEntry = new ParentProfileEntryNode(name);
-        parentProfileEntry.setChildProfileEntries(Arrays.asList(children));
-        return parentProfileEntry;
-    }
-
-    private ProfileEntryNode createChild(final String name, final String pageName, final boolean custom) {
-        final ProfileEntryNode parentProfileEntry = new ProfileEntryNode(name);
-        parentProfileEntry.setPage(pageName);
-        parentProfileEntry.setCustom(custom);
-        return parentProfileEntry;
     }
 
     @Test
