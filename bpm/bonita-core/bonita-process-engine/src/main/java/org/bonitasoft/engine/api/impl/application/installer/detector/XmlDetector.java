@@ -15,16 +15,14 @@ package org.bonitasoft.engine.api.impl.application.installer.detector;
 
 import static org.bonitasoft.engine.io.FileOperations.isXmlFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.bonitasoft.engine.io.FileAndContent;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -57,9 +55,9 @@ public abstract class XmlDetector implements ArtifactDetector {
     }
 
     @Override
-    public boolean isCompliant(FileAndContent file) {
-        if (isXmlFile(file.getFileName())) {
-            return isCompliant(file.getContent());
+    public boolean isCompliant(File file) throws IOException {
+        if (isXmlFile(file.getName())) {
+            return isCompliant(Files.readAllBytes(file.toPath()));
         }
         return false;
     }

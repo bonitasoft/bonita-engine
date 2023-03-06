@@ -20,9 +20,8 @@ import static org.bonitasoft.engine.api.result.Status.*;
 import static org.bonitasoft.engine.api.result.StatusCode.*;
 import static org.bonitasoft.engine.api.result.StatusContext.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,6 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationImportException;
-import org.bonitasoft.engine.io.FileAndContent;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
@@ -156,9 +154,14 @@ public class ApplicationInstaller {
 
     public void installOrganization(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws OrganizationImportException {
-        final List<String> warnings = getOrganizationImporter().importOrganizationWithWarnings(
-                new String(applicationArchive.getOrganization().getContent(), UTF_8),
-                ImportPolicy.FAIL_ON_DUPLICATES);
+        final List<String> warnings;
+        try {
+            warnings = getOrganizationImporter().importOrganizationWithWarnings(
+                    new String(Files.readAllBytes(applicationArchive.getOrganization().toPath()), UTF_8),
+                    ImportPolicy.FAIL_ON_DUPLICATES);
+        } catch (IOException e) {
+            throw new OrganizationImportException(e);
+        }
         for (String warning : warnings) {
             executionResult.addStatus(warningStatus(ORGANIZATION_IMPORT_WARNING, warning));
         }
@@ -200,7 +203,12 @@ public class ApplicationInstaller {
         String bdmVersion;
         try {
             uninstallBusinessDataModel();
-            bdmVersion = installBusinessDataModel(applicationArchive.getBdm().getContent());
+            bdmVersion = installBusinessDataModel(Files.readAllBytes(applicationArchive.getBdm().toPath()));
+        } catch (IOException e) {
+            log.warn("Cannot read the BDM file on disk");
+            log.warn(
+                    "Caught an error when installing/updating the BDM, the transaction will be reverted and the previous BDM restored.");
+            throw new BusinessDataRepositoryDeploymentException(e);
         } catch (Exception e) {
             log.warn(
                     "Caught an error when installing/updating the BDM, the transaction will be reverted and the previous BDM restored.");
@@ -253,10 +261,15 @@ public class ApplicationInstaller {
 
     public void installLivingApplications(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws AlreadyExistsException, ImportException {
-        for (FileAndContent livingApplication : applicationArchive.getApplications()) {
-            log.info("Installing / updating Living Application from file '{}'", livingApplication.getFileName());
-            final List<ImportStatus> importStatusList = importApplications(livingApplication.getContent());
-            convertResultOfLivingApplicationImport(importStatusList, executionResult);
+        try {
+            for (File livingApplicationFile : applicationArchive.getApplications()) {
+                log.info("Installing / updating Living Application from file '{}'", livingApplicationFile.getName());
+                final List<ImportStatus> importStatusList = importApplications(
+                        Files.readAllBytes(livingApplicationFile.toPath()));
+                convertResultOfLivingApplicationImport(importStatusList, executionResult);
+            }
+        } catch (IOException e) {
+            throw new ImportException(e);
         }
     }
 
@@ -322,28 +335,28 @@ public class ApplicationInstaller {
 
     public void installPages(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
-        for (FileAndContent pageFile : applicationArchive.getPages()) {
+        for (File pageFile : applicationArchive.getPages()) {
             installUnitPage(pageFile, "page", executionResult);
         }
     }
 
     public void installLayouts(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
-        for (FileAndContent layoutFile : applicationArchive.getLayouts()) {
+        for (File layoutFile : applicationArchive.getLayouts()) {
             installUnitPage(layoutFile, "layout", executionResult);
         }
     }
 
     public void installThemes(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
-        for (FileAndContent pageFile : applicationArchive.getThemes()) {
+        for (File pageFile : applicationArchive.getThemes()) {
             installUnitPage(pageFile, "theme", executionResult);
         }
     }
 
     public void installRestApiExtensions(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws IOException, BonitaException {
-        for (FileAndContent pageFile : applicationArchive.getRestAPIExtensions()) {
+        for (File pageFile : applicationArchive.getRestAPIExtensions()) {
             installUnitPage(pageFile, "REST API extension", executionResult);
         }
     }
@@ -351,8 +364,9 @@ public class ApplicationInstaller {
     /**
      * From the Engine perspective, all custom pages, layouts, themes, custom Rest APIs are of type <code>Page</code>
      */
-    public void installUnitPage(FileAndContent pageFile, String precisePageType, ExecutionResult executionResult)
+    public void installUnitPage(File pageFile, String precisePageType, ExecutionResult executionResult)
             throws IOException, BonitaException {
+        byte[] pageContent = Files.readAllBytes(pageFile.toPath());
         String pageToken = getPageToken(pageFile);
         org.bonitasoft.engine.page.Page existingPage = getPage(pageToken);
 
@@ -362,14 +376,14 @@ public class ApplicationInstaller {
         if (existingPage != null) {
             // page already exists, we update it:
             log.info("Updating existing {} '{}'", precisePageType, getPageName(existingPage));
-            updatePageContent(pageFile, existingPage);
+            updatePageContent(pageContent, existingPage);
 
             executionResult.addStatus(infoStatus(PAGE_DEPLOYMENT_UPDATE_EXISTING,
                     format("Existing %s '%s' has been updated", precisePageType, getPageName(existingPage)),
                     context));
         } else {
             // page does not exist, we create it:
-            final Page page = createPage(pageFile, pageToken);
+            final Page page = createPage(pageContent, pageToken);
             log.info("Creating new {} '{}'", precisePageType, getPageName(page));
 
             executionResult.addStatus(infoStatus(PAGE_DEPLOYMENT_CREATE_NEW,
@@ -378,20 +392,20 @@ public class ApplicationInstaller {
         }
     }
 
-    public Page createPage(FileAndContent pageFile, String pageToken) throws CreationException {
-        return getPageAPIDelegate().createPage(pageToken, pageFile.getContent(), SessionService.SYSTEM_ID);
+    public Page createPage(byte[] pageContent, String pageToken) throws CreationException {
+        return getPageAPIDelegate().createPage(pageToken, pageContent, SessionService.SYSTEM_ID);
     }
 
-    void updatePageContent(FileAndContent pageFile, Page existingPage) throws UpdateException {
-        getPageAPIDelegate().updatePageContent(existingPage.getId(), pageFile.getContent(), SessionService.SYSTEM_ID);
+    void updatePageContent(byte[] pageContent, Page existingPage) throws UpdateException {
+        getPageAPIDelegate().updatePageContent(existingPage.getId(), pageContent, SessionService.SYSTEM_ID);
     }
 
     private String getPageName(Page page) {
         return isNotBlank(page.getDisplayName()) ? page.getDisplayName() : page.getName();
     }
 
-    private String getPageToken(FileAndContent fileAndContent) throws IOException {
-        byte[] pageProperties = FileOperations.getFileFromZip(new ByteArrayInputStream(fileAndContent.getContent()),
+    private String getPageToken(File file) throws IOException {
+        byte[] pageProperties = FileOperations.getFileFromZip(new FileInputStream(file),
                 "page.properties");
         Properties properties = new Properties();
         properties.load(new ByteArrayInputStream(pageProperties));
@@ -399,16 +413,16 @@ public class ApplicationInstaller {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException(
                     format("Invalid page %s, page.properties file do not contain mandatory 'name' attribute",
-                            fileAndContent.getFileName()));
+                            file.getName()));
         }
         return name;
     }
 
     protected void installProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws InvalidBusinessArchiveFormatException, IOException, ProcessDeployException {
-        for (FileAndContent process : applicationArchive.getProcesses()) {
+        for (File processFile : applicationArchive.getProcesses()) {
             final BusinessArchive businessArchive = BusinessArchiveFactory
-                    .readBusinessArchive(new ByteArrayInputStream(process.getContent()));
+                    .readBusinessArchive(new FileInputStream(processFile));
             final String processName = businessArchive.getProcessDefinition().getName();
             final String processVersion = businessArchive.getProcessDefinition().getVersion();
 

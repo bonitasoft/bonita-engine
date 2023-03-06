@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
+import static org.bonitasoft.engine.io.IOUtils.createTempFile;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -35,7 +36,6 @@ import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.io.FileAndContent;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -44,12 +44,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -85,11 +80,14 @@ public class ApplicationInstallerTest {
     @Test
     public void should_install_application_containing_all_kind_of_custom_pages() throws Exception {
         ApplicationArchive applicationArchive = new ApplicationArchive();
-        applicationArchive.addPage(new FileAndContent("page.zip", zip(file("page.properties", "name=page"))))
-                .addLayout(new FileAndContent("layout.zip", zip(file("page.properties", "name=layout"))))
-                .addTheme(new FileAndContent("theme.zip", zip(file("page.properties", "name=theme"))))
-                .addRestAPIExtension(new FileAndContent("restApiExtension.zip",
-                        zip(file("page.properties", "name=restApiExtension"))));
+        File page = createTempFile("page", "zip", zip(file("page.properties", "name=page")));
+        File layout = createTempFile("layout", "zip", zip(file("page.properties", "name=layout")));
+        File theme = createTempFile("theme", "zip", zip(file("page.properties", "name=theme")));
+        File restAPI = createTempFile("restApiExtension", "zip", zip(file("page.properties", "name=restApiExtension")));
+        applicationArchive.addPage(page)
+                .addLayout(layout)
+                .addTheme(theme)
+                .addRestAPIExtension(restAPI);
 
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
@@ -101,25 +99,36 @@ public class ApplicationInstallerTest {
         verify(applicationInstaller).createPage(any(), eq("layout"));
         verify(applicationInstaller).createPage(any(), eq("theme"));
         verify(applicationInstaller).createPage(any(), eq("restApiExtension"));
+
+        //cleanup
+        page.delete();
+        layout.delete();
+        theme.delete();
+        restAPI.delete();
     }
 
     @Test
     public void should_install_application_containing_living_applications() throws Exception {
+        File application = createTempFile("application", "xml", "content".getBytes());
         ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addApplication(new FileAndContent("application.xml", "content".getBytes()));
+                .addApplication(application);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(emptyList()).when(applicationInstaller).importApplications(any());
 
         applicationInstaller.install(applicationArchive);
 
         verify(applicationInstaller).importApplications("content".getBytes());
+
+        //cleanup
+        application.delete();
     }
 
     @Test
     public void should_install_and_enable_resolved_process() throws Exception {
         byte[] barContent = createValidBusinessArchive();
+        File process = createTempFile("process", "bar", barContent);
         ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(new FileAndContent("process.bar", barContent));
+                .addProcess(process);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doReturn(myProcess).when(applicationInstaller).deployAndEnableProcess(any());
@@ -127,13 +136,17 @@ public class ApplicationInstallerTest {
         applicationInstaller.install(applicationArchive);
 
         verify(applicationInstaller).deployAndEnableProcess(any());
+
+        //cleanup
+        process.delete();
     }
 
     @Test
     public void should_install_bdm() throws Exception {
         byte[] bdmZipContent = createValidBDMZipFile();
+        File bdm = createTempFile("bdm", "zip", bdmZipContent);
         ApplicationArchive applicationArchive = new ApplicationArchive()
-                .setBdm(new FileAndContent("bdm.zip", bdmZipContent));
+                .setBdm(bdm);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doNothing().when(applicationInstaller).pauseTenant();
         doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
@@ -144,14 +157,18 @@ public class ApplicationInstallerTest {
         verify(applicationInstaller).pauseTenant();
         verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
         verify(applicationInstaller).resumeTenant();
+
+        //cleanup
+        bdm.delete();
     }
 
     @Test
     public void should_fail_to_install_unresolved_process() throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
+        File process = createTempFile("process", "bar", barContent);
         ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(new FileAndContent("process.bar", barContent));
+                .addProcess(process);
         doThrow(new ProcessEnablementException("Process not resolved")).when(applicationInstaller)
                 .deployAndEnableProcess(any());
 
@@ -160,14 +177,18 @@ public class ApplicationInstallerTest {
                 .withMessageContaining("Failed to enable process");
 
         verify(applicationInstaller).deployAndEnableProcess(any());
+
+        //cleanup
+        process.delete();
     }
 
     @Test
     public void should_throw_exception_if_already_existing_process() throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
+        File process = createTempFile("process", "bar", barContent);
         ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(new FileAndContent("process.bar", barContent));
+                .addProcess(process);
         ProcessDefinition myProcess = aProcessDefinition(1193L);
         doThrow(new AlreadyExistsException("already exists"))
                 .doReturn(myProcess)
@@ -181,6 +202,9 @@ public class ApplicationInstallerTest {
 
         verify(applicationInstaller).deployAndEnableProcess(ArgumentMatchers
                 .argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
+
+        //cleanup
+        process.delete();
     }
 
     private ProcessDefinitionImpl aProcessDefinition(long id) {

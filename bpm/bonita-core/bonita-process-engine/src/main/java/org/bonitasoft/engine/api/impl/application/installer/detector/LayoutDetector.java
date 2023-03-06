@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
-import org.bonitasoft.engine.io.FileAndContent;
+import java.io.File;
+import java.io.IOException;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,7 +29,7 @@ public class LayoutDetector extends CustomPageDetector {
 
     private static final String LAYOUT_CONTENT_TYPE = "layout";
 
-    public boolean isCompliant(FileAndContent file) {
+    public boolean isCompliant(File file) throws IOException {
         return super.isCompliant(file, LAYOUT_CONTENT_TYPE)
                 && (isFilePresent(file, INDEX_HTML) || isFilePresent(file, INDEX_GROOVY));
     }

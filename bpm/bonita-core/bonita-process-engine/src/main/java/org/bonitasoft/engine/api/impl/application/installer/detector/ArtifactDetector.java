@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
-import org.bonitasoft.engine.io.FileAndContent;
+import java.io.File;
+import java.io.IOException;
 
 public interface ArtifactDetector {
 
-    boolean isCompliant(FileAndContent file);
+    boolean isCompliant(File file) throws IOException;
 }
