@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,11 +28,13 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SV6FormsDeployException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
@@ -129,6 +132,24 @@ public class ProcessDeploymentAPIDelegate {
             return tenantAccessor.getBusinessArchiveArtifactsManager().getProcessResolutionProblems(processDefinition);
         } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
             throw new ProcessDefinitionNotFoundException(e);
+        }
+    }
+
+    public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromIds(final List<Long> processDefinitionIds) {
+        final TenantServiceAccessor tenantAccessor = getTenantServiceAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        try {
+            final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService
+                    .getProcessDeploymentInfos(processDefinitionIds);
+            final List<ProcessDeploymentInfo> processDeploymentInfos = ModelConvertor
+                    .toProcessDeploymentInfo(processDefinitionDeployInfos);
+            final Map<Long, ProcessDeploymentInfo> mProcessDefinitions = new HashMap<>();
+            for (final ProcessDeploymentInfo p : processDeploymentInfos) {
+                mProcessDefinitions.put(p.getProcessId(), p);
+            }
+            return mProcessDefinitions;
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
         }
     }
 

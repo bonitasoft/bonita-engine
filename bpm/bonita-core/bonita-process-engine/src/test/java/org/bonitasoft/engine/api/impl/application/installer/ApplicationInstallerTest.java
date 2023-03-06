@@ -14,7 +14,9 @@
 package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_KO;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.bonitasoft.engine.io.IOUtils.createTempFile;
@@ -22,17 +24,23 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.api.impl.ProcessDeploymentAPIDelegate;
 import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -89,6 +97,7 @@ public class ApplicationInstallerTest {
                 .addTheme(theme)
                 .addRestAPIExtension(restAPI);
 
+        doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
         doReturn(null).when(applicationInstaller).getPage(anyString());
@@ -114,6 +123,7 @@ public class ApplicationInstallerTest {
                 .addApplication(application);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(emptyList()).when(applicationInstaller).importApplications(any());
+        doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
 
         applicationInstaller.install(applicationArchive);
 
@@ -125,17 +135,26 @@ public class ApplicationInstallerTest {
 
     @Test
     public void should_install_and_enable_resolved_process() throws Exception {
+        // given
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
         ApplicationArchive applicationArchive = new ApplicationArchive()
                 .addProcess(process);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
-        ProcessDefinition myProcess = aProcessDefinition(123L);
-        doReturn(myProcess).when(applicationInstaller).deployAndEnableProcess(any());
 
+        ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
+        doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
+
+        ProcessDefinition myProcess = aProcessDefinition(123L);
+        doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
+
+        // when
         applicationInstaller.install(applicationArchive);
 
-        verify(applicationInstaller).deployAndEnableProcess(any());
+        // then
+        verify(applicationInstaller).deployProcess(any(), any());
+        verify(processDeploymentAPIDelegate).deploy(any());
+        verify(processDeploymentAPIDelegate, never()).enableProcess(123L);
 
         //cleanup
         process.delete();
@@ -151,6 +170,8 @@ public class ApplicationInstallerTest {
         doNothing().when(applicationInstaller).pauseTenant();
         doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
         doNothing().when(applicationInstaller).resumeTenant();
+        doReturn(Collections.emptyList()).when(applicationInstaller).installProcesses(any(), any());
+        doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
 
         applicationInstaller.install(applicationArchive);
 
@@ -163,23 +184,72 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_fail_to_install_unresolved_process() throws Exception {
-        final ExecutionResult executionResult = new ExecutionResult();
+    public void should_call_enable_resolved_processes() throws Exception {
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
         ApplicationArchive applicationArchive = new ApplicationArchive()
                 .addProcess(process);
-        doThrow(new ProcessEnablementException("Process not resolved")).when(applicationInstaller)
-                .deployAndEnableProcess(any());
 
-        assertThatExceptionOfType(ProcessDeployException.class)
-                .isThrownBy(() -> applicationInstaller.installProcesses(applicationArchive, executionResult))
-                .withMessageContaining("Failed to enable process");
+        doNothing().when(applicationInstaller).installOrganization(any(), any());
+        ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
 
-        verify(applicationInstaller).deployAndEnableProcess(any());
+        doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
+        ProcessDefinition myProcess = aProcessDefinition(123L);
+        doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
+
+        applicationInstaller.install(applicationArchive);
+
+        verify(applicationInstaller).deployProcess(any(), any());
+        verify(processDeploymentAPIDelegate).deploy(any());
+        verify(applicationInstaller).enableResolvedProcesses(eq(Collections.singletonList(123L)), any());
 
         //cleanup
         process.delete();
+    }
+
+    @Test
+    public void enableResolvedProcesses_should_enable_processes_resolved_and_not_already_enabled() throws Exception {
+        // given:
+        final ExecutionResult result = new ExecutionResult();
+        ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
+        doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
+        final ProcessDeploymentInfo info = mock(ProcessDeploymentInfo.class);
+        final long processDefId = 234L;
+        doReturn(Map.of(processDefId, info)).when(processDeploymentAPIDelegate)
+                .getProcessDeploymentInfosFromIds(List.of(processDefId));
+        doReturn(processDefId).when(info).getProcessId();
+        doReturn(ConfigurationState.RESOLVED).when(info).getConfigurationState();
+        doReturn(ActivationState.DISABLED).when(info).getActivationState();
+
+        // when:
+        applicationInstaller.enableResolvedProcesses(List.of(processDefId), result);
+
+        // then:
+        verify(processDeploymentAPIDelegate).enableProcess(processDefId);
+    }
+
+    @Test
+    public void enableResolvedProcesses_should_throw_exception_on_unresolved_process() throws Exception {
+        // given:
+        final ExecutionResult result = new ExecutionResult();
+        ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
+        doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
+        final ProcessDeploymentInfo info = mock(ProcessDeploymentInfo.class);
+        final long processDefId = 234L;
+        doReturn(Map.of(processDefId, info)).when(processDeploymentAPIDelegate)
+                .getProcessDeploymentInfosFromIds(List.of(processDefId));
+        doReturn(processDefId).when(info).getProcessId();
+        doReturn(ConfigurationState.UNRESOLVED).when(info).getConfigurationState();
+
+        // when:
+        assertThatExceptionOfType(ProcessDeployException.class)
+                .isThrownBy(() -> applicationInstaller.enableResolvedProcesses(List.of(processDefId), result))
+                .withMessage("At least one process failed to deploy / enable. Canceling installation.");
+
+        // then:
+        verify(processDeploymentAPIDelegate, never()).enableProcess(anyLong());
+        assertThat(result.getAllStatus()).hasSize(1).extracting("code")
+                .containsExactly(PROCESS_DEPLOYMENT_ENABLEMENT_KO);
     }
 
     @Test
@@ -189,19 +259,23 @@ public class ApplicationInstallerTest {
         File process = createTempFile("process", "bar", barContent);
         ApplicationArchive applicationArchive = new ApplicationArchive()
                 .addProcess(process);
+
+        ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
+        doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
         ProcessDefinition myProcess = aProcessDefinition(1193L);
         doThrow(new AlreadyExistsException("already exists"))
                 .doReturn(myProcess)
-                .when(applicationInstaller)
-                .deployAndEnableProcess(any(BusinessArchive.class));
+                .when(processDeploymentAPIDelegate)
+                .deploy(any());
 
         // when
         assertThatExceptionOfType(ProcessDeployException.class).isThrownBy(
                 () -> applicationInstaller.installProcesses(applicationArchive, executionResult))
                 .withMessageContaining("Process myProcess - 1.0 already exists");
 
-        verify(applicationInstaller).deployAndEnableProcess(ArgumentMatchers
-                .argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
+        verify(applicationInstaller).deployProcess(ArgumentMatchers
+                .argThat(b -> b.getProcessDefinition().getName().equals("myProcess")), any());
+        verify(applicationInstaller, never()).enableResolvedProcesses(any(), any());
 
         //cleanup
         process.delete();
