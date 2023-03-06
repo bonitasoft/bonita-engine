@@ -117,7 +117,7 @@ dependencyManagement {
         dependency "org.keycloak:keycloak-saml-servlet-filter-adapter:${Deps.keycloakVersion}"
         dependency "org.keycloak:keycloak-saml-adapter-api-public:${Deps.keycloakVersion}"
         dependency "org.keycloak:keycloak-adapter-core:${Deps.keycloakVersion}"
-        dependency "net.sourceforge.spnego:spnego:${Deps.spnegoVersion}"
+        dependency "org.codelibs:spnego:${Deps.spnegoVersion}"
     }
 }
 publishing {
