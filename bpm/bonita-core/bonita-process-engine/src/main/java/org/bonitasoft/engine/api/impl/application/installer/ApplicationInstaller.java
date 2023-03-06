@@ -14,14 +14,20 @@
 package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.bonitasoft.engine.api.result.Status.*;
 import static org.bonitasoft.engine.api.result.StatusCode.*;
 import static org.bonitasoft.engine.api.result.StatusContext.*;
+import static org.bonitasoft.engine.bpm.process.ActivationState.DISABLED;
+import static org.bonitasoft.engine.bpm.process.ConfigurationState.RESOLVED;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +49,10 @@ import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
@@ -124,8 +132,8 @@ public class ApplicationInstaller {
     }
 
     public void install(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
+        final ExecutionResult executionResult = new ExecutionResult();
         try {
-            final ExecutionResult executionResult = new ExecutionResult();
             final long startPoint = System.currentTimeMillis();
             log.info("Starting Application Archive installation...");
             installBusinessDataModel(applicationArchive);
@@ -137,7 +145,11 @@ public class ApplicationInstaller {
                     (System.currentTimeMillis() - startPoint));
             logInstallationResult(executionResult);
         } catch (Exception e) {
+            logInstallationResult(executionResult);
             throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
+        }
+        if (executionResult.hasErrors()) {
+            throw new ApplicationInstallationException("The Application Archive install operation has been aborted");
         }
     }
 
@@ -149,7 +161,64 @@ public class ApplicationInstaller {
         installLayouts(applicationArchive, executionResult);
         installThemes(applicationArchive, executionResult);
         installLivingApplications(applicationArchive, executionResult);
-        installProcesses(applicationArchive, executionResult);
+        List<Long> processDefinitionIds = installProcesses(applicationArchive, executionResult);
+        enableResolvedProcesses(processDefinitionIds, executionResult);
+    }
+
+    public void enableResolvedProcesses(List<Long> processDefinitionIds, ExecutionResult executionResult)
+            throws ProcessDeployException {
+        Collection<ProcessDeploymentInfo> processDeploymentInfos = getProcessDeploymentAPIDelegate()
+                .getProcessDeploymentInfosFromIds(processDefinitionIds)
+                .values();
+
+        boolean atLeastOneBlockingProblem = false;
+        // for all deployed process
+        // if resolved and not already enabled,
+        // enable it => if exception, add error status
+        // if enablement ok, add info status Ok
+        // if not resolved, add error status and list resolution problems
+        // At the end, if at least one process disabled, throw Exception to cancel deployment and startup
+        for (ProcessDeploymentInfo info : processDeploymentInfos) {
+            if (info.getConfigurationState() == RESOLVED) {
+                if (info.getActivationState() == DISABLED) {
+                    try {
+                        getProcessDeploymentAPIDelegate().enableProcess(info.getProcessId());
+                    } catch (ProcessDefinitionNotFoundException | ProcessEnablementException e) {
+                        final Map<String, Serializable> context = new HashMap<>();
+                        context.put(PROCESS_NAME_KEY, info.getName());
+                        context.put(PROCESS_VERSION_KEY, info.getVersion());
+                        executionResult.addStatus(errorStatus(PROCESS_DEPLOYMENT_ENABLEMENT_KO,
+                                format("Process %s (%s) could not be enabled", info.getName(), info.getVersion()),
+                                context));
+                        atLeastOneBlockingProblem = true;
+                        continue;
+                    }
+                }
+                executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_ENABLEMENT_OK,
+                        format("Process %s (%s) has been enabled successfully",
+                                info.getDisplayName(), info.getVersion())));
+            } else {
+                try {
+                    atLeastOneBlockingProblem = true;
+                    List<Problem> problems = getProcessDeploymentAPIDelegate()
+                            .getProcessResolutionProblems(info.getProcessId());
+                    String message = format(
+                            "Process '%s' (%s) is unresolved. It cannot be enabled for now.",
+                            info.getDisplayName(), info.getVersion());
+                    String description = message + lineSeparator()
+                            + problems.stream().map(Problem::getDescription)
+                                    .collect(joining(lineSeparator()));
+                    executionResult.addStatus(errorStatus(PROCESS_DEPLOYMENT_ENABLEMENT_KO, description));
+                } catch (ProcessDefinitionNotFoundException e) {
+                    executionResult
+                            .addStatus(errorStatus(PROCESS_DEPLOYMENT_ENABLEMENT_KO, "Process definition not found"));
+                }
+            }
+        }
+
+        if (atLeastOneBlockingProblem) {
+            throw new ProcessDeployException("At least one process failed to deploy / enable. Canceling installation.");
+        }
     }
 
     public void installOrganization(ApplicationArchive applicationArchive, ExecutionResult executionResult)
@@ -418,47 +487,45 @@ public class ApplicationInstaller {
         return name;
     }
 
-    protected void installProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
+    public List<Long> installProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws InvalidBusinessArchiveFormatException, IOException, ProcessDeployException {
+        List<Long> processDefinitionIds = new ArrayList<>();
         for (File processFile : applicationArchive.getProcesses()) {
             final BusinessArchive businessArchive = BusinessArchiveFactory
                     .readBusinessArchive(new FileInputStream(processFile));
-            final String processName = businessArchive.getProcessDefinition().getName();
-            final String processVersion = businessArchive.getProcessDefinition().getVersion();
-
-            final Map<String, Serializable> context = new HashMap<>();
-            context.put(PROCESS_NAME_KEY, processName);
-            context.put(PROCESS_VERSION_KEY, processVersion);
-
-            try {
-                // Let's try to deploy the process, even if it already exists:
-                deployAndEnableProcess(businessArchive);
-                log.info("Process {} ({}) has been enabled.", processName, processVersion);
-                executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_CREATE_NEW,
-                        format("New process %s (%s) has been installed successfully", processName, processVersion),
-                        context));
-                executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_ENABLEMENT_OK,
-                        format("Process %s (%s) has been enabled successfully", processName, processVersion),
-                        context));
-            } catch (AlreadyExistsException e) {
-                final String message = format("Process %s - %s already exists. Abandoning.", processName,
-                        processVersion);
-                log.error(message);
-                throw new ProcessDeployException(message);
-            } catch (ProcessEnablementException e) {
-                log.info("Failed to enable process {} ({}).", processName, processVersion);
-                log.info("This is certainly due to configuration issues, see details below.", e);
-                throw new ProcessDeployException(
-                        format("Failed to enable process %s (%s). Process is not resolved",
-                                processName, processVersion),
-                        e);
-            }
+            processDefinitionIds.add(deployProcess(businessArchive, executionResult));
         }
+        return processDefinitionIds;
+
     }
 
-    protected ProcessDefinition deployAndEnableProcess(BusinessArchive businessArchive)
-            throws AlreadyExistsException, ProcessDeployException, ProcessEnablementException {
-        return ProcessDeploymentAPIDelegate.getInstance().deployAndEnableProcess(businessArchive);
+    protected Long deployProcess(BusinessArchive businessArchive, ExecutionResult executionResult)
+            throws ProcessDeployException {
+        final String processName = businessArchive.getProcessDefinition().getName();
+        final String processVersion = businessArchive.getProcessDefinition().getVersion();
+        Long processDefinitionId = null;
+
+        final Map<String, Serializable> context = new HashMap<>();
+        context.put(PROCESS_NAME_KEY, processName);
+        context.put(PROCESS_VERSION_KEY, processVersion);
+        try {
+            // Let's try to deploy the process, even if it already exists:
+            processDefinitionId = getProcessDeploymentAPIDelegate().deploy(businessArchive).getId();
+            executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_CREATE_NEW,
+                    format("New process %s (%s) has been installed successfully", processName, processVersion),
+                    context));
+
+        } catch (AlreadyExistsException e) {
+            final String message = format("Process %s - %s already exists. Abandoning.", processName, processVersion);
+            log.error(message);
+            throw new ProcessDeployException(message);
+        }
+        return processDefinitionId;
+    }
+
+    @VisibleForTesting
+    ProcessDeploymentAPIDelegate getProcessDeploymentAPIDelegate() {
+        return ProcessDeploymentAPIDelegate.getInstance();
     }
 
     org.bonitasoft.engine.page.Page getPage(String urlToken) throws SearchException {
@@ -505,7 +572,8 @@ public class ApplicationInstaller {
         return TenantServiceSingleton.getInstance();
     }
 
-    private static void logInstallationResult(ExecutionResult result) {
+    @VisibleForTesting
+    void logInstallationResult(ExecutionResult result) {
         log.info("Result of the installation of the application:");
         for (Status s : result.getAllStatus()) {
             log.info("[{}] - {} - {} - {}", s.getLevel(), s.getCode(), s.getMessage(),

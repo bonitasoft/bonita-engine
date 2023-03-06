@@ -109,19 +109,21 @@ public class CustomOrDefaultApplicationInstaller {
         // loop over resources to find an existing, readable and not empty resource
         Resource customRsource = null;
         var nbZipApplication = 0;
-        for (Resource resource : resources) {
-            if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
-                nbZipApplication++;
-                customRsource = resource;
-            } else {
-                log.info("A custom resource file '{}' is found but it cannot be read. It will be ignored.",
-                        resource.getFilename());
+        if (resources != null) {
+            for (Resource resource : resources) {
+                if (resource.exists() && resource.isReadable() && resource.contentLength() > 0) {
+                    nbZipApplication++;
+                    customRsource = resource;
+                } else {
+                    log.info("A custom resource file '{}' is found but it cannot be read. It will be ignored.",
+                            resource.getFilename());
+                }
             }
-        }
-        // if more than one application detected, stop execution by raising an exception
-        if (nbZipApplication > 1) {
-            throw new ApplicationInstallationException(
-                    format("More than one resource of type %s detected. Abort startup.", type));
+            // if more than one application detected, stop execution by raising an exception
+            if (nbZipApplication > 1) {
+                throw new ApplicationInstallationException(
+                        format("More than one resource of type %s detected. Abort startup.", type));
+            }
         }
         return customRsource;
     }

@@ -25,6 +25,11 @@ public enum StatusCode {
     OK,
 
     /**
+     * Failed to deploy BDM Access Control
+     */
+    BDM_ACCESS_CONTROL_INSTALLATION_ERROR,
+
+    /**
      * Uploaded file is a null byte array. Not supported.
      */
     BDM_ACCESS_CONTROL_FILE_EMPTY,

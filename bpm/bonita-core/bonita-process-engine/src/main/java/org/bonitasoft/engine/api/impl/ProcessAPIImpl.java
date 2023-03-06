@@ -4904,22 +4904,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromIds(final List<Long> processDefinitionIds) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
-        try {
-            final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService
-                    .getProcessDeploymentInfos(processDefinitionIds);
-            final List<ProcessDeploymentInfo> processDeploymentInfos = ModelConvertor
-                    .toProcessDeploymentInfo(processDefinitionDeployInfos);
-            final Map<Long, ProcessDeploymentInfo> mProcessDefinitions = new HashMap<>();
-            for (final ProcessDeploymentInfo p : processDeploymentInfos) {
-                mProcessDefinitions.put(p.getProcessId(), p);
-            }
-            return mProcessDefinitions;
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
+        return ProcessDeploymentAPIDelegate.getInstance().getProcessDeploymentInfosFromIds(processDefinitionIds);
     }
 
     @Override
@@ -6360,12 +6345,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     /**
      * Execute a flow node. All methods that executes flow nodes and human tasks uses this one.
      *
-     * @param userId
-     *        the id of the user executing the task
+     * @param userId the id of the user executing the task
      * @param flowNodeInstanceId
      * @param inputs
-     * @param shouldBeReadyTask
-     *        if true the method will only accept to execute human task in ready state
+     * @param shouldBeReadyTask if true the method will only accept to execute human task in ready state
      * @throws ContractViolationException
      * @throws SBonitaException
      */
