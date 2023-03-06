@@ -16,9 +16,10 @@ package org.bonitasoft.engine.api.impl.application.installer.detector;
 import static org.bonitasoft.engine.io.FileOperations.getFileFromZip;
 import static org.bonitasoft.engine.io.FileOperations.isBarFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
-import org.bonitasoft.engine.io.FileAndContent;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,10 +32,11 @@ public class ProcessDetector extends XmlDetector {
         super(PROCESS_DEFINITION_NAMESPACE);
     }
 
-    public boolean isCompliant(FileAndContent file) {
-        if (isBarFile(file.getFileName())) {
+    public boolean isCompliant(File file) {
+        if (isBarFile(file.getName())) {
             try {
-                return super.isCompliant(getFileFromZip(file.getContent(), PROCESS_DESIGN_DEFINITION));
+                return super.isCompliant(
+                        getFileFromZip(Files.readAllBytes(file.toPath()), PROCESS_DESIGN_DEFINITION));
             } catch (IOException ignored) {
             }
         }

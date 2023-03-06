@@ -15,14 +15,13 @@ package org.bonitasoft.engine.api.impl.application.installer.detector;
 
 import static org.bonitasoft.engine.io.FileOperations.getFileFromZip;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.bonitasoft.engine.io.FileAndContent;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,7 +30,7 @@ public class CustomPageDetector {
     private static final String CONTENT_TYPE_PROPERTY = "contentType";
     private static final String PAGE_PROPERTIES_FILE = "page.properties";
 
-    public boolean isCompliant(FileAndContent file, String... contentTypes) {
+    public boolean isCompliant(File file, String... contentTypes) throws IOException {
         return getPageProperties(file)
                 .map(properties -> properties.getProperty(CONTENT_TYPE_PROPERTY))
                 .filter(Objects::nonNull)
@@ -39,9 +38,9 @@ public class CustomPageDetector {
                 .isPresent();
     }
 
-    private Optional<Properties> getPageProperties(FileAndContent file) {
+    private Optional<Properties> getPageProperties(File file) {
         try {
-            byte[] fileFromZip = getFileFromZip(file.getContent(), PAGE_PROPERTIES_FILE);
+            byte[] fileFromZip = getFileFromZip(Files.readAllBytes(file.toPath()), PAGE_PROPERTIES_FILE);
             Properties properties = new Properties();
             properties.load(new ByteArrayInputStream(fileFromZip));
             return Optional.of(properties);
@@ -50,9 +49,9 @@ public class CustomPageDetector {
         }
     }
 
-    public boolean isFilePresent(FileAndContent file, String filename) {
+    public boolean isFilePresent(File file, String filename) {
         try {
-            getFileFromZip(file.getContent(), filename);
+            getFileFromZip(Files.readAllBytes(file.toPath()), filename);
             return true;
         } catch (IOException e) {
             return false;

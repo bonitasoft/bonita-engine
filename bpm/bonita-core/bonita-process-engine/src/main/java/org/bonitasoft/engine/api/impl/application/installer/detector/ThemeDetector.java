@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
-import org.bonitasoft.engine.io.FileAndContent;
+import java.io.File;
+import java.io.IOException;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +27,7 @@ public class ThemeDetector extends CustomPageDetector {
     private static final String THEME_CSS = "resources/theme.css";
     private static final String THEME_CONTENT_TYPE = "theme";
 
-    public boolean isCompliant(FileAndContent file) {
+    public boolean isCompliant(File file) throws IOException {
         return super.isCompliant(file, THEME_CONTENT_TYPE) && isFilePresent(file, THEME_CSS);
     }
 }

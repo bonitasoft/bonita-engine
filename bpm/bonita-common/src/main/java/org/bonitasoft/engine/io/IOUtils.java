@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.engine.io;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -171,6 +168,10 @@ public class IOUtils {
             final StreamResult outputTarget = new StreamResult(fos);
             tf.transform(new DOMSource(document), outputTarget);
         }
+    }
+
+    public static File createTempFile(String name, String suffix, byte[] content) throws IOException {
+        return Files.write(Files.createTempFile(name, suffix), content).toFile();
     }
 
 }

@@ -16,8 +16,10 @@ package org.bonitasoft.engine.api.impl.application.installer.detector;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
+import static org.bonitasoft.engine.io.IOUtils.createTempFile;
 
-import org.bonitasoft.engine.io.FileAndContent;
+import java.io.File;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -37,12 +39,16 @@ public class LayoutDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=toto"),
                 file("resources/index.html", "anything"));
+        File tempFile = createTempFile("myLayout", "zip", zip);
 
         // when:
-        final boolean compliant = detector.isCompliant(new FileAndContent("myLayout.zip", zip));
+        final boolean compliant = detector.isCompliant(tempFile);
 
         // then:
         assertThat(compliant).isFalse();
+
+        //cleanup
+        tempFile.delete();
     }
 
     @Test
@@ -52,25 +58,32 @@ public class LayoutDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=layout"),
                 file("resources/toto.html", "anything"));
+        File tempFile = createTempFile("myLayout", "zip", zip);
 
         // when:
-        final boolean compliant = detector.isCompliant(new FileAndContent("myLayout.zip", zip));
+        final boolean compliant = detector.isCompliant(tempFile);
 
         // then:
         assertThat(compliant).isFalse();
+
+        //cleanup
+        tempFile.delete();
     }
 
     @Test
     public void isCompliant_should_accept_valid_layout() throws Exception {
         // given:
-        final FileAndContent file = file("layout.zip",
-                zip(file("page.properties", "name=custompage_test1\ncontentType=layout"),
-                        file("resources/index.html", "someContent")));
+        final byte[] zip = zip(file("page.properties", "name=custompage_test1\ncontentType=layout"),
+                file("resources/index.html", "someContent"));
+        File tempFile = createTempFile("layout", "zip", zip);
 
         // when:
-        final boolean compliant = new LayoutDetector().isCompliant(file);
+        final boolean compliant = new LayoutDetector().isCompliant(tempFile);
 
         // then:
         assertThat(compliant).isTrue();
+
+        //cleanup
+        tempFile.delete();
     }
 }

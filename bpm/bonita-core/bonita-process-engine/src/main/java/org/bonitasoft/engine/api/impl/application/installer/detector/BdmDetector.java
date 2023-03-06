@@ -15,10 +15,11 @@ package org.bonitasoft.engine.api.impl.application.installer.detector;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 
-import org.bonitasoft.engine.io.FileAndContent;
 import org.bonitasoft.engine.io.FileOperations;
 import org.springframework.stereotype.Component;
 
@@ -26,11 +27,11 @@ import org.springframework.stereotype.Component;
 public class BdmDetector implements ArtifactDetector {
 
     @Override
-    public boolean isCompliant(FileAndContent file) {
+    public boolean isCompliant(File file) {
         byte[] bdm;
         try {
             try {
-                bdm = FileOperations.getFileFromZip(file.getContent(), "bom.xml");
+                bdm = FileOperations.getFileFromZip(Files.readAllBytes(file.toPath()), "bom.xml");
             } catch (FileNotFoundException e) {
                 return false;
             }

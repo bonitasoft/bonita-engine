@@ -16,8 +16,10 @@ package org.bonitasoft.engine.api.impl.application.installer.detector;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
+import static org.bonitasoft.engine.io.IOUtils.createTempFile;
 
-import org.bonitasoft.engine.io.FileAndContent;
+import java.io.File;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -37,12 +39,16 @@ public class PageAndFormDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=toto"),
                 file("resources/index.html", "anything"));
+        File tempFile = createTempFile("myPage", "zip", zip);
 
         // when:
-        final boolean compliant = detector.isCompliant(new FileAndContent("myPage.zip", zip));
+        final boolean compliant = detector.isCompliant(tempFile);
 
         // then:
         assertThat(compliant).isFalse();
+
+        //cleanup
+        tempFile.delete();
     }
 
     @Test
@@ -50,12 +56,16 @@ public class PageAndFormDetectorTest {
         // given:
         final PageAndFormDetector detector = new PageAndFormDetector();
         byte[] zip = zip(file("page.properties", "contentType=layout"));
+        File tempFile = createTempFile("myPage", "zip", zip);
 
         // when:
-        final boolean compliant = detector.isCompliant(new FileAndContent("myPage.zip", zip));
+        final boolean compliant = detector.isCompliant(tempFile);
 
         // then:
         assertThat(compliant).isFalse();
+
+        //cleanup
+        tempFile.delete();
     }
 
     @Test
@@ -64,12 +74,16 @@ public class PageAndFormDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=page"),
                 file("resources/index.html", "some HTML content"));
+        File tempFile = createTempFile("myPage", "zip", zip);
 
         // when:
-        final boolean compliant = new PageAndFormDetector().isCompliant(new FileAndContent("myPage.zip", zip));
+        final boolean compliant = new PageAndFormDetector().isCompliant(tempFile);
 
         // then:
         assertThat(compliant).isTrue();
+
+        //cleanup
+        tempFile.delete();
     }
 
     @Test
@@ -78,12 +92,15 @@ public class PageAndFormDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=form"),
                 file("resources/Index.groovy", "some Groovy content"));
-
+        File tempFile = createTempFile("myGroovyForm", "zip", zip);
         // when:
-        final boolean compliant = new PageAndFormDetector().isCompliant(new FileAndContent("myGroovyForm.zip", zip));
+        final boolean compliant = new PageAndFormDetector().isCompliant(tempFile);
 
         // then:
         assertThat(compliant).isTrue();
+
+        //cleanup
+        tempFile.delete();
     }
 
 }

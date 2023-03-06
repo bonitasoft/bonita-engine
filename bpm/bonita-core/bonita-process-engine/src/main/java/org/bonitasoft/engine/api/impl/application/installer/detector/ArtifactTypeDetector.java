@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
-import org.bonitasoft.engine.io.FileAndContent;
-import org.bonitasoft.engine.io.FileAndContentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
@@ -56,74 +53,66 @@ public class ArtifactTypeDetector {
         this.layoutDetector = layoutDetector;
     }
 
-    public boolean isApplication(FileAndContent file) {
+    public boolean isApplication(File file) throws IOException {
         return livingApplicationDetector.isCompliant(file);
     }
 
-    public boolean isOrganization(FileAndContent file) {
+    public boolean isOrganization(File file) throws IOException {
         return organizationDetector.isCompliant(file);
     }
 
-    public boolean isRestApiExtension(FileAndContent file) {
+    public boolean isRestApiExtension(File file) throws IOException {
         return customPageDetector.isCompliant(file, REST_API_EXTENSION_CONTENT_TYPE);
     }
 
-    public boolean isPage(FileAndContent file) {
+    public boolean isPage(File file) throws IOException {
         return pageAndFormDetector.isCompliant(file);
     }
 
-    public boolean isLayout(FileAndContent file) {
+    public boolean isLayout(File file) throws IOException {
         return layoutDetector.isCompliant(file);
     }
 
-    public boolean isTheme(FileAndContent file) {
+    public boolean isTheme(File file) throws IOException {
         return themeDetector.isCompliant(file);
     }
 
-    public boolean isBdm(FileAndContent file) {
+    public boolean isBdm(File file) {
         return bdmDetector.isCompliant(file);
     }
 
-    public boolean isProcess(FileAndContent file) {
+    public boolean isProcess(File file) throws IOException {
         return processDetector.isCompliant(file);
     }
 
-    public void detectAndStore(String fileName, InputStream content, ApplicationArchive applicationArchive)
-            throws IOException {
-        checkFile(getFileAndContent(fileName, content), applicationArchive);
-    }
-
-    protected void checkFile(FileAndContent file, ApplicationArchive applicationArchive) {
+    public void checkFileAndAddToArchive(File file, ApplicationArchive applicationArchive) throws IOException {
         if (isApplication(file)) {
-            logger.info("Found application file: '{}'. ", file.getFileName());
+            logger.info("Found application file: '{}'. ", file.getName());
             applicationArchive.addApplication(file);
         } else if (isProcess(file)) {
-            logger.info("Found process file: '{}'. ", file.getFileName());
+            logger.info("Found process file: '{}'. ", file.getName());
             applicationArchive.addProcess(file);
         } else if (isOrganization(file)) {
-            logger.info("Found organization file: '{}'. ", file.getFileName());
+            logger.info("Found organization file: '{}'. ", file.getName());
             applicationArchive.setOrganization(file);
         } else if (isPage(file)) {
-            logger.info("Found page file: '{}'. ", file.getFileName());
+            logger.info("Found page file: '{}'. ", file.getName());
             applicationArchive.addPage(file);
         } else if (isLayout(file)) {
-            logger.info("Found layout file: '{}'. ", file.getFileName());
+            logger.info("Found layout file: '{}'. ", file.getName());
             applicationArchive.addLayout(file);
         } else if (isTheme(file)) {
-            logger.info("Found theme file: '{}'. ", file.getFileName());
+            logger.info("Found theme file: '{}'. ", file.getName());
             applicationArchive.addTheme(file);
         } else if (isRestApiExtension(file)) {
-            logger.info("Found rest api extension file: '{}'. ", file.getFileName());
+            logger.info("Found rest api extension file: '{}'. ", file.getName());
             applicationArchive.addRestAPIExtension(file);
         } else if (isBdm(file)) {
-            logger.info("Found business data model file: '{}'. ", file.getFileName());
+            logger.info("Found business data model file: '{}'. ", file.getName());
             applicationArchive.setBdm(file);
         } else {
-            logger.warn("Ignoring file '{}'.", file.getFileName());
+            logger.warn("Ignoring file '{}'.", file.getName());
         }
     }
 
-    protected static FileAndContent getFileAndContent(String fileName, InputStream content) throws IOException {
-        return FileAndContentUtils.file(fileName.substring(fileName.lastIndexOf('/') + 1), content);
-    }
 }

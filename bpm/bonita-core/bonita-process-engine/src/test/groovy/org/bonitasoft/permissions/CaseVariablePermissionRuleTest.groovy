@@ -74,7 +74,6 @@ class CaseVariablePermissionRuleTest {
 
     @Test
     void should_check_return_false_on_delete() {
-        doReturn(true).when(apiCallContext).isDELETE()
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)

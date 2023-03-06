@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
+import org.bonitasoft.engine.io.IOUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 
@@ -46,12 +46,16 @@ public class ApplicationArchiveReader {
 
     public ApplicationArchive read(InputStream inputStream) throws IOException {
         final ApplicationArchive applicationArchive = createNewApplicationArchive();
-        ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-        ZipEntry zipEntry;
-        while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-            if (!zipEntry.isDirectory()) {
-                this.artifactTypeDetector.detectAndStore(zipEntry.getName(), zipInputStream, applicationArchive);
-            }
+        File destDir = IOUtil.createTempDirectory(Files.createTempDirectory("temp-custom-application").toUri());
+        IOUtil.unzipToFolder(inputStream, destDir);
+        try (Stream<Path> walker = Files.walk(destDir.toPath())) {
+            walker.filter(p -> p.toFile().isFile()).forEach(path -> {
+                try {
+                    artifactTypeDetector.checkFileAndAddToArchive(path.toFile(), applicationArchive);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
         return applicationArchive;
     }

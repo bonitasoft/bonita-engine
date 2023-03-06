@@ -173,9 +173,6 @@ public class ApplicationMenuPermissionRuleTest {
     @Test
     public void should_check_verify_not_get_return_false() {
         doReturn(false).when(apiCallContext).isGET()
-        doReturn(true).when(apiCallContext).isPOST()
-        doReturn(true).when(apiCallContext).isDELETE()
-        doReturn(true).when(apiCallContext).isPUT()
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then

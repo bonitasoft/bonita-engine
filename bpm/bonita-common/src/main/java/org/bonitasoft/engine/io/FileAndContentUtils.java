@@ -33,9 +33,9 @@ public class FileAndContentUtils {
                 if (!e.isDirectory()) {
                     zos.write(file.getContent());
                 }
-                zos.flush();
                 zos.closeEntry();
             }
+            zos.finish();
             return baos.toByteArray();
         }
     }
@@ -53,7 +53,7 @@ public class FileAndContentUtils {
     }
 
     public static FileAndContent file(String fileName, InputStream content) throws IOException {
-        return new FileAndContent(fileName, FileOperations.readFully(content));
+        return new FileAndContent(fileName, content.readAllBytes());
     }
 
 }

@@ -18,9 +18,12 @@ import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.bonitasoft.engine.io.FileOperations.asInputStream;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.assertj.core.groups.Tuple;
 import org.bonitasoft.engine.api.impl.application.installer.detector.*;
 import org.junit.Test;
 
@@ -43,11 +46,11 @@ public class ApplicationArchiveReaderTest {
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
-        assertThat(applicationArchive.getApplications()).hasOnlyOneElementSatisfying(a -> {
-            assertThat(a.getFileName()).isEqualTo("MyApp.xml");
-            assertThat(new String(a.getContent())).contains(
-                    "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>");
-        });
+        assertThat(applicationArchive.getApplications().size()).isEqualTo(1);
+        assertThat(applicationArchive.getApplications().get(0).getName()).isEqualTo("MyApp.xml");
+        assertThat(new String(Files.readAllBytes(applicationArchive.getApplications().get(0).toPath()))).contains(
+                "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>");
+
     }
 
     @Test
@@ -64,15 +67,19 @@ public class ApplicationArchiveReaderTest {
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(zip);
 
-        assertThat(applicationArchive.getPages()).hasSize(2)
-                .extracting("fileName", "content")
-                .containsExactly(
-                        new Tuple("myCustomPage1.zip",
-                                zip(file("page.properties", "name=custompage_test1\ncontentType=page"),
-                                        file("resources/index.html", "someContent"))),
-                        new Tuple("myCustomPage2.zip",
-                                zip(file("page.properties", "name=custompage_test2\ncontentType=page"),
-                                        file("resources/Index.groovy", "someContent"))));
+        assertThat(applicationArchive.getPages()).hasSize(2);
+        List<java.io.File> pageList = applicationArchive.getPages().stream().sorted().collect(Collectors.toList());
+        File firstPage = pageList.get(0);
+        File secondPage = pageList.get(1);
+
+        assertThat(firstPage.getName()).contains("myCustomPage1.zip");
+        assertThat(Files.readAllBytes(firstPage.toPath()))
+                .containsExactly(zip(file("page.properties", "name=custompage_test1\ncontentType=page"),
+                        file("resources/index.html", "someContent")));
+        assertThat(secondPage.getName()).contains("myCustomPage2.zip");
+        assertThat(Files.readAllBytes(secondPage.toPath()))
+                .containsExactly(zip(file("page.properties", "name=custompage_test2\ncontentType=page"),
+                        file("resources/Index.groovy", "someContent")));
     }
 
     @Test
@@ -84,8 +91,10 @@ public class ApplicationArchiveReaderTest {
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
-        assertThat(applicationArchive.getLayouts())
-                .containsExactly(file("layout.zip", layout));
+        List<java.io.File> layouts = applicationArchive.getLayouts();
+        assertThat(layouts.size()).isEqualTo(1);
+        assertThat(layouts.get(0).getName()).contains("layout.zip");
+        assertThat(Files.readAllBytes(layouts.get(0).toPath())).containsExactly(layout);
     }
 
     @Test
@@ -97,8 +106,11 @@ public class ApplicationArchiveReaderTest {
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
-        assertThat(applicationArchive.getThemes())
-                .containsExactly(file("theme.zip", themeContent));
+        List<java.io.File> themes = applicationArchive.getThemes();
+        assertThat(themes.size()).isEqualTo(1);
+        assertThat(themes.get(0).getName()).contains("theme.zip");
+        assertThat(Files.readAllBytes(themes.get(0).toPath())).containsExactly(themeContent);
+
     }
 
     @Test
@@ -109,8 +121,10 @@ public class ApplicationArchiveReaderTest {
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
-        assertThat(applicationArchive.getRestAPIExtensions())
-                .containsExactly(file("apiExtension.zip", apiExtensionContent));
+        List<java.io.File> restAPIExtensions = applicationArchive.getRestAPIExtensions();
+        assertThat(restAPIExtensions.size()).isEqualTo(1);
+        assertThat(restAPIExtensions.get(0).getName()).contains("apiExtension.zip");
+        assertThat(Files.readAllBytes(restAPIExtensions.get(0).toPath())).containsExactly(apiExtensionContent);
     }
 
     @Test
@@ -122,7 +136,10 @@ public class ApplicationArchiveReaderTest {
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
-        assertThat(applicationArchive.getProcesses())
-                .containsExactly(file("myprocess.bar", barContent));
+        List<java.io.File> processes = applicationArchive.getProcesses();
+        assertThat(processes.size()).isEqualTo(1);
+        assertThat(processes.get(0).getName()).contains("myprocess.bar");
+        assertThat(Files.readAllBytes(processes.get(0).toPath())).containsExactly(barContent);
     }
+
 }
