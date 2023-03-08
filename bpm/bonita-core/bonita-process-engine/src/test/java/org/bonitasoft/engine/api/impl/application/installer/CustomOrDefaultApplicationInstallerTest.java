@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
+import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.MandatoryLivingApplicationImporter;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -50,7 +51,8 @@ public class CustomOrDefaultApplicationInstallerTest {
     public void before() {
         applicationInstaller = spy(new ApplicationInstaller(mock(BusinessDataModelRepository.class),
                 mock(TransactionService.class), 1L, mock(SessionAccessor.class), mock(SessionService.class),
-                mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class)));
+                mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class),
+                mock(ApplicationImporter.class)));
         listener = spy(new CustomOrDefaultApplicationInstaller(applicationInstaller,
                 mock(DefaultLivingApplicationImporter.class), mock(MandatoryLivingApplicationImporter.class),
                 mock(TenantServicesManager.class), mock(ApplicationArchiveReader.class)));
