@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl.application.installer;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PAGE;
 import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_KO;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.ProcessDeploymentAPIDelegate;
 import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -44,6 +47,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -100,7 +104,6 @@ public class ApplicationInstallerTest {
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
-        doReturn(null).when(applicationInstaller).getPage(anyString());
 
         applicationInstaller.install(applicationArchive);
 
@@ -129,6 +132,28 @@ public class ApplicationInstallerTest {
 
         verify(applicationInstaller).importApplications("content".getBytes());
 
+        //cleanup
+        application.delete();
+    }
+
+    @Test
+    public void should_not_install_living_applications_if_page_missing() throws Exception {
+        final ExecutionResult result = new ExecutionResult();
+        ImportStatus importStatus = new ImportStatus("application");
+        importStatus.addError(new ImportError("page", ImportError.Type.PAGE));
+        List<ImportStatus> importStatuses = Collections.singletonList(importStatus);
+        File application = createTempFile("application", "xml", "content".getBytes());
+        ApplicationArchive applicationArchive = new ApplicationArchive()
+                .addApplication(application);
+        doReturn(importStatuses).when(applicationInstaller).importApplications(any());
+
+        assertThatExceptionOfType(ApplicationInstallationException.class)
+                .isThrownBy(() -> applicationInstaller.installLivingApplications(applicationArchive, result))
+                .withMessage("At least one application failed to be installed. Canceling installation.");
+
+        verify(applicationInstaller).importApplications("content".getBytes());
+        assertThat(result.getAllStatus()).hasSize(1).extracting("code")
+                .containsExactly(LIVING_APP_REFERENCES_UNKNOWN_PAGE);
         //cleanup
         application.delete();
     }

@@ -55,6 +55,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
+import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
@@ -107,13 +108,15 @@ public class ApplicationInstaller {
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
+    private ApplicationImporter applicationImporter;
     private final Long tenantId;
 
     @Autowired
     public ApplicationInstaller(@Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
             UserTransactionService transactionService, @Value("${tenantId}") Long tenantId,
             SessionAccessor sessionAccessor, SessionService sessionService, TenantStateManager tenantStateManager,
-            @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager) {
+            @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager,
+            ApplicationImporter applicationImporter) {
         this.bdmRepository = bdmRepository;
         this.transactionService = transactionService;
         this.tenantId = tenantId;
@@ -121,6 +124,7 @@ public class ApplicationInstaller {
         this.sessionService = sessionService;
         this.tenantStateManager = tenantStateManager;
         this.businessArchiveArtifactsManager = businessArchiveArtifactsManager;
+        this.applicationImporter = applicationImporter;
     }
 
     private PageAPIDelegate getPageAPIDelegate() {
@@ -329,51 +333,45 @@ public class ApplicationInstaller {
     }
 
     public void installLivingApplications(ApplicationArchive applicationArchive, ExecutionResult executionResult)
-            throws AlreadyExistsException, ImportException {
+            throws AlreadyExistsException, ImportException, ApplicationInstallationException {
         try {
             for (File livingApplicationFile : applicationArchive.getApplications()) {
-                log.info("Installing / updating Living Application from file '{}'", livingApplicationFile.getName());
+                log.info("Installing Living Application from file '{}'", livingApplicationFile.getName());
                 final List<ImportStatus> importStatusList = importApplications(
                         Files.readAllBytes(livingApplicationFile.toPath()));
-                convertResultOfLivingApplicationImport(importStatusList, executionResult);
+                boolean atLeastOneBlockingProblem = false;
+                for (ImportStatus status : importStatusList) {
+                    final Map<String, Serializable> context = new HashMap<>();
+                    context.put(LIVING_APPLICATION_TOKEN_KEY, status.getName());
+                    context.put(LIVING_APPLICATION_IMPORT_STATUS_KEY, status.getStatus());
+                    final List<ImportError> errors = status.getErrors();
+                    if (errors != null && !errors.isEmpty()) {
+                        errors.forEach(error -> {
+                            executionResult.addStatus(buildErrorStatus(error, livingApplicationFile.getName()));
+                        });
+
+                        atLeastOneBlockingProblem = true;
+                        continue;
+                    }
+
+                    executionResult.addStatus(
+                            infoStatus(LIVING_APP_DEPLOYMENT, format("Application '%s' has been %s", status.getName(),
+                                    status.getStatus().name().toLowerCase()), context));
+
+                }
+                if (atLeastOneBlockingProblem) {
+                    throw new ApplicationInstallationException(
+                            "At least one application failed to be installed. Canceling installation.");
+                }
             }
         } catch (IOException e) {
             throw new ImportException(e);
         }
     }
 
-    List<ImportStatus> importApplications(final byte[] xmlContent)
-            throws ImportException, AlreadyExistsException {
-        return getTenantAccessor().getApplicationImporter().importApplications(xmlContent, null, null,
-                SessionService.SYSTEM_ID,
-                new StrategySelector().selectStrategy(ApplicationImportPolicy.REPLACE_DUPLICATES));
-    }
-
-    private void convertResultOfLivingApplicationImport(List<ImportStatus> importStatusList,
-            ExecutionResult executionResult) {
-        for (ImportStatus status : importStatusList) {
-            final Map<String, Serializable> context = new HashMap<>();
-            context.put(LIVING_APPLICATION_TOKEN_KEY, status.getName());
-            context.put(LIVING_APPLICATION_IMPORT_STATUS_KEY, status.getStatus());
-            final List<ImportError> errors = status.getErrors();
-            if (errors != null && !errors.isEmpty()) {
-                executionResult.addStatus(
-                        warningStatus(LIVING_APP_DEPLOYMENT, format("Application '%s' has been %s with warnings",
-                                status.getName(), status.getStatus().name().toLowerCase()), context));
-                for (ImportError warning : errors) {
-                    executionResult.addStatus(buildWarningStatus(warning, status.getName()));
-                }
-            } else {
-                executionResult.addStatus(
-                        infoStatus(LIVING_APP_DEPLOYMENT, format("Application '%s' has been %s", status.getName(),
-                                status.getStatus().name().toLowerCase()), context));
-            }
-        }
-    }
-
-    private Status buildWarningStatus(ImportError warning, @NonNull String applicationName) {
+    private Status buildErrorStatus(ImportError importError, @NonNull String applicationName) {
         StatusCode code = null;
-        switch (warning.getType()) {
+        switch (importError.getType()) {
             case PAGE:
                 code = LIVING_APP_REFERENCES_UNKNOWN_PAGE;
                 break;
@@ -394,12 +392,19 @@ public class ApplicationInstaller {
         }
         final Map<String, Serializable> context = new HashMap<>();
         context.put(LIVING_APPLICATION_TOKEN_KEY, applicationName);
-        context.put(LIVING_APPLICATION_INVALID_ELEMENT_NAME, warning.getName());
-        context.put(LIVING_APPLICATION_INVALID_ELEMENT_TYPE, warning.getType());
-        return warningStatus(
+        context.put(LIVING_APPLICATION_INVALID_ELEMENT_NAME, importError.getName());
+        context.put(LIVING_APPLICATION_INVALID_ELEMENT_TYPE, importError.getType());
+        return errorStatus(
                 code,
-                String.format("Unknown %s named '%s'", warning.getType().name(), warning.getName()),
+                String.format("Unknown %s named '%s'", importError.getType().name(), importError.getName()),
                 context);
+    }
+
+    List<ImportStatus> importApplications(final byte[] xmlContent)
+            throws ImportException, AlreadyExistsException {
+        return applicationImporter.importApplications(xmlContent, null, null,
+                SessionService.SYSTEM_ID,
+                new StrategySelector().selectStrategy(ApplicationImportPolicy.FAIL_ON_DUPLICATES));
     }
 
     public void installPages(ApplicationArchive applicationArchive, ExecutionResult executionResult)
@@ -435,38 +440,21 @@ public class ApplicationInstaller {
      */
     public void installUnitPage(File pageFile, String precisePageType, ExecutionResult executionResult)
             throws IOException, BonitaException {
-        byte[] pageContent = Files.readAllBytes(pageFile.toPath());
         String pageToken = getPageToken(pageFile);
-        org.bonitasoft.engine.page.Page existingPage = getPage(pageToken);
 
         final Map<String, Serializable> context = new HashMap<>();
         context.put(PAGE_NAME_KEY, pageToken);
 
-        if (existingPage != null) {
-            // page already exists, we update it:
-            log.info("Updating existing {} '{}'", precisePageType, getPageName(existingPage));
-            updatePageContent(pageContent, existingPage);
+        final Page page = createPage(Files.readAllBytes(pageFile.toPath()), pageToken);
+        log.info("Creating new {} '{}'", precisePageType, getPageName(page));
 
-            executionResult.addStatus(infoStatus(PAGE_DEPLOYMENT_UPDATE_EXISTING,
-                    format("Existing %s '%s' has been updated", precisePageType, getPageName(existingPage)),
-                    context));
-        } else {
-            // page does not exist, we create it:
-            final Page page = createPage(pageContent, pageToken);
-            log.info("Creating new {} '{}'", precisePageType, getPageName(page));
-
-            executionResult.addStatus(infoStatus(PAGE_DEPLOYMENT_CREATE_NEW,
-                    format("New %s '%s' has been installed", precisePageType, getPageName(page)),
-                    context));
-        }
+        executionResult.addStatus(infoStatus(PAGE_DEPLOYMENT_CREATE_NEW,
+                format("New %s '%s' has been installed", precisePageType, getPageName(page)),
+                context));
     }
 
     public Page createPage(byte[] pageContent, String pageToken) throws CreationException {
         return getPageAPIDelegate().createPage(pageToken, pageContent, SessionService.SYSTEM_ID);
-    }
-
-    void updatePageContent(byte[] pageContent, Page existingPage) throws UpdateException {
-        getPageAPIDelegate().updatePageContent(existingPage.getId(), pageContent, SessionService.SYSTEM_ID);
     }
 
     private String getPageName(Page page) {
