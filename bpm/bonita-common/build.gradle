@@ -28,6 +28,7 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly project(':bpm:bonita-sap-jco-connector-api')
     testImplementation project(':bpm:bonita-sap-jco-connector-api')
+    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
 
     schemagen(
             "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",
