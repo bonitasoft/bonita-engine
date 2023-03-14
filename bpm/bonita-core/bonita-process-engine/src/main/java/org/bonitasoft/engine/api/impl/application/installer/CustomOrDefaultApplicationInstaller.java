@@ -66,7 +66,7 @@ public class CustomOrDefaultApplicationInstaller {
 
     @EventListener
     public void autoDeployDetectedCustomApplication(PlatformStartedEvent event)
-            throws ApplicationInstallationException, IOException {
+            throws Exception {
 
         // check under custom application default folder if an application is found, and retrieve it
         final Resource customApplication = detectCustomApplication();
@@ -139,9 +139,10 @@ public class CustomOrDefaultApplicationInstaller {
      * @param customApplication custom application resource
      * @throws ApplicationInstallationException if unable to install the application
      */
-    protected void installCustomApplication(final Resource customApplication) throws ApplicationInstallationException {
-        try (final InputStream applicationZipFileStream = customApplication.getInputStream()) {
-            applicationInstaller.install(getApplicationArchive(applicationZipFileStream));
+    protected void installCustomApplication(final Resource customApplication) throws Exception {
+        try (final InputStream applicationZipFileStream = customApplication.getInputStream();
+                ApplicationArchive applicationArchive = getApplicationArchive(applicationZipFileStream)) {
+            applicationInstaller.install(applicationArchive);
         } catch (IOException | ApplicationInstallationException e) {
             throw new ApplicationInstallationException(
                     "Unable to install the application " + customApplication.getFilename(), e);

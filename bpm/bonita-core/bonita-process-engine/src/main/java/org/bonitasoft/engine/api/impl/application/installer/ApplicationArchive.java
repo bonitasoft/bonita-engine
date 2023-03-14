@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.api.impl.application.installer;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplicationArchive {
+public class ApplicationArchive implements AutoCloseable {
 
     private File organization;
     private File bdm;
@@ -68,4 +70,29 @@ public class ApplicationArchive {
         return this;
     }
 
+    @Override
+    public void close() throws Exception {
+        cleanPhysicalArtifacts();
+    }
+
+    protected void cleanPhysicalArtifacts() throws IOException {
+        if (organization != null) {
+            Files.deleteIfExists(organization.toPath());
+        }
+        if (bdm != null) {
+            Files.deleteIfExists(bdm.toPath());
+        }
+        deletePhysicalFilesFromList(processes);
+        deletePhysicalFilesFromList(restAPIExtensions);
+        deletePhysicalFilesFromList(pages);
+        deletePhysicalFilesFromList(layouts);
+        deletePhysicalFilesFromList(themes);
+        deletePhysicalFilesFromList(applications);
+    }
+
+    protected void deletePhysicalFilesFromList(List<File> list) throws IOException {
+        for (File f : list) {
+            Files.deleteIfExists(f.toPath());
+        }
+    }
 }

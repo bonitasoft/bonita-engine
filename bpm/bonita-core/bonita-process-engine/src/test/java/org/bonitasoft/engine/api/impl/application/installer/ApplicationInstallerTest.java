@@ -91,49 +91,43 @@ public class ApplicationInstallerTest {
 
     @Test
     public void should_install_application_containing_all_kind_of_custom_pages() throws Exception {
-        ApplicationArchive applicationArchive = new ApplicationArchive();
         File page = createTempFile("page", "zip", zip(file("page.properties", "name=page")));
         File layout = createTempFile("layout", "zip", zip(file("page.properties", "name=layout")));
         File theme = createTempFile("theme", "zip", zip(file("page.properties", "name=theme")));
         File restAPI = createTempFile("restApiExtension", "zip", zip(file("page.properties", "name=restApiExtension")));
-        applicationArchive.addPage(page)
-                .addLayout(layout)
-                .addTheme(theme)
-                .addRestAPIExtension(restAPI);
+        try (
+                ApplicationArchive applicationArchive = new ApplicationArchive();) {
+            applicationArchive.addPage(page)
+                    .addLayout(layout)
+                    .addTheme(theme)
+                    .addRestAPIExtension(restAPI);
 
-        doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
-        doNothing().when(applicationInstaller).installOrganization(any(), any());
-        doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
+            doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
+            doNothing().when(applicationInstaller).installOrganization(any(), any());
+            doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
 
-        applicationInstaller.install(applicationArchive);
+            applicationInstaller.install(applicationArchive);
+        }
 
         verify(applicationInstaller).createPage(any(), eq("page"));
         verify(applicationInstaller).createPage(any(), eq("layout"));
         verify(applicationInstaller).createPage(any(), eq("theme"));
         verify(applicationInstaller).createPage(any(), eq("restApiExtension"));
-
-        //cleanup
-        page.delete();
-        layout.delete();
-        theme.delete();
-        restAPI.delete();
     }
 
     @Test
     public void should_install_application_containing_living_applications() throws Exception {
         File application = createTempFile("application", "xml", "content".getBytes());
-        ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addApplication(application);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(emptyList()).when(applicationInstaller).importApplications(any());
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
-
-        applicationInstaller.install(applicationArchive);
+        try (
+                ApplicationArchive applicationArchive = new ApplicationArchive()
+                        .addApplication(application)) {
+            applicationInstaller.install(applicationArchive);
+        }
 
         verify(applicationInstaller).importApplications("content".getBytes());
-
-        //cleanup
-        application.delete();
     }
 
     @Test
@@ -143,19 +137,19 @@ public class ApplicationInstallerTest {
         importStatus.addError(new ImportError("page", ImportError.Type.PAGE));
         List<ImportStatus> importStatuses = Collections.singletonList(importStatus);
         File application = createTempFile("application", "xml", "content".getBytes());
-        ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addApplication(application);
         doReturn(importStatuses).when(applicationInstaller).importApplications(any());
 
-        assertThatExceptionOfType(ApplicationInstallationException.class)
-                .isThrownBy(() -> applicationInstaller.installLivingApplications(applicationArchive, result))
-                .withMessage("At least one application failed to be installed. Canceling installation.");
+        try (
+                ApplicationArchive applicationArchive = new ApplicationArchive()
+                        .addApplication(application)) {
 
+            assertThatExceptionOfType(ApplicationInstallationException.class)
+                    .isThrownBy(() -> applicationInstaller.installLivingApplications(applicationArchive, result))
+                    .withMessage("At least one application failed to be installed. Canceling installation.");
+        }
         verify(applicationInstaller).importApplications("content".getBytes());
         assertThat(result.getAllStatus()).hasSize(1).extracting("code")
                 .containsExactly(LIVING_APP_REFERENCES_UNKNOWN_PAGE);
-        //cleanup
-        application.delete();
     }
 
     @Test
@@ -163,8 +157,6 @@ public class ApplicationInstallerTest {
         // given
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
-        ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(process);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
 
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
@@ -174,47 +166,44 @@ public class ApplicationInstallerTest {
         doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
 
         // when
-        applicationInstaller.install(applicationArchive);
-
+        try (ApplicationArchive applicationArchive = new ApplicationArchive()
+                .addProcess(process)) {
+            applicationInstaller.install(applicationArchive);
+        }
         // then
         verify(applicationInstaller).deployProcess(any(), any());
         verify(processDeploymentAPIDelegate).deploy(any());
         verify(processDeploymentAPIDelegate, never()).enableProcess(123L);
 
-        //cleanup
-        process.delete();
     }
 
     @Test
     public void should_install_bdm() throws Exception {
         byte[] bdmZipContent = createValidBDMZipFile();
         File bdm = createTempFile("bdm", "zip", bdmZipContent);
-        ApplicationArchive applicationArchive = new ApplicationArchive()
-                .setBdm(bdm);
-        doNothing().when(applicationInstaller).installOrganization(any(), any());
-        doNothing().when(applicationInstaller).pauseTenant();
-        doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
-        doNothing().when(applicationInstaller).resumeTenant();
-        doReturn(Collections.emptyList()).when(applicationInstaller).installProcesses(any(), any());
-        doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
+        try (
+                ApplicationArchive applicationArchive = new ApplicationArchive()
+                        .setBdm(bdm)) {
+            doNothing().when(applicationInstaller).installOrganization(any(), any());
+            doNothing().when(applicationInstaller).pauseTenant();
+            doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
+            doNothing().when(applicationInstaller).resumeTenant();
+            doReturn(Collections.emptyList()).when(applicationInstaller).installProcesses(any(), any());
+            doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
 
-        applicationInstaller.install(applicationArchive);
+            applicationInstaller.install(applicationArchive);
 
-        verify(applicationInstaller).pauseTenant();
-        verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
-        verify(applicationInstaller).resumeTenant();
+            verify(applicationInstaller).pauseTenant();
+            verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
+            verify(applicationInstaller).resumeTenant();
+        }
 
-        //cleanup
-        bdm.delete();
     }
 
     @Test
     public void should_call_enable_resolved_processes() throws Exception {
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
-        ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(process);
-
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
 
@@ -222,14 +211,15 @@ public class ApplicationInstallerTest {
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
 
-        applicationInstaller.install(applicationArchive);
+        try (ApplicationArchive applicationArchive = new ApplicationArchive()
+                .addProcess(process)) {
+            applicationInstaller.install(applicationArchive);
+        }
 
         verify(applicationInstaller).deployProcess(any(), any());
         verify(processDeploymentAPIDelegate).deploy(any());
         verify(applicationInstaller).enableResolvedProcesses(eq(Collections.singletonList(123L)), any());
 
-        //cleanup
-        process.delete();
     }
 
     @Test
@@ -282,9 +272,6 @@ public class ApplicationInstallerTest {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
-        ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(process);
-
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
         doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
         ProcessDefinition myProcess = aProcessDefinition(1193L);
@@ -294,16 +281,17 @@ public class ApplicationInstallerTest {
                 .deploy(any());
 
         // when
-        assertThatExceptionOfType(ProcessDeployException.class).isThrownBy(
-                () -> applicationInstaller.installProcesses(applicationArchive, executionResult))
-                .withMessageContaining("Process myProcess - 1.0 already exists");
+        try (ApplicationArchive applicationArchive = new ApplicationArchive()
+                .addProcess(process)) {
+            assertThatExceptionOfType(ProcessDeployException.class).isThrownBy(
+                    () -> applicationInstaller.installProcesses(applicationArchive, executionResult))
+                    .withMessageContaining("Process myProcess - 1.0 already exists");
+        }
 
         verify(applicationInstaller).deployProcess(ArgumentMatchers
                 .argThat(b -> b.getProcessDefinition().getName().equals("myProcess")), any());
         verify(applicationInstaller, never()).enableResolvedProcesses(any(), any());
 
-        //cleanup
-        process.delete();
     }
 
     private ProcessDefinitionImpl aProcessDefinition(long id) {
