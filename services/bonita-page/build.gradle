@@ -11,6 +11,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"

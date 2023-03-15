@@ -56,4 +56,22 @@ public class FileAndContentUtils {
         return new FileAndContent(fileName, content.readAllBytes());
     }
 
+    public static class FileAndContent {
+
+        private String fileName;
+        private byte[] content;
+
+        public FileAndContent(String fileName, byte[] content) {
+            this.fileName = fileName;
+            this.content = content;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public byte[] getContent() {
+            return content;
+        }
+    }
 }

@@ -89,6 +89,7 @@ dependencies {
     testImplementation "org.springframework:spring-test:${Deps.springVersion}"
     compileOnly project(':bpm:bonita-common')
     testImplementation project(':bpm:bonita-common')
+    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
