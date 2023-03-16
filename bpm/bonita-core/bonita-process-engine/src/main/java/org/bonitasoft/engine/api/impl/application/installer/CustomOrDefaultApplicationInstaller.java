@@ -53,6 +53,10 @@ public class CustomOrDefaultApplicationInstaller {
     @Getter
     protected String applicationInstallFolder;
 
+    @Value("${bonita.runtime.custom-application.install-provided-pages:false}")
+    @Getter
+    protected boolean addDefaultPages;
+
     protected final ApplicationInstaller applicationInstaller;
 
     private final DefaultLivingApplicationImporter defaultLivingApplicationImporter;
@@ -80,6 +84,10 @@ public class CustomOrDefaultApplicationInstaller {
             log.info("Custom application detected with name '{}' under folder '{}'", customApplication.getFilename(),
                     applicationInstallFolder);
             if (isPlatformFirstInitialization()) {
+                // install default page
+                if (isAddDefaultPages()) {
+                    installDefaultProvidedPages();
+                }
                 // install application if it exists and if it is the first init of the platform
                 log.info("Bonita now tries to install it automatically...");
                 installCustomApplication(customApplication);
@@ -168,6 +176,19 @@ public class CustomOrDefaultApplicationInstaller {
             });
         } catch (Exception e) {
             throw new ApplicationInstallationException("Unable to import default living applications", e);
+        }
+    }
+
+    @VisibleForTesting
+    void installDefaultProvidedPages() throws ApplicationInstallationException {
+        try {
+            // default app importer requires a tenant session and to be executed inside a transaction
+            tenantServicesManager.inTenantSessionTransaction(() -> {
+                defaultLivingApplicationImporter.importDefaultPages();
+                return null;
+            });
+        } catch (Exception e) {
+            throw new ApplicationInstallationException("Unable to import default pages", e);
         }
     }
 }

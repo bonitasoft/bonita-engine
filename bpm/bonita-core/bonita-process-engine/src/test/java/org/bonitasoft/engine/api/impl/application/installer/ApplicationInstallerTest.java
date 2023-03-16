@@ -16,8 +16,9 @@ package org.bonitasoft.engine.api.impl.application.installer;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PAGE;
-import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_KO;
+import static org.bonitasoft.engine.api.result.Status.Level.ERROR;
+import static org.bonitasoft.engine.api.result.Status.Level.WARNING;
+import static org.bonitasoft.engine.api.result.StatusCode.*;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.bonitasoft.engine.io.IOUtils.createTempFile;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -132,10 +134,13 @@ public class ApplicationInstallerTest {
 
     @Test
     public void should_not_install_living_applications_if_page_missing() throws Exception {
+
         final ExecutionResult result = new ExecutionResult();
         ImportStatus importStatus = new ImportStatus("application");
         importStatus.addError(new ImportError("page", ImportError.Type.PAGE));
-        List<ImportStatus> importStatuses = Collections.singletonList(importStatus);
+        ImportStatus importStatus2 = new ImportStatus("application");
+        importStatus2.addError(new ImportError("test", ImportError.Type.PAGE));
+        List<ImportStatus> importStatuses = Arrays.asList(importStatus, importStatus2);
         File application = createTempFile("application", "xml", "content".getBytes());
         doReturn(importStatuses).when(applicationInstaller).importApplications(any());
 
@@ -148,8 +153,14 @@ public class ApplicationInstallerTest {
                     .withMessage("At least one application failed to be installed. Canceling installation.");
         }
         verify(applicationInstaller).importApplications("content".getBytes());
-        assertThat(result.getAllStatus()).hasSize(1).extracting("code")
-                .containsExactly(LIVING_APP_REFERENCES_UNKNOWN_PAGE);
+
+        assertThat(result.getAllStatus()).hasSize(3).extracting("code")
+                .containsOnly(LIVING_APP_REFERENCES_UNKNOWN_PAGE);
+        assertThat(result.getAllStatus()).extracting("message")
+                .containsExactly("Unknown PAGE named 'page'", "Unknown PAGE named 'test'",
+                        ApplicationInstaller.WARNING_MISSING_PAGE_MESSAGE);
+        assertThat(result.getAllStatus()).extracting("level")
+                .containsExactly(ERROR, ERROR, WARNING);
     }
 
     @Test

@@ -70,7 +70,7 @@ public class DefaultLivingApplicationImporter extends LivingApplicationImporter 
         log.info("Import of Bonita default applications completed");
     }
 
-    private void importDefaultPages() {
+    public void importDefaultPages() {
         try {
             if (addRemovablePagesIfMissing) {
                 log.info("Detected a first run (a tenant creation or an installation from scratch), "
