@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -110,6 +111,14 @@ public class ApplicationInstaller {
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     private ApplicationImporter applicationImporter;
     private final Long tenantId;
+
+    @VisibleForTesting
+    static final String WARNING_MISSING_PAGE_MESSAGE = "If your are using pages from Bonita Admin or User applications, "
+            +
+            "ensure to set the Bonita runtime property " +
+            "'bonita.runtime.custom-application.install-provided-pages=true' " +
+            "or the environment variable 'INSTALL_PROVIDED_PAGES=true " +
+            "(if you are in docker context) in order to install those pages";
 
     @Autowired
     public ApplicationInstaller(@Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
@@ -340,6 +349,7 @@ public class ApplicationInstaller {
                 final List<ImportStatus> importStatusList = importApplications(
                         Files.readAllBytes(livingApplicationFile.toPath()));
                 boolean atLeastOneBlockingProblem = false;
+                AtomicBoolean displaySpecificErrorMessage = new AtomicBoolean(false);
                 for (ImportStatus status : importStatusList) {
                     final Map<String, Serializable> context = new HashMap<>();
                     context.put(LIVING_APPLICATION_TOKEN_KEY, status.getName());
@@ -347,7 +357,12 @@ public class ApplicationInstaller {
                     final List<ImportError> errors = status.getErrors();
                     if (errors != null && !errors.isEmpty()) {
                         errors.forEach(error -> {
-                            executionResult.addStatus(buildErrorStatus(error, livingApplicationFile.getName()));
+                            Status errorStatus = buildErrorStatus(error, livingApplicationFile.getName());
+                            executionResult.addStatus(errorStatus);
+                            if (!displaySpecificErrorMessage.get()
+                                    && errorStatus.getCode() == LIVING_APP_REFERENCES_UNKNOWN_PAGE) {
+                                displaySpecificErrorMessage.set(true);
+                            }
                         });
 
                         atLeastOneBlockingProblem = true;
@@ -360,6 +375,10 @@ public class ApplicationInstaller {
 
                 }
                 if (atLeastOneBlockingProblem) {
+                    if (displaySpecificErrorMessage.get()) {
+                        executionResult.addStatus(
+                                warningStatus(LIVING_APP_REFERENCES_UNKNOWN_PAGE, WARNING_MISSING_PAGE_MESSAGE, null));
+                    }
                     throw new ApplicationInstallationException(
                             "At least one application failed to be installed. Canceling installation.");
                 }
