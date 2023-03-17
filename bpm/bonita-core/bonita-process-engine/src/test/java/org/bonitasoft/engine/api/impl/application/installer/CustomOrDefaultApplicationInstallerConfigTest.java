@@ -54,17 +54,20 @@ public class CustomOrDefaultApplicationInstallerConfigTest {
         @Test
         public void should_application_install_folder_have_default_value() {
             assertThat(installer.getApplicationInstallFolder()).isEqualTo("my-application");
+            assertThat(installer.isAddDefaultPages()).isFalse();
         }
     }
 
     @TestPropertySource(properties = {
             "bonita.runtime.custom-application.install-folder=my-carpeta-personalizada",
+            "bonita.runtime.custom-application.install-provided-pages=true",
     })
     public static class CustomOrDefaultApplicationInstallerOverwrittenConfigTest extends AbstractConfigTest {
 
         @Test
         public void should_support_application_install_folder_overwrite() {
             assertThat(installer.getApplicationInstallFolder()).isEqualTo("my-carpeta-personalizada");
+            assertThat(installer.isAddDefaultPages()).isTrue();
         }
     }
 }

@@ -22,40 +22,43 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
-import org.bonitasoft.engine.business.application.importer.MandatoryLivingApplicationImporter;
-import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
-import org.bonitasoft.engine.tenant.TenantStateManager;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class CustomOrDefaultApplicationInstallerTest {
 
-    private CustomOrDefaultApplicationInstaller listener;
+    @Captor
+    ArgumentCaptor<Callable<Object>> callableCaptor;
+
+    @Mock
     private ApplicationInstaller applicationInstaller;
+    @Mock
+    DefaultLivingApplicationImporter defaultLivingApplicationImporter;
+    @Mock
+    TenantServicesManager tenantServicesManager;
+    @InjectMocks
+    @Spy
+    private CustomOrDefaultApplicationInstaller listener;
 
     @Before
-    public void before() {
-        applicationInstaller = spy(new ApplicationInstaller(mock(BusinessDataModelRepository.class),
-                mock(TransactionService.class), 1L, mock(SessionAccessor.class), mock(SessionService.class),
-                mock(TenantStateManager.class), mock(BusinessArchiveArtifactsManager.class),
-                mock(ApplicationImporter.class)));
-        listener = spy(new CustomOrDefaultApplicationInstaller(applicationInstaller,
-                mock(DefaultLivingApplicationImporter.class), mock(MandatoryLivingApplicationImporter.class),
-                mock(TenantServicesManager.class), mock(ApplicationArchiveReader.class)));
+    public void before() throws Exception {
+        doAnswer(inv -> callableCaptor.getValue().call()).when(tenantServicesManager)
+                .inTenantSessionTransaction(callableCaptor.capture());
+
     }
 
     @Test
@@ -140,7 +143,8 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_custom_application_if_detected_and_platform_first_init() throws Exception {
+    public void should_install_custom_application_if_detected_and_platform_first_init_and_install_provided_resources_is_false()
+            throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 0L);
         InputStream resourceStream1 = mock(InputStream.class);
@@ -149,48 +153,54 @@ public class CustomOrDefaultApplicationInstallerTest {
         doReturn(resourceStream1).when(resource1).getInputStream();
         final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
         doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
-        doNothing().when(applicationInstaller).install(any());
         doReturn(true).when(listener).isPlatformFirstInitialization();
-
+        doReturn(false).when(listener).isAddDefaultPages();
         //when
         listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(listener).installCustomApplication(eq(resource1));
+        verify(defaultLivingApplicationImporter, never()).importDefaultPages();
         verify(applicationInstaller).install(eq(applicationArchive));
-        verify(listener, never()).installDefaultProvidedApplications();
+
+        verify(defaultLivingApplicationImporter, never()).execute();
     }
 
     @Test
-    public void should_install_default_applications_if_no_custom_app_detected_and_platform_first_init()
+    public void should_install_custom_application_and_provided_provide_page_if_detected_and_platform_first_init_and_install_provided_resources_is_true()
             throws Exception {
         //given
-        doReturn(null).when(listener).detectCustomApplication();
+        Resource resource1 = mockResource("resource1", true, true, 0L);
+        InputStream resourceStream1 = mock(InputStream.class);
+
+        doReturn(resource1).when(listener).detectCustomApplication();
+        doReturn(resourceStream1).when(resource1).getInputStream();
+        final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
+        doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
         doReturn(true).when(listener).isPlatformFirstInitialization();
-
+        doReturn(true).when(listener).isAddDefaultPages();
         //when
         listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(listener, never()).installCustomApplication(any());
-        verify(applicationInstaller, never()).install(any());
-        verify(listener).installDefaultProvidedApplications();
+        InOrder inOrder = inOrder(defaultLivingApplicationImporter, applicationInstaller);
+        inOrder.verify(defaultLivingApplicationImporter).importDefaultPages();
+        inOrder.verify(applicationInstaller).install(eq(applicationArchive));
+        verify(defaultLivingApplicationImporter, never()).execute();
     }
 
     @Test
-    public void should_install_default_applications_if_no_custom_app_detected_and_not_platform_first_init()
+    public void should_install_default_applications_if_no_custom_app_detected()
             throws Exception {
         //given
         doReturn(null).when(listener).detectCustomApplication();
-        doReturn(false).when(listener).isPlatformFirstInitialization();
 
         //when
         listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(listener, never()).installCustomApplication(any());
         verify(applicationInstaller, never()).install(any());
-        verify(listener).installDefaultProvidedApplications();
+        verify(defaultLivingApplicationImporter).execute();
+        verify(defaultLivingApplicationImporter, never()).importDefaultPages();
     }
 
     private Resource mockResource(String filename, boolean exists, boolean isReadable, long contentLength)
