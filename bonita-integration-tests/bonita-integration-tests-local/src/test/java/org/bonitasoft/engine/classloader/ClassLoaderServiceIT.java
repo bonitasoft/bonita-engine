@@ -82,7 +82,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     public void setUp() {
         classLoaderService = getTenantAccessor().getClassLoaderService();
         dependencyService = getTenantAccessor().getDependencyService();
-        platformDependencyService = getPlatformAccessor().getDependencyService();
+        platformDependencyService = getPlatformAccessor().getPlatformDependencyService();
     }
 
     private <T> T inTx(CallableWithException<T> runnable) throws Exception {

@@ -73,7 +73,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     @Override
     public void addDependency(final String name, final byte[] jar) throws CreationException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
-        final DependencyService dependencyService = platformAccessor.getDependencyService();
+        final DependencyService dependencyService = platformAccessor.getPlatformDependencyService();
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
         try {
             dependencyService.createMappedDependency(name, jar, name, GLOBAL_ID, GLOBAL_TYPE);
@@ -86,7 +86,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     @Override
     public void removeDependency(final String name) throws DependencyNotFoundException, DeletionException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
-        final DependencyService dependencyService = platformAccessor.getDependencyService();
+        final DependencyService dependencyService = platformAccessor.getPlatformDependencyService();
         ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
 
         try {
