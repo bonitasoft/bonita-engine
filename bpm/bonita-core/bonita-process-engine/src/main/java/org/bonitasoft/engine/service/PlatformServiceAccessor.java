@@ -13,20 +13,6 @@
  **/
 package org.bonitasoft.engine.service;
 
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
-import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.platform.PlatformManager;
-import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
-import org.bonitasoft.engine.platform.command.PlatformCommandService;
-import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
-import org.bonitasoft.engine.platform.session.PlatformSessionService;
-import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.transaction.TransactionService;
-
 /**
  * Accessor for tenant level engine services.
  * <p>
@@ -37,42 +23,9 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  * @author Zhao Na
+ * @deprecated since 9.0.0, use {@link ServiceAccessor} instead
  */
+@Deprecated(forRemoval = true, since = "9.0.0")
 public interface PlatformServiceAccessor extends ServiceAccessor {
 
-    PlatformService getPlatformService();
-
-    PlatformLoginService getPlatformLoginService();
-
-    SchedulerService getSchedulerService();
-
-    TransactionService getTransactionService();
-
-    TenantServiceAccessor getTenantServiceAccessor();
-
-    PlatformSessionService getPlatformSessionService();
-
-    ClassLoaderService getClassLoaderService();
-
-    DependencyService getDependencyService();
-
-    PlatformCommandService getPlatformCommandService();
-
-    NodeConfiguration getPlatformConfiguration();
-
-    PlatformManager getPlatformManager();
-
-    CacheService getPlatformCacheService();
-
-    void destroy();
-
-    BroadcastService getBroadcastService();
-
-    PlatformAuthenticationService getPlatformAuthenticationService();
-
-    <T> T lookup(String serviceName) throws NotFoundException;
-
-    ServicesResolver getServicesResolver();
-
-    void publishEvent(Object event);
 }
