@@ -20,7 +20,7 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Parameter keys: USER_ID_KEY: the ID of the user to search for, DISCRIMINATOR_ID_KEY : the discriminator to isolate
@@ -34,12 +34,12 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 public class SearchEntityMembersForUserCommand extends EntityMemberCommand {
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
-        final String kind = getStringMandadoryParameter(parameters, DISCRIMINATOR_ID_KEY);
+        final String kind = getStringMandatoryParameter(parameters, DISCRIMINATOR_ID_KEY);
         final Long userId = getUserIdParameter(parameters);
-        final String externalId = getStringMandadoryParameter(parameters, EXTERNAL_ID_KEY);
+        final String externalId = getStringMandatoryParameter(parameters, EXTERNAL_ID_KEY);
         final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY,
                 "Parameters map must contain an entry " + SEARCH_OPTIONS_KEY
                         + " with a SearchOptions value");

@@ -19,20 +19,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.command.RuntimeCommand;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
-public class AddJobCommand extends TenantCommand {
+public class AddJobCommand extends RuntimeCommand {
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandExecutionException {
         final SchedulerService schedulerService = serviceAccessor.getSchedulerService();
         final Trigger trigger = new OneShotTrigger("OneShot", new Date());

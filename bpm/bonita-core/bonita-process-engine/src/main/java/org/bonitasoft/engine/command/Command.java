@@ -24,12 +24,10 @@ import org.bonitasoft.engine.service.ServiceAccessor;
  * It is used to extend the engine behavior. See {@link org.bonitasoft.engine.api.CommandAPI} for explanations of how to
  * deploy, undeploy and execute a command.
  * <br>
- * This class should not be directly subclassed by implementors: use {@link PlatformCommand} or
- * {@link org.bonitasoft.engine.command.TenantCommand} instead.
+ * This class should not be directly subclassed by implementors: use {@link RuntimeCommand} instead
  *
  * @see org.bonitasoft.engine.api.CommandAPI
- * @see org.bonitasoft.engine.command.PlatformCommand
- * @see org.bonitasoft.engine.command.TenantCommand
+ * @see org.bonitasoft.engine.command.RuntimeCommand
  * @author Matthieu Chaffotte
  */
 public interface Command<T extends ServiceAccessor> {

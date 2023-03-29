@@ -17,15 +17,15 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.command.RuntimeCommand;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
-public class AddHandlerCommand extends TenantCommand {
+public class AddHandlerCommand extends RuntimeCommand {
 
     private static final String PROCESSINSTANCE_STATE_UPDATED = "PROCESSINSTANCE_STATE_UPDATED";
 
@@ -40,7 +40,7 @@ public class AddHandlerCommand extends TenantCommand {
     private static final String GATEWAYINSTANCE_STATE_UPDATED = "GATEWAYINSTANCE_STATE_UPDATED";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandExecutionException {
         final EventService eventService = serviceAccessor.getEventService();
         try {

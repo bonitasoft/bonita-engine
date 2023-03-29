@@ -26,7 +26,7 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityMemberGroupDescriptor
 import org.bonitasoft.engine.search.descriptor.SearchEntityMemberRoleAndGroupDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityMemberRoleDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityMemberUserDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Parameter keys: DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions,
@@ -40,11 +40,11 @@ public class SearchEntityMembersCommand extends EntityMemberCommand {
     private static final String MEMBER_TYPE_KEY = "MEMBER_TYPE_KEY";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
 
-        final String kind = getStringMandadoryParameter(parameters, DISCRIMINATOR_ID_KEY);
+        final String kind = getStringMandatoryParameter(parameters, DISCRIMINATOR_ID_KEY);
         final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY,
                 "Parameters map must contain an entry " + SEARCH_OPTIONS_KEY
                         + " with a SearchOptions value");

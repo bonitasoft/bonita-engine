@@ -21,7 +21,7 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
 import org.bonitasoft.engine.identity.MemberType;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Parameter keys: EXTERNAL_ID_KEY: external id provided as is by the external system, USER_ID_KEY: -1 is not needed,
@@ -34,11 +34,11 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 public class AddEntityMemberCommand extends EntityMemberCommand {
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
-        String externalId = getStringMandadoryParameter(parameters, EXTERNAL_ID_KEY);
-        String kind = getStringMandadoryParameter(parameters, DISCRIMINATOR_ID_KEY);
+        String externalId = getStringMandatoryParameter(parameters, EXTERNAL_ID_KEY);
+        String kind = getStringMandatoryParameter(parameters, DISCRIMINATOR_ID_KEY);
         final Long userId = getUserIdParameter(parameters);
         final Long groupId = getGroupIdParameter(parameters);
         final Long roleId = getRoleIdParameter(parameters);

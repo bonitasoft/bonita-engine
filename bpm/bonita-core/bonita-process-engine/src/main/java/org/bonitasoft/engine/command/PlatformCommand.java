@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.command;
 
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-
 /**
  * Class to be subclassed by implementors of a platform scope {@link Command}. It is design to be executed by the
  * {@link org.bonitasoft.engine.api.PlatformCommandAPI}.
@@ -22,7 +20,9 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
  * @see org.bonitasoft.engine.api.PlatformCommandAPI
  * @author Matthieu Chaffotte
  * @since 6.0.0
+ * @deprecated since 9.0.0, use {@link RuntimeCommand} instead
  */
-public abstract class PlatformCommand implements Command<PlatformServiceAccessor> {
+@Deprecated(forRemoval = true, since = "9.0.0")
+public abstract class PlatformCommand extends RuntimeCommand {
 
 }

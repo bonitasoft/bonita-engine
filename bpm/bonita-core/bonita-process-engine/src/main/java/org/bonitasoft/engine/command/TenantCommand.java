@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.command;
 
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-
 /**
  * Class to be subclassed by implementors of a tenant scope {@link Command}. It is design to be executed by the
  * {@link org.bonitasoft.engine.api.CommandAPI}.
@@ -22,7 +20,9 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @see org.bonitasoft.engine.api.CommandAPI
  * @since 6.0.0
+ * @deprecated since 9.0.0, use {@link RuntimeCommand} instead
  */
-public abstract class TenantCommand implements Command<TenantServiceAccessor> {
+@Deprecated(forRemoval = true, since = "9.0.0")
+public abstract class TenantCommand extends RuntimeCommand {
 
 }

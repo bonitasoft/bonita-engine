@@ -18,14 +18,14 @@ import java.util.Map;
 
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Charles Souillard
  */
-public class DeletePlatformSessionCommand extends PlatformCommand {
+public class DeletePlatformSessionCommand extends RuntimeCommand {
 
-    public Serializable execute(Map parameters, PlatformServiceAccessor serviceAccessor)
+    public Serializable execute(Map parameters, ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         Long sessionId = (Long) parameters.get("sessionId");
         PlatformSessionService sessionService = serviceAccessor.getPlatformSessionService();

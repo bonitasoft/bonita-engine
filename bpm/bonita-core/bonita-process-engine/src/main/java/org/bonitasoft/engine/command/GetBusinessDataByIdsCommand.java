@@ -19,27 +19,26 @@ import java.util.Map;
 
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.command.system.CommandWithParameters;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class GetBusinessDataByIdsCommand extends CommandWithParameters {
+public class GetBusinessDataByIdsCommand extends RuntimeCommand {
 
     public static final String ENTITY_CLASS_NAME = "entityClassName";
 
     public static final String BUSINESS_DATA_IDS = "businessDataIds";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         final BusinessDataService businessDataService = serviceAccessor.getBusinessDataService();
         final List<Long> identifiers = getMandatoryParameter(parameters, BUSINESS_DATA_IDS,
                 "Parameters map must contain an entry " + BUSINESS_DATA_IDS
                         + " with a Long List value.");
-        final String entityClassName = getStringMandadoryParameter(parameters, ENTITY_CLASS_NAME);
-        final String businessDataURIPattern = getStringMandadoryParameter(parameters,
+        final String entityClassName = getStringMandatoryParameter(parameters, ENTITY_CLASS_NAME);
+        final String businessDataURIPattern = getStringMandatoryParameter(parameters,
                 BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
         try {
             return businessDataService.getJsonEntities(entityClassName, identifiers, businessDataURIPattern);

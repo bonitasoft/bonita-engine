@@ -17,14 +17,13 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.command.system.CommandWithParameters;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
  * @author Laurent Leseigneur
  */
-public class GetBusinessDataByQueryCommand extends CommandWithParameters {
+public class GetBusinessDataByQueryCommand extends RuntimeCommand {
 
     public static final String QUERY_PARAMETERS = "queryParameters";
     public static final String ENTITY_CLASS_NAME = "entityClassName";
@@ -34,16 +33,16 @@ public class GetBusinessDataByQueryCommand extends CommandWithParameters {
     public static final String MAX_RESULTS = "maxResults";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
 
-        final String queryName = getStringMandadoryParameter(parameters, QUERY_NAME);
+        final String queryName = getStringMandatoryParameter(parameters, QUERY_NAME);
         @SuppressWarnings("unchecked")
         final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters.get(QUERY_PARAMETERS);
-        final String entityClassName = getStringMandadoryParameter(parameters, ENTITY_CLASS_NAME);
-        final Integer startIndex = getIntegerMandadoryParameter(parameters, START_INDEX);
-        final Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
-        String businessDataURIPattern = getStringMandadoryParameter(parameters,
+        final String entityClassName = getStringMandatoryParameter(parameters, ENTITY_CLASS_NAME);
+        final Integer startIndex = getIntegerMandatoryParameter(parameters, START_INDEX);
+        final Integer maxResults = super.getIntegerMandatoryParameter(parameters, MAX_RESULTS);
+        String businessDataURIPattern = getStringMandatoryParameter(parameters,
                 BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
         try {
             return serviceAccessor.getBusinessDataService().getJsonQueryEntities(entityClassName, queryName,

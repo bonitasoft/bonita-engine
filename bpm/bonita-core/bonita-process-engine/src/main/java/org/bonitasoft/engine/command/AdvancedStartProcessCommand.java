@@ -59,7 +59,7 @@ public class AdvancedStartProcessCommand extends AbstractStartProcessCommand {
 
     protected List<String> getActivityNames(final Map<String, Serializable> parameters)
             throws SCommandParameterizationException {
-        return Collections.singletonList(getStringMandadoryParameter(parameters, ACTIVITY_NAME));
+        return Collections.singletonList(getStringMandatoryParameter(parameters, ACTIVITY_NAME));
     }
 
 }

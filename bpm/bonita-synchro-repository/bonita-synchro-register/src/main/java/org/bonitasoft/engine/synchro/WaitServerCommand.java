@@ -16,17 +16,17 @@ package org.bonitasoft.engine.synchro;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.command.RuntimeCommand;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.TenantCommand;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Baptiste Mesta
  */
-public class WaitServerCommand extends TenantCommand {
+public class WaitServerCommand extends RuntimeCommand {
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandExecutionException {
         if (parameters.get("clear") != null) {
             serviceAccessor.getSynchroService().clearAllEvents();

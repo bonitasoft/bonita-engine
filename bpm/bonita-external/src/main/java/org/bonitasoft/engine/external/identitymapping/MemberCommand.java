@@ -16,15 +16,15 @@ package org.bonitasoft.engine.external.identitymapping;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.command.RuntimeCommand;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
-import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.identity.MemberType;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
-public abstract class MemberCommand extends CommandWithParameters {
+public abstract class MemberCommand extends RuntimeCommand {
 
     protected MemberType getMemberType(final Long userId, final Long groupId, final Long roleId)
             throws SCommandParameterizationException {
@@ -51,7 +51,7 @@ public abstract class MemberCommand extends CommandWithParameters {
 
     protected Long getProfileIdParameter(final Map<String, Serializable> parameters)
             throws SCommandParameterizationException {
-        return getLongMandadoryParameter(parameters, ProfileMemberUtils.PROFILE_ID);
+        return getLongMandatoryParameter(parameters, ProfileMemberUtils.PROFILE_ID);
     }
 
     protected Long getUserIdParameter(final Map<String, Serializable> parameters)

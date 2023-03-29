@@ -28,21 +28,8 @@ import org.bonitasoft.engine.api.impl.transaction.command.GetCommands;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.command.CommandCriterion;
-import org.bonitasoft.engine.command.CommandDescriptor;
-import org.bonitasoft.engine.command.CommandExecutionException;
-import org.bonitasoft.engine.command.CommandNotFoundException;
-import org.bonitasoft.engine.command.CommandParameterizationException;
-import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.command.CommandUpdater;
+import org.bonitasoft.engine.command.*;
 import org.bonitasoft.engine.command.CommandUpdater.CommandField;
-import org.bonitasoft.engine.command.DependencyNotFoundException;
-import org.bonitasoft.engine.command.SCommandDeletionException;
-import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.SCommandNotFoundException;
-import org.bonitasoft.engine.command.SCommandParameterizationException;
-import org.bonitasoft.engine.command.SCommandUpdateException;
-import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilder;
@@ -141,7 +128,7 @@ public class CommandAPIImpl implements CommandAPI {
         }
     }
 
-    private TenantCommand fetchTenantCommand(final SCommandFetcher commandFetcher,
+    private RuntimeCommand fetchRuntimeCommand(final SCommandFetcher commandFetcher,
             final boolean transactionManagedManually) throws SCommandNotFoundException,
             SCommandParameterizationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -155,9 +142,9 @@ public class CommandAPIImpl implements CommandAPI {
                 sCommand = commandFetcher.fetch(tenantAccessor.getCommandService());
             }
 
-            final String tenantCommandClassName = sCommand.getImplementation();
+            final String runtimeCommandClassName = sCommand.getImplementation();
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            return (TenantCommand) contextClassLoader.loadClass(tenantCommandClassName).newInstance();
+            return (RuntimeCommand) contextClassLoader.loadClass(runtimeCommandClassName).newInstance();
         } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new SCommandParameterizationException(e);
         }
@@ -212,8 +199,8 @@ public class CommandAPIImpl implements CommandAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         try {
-            final TenantCommand tenantCommand = fetchTenantCommand(commandFetcher, transactionManagedManually);
-            return tenantCommand.execute(parameters, tenantAccessor);
+            final RuntimeCommand runtimeCommand = fetchRuntimeCommand(commandFetcher, transactionManagedManually);
+            return runtimeCommand.execute(parameters, tenantAccessor);
         } catch (final SCommandExecutionException scee) {
             throw new CommandExecutionException(scee);
         } catch (final SCommandParameterizationException scpe) {
