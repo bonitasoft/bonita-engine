@@ -19,7 +19,7 @@ import java.util.Map;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Delete all entity members related to the provided external ID.
@@ -32,11 +32,11 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 public class DeleteEntityMembersCommand extends EntityMemberCommand {
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
-        String externalId = getStringMandadoryParameter(parameters, EXTERNAL_ID_KEY);
-        String kind = getStringMandadoryParameter(parameters, DISCRIMINATOR_ID_KEY);
+        String externalId = getStringMandatoryParameter(parameters, EXTERNAL_ID_KEY);
+        String kind = getStringMandatoryParameter(parameters, DISCRIMINATOR_ID_KEY);
         try {
             deleteExternalIdentityMappings(externalId, kind);
             // everything went right:

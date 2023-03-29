@@ -20,24 +20,24 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.command.RuntimeCommand;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Guillaume Rosinosky <guillaume.rosinosky@bonitasoft.com>
  */
-public class RemovePerfHandlerCommand extends TenantCommand {
+public class RemovePerfHandlerCommand extends RuntimeCommand {
 
     private static final String PROCESSINSTANCE_STATE_UPDATED = "PROCESSINSTANCE_STATE_UPDATED";
 
     private static final String ACTIVITYINSTANCE_STATE_UPDATED = "ACTIVITYINSTANCE_STATE_UPDATED";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandExecutionException {
         JMSProducer.resetInstance();
 

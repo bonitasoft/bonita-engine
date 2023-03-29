@@ -16,6 +16,7 @@ package org.bonitasoft.engine.command.system;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.command.RuntimeCommand;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -23,7 +24,7 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchWaitingEventSerchDescriptor;
 import org.bonitasoft.engine.search.events.trigger.SearchWaitingEvents;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Search Waiting events
@@ -32,7 +33,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  *
  * @author Elias Ricken de Medeiros
  */
-public class SearchWaitingEventsCommand extends CommandWithParameters {
+public class SearchWaitingEventsCommand extends RuntimeCommand {
 
     private static final String SEARCH_OPTIONS_KEY = "searchOptions";
 
@@ -41,7 +42,7 @@ public class SearchWaitingEventsCommand extends CommandWithParameters {
      *        searchOptions: the searchOptions
      */
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         final EventInstanceService eventInstanceService = serviceAccessor.getEventInstanceService();
         final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY,

@@ -16,26 +16,26 @@ package org.bonitasoft.engine.external.comment;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.command.RuntimeCommand;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
-import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.external.comment.transaction.SearchCommentsSupervisedByTransaction;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Hongwen Zang
  * @author Matthieu Chaffotte
  */
-public class SearchCommentsSupervisedBy extends TenantCommand {
+public class SearchCommentsSupervisedBy extends RuntimeCommand {
 
     private static final String SUPERVISOR_ID_KEY = "supervisorId";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
 
         final Long supervisorId = (Long) parameters.get(SUPERVISOR_ID_KEY);

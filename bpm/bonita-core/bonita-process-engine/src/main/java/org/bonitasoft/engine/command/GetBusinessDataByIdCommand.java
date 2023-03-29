@@ -20,28 +20,27 @@ import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.command.system.CommandWithParameters;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
  * @author Laurent Leseigneur
  */
-public class GetBusinessDataByIdCommand extends CommandWithParameters {
+public class GetBusinessDataByIdCommand extends RuntimeCommand {
 
     public static final String ENTITY_CLASS_NAME = "entityClassName";
     public static final String BUSINESS_DATA_ID = "businessDataId";
     public static final String BUSINESS_DATA_CHILD_NAME = "businessDataChildName";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
 
         final BusinessDataService businessDataService = serviceAccessor.getBusinessDataService();
 
-        final Long identifier = getLongMandadoryParameter(parameters, BUSINESS_DATA_ID);
-        final String entityClassName = getStringMandadoryParameter(parameters, ENTITY_CLASS_NAME);
-        final String businessDataURIPattern = getStringMandadoryParameter(parameters,
+        final Long identifier = getLongMandatoryParameter(parameters, BUSINESS_DATA_ID);
+        final String entityClassName = getStringMandatoryParameter(parameters, ENTITY_CLASS_NAME);
+        final String businessDataURIPattern = getStringMandatoryParameter(parameters,
                 BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
         final String childName = getParameter(parameters, BUSINESS_DATA_CHILD_NAME);
         try {

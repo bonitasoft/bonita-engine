@@ -23,16 +23,15 @@ import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.AdvancedStartProcessValidator;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public abstract class AbstractStartProcessCommand extends CommandWithParameters {
+public abstract class AbstractStartProcessCommand extends RuntimeCommand {
 
     public static final String STARTED_BY = "started_by";
     public static final String PROCESS_DEFINITION_ID = "process_definition_id";
@@ -41,7 +40,7 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
     public static final String PROCESS_CONTRACT_INPUTS = "process_contract_inputs";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         // get parameters
         final long processDefinitionId = getProcessDefinitionId(parameters);
@@ -73,7 +72,7 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
         return starter.start();
     }
 
-    private void validateInputs(final TenantServiceAccessor serviceAccessor, final long processDefinitionId,
+    private void validateInputs(final ServiceAccessor serviceAccessor, final long processDefinitionId,
             final List<String> activityNames,
             Map<String, Serializable> processContractInputs)
             throws SBonitaException {
@@ -96,12 +95,12 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
     }
 
     private Long getStartedBy(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getLongMandadoryParameter(parameters, STARTED_BY);
+        return getLongMandatoryParameter(parameters, STARTED_BY);
     }
 
     private Long getProcessDefinitionId(final Map<String, Serializable> parameters)
             throws SCommandParameterizationException {
-        return getLongMandadoryParameter(parameters, PROCESS_DEFINITION_ID);
+        return getLongMandatoryParameter(parameters, PROCESS_DEFINITION_ID);
     }
 
     private List<Operation> getOperations(final Map<String, Serializable> parameters)

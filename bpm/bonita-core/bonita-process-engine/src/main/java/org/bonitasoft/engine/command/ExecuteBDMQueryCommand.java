@@ -22,14 +22,13 @@ import java.util.Map;
 import org.bonitasoft.engine.bdm.serialization.BusinessDataObjectMapper;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
-import org.bonitasoft.engine.command.system.CommandWithParameters;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
  */
-public class ExecuteBDMQueryCommand extends CommandWithParameters {
+public class ExecuteBDMQueryCommand extends RuntimeCommand {
 
     public static final String RETURNS_LIST = "returnsList";
 
@@ -47,20 +46,20 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
     private static final BusinessDataObjectMapper businessDataObjectMapper = new BusinessDataObjectMapper();
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final String queryName = getStringMandadoryParameter(parameters, QUERY_NAME);
+        final String queryName = getStringMandatoryParameter(parameters, QUERY_NAME);
         @SuppressWarnings("unchecked")
         final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters.get(QUERY_PARAMETERS);
-        final String returnType = getStringMandadoryParameter(parameters, RETURN_TYPE);
+        final String returnType = getStringMandatoryParameter(parameters, RETURN_TYPE);
         Class<? extends Serializable> resultClass = loadClass(returnType);
         final BusinessDataRepository businessDataRepository = serviceAccessor.getBusinessDataRepository();
         final Boolean returnsList = (Boolean) parameters.get(RETURNS_LIST);
 
         final Serializable result;
         if (toBoolean(returnsList)) {
-            final Integer startIndex = getIntegerMandadoryParameter(parameters, START_INDEX);
-            final Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
+            final Integer startIndex = getIntegerMandatoryParameter(parameters, START_INDEX);
+            final Integer maxResults = getIntegerMandatoryParameter(parameters, MAX_RESULTS);
             result = (Serializable) businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters,
                     startIndex, maxResults);
         } else {

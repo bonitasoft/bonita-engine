@@ -19,7 +19,7 @@ import java.util.Map;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Parameter keys: ENTITY_MEMBER_ID_KEY: entity member id to remove.
@@ -30,7 +30,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 public class RemoveEntityMemberCommand extends EntityMemberCommand {
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final ServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
         long entityMemberId;

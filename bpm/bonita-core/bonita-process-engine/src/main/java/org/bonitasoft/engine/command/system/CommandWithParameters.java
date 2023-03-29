@@ -16,61 +16,34 @@ package org.bonitasoft.engine.command.system;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.command.RuntimeCommand;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @deprecated since 9.0.0, use {@link RuntimeCommand} instead
  */
+@Deprecated(forRemoval = true, since = "9.0.0")
 public abstract class CommandWithParameters extends TenantCommand {
 
-    @SuppressWarnings("unchecked")
-    protected <T> T getParameter(final Map<String, Serializable> parameters, final String parameterName,
-            final String message)
-            throws SCommandParameterizationException {
-        try {
-            return (T) parameters.get(parameterName);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException(message);
-        }
-    }
-
-    protected <T> T getParameter(final Map<String, Serializable> parameters, final String parameterName)
-            throws SCommandParameterizationException {
-        return getParameter(parameters, parameterName, "An error occurred while parsing " + parameterName);
-    }
-
+    @Deprecated
     protected Long getLongMandadoryParameter(final Map<String, Serializable> parameters, final String field)
             throws SCommandParameterizationException {
-        final String message = "Parameters map must contain an entry " + field + " with a long value.";
-        final Long mandatoryParameter = getMandatoryParameter(parameters, field, message);
-        if (mandatoryParameter == 0L) {
-            throw new SCommandParameterizationException(message);
-        }
-        return mandatoryParameter;
+        return getLongMandatoryParameter(parameters, field);
     }
 
+    @Deprecated
     protected Integer getIntegerMandadoryParameter(final Map<String, Serializable> parameters, final String field)
             throws SCommandParameterizationException {
-        final String message = "Parameters map must contain an entry " + field + " with a int value.";
-        return getMandatoryParameter(parameters, field, message);
+        return getIntegerMandatoryParameter(parameters, field);
     }
 
+    @Deprecated
     protected String getStringMandadoryParameter(final Map<String, Serializable> parameters, final String field)
             throws SCommandParameterizationException {
-        final String message = "Parameters map must contain an entry " + field + " with a String value.";
-        return getMandatoryParameter(parameters, field, message);
-    }
-
-    protected <T> T getMandatoryParameter(final Map<String, Serializable> parameters, final String field,
-            final String message)
-            throws SCommandParameterizationException {
-        final T value = getParameter(parameters, field, message);
-        if (value == null) {
-            throw new SCommandParameterizationException(message);
-        }
-        return value;
+        return getStringMandatoryParameter(parameters, field);
     }
 
 }

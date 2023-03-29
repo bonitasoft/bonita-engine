@@ -34,7 +34,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Emmanuel Duchastenier
@@ -56,9 +56,9 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
 
     protected static final String SEARCH_OPTIONS_KEY = "SEARCH_OPTIONS_KEY";
 
-    protected TenantServiceAccessor serviceAccessor;
+    protected ServiceAccessor serviceAccessor;
 
-    public TenantServiceAccessor getServiceAccessor() {
+    public ServiceAccessor getServiceAccessor() {
         return serviceAccessor;
     }
 
