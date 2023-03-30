@@ -110,7 +110,8 @@ import org.bonitasoft.engine.work.WorkExecutorService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
-public class SpringServiceAccessor implements ServiceAccessor, TenantServiceAccessor, PlatformServiceAccessor {
+public class SpringServiceAccessor
+        implements ServiceAccessor, TenantServiceAccessor, PlatformServiceAccessor, PlatformInitServiceAccessor {
 
     protected final SpringBeanAccessor beanAccessor;
 
