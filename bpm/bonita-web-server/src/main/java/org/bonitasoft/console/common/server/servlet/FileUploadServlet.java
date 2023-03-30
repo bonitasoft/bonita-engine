@@ -35,6 +35,7 @@ import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededExcepti
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.bonitasoft.console.common.server.utils.DocumentUtil;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,7 +159,7 @@ public abstract class FileUploadServlet extends HttpServlet {
                     continue;
                 }
 
-                final String fileName = item.getName();
+                final String fileName = DocumentUtil.sanitizeFilename(item.getName());
 
                 // Check if extension is allowed
                 if (!isSupportedExtension(fileName)) {
