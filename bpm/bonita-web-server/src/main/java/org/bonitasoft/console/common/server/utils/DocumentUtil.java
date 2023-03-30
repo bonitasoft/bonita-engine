@@ -48,4 +48,10 @@ public class DocumentUtil {
         }
     }
 
+    public static String sanitizeFilename(String filename) {
+        if (filename != null) {
+            return filename.replaceAll("[<>\"]+", "_").trim();
+        }
+        return null;
+    }
 }
