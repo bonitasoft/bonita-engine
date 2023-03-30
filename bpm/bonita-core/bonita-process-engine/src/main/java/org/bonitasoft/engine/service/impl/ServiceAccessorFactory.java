@@ -22,6 +22,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -47,6 +48,15 @@ public class ServiceAccessorFactory {
         return INSTANCE;
     }
 
+    public synchronized ServiceAccessor createServiceAccessor() throws BonitaHomeConfigurationException, IOException,
+            ClassNotFoundException, IllegalAccessException, InstantiationException {
+        return getServiceAccessors().getServiceAccessor();
+    }
+
+    /**
+     * @deprecated since 9.0.0, use {@link #createServiceAccessor()} instead
+     */
+    @Deprecated(forRemoval = true, since = "9.0.0")
     public synchronized PlatformServiceAccessor createPlatformServiceAccessor()
             throws BonitaHomeNotSetException, InstantiationException,
             IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
@@ -61,6 +71,10 @@ public class ServiceAccessorFactory {
         return serviceAccessors;
     }
 
+    /**
+     * @deprecated since 9.0.0, use {@link #createServiceAccessor()} instead
+     */
+    @Deprecated(forRemoval = true, since = "9.0.0")
     public TenantServiceAccessor createTenantServiceAccessor()
             throws SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException,
