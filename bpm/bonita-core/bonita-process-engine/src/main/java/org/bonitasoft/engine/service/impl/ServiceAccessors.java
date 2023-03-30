@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.service.impl;
 
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -25,8 +26,18 @@ public interface ServiceAccessors {
 
     PlatformInitServiceAccessor getPlatformInitServiceAccessor();
 
+    ServiceAccessor getServiceAccessor();
+
+    /**
+     * @deprecated since 9.0.0, use {@link #getServiceAccessor()} instead
+     */
+    @Deprecated(forRemoval = true, since = "9.0.0")
     PlatformServiceAccessor getPlatformServiceAccessor();
 
+    /**
+     * @deprecated since 9.0.0, use {@link #getServiceAccessor()} instead
+     */
+    @Deprecated(forRemoval = true, since = "9.0.0")
     TenantServiceAccessor getTenantServiceAccessor();
 
     void destroy();
