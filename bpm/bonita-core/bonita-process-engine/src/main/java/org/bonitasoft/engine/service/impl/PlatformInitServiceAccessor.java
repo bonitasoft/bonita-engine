@@ -13,15 +13,14 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Access all Platform init (bootstrap) services
+ *
+ * @deprecated since 9.0.0, use {@link ServiceAccessor} instead
  */
-public interface PlatformInitServiceAccessor {
-
-    SessionAccessor getSessionAccessor();
-
-    void destroy();
+@Deprecated(forRemoval = true, since = "9.0.0")
+public interface PlatformInitServiceAccessor extends ServiceAccessor {
 
 }

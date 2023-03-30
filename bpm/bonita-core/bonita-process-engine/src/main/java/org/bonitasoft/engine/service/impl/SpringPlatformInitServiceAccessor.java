@@ -13,27 +13,16 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-
 /**
  * Uses spring to access platform init services
+ *
+ * @deprecated since 9.0.0, use {@link SpringServiceAccessor} instead
  */
-public class SpringPlatformInitServiceAccessor implements PlatformInitServiceAccessor {
+@Deprecated(forRemoval = true, since = "9.0.0")
+public class SpringPlatformInitServiceAccessor extends SpringServiceAccessor {
 
-    private SpringBeanAccessor platformBeanAccessor;
-
-    public SpringPlatformInitServiceAccessor(SpringBeanAccessor platformBeanAccessor) {
-        this.platformBeanAccessor = platformBeanAccessor;
-    }
-
-    @Override
-    public SessionAccessor getSessionAccessor() {
-        return platformBeanAccessor.getService(SessionAccessor.class);
-    }
-
-    @Override
-    public void destroy() {
-        platformBeanAccessor.destroy();
+    public SpringPlatformInitServiceAccessor(final SpringBeanAccessor beanAccessor) {
+        super(beanAccessor);
     }
 
 }

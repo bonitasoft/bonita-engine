@@ -24,6 +24,10 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public interface ServiceAccessors {
 
+    /**
+     * @deprecated since 9.0.0, use {@link #getServiceAccessor()} instead
+     */
+    @Deprecated(forRemoval = true, since = "9.0.0")
     PlatformInitServiceAccessor getPlatformInitServiceAccessor();
 
     ServiceAccessor getServiceAccessor();

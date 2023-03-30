@@ -86,13 +86,7 @@ public class ServiceAccessorFactory {
     public SessionAccessor createSessionAccessor()
             throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
-        return createPlatformInitServiceAccessor().getSessionAccessor();
-    }
-
-    private PlatformInitServiceAccessor createPlatformInitServiceAccessor()
-            throws IOException, BonitaHomeConfigurationException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException {
-        return getServiceAccessors().getPlatformInitServiceAccessor();
+        return createServiceAccessor().getSessionAccessor();
     }
 
     public synchronized APIAccessResolver createAPIAccessResolver()
