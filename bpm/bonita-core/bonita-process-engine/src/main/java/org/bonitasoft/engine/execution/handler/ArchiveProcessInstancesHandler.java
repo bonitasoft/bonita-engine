@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
@@ -51,7 +51,7 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
     public void execute(final SUpdateEvent event) throws SHandlerExecutionException {
         final SProcessInstance processInstance = (SProcessInstance) event.getObject();
         try {
-            getTenantServiceAccessor().getBPMArchiverService().archiveAndDeleteProcessInstance(processInstance);
+            getServiceAccessor().getBPMArchiverService().archiveAndDeleteProcessInstance(processInstance);
         } catch (SBonitaException e) {
             throw new SHandlerExecutionException(e);
         }
@@ -61,10 +61,9 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
      * @return tenantServiceAccessor
      * @throws SHandlerExecutionException
      */
-    private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
+    private ServiceAccessor getServiceAccessor() throws SHandlerExecutionException {
         try {
-            ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
-            return serviceAccessorFactory.createTenantServiceAccessor();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (Exception e) {
             throw new SHandlerExecutionException(e.getMessage(), null);
         }

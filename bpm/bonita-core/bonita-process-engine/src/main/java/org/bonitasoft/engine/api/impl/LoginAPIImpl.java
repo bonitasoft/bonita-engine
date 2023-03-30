@@ -32,7 +32,10 @@ import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.UnknownUserException;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.service.*;
+import org.bonitasoft.engine.service.ModelConvertor;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -108,14 +111,12 @@ public class LoginAPIImpl implements LoginAPI {
                 ? String.valueOf(credentials
                         .get(AuthenticationConstants.BASIC_USERNAME))
                 : null;
-        final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance()
-                .createPlatformServiceAccessor();
-        final STenant sTenant = getTenant(tenantId, platformServiceAccessor);
+        final ServiceAccessor serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
+        final STenant sTenant = getTenant(tenantId, serviceAccessor);
 
-        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         checkThatWeCanLogin(userName, sTenant, serviceAccessor.getTechnicalUser());
         final LoginService loginService = serviceAccessor.getLoginService();
-        final TransactionService transactionService = platformServiceAccessor.getTransactionService();
+        final TransactionService transactionService = serviceAccessor.getTransactionService();
         SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
 
         final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<>(credentials);
@@ -132,10 +133,10 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected STenant getTenant(final Long tenantId, final PlatformServiceAccessor platformServiceAccessor)
+    protected STenant getTenant(final Long tenantId, final ServiceAccessor serviceAccessor)
             throws SBonitaException {
-        final PlatformService platformService = platformServiceAccessor.getPlatformService();
-        final TransactionService transactionService = platformServiceAccessor.getTransactionService();
+        final PlatformService platformService = serviceAccessor.getPlatformService();
+        final TransactionService transactionService = serviceAccessor.getTransactionService();
         try {
             if (tenantId == null) {
                 return transactionService.executeInTransaction(platformService::getDefaultTenant);

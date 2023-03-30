@@ -36,8 +36,8 @@ public class AuthenticationServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        identityService = getTenantAccessor().getIdentityService();
-        authService = getTenantAccessor().getAuthenticationService();
+        identityService = getServiceAccessor().getIdentityService();
+        authService = getServiceAccessor().getAuthenticationService();
     }
 
     @Test

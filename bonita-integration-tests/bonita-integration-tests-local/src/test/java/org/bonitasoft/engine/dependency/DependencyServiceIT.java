@@ -31,7 +31,7 @@ public class DependencyServiceIT extends CommonBPMServicesTest {
     private static DependencyService dependencyService;
 
     public DependencyServiceIT() {
-        dependencyService = getTenantAccessor().getDependencyService();
+        dependencyService = getServiceAccessor().getDependencyService();
     }
 
     private final String defaultName = "abc";

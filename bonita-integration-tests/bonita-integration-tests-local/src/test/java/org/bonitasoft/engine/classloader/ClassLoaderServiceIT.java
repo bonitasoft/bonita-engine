@@ -80,9 +80,9 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setUp() {
-        classLoaderService = getTenantAccessor().getClassLoaderService();
-        dependencyService = getTenantAccessor().getDependencyService();
-        platformDependencyService = getPlatformAccessor().getPlatformDependencyService();
+        classLoaderService = getServiceAccessor().getClassLoaderService();
+        dependencyService = getServiceAccessor().getDependencyService();
+        platformDependencyService = getServiceAccessor().getPlatformDependencyService();
     }
 
     private <T> T inTx(CallableWithException<T> runnable) throws Exception {

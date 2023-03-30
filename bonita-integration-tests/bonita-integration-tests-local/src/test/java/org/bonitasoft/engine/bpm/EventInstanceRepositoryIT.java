@@ -36,7 +36,7 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
 
     @Before
     public void before() throws Exception {
-        eventInstanceRepository = getTenantAccessor().getEventInstanceRepository();
+        eventInstanceRepository = getServiceAccessor().getEventInstanceRepository();
         transactionService = getTransactionService();
 
         transactionService.executeInTransaction(() -> {

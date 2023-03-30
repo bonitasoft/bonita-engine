@@ -15,7 +15,7 @@ package org.bonitasoft.engine.test;
 
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -35,9 +35,9 @@ public class CommonAPILocalIT extends CommonAPIIT {
         }
     }
 
-    protected PlatformServiceAccessor getPlatformAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

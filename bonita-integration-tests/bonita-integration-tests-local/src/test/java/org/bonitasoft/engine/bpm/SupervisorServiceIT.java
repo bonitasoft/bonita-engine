@@ -55,8 +55,8 @@ public class SupervisorServiceIT extends CommonBPMServicesTest {
     @Before
     public void setup() {
         this.transactionService = getTransactionService();
-        supervisorService = getTenantAccessor().getSupervisorService();
-        this.identityService = getTenantAccessor().getIdentityService();
+        supervisorService = getServiceAccessor().getSupervisorService();
+        this.identityService = getServiceAccessor().getIdentityService();
     }
 
     @Test

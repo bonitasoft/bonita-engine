@@ -20,7 +20,7 @@ import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -35,9 +35,9 @@ public class BonitaServletContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
         try {
-            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            ServiceAccessor serviceAccessor = getServiceAccessor();
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
+            PlatformSessionService platformSessionService = serviceAccessor.getPlatformSessionService();
             SPlatformSession createSession = platformSessionService.createSession("john");
             sessionAccessor.setSessionInfo(createSession.getId(), -1);
             PlatformAPIImpl platformAPI = new PlatformAPIImpl();
@@ -53,9 +53,9 @@ public class BonitaServletContextListener implements ServletContextListener {
 
     }
 
-    protected PlatformServiceAccessor getPlatformAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

@@ -31,7 +31,7 @@ import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.BroadcastService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
@@ -103,10 +103,10 @@ public class TenantStateManager {
         tenantServicesManager.start();
     }
 
-    protected PlatformServiceAccessor getPlatformAccessor()
+    protected ServiceAccessor getServiceAccessor()
             throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
-        return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+        return ServiceAccessorFactory.getInstance().createServiceAccessor();
     }
 
     private STenant getTenantInTransaction() throws Exception {

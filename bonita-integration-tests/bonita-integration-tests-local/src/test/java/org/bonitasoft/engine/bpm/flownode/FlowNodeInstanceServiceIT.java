@@ -50,8 +50,8 @@ public class FlowNodeInstanceServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        userTransactionService = getTenantAccessor().getUserTransactionService();
-        activityInstanceService = getTenantAccessor().getActivityInstanceService();
+        userTransactionService = getServiceAccessor().getUserTransactionService();
+        activityInstanceService = getServiceAccessor().getActivityInstanceService();
     }
 
     private long getNbFlowNodeInstances(final QueryOptions countOptions) throws Exception {

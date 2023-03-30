@@ -74,14 +74,14 @@ public class DataInstanceServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setupDataInstanceService() {
-        final Recorder recorder = getTenantAccessor().getRecorder();
-        final ReadPersistenceService persistenceService = getTenantAccessor().getReadPersistenceService();
-        final ArchiveService archiveService = getTenantAccessor().getArchiveService();
-        expressionService = getTenantAccessor().getExpressionService();
-        parentContainerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
+        final Recorder recorder = getServiceAccessor().getRecorder();
+        final ReadPersistenceService persistenceService = getServiceAccessor().getReadPersistenceService();
+        final ArchiveService archiveService = getServiceAccessor().getArchiveService();
+        expressionService = getServiceAccessor().getExpressionService();
+        parentContainerResolver = (ParentContainerResolverImpl) getServiceAccessor().getParentContainerResolver();
         dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService);
         parentContainerResolver.setAllowUnknownContainer(true);
-        final EhCacheCacheService cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
+        final EhCacheCacheService cacheService = (EhCacheCacheService) getServiceAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
                 cacheService.start();
@@ -93,7 +93,7 @@ public class DataInstanceServiceIT extends CommonBPMServicesTest {
 
     @After
     public void tearDown() {
-        final EhCacheCacheService cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
+        final EhCacheCacheService cacheService = (EhCacheCacheService) getServiceAccessor().getCacheService();
         try {
             cacheService.stop();
             cacheService.start();

@@ -43,7 +43,7 @@ public class CategoryServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        categoryService = getTenantAccessor().getCategoryService();
+        categoryService = getServiceAccessor().getCategoryService();
         transactionService = getTransactionService();
     }
 

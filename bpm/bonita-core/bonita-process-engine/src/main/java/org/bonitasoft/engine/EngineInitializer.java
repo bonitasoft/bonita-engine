@@ -26,7 +26,7 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class EngineInitializer {
         LOGGER.info("Initializing Bonita Engine...");
         final long before = System.currentTimeMillis();
         // create a session to call the engine
-        final PlatformServiceAccessor platformService = getPlatformService();
+        final ServiceAccessor platformService = getPlatformService();
         final PlatformSessionService platformSessionService = platformService.getPlatformSessionService();
         final SessionAccessor sessionAccessor = getSessionAccessor();
         final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
@@ -97,9 +97,9 @@ public class EngineInitializer {
         return getServiceAccessorFactory().createSessionAccessor();
     }
 
-    PlatformServiceAccessor getPlatformService() {
+    ServiceAccessor getPlatformService() {
         try {
-            return getServiceAccessorFactory().createPlatformServiceAccessor();
+            return getServiceAccessorFactory().createServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

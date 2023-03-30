@@ -36,7 +36,7 @@ public class PlatformCommandServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        platformCommandService = getPlatformAccessor().getPlatformCommandService();
+        platformCommandService = getServiceAccessor().getPlatformCommandService();
     }
 
     @Test(expected = SPlatformCommandAlreadyExistsException.class)

@@ -71,11 +71,11 @@ public class RecorderIT extends CommonBPMServicesTest {
 
     @Before
     public void setUp() throws Exception {
-        persistenceService = getTenantAccessor().getReadPersistenceService();
-        recorder = getTenantAccessor().getRecorder();
-        eventService = getTenantAccessor().getEventService();
-        loggerService = getTenantAccessor().getQueriableLoggerService();
-        scheduler = getTenantAccessor().getSchedulerService();
+        persistenceService = getServiceAccessor().getReadPersistenceService();
+        recorder = getServiceAccessor().getRecorder();
+        eventService = getServiceAccessor().getEventService();
+        loggerService = getServiceAccessor().getQueriableLoggerService();
+        scheduler = getServiceAccessor().getSchedulerService();
         TestUtil.stopScheduler(scheduler, getTransactionService());
         TestUtil.startScheduler(scheduler);
     }

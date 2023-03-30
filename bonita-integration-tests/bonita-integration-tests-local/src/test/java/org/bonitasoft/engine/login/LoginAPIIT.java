@@ -69,8 +69,7 @@ public class LoginAPIIT extends CommonAPIIT {
 
     @SneakyThrows
     private void deleteSession(final long sessionId) {
-        long tenantId = getApiClient().getSession().getTenantId();
-        ServiceAccessorFactory.getInstance().createTenantServiceAccessor()
+        ServiceAccessorFactory.getInstance().createServiceAccessor()
                 .getSessionService()
                 .deleteSession(sessionId);
     }

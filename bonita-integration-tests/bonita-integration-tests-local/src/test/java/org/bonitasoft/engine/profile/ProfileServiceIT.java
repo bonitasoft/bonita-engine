@@ -45,8 +45,8 @@ public class ProfileServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        profileService = getTenantAccessor().getProfileService();
-        identityService = getTenantAccessor().getIdentityService();
+        profileService = getServiceAccessor().getProfileService();
+        identityService = getServiceAccessor().getIdentityService();
     }
 
     @Test(expected = SProfileNotFoundException.class)

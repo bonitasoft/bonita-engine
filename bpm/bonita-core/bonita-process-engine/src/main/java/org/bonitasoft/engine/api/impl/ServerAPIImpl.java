@@ -59,7 +59,7 @@ import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.APIAccessResolver;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
@@ -197,7 +197,7 @@ public class ServerAPIImpl implements ServerAPI {
         SessionAccessor sessionAccessor = null;
 
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
-        final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
+        final ServiceAccessor serviceAccessor = serviceAccessorFactory.createServiceAccessor();
 
         ClassLoader serverClassLoader = null;
         if (session != null) {
@@ -205,12 +205,12 @@ public class ServerAPIImpl implements ServerAPI {
             sessionAccessor = serviceAccessorFactory.createSessionAccessor();
             switch (sessionType) {
                 case PLATFORM:
-                    serverClassLoader = beforeInvokeMethodForPlatformSession(sessionAccessor, platformServiceAccessor,
+                    serverClassLoader = beforeInvokeMethodForPlatformSession(sessionAccessor, serviceAccessor,
                             session);
                     break;
 
                 case API:
-                    serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, platformServiceAccessor,
+                    serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, serviceAccessor,
                             session);
                     break;
 
@@ -238,27 +238,27 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private ClassLoader beforeInvokeMethodForAPISession(SessionAccessor sessionAccessor,
-            PlatformServiceAccessor platformServiceAccessor, Session session) throws SBonitaException {
-        checkTenantSession(platformServiceAccessor, session);
+            ServiceAccessor serviceAccessor, Session session) throws SBonitaException {
+        checkTenantSession(serviceAccessor, session);
         long tenantId = ((APISession) session).getTenantId();
-        SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor().getSessionService();
+        SessionService sessionService = serviceAccessor.getTenantServiceAccessor().getSessionService();
         sessionService.renewSession(session.getId());
         sessionAccessor.setSessionInfo(session.getId(), tenantId);
-        return getTenantClassLoader(platformServiceAccessor, session);
+        return getTenantClassLoader(serviceAccessor, session);
     }
 
     private ClassLoader beforeInvokeMethodForPlatformSession(final SessionAccessor sessionAccessor,
-            final PlatformServiceAccessor platformServiceAccessor,
+            final ServiceAccessor serviceAccessor,
             final Session session) throws SSessionException, SClassLoaderException {
-        final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
-        final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
+        final PlatformSessionService platformSessionService = serviceAccessor.getPlatformSessionService();
+        final PlatformLoginService loginService = serviceAccessor.getPlatformLoginService();
 
         if (!loginService.isValid(session.getId())) {
             throw new InvalidSessionException("Invalid session");
         }
         platformSessionService.renewSession(session.getId());
         sessionAccessor.setSessionInfo(session.getId(), -1);
-        return getPlatformClassLoader(platformServiceAccessor);
+        return getPlatformClassLoader(serviceAccessor);
     }
 
     private SessionType getSessionType(final Session session) {
@@ -312,8 +312,7 @@ public class ServerAPIImpl implements ServerAPI {
         if (lockKey.isPresent()) {
             // try and acquire a lock with this scope
             final long tenantId = (session instanceof APISession) ? ((APISession) session).getTenantId() : 1L;
-            LockService lockService = getServiceAccessorFactoryInstance().createTenantServiceAccessor()
-                    .getLockService();
+            LockService lockService = getServiceAccessorFactoryInstance().createServiceAccessor().getLockService();
             BonitaLock lock = lockService.tryLock(1L, lockKey.get(), 1L, TimeUnit.MILLISECONDS, tenantId);
             if (lock == null) {
                 // timeout expired, we should not pursue this way
@@ -466,13 +465,13 @@ public class ServerAPIImpl implements ServerAPI {
             BonitaHomeConfigurationException {
         UserTransactionService transactionService;
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
-        final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
+        final ServiceAccessor serviceAccessor = serviceAccessorFactory.createServiceAccessor();
         switch (sessionType) {
             case PLATFORM:
-                transactionService = platformServiceAccessor.getTransactionService();
+                transactionService = serviceAccessor.getTransactionService();
                 break;
             case API:
-                final TenantServiceAccessor tenantAccessor = platformServiceAccessor
+                final TenantServiceAccessor tenantAccessor = serviceAccessor
                         .getTenantServiceAccessor();
                 transactionService = tenantAccessor.getUserTransactionService();
                 break;
@@ -513,7 +512,7 @@ public class ServerAPIImpl implements ServerAPI {
         return parameterTypes;
     }
 
-    private void checkTenantSession(final PlatformServiceAccessor platformAccessor, final Session session)
+    private void checkTenantSession(final ServiceAccessor platformAccessor, final Session session)
             throws SSchedulerException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         if (!schedulerService.isStarted()) {
@@ -528,19 +527,19 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private ClassLoader getTenantClassLoader(final PlatformServiceAccessor platformServiceAccessor,
+    private ClassLoader getTenantClassLoader(final ServiceAccessor serviceAccessor,
             final Session session) throws SClassLoaderException {
         final APISession apiSession = (APISession) session;
-        final TenantServiceAccessor tenantAccessor = platformServiceAccessor
+        final TenantServiceAccessor tenantAccessor = serviceAccessor
                 .getTenantServiceAccessor();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         return classLoaderService.getClassLoader(identifier(ScopeType.TENANT, apiSession.getTenantId()));
     }
 
-    private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor)
+    private ClassLoader getPlatformClassLoader(final ServiceAccessor serviceAccessor)
             throws SClassLoaderException {
         ClassLoader classLoader = null;
-        PlatformState state = platformServiceAccessor.getPlatformManager().getState();
+        PlatformState state = serviceAccessor.getPlatformManager().getState();
         if (state != PlatformState.STARTED) {
             // We do not retrieve the platform classloader when the platform is not yet started
             // It needs to have services to be started to retrieve it
@@ -548,11 +547,11 @@ public class ServerAPIImpl implements ServerAPI {
             logger.debug("Tried to retrieve platform classloader on a not started platform, state = {}", state);
             return null;
         }
-        final PlatformService platformService = platformServiceAccessor.getPlatformService();
+        final PlatformService platformService = serviceAccessor.getPlatformService();
         // get the platform to put it in cache if needed
         if (!platformService.isPlatformCreated()) {
             try {
-                platformServiceAccessor.getTransactionService().executeInTransaction(new Callable<Void>() {
+                serviceAccessor.getTransactionService().executeInTransaction(new Callable<Void>() {
 
                     @Override
                     public Void call() throws Exception {
@@ -566,7 +565,7 @@ public class ServerAPIImpl implements ServerAPI {
             }
         }
         if (platformService.isPlatformCreated()) {
-            final ClassLoaderService classLoaderService = platformServiceAccessor.getClassLoaderService();
+            final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
             classLoader = classLoaderService.getClassLoader(ClassLoaderIdentifier.GLOBAL);
         }
         return classLoader;

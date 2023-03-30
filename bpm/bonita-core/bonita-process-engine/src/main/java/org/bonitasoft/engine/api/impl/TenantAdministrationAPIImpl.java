@@ -34,7 +34,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -51,9 +51,9 @@ import org.bonitasoft.engine.tenant.TenantStateManager;
 @Slf4j
 public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
-    protected PlatformServiceAccessor getPlatformAccessorNoException() {
+    protected ServiceAccessor getServiceAccessorNoException() {
         try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -72,7 +72,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     public boolean isPaused() {
         final long tenantId = getTenantId();
         try {
-            return getPlatformAccessorNoException().getPlatformService().getTenant(tenantId).isPaused();
+            return getServiceAccessorNoException().getPlatformService().getTenant(tenantId).isPaused();
         } catch (final SBonitaException e) {
             throw new RetrieveException("Unable to retrieve the tenant with id " + tenantId, e);
         }
@@ -82,7 +82,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused
     @CustomTransactions
     public void pause() throws UpdateException {
-        TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException()
+        TenantServiceAccessor tenantServiceAccessor = getServiceAccessorNoException()
                 .getTenantServiceAccessor();
         try {
             tenantServiceAccessor.getTenantStateManager().pause();
@@ -95,7 +95,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused
     @CustomTransactions
     public void resume() throws UpdateException {
-        TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException()
+        TenantServiceAccessor tenantServiceAccessor = getServiceAccessorNoException()
                 .getTenantServiceAccessor();
         try {
             tenantServiceAccessor.getTenantStateManager().resume();

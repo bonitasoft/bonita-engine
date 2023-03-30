@@ -26,7 +26,7 @@ public class PlatformAuthenticationServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        platformAuthService = getPlatformAccessor().getPlatformAuthenticationService();
+        platformAuthService = getServiceAccessor().getPlatformAuthenticationService();
     }
 
     @Test

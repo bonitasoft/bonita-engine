@@ -23,9 +23,7 @@ public class ProcessEngineServicesResolver implements ServicesLookup {
     @Override
     public <T> T lookupOnPlatform(String serviceName) {
         try {
-            PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance()
-                    .createPlatformServiceAccessor();
-            return platformServiceAccessor.lookup(serviceName);
+            return ServiceAccessorFactory.getInstance().createServiceAccessor().lookup(serviceName);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to find the service " + serviceName, e);
         }

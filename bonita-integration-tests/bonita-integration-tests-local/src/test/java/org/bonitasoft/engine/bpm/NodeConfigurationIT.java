@@ -21,7 +21,7 @@ import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.handler.SchedulerServiceRestartHandler;
 import org.bonitasoft.engine.platform.configuration.NodeConfiguration;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,13 +32,13 @@ public class NodeConfigurationIT {
 
     @BeforeClass
     public static void beforeClass() throws BonitaException {
-        PlatformServiceAccessor platformAccessor;
+        ServiceAccessor serviceAccessor;
         try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (Exception ex) {
             throw new BonitaException(ex);
         }
-        nodeConfiguration = platformAccessor.getPlatformConfiguration();
+        nodeConfiguration = serviceAccessor.getPlatformConfiguration();
     }
 
     @Test

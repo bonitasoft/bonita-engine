@@ -25,7 +25,7 @@ import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.platform.PlatformLogoutException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
@@ -41,13 +41,13 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public PlatformSession login(final String userName, final String password) throws PlatformLoginException {
-        PlatformServiceAccessor platformAccessor;
+        ServiceAccessor serviceAccessor;
         try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new PlatformLoginException(e);
         }
-        final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
+        final PlatformLoginService platformLoginService = serviceAccessor.getPlatformLoginService();
 
         final SPlatformSession platformSession;
         try {
@@ -68,13 +68,13 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void logout(final PlatformSession session) throws PlatformLogoutException, SessionNotFoundException {
-        PlatformServiceAccessor platformAccessor;
+        ServiceAccessor serviceAccessor;
         try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new PlatformLogoutException(e);
         }
-        final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
+        final PlatformLoginService platformLoginService = serviceAccessor.getPlatformLoginService();
         try {
             platformLoginService.logout(session.getId());
         } catch (final SSessionNotFoundException e) {

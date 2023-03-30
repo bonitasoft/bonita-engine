@@ -33,7 +33,7 @@ public class PlatformSessionServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() {
-        sessionService = getPlatformAccessor().getPlatformSessionService();
+        sessionService = getServiceAccessor().getPlatformSessionService();
     }
 
     @Test

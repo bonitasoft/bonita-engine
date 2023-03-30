@@ -70,8 +70,8 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        expressionService = getTenantAccessor().getExpressionService();
-        cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
+        expressionService = getServiceAccessor().getExpressionService();
+        cacheService = (EhCacheCacheService) getServiceAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
                 cacheService.start();
@@ -80,9 +80,9 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
             }
         }
         dataInstanceService = new TransientDataServiceImpl(cacheService,
-                getTenantAccessor().getExpressionResolverService(),
-                getTenantAccessor().getActivityInstanceService(),
-                getTenantAccessor().getProcessDefinitionService());
+                getServiceAccessor().getExpressionResolverService(),
+                getServiceAccessor().getActivityInstanceService(),
+                getServiceAccessor().getProcessDefinitionService());
     }
 
     @After
