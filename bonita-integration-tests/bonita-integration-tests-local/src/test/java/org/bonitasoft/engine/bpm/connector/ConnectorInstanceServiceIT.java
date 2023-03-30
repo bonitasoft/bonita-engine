@@ -38,7 +38,7 @@ public class ConnectorInstanceServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setUp() {
-        connectorInstanceService = getTenantAccessor().getConnectorInstanceService();
+        connectorInstanceService = getServiceAccessor().getConnectorInstanceService();
     }
 
     @After

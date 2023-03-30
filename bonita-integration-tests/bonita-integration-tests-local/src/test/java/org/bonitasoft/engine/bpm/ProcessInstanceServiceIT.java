@@ -66,8 +66,8 @@ public class ProcessInstanceServiceIT extends CommonBPMServicesTest {
     @Before
     public void setup() {
         transactionService = getTransactionService();
-        processInstanceService = getTenantAccessor().getProcessInstanceService();
-        activityInstanceService = getTenantAccessor().getActivityInstanceService();
+        processInstanceService = getServiceAccessor().getProcessInstanceService();
+        activityInstanceService = getServiceAccessor().getActivityInstanceService();
     }
 
     /**
@@ -411,7 +411,7 @@ public class ProcessInstanceServiceIT extends CommonBPMServicesTest {
         dataInstanceBuilder.setContainerType(containerType.name());
 
         final SDataInstance dataInstance = dataInstanceBuilder.done();
-        getTenantAccessor().getDataInstanceService().createDataInstance(dataInstance);
+        getServiceAccessor().getDataInstanceService().createDataInstance(dataInstance);
 
         getTransactionService().complete();
         return dataInstance;
@@ -421,7 +421,7 @@ public class ProcessInstanceServiceIT extends CommonBPMServicesTest {
         SDataInstance dataInstance;
         getTransactionService().begin();
         try {
-            dataInstance = getTenantAccessor().getDataInstanceService().getDataInstance(dataInstanceId);
+            dataInstance = getServiceAccessor().getDataInstanceService().getDataInstance(dataInstanceId);
         } finally {
             getTransactionService().complete();
         }

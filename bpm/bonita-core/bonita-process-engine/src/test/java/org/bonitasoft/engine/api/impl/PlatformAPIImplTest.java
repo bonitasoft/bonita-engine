@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
@@ -26,7 +24,7 @@ import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +38,7 @@ public class PlatformAPIImplTest {
 
     public static final long TENANT_ID = 56423L;
     @Mock
-    private PlatformServiceAccessor platformServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private SchedulerService schedulerService;
     @Mock
@@ -53,9 +51,9 @@ public class PlatformAPIImplTest {
 
     @Before
     public void setup() throws Exception {
-        doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
-        doReturn(platformManager).when(platformServiceAccessor).getPlatformManager();
-        doReturn(platformServiceAccessor).when(platformAPI).getPlatformAccessor();
+        doReturn(schedulerService).when(serviceAccessor).getSchedulerService();
+        doReturn(platformManager).when(serviceAccessor).getPlatformManager();
+        doReturn(serviceAccessor).when(platformAPI).getServiceAccessor();
         doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServer();
     }
 
@@ -76,7 +74,7 @@ public class PlatformAPIImplTest {
 
     @Test(expected = UpdateException.class)
     public void rescheduleErroneousTriggers_should_throw_exception_when_cant_getPlatformAccessor() throws Exception {
-        doThrow(new IOException()).when(platformAPI).getPlatformAccessor();
+        doThrow(new IOException()).when(platformAPI).getServiceAccessor();
 
         platformAPI.rescheduleErroneousTriggers();
     }

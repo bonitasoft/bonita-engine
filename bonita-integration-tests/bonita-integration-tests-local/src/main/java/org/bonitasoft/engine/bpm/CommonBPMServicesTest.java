@@ -64,8 +64,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -95,8 +94,7 @@ public class CommonBPMServicesTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
     protected static SessionAccessor sessionAccessor;
-    protected static PlatformServiceAccessor platformServiceAccessor;
-    protected static TenantServiceAccessor tenantServiceAccessor;
+    protected static ServiceAccessor serviceAccessor;
     private static long tenantId;
     @Rule
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
@@ -126,27 +124,19 @@ public class CommonBPMServicesTest {
         return sessionAccessor;
     }
 
-    protected TenantServiceAccessor getAccessor(final long tenantId) throws Exception {
-        if (tenantServiceAccessor == null) {
-            tenantServiceAccessor = getServiceAccessorFactory().createTenantServiceAccessor();
+    protected ServiceAccessor getServiceAccessor() {
+        if (serviceAccessor == null) {
+            try {
+                serviceAccessor = getServiceAccessorFactory().createServiceAccessor();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
-        return tenantServiceAccessor;
-    }
-
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return getAccessor(getDefaultTenantId());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected PlatformServiceAccessor getPlatformAccessor() {
-        return platformServiceAccessor;
+        return serviceAccessor;
     }
 
     protected TransactionService getTransactionService() {
-        return getPlatformAccessor().getTransactionService();
+        return getServiceAccessor().getTransactionService();
     }
 
     @Before
@@ -156,8 +146,8 @@ public class CommonBPMServicesTest {
         if (sessionAccessor == null) {
             sessionAccessor = getServiceAccessorFactory().createSessionAccessor();
         }
-        if (platformServiceAccessor == null) {
-            platformServiceAccessor = getServiceAccessorFactory().createPlatformServiceAccessor();
+        if (serviceAccessor == null) {
+            serviceAccessor = getServiceAccessorFactory().createServiceAccessor();
         }
 
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
@@ -182,7 +172,7 @@ public class CommonBPMServicesTest {
 
     @After
     public void after() throws Exception {
-        TestUtil.closeTransactionIfOpen(platformServiceAccessor.getTransactionService());
+        TestUtil.closeTransactionIfOpen(serviceAccessor.getTransactionService());
         if (apiSession != null) {
             new LoginAPIImpl().logout(apiSession);
         }
@@ -199,9 +189,9 @@ public class CommonBPMServicesTest {
             cleaRoles();
             cleanUsers();
             cleanGroups();
-            getTenantAccessor().getLoginService().logout(apiSession.getId());
+            getServiceAccessor().getLoginService().logout(apiSession.getId());
         } finally {
-            if (platformServiceAccessor.getTransactionService().isTransactionActive()) {
+            if (serviceAccessor.getTransactionService().isTransactionActive()) {
                 closeTx();
             }
         }
@@ -211,16 +201,16 @@ public class CommonBPMServicesTest {
             SProcessDeletionException, SDeletingEnabledProcessException {
         final QueryOptions queryOptions = new QueryOptions(0, 200, SProcessDefinitionDeployInfo.class, "name",
                 OrderByType.ASC);
-        final List<SProcessDefinitionDeployInfo> processes = getTenantAccessor().getProcessDefinitionService()
+        final List<SProcessDefinitionDeployInfo> processes = getServiceAccessor().getProcessDefinitionService()
                 .getProcessDeploymentInfos(queryOptions);
         if (processes.size() > 0) {
             for (final SProcessDefinitionDeployInfo process : processes) {
                 try {
-                    getTenantAccessor().getProcessDefinitionService()
+                    getServiceAccessor().getProcessDefinitionService()
                             .disableProcessDeploymentInfo(process.getProcessId());
                 } catch (final Throwable ignored) {
                 }
-                getTenantAccessor().getProcessDefinitionService().delete(process.getProcessId());
+                getServiceAccessor().getProcessDefinitionService().delete(process.getProcessId());
             }
         }
     }
@@ -232,7 +222,7 @@ public class CommonBPMServicesTest {
         List<SProcessInstance> processInstances = getFirstProcessInstances(5000);
         while (processInstances.size() > 0) {
             for (final SProcessInstance sProcessInstance : processInstances) {
-                getTenantAccessor().getProcessInstanceService().deleteProcessInstance(sProcessInstance.getId());
+                getServiceAccessor().getProcessInstanceService().deleteProcessInstance(sProcessInstance.getId());
             }
             // get the next 100:
             processInstances = getFirstProcessInstances(5000);
@@ -240,26 +230,27 @@ public class CommonBPMServicesTest {
     }
 
     private void cleanMemberships() throws SIdentityException {
-        for (final SUserMembership sMembership : getTenantAccessor().getIdentityService().getUserMemberships(0, 5000)) {
-            getTenantAccessor().getIdentityService().deleteUserMembership(sMembership);
+        for (final SUserMembership sMembership : getServiceAccessor().getIdentityService().getUserMemberships(0,
+                5000)) {
+            getServiceAccessor().getIdentityService().deleteUserMembership(sMembership);
         }
     }
 
     private void cleaRoles() throws SIdentityException {
-        for (final SRole sRole : getTenantAccessor().getIdentityService().getRoles(0, 5000)) {
-            getTenantAccessor().getIdentityService().deleteRole(sRole);
+        for (final SRole sRole : getServiceAccessor().getIdentityService().getRoles(0, 5000)) {
+            getServiceAccessor().getIdentityService().deleteRole(sRole);
         }
     }
 
     private void cleanUsers() throws SIdentityException {
-        for (final SUser sUser : getTenantAccessor().getIdentityService().getUsers(0, 5000)) {
-            getTenantAccessor().getIdentityService().deleteUser(sUser);
+        for (final SUser sUser : getServiceAccessor().getIdentityService().getUsers(0, 5000)) {
+            getServiceAccessor().getIdentityService().deleteUser(sUser);
         }
     }
 
     private void cleanGroups() throws SIdentityException {
-        for (final SGroup sGroup : getTenantAccessor().getIdentityService().getGroups(0, 5000)) {
-            getTenantAccessor().getIdentityService().deleteGroup(sGroup);
+        for (final SGroup sGroup : getServiceAccessor().getIdentityService().getGroups(0, 5000)) {
+            getServiceAccessor().getIdentityService().deleteGroup(sGroup);
         }
     }
 
@@ -269,7 +260,7 @@ public class CommonBPMServicesTest {
                 OrderByType.DESC);
         final QueryOptions queryOptions = new QueryOptions(0, nb, Collections.singletonList(orderByOption),
                 Collections.emptyList(), null);
-        return getTenantAccessor().getProcessInstanceService().searchProcessInstances(queryOptions);
+        return getServiceAccessor().getProcessInstanceService().searchProcessInstances(queryOptions);
     }
 
     public List<SAProcessInstance> getFirstArchivedProcessInstances(final int nb) throws SBonitaReadException {
@@ -278,7 +269,7 @@ public class CommonBPMServicesTest {
                 OrderByType.DESC);
         final QueryOptions queryOptions = new QueryOptions(0, nb, Collections.singletonList(orderByOption),
                 Collections.emptyList(), null);
-        return getTenantAccessor().getProcessInstanceService().searchArchivedProcessInstances(queryOptions);
+        return getServiceAccessor().getProcessInstanceService().searchArchivedProcessInstances(queryOptions);
     }
 
     protected SProcessInstance createSProcessInstance() throws SBonitaException {
@@ -286,7 +277,7 @@ public class CommonBPMServicesTest {
                 .build();
 
         openTx();
-        getTenantAccessor().getProcessInstanceService().createProcessInstance(processInstance);
+        getServiceAccessor().getProcessInstanceService().createProcessInstance(processInstance);
         closeTx();
 
         return processInstance;
@@ -294,7 +285,7 @@ public class CommonBPMServicesTest {
 
     protected void deleteSProcessInstance(final SProcessInstance processInstance) throws SBonitaException {
         openTx();
-        getTenantAccessor().getProcessInstanceService().deleteProcessInstance(processInstance.getId());
+        getServiceAccessor().getProcessInstanceService().deleteProcessInstance(processInstance.getId());
         closeTx();
     }
 
@@ -302,7 +293,8 @@ public class CommonBPMServicesTest {
         SFlowNodeInstance flowNodeInstance = null;
         openTx();
         try {
-            flowNodeInstance = getTenantAccessor().getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
+            flowNodeInstance = getServiceAccessor().getActivityInstanceService()
+                    .getFlowNodeInstance(flowNodeInstanceId);
         } finally {
             closeTx();
         }
@@ -388,13 +380,13 @@ public class CommonBPMServicesTest {
             throws STransactionCreationException, SEventInstanceCreationException,
             STransactionCommitException, STransactionRollbackException, SMessageInstanceCreationException {
         openTx();
-        getTenantAccessor().getEventInstanceService().createEventInstance(eventInstance);
+        getServiceAccessor().getEventInstanceService().createEventInstance(eventInstance);
         closeTx();
     }
 
     protected void insertGatewayInstance(final SGatewayInstance gatewayInstance) throws SBonitaException {
         openTx();
-        getTenantAccessor().getGatewayInstanceService().createGatewayInstance(gatewayInstance);
+        getServiceAccessor().getGatewayInstanceService().createGatewayInstance(gatewayInstance);
         closeTx();
     }
 
@@ -407,7 +399,7 @@ public class CommonBPMServicesTest {
                         processDefinitionId, rootProcessInst, parentId)
                 .done();
         openTx();
-        getTenantAccessor().getActivityInstanceService().createActivityInstance(taskInstance);
+        getServiceAccessor().getActivityInstanceService().createActivityInstance(taskInstance);
         closeTx();
         return taskInstance;
     }
@@ -420,7 +412,7 @@ public class CommonBPMServicesTest {
                         processDefinitionId, rootProcessInst, parentId)
                 .done();
         openTx();
-        getTenantAccessor().getActivityInstanceService().createActivityInstance(taskInstance);
+        getServiceAccessor().getActivityInstanceService().createActivityInstance(taskInstance);
         closeTx();
         return taskInstance;
     }
@@ -429,13 +421,13 @@ public class CommonBPMServicesTest {
             throws SProcessDefinitionException {
         final DesignProcessDefinitionImpl designProcessDefinition = new DesignProcessDefinitionImpl(name, version);
         designProcessDefinition.setProcessContainer(new FlowElementContainerDefinitionImpl());
-        return getTenantAccessor().getProcessDefinitionService().store(designProcessDefinition);
+        return getServiceAccessor().getProcessDefinitionService().store(designProcessDefinition);
     }
 
     private SActor buildSActor(final String name, final long scopeId, final boolean initiator)
             throws SActorCreationException {
         final SActor sActor = SActor.builder().name(name).scopeId(scopeId).initiator(initiator).build();
-        return getTenantAccessor().getActorMappingService().addActor(sActor);
+        return getServiceAccessor().getActorMappingService().addActor(sActor);
     }
 
     public SProcessDefinition createSProcessDefinitionWithSActor(final String name, final String version,
@@ -444,12 +436,12 @@ public class CommonBPMServicesTest {
         openTx();
 
         final SProcessDefinition sProcessDefinition = buildSProcessDefinition(name, version);
-        getTenantAccessor().getProcessDefinitionService().resolveProcess(sProcessDefinition.getId());
-        getTenantAccessor().getProcessDefinitionService().enableProcessDeploymentInfo(sProcessDefinition.getId());
+        getServiceAccessor().getProcessDefinitionService().resolveProcess(sProcessDefinition.getId());
+        getServiceAccessor().getProcessDefinitionService().enableProcessDeploymentInfo(sProcessDefinition.getId());
 
         final SActor sActor = buildSActor(actorName, sProcessDefinition.getId(), actorIsInitiator);
         for (final SUser sUser : sUsersToAddToActor) {
-            getTenantAccessor().getActorMappingService().addUserToActor(sActor.getId(), sUser.getId());
+            getServiceAccessor().getActorMappingService().addUserToActor(sActor.getId(), sUser.getId());
         }
 
         closeTx();
@@ -461,8 +453,8 @@ public class CommonBPMServicesTest {
         openTx();
 
         final SProcessDefinition sProcessDefinition = buildSProcessDefinition(name, version);
-        getTenantAccessor().getProcessDefinitionService().resolveProcess(sProcessDefinition.getId());
-        getTenantAccessor().getProcessDefinitionService().enableProcessDeploymentInfo(sProcessDefinition.getId());
+        getServiceAccessor().getProcessDefinitionService().resolveProcess(sProcessDefinition.getId());
+        getServiceAccessor().getProcessDefinitionService().enableProcessDeploymentInfo(sProcessDefinition.getId());
 
         closeTx();
         return sProcessDefinition;
@@ -475,8 +467,8 @@ public class CommonBPMServicesTest {
         openTx();
         for (int i = 1; i <= count; i++) {
             final SProcessDefinition sProcessDefinition = buildSProcessDefinition(name + i, version + i);
-            getTenantAccessor().getProcessDefinitionService().resolveProcess(sProcessDefinition.getId());
-            getTenantAccessor().getProcessDefinitionService().enableProcessDeploymentInfo(sProcessDefinition.getId());
+            getServiceAccessor().getProcessDefinitionService().resolveProcess(sProcessDefinition.getId());
+            getServiceAccessor().getProcessDefinitionService().enableProcessDeploymentInfo(sProcessDefinition.getId());
             processDefinitons.add(sProcessDefinition);
         }
         closeTx();
@@ -489,14 +481,14 @@ public class CommonBPMServicesTest {
 
     public void deleteSProcessDefinition(final long sProcessDefinitionId) throws SBonitaException {
         openTx();
-        getTenantAccessor().getActorMappingService().deleteActors(sProcessDefinitionId);
-        getTenantAccessor().getProcessDefinitionService().disableProcessDeploymentInfo(sProcessDefinitionId);
-        getTenantAccessor().getProcessDefinitionService().delete(sProcessDefinitionId);
+        getServiceAccessor().getActorMappingService().deleteActors(sProcessDefinitionId);
+        getServiceAccessor().getProcessDefinitionService().disableProcessDeploymentInfo(sProcessDefinitionId);
+        getServiceAccessor().getProcessDefinitionService().delete(sProcessDefinitionId);
         closeTx();
     }
 
     void openTx() throws STransactionCreationException {
-        platformServiceAccessor.getTransactionService().begin();
+        serviceAccessor.getTransactionService().begin();
     }
 
     public void deleteSProcessDefinitions(final SProcessDefinition... sProcessDefinitions) throws SBonitaException {
@@ -508,9 +500,9 @@ public class CommonBPMServicesTest {
     public void deleteSProcessDefinitions(final List<SProcessDefinition> sProcessDefinitions) throws SBonitaException {
         openTx();
         for (final SProcessDefinition sProcessDefinition : sProcessDefinitions) {
-            getTenantAccessor().getActorMappingService().deleteActors(sProcessDefinition.getId());
-            getTenantAccessor().getProcessDefinitionService().disableProcessDeploymentInfo(sProcessDefinition.getId());
-            getTenantAccessor().getProcessDefinitionService().delete(sProcessDefinition.getId());
+            getServiceAccessor().getActorMappingService().deleteActors(sProcessDefinition.getId());
+            getServiceAccessor().getProcessDefinitionService().disableProcessDeploymentInfo(sProcessDefinition.getId());
+            getServiceAccessor().getProcessDefinitionService().delete(sProcessDefinition.getId());
         }
         closeTx();
     }
@@ -520,7 +512,7 @@ public class CommonBPMServicesTest {
         openTx();
         final List<SUser> users = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
-            users.add(getTenantAccessor().getIdentityService()
+            users.add(getServiceAccessor().getIdentityService()
                     .createUser(buildEnabledSUser(firstName + i, lastName + i, password + i, 0)));
         }
         closeTx();
@@ -536,7 +528,7 @@ public class CommonBPMServicesTest {
     public SUser createEnabledSUser(final String firstName, final String lastName, final String password,
             final long managerUserId) throws SBonitaException {
         openTx();
-        final SUser user = getTenantAccessor().getIdentityService()
+        final SUser user = getServiceAccessor().getIdentityService()
                 .createUser(buildEnabledSUser(firstName, lastName, password, managerUserId));
         closeTx();
 
@@ -563,14 +555,14 @@ public class CommonBPMServicesTest {
     public SUser createSUser(final String username, final String password) throws SBonitaException {
         openTx();
         final SUser.SUserBuilder userBuilder = SUser.builder().userName(username).password(password);
-        final SUser user = getTenantAccessor().getIdentityService().createUser(userBuilder.build());
+        final SUser user = getServiceAccessor().getIdentityService().createUser(userBuilder.build());
         closeTx();
         return user;
     }
 
     public void deleteSUser(final SUser sUser) throws SBonitaException {
         openTx();
-        getTenantAccessor().getIdentityService().deleteUser(sUser);
+        getServiceAccessor().getIdentityService().deleteUser(sUser);
         closeTx();
     }
 
@@ -583,14 +575,14 @@ public class CommonBPMServicesTest {
     public void deleteSUsers(final List<SUser> users) throws SBonitaException {
         openTx();
         for (final SUser sUser : users) {
-            getTenantAccessor().getIdentityService().deleteUser(sUser);
+            getServiceAccessor().getIdentityService().deleteUser(sUser);
         }
         closeTx();
     }
 
     public void deleteSGroup(final SGroup sGroup) throws SBonitaException {
         openTx();
-        getTenantAccessor().getIdentityService().deleteGroup(sGroup);
+        getServiceAccessor().getIdentityService().deleteGroup(sGroup);
         closeTx();
     }
 
@@ -598,7 +590,7 @@ public class CommonBPMServicesTest {
         if (groups != null) {
             openTx();
             for (final SGroup sGroup : groups) {
-                getTenantAccessor().getIdentityService().deleteGroup(sGroup);
+                getServiceAccessor().getIdentityService().deleteGroup(sGroup);
             }
             closeTx();
         }
@@ -606,7 +598,7 @@ public class CommonBPMServicesTest {
 
     public void deleteSRole(final SRole sRole) throws SBonitaException {
         openTx();
-        getTenantAccessor().getIdentityService().deleteRole(sRole);
+        getServiceAccessor().getIdentityService().deleteRole(sRole);
         closeTx();
     }
 
@@ -614,7 +606,7 @@ public class CommonBPMServicesTest {
         if (roles != null) {
             openTx();
             for (final SRole sRole : roles) {
-                getTenantAccessor().getIdentityService().deleteRole(sRole);
+                getServiceAccessor().getIdentityService().deleteRole(sRole);
             }
             closeTx();
         }
@@ -623,7 +615,7 @@ public class CommonBPMServicesTest {
     public SRole createSRole(final String roleName) throws SBonitaException {
         openTx();
         final SRole role = SRole.builder().name(roleName).build();
-        getTenantAccessor().getIdentityService().createRole(role, null, null);
+        getServiceAccessor().getIdentityService().createRole(role, null, null);
         closeTx();
         return role;
     }
@@ -633,7 +625,7 @@ public class CommonBPMServicesTest {
         openTx();
         final SUserMembership userMembership = SUserMembership.builder().userId(user.getId()).groupId(group.getId())
                 .roleId(role.getId()).build();
-        getTenantAccessor().getIdentityService().createUserMembership(userMembership);
+        getServiceAccessor().getIdentityService().createUserMembership(userMembership);
         closeTx();
         return userMembership;
     }
@@ -641,7 +633,7 @@ public class CommonBPMServicesTest {
     protected List<SFlowNodeInstance> searchFlowNodeInstances(final QueryOptions searchOptions)
             throws SBonitaException {
         openTx();
-        final List<SFlowNodeInstance> flowNodes = getTenantAccessor().getActivityInstanceService()
+        final List<SFlowNodeInstance> flowNodes = getServiceAccessor().getActivityInstanceService()
                 .searchFlowNodeInstances(SFlowNodeInstance.class,
                         searchOptions);
         closeTx();
@@ -650,7 +642,7 @@ public class CommonBPMServicesTest {
     }
 
     private void closeTx() throws STransactionCommitException, STransactionRollbackException {
-        platformServiceAccessor.getTransactionService().complete();
+        serviceAccessor.getTransactionService().complete();
     }
 
 }

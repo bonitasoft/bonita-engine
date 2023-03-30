@@ -33,7 +33,7 @@ public class GatewayInstanceServiceIT extends CommonBPMServicesTest {
     protected void deleteGatewayInstance(final SGatewayInstance gatewayInstance) throws SBonitaException {
         getTransactionService().begin();
         try {
-            getTenantAccessor().getActivityInstanceService().deleteFlowNodeInstance(gatewayInstance);
+            getServiceAccessor().getActivityInstanceService().deleteFlowNodeInstance(gatewayInstance);
         } catch (final SBonitaException e) {
             throw new SFlowNodeDeletionException(e);
         } finally {
@@ -58,7 +58,7 @@ public class GatewayInstanceServiceIT extends CommonBPMServicesTest {
 
     private SGatewayInstance getGatewayInstanceFromDB(final Long gatewayId) throws SBonitaException {
         getTransactionService().begin();
-        final SGatewayInstance gatewayInstanceRes = getTenantAccessor().getGatewayInstanceService()
+        final SGatewayInstance gatewayInstanceRes = getServiceAccessor().getGatewayInstanceService()
                 .getGatewayInstance(gatewayId);
         getTransactionService().complete();
         return gatewayInstanceRes;
@@ -81,18 +81,18 @@ public class GatewayInstanceServiceIT extends CommonBPMServicesTest {
 
     private void updateGatewayState(final SGatewayInstance gatewayInstance, final int stateId) throws SBonitaException {
         getTransactionService().begin();
-        final SGatewayInstance gatewayInstance2 = getTenantAccessor().getGatewayInstanceService()
+        final SGatewayInstance gatewayInstance2 = getServiceAccessor().getGatewayInstanceService()
                 .getGatewayInstance(gatewayInstance.getId());
-        getTenantAccessor().getGatewayInstanceService().setState(gatewayInstance2, stateId);
+        getServiceAccessor().getGatewayInstanceService().setState(gatewayInstance2, stateId);
         getTransactionService().complete();
     }
 
     private void updateGatewayHitbys(final SGatewayInstance gatewayInstance, final long transitionIndex)
             throws SBonitaException {
         getTransactionService().begin();
-        final SGatewayInstance gatewayInstance2 = getTenantAccessor().getGatewayInstanceService()
+        final SGatewayInstance gatewayInstance2 = getServiceAccessor().getGatewayInstanceService()
                 .getGatewayInstance(gatewayInstance.getId());
-        getTenantAccessor().getGatewayInstanceService().hitTransition(gatewayInstance2, transitionIndex);
+        getServiceAccessor().getGatewayInstanceService().hitTransition(gatewayInstance2, transitionIndex);
         getTransactionService().complete();
     }
 

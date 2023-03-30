@@ -61,8 +61,8 @@ public class EventInstanceServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        userTransactionService = getTenantAccessor().getUserTransactionService();
-        eventInstanceService = getTenantAccessor().getEventInstanceService();
+        userTransactionService = getServiceAccessor().getUserTransactionService();
+        eventInstanceService = getServiceAccessor().getEventInstanceService();
     }
 
     private void checkStartEventInstance(final SEventInstance expectedEventInstance,

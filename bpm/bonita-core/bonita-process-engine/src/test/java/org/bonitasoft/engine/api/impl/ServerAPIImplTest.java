@@ -46,7 +46,7 @@ import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.APIAccessResolver;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
@@ -88,7 +88,7 @@ public class ServerAPIImplTest {
     @Mock
     private ServiceAccessorFactory serviceAccessorFactory;
     @Mock
-    private PlatformServiceAccessor platformServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
     @Mock
@@ -126,13 +126,13 @@ public class ServerAPIImplTest {
         doReturn(true).when(platformApi).isNodeStarted();
         when(userTransactionService.executeInTransaction(any()))
                 .thenAnswer(invocation -> ((Callable<?>) invocation.getArgument(0)).call());
-        doReturn(platformServiceAccessor).when(serviceAccessorFactory).createPlatformServiceAccessor();
+        doReturn(serviceAccessor).when(serviceAccessorFactory).createServiceAccessor();
         doReturn(sessionAccessor).when(serviceAccessorFactory).createSessionAccessor();
-        doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
-        doReturn(platformLoginService).when(platformServiceAccessor).getPlatformLoginService();
-        doReturn(platformSessionService).when(platformServiceAccessor).getPlatformSessionService();
-        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor();
-        doReturn(platformManager).when(platformServiceAccessor).getPlatformManager();
+        doReturn(schedulerService).when(serviceAccessor).getSchedulerService();
+        doReturn(platformLoginService).when(serviceAccessor).getPlatformLoginService();
+        doReturn(platformSessionService).when(serviceAccessor).getPlatformSessionService();
+        doReturn(tenantServiceAccessor).when(serviceAccessor).getTenantServiceAccessor();
+        doReturn(platformManager).when(serviceAccessor).getPlatformManager();
         doReturn(tenantLoginService).when(tenantServiceAccessor).getLoginService();
         doReturn(sessionService).when(tenantServiceAccessor).getSessionService();
         doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();

@@ -35,7 +35,7 @@ public class TenantManagementIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        platformService = getPlatformAccessor().getPlatformService();
+        platformService = getServiceAccessor().getPlatformService();
     }
 
     @After

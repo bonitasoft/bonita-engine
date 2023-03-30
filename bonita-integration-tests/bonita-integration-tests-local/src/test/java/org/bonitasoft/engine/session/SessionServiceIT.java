@@ -34,7 +34,7 @@ public class SessionServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        sessionService = getTenantAccessor().getSessionService();
+        sessionService = getServiceAccessor().getSessionService();
         sessionService.setSessionDuration(sessionService.getDefaultSessionDuration());
     }
 

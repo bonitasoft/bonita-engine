@@ -43,7 +43,7 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
     @Before
     public void setUp() {
         transactionService = getTransactionService();
-        pageMappingService = getTenantAccessor().getPageMappingService();
+        pageMappingService = getServiceAccessor().getPageMappingService();
     }
 
     @After

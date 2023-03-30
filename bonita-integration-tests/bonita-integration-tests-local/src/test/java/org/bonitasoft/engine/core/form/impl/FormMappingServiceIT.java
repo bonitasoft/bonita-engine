@@ -51,10 +51,10 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() throws Exception {
-        processDefinitionService = getTenantAccessor().getProcessDefinitionService();
+        processDefinitionService = getServiceAccessor().getProcessDefinitionService();
         transactionService = getTransactionService();
-        formMappingService = getTenantAccessor().getFormMappingService();
-        pageService = getTenantAccessor().getPageService();
+        formMappingService = getServiceAccessor().getFormMappingService();
+        pageService = getServiceAccessor().getPageService();
         transactionService.begin();
 
         p1 = buildSProcessDefinition("P1", "1.0");

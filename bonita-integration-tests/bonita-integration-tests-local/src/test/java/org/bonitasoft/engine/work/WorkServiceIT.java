@@ -38,8 +38,8 @@ public class WorkServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() {
-        this.workExecutorService = (RetryingWorkExecutorService) getTenantAccessor().getWorkExecutorService();
-        this.workFactory = getTenantAccessor().getBPMWorkFactory();
+        this.workExecutorService = (RetryingWorkExecutorService) getServiceAccessor().getWorkExecutorService();
+        this.workFactory = getServiceAccessor().getBPMWorkFactory();
         originalDelay = workExecutorService.getDelay();
         workExecutorService.setDelay(1);
     }

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
@@ -65,9 +64,7 @@ public class SessionInfos {
 
     private static SessionService getSessionService() {
         try {
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance()
-                    .createPlatformServiceAccessor();
-            return platformServiceAccessor.getTenantServiceAccessor()
+            return ServiceAccessorFactory.getInstance().createServiceAccessor().getTenantServiceAccessor()
                     .getSessionService();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);

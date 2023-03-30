@@ -46,7 +46,7 @@ import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
@@ -57,9 +57,9 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 @Slf4j
 public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */ {
 
-    private static PlatformServiceAccessor getPlatformServiceAccessor() {
+    private static ServiceAccessor getServiceAccessor() {
         try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -86,10 +86,10 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
     public void disableProcess(final long processId) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
-        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        final SchedulerService schedulerService = serviceAccessor.getSchedulerService();
 
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId,
                 eventInstanceService,

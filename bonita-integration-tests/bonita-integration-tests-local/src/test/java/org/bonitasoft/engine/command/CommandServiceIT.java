@@ -37,13 +37,13 @@ public class CommandServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        commandService = getTenantAccessor().getCommandService();
+        commandService = getServiceAccessor().getCommandService();
     }
 
     @After
     public void restoreDefaultCommands() throws SBonitaException {
         getTransactionService().begin();
-        getTenantAccessor().getCommandService().start();
+        getServiceAccessor().getCommandService().start();
         getTransactionService().complete();
     }
 

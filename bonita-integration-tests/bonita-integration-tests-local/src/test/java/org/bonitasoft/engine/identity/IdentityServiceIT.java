@@ -61,7 +61,7 @@ public class IdentityServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() {
-        identityService = getTenantAccessor().getIdentityService();
+        identityService = getServiceAccessor().getIdentityService();
     }
 
     @After

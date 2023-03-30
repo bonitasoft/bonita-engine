@@ -16,7 +16,7 @@ package org.bonitasoft.engine.synchro;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 
 /**
@@ -39,7 +39,7 @@ public abstract class AbstractJMSUpdateHandler extends AbstractUpdateHandler {
 
     @Override
     protected BonitaTransactionSynchronization getSynchronization(final Map<String, Serializable> event, final Long id,
-            final TenantServiceAccessor tenantServiceAccessor) {
+            final ServiceAccessor serviceAccessor) {
         return new SendJMSMessageSynchronization(event, id, JMSProducer.getInstance(messageTimeout, brokerURL));
     }
 }

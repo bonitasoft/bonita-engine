@@ -34,7 +34,7 @@ public class PlatformLoginServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        platformLoginService = getPlatformAccessor().getPlatformLoginService();
+        platformLoginService = getServiceAccessor().getPlatformLoginService();
     }
 
     @Test

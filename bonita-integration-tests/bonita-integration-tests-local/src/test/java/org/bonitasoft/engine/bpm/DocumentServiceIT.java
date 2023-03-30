@@ -49,7 +49,7 @@ public class DocumentServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() {
-        documentService = getTenantAccessor().getDocumentService();
+        documentService = getServiceAccessor().getDocumentService();
         transactionService = getTransactionService();
         documentNameKey = SDocument.NAME;
     }

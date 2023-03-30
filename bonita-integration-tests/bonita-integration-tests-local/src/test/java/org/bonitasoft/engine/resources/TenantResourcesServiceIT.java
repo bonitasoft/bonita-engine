@@ -32,7 +32,7 @@ public class TenantResourcesServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() {
-        tenantResourcesService = getTenantAccessor().getTenantResourcesService();
+        tenantResourcesService = getServiceAccessor().getTenantResourcesService();
         transactionService = getTransactionService();
     }
 

@@ -33,8 +33,8 @@ public class PersistenceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() {
-        persistenceService = getTenantAccessor().getReadPersistenceService();
-        recorder = getTenantAccessor().getRecorder();
+        persistenceService = getServiceAccessor().getReadPersistenceService();
+        recorder = getServiceAccessor().getRecorder();
     }
 
     @Test

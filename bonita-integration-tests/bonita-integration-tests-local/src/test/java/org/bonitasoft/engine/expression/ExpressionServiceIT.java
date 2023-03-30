@@ -67,11 +67,11 @@ public class ExpressionServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() {
-        expressionService = getTenantAccessor().getExpressionService();
-        dataInstanceService = getTenantAccessor().getDataInstanceService();
-        containerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
+        expressionService = getServiceAccessor().getExpressionService();
+        dataInstanceService = getServiceAccessor().getDataInstanceService();
+        containerResolver = (ParentContainerResolverImpl) getServiceAccessor().getParentContainerResolver();
         containerResolver.setAllowUnknownContainer(true);
-        cacheService = (EhCacheCacheService) getTenantAccessor().getCacheService();
+        cacheService = (EhCacheCacheService) getServiceAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
                 cacheService.start();

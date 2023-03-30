@@ -28,7 +28,7 @@ public class CacheConfigurationIT extends CommonBPMServicesTest {
 
     @Before
     public void setUp() {
-        cacheService = (EhCacheCacheService) getPlatformAccessor().getPlatformCacheService();
+        cacheService = (EhCacheCacheService) getServiceAccessor().getPlatformCacheService();
     }
 
     @Test

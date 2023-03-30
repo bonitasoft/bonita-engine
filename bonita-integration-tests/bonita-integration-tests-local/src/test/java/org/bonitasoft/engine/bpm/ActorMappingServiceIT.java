@@ -47,7 +47,7 @@ public class ActorMappingServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void setup() throws Exception {
-        actorMappingService = getTenantAccessor().getActorMappingService();
+        actorMappingService = getServiceAccessor().getActorMappingService();
         mainGroup = createGroup("main");
         parentGroup = createGroup("parent");
         childGroup = createGroup("child", "/parent");

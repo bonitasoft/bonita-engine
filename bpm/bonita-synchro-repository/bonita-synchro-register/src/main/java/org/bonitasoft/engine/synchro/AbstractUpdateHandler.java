@@ -22,8 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -50,11 +49,10 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
             final Map<String, Serializable> event = getEvent(sEvent);
             final Long id = getObjectId(sEvent);
 
-            final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-            final BonitaTransactionSynchronization synchronization = getSynchronization(event, id,
-                    tenantServiceAccessor);
+            final ServiceAccessor serviceAccessor = getServiceAccessor();
+            final BonitaTransactionSynchronization synchronization = getSynchronization(event, id, serviceAccessor);
 
-            final UserTransactionService userTransactionService = tenantServiceAccessor.getUserTransactionService();
+            final UserTransactionService userTransactionService = serviceAccessor.getUserTransactionService();
             userTransactionService.registerBonitaSynchronization(synchronization);
         } catch (final STransactionNotFoundException e) {
             e.printStackTrace();
@@ -63,8 +61,8 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
     }
 
     protected BonitaTransactionSynchronization getSynchronization(final Map<String, Serializable> event, final Long id,
-            final TenantServiceAccessor tenantServiceAccessor) {
-        return new WaitForEventSynchronization(event, id, tenantServiceAccessor.getSynchroService());
+            final ServiceAccessor serviceAccessor) {
+        return new WaitForEventSynchronization(event, id, serviceAccessor.getSynchroService());
     }
 
     /**
@@ -91,11 +89,9 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
         return id;
     }
 
-    private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
+    private ServiceAccessor getServiceAccessor() throws SHandlerExecutionException {
         try {
-            PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance()
-                    .createPlatformServiceAccessor();
-            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new SHandlerExecutionException(e.getMessage(), null);
         }

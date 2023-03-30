@@ -23,13 +23,17 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.STenantResourceState;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.tenant.TenantStateManager;
@@ -55,7 +59,7 @@ public class TenantAdministrationAPIImplTest {
     @Mock
     private TenantResourcesService tenantResourcesService;
     @Mock
-    private PlatformServiceAccessor platformServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
     @Mock
@@ -71,14 +75,14 @@ public class TenantAdministrationAPIImplTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
+        doReturn(serviceAccessor).when(tenantManagementAPI).getServiceAccessorNoException();
         doReturn(tenantServiceAccessor).when(tenantManagementAPI).getTenantAccessor();
         doReturn(tenantResourcesService).when(tenantServiceAccessor).getTenantResourcesService();
         doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
 
         doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(userTransactionService)
                 .executeInTransaction(any());
-        when(platformServiceAccessor.getTenantServiceAccessor()).thenReturn(tenantServiceAccessor);
+        when(serviceAccessor.getTenantServiceAccessor()).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
         when(tenantServiceAccessor.getTenantStateManager()).thenReturn(tenantStateManager);

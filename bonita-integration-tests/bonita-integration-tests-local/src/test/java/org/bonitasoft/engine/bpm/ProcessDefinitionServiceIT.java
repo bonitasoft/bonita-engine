@@ -49,12 +49,12 @@ public class ProcessDefinitionServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() {
-        processDefinitionService = getTenantAccessor().getProcessDefinitionService();
-        actorMappingService = getTenantAccessor().getActorMappingService();
+        processDefinitionService = getServiceAccessor().getProcessDefinitionService();
+        actorMappingService = getServiceAccessor().getActorMappingService();
     }
 
     private SessionService getSessionService() {
-        return getTenantAccessor().getSessionService();
+        return getServiceAccessor().getSessionService();
     }
 
     @Test(expected = IllegalArgumentException.class)

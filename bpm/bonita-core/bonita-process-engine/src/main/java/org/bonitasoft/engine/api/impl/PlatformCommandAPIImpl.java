@@ -28,7 +28,15 @@ import org.bonitasoft.engine.api.impl.transaction.platform.GetSPlatformCommands;
 import org.bonitasoft.engine.api.impl.transaction.platform.UpdateSPlatformCommand;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.command.*;
+import org.bonitasoft.engine.command.CommandCriterion;
+import org.bonitasoft.engine.command.CommandDescriptor;
+import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
+import org.bonitasoft.engine.command.CommandUpdater;
+import org.bonitasoft.engine.command.DependencyNotFoundException;
+import org.bonitasoft.engine.command.RuntimeCommand;
+import org.bonitasoft.engine.command.SCommandNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
@@ -56,7 +64,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
 
     private static ServiceAccessor getServiceAccessor() throws RetrieveException {
         try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new RetrieveException(e);
         }

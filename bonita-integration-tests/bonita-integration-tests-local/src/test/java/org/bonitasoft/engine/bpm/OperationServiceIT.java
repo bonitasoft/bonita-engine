@@ -64,9 +64,9 @@ public class OperationServiceIT extends CommonBPMServicesTest {
     @Before
     public void setup() {
         transactionService = getTransactionService();
-        dataInstanceService = getTenantAccessor().getDataInstanceService();
-        operationService = getTenantAccessor().getOperationService();
-        parentContainerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
+        dataInstanceService = getServiceAccessor().getDataInstanceService();
+        operationService = getServiceAccessor().getOperationService();
+        parentContainerResolver = (ParentContainerResolverImpl) getServiceAccessor().getParentContainerResolver();
         parentContainerResolver.setAllowUnknownContainer(true);
     }
 

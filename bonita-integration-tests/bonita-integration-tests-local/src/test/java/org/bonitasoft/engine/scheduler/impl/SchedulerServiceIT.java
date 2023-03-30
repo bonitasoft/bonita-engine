@@ -59,12 +59,12 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() throws Exception {
-        schedulerService = getTenantAccessor().getSchedulerService();
-        userTransactionService = getTenantAccessor().getUserTransactionService();
-        jobService = getTenantAccessor().getJobService();
+        schedulerService = getServiceAccessor().getSchedulerService();
+        userTransactionService = getServiceAccessor().getUserTransactionService();
+        jobService = getServiceAccessor().getJobService();
         TestUtil.stopScheduler(schedulerService, getTransactionService());
         TestUtil.startScheduler(schedulerService);
-        getTenantAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
+        getServiceAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
     }
 
     @After
@@ -290,7 +290,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
     private <T> T inTx(Callable<T> callable) throws Exception {
 
         return userTransactionService.executeInTransaction(() -> {
-            getTenantAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
+            getServiceAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
             return callable.call();
         });
     }

@@ -18,7 +18,6 @@ import java.util.Date;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
@@ -35,9 +34,8 @@ public class LocalLoginMechanism {
 
     public PlatformSession login() throws PlatformLoginException {
         try {
-            PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance()
-                    .createPlatformServiceAccessor();
-            final PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
+            final PlatformSessionService platformSessionService = ServiceAccessorFactory.getInstance()
+                    .createServiceAccessor().getPlatformSessionService();
             SPlatformSession platformSession = platformSessionService.createSession("local");
             final Date creationDate = platformSession.getCreationDate();
             return new PlatformSessionImpl(platformSession.getId(), creationDate, platformSession.getDuration(),

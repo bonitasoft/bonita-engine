@@ -38,7 +38,7 @@ public class ArchiveServiceIT extends CommonBPMServicesTest {
 
     @Before
     public void before() {
-        this.archiveService = getTenantAccessor().getArchiveService();
+        this.archiveService = getServiceAccessor().getArchiveService();
     }
 
     @Test
