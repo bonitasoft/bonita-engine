@@ -208,8 +208,7 @@ public class ProcessFormServletTest {
     @Test
     public void should_get_not_found_when_invalid_task() throws Exception {
         when(hsRequest.getPathInfo()).thenReturn("/processInstance/42/task/taskName/");
-        when(processFormService.getTaskInstanceId(apiSession, 42L, "taskName", -1L)).thenReturn(-1L);
-        when(processFormService.ensureProcessDefinitionId(apiSession, -1L, 42L, -1L))
+        when(processFormService.getTaskInstanceId(apiSession, 42L, "taskName", -1L))
                 .thenThrow(ActivityInstanceNotFoundException.class);
 
         formServlet.doGet(hsRequest, hsResponse);
