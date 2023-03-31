@@ -110,9 +110,14 @@ public class ProcessFormService {
                             .done());
             if (searchArchivedHumanTasks.getCount() > 0) {
                 return searchArchivedHumanTasks.getResult().get(0).getSourceObjectId();
+            } else {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Could not find task available with name " + taskName + " for process instance "
+                            + processInstanceId);
+                }
+                throw new ActivityInstanceNotFoundException(-1L);
             }
         }
-        return -1L;
     }
 
     public String getTaskName(final APISession apiSession, final long taskInstanceId) throws BonitaException {
