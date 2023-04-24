@@ -19,13 +19,13 @@ class ShadePlugin implements Plugin<Project> {
         def extension = project.extensions.create("shade", ShadeExtension)
 
         project.jar {
-            classifier = 'original'
+            archiveClassifier = 'original'
         }
 
         project.afterEvaluate {
 
             project.shadowJar {
-                classifier = "" // we replace the original jar by the shadow jar	
+                archiveClassifier = "" // we replace the original jar by the shadow jar
                 dependencies {
                     include({
                         if (!project.ext.has("shadedDependencies")) {
@@ -78,11 +78,11 @@ class ShadePlugin implements Plugin<Project> {
                         it.sourceSets.main.allJava
                     }
                 }
-                classifier = 'sources'
+                archiveClassifier = 'sources'
             }
             project.tasks.register("javadocJar", Jar) {
                 from project.javadoc
-                classifier = 'javadoc'
+                archiveClassifier = 'javadoc'
             }
 
             project.publishing.publications {
