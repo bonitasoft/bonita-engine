@@ -2,13 +2,15 @@ package org.bonitasoft.engine.gradle
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.toolchain.JavaToolchainService
 
 /**
  * @author Emmanuel Duchastenier
  */
 class JVMModifier {
 
-    public static final String TEST_JVM = "test.jvm"
+    public static final String TEST_JVM_VERSION = "test.jvm.version"
 
     private static void setJvmArgs(Project project, Test task) {
         ArrayList<String> jvmArgs = ["-Dorg.bonitasoft.h2.database.dir=./build/h2databasedir"]
@@ -30,10 +32,17 @@ class JVMModifier {
     }
 
     private static void setTestJVM(Project project, Test task) {
-        if (project.hasProperty(TEST_JVM)) {
-            def alternateJvm = project.property(TEST_JVM)
-            project.logger.info("Parameter '$TEST_JVM' detected. ${project.name} will use alternate JVM '$alternateJvm' to run $task")
-            task.executable = alternateJvm
+        if (project.hasProperty(TEST_JVM_VERSION)) {
+            def alternateJvm = project.property(TEST_JVM_VERSION)
+            project.logger.info("Parameter '$TEST_JVM_VERSION' detected...")
+
+            // to work around error "Toolchain from `executable` property does not match toolchain from `javaLauncher` property",
+            // when upgrading to Gradle 8:
+            JavaToolchainService service = project.getExtensions().getByType(JavaToolchainService.class);
+            task.javaLauncher.set(service.launcherFor {
+                languageVersion = JavaLanguageVersion.of(alternateJvm as int)
+            })
+            project.logger.info("${project.name} will use alternate JVM '$alternateJvm' (${task.javaLauncher.get().executablePath.asFile.absolutePath}) to run $task")
         }
     }
 }

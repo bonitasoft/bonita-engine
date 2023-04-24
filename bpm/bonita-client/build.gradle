@@ -23,7 +23,7 @@ dependencies {
 }
 
 tasks.register("testsJar", Jar) {
-    classifier = 'tests'
+    archiveClassifier = 'tests'
     from(sourceSets.test.output)
 }
 
