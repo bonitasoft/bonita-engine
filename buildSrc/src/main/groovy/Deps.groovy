@@ -1,6 +1,6 @@
 class Deps {
 
-    public static String springVersion = "5.3.26"
+    public static String springVersion = "5.3.27"
     public static String springBootVersion = "2.6.9"
     public static String commonsIOVersion = "2.8.0"
     //fileupload 1.4 does not work on web-side.
