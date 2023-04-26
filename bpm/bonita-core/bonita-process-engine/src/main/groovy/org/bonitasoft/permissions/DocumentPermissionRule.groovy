@@ -22,8 +22,10 @@ import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor
 import org.bonitasoft.engine.exception.BonitaException
 import org.bonitasoft.engine.exception.NotFoundException
+import org.bonitasoft.engine.search.SearchOptionsBuilder
 import org.bonitasoft.engine.session.APISession
 
 /**
@@ -52,32 +54,33 @@ class DocumentPermissionRule implements PermissionRule {
 
         def resourceId = apiCallContext.getResourceId()
         if (resourceId != null) {
-            return checkMethodWithResourceId(resourceId, apiAccessor, currentUserId)
+            return checkMethodWithResourceId(resourceId, apiAccessor, currentUserId, logger)
         }
 
         if (apiCallContext.isGET()) {
-            return checkGetMethod(apiCallContext, apiAccessor, currentUserId)
+            return checkGetMethod(apiCallContext, apiAccessor, currentUserId, logger)
         } else if (apiCallContext.isPOST()) {
-            return checkPostMethod(apiCallContext, apiAccessor, currentUserId)
+            return checkPostMethod(apiCallContext, apiAccessor, currentUserId, logger)
         }
 
         return false
     }
 
-    private boolean checkMethodWithResourceId(String resourceId, APIAccessor apiAccessor, long currentUserId) {
+    private boolean checkMethodWithResourceId(String resourceId, APIAccessor apiAccessor, long currentUserId, Logger logger) {
         def processAPI = apiAccessor.getProcessAPI()
         try {
             long documentId = Long.valueOf(resourceId)
             def processInstanceId = processAPI.getDocument(documentId).getProcessInstanceId()
-            return isInvolved(processAPI, currentUserId, processInstanceId) ||
-                    isSupervisor(processAPI, currentUserId, processInstanceId)
+            return isInvolved(processAPI, currentUserId, processInstanceId, logger) ||
+                    isSupervisor(processAPI, currentUserId, processInstanceId, logger)
         }
         catch (NumberFormatException e) {
-            return true
+            logger.debug("documentId " + documentIdStr + " is not a number")
+            return false
         }
     }
 
-    private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
+    private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
 
         ObjectMapper mapper = new ObjectMapper()
         def map = mapper.readValue(apiCallContext.getBody(), Map.class)
@@ -93,14 +96,15 @@ class DocumentPermissionRule implements PermissionRule {
         try {
             def processAPI = apiAccessor.getProcessAPI()
             def processDefinitionId = processAPI.getProcessInstance(processInstanceId).getProcessDefinitionId()
-            return isInvolved(processAPI, currentUserId, processInstanceId) ||
+            return isInvolved(processAPI, currentUserId, processInstanceId, logger) ||
                     processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
         } catch (NotFoundException e) {
+            logger.debug("Process instance of document not found.")
             return true
         }
     }
 
-    private boolean checkGetMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
+    private boolean checkGetMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
         def filters = apiCallContext.getFilters()
         def processAPI = apiAccessor.getProcessAPI()
 
@@ -122,7 +126,7 @@ class DocumentPermissionRule implements PermissionRule {
         }
 
         if (processInstanceId > 0 && processDefinitionId > 0) {
-            return isInvolved(processAPI, currentUserId, processInstanceId) ||
+            return isInvolved(processAPI, currentUserId, processInstanceId, logger) ||
                     processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
         }
 
@@ -130,15 +134,18 @@ class DocumentPermissionRule implements PermissionRule {
     }
 
 
-    private boolean isInvolved(ProcessAPI processAPI, long currentUserId, long processInstanceId) {
+    private boolean isInvolved(ProcessAPI processAPI, long currentUserId, long processInstanceId, Logger logger) {
         try {
-            return processAPI.isInvolvedInProcessInstance(currentUserId, processInstanceId) || processAPI.isManagerOfUserInvolvedInProcessInstance(currentUserId, processInstanceId)
+            return processAPI.isInvolvedInProcessInstance(currentUserId, processInstanceId) ||
+                    processAPI.isManagerOfUserInvolvedInProcessInstance(currentUserId, processInstanceId) ||
+                    hasPendingTaskInCurrentSubprocess(processAPI, currentUserId, processInstanceId, logger)
         } catch (BonitaException e) {
-            return true
+            logger.debug("Error checking if user is involved in process instance of document.", e)
+            return false
         }
     }
 
-    private boolean isSupervisor(ProcessAPI processAPI, long currentUserId, long processInstanceId) {
+    private boolean isSupervisor(ProcessAPI processAPI, long currentUserId, long processInstanceId, Logger logger) {
         def processDefinitionId
         try {
             processDefinitionId = processAPI.getProcessInstance(processInstanceId).getProcessDefinitionId()
@@ -146,9 +153,22 @@ class DocumentPermissionRule implements PermissionRule {
             try {
                 processDefinitionId = processAPI.getFinalArchivedProcessInstance(processInstanceId).getProcessDefinitionId()
             } catch (NotFoundException e1) {
-                return true
+                logger.debug("Process instance of document not found.")
+                return false
             }
         }
         return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
+    }
+
+    private boolean hasPendingTaskInCurrentSubprocess(ProcessAPI processAPI, long currentUserId, long processInstanceIdAsSubprocess, Logger logger) {
+        try {
+            SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 0)
+            builder.filter(HumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstanceIdAsSubprocess)
+            def taskSearchResult = processAPI.searchMyAvailableHumanTasks(currentUserId, builder.done())
+            return taskSearchResult.getCount() > 0
+        } catch (BonitaException e) {
+            logger.debug("Error checking if user is involved in process instance of document.", e)
+            return false
+        }
     }
 }
