@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-10 18:40+0100\n"
-"PO-Revision-Date: 2023-03-16 02:28\n"
+"POT-Creation-Date: 2022-03-31 05:21+0200\n"
+"PO-Revision-Date: 2023-05-03 01:28\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -14,11 +14,14 @@ msgstr ""
 "X-Crowdin-Project: bonita\n"
 "X-Crowdin-Project-ID: 13316\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /release-8.0.0/bonita-web/portal/portal.po\n"
-"X-Crowdin-File-ID: 71437\n"
+"X-Crowdin-File: /master/bonita-web/portal/portal.po\n"
+"X-Crowdin-File-ID: 61797\n"
 
 msgid "%attribute% file format is not allowed. Only %file_formats% files are allowed."
 msgstr "le format de fichier %attribute%  n'est pas autorisé. Utiliser les fichiers de format %file_formats%."
+
+msgid "%attribute% file format not allowed"
+msgstr "Le format de fichier %attribute% n'est pas autorisé"
 
 msgid "%attribute% file format not allowed or not starting with correct servlet path"
 msgstr "Le format de fichier %attribute% n'est pas autorisé ou ne commence pas par un chemin de servlet correct"
@@ -41,17 +44,50 @@ msgstr "%attribute% n'est pas correctement écrit"
 msgid "%attribute% must be a boolean value"
 msgstr "%attribute% doit être une valeur booléenne"
 
+msgid "%attribute% must be a negative value"
+msgstr "%attribute% doit être une valeur négative"
+
+msgid "%attribute% must be a negative value diffrent from 0"
+msgstr "%attribute% doit être une valeur négative différente de 0"
+
 msgid "%attribute% must be a numeric value"
 msgstr "%attribute% doit être valeur numérique"
+
+msgid "%attribute% must be a positive value"
+msgstr "%attribute% doit être une valeure positive"
+
+msgid "%attribute% must be a positive value different from 0"
+msgstr "%attribute% doit être une valeur positive suppérieure à 0"
+
+msgid "%attribute% must be a valid date"
+msgstr "%attribute% doit être une date correcte"
 
 msgid "%attribute% must be an integer value"
 msgstr "%attribute% doit être un entier"
 
+msgid "%attribute% must be equal to %secondAttribute%"
+msgstr "%attribute% doit être égale à %secondAttribute%"
+
 msgid "%attribute% must be less or equal than %value%"
 msgstr "%attribute% doit être inférieur ou égale à %value%"
 
+msgid "%attribute% must be less than %secondAttribute%"
+msgstr "%attribute% doit être inférieur à %secondAttribute%"
+
 msgid "%attribute% must be less than %value%"
 msgstr "%attribute% doit être inférieure à %value%"
+
+msgid "%attribute% must be more or equal than %secondAttribute%"
+msgstr "%attribute% doit être supérieur ou égale à %secondAttribute%"
+
+msgid "%attribute% must be more or equal than %value%"
+msgstr "%attribute% doit être supérieur ou égal à %value%"
+
+msgid "%attribute% must be more than %secondAttribute%"
+msgstr "%attribute% doit être supérieure à %secondAttribute%"
+
+msgid "%attribute% must be more than %value%"
+msgstr "%attribute% doit être suppérieur à %value%"
 
 msgid "%attribute% must be on a single line"
 msgstr "%attribute% doit être sur une ligne unique"
@@ -59,11 +95,23 @@ msgstr "%attribute% doit être sur une ligne unique"
 msgid "%attribute% must be one of {%list%}"
 msgstr "%attribute% doit être dans {%list%}"
 
+msgid "%attribute% must contain exactly %length% characters"
+msgstr "%attribute% doit contenir %length% caractères exactement"
+
+msgid "%attribute% must not be equal to %secondAttribute%"
+msgstr "%attribute% ne doit pas être égale à %secondAttribute%"
+
 msgid "%className% is not Serializable"
 msgstr "%className% n'est pas serializable"
 
 msgid "%className% not found. Only jdk types are supported"
 msgstr "%className% est introuvable. Seuls les éléments de types jdk sont supportés"
+
+msgid "%secondAttribute% must be a numeric value"
+msgstr "%secondAttribute% doit être une valeur numérique"
+
+msgid "%time% ago"
+msgstr "il y a %time%"
 
 msgid "%value% is not a valid value for %className%"
 msgstr "%value% n'est pas valide pour la valeur de %className%"
@@ -71,14 +119,29 @@ msgstr "%value% n'est pas valide pour la valeur de %className%"
 msgid "A group with the name %groupName% already exists"
 msgstr "Il existe déjà un groupe portant le nom %groupName%"
 
+msgid "Administrator"
+msgstr "Administrateur"
+
 msgid "An error occurred while creating a definition"
 msgstr "Une erreur s'est produite lors de la création d'une définition"
 
 msgid "An error occurred while deleting an item with the id %id%"
 msgstr "Une erreur s'est produite lors de la suppression d'un élément dont l'id est %id%"
 
+msgid "Analytics"
+msgstr "Métriques"
+
+msgid "Applications"
+msgstr "Applications"
+
+msgid "BDM"
+msgstr "BDM"
+
 msgid "Bonita Applications"
 msgstr "Applications Bonita"
+
+msgid "Call activity"
+msgstr "Activité appelante"
 
 msgid "Can't create group. Group '%groupName%' already exists"
 msgstr "Impossible de créer le groupe. Le groupe '%groupName%' existe"
@@ -116,8 +179,14 @@ msgstr "Impossible de démarrer le processus, processus %processId% introuvable"
 msgid "Can't update user. User not found"
 msgstr "Impossible de mettre à jour les données de l'utilisateur. L'utilisateur est introuvable"
 
+msgid "Cases"
+msgstr "Cas"
+
 msgid "Category with name %categoryName% already exists"
 msgstr "La catégorie %categoryName% existe déjà"
+
+msgid "Custom Pages"
+msgstr "Pages personnalisées"
 
 msgid "Data definition %dataName% doesn't exists for process %processId%"
 msgstr "Data definition %dataName% n'existe pas pour le process %processId%"
@@ -170,14 +239,80 @@ msgstr "Erreur lors de l'actualisation des données de l'utilisateur"
 msgid "Filters are not supported by this API"
 msgstr "Les filtres ne sont pas supportés par cette API"
 
+msgid "For administrator-type of profiles. To manage processes: install, delete and configure, for all processes"
+msgstr "Pour des profils de type administrateur. Permet de gérer les processus : installer, supprimer et configurer tous les processus"
+
+msgid "For administrator-type of profiles. To monitor all processes"
+msgstr "Pour des profils de type administrateur. Permet de suivre le statut de tous les processus"
+
+msgid "For administrator-type of profiles. To monitor cases of all processes"
+msgstr "Pour des profils de type administrateur. Permet de suivre la progression des cas de tous les processus"
+
+msgid "For administrator-type of profiles. To monitor task completion for all processes"
+msgstr "Pour un profil de type administrateur. Permet de suivre la réalisation des tâches pour tous les processus"
+
+msgid "For process manager-type of profiles. To manage processes under her responsibility"
+msgstr "Pour des profils de type gestionnaire de processus. Permet de gérer les processus placés sous sa responsabilité"
+
+msgid "For process manager-type of profiles. To monitor cases of processes under her responsibility"
+msgstr "Pour des profils de type gestionnaire de processus. Permet de suivre la progression des cas des processus placés sous sa responsabilité"
+
+msgid "For process manager-type of profiles. To monitor processes under her responsibility"
+msgstr "Pour des profils de type gestionnaire de processus. Permet de suivre le statut des processus placés sous sa responsabilité"
+
+msgid "For process manager-type of profiles. To monitor task completion, only for processes under her responsibility"
+msgstr "Pour un profil de type gestionnaire de processus. Permet de suivre la réalisation des tâches, uniquement pour les processus placés sous sa responsabilité"
+
+msgid "For user-type of profiles. To view and do tasks  if he is a candidate"
+msgstr "Pour un profil de type utilisateur. Permet de voir et de faire les tâches pour lesquels il est candidat"
+
+msgid "For user-type of profiles. To visualize cases started by the user or cases he has worked on"
+msgstr "Pour des profils de type utilisateur. Permet de visualiser les cas démarrés par l’utilisateur ou ceux sur lesquels il a travaillé"
+
+msgid "For user-type of profiles. UI Designer page to visualize processes and start cases"
+msgstr "Pour des profils de type utilisateur. Page du UI Designer permettant de visualiser les processus et de démarrer des cas."
+
+msgid "Groups"
+msgstr "Groupes"
+
+msgid "High"
+msgstr "Haute"
+
+msgid "Highest"
+msgstr "Plus haute"
+
+msgid "Human task"
+msgstr "Tâche humaine"
+
+msgid "Install/Export"
+msgstr "Installer / Exporter"
+
+msgid "Install/export organization"
+msgstr "Installer/exporter une organisation"
+
 msgid "Json can't be mapped to "
 msgstr "Json ne peut pas être mappée à"
+
+msgid "License"
+msgstr "Licence"
 
 msgid "Login failed. No profile has been set up for this user. Contact your administrator."
 msgstr "Échec de la connexion. Aucun permission n'a été mise en place pour cet utilisateur. Contactez votre administrateur."
 
 msgid "Login form"
 msgstr "Formulaire de connexion"
+
+msgid "Look and Feel"
+msgstr "Look and Feel"
+
+msgid "Loop activity"
+msgstr "Activité de boucle"
+
+msgid "Low"
+msgstr "Basse"
+
+msgid "Lowest"
+msgstr "Plus basse"
 
 msgid "MM/dd/yyyy"
 msgstr "dd/MM/yyyy"
@@ -187,6 +322,39 @@ msgstr "dd/MM/yyyy HH:mm"
 
 msgid "MMMM dd, yyyy"
 msgstr "dd/MM/yyyy"
+
+msgid "Manage BDM"
+msgstr "Gérer le BDM"
+
+msgid "Manage Look and Feel"
+msgstr "Gérer le look and feel"
+
+msgid "Manage applications"
+msgstr "Gérer les applications"
+
+msgid "Manage custom pages"
+msgstr "Gérer les pages personnalisées"
+
+msgid "Manage groups"
+msgstr "Gérer les groupes"
+
+msgid "Manage roles"
+msgstr "Gérer les rôles"
+
+msgid "Manage users"
+msgstr "Gérer les utilisateurs"
+
+msgid "Monitoring"
+msgstr "Monitoring"
+
+msgid "Multi-instanciation activity"
+msgstr "Activité d'instances multiple"
+
+msgid "No description."
+msgstr "Aucune description disponible."
+
+msgid "Normal"
+msgstr "Normale"
 
 msgid "Only the value attribute can be updated"
 msgstr "Seul l'attribut valeur peut être mis à jour"
@@ -221,14 +389,26 @@ msgstr "Le processus %appName% en version %version% contient des artefacts (form
 msgid "Process definition not found for id %processId%"
 msgstr "La définition du processus est introuvable pour l'id %processId%"
 
+msgid "Processes"
+msgstr "Processus"
+
 msgid "Profile member already exists"
 msgstr "Ce membre est déjà associé au profil"
+
+msgid "Profiles"
+msgstr "Profils"
 
 msgid "Request parameter \"id\" must be set."
 msgstr "Le paramètre de requête \"id\" doit être défini."
 
+msgid "Roles"
+msgstr "Rôles"
+
 msgid "Search terms are not supported by this API"
 msgstr "Les critères de recherche ne sont pas supportés par cette API"
+
+msgid "Service task"
+msgstr "Tâche automatique"
 
 msgid "Session expired. Please log in again."
 msgstr "La session a expiré. Connectez-vous à nouveau."
@@ -236,11 +416,23 @@ msgstr "La session a expiré. Connectez-vous à nouveau."
 msgid "Sorting is not supported by this API"
 msgstr "Le tri n'est pas supporté par cette API"
 
+msgid "Tasks"
+msgstr "Tâches"
+
+msgid "The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task)."
+msgstr "L'administrateur peut installer un processus, gérer l'organisation et gérer certaines erreurs (par exemple, en rejouant une tâche)."
+
 msgid "The only mandatory filter is %name%"
 msgstr "Seul le filtre %name% est obligatoire"
 
+msgid "The platform already exist !"
+msgstr "La plate-forme existe déjà !"
+
 msgid "The server is not available"
 msgstr "Le serveur n'est pas disponible"
+
+msgid "The user can view and perform tasks and can start a new case of a process."
+msgstr "L'utilisateur peut visualiser et réaliser des tâches. Il peut également créer de nouveaux cas en démarrant un processus."
 
 msgid "This category has already been added to this process"
 msgstr "Cette catégorie a déjà été ajoutée à ce processus"
@@ -262,6 +454,9 @@ msgstr "Ce service est actuellement hors ligne pour maintenance. Veuillez essaye
 
 msgid "This user has already been mapped to actor"
 msgstr "Cet utilisateur est déjà lié à l'acteur"
+
+msgid "UI Designer page to visualize processes and start cases"
+msgstr "Page du UI Designer permettant de visualiser les processus et de démarrer des cas"
 
 msgid "Unable to deploy business archive"
 msgstr "Impossible de déployer le fichier .bar"
@@ -293,12 +488,39 @@ msgstr "Utilisateur"
 msgid "User not found"
 msgstr "Utilisateur introuvable"
 
+msgid "User privilege settings"
+msgstr "Gestion des privilèges utilisateur"
+
+msgid "Users"
+msgstr "Utilisateurs"
+
 msgid "Welcome to"
 msgstr "Bienvenue sur"
+
+msgid "day"
+msgstr "jr"
+
+msgid "hr"
+msgstr "hr"
+
+msgid "in %time%"
+msgstr "dans %time%"
 
 msgid "message"
 msgstr "Message"
 
+msgid "min"
+msgstr "min"
+
+msgid "mo"
+msgstr "mois"
+
 msgid "or"
 msgstr "ou"
+
+msgid "sec"
+msgstr "sec"
+
+msgid "yr"
+msgstr "an"
 

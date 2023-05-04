@@ -7,20 +7,17 @@ msgstr ""
 "X-Crowdin-Project: bonita\n"
 "X-Crowdin-Project-ID: 13316\n"
 "X-Crowdin-Language: pt-BR\n"
-"X-Crowdin-File: /dev/bonita-web/portal/portal-js.pot\n"
-"X-Crowdin-File-ID: 60594\n"
+"X-Crowdin-File: /master/bonita-web/portal/portal-js.pot\n"
+"X-Crowdin-File-ID: 61810\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2022-02-25 02:29\n"
+"PO-Revision-Date: 2023-04-29 01:30\n"
 
 msgid "1 case has been deleted"
 msgstr "1 caso foi excluído"
 
 msgid "A page with this name already exists."
 msgstr "Já existe uma página com esse nome."
-
-msgid "A server error occurred. The operation did not complete successfully"
-msgstr "Ocorreu um erro de servidor. A operação não foi concluída com sucesso"
 
 msgid "Above normal"
 msgstr "Acima do nomal"
@@ -79,12 +76,6 @@ msgstr "Todos"
 msgid "All done. Good job!"
 msgstr "Tudo feito. Bom trabalho!"
 
-msgid "An Error occurred during process activation/deactivation."
-msgstr "Ocorreu um erro durante a ativação/desativação do processo"
-
-msgid "An Error occurred during process deletion."
-msgstr "Ocorreu um erro durante o processo de deleção."
-
 msgid "An application is a customized environment for a specific user profile, in which users interact with business data and business processes in the most efficient way."
 msgstr "Uma aplicação é um ambiente personalizado para um perfil específico, no qual usuários interagem com dados e processos de negócios de maneira mais eficaz."
 
@@ -122,7 +113,7 @@ msgid "Archived cases"
 msgstr "Instâncias arquivadas"
 
 msgid "Are you sure you want to delete it?"
-msgstr ""
+msgstr "Tem certeza que deseja excluir "
 
 msgid "Are you sure you want to delete this membership ?"
 msgstr "Tem certeza que deseja excluir este membro?"
@@ -320,7 +311,7 @@ msgid "Delete process"
 msgstr "Excluir processo"
 
 msgid "Deleting a process definition will also delete all open and archived cases of this process."
-msgstr ""
+msgstr "Excluir uma definição de processo também irá apagar todos os casos abertos e arquivados deste processo."
 
 msgid "Description"
 msgstr "Descrição"
@@ -413,7 +404,7 @@ msgid "Failed instances"
 msgstr "Instâncias em erro"
 
 msgid "File format may be invalid. For more information, check the log file."
-msgstr ""
+msgstr "O formato do arquivo pode ser inválido. Para mais informações, verifique o arquivo de log."
 
 msgid "Filename too long. The zip filename must be no longer than 50 characters"
 msgstr "O nome do arquivo muito grande. O nome do arquivo zip não deve exceder 50 caracteres"
@@ -488,7 +479,7 @@ msgid "Import an application descriptor"
 msgstr "Importar um descritor de aplicação"
 
 msgid "In a production environment, this should be used with caution."
-msgstr ""
+msgstr "Num ambiente de produção, isto deve ser utilizado com prudência."
 
 msgid "In such cases, you must CANCEL THIS UPDATE and let the database administrator carefully script the changes and apply them to the database. Only then will you be able to update the BDM from this page."
 msgstr "Nesses casos, você deve CANCELAR ESTE UPDATE e permitir que o administrador da base de dados escreva cuidadosamente as alterações e as aplique ao banco de dados. Somente então você poderá atualizar o BDM a partir desta página."
@@ -751,9 +742,6 @@ msgstr "Informações pessoais atualizadas com sucesso"
 msgid "Phone"
 msgstr "Telefone"
 
-msgid "Please refresh the page."
-msgstr "Por favor, atualize a página."
-
 msgid "Priority"
 msgstr "Prioridade"
 
@@ -802,9 +790,6 @@ msgstr "Remover tudo"
 msgid "Reset"
 msgstr "Restaurar"
 
-msgid "Reset to default"
-msgstr "Redefinir para padrão"
-
 msgid "Roles"
 msgstr "Funções"
 
@@ -827,7 +812,7 @@ msgid "Search Key 5"
 msgstr "Chave de pesquisa 5"
 
 msgid "Search by process name or search keys"
-msgstr ""
+msgstr "Pesquisar por nome do processo ou chaves de busca"
 
 msgid "Search..."
 msgstr "Pesquisar..."
@@ -894,9 +879,6 @@ msgstr "Algo deu errado durante a exclusão. Você pode cancelar e tentar de nov
 
 msgid "Something went wrong during the modification. You might want to cancel and try again."
 msgstr "Algo deu errado durante a modificação. Talvez você queira cancelar e tentar novamente."
-
-msgid "Something went wrong. You might want to cancel and try again."
-msgstr "Algo deu errado. Talvez você queira cancelar e tentar novamente."
 
 msgid "Sort by URL"
 msgstr "Ordenar pela URL"
@@ -1015,9 +997,6 @@ msgstr "Os mapeamentos de formulário devem ser resolvidos antes de ativar o pro
 msgid "The image you are trying to upload is too big"
 msgstr "A imagem que você está tentando enviar é muito grande"
 
-msgid "The item does not exist anymore. Refresh the page to see the new status"
-msgstr "O item não existe mais. Atualize a página para ver o novo status"
-
 msgid "The menu does not exist. Reload the page to see the new list of menus."
 msgstr "O menu não existe. Recarregue a página para ver a nova lista de menus."
 
@@ -1046,7 +1025,7 @@ msgid "These deleted cases will be permanently deleted from the archives."
 msgstr "Estes casos serão excluídos dos arquivos permanentemente."
 
 msgid "They will be removed from the database permanently."
-msgstr ""
+msgstr "Eles serão removidos permanentemente do banco de dados."
 
 msgid "This URL is already in use"
 msgstr "Essa URL já está em uso"
@@ -1058,16 +1037,13 @@ msgid "This field is mandatory"
 msgstr "Este campo é obrigatório"
 
 msgid "This filters the case list only by process name. The display name is shown for information purposes."
-msgstr ""
+msgstr "Isso filtra a lista de casos apenas pelo nome do processo. O nome de exibição é mostrado para fins de informação."
 
 msgid "This is the task details panel. No information to display"
 msgstr "Este é o painel de detalhes de tarefa. Nenhuma informação para exibir"
 
 msgid "This name is already in use"
 msgstr "Este nome já está em uso"
-
-msgid "This process is no longer available."
-msgstr "Este processo não está mais disponível."
 
 msgid "This process is not fully configured, but it is still enabled. Users may still be able to start cases or do tasks, which may lead to errors."
 msgstr "Esse processo não está totalmente configurado, mas ainda está habilitado. Os usuários ainda podem iniciar casos ou realizar tarefas, o que pode levar a erros."
@@ -1079,7 +1055,7 @@ msgid "This process is not fully configured. It cannot be enabled."
 msgstr "Esse processo não está totalmente configurado. Não pode ser habilitado."
 
 msgid "This task cannot be executed from here."
-msgstr ""
+msgstr "Esta tarefa não pode ser executada a partir daqui."
 
 msgid "This task is completed."
 msgstr "Esta tarefa esta concluída."
@@ -1221,9 +1197,6 @@ msgstr "Com erros"
 
 msgid "You are about to export the descriptor of the application"
 msgstr "Você está prestes a exportar o descritor da aplicação"
-
-msgid "You are going to be redirected to the process list."
-msgstr "Você vai ser redirecionado para a lista de processos."
 
 msgid "You can create custom information in Bonita Studio:"
 msgstr "Você pode criar informações personalizadas no Bonita Studio:"
