@@ -215,7 +215,7 @@ public class ContractTypeConverter {
                     && mapOfValues.containsKey(FILE_TEMP_PATH)) {
                 final String filename = (String) mapOfValues.get(InputDefinition.FILE_INPUT_FILENAME);
                 return new FileInputValue(
-                        filename,
+                        DocumentUtil.sanitizeFilename(filename),
                         (String) mapOfValues.get(CONTENT_TYPE),
                         retrieveFileAndGetContent((String) mapOfValues.get(FILE_TEMP_PATH)),
                         (String) mapOfValues.get(FILE_INPUT_ID));
