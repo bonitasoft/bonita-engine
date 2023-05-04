@@ -300,6 +300,22 @@ public class ContractTypeConverterTest {
     }
 
     @Test
+    public void should_sanitize_filename_of_contract_input() throws Exception {
+        final List<InputDefinition> inputDefinition = generateSimpleInputDefinition(true);
+        when(contractDefinition.getInputs()).thenReturn(inputDefinition);
+        final String tempFilePath = "tempFile";
+        final File tempFile = generateTempFile();
+        doReturn(tempFile).when(bonitaHomeFolderAccessor).getTempFile(tempFilePath);
+        final Map<String, Serializable> input = generateInputMap("file<with>forbidden\".txt", tempFilePath);
+
+        final Map<String, Serializable> processedInput = contractTypeConverter.getProcessedInput(contractDefinition,
+                input, maxSizeForTenant);
+
+        assertThat(processedInput).contains(entry("inputFile",
+                new FileInputValue("file_with_forbidden_.txt", "", fileContentString.getBytes("UTF-8"))));
+    }
+
+    @Test
     public void getAdaptedContractDefinition_should_return_a_converter_contract() throws IOException {
         //given
         final ContractDefinitionImpl processContract = new ContractDefinitionImpl();
@@ -348,6 +364,10 @@ public class ContractTypeConverterTest {
     }
 
     private Map<String, Serializable> generateInputMap(final String tempFilePath) {
+        return generateInputMap(filename, tempFilePath);
+    }
+
+    private Map<String, Serializable> generateInputMap(final String filename, final String tempFilePath) {
         final Map<String, Serializable> inputMap = new HashMap<>();
         inputMap.put("inputText", "text");
         inputMap.put("inputBoolean", "true");
