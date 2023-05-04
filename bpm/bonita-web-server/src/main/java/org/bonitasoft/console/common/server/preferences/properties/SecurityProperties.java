@@ -46,6 +46,16 @@ public class SecurityProperties {
     public static final String SECURE_TOKEN_COOKIE = "security.csrf.cookie.secure";
 
     /**
+     * property allowing to set the X-Frame-Options header value in the response
+     */
+    public static final String X_FRAME_OPTIONS_HEADER = "bonita.runtime.security.csrf.header.frame.options";
+
+    /**
+     * property allowing to set the Content-Security-Policy header value in the response
+     */
+    public static final String CONTENT_SECURITY_POLICY_HEADER = "bonita.runtime.security.csrf.header.content.security.policy";
+
+    /**
      * property for the REST API Authorization checks activation
      */
     public static final String API_AUTHORIZATIONS_CHECK = "security.rest.api.authorizations.check.enabled";
@@ -81,6 +91,14 @@ public class SecurityProperties {
     public boolean isCSRFTokenCookieSecure() {
         final String res = getPlatformProperty(SECURE_TOKEN_COOKIE);
         return res != null && res.equals("true");
+    }
+
+    public String getXFrameOptionsHeader() {
+        return getPlatformProperty(X_FRAME_OPTIONS_HEADER);
+    }
+
+    public String getContentSecurityPolicyHeader() {
+        return getPlatformProperty(CONTENT_SECURITY_POLICY_HEADER);
     }
 
     protected ConfigurationFilesManager getConfigurationFilesManager() {
