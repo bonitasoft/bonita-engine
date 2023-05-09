@@ -30,4 +30,12 @@ public class SHandlerExecutionException extends SBonitaException {
         super(message, cause);
     }
 
+    public SHandlerExecutionException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public SHandlerExecutionException(final Throwable cause) {
+        super(cause);
+    }
+
 }
