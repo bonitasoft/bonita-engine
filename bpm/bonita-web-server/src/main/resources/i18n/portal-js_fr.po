@@ -7,20 +7,17 @@ msgstr ""
 "X-Crowdin-Project: bonita\n"
 "X-Crowdin-Project-ID: 13316\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /dev/bonita-web/portal/portal-js.pot\n"
-"X-Crowdin-File-ID: 60594\n"
+"X-Crowdin-File: /master/bonita-web/portal/portal-js.pot\n"
+"X-Crowdin-File-ID: 61810\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2022-03-03 02:29\n"
+"PO-Revision-Date: 2023-05-03 01:28\n"
 
 msgid "1 case has been deleted"
 msgstr "1 cas a été supprimé"
 
 msgid "A page with this name already exists."
 msgstr "Une page portant ce nom existe déjà."
-
-msgid "A server error occurred. The operation did not complete successfully"
-msgstr "Une erreur de serveur s'est produite. L'opération n'a pas été terminée avec succès"
 
 msgid "Above normal"
 msgstr "Haute priorité"
@@ -78,12 +75,6 @@ msgstr "Tous"
 
 msgid "All done. Good job!"
 msgstr "Vous avez accompli toutes vos tâches. Bravo !"
-
-msgid "An Error occurred during process activation/deactivation."
-msgstr "Une erreur s'est produite lors de l'activation/désactivation du processus."
-
-msgid "An Error occurred during process deletion."
-msgstr "Une erreur s'est produite durant la suppression du processus. "
 
 msgid "An application is a customized environment for a specific user profile, in which users interact with business data and business processes in the most efficient way."
 msgstr "Une application est un environnement adapté à un profil particulier, dans lequel les utilisateurs interagissent avec les données et les processus métier avec une efficacité optimale."
@@ -752,9 +743,6 @@ msgstr "Les informations personnelles ont été mises à jour avec succès"
 msgid "Phone"
 msgstr "Téléphone"
 
-msgid "Please refresh the page."
-msgstr "Veuillez actualiser la page."
-
 msgid "Priority"
 msgstr "Priorité"
 
@@ -802,9 +790,6 @@ msgstr "Tout supprimer"
 
 msgid "Reset"
 msgstr "Réinitialiser"
-
-msgid "Reset to default"
-msgstr "Réinitialiser avec les paramètres par défaut"
 
 msgid "Roles"
 msgstr "Rôles"
@@ -895,9 +880,6 @@ msgstr "Une erreur s'est produite lors de la suppression. Vous pouvez annuler et
 
 msgid "Something went wrong during the modification. You might want to cancel and try again."
 msgstr "Une erreur s'est produite lors de la modification. Vous pouvez annuler et réessayer."
-
-msgid "Something went wrong. You might want to cancel and try again."
-msgstr "Une erreur s'est produite lors de la suppression. Vous pouvez annuler et réessayer."
 
 msgid "Sort by URL"
 msgstr "Trier par URL"
@@ -1016,9 +998,6 @@ msgstr "Le mapping de tous les éléments en attente d'un formulaire ou d'une pa
 msgid "The image you are trying to upload is too big"
 msgstr "L'image que vous essayez de charger est trop grande"
 
-msgid "The item does not exist anymore. Refresh the page to see the new status"
-msgstr "L' élément n'existe plus. Rafraîchissez la page pour voir le nouveau statut"
-
 msgid "The menu does not exist. Reload the page to see the new list of menus."
 msgstr "Le menu n'existe pas. Rechargez la page pour voir la nouvelle liste de menus."
 
@@ -1066,9 +1045,6 @@ msgstr "Cette zone est dédiée aux détails d'une tâche. Aucune information à
 
 msgid "This name is already in use"
 msgstr "Ce nom est déjà utilisé"
-
-msgid "This process is no longer available."
-msgstr "Ce processus n'est plus disponible."
 
 msgid "This process is not fully configured, but it is still enabled. Users may still be able to start cases or do tasks, which may lead to errors."
 msgstr "Ce processus n'est pas entièrement configuré, mais il est toujours activé. Les utilisateurs peuvent toujours démarrer des cas ou exécuter des tâches, ce qui pourrait entraîner des erreurs."
@@ -1222,9 +1198,6 @@ msgstr "Avec erreurs"
 
 msgid "You are about to export the descriptor of the application"
 msgstr "Vous allez exporter le descripteur de l'application"
-
-msgid "You are going to be redirected to the process list."
-msgstr "Vous allez être redirigé vers la liste des processus."
 
 msgid "You can create custom information in Bonita Studio:"
 msgstr "Vous pouvez créer des informations spécifiques dans Bonita Studio :"
