@@ -27,6 +27,8 @@ import org.bonitasoft.engine.bpm.document.Document
 import org.bonitasoft.engine.bpm.process.ProcessInstance
 import org.bonitasoft.engine.exception.BonitaException
 import org.bonitasoft.engine.identity.User
+import org.bonitasoft.engine.search.SearchOptions
+import org.bonitasoft.engine.search.SearchResult
 import org.bonitasoft.engine.session.APISession
 import org.junit.Before
 import org.junit.Test
@@ -92,6 +94,8 @@ public class DocumentPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(filters).when(apiCallContext).getFilters()
         doReturn(true).when(processAPI).isInvolvedInProcessInstance(currentUserId, 45l)
+        def SearchResult = mock(SearchResult.class)
+        doReturn(SearchResult).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), any(SearchOptions.class))
     }
 
     def havingResourceId(boolean isInvolvedIn, boolean isInvolvedAsManager) {
@@ -106,6 +110,8 @@ public class DocumentPermissionRuleTest {
         doReturn(false).when(processAPI).isUserProcessSupervisor(2048L, currentUserId)
         doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 123L)
         doReturn(isInvolvedAsManager).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 123L)
+        def SearchResult = mock(SearchResult.class)
+        doReturn(SearchResult).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), any(SearchOptions.class))
     }
 
     @Test
@@ -152,14 +158,14 @@ public class DocumentPermissionRuleTest {
     }
 
     @Test
-    public void should_allow_user_when_isManager_throws_exception() {
+    public void should_not_allow_user_when_isManager_throws_exception() {
         //given
         havingResourceId(false, false)
         doThrow(new BonitaException("cause")).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 123L)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue()
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -202,10 +208,12 @@ public class DocumentPermissionRuleTest {
                 "other":"sample"
             }
         ''').when(apiCallContext).getBody()
-        doReturn(false).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l)
         def instance = mock(ProcessInstance.class)
         doReturn(instance).when(processAPI).getProcessInstance(154L)
         doReturn(1024L).when(instance).getProcessDefinitionId()
+        doReturn(false).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l)
+        def SearchResult = mock(SearchResult.class)
+        doReturn(SearchResult).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), any(SearchOptions.class))
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
