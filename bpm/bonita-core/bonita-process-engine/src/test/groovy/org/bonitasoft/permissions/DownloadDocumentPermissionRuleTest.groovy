@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance
 import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.search.SearchOptions
+import org.bonitasoft.engine.search.SearchResult
 import org.bonitasoft.engine.search.impl.SearchResultImpl
 import org.bonitasoft.engine.session.APISession
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException
@@ -38,6 +39,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 import static org.assertj.core.api.Assertions.assertThat
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.doReturn
 import static org.mockito.Mockito.doThrow
 import static org.mockito.Mockito.mock
@@ -86,7 +88,7 @@ public class DownloadDocumentPermissionRuleTest {
     public void should_deny_on_GET_with_user_not_involved_nor_supervisor() {
         //given
         havingDocumentParameter()
-        havingInvolvementInProcessInstance(false, false, false)
+        havingInvolvementInProcessInstance(false, false, false, false)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -108,7 +110,7 @@ public class DownloadDocumentPermissionRuleTest {
     public void should_deny_on_GET_content_storage_id_with_user_not_involved_nor_supervisor() {
         //given
         havingContentStorageIdParameter()
-        havingInvolvementInProcessInstance(false, false, false)
+        havingInvolvementInProcessInstance(false, false, false, false)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -130,7 +132,7 @@ public class DownloadDocumentPermissionRuleTest {
     public void should_allow_on_GET_with_user_not_involved_but_supervisor() {
         //given
         havingDocumentParameter()
-        havingInvolvementInProcessInstance(true, false, false)
+        havingInvolvementInProcessInstance(true, false, false, false)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -141,7 +143,7 @@ public class DownloadDocumentPermissionRuleTest {
     public void should_allow_on_GET_with_user_involved() {
         //given
         havingDocumentParameter()
-        havingInvolvementInProcessInstance(false, true, false)
+        havingInvolvementInProcessInstance(false, true, false, false)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -163,7 +165,7 @@ public class DownloadDocumentPermissionRuleTest {
     public void should_allow_on_GET_with_manager_of_involved_user() {
         //given
         havingDocumentParameter()
-        havingInvolvementInProcessInstance(false, false, true)
+        havingInvolvementInProcessInstance(false, false, true, false)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -174,7 +176,18 @@ public class DownloadDocumentPermissionRuleTest {
     public void should_allow_on_GET_with_user_involved_and_supervisor() {
         //given
         havingDocumentParameter()
-        havingInvolvementInProcessInstance(true, true, true)
+        havingInvolvementInProcessInstance(true, true, true, false)
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        assertThat(isAuthorized).isTrue()
+    }
+
+    @Test
+    public void should_allow_on_GET_with_user_involved_in_process_instance_as_subprocess() {
+        //given
+        havingDocumentParameter()
+        havingInvolvementInProcessInstance(false, false, false, true)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
@@ -217,13 +230,18 @@ public class DownloadDocumentPermissionRuleTest {
         doReturn(123L).when(document).getProcessInstanceId()
     }
 
-    def havingInvolvementInProcessInstance(boolean isSupervisor, boolean isInvolvedIn, boolean isInvolvedAsManager) {
+    def havingInvolvementInProcessInstance(boolean isSupervisor, boolean isInvolvedIn, boolean isInvolvedAsManager, boolean isInvolvedInForSubprocesses) {
         def instance = mock(ProcessInstance.class)
         doReturn(instance).when(processAPI).getProcessInstance(123L)
         doReturn(2048L).when(instance).getProcessDefinitionId()
         doReturn(isSupervisor).when(processAPI).isUserProcessSupervisor(2048L, currentUserId)
         doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 123L)
         doReturn(isInvolvedAsManager).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 123L)
+        def searchResult = mock(SearchResult.class)
+        if (isInvolvedInForSubprocesses) {
+            doReturn(1L).when(searchResult).getCount()
+        }
+        doReturn(searchResult).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), any(SearchOptions.class))
     }
 
     def havingInvolvementInArchivedProcessInstance(boolean isSupervisor, boolean isInvolvedIn, boolean isInvolvedAsManager) {
@@ -234,5 +252,7 @@ public class DownloadDocumentPermissionRuleTest {
         doReturn(isSupervisor).when(processAPI).isUserProcessSupervisor(2048L, currentUserId)
         doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 123L)
         doReturn(isInvolvedAsManager).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 123L)
+        def searchResult = mock(SearchResult.class)
+        doReturn(searchResult).when(processAPI).searchMyAvailableHumanTasks(eq(currentUserId), any(SearchOptions.class))
     }
 }
