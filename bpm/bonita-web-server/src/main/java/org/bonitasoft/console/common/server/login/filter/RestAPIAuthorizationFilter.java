@@ -68,9 +68,12 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
     public void proceedWithFiltering(ServletRequest request, ServletResponse response, FilterChain chain)
             throws ServletException {
         try {
-            //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the inputstream twice (in the filter and in the API servlet)
-            MultiReadHttpServletRequest httpServletRequest = new MultiReadHttpServletRequest(
-                    (HttpServletRequest) request);
+            HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+            // body of multi-parts requests is not needed when checking permissions
+            if (!ServletFileUpload.isMultipartContent(httpServletRequest)) {
+                //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the input stream twice (in the filter and in the API servlet)
+                httpServletRequest = new MultiReadHttpServletRequest(httpServletRequest);
+            }
             String pathInfo = Optional.ofNullable(httpServletRequest.getPathInfo()).orElse("");
             String requestPath = httpServletRequest.getServletPath() + pathInfo;
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
