@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.filter.ExcludingPatternFilter;
 import org.bonitasoft.console.common.server.login.servlet.PlatformLoginServlet;
@@ -107,7 +108,6 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
                 return true;
             }
         } catch (InvalidSessionException e) {
-
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Invalid Bonita engine session.", e);
             }
@@ -175,6 +175,13 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
 
     protected String getRequestBody(final HttpServletRequest request) throws ServletException {
         try {
+            // body of multi-parts requests is not needed when checking permissions
+            if (ServletFileUpload.isMultipartContent(request)) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("[Multi-Part Request] not adding body to APIContext");
+                }
+                return null;
+            }
             final ServletInputStream inputStream = request.getInputStream();
             return IOUtils.toString(inputStream, request.getCharacterEncoding());
         } catch (final IOException e) {
