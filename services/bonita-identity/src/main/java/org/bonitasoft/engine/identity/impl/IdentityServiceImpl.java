@@ -13,64 +13,15 @@
  **/
 package org.bonitasoft.engine.identity.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.identity.IconService;
-import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
-import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionCreationException;
-import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionNotFoundException;
-import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionReadException;
-import org.bonitasoft.engine.identity.SCustomUserInfoValueNotFoundException;
-import org.bonitasoft.engine.identity.SCustomUserInfoValueReadException;
-import org.bonitasoft.engine.identity.SGroupCreationException;
-import org.bonitasoft.engine.identity.SGroupDeletionException;
-import org.bonitasoft.engine.identity.SGroupNotFoundException;
-import org.bonitasoft.engine.identity.SIcon;
-import org.bonitasoft.engine.identity.SIdentityException;
-import org.bonitasoft.engine.identity.SMembershipDeletionException;
-import org.bonitasoft.engine.identity.SRoleDeletionException;
-import org.bonitasoft.engine.identity.SRoleNotFoundException;
-import org.bonitasoft.engine.identity.SUserCreationException;
-import org.bonitasoft.engine.identity.SUserDeletionException;
-import org.bonitasoft.engine.identity.SUserMembershipCreationException;
-import org.bonitasoft.engine.identity.SUserNotFoundException;
-import org.bonitasoft.engine.identity.SUserUpdateException;
-import org.bonitasoft.engine.identity.model.SContactInfo;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
-import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUserLogin;
-import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilder;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionLogBuilder;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionLogBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SGroupLogBuilder;
-import org.bonitasoft.engine.identity.model.builder.SGroupLogBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SRoleLogBuilder;
-import org.bonitasoft.engine.identity.model.builder.SRoleLogBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserLogBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
+import org.bonitasoft.engine.identity.*;
+import org.bonitasoft.engine.identity.model.*;
+import org.bonitasoft.engine.identity.model.builder.*;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -79,11 +30,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
-import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
-import org.bonitasoft.engine.recorder.model.DeleteRecord;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.recorder.model.InsertRecord;
-import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.recorder.model.*;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.springframework.stereotype.Service;
 
@@ -246,8 +193,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     private void insertUser(SUser hashedUser) throws SRecorderException {
         final InsertRecord insertRecord = new InsertRecord(hashedUser);
-        // FIXME: 23/03/2021 the second parameter must be USER instead of USER_LOGIN to have a better event consistency
-        recorder.recordInsert(insertRecord, USER_LOGIN);
+        recorder.recordInsert(insertRecord, USER);
     }
 
     @Override
