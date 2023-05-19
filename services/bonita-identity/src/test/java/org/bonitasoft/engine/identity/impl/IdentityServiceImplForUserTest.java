@@ -32,11 +32,7 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -50,12 +46,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -336,7 +327,7 @@ public class IdentityServiceImplForUserTest {
 
         verify(recorder, times(1))
                 .recordInsert(argThat(perInsertRecord -> (perInsertRecord.getEntity() instanceof SUser)
-                        && ((SUser) perInsertRecord.getEntity()).getIconId() == NEW_ICON_ID), eq("USER_LOGIN"));
+                        && ((SUser) perInsertRecord.getEntity()).getIconId() == NEW_ICON_ID), eq("USER"));
         verify(recorder, times(1)).recordInsert(
                 argThat(perInsertRecord -> perInsertRecord.getEntity() instanceof SUserLogin), eq("USER_LOGIN"));
         verify(iconService).createIcon("test.jpg", "iconContent".getBytes());
