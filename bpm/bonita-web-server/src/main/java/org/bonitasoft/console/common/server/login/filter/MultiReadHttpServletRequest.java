@@ -16,7 +16,11 @@ package org.bonitasoft.console.common.server.login.filter;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import javax.servlet.ReadListener;
@@ -24,19 +28,25 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 
 public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
 
+    private File tempFile;
     private ByteArrayOutputStream readBytes;
+    private boolean isMultipart;
 
     public MultiReadHttpServletRequest(final HttpServletRequest request) {
         super(request);
+        isMultipart = ServletFileUpload.isMultipartContent(request);
     }
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        if (readBytes == null) {
+        if (!isMultipart && readBytes == null
+                || isMultipart && (tempFile == null || !tempFile.exists())) {
             readInputStream();
         }
         return new CachedServletInputStream();
@@ -52,17 +62,43 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     private void readInputStream() throws IOException {
-        readBytes = new ByteArrayOutputStream();
-        IOUtils.copy(super.getInputStream(), readBytes);
+        if (!isMultipart) {
+            readBytes = new ByteArrayOutputStream();
+            IOUtils.copy(super.getInputStream(), readBytes);
+        } else {
+            File tempDir = WebBonitaConstantsUtils.getPlatformInstance().getTempFolder();
+            if (!tempDir.exists()) {
+                tempDir.mkdirs();
+            }
+            tempFile = File.createTempFile("tmp_", ".part", tempDir);
+            tempFile.deleteOnExit();
+            try (FileOutputStream fileOutput = new FileOutputStream(tempFile)) {
+                IOUtils.copy(super.getInputStream(), fileOutput);
+            }
+        }
+    }
+
+    public void cleanMultipartTempContent() {
+        if (tempFile != null && tempFile.exists()) {
+            tempFile.delete();
+        }
+        // clean recursively if there are several layers of wrapped requests
+        if (getRequest() instanceof MultiReadHttpServletRequest) {
+            ((MultiReadHttpServletRequest) getRequest()).cleanMultipartTempContent();
+        }
     }
 
     class CachedServletInputStream extends ServletInputStream {
 
-        private final ByteArrayInputStream input;
+        private final InputStream input;
         private ReadListener readListener;
 
-        public CachedServletInputStream() {
-            input = new ByteArrayInputStream(readBytes.toByteArray());
+        public CachedServletInputStream() throws IOException {
+            if (!isMultipart) {
+                input = new ByteArrayInputStream(readBytes.toByteArray());
+            } else {
+                input = new FileInputStream(tempFile);
+            }
             readListener = null;
         }
 
@@ -101,7 +137,12 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
 
         @Override
         public boolean isFinished() {
-            return input.available() == 0;
+            try {
+                return input.available() == 0;
+            } catch (IOException e) {
+                // stream has been closed
+                return true;
+            }
         }
 
         @Override
