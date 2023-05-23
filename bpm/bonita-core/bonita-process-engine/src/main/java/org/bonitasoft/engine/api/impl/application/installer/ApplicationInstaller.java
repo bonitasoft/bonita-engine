@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.bonitasoft.engine.api.result.Status.*;
@@ -26,12 +25,7 @@ import static org.bonitasoft.engine.bpm.process.ConfigurationState.RESOLVED;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -50,34 +44,17 @@ import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
-import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.ApplicationInstallationException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
-import org.bonitasoft.engine.page.PageSearchDescriptor;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -103,13 +80,18 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(ApplicationInstaller.class)
 public class ApplicationInstaller {
 
+    private static final String PAGE_TOKEN_PROPERTY = "name";
+    private static final String PAGE_DISPLAY_NAME_PROPERTY = "displayName";
+    private static final String PAGE_DESCRIPTION_PROPERTY = "description";
+    private static final String PAGE_CONTENT_TYPE_PROPERTY = "contentType";
+
     private final BusinessDataModelRepository bdmRepository;
     private final UserTransactionService transactionService;
     private final TenantStateManager tenantStateManager;
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
-    private ApplicationImporter applicationImporter;
+    private final ApplicationImporter applicationImporter;
     private final Long tenantId;
 
     @VisibleForTesting
@@ -239,7 +221,7 @@ public class ApplicationInstaller {
         final List<String> warnings;
         try {
             warnings = getOrganizationImporter().importOrganizationWithWarnings(
-                    new String(Files.readAllBytes(applicationArchive.getOrganization().toPath()), UTF_8),
+                    Files.readString(applicationArchive.getOrganization().toPath()),
                     ImportPolicy.FAIL_ON_DUPLICATES);
         } catch (IOException e) {
             throw new OrganizationImportException(e);
@@ -459,12 +441,12 @@ public class ApplicationInstaller {
      */
     public void installUnitPage(File pageFile, String precisePageType, ExecutionResult executionResult)
             throws IOException, BonitaException {
-        String pageToken = getPageToken(pageFile);
-
+        var pageProperties = loadPageProperties(pageFile);
+        var pageToken = pageProperties.getProperty(PAGE_TOKEN_PROPERTY);
         final Map<String, Serializable> context = new HashMap<>();
         context.put(PAGE_NAME_KEY, pageToken);
 
-        final Page page = createPage(Files.readAllBytes(pageFile.toPath()), pageToken);
+        final Page page = createPage(pageFile, pageProperties);
         log.info("Creating new {} '{}'", precisePageType, getPageName(page));
 
         executionResult.addStatus(infoStatus(PAGE_DEPLOYMENT_CREATE_NEW,
@@ -472,35 +454,58 @@ public class ApplicationInstaller {
                 context));
     }
 
-    public Page createPage(byte[] pageContent, String pageToken) throws CreationException {
-        return getPageAPIDelegate().createPage(pageToken, pageContent, SessionService.SYSTEM_ID);
+    Page createPage(File pageFile, Properties pageProperties) throws CreationException {
+        try {
+            var pageCreator = new PageCreator(pageProperties.getProperty(PAGE_TOKEN_PROPERTY), pageFile.getName())
+                    .setContentType(pageProperties.getProperty(PAGE_CONTENT_TYPE_PROPERTY))
+                    .setDisplayName(pageProperties.getProperty(PAGE_DISPLAY_NAME_PROPERTY))
+                    .setDescription(pageProperties.getProperty(PAGE_DESCRIPTION_PROPERTY));
+            return getPageAPIDelegate().createPage(pageCreator,
+                    Files.readAllBytes(pageFile.toPath()),
+                    SessionService.SYSTEM_ID);
+        } catch (IOException e) {
+            throw new CreationException("Failed to read custom page content", e);
+        }
     }
 
     private String getPageName(Page page) {
         return isNotBlank(page.getDisplayName()) ? page.getDisplayName() : page.getName();
     }
 
-    private String getPageToken(File file) throws IOException {
-        byte[] pageProperties = FileOperations.getFileFromZip(new FileInputStream(file),
-                "page.properties");
-        Properties properties = new Properties();
-        properties.load(new ByteArrayInputStream(pageProperties));
-        String name = properties.getProperty("name");
+    private Properties loadPageProperties(File zipFile) throws IOException {
+        var properties = new Properties();
+        try (var pagePropertiesIs = new ByteArrayInputStream(
+                FileOperations.getFileFromZip(zipFile, "page.properties"))) {
+            properties.load(pagePropertiesIs);
+            return validatePageProperties(zipFile, properties);
+        }
+    }
+
+    private Properties validatePageProperties(File file, Properties properties) {
+        String name = properties.getProperty(PAGE_TOKEN_PROPERTY);
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException(
-                    format("Invalid page %s, page.properties file do not contain mandatory 'name' attribute",
-                            file.getName()));
+                    format("Invalid page %s, page.properties file do not contain mandatory '%s' attribute",
+                            file.getName(), PAGE_TOKEN_PROPERTY));
         }
-        return name;
+        String type = properties.getProperty(PAGE_CONTENT_TYPE_PROPERTY);
+        if (type == null || type.isEmpty()) {
+            throw new IllegalArgumentException(
+                    format("Invalid page %s, page.properties file do not contain mandatory '%s' attribute",
+                            file.getName(), PAGE_CONTENT_TYPE_PROPERTY));
+        }
+        return properties;
     }
 
     public List<Long> installProcesses(ApplicationArchive applicationArchive, ExecutionResult executionResult)
             throws InvalidBusinessArchiveFormatException, IOException, ProcessDeployException {
         List<Long> processDefinitionIds = new ArrayList<>();
         for (File processFile : applicationArchive.getProcesses()) {
-            final BusinessArchive businessArchive = BusinessArchiveFactory
-                    .readBusinessArchive(new FileInputStream(processFile));
-            processDefinitionIds.add(deployProcess(businessArchive, executionResult));
+            try (var is = new FileInputStream(processFile)) {
+                final BusinessArchive businessArchive = BusinessArchiveFactory
+                        .readBusinessArchive(is);
+                processDefinitionIds.add(deployProcess(businessArchive, executionResult));
+            }
         }
         return processDefinitionIds;
 
@@ -510,7 +515,7 @@ public class ApplicationInstaller {
             throws ProcessDeployException {
         final String processName = businessArchive.getProcessDefinition().getName();
         final String processVersion = businessArchive.getProcessDefinition().getVersion();
-        Long processDefinitionId = null;
+        long processDefinitionId;
 
         final Map<String, Serializable> context = new HashMap<>();
         context.put(PROCESS_NAME_KEY, processName);
@@ -535,17 +540,6 @@ public class ApplicationInstaller {
         return ProcessDeploymentAPIDelegate.getInstance();
     }
 
-    org.bonitasoft.engine.page.Page getPage(String urlToken) throws SearchException {
-        final SearchResult<Page> pages = getPageAPIDelegate()
-                .searchPages(new SearchOptionsBuilder(0, 1).filter(PageSearchDescriptor.NAME, urlToken).done());
-        if (pages.getCount() == 0) {
-            log.debug("Can't find any existing page with the token '{}'.", urlToken);
-            return null;
-        }
-        log.debug("Page '{}' retrieved successfully.", urlToken);
-        return pages.getResult().get(0);
-    }
-
     @VisibleForTesting
     public <T> T inSession(Callable<T> callable) throws Exception {
         final SSession session = sessionService.createSession(tenantId, SessionService.SYSTEM);
@@ -553,9 +547,7 @@ public class ApplicationInstaller {
         log.info("Created new session with id {}", sessionId);
         try {
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final T result = callable.call();
-            // sessionService.deleteSession(sessionId);
-            return result;
+            return callable.call();
         } finally {
             sessionAccessor.deleteSessionId();
             sessionAccessor.deleteTenantId();

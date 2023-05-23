@@ -145,7 +145,12 @@ public class PageServiceImpl implements PageService {
             SInvalidPageZipException, SInvalidPageTokenException {
         try {
             final Map<String, byte[]> zipContent = unzip(content);
-            checkZipContainsRequiredEntries(zipContent);
+            var pageProperties = getPreviousPageProperties(content);
+            if (isAnAPIExtension(pageProperties)) {
+                checkApiControllerExists(zipContent, pageProperties);
+            } else {
+                checkZipContainsRequiredEntries(zipContent);
+            }
             checkPageNameIsValid(page.getName(), page.isProvided());
             checkPageDisplayNameIsValid(page.getDisplayName());
             return insertPage(page, content);
