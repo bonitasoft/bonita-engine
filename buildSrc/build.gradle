@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     api "com.github.johnrengelman:shadow:8.1.1"
-    api "com.adarshr:gradle-test-logger-plugin:2.1.0"
+    api "com.adarshr:gradle-test-logger-plugin:3.2.0"
 
     // for database tests:
     api "com.bmuschko:gradle-docker-plugin:6.7.0"
