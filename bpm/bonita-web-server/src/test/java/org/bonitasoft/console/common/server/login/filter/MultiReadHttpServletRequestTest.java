@@ -48,10 +48,33 @@ public class MultiReadHttpServletRequestTest {
             final MultiReadHttpServletRequest multiReadHttpServletRequest = new MultiReadHttpServletRequest(request);
 
             final InputStream inputStream = multiReadHttpServletRequest.getInputStream();
-            Assert.assertEquals("body content", IOUtils.toString(inputStream));
+            Assert.assertEquals("body content", IOUtils.toString(inputStream, StandardCharsets.UTF_8));
 
             final InputStream inputStream2 = multiReadHttpServletRequest.getInputStream();
-            Assert.assertEquals("body content", IOUtils.toString(inputStream2));
+            Assert.assertEquals("body content", IOUtils.toString(inputStream2, StandardCharsets.UTF_8));
+        } finally {
+            if (fakeInputStream != null) {
+                fakeInputStream.close();
+            }
+        }
+    }
+
+    @Test
+    public void should_getInputStream_work_when_called_twice_for_multipart() throws Exception {
+
+        doReturn("POST").when(request).getMethod();
+        doReturn("multipart/form-data").when(request).getContentType();
+        ServletInputStream fakeInputStream = null;
+        try {
+            fakeInputStream = new FakeServletInputStream();
+            doReturn(fakeInputStream).when(request).getInputStream();
+            final MultiReadHttpServletRequest multiReadHttpServletRequest = new MultiReadHttpServletRequest(request);
+
+            final InputStream inputStream = multiReadHttpServletRequest.getInputStream();
+            Assert.assertEquals("body content", IOUtils.toString(inputStream, StandardCharsets.UTF_8));
+
+            final InputStream inputStream2 = multiReadHttpServletRequest.getInputStream();
+            Assert.assertEquals("body content", IOUtils.toString(inputStream2, StandardCharsets.UTF_8));
         } finally {
             if (fakeInputStream != null) {
                 fakeInputStream.close();

@@ -35,6 +35,7 @@ import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededExcepti
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.bonitasoft.console.common.server.login.filter.MultiReadHttpServletRequest;
 import org.bonitasoft.console.common.server.utils.DocumentUtil;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.slf4j.Logger;
@@ -176,6 +177,10 @@ public abstract class FileUploadServlet extends HttpServlet {
                     LOGGER.trace("File uploaded : " + uploadedFile.getPath());
                 }
                 uploadedFile.deleteOnExit();
+                //Clean multiread wrapper temp file if it exists
+                if (request instanceof MultiReadHttpServletRequest) {
+                    ((MultiReadHttpServletRequest) request).cleanMultipartTempContent();
+                }
 
                 // Response
                 final String responseString;

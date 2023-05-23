@@ -104,7 +104,9 @@ public class TokenValidatorFilter extends ExcludingPatternFilter {
             token = httpRequest.getParameter(CSRF_TOKEN_PARAM);
         }
         if (isBlank(token) && isFormData(httpRequest.getContentType())) {
-            MultipartHttpServletRequest multiPartRequest = new CommonsMultipartResolver().resolveMultipart(httpRequest);
+            CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+            multipartResolver.setResolveLazily(true);
+            MultipartHttpServletRequest multiPartRequest = multipartResolver.resolveMultipart(httpRequest);
             if (multiPartRequest.getParameterMap().containsKey(CSRF_TOKEN_PARAM)) {
                 token = multiPartRequest.getParameter(CSRF_TOKEN_PARAM);
             }

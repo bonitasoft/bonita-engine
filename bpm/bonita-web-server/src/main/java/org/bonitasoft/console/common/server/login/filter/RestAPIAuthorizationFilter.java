@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.filter.ExcludingPatternFilter;
 import org.bonitasoft.console.common.server.login.servlet.PlatformLoginServlet;
@@ -67,9 +68,12 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
     public void proceedWithFiltering(ServletRequest request, ServletResponse response, FilterChain chain)
             throws ServletException {
         try {
-            //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the inputstream twice (in the filter and in the API servlet)
-            MultiReadHttpServletRequest httpServletRequest = new MultiReadHttpServletRequest(
-                    (HttpServletRequest) request);
+            HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+            // body of multi-parts requests is not needed when checking permissions
+            if (!ServletFileUpload.isMultipartContent(httpServletRequest)) {
+                //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the input stream twice (in the filter and in the API servlet)
+                httpServletRequest = new MultiReadHttpServletRequest(httpServletRequest);
+            }
             String pathInfo = Optional.ofNullable(httpServletRequest.getPathInfo()).orElse("");
             String requestPath = httpServletRequest.getServletPath() + pathInfo;
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
@@ -107,7 +111,6 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
                 return true;
             }
         } catch (InvalidSessionException e) {
-
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Invalid Bonita engine session.", e);
             }
@@ -175,6 +178,13 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
 
     protected String getRequestBody(final HttpServletRequest request) throws ServletException {
         try {
+            // body of multi-parts requests is not needed when checking permissions
+            if (ServletFileUpload.isMultipartContent(request)) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("[Multi-Part Request] not adding body to APIContext");
+                }
+                return null;
+            }
             final ServletInputStream inputStream = request.getInputStream();
             return IOUtils.toString(inputStream, request.getCharacterEncoding());
         } catch (final IOException e) {
