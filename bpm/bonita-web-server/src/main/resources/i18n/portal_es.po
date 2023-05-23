@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-31 05:21+0200\n"
-"PO-Revision-Date: 2023-04-29 01:31\n"
+"POT-Creation-Date: 2023-05-04 05:21+0200\n"
+"PO-Revision-Date: 2023-05-23 01:29\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -19,9 +19,6 @@ msgstr ""
 
 msgid "%attribute% file format is not allowed. Only %file_formats% files are allowed."
 msgstr "%attribute% formato de archivo no permitido. Sólo se permiten archivos %file_formats%."
-
-msgid "%attribute% file format not allowed"
-msgstr "%attribute% formato de archivo no permitido"
 
 msgid "%attribute% file format not allowed or not starting with correct servlet path"
 msgstr "%attribute% formato de archivo no permitido o no está comenzando con la ruta de servlet correcta"
@@ -44,50 +41,17 @@ msgstr "%attribute% no esta bien escrito"
 msgid "%attribute% must be a boolean value"
 msgstr "%attribute% debe ser un valor booleano"
 
-msgid "%attribute% must be a negative value"
-msgstr "%attribute% debe ser un valor negativo"
-
-msgid "%attribute% must be a negative value diffrent from 0"
-msgstr "%attribute% debe ser un valor positivo diferente de 0"
-
 msgid "%attribute% must be a numeric value"
 msgstr "%attribute% debe ser un valor numérico"
-
-msgid "%attribute% must be a positive value"
-msgstr "%attribute% debe ser un valor positivo"
-
-msgid "%attribute% must be a positive value different from 0"
-msgstr "%attribute% debe ser un valor positivo diferente de 0"
-
-msgid "%attribute% must be a valid date"
-msgstr "%attribute% debe ser una fecha válida"
 
 msgid "%attribute% must be an integer value"
 msgstr "%attribute% debe ser un valor entero"
 
-msgid "%attribute% must be equal to %secondAttribute%"
-msgstr "%attribute% debe ser igual a %secondAttribute%"
-
 msgid "%attribute% must be less or equal than %value%"
 msgstr "%attribute% debe ser menor o igual que %value%"
 
-msgid "%attribute% must be less than %secondAttribute%"
-msgstr "%attribute% debe ser menor %secondAttribute%"
-
 msgid "%attribute% must be less than %value%"
 msgstr "%attribute% debe ser menor que %value%"
-
-msgid "%attribute% must be more or equal than %secondAttribute%"
-msgstr "%attribute% debe ser mayor o igual %secondAttribute%"
-
-msgid "%attribute% must be more or equal than %value%"
-msgstr "%attribute% debe ser igual o más que %value%"
-
-msgid "%attribute% must be more than %secondAttribute%"
-msgstr "%attribute% debe ser mayor que %secondAttribute%"
-
-msgid "%attribute% must be more than %value%"
-msgstr "%attribute% debe ser más que %value%"
 
 msgid "%attribute% must be on a single line"
 msgstr "%attribute% debe estar en una sola línea"
@@ -95,23 +59,11 @@ msgstr "%attribute% debe estar en una sola línea"
 msgid "%attribute% must be one of {%list%}"
 msgstr "%attribute% debe ser uno de {%list%}"
 
-msgid "%attribute% must contain exactly %length% characters"
-msgstr "%attribute% debe contener exactamente %length% carácteres"
-
-msgid "%attribute% must not be equal to %secondAttribute%"
-msgstr "%attribute% no debe ser igual a %secondAttribute%"
-
 msgid "%className% is not Serializable"
 msgstr "%className% no es Serializable"
 
 msgid "%className% not found. Only jdk types are supported"
 msgstr "%className% no encontrada. Solo los tipos jdk son soportados"
-
-msgid "%secondAttribute% must be a numeric value"
-msgstr "%secondAttribute% debe ser un valor numérico"
-
-msgid "%time% ago"
-msgstr "hace %time%"
 
 msgid "%value% is not a valid value for %className%"
 msgstr "%value% no es un valor valido para %className%"
@@ -119,29 +71,14 @@ msgstr "%value% no es un valor valido para %className%"
 msgid "A group with the name %groupName% already exists"
 msgstr "Ya existe un grupo con el mismo nombre %groupName%"
 
-msgid "Administrator"
-msgstr "Administrador"
-
 msgid "An error occurred while creating a definition"
 msgstr "Error al crear una definición"
 
 msgid "An error occurred while deleting an item with the id %id%"
 msgstr "Error al eliminar un elemento con el identificador %id%"
 
-msgid "Analytics"
-msgstr "Análisis"
-
-msgid "Applications"
-msgstr "Aplicaciones"
-
-msgid "BDM"
-msgstr "BDM"
-
 msgid "Bonita Applications"
 msgstr "Aplicaciones Bonita"
-
-msgid "Call activity"
-msgstr "Actividad de Llamada"
 
 msgid "Can't create group. Group '%groupName%' already exists"
 msgstr "No se puede crear el grupo. El grupo '%groupName%' ya existe"
@@ -179,14 +116,8 @@ msgstr "No se puede iniciar el proceso, no se encuentra el proceso %processId%"
 msgid "Can't update user. User not found"
 msgstr "No se puede actualizar el usuario. Usuario no encontrado"
 
-msgid "Cases"
-msgstr "Casos"
-
 msgid "Category with name %categoryName% already exists"
 msgstr "La categoría %categoryName% ya existe"
-
-msgid "Custom Pages"
-msgstr "Páginas Personalizadas"
 
 msgid "Data definition %dataName% doesn't exists for process %processId%"
 msgstr "La definición de dato %dataName% no existe para el proceso %processId%"
@@ -239,80 +170,14 @@ msgstr "Ha ocurrido un error al actualizar el usuario"
 msgid "Filters are not supported by this API"
 msgstr "Los filtros no son soportados con este API"
 
-msgid "For administrator-type of profiles. To manage processes: install, delete and configure, for all processes"
-msgstr "Para perfiles de tipo administrador. Permite gestionar los procesos: instalar, eliminar y configurar todos los procesos"
-
-msgid "For administrator-type of profiles. To monitor all processes"
-msgstr "Para perfiles de tipo administrador. Permite monitorizar todos los procesos"
-
-msgid "For administrator-type of profiles. To monitor cases of all processes"
-msgstr "Para perfiles de tipo administrador. Permite monitorizar los casos de todos los procesos"
-
-msgid "For administrator-type of profiles. To monitor task completion for all processes"
-msgstr "Para perfiles de tipo administrador. Permite monitorizar la realización de tareas de todos los procesos"
-
-msgid "For process manager-type of profiles. To manage processes under her responsibility"
-msgstr "Para perfiles de tipo gestor de procesos. Permite gestionar los procesos bajo su responsabilidad"
-
-msgid "For process manager-type of profiles. To monitor cases of processes under her responsibility"
-msgstr "Para perfiles de tipo gestor de procesos. Permite monitorizar casos de procesos bajo su responsabildiad"
-
-msgid "For process manager-type of profiles. To monitor processes under her responsibility"
-msgstr "Para perfiles de tipo gestor de procesos. Permite monitorizar procesos bajo su responsabilidad"
-
-msgid "For process manager-type of profiles. To monitor task completion, only for processes under her responsibility"
-msgstr "Para perfiles de tipo gestor de procesos. Permite monitorizar la realización de las tareas, sólo para procesos bajo su responsabilidad"
-
-msgid "For user-type of profiles. To view and do tasks  if he is a candidate"
-msgstr "Para perfiles de tipo usuario. Permite visualizar y realizar tareas si es el candidato"
-
-msgid "For user-type of profiles. To visualize cases started by the user or cases he has worked on"
-msgstr "Para perfiles de tipo usuario. Permite visualizar casos comenzados por el usuario o casos en los que ha trabajado"
-
-msgid "For user-type of profiles. UI Designer page to visualize processes and start cases"
-msgstr "Para perfiles de tipo usuario. Página UI Designer para visualizar procesos e iniciar casos"
-
-msgid "Groups"
-msgstr "Grupos"
-
-msgid "High"
-msgstr "alto"
-
-msgid "Highest"
-msgstr "Mayor"
-
-msgid "Human task"
-msgstr "Tarea Humana"
-
-msgid "Install/Export"
-msgstr "Instalar/Exportar"
-
-msgid "Install/export organization"
-msgstr "Instalar/exportar organización"
-
 msgid "Json can't be mapped to "
 msgstr "Json no puede ser mapeado a "
-
-msgid "License"
-msgstr "Licencia"
 
 msgid "Login failed. No profile has been set up for this user. Contact your administrator."
 msgstr "Error de login. Ningún perfil está definido para este usuario. Contacte con tu administrador."
 
 msgid "Login form"
 msgstr "Formulario de login"
-
-msgid "Look and Feel"
-msgstr "Apariencia"
-
-msgid "Loop activity"
-msgstr "Actividad de bucle"
-
-msgid "Low"
-msgstr "bajo"
-
-msgid "Lowest"
-msgstr "Menor"
 
 msgid "MM/dd/yyyy"
 msgstr "dd/MM/yyyy"
@@ -322,39 +187,6 @@ msgstr "dd/MM/yyyy HH:mm"
 
 msgid "MMMM dd, yyyy"
 msgstr "MMMM dd, yyyy"
-
-msgid "Manage BDM"
-msgstr "Administrar BDM"
-
-msgid "Manage Look and Feel"
-msgstr "Administrar el Look & Feel"
-
-msgid "Manage applications"
-msgstr "Administrar aplicaciones"
-
-msgid "Manage custom pages"
-msgstr "Gestionar Páginas Personalizadas"
-
-msgid "Manage groups"
-msgstr "Administrar grupos"
-
-msgid "Manage roles"
-msgstr "Administrar roles"
-
-msgid "Manage users"
-msgstr "Administrar usuarios"
-
-msgid "Monitoring"
-msgstr "Monitorización"
-
-msgid "Multi-instanciation activity"
-msgstr "Actividad multi-instanciada"
-
-msgid "No description."
-msgstr "No hay descripción."
-
-msgid "Normal"
-msgstr "Normal"
 
 msgid "Only the value attribute can be updated"
 msgstr "Sólo el atributo de valor puede ser actualizado"
@@ -389,26 +221,14 @@ msgstr "El proceso %appName% en la versión %version% contiene 6.x artefactos he
 msgid "Process definition not found for id %processId%"
 msgstr "No se encuentra la definición del proceso con identificador %processId%"
 
-msgid "Processes"
-msgstr "Procesos"
-
 msgid "Profile member already exists"
 msgstr "El usuario ya está asociado con este perfil "
-
-msgid "Profiles"
-msgstr "Perfiles"
 
 msgid "Request parameter \"id\" must be set."
 msgstr "Debe establecerse el parámetro \"id\"."
 
-msgid "Roles"
-msgstr "Roles"
-
 msgid "Search terms are not supported by this API"
 msgstr "Los términos de búsqueda no son soportados por este API"
-
-msgid "Service task"
-msgstr "Tarea de Servicio"
 
 msgid "Session expired. Please log in again."
 msgstr "La sesión expiró. Por favor inicie sesión de nuevo."
@@ -416,23 +236,11 @@ msgstr "La sesión expiró. Por favor inicie sesión de nuevo."
 msgid "Sorting is not supported by this API"
 msgstr "Ordenes no son soportados por la API"
 
-msgid "Tasks"
-msgstr "Tareas"
-
-msgid "The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task)."
-msgstr "El administrador puede instalar un proceso, administrar la organización y gestionar algunos errores (por ejemplo, ejecutando de nuevo una tarea)."
-
 msgid "The only mandatory filter is %name%"
 msgstr "El único filtro obligatorio es %name%"
 
-msgid "The platform already exist !"
-msgstr "La plataforma ya existe!"
-
 msgid "The server is not available"
 msgstr "El servidor no está disponible"
-
-msgid "The user can view and perform tasks and can start a new case of a process."
-msgstr "El usuario puede ver y realizar tareas y puede iniciar un nuevo caso de un proceso."
 
 msgid "This category has already been added to this process"
 msgstr "Esta categoría ya ha sido añadida a este proceso"
@@ -454,9 +262,6 @@ msgstr "Este servicio está desconectado por mantenimiento. Por favor, intente m
 
 msgid "This user has already been mapped to actor"
 msgstr "Este usuario ya ha sido mapeado a un actor"
-
-msgid "UI Designer page to visualize processes and start cases"
-msgstr "Página UI Designer para visualizar procesos e iniciar casos"
 
 msgid "Unable to deploy business archive"
 msgstr "No se puede desplegar el archivo de negocios"
@@ -488,39 +293,12 @@ msgstr "Usuario"
 msgid "User not found"
 msgstr "Usuario no encontrado"
 
-msgid "User privilege settings"
-msgstr "Configuración de privilegios de usuario"
-
-msgid "Users"
-msgstr "Usuarios"
-
 msgid "Welcome to"
 msgstr "Bienvenido a"
-
-msgid "day"
-msgstr "día"
-
-msgid "hr"
-msgstr "hr"
-
-msgid "in %time%"
-msgstr "en %time%"
 
 msgid "message"
 msgstr "mensaje"
 
-msgid "min"
-msgstr "min"
-
-msgid "mo"
-msgstr "mo"
-
 msgid "or"
 msgstr "o"
-
-msgid "sec"
-msgstr "segundo"
-
-msgid "yr"
-msgstr "yr"
 
