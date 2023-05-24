@@ -16,6 +16,8 @@ package org.bonitasoft.engine.page;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.bonitasoft.engine.io.FileAndContentUtils.file;
+import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.bonitasoft.engine.page.PageAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 
@@ -392,7 +394,8 @@ public class PageAPIIT extends CommonAPIIT {
     public void should_createPage_with_invalid_content_InvalidPageZipContentException() throws Exception {
         // given
         final String pageName = generateUniquePageName(0);
-        final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
+        final byte[] pageContent = zip(file("README.md", "empty file".getBytes()),
+                file("page.properties", String.format("name=%s\ncontentType=page", pageName).getBytes()));
 
         // when
         assertThrows(InvalidPageZipMissingIndexException.class, () -> getPageAPI().createPage(
