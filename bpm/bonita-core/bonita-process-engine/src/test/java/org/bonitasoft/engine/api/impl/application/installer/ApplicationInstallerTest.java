@@ -16,13 +16,25 @@ package org.bonitasoft.engine.api.impl.application.installer;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.api.result.Status.Level.ERROR;
 import static org.bonitasoft.engine.api.result.Status.Level.WARNING;
-import static org.bonitasoft.engine.api.result.StatusCode.*;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PAGE;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_KO;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.bonitasoft.engine.io.IOUtils.createTempFile;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.ImportError;
@@ -58,7 +71,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -93,12 +111,13 @@ public class ApplicationInstallerTest {
 
     @Test
     public void should_install_application_containing_all_kind_of_custom_pages() throws Exception {
-        File page = createTempFile("page", "zip", zip(file("page.properties", "name=page")));
-        File layout = createTempFile("layout", "zip", zip(file("page.properties", "name=layout")));
-        File theme = createTempFile("theme", "zip", zip(file("page.properties", "name=theme")));
-        File restAPI = createTempFile("restApiExtension", "zip", zip(file("page.properties", "name=restApiExtension")));
-        try (
-                ApplicationArchive applicationArchive = new ApplicationArchive();) {
+        File page = createTempFile("page", "zip", zip(file("page.properties", "name=MyPage\ncontentType=page")));
+        File layout = createTempFile("layout", "zip",
+                zip(file("page.properties", "name=MyLayout\ncontentType=layout")));
+        File theme = createTempFile("theme", "zip", zip(file("page.properties", "name=MyTheme\ncontentType=theme")));
+        File restAPI = createTempFile("restApiExtension", "zip",
+                zip(file("page.properties", "name=MyApi\ncontentType=apiExtension")));
+        try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addPage(page)
                     .addLayout(layout)
                     .addTheme(theme)
@@ -110,11 +129,13 @@ public class ApplicationInstallerTest {
 
             applicationInstaller.install(applicationArchive);
         }
+        var captor = ArgumentCaptor.forClass(Properties.class);
+        verify(applicationInstaller, times(4)).createPage(any(), captor.capture());
 
-        verify(applicationInstaller).createPage(any(), eq("page"));
-        verify(applicationInstaller).createPage(any(), eq("layout"));
-        verify(applicationInstaller).createPage(any(), eq("theme"));
-        verify(applicationInstaller).createPage(any(), eq("restApiExtension"));
+        assertThat(captor.getAllValues()).extracting("name", "contentType").contains(tuple("MyPage", "page"),
+                tuple("MyLayout", "layout"),
+                tuple("MyTheme", "theme"),
+                tuple("MyApi", "apiExtension"));
     }
 
     @Test
@@ -123,9 +144,8 @@ public class ApplicationInstallerTest {
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         doReturn(emptyList()).when(applicationInstaller).importApplications(any());
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
-        try (
-                ApplicationArchive applicationArchive = new ApplicationArchive()
-                        .addApplication(application)) {
+        try (var applicationArchive = new ApplicationArchive()) {
+            applicationArchive.addApplication(application);
             applicationInstaller.install(applicationArchive);
         }
 
@@ -144,10 +164,8 @@ public class ApplicationInstallerTest {
         File application = createTempFile("application", "xml", "content".getBytes());
         doReturn(importStatuses).when(applicationInstaller).importApplications(any());
 
-        try (
-                ApplicationArchive applicationArchive = new ApplicationArchive()
-                        .addApplication(application)) {
-
+        try (var applicationArchive = new ApplicationArchive()) {
+            applicationArchive.addApplication(application);
             assertThatExceptionOfType(ApplicationInstallationException.class)
                     .isThrownBy(() -> applicationInstaller.installLivingApplications(applicationArchive, result))
                     .withMessage("At least one application failed to be installed. Canceling installation.");
@@ -177,8 +195,8 @@ public class ApplicationInstallerTest {
         doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
 
         // when
-        try (ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(process)) {
+        try (var applicationArchive = new ApplicationArchive()) {
+            applicationArchive.addProcess(process);
             applicationInstaller.install(applicationArchive);
         }
         // then
@@ -192,9 +210,8 @@ public class ApplicationInstallerTest {
     public void should_install_bdm() throws Exception {
         byte[] bdmZipContent = createValidBDMZipFile();
         File bdm = createTempFile("bdm", "zip", bdmZipContent);
-        try (
-                ApplicationArchive applicationArchive = new ApplicationArchive()
-                        .setBdm(bdm)) {
+        try (var applicationArchive = new ApplicationArchive()) {
+            applicationArchive.setBdm(bdm);
             doNothing().when(applicationInstaller).installOrganization(any(), any());
             doNothing().when(applicationInstaller).pauseTenant();
             doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
@@ -222,8 +239,8 @@ public class ApplicationInstallerTest {
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
 
-        try (ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(process)) {
+        try (var applicationArchive = new ApplicationArchive()) {
+            applicationArchive.addProcess(process);
             applicationInstaller.install(applicationArchive);
         }
 
@@ -292,8 +309,8 @@ public class ApplicationInstallerTest {
                 .deploy(any());
 
         // when
-        try (ApplicationArchive applicationArchive = new ApplicationArchive()
-                .addProcess(process)) {
+        try (ApplicationArchive applicationArchive = new ApplicationArchive()) {
+            applicationArchive.addProcess(process);
             assertThatExceptionOfType(ProcessDeployException.class).isThrownBy(
                     () -> applicationInstaller.installProcesses(applicationArchive, executionResult))
                     .withMessageContaining("Process myProcess - 1.0 already exists");
