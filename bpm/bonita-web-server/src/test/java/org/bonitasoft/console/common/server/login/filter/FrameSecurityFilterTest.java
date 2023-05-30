@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.console.common.server.login.filter;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import javax.servlet.FilterChain;
@@ -30,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FrameSecurityFilterTest {
@@ -40,22 +38,22 @@ public class FrameSecurityFilterTest {
 
     @Mock
     private HttpServletResponse httpResponse;
-    
+
     @Mock
     private FilterConfig filterConfig;
-    
+
     @Mock
     private FilterChain chain;
-    
+
     @Mock
     private ServletContext servletContext;
-    
+
     @Mock
     private SecurityProperties securityProperties;
-    
+
     @Spy
     FrameSecurityFilter frameSecurityFilter;
-    
+
     @Before
     public void setUp() throws Exception {
         initMocks(this);
@@ -63,27 +61,29 @@ public class FrameSecurityFilterTest {
         when(servletContext.getContextPath()).thenReturn("");
         when(filterConfig.getServletContext()).thenReturn(servletContext);
     }
-    
+
     @Test
     public void should_add_default_headers() throws Exception {
-        
+
         frameSecurityFilter.init(filterConfig);
-        
+
         frameSecurityFilter.proceedWithFiltering(httpRequest, httpResponse, chain);
-        
-        verify(httpResponse).setHeader(FrameSecurityFilter.X_FRAME_OPTIONS_HEADER, FrameSecurityFilter.X_FRAME_OPTIONS_HEADER_DEFAULT);
-        verify(httpResponse).setHeader(FrameSecurityFilter.CONTENT_SECURITY_POLICY_HEADER, FrameSecurityFilter.CONTENT_SECURITY_POLICY_HEADER_DEFAULT);
+
+        verify(httpResponse).setHeader(FrameSecurityFilter.X_FRAME_OPTIONS_HEADER,
+                FrameSecurityFilter.X_FRAME_OPTIONS_HEADER_DEFAULT);
+        verify(httpResponse).setHeader(FrameSecurityFilter.CONTENT_SECURITY_POLICY_HEADER,
+                FrameSecurityFilter.CONTENT_SECURITY_POLICY_HEADER_DEFAULT);
     }
-    
+
     @Test
     public void should_add_configured_headers() throws Exception {
-        
+
         doReturn("DENY").when(securityProperties).getXFrameOptionsHeader();
         doReturn("frame-ancestors 'none';").when(securityProperties).getContentSecurityPolicyHeader();
         frameSecurityFilter.init(filterConfig);
-        
+
         frameSecurityFilter.proceedWithFiltering(httpRequest, httpResponse, chain);
-        
+
         verify(httpResponse).setHeader(FrameSecurityFilter.X_FRAME_OPTIONS_HEADER, "DENY");
         verify(httpResponse).setHeader(FrameSecurityFilter.CONTENT_SECURITY_POLICY_HEADER, "frame-ancestors 'none';");
     }
