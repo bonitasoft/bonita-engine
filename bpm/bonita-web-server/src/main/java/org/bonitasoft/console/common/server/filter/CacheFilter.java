@@ -84,7 +84,7 @@ public class CacheFilter extends ExcludingPatternFilter {
         final Integer duration = Integer.valueOf(paramMap.get(DURATION));
         final boolean alwaysCaching = Boolean.parseBoolean(paramMap.get(ALWAYS_CACHING));
         final boolean noCustomPageCache = Boolean.parseBoolean(System.getProperty(NO_CUSTOMPAGE_CACHE));
-        if (!noCustomPageCache || alwaysCaching) {
+        if (!noCustomPageCache && alwaysCaching) {
             response.setHeader("Cache-Control", "max-age=" + duration.intValue());
         } else {
             response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
