@@ -319,7 +319,15 @@ public class ApplicationInstallerTest {
         verify(applicationInstaller).deployProcess(ArgumentMatchers
                 .argThat(b -> b.getProcessDefinition().getName().equals("myProcess")), any());
         verify(applicationInstaller, never()).enableResolvedProcesses(any(), any());
+    }
 
+    @Test
+    public void should_throw_exception_if_application_archive_is_empty() throws Exception {
+        try (ApplicationArchive applicationArchive = new ApplicationArchive()) {
+            assertThatExceptionOfType(ApplicationInstallationException.class)
+                    .isThrownBy(() -> applicationInstaller.install(applicationArchive))
+                    .withMessage("The Application Archive contains no valid artifact to install");
+        }
     }
 
     private ProcessDefinitionImpl aProcessDefinition(long id) {

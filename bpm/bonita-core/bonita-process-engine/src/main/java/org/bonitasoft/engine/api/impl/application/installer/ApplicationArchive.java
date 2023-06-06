@@ -70,6 +70,20 @@ public class ApplicationArchive implements AutoCloseable {
         return this;
     }
 
+    /**
+     * @return <code>true</code> if the application archive has no artifact
+     */
+    public boolean isEmpty() {
+        return organization == null &&
+                bdm == null &&
+                processes.isEmpty() &&
+                restAPIExtensions.isEmpty() &&
+                pages.isEmpty() &&
+                layouts.isEmpty() &&
+                themes.isEmpty() &&
+                applications.isEmpty();
+    }
+
     @Override
     public void close() throws Exception {
         cleanPhysicalArtifacts();

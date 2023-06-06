@@ -127,6 +127,9 @@ public class ApplicationInstaller {
     }
 
     public void install(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
+        if (applicationArchive.isEmpty()) {
+            throw new ApplicationInstallationException("The Application Archive contains no valid artifact to install");
+        }
         final ExecutionResult executionResult = new ExecutionResult();
         try {
             final long startPoint = System.currentTimeMillis();
