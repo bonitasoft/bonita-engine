@@ -39,7 +39,7 @@ class DockerDatabaseContainerTasksCreator {
              uriTemplate        : 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1?oracle.net.disableOob=true',
             ],
             [name       : 'postgres',
-             image      : 'bonitasoft/bonita-postgres:12.6',
+             image      : 'bonitasoft/bonita-postgres:15.3',
              portBinding: 5432,
              uriTemplate: 'jdbc:postgresql://%s:%s/%s',
             ],
