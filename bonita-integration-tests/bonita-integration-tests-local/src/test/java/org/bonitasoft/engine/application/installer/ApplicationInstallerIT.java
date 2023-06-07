@@ -14,11 +14,12 @@
 package org.bonitasoft.engine.application.installer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.InputStream;
 
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchiveReader;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationInstaller;
 import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
@@ -34,6 +35,7 @@ import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.junit.After;
@@ -58,8 +60,8 @@ public class ApplicationInstallerIT extends CommonAPIIT {
     @Test
     public void custom_application_should_be_deployed_entirely() throws Exception {
         // ensure application did not exist initially:
-        assertThatThrownBy(() -> getApplicationAPI().getApplicationByToken("appsManagerBonita"))
-                .isInstanceOf(ApplicationNotFoundException.class);
+        assertThatExceptionOfType(ApplicationNotFoundException.class)
+                .isThrownBy(() -> getApplicationAPI().getApplicationByToken("appsManagerBonita"));
 
         // given:
         final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
@@ -98,4 +100,23 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         assertThat(getPageAPI().getPageByName("custompage_pmLayout")).isNotNull();
     }
 
+    @Test
+    public void empty_custom_application_should_throw_an_exception() throws Exception {
+        // given:
+        final InputStream applicationAsStream = this.getClass().getResourceAsStream("/empty-customer-application.zip");
+        ApplicationInstaller applicationInstaller = TenantServiceSingleton.getInstance()
+                .lookup(ApplicationInstaller.class);
+        final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
+                new ArtifactTypeDetector(new BdmDetector(),
+                        new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
+                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(),
+                        new LayoutDetector()));
+
+        final ApplicationArchive applicationArchive = applicationArchiveReader.read(applicationAsStream);
+
+        // then:
+        assertThatExceptionOfType(ApplicationInstallationException.class)
+                .isThrownBy(() -> applicationInstaller.install(applicationArchive))
+                .withMessage("The Application Archive contains no valid artifact to install");
+    }
 }
