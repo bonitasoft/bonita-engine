@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -198,6 +199,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -210,6 +212,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.category.exception.SCategoryAlreadyExistsException;
+import org.bonitasoft.engine.core.category.exception.SCategoryException;
 import org.bonitasoft.engine.core.category.exception.SCategoryInProcessAlreadyExistsException;
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.model.SCategory;
@@ -353,14 +356,7 @@ import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderAndField;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
@@ -502,6 +498,10 @@ public class ProcessAPIImpl implements ProcessAPI {
             checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasOpenProcessInstances);
             final boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
             checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasArchivedProcessInstances);
+
+            removeAllCategoriesFromProcessDefinition(processDefinitionId);
+            deleteAllSupervisorsOfProcess(processDefinitionId);
+
             processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
         } catch (final Exception e) {
             throw new DeletionException(e);
@@ -2021,6 +2021,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
+    }
+
+    private void removeAllCategoriesFromProcessDefinition(final long processDefinitionId)
+            throws SCategoryException, DeletionException {
+        removeCategoriesFromProcessDefinition(processDefinitionId, 0, Integer.MAX_VALUE);
     }
 
     @Override
@@ -4351,6 +4356,23 @@ public class ProcessAPIImpl implements ProcessAPI {
                 throw new SSupervisorNotFoundException(userId, roleId, groupId, processDefinitionId);
             }
         } catch (final SBonitaException e) {
+            throw new DeletionException(e);
+        }
+    }
+
+    private void deleteAllSupervisorsOfProcess(final long processDefinitionId) throws DeletionException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, Integer.MAX_VALUE);
+        builder.filter(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
+        try {
+            SearchResult<ProcessSupervisor> processSupervisors = searchProcessSupervisors(builder.done());
+
+            List<Long> supervisorIds = processSupervisors.getResult().stream().map(ProcessSupervisor::getSupervisorId)
+                    .collect(Collectors.toList());
+
+            for (Long id : supervisorIds) {
+                deleteSupervisor(id);
+            }
+        } catch (SearchException e) {
             throw new DeletionException(e);
         }
     }
