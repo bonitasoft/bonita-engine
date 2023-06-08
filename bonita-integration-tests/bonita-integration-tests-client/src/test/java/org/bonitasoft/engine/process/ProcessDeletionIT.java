@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.process;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
+import org.bonitasoft.engine.bpm.category.Category;
+import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.document.Document;
@@ -38,6 +41,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.impl.DocumentDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.expression.Expression;
@@ -45,6 +49,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -664,6 +669,94 @@ public class ProcessDeletionIT extends TestWithUser {
         // check all archived comments were deleted along with process instance:
         searchResult = getProcessAPI().searchArchivedComments(new SearchOptionsBuilder(0, 10).done());
         assertEquals(0, searchResult.getCount());
+    }
+
+    @Test
+    public void deleteShouldNotKeepResources() throws Exception {
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+                        Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+
+        Category category = getProcessAPI().createCategory("processCategory", "category assigned to process");
+        getProcessAPI().addCategoriesToProcess(processDefinition.getId(), singletonList(category.getId()));
+
+        assertEquals(1, getProcessAPI()
+                .getCategoriesOfProcessDefinition(processDefinition.getId(), 0, 5, CategoryCriterion.NAME_ASC).size());
+
+        getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user.getId());
+        getProcessAPI().createProcessSupervisorForGroup(processDefinition.getId(),
+                createGroup("supervisingGroup").getId());
+        getProcessAPI().createProcessSupervisorForRole(processDefinition.getId(),
+                createRole("supervisingRole").getId());
+
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 5);
+        builder.filter(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
+        assertEquals(3, getProcessAPI().searchProcessSupervisors(builder.done()).getCount());
+
+        disableAndDeleteProcess(processDefinition);
+
+        assertEquals(0, getProcessAPI()
+                .getCategoriesOfProcessDefinition(processDefinition.getId(), 0, 5, CategoryCriterion.NAME_ASC).size());
+        assertEquals(0, getProcessAPI().searchProcessSupervisors(builder.done()).getCount());
+
+        assertNotNull(getProcessAPI().getCategory(category.getId()));
+    }
+
+    @Test
+    public void deleteShouldNotModifyAnotherProcess() throws Exception {
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
+                        Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1,
+                ACTOR_NAME,
+                user);
+
+        final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", "1.0",
+                        Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2,
+                ACTOR_NAME,
+                user);
+
+        Category category1 = getProcessAPI().createCategory("processCategory1", "category assigned to both processes");
+        getProcessAPI().addCategoriesToProcess(processDefinition1.getId(), singletonList(category1.getId()));
+        getProcessAPI().addCategoriesToProcess(processDefinition2.getId(), singletonList(category1.getId()));
+        Category category2 = getProcessAPI().createCategory("processCategory2",
+                "category assigned only to second process");
+        getProcessAPI().addCategoriesToProcess(processDefinition2.getId(), singletonList(category2.getId()));
+
+        assertEquals(1, getProcessAPI()
+                .getCategoriesOfProcessDefinition(processDefinition1.getId(), 0, 5, CategoryCriterion.NAME_ASC).size());
+        assertEquals(2, getProcessAPI()
+                .getCategoriesOfProcessDefinition(processDefinition2.getId(), 0, 5, CategoryCriterion.NAME_ASC).size());
+
+        getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), user.getId());
+        getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), user.getId());
+
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 5);
+        builder.filter(ProcessSupervisorSearchDescriptor.USER_ID, user.getId());
+        assertEquals(2, getProcessAPI().searchProcessSupervisors(builder.done()).getCount());
+
+        disableAndDeleteProcess(processDefinition1);
+
+        SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 5);
+        builder2.filter(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition1.getId());
+
+        assertEquals(0, getProcessAPI()
+                .getCategoriesOfProcessDefinition(processDefinition1.getId(), 0, 5, CategoryCriterion.NAME_ASC).size());
+        assertEquals(0, getProcessAPI().searchProcessSupervisors(builder2.done()).getCount());
+
+        SearchOptionsBuilder builder3 = new SearchOptionsBuilder(0, 5);
+        builder3.filter(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition2.getId());
+
+        assertEquals(2, getProcessAPI().getCategoriesOfProcessDefinition(processDefinition2.getId(), 0, 5,
+                CategoryCriterion.NAME_ASC).size());
+        assertEquals(1, getProcessAPI().searchProcessSupervisors(builder3.done()).getCount());
+
+        assertNotNull(getProcessAPI().getCategory(category1.getId()));
+        assertNotNull(getProcessAPI().getCategory(category2.getId()));
     }
 
 }
