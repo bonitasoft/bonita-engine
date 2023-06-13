@@ -44,7 +44,7 @@ class DockerDatabaseContainerTasksCreator {
              uriTemplate: 'jdbc:postgresql://%s:%s/%s',
             ],
             [name       : 'mysql',
-             image      : 'bonitasoft/bonita-mysql:8.0.22',
+             image      : 'bonitasoft/bonita-mysql:8.0.33',
              portBinding: 3306,
              uriTemplate: 'jdbc:mysql://%s:%s/%s?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
             ],
