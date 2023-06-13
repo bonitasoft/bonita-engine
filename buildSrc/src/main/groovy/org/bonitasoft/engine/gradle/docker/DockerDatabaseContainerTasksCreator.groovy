@@ -49,7 +49,7 @@ class DockerDatabaseContainerTasksCreator {
              uriTemplate: 'jdbc:mysql://%s:%s/%s?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
             ],
             [name       : 'sqlserver',
-             image      : 'bonitasoft/bonita-sqlserver:2019-CU14',
+             image      : 'bonitasoft/bonita-sqlserver:2022-CU4',
              portBinding: 1433,
              uriTemplate: 'jdbc:sqlserver://%s:%s;database=%s',
             ]
