@@ -2,6 +2,7 @@ package org.bonitasoft.engine.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 
 class TestsPlugin implements Plugin<Project> {
@@ -11,35 +12,34 @@ class TestsPlugin implements Plugin<Project> {
 
         def tests = project.extensions.create("tests", TestsExtension)
 
-        Test integrationTest = project.tasks.create("integrationTest", Test) {
+        TaskProvider<Test> integrationTest = project.tasks.register("integrationTest", Test) {
             group = "Verification"
             description = "Runs all integration tests (except tests from slow suite) on H2 database."
-        } as Test
+        }
 
         project.afterEvaluate {
-
             JVMModifier.setTestJVM(project, integrationTest)
             JVMModifier.setJvmArgs(project, integrationTest)
             if (tests.integrationTestsSuite) {
-                integrationTest.include(tests.integrationTestsSuite)
+                integrationTest.configure { include(tests.integrationTestsSuite) }
             } else {
-                integrationTest.include(tests.integrationTestsPattern)
+                integrationTest.configure { include(tests.integrationTestsPattern) }
             }
-            integrationTest.systemProperty("bonita.version", project.version)
+            integrationTest.configure { systemProperty("bonita.version", project.version) }
 
             if (tests.slowTestsSuite) {
-                Test slowTest = project.tasks.create("slowTest", Test)
-                slowTest.include(tests.slowTestsSuite)
+                TaskProvider<Test> slowTest = project.tasks.register("slowTest", Test)
+                slowTest.configure { include(tests.slowTestsSuite) }
                 JVMModifier.setTestJVM(project, slowTest)
                 JVMModifier.setJvmArgs(project, slowTest)
-                slowTest.systemProperty("bonita.version", project.version)
+                slowTest.configure { systemProperty("bonita.version", project.version) }
             }
 
-            Test testTask = project.tasks.getByName("test") as Test
+            TaskProvider<Test> testTask = project.tasks.named("test")
             if (testTask) {
                 JVMModifier.setTestJVM(project, testTask)
                 JVMModifier.setJvmArgs(project, testTask)
-                testTask.include(tests.testPattern)
+                testTask.configure { include(tests.testPattern) }
             }
         }
     }

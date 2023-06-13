@@ -2,6 +2,7 @@ package org.bonitasoft.engine.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 
 /**
@@ -14,21 +15,21 @@ class HttpTestPlugin implements Plugin<Project> {
 
         def httpTests = project.extensions.create("httpTests", TestsExtension)
 
-        Test httpIntegrationTests = project.tasks.create("httpIT", Test) {
+        TaskProvider<Test> httpIntegrationTests = project.tasks.register("httpIT", Test) {
             group = "Verification"
             description = "Runs all integration tests to remote HTTP server."
-        } as Test
+        }
 
         project.afterEvaluate {
             if (httpTests.integrationTestsSuite) {
-                httpIntegrationTests.include(httpTests.integrationTestsSuite)
+                httpIntegrationTests.configure { include(httpTests.integrationTestsSuite) }
             } else {
                 // to be able to run only one class with right-click in IDE
                 // Still not possible for now, as *IT classes are not yet in src/test/java folder
-                httpIntegrationTests.include("**/*IT.class")
+                httpIntegrationTests.configure { include("**/*IT.class") }
             }
             // So that TestEngine start in HTTP instead of local:
-            httpIntegrationTests.jvmArgs("-Dorg.bonitasoft.engine.access.mode=http")
+            httpIntegrationTests.configure { jvmArgs("-Dorg.bonitasoft.engine.access.mode=http") }
 
             // Add HTTP server dependencies only for this task:
             project.configurations {
@@ -38,7 +39,7 @@ class HttpTestPlugin implements Plugin<Project> {
                 httpTestConfig "org.eclipse.jetty:jetty-server:${Deps.jettyVersion}"
                 httpTestConfig "org.eclipse.jetty:jetty-servlet:${Deps.jettyVersion}"
             }
-            httpIntegrationTests.classpath += project.configurations.httpTestConfig
+            httpIntegrationTests.configure { classpath += project.configurations.httpTestConfig }
 
 
             JVMModifier.setTestJVM(project, httpIntegrationTests)

@@ -1,11 +1,14 @@
+apply plugin: 'org.barfuin.gradle.taskinfo'
+
 allprojects {
     apply plugin: 'maven-publish'
+
     group = 'org.bonitasoft.engine'
 
-	tasks.withType(Copy).all {
-		duplicatesStrategy 'include'
-	 }
-	
+    tasks.withType(Copy).configureEach {
+        setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+    }
+
     publishing {
         repositories {
             if (project.hasProperty("altDeploymentRepository")) {
@@ -55,7 +58,7 @@ subprojects {
             languageVersion = JavaLanguageVersion.of(11)
         }
     }
-    configurations.all {
+    configurations.configureEach {
     }
     afterEvaluate {
         tasks.withType(AbstractCompile).configureEach { options.encoding = 'UTF-8' }
