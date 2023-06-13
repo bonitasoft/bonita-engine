@@ -190,10 +190,8 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private SessionAccessor beforeInvokeMethod(final Session session, final Object api)
-            throws BonitaHomeNotSetException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException,
-            IOException,
-            SBonitaException {
+            throws BonitaHomeNotSetException, BonitaHomeConfigurationException, IOException, SBonitaException,
+            ReflectiveOperationException {
         SessionAccessor sessionAccessor = null;
 
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
@@ -460,9 +458,8 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType)
-            throws BonitaHomeNotSetException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException, IOException,
-            BonitaHomeConfigurationException {
+            throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
+            ReflectiveOperationException {
         UserTransactionService transactionService;
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
         final ServiceAccessor serviceAccessor = serviceAccessorFactory.createServiceAccessor();
