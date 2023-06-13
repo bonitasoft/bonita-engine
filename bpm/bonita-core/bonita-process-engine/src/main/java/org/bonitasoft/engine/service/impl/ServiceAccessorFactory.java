@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.service.impl;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
@@ -49,7 +48,7 @@ public class ServiceAccessorFactory {
     }
 
     public synchronized ServiceAccessor createServiceAccessor() throws BonitaHomeConfigurationException, IOException,
-            ClassNotFoundException, IllegalAccessException, InstantiationException {
+            ReflectiveOperationException {
         return getServiceAccessors().getServiceAccessor();
     }
 
@@ -58,15 +57,16 @@ public class ServiceAccessorFactory {
      */
     @Deprecated(forRemoval = true, since = "9.0.0")
     public synchronized PlatformServiceAccessor createPlatformServiceAccessor()
-            throws BonitaHomeNotSetException, InstantiationException,
-            IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
+            ReflectiveOperationException {
         return getServiceAccessors().getPlatformServiceAccessor();
     }
 
     private synchronized ServiceAccessors getServiceAccessors() throws BonitaHomeConfigurationException, IOException,
-            ClassNotFoundException, IllegalAccessException, InstantiationException {
+            ReflectiveOperationException {
         if (serviceAccessors == null) {
-            serviceAccessors = (ServiceAccessors) loadClassFromPropertyName(SERVICE_ACCESSORS).newInstance();
+            serviceAccessors = (ServiceAccessors) loadClassFromPropertyName(SERVICE_ACCESSORS).getDeclaredConstructor()
+                    .newInstance();
         }
         return serviceAccessors;
     }
@@ -77,24 +77,21 @@ public class ServiceAccessorFactory {
     @Deprecated(forRemoval = true, since = "9.0.0")
     public TenantServiceAccessor createTenantServiceAccessor()
             throws SBonitaException, BonitaHomeNotSetException, IOException,
-            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            InvocationTargetException,
-            ClassNotFoundException {
+            BonitaHomeConfigurationException, ReflectiveOperationException {
         return getServiceAccessors().getTenantServiceAccessor();
     }
 
     public SessionAccessor createSessionAccessor()
-            throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
+            ReflectiveOperationException {
         return createServiceAccessor().getSessionAccessor();
     }
 
     public synchronized APIAccessResolver createAPIAccessResolver()
-            throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException {
+            throws IOException, BonitaHomeConfigurationException, ReflectiveOperationException {
         if (apiAccessResolver == null) {
             apiAccessResolver = (APIAccessResolver) loadClassFromPropertyName(API_ACCESS_RESOLVER_CLASS_NAME)
-                    .newInstance();
+                    .getDeclaredConstructor().newInstance();
         }
         return apiAccessResolver;
     }

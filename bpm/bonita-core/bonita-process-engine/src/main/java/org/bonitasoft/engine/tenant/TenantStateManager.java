@@ -104,8 +104,8 @@ public class TenantStateManager {
     }
 
     protected ServiceAccessor getServiceAccessor()
-            throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
+            ReflectiveOperationException {
         return ServiceAccessorFactory.getInstance().createServiceAccessor();
     }
 

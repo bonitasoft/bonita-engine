@@ -92,8 +92,8 @@ public class EngineInitializer {
         LOGGER.info("                                                                                   |___/ ");
     }
 
-    SessionAccessor getSessionAccessor() throws BonitaHomeNotSetException, InstantiationException,
-            IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+    SessionAccessor getSessionAccessor() throws BonitaHomeNotSetException, IOException,
+            BonitaHomeConfigurationException, ReflectiveOperationException {
         return getServiceAccessorFactory().createSessionAccessor();
     }
 

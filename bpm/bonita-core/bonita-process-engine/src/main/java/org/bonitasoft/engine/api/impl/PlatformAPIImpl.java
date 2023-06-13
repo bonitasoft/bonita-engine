@@ -68,8 +68,8 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected ServiceAccessor getServiceAccessor()
-            throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
+            ReflectiveOperationException {
         return ServiceAccessorFactory.getInstance().createServiceAccessor();
     }
 
@@ -203,8 +203,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             HashMap<Long, Map<String, byte[]>> conf = new HashMap<>();
             conf.put(tenant.getId(), getBonitaHomeServer().getTenantPortalConfigurations(tenant.getId()));
             return conf;
-        } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException
-                | InstantiationException | STenantNotFoundException e) {
+        } catch (ReflectiveOperationException | BonitaException | IOException | STenantNotFoundException e) {
             throw new RetrieveException(e);
         }
     }

@@ -250,8 +250,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
-    private SessionAccessor getSessionAccessor() throws IllegalAccessException, InstantiationException, IOException,
-            ClassNotFoundException, BonitaHomeConfigurationException, BonitaHomeNotSetException {
+    private SessionAccessor getSessionAccessor() throws IOException, BonitaHomeConfigurationException,
+            BonitaHomeNotSetException, ReflectiveOperationException {
         return ServiceAccessorFactory.getInstance().createSessionAccessor();
     }
 
