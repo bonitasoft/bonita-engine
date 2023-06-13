@@ -21,6 +21,8 @@ import com.bmuschko.gradle.docker.tasks.container.extras.DockerWaitHealthyContai
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.UnknownTaskException
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.testing.Test
 
@@ -79,10 +81,10 @@ class DockerDatabaseContainerTasksCreator {
 
             DbParser.DbConnectionSettings dbConnectionSettings = new DbParser.DbConnectionSettings()
             DbParser.DbConnectionSettings bdmDbConnectionSettings = new DbParser.DbConnectionSettings()
-            Task inspectContainer
-            Task removeContainer
+            TaskProvider<DockerInspectContainer> inspectContainer
+            TaskProvider<DockerRemoveContainer> removeContainer
 
-            def pullImage = createTaskInRootProject(project, "pull${uniqueName}Image", DockerPullImage) {
+            TaskProvider<DockerPullImage> pullImage = registerTaskInRootProject(project, "pull${uniqueName}Image", DockerPullImage) {
                 description "Pull docker image for $uniqueName db vendor"
                 group null // do not show task when running `gradle tasks`
 
@@ -97,7 +99,7 @@ class DockerDatabaseContainerTasksCreator {
                 }
             }
 
-            def createContainer = createTaskInRootProject(project, "create${uniqueName}Container", DockerCreateContainer) {
+            TaskProvider<DockerCreateContainer> createContainer = registerTaskInRootProject(project, "create${uniqueName}Container", DockerCreateContainer) {
                 description "Create a docker container for $uniqueName db vendor"
                 group null // do not show task when running `gradle tasks`
 
@@ -105,7 +107,7 @@ class DockerDatabaseContainerTasksCreator {
                     containerName = project.getProperty("docker-container-alias")
                 }
                 hostConfig.portBindings = [":$vendor.portBinding"]
-                targetImageId pullImage.getImage()
+                targetImageId pullImage.get().getImage()
                 if ('oracle' == vendor.name) {
                     // 1Go
                     hostConfig.shmSize = 1099511627776
@@ -113,26 +115,26 @@ class DockerDatabaseContainerTasksCreator {
                 hostConfig.autoRemove = true
             }
 
-            def startContainer = createTaskInRootProject(project, "start${uniqueName}Container", DockerStartContainer) {
+            TaskProvider<DockerStartContainer> startContainer = registerTaskInRootProject(project, "start${uniqueName}Container", DockerStartContainer) {
                 description "Start a docker container for $uniqueName db vendor"
                 group "docker"
 
-                targetContainerId createContainer.getContainerId()
+                targetContainerId createContainer.get().getContainerId()
             }
 
-            def waitForContainerStartup = createTaskInRootProject(project, "waitFor${uniqueName}ContainerStartup", DockerWaitHealthyContainer) {
+            def waitForContainerStartup = registerTaskInRootProject(project, "waitFor${uniqueName}ContainerStartup", DockerWaitHealthyContainer) {
                 description "Wait for a started docker container for $vendor.name db vendor to be healthy"
                 group null // do not show task when running `gradle tasks`
 
-                targetContainerId startContainer.getContainerId()
+                targetContainerId startContainer.get().getContainerId()
                 awaitStatusTimeout = 360
             }
 
-            inspectContainer = project.tasks.create("inspect${uniqueName}ContainerUrl", DockerInspectContainer) {
-                description "Get url of a docker container for $uniqueName db vendor"
-                group null // do not show task when running `gradle tasks`
+            inspectContainer = project.tasks.register("inspect${uniqueName}ContainerUrl", DockerInspectContainer) {
+                description = "Get url of a docker container for $uniqueName db vendor"
+                group = null // do not show task when running `gradle tasks`
 
-                targetContainerId startContainer.getContainerId()
+                targetContainerId(startContainer.get().getContainerId())
 
                 onNext {
                     it.networkSettings.ports.getBindings().each { exposedPort, bindingArr ->
@@ -151,18 +153,18 @@ class DockerDatabaseContainerTasksCreator {
                 }
             }
 
-            removeContainer = createTaskInRootProject(project, "remove${uniqueName}Container", DockerRemoveContainer) {
+            removeContainer = registerTaskInRootProject(project, "remove${uniqueName}Container", DockerRemoveContainer) {
                 description "Remove a docker container for $uniqueName db vendor"
                 group "docker"
 
                 force = true
                 removeVolumes = true
-                targetContainerId createContainer.getContainerId()
+                targetContainerId createContainer.get().getContainerId()
             }
 
-            Task databaseTestTask = project.tasks.create("${vendor.name}DatabaseTest", Test) {
-                group "Verification"
-                description "Runs slow integration test suite on $vendor.name database."
+            TaskProvider databaseTestTask = project.tasks.register("${vendor.name}DatabaseTest", Test) {
+                group = "Verification"
+                description = "Runs slow integration test suite on $vendor.name database."
                 systemProperty "bonita.version", project.version
                 classpath += project.files(project.configurations.drivers)
 
@@ -195,29 +197,48 @@ class DockerDatabaseContainerTasksCreator {
                 }
             }
 
-            Task zipReport = project.tasks.create("zip${vendor.name}DatabaseTestReport" as String, Zip) {
-                archiveFileName = databaseTestTask.reports.html.outputLocation.get().getAsFile().name + ".zip"
-                destinationDirectory = databaseTestTask.reports.html.outputLocation.get().getAsFile().parentFile
-                from databaseTestTask.reports.html.outputLocation.get().getAsFile()
+            TaskProvider zipReport = project.tasks.register("zip${vendor.name}DatabaseTestReport" as String, Zip) {
+                archiveFileName = databaseTestTask.get().reports.html.outputLocation.get().getAsFile().name + ".zip"
+                destinationDirectory = databaseTestTask.get().reports.html.outputLocation.get().getAsFile().parentFile
+                from databaseTestTask.get().reports.html.outputLocation.get().getAsFile()
             }
             project.afterEvaluate {
-                databaseTestTask.includes = extension.includes
+                databaseTestTask.configure { includes = extension.includes }
             }
 
 
-            createContainer.dependsOn pullImage
-            startContainer.dependsOn createContainer
-            waitForContainerStartup.dependsOn startContainer
-            inspectContainer.dependsOn waitForContainerStartup
-            databaseTestTask.dependsOn inspectContainer
-
-            startContainer.finalizedBy removeContainer
-            databaseTestTask.finalizedBy zipReport
-            removeContainer.mustRunAfter databaseTestTask
+            if (createContainer) {
+                createContainer.configure { dependsOn(pullImage) }
+            }
+            if (startContainer) {
+                startContainer.configure {
+                    dependsOn(createContainer)
+                    finalizedBy(removeContainer)
+                }
+            }
+            if (waitForContainerStartup) {
+                waitForContainerStartup.configure { dependsOn(startContainer) }
+            }
+            if (inspectContainer) {
+                inspectContainer.configure { dependsOn(waitForContainerStartup) }
+            }
+            if (databaseTestTask) {
+                databaseTestTask.configure {
+                    dependsOn(inspectContainer)
+                    finalizedBy(zipReport)
+                }
+            }
+            if (removeContainer) {
+                removeContainer.configure { mustRunAfter(databaseTestTask) }
+            }
         }
     }
 
-    static Task createTaskInRootProject(Project project, String taskName, Class<? extends Task> taskType, Closure configuration) {
-        project.rootProject.tasks.findByPath(taskName) ?: project.rootProject.tasks.create(taskName, taskType, configuration)
+    static TaskProvider registerTaskInRootProject(Project project, String taskName, Class<? extends Task> taskType, Closure configuration) {
+        try {
+            project.rootProject.tasks.named(taskName)
+        } catch (UnknownTaskException ignored) {
+            project.rootProject.tasks.register(taskName, taskType, configuration)
+        }
     }
 }
