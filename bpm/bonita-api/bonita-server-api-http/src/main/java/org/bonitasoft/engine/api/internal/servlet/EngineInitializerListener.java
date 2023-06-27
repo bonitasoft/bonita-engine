@@ -17,28 +17,51 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.bonitasoft.engine.EngineInitializer;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.GenericWebApplicationContext;
 
 public class EngineInitializerListener implements ServletContextListener {
 
     private static final Logger log = LoggerFactory.getLogger(EngineInitializerListener.class);
 
     @Override
-    public void contextInitialized(final ServletContextEvent arg0) {
+    public void contextInitialized(final ServletContextEvent event) {
         try {
+
             PlatformSetupAccessor.getPlatformSetup().init(); // init tables and default configuration
-            new EngineInitializer().initializeEngine();
+            getEngineInitializer().initializeEngine();
+            ApplicationContext engineContext = ServiceAccessorFactory.getInstance()
+                    .createServiceAccessor()
+                    .getContext();
+
+            GenericWebApplicationContext webApplicationContext = new GenericWebApplicationContext(
+                    new DefaultListableBeanFactory(engineContext), event.getServletContext());
+
+            webApplicationContext.refresh();
+
+            //A web application context needs to be referenced in the Servlet context so that servlet and filters beans handled by Spring can use it
+            event.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE,
+                    webApplicationContext);
         } catch (final Throwable e) {
             throw new RuntimeException("Error while initializing the Engine", e);
         }
+
+    }
+
+    protected EngineInitializer getEngineInitializer() {
+        return new EngineInitializer();
     }
 
     @Override
     public void contextDestroyed(final ServletContextEvent arg0) {
         try {
-            new EngineInitializer().unloadEngine();
+            getEngineInitializer().unloadEngine();
         } catch (final Throwable e) {
             log.error("Error while unloading the Engine", e);
         }
