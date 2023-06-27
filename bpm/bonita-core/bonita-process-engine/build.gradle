@@ -56,6 +56,8 @@ dependencies {
     api project(':platform:platform-resources')
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
     api "org.springframework:spring-context:${Deps.springVersion}"
+    api "org.springframework.session:spring-session-core:${Deps.springSessionVersion}"
+    api "org.springframework:spring-web:${Deps.springVersion}"
     api "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
     api "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
     api "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
@@ -71,6 +73,7 @@ dependencies {
     api "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
     api "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
     api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
 

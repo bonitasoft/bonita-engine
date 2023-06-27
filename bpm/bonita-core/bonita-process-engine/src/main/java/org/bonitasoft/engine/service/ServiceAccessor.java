@@ -101,6 +101,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkExecutorService;
 import org.bonitasoft.engine.work.WorkService;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Matthieu Chaffotte
@@ -300,4 +301,6 @@ public interface ServiceAccessor {
     ServicesResolver getServicesResolver();
 
     void publishEvent(Object event);
+
+    ApplicationContext getContext();
 }

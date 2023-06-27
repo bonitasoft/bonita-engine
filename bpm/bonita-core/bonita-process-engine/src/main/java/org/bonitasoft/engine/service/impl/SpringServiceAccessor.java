@@ -109,6 +109,7 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkExecutorService;
 import org.bonitasoft.engine.work.WorkService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
 
 public class SpringServiceAccessor
         implements ServiceAccessor, TenantServiceAccessor, PlatformServiceAccessor, PlatformInitServiceAccessor {
@@ -621,4 +622,10 @@ public class SpringServiceAccessor
     public void publishEvent(final Object event) {
         beanAccessor.getContext().publishEvent(event);
     }
+
+    @Override
+    public ApplicationContext getContext() {
+        return beanAccessor.getContext();
+    }
+
 }
