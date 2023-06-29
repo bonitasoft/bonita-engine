@@ -42,7 +42,6 @@ import org.bonitasoft.engine.bpm.process.impl.DocumentDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -75,7 +74,7 @@ public class ProcessDeletionIT extends TestWithUser {
         super.after();
     }
 
-    private ProcessDefinition deployProcessWithSeveralOutGoingTransitions() throws BonitaException {
+    private ProcessDefinition deployProcessWithSeveralOutGoingTransitions() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("process To Delete", "2.5");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -267,7 +266,7 @@ public class ProcessDeletionIT extends TestWithUser {
     }
 
     private ProcessDefinition deployAndEnableSimpleProcess(final String processName, final String userTaskName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
                 "1.0");
         processDefBuilder.addActor(ACTOR_NAME);
@@ -281,7 +280,7 @@ public class ProcessDeletionIT extends TestWithUser {
 
     private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName,
             final String targetProcessName, final String userTaskName,
-            final String callActivityName) throws BonitaException {
+            final String callActivityName) throws Exception {
         final Expression targetProcessNameExpr = new ExpressionBuilder()
                 .createConstantStringExpression(targetProcessName);
 
@@ -437,7 +436,7 @@ public class ProcessDeletionIT extends TestWithUser {
 
     private ProcessDefinition deployAndEnableProcessWithSignalEventSubProcess(final String parentTaskName,
             final String childTaskName, final String signalName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
@@ -582,7 +581,7 @@ public class ProcessDeletionIT extends TestWithUser {
 
     private ProcessDefinition deployAndEnableProcessWithDocument(final String processName, final String userTaskName,
             final String docName, final String url)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
                 "1.0");
         processDefBuilder.addActor(ACTOR_NAME);

@@ -64,7 +64,6 @@ import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.VariableStorage;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -1128,7 +1127,7 @@ public class MultiInstanceIT extends TestWithUser {
 
     private ProcessDefinition deployProcessWithTestFilter(final String actorName,
             final ProcessDefinitionBuilder designProcessDefinition)
-            throws BonitaException, IOException {
+            throws Exception {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(
                         designProcessDefinition.done());

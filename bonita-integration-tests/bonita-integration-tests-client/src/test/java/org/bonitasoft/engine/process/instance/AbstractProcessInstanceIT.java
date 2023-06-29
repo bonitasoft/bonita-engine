@@ -17,7 +17,6 @@ import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 
@@ -25,7 +24,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
 
     protected ProcessDefinition deployProcessWith2UserTasksAnd1AutoTask(final String taskName1, final String taskName2,
             final String autoTaskName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process", "1.0");
         processDefinitionBuilder.addStartEvent("start");
@@ -45,7 +44,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
     }
 
     protected ProcessDefinition deployProcessWith2AutomaticTasks(final String taskName1, final String taskName2)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process", "1.0");
         processDefinitionBuilder.addStartEvent("start");
@@ -63,7 +62,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
 
     protected ProcessDefinition deployProcessWithCallActivity(final String taskName1, final String callActivityName,
             final String targetProcess,
-            final String targetVersion, final String taskName2) throws BonitaException {
+            final String targetVersion, final String taskName2) throws Exception {
         final Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(targetProcess);
         final Expression targetVersionExpr = new ExpressionBuilder().createConstantStringExpression(targetVersion);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
@@ -83,7 +82,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
 
     protected ProcessDefinition deployProcessWithIntermediateThrowMessageEvent(final String eventName,
             final String messageName,
-            final String targetProcessName, final String targetFlowNodeName) throws BonitaException {
+            final String targetProcessName, final String targetFlowNodeName) throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process", "1.0");
         processDefinitionBuilder.addStartEvent("start");
@@ -106,7 +105,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
     }
 
     protected ProcessDefinition deployProcessWithIntermediateThrowSignalEvent(final String eventName,
-            final String signalName) throws BonitaException {
+            final String signalName) throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process", "1.0");
         processDefinitionBuilder.addStartEvent("start");
@@ -124,7 +123,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
 
     protected ProcessDefinition deployProcessWithIntermediateCatchMessageEvent(final String eventName,
             final String messageName, final String previousStep,
-            final String nextStep) throws BonitaException {
+            final String nextStep) throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process", "1.0");
         processDefinitionBuilder.addStartEvent("start");
@@ -142,7 +141,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
 
     protected ProcessDefinition deployProcessWithIntermediateCatchSignalEvent(final String eventName,
             final String signalName, final String previousStep,
-            final String nextStep) throws BonitaException {
+            final String nextStep) throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process", "1.0");
         processDefinitionBuilder.addStartEvent("start");
@@ -158,7 +157,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
         return deployAndEnableProcess(processDefinitionBuilder.done());
     }
 
-    protected ProcessDefinition deployProcessWithParallelGateways() throws BonitaException {
+    protected ProcessDefinition deployProcessWithParallelGateways() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", "1.0");
         processDefinitionBuilder.addAutomaticTask("step1");
@@ -177,7 +176,7 @@ public abstract class AbstractProcessInstanceIT extends TestWithUser {
         return deployAndEnableProcess(processDefinitionBuilder.done());
     }
 
-    protected ProcessDefinition deployProcessWithExclusiveSplitGateway() throws BonitaException {
+    protected ProcessDefinition deployProcessWithExclusiveSplitGateway() throws Exception {
         final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", "1.0");

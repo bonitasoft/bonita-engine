@@ -53,7 +53,6 @@ import org.bonitasoft.engine.bpm.process.impl.IntermediateCatchEventDefinitionBu
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.expression.Expression;
@@ -107,7 +106,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     private ProcessDefinition getSimpleProcess(final String ACTOR_NAME, final String processName,
             final String processVersion, final boolean terminateEnd)
-            throws BonitaException {
+            throws Exception {
         final Expression clientNumberExpr = new ExpressionBuilder().createConstantIntegerExpression(10);
         final Expression protocolNumberExpr = new ExpressionBuilder().createConstantIntegerExpression(305020);
 
@@ -137,7 +136,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
     private ProcessDefinition buildProcessWithCallActivity(final boolean addInputOperations,
             final boolean addOutputOperations,
             final String processName, final String targetProcessName, final int loopNb, final String strTargetVersion)
-            throws BonitaException {
+            throws Exception {
 
         final Expression targetProcessNameExpr = new ExpressionBuilder()
                 .createConstantStringExpression(targetProcessName);
@@ -176,13 +175,13 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     private ProcessDefinition buildProcessWithCallActivity(final String processName, final String targetProcessName,
             final String strTargetVersion)
-            throws BonitaException {
+            throws Exception {
         return buildProcessWithCallActivity(false, false, processName, targetProcessName, 0, strTargetVersion);
     }
 
     private ProcessDefinition buildProcessWithCallActivity(final String processName, final String targetProcessName,
             int loopNb, final String strTargetVersion)
-            throws BonitaException {
+            throws Exception {
         return buildProcessWithCallActivity(false, false, processName, targetProcessName, loopNb, strTargetVersion);
     }
 

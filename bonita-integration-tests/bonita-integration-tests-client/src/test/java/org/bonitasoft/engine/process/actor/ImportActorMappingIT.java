@@ -40,7 +40,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -208,7 +207,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void importActorMappingComputesProcessResolution() throws BonitaException {
+    public void importActorMappingComputesProcessResolution() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("resolve", "1.0").addActor("Leader", true).addUserTask("step1", "Leader");
         final DesignProcessDefinition processDesignDefinition = builder.done();

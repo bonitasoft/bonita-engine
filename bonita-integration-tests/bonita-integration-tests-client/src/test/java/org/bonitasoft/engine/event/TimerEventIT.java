@@ -31,7 +31,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -164,7 +163,7 @@ public class TimerEventIT extends TestWithUser {
 
     private ProcessDefinition deployProcessWithTimerIntermediateCatchEventAndUserTask(final TimerType timerType,
             final Expression timerValue,
-            final String step1Name, final String step2Name) throws BonitaException {
+            final String step1Name, final String step2Name) throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My Process with start event", "1.0")
                 .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent("startEvent")
@@ -183,7 +182,7 @@ public class TimerEventIT extends TestWithUser {
 
     private ProcessDefinition deployProcessWithTimerStartEventAndUserTask(final TimerType timerType,
             final Expression timerValue, final String stepName)
-            throws BonitaException {
+            throws Exception {
         final String delivery = "Delivery men";
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My Process with start event", "1.0")

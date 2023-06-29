@@ -60,7 +60,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void getNoParametersWhenAddingNoParameters() throws BonitaException {
+    public void getNoParametersWhenAddingNoParameters() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addUserTask("userTask1", null);
@@ -76,7 +76,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void getNumberOfParameters() throws BonitaException {
+    public void getNumberOfParameters() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("key1", String.class.getCanonicalName())
@@ -100,7 +100,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void getNoParameters() throws BonitaException {
+    public void getNoParameters() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addUserTask("userTask1", null);
@@ -117,7 +117,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void getParameters() throws BonitaException {
+    public void getParameters() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("key1", String.class.getCanonicalName())
@@ -147,7 +147,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void getParameter() throws BonitaException {
+    public void getParameter() throws Exception {
         final String parameterValue = "a very important piece of information";
         final String parameterName = "myParam1";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter",
@@ -211,7 +211,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void deployWithNullParamAndFormMappings() throws BonitaException {
+    public void deployWithNullParamAndFormMappings() throws Exception {
         final String parameterName = "myParam1";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter",
                 "1.0");
@@ -242,7 +242,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test(expected = NotFoundException.class)
-    public void getUnknownParameter() throws BonitaException {
+    public void getUnknownParameter() throws Exception {
         final String parameterValue = "a very important piece of information";
         final String parameterName = "myParam1";
         final String wrongParameterName = "wrongParameterName";
@@ -269,7 +269,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void sortParametersByNameAsc() throws BonitaException {
+    public void sortParametersByNameAsc() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName())
@@ -300,7 +300,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void sortParametersByNameDesc() throws BonitaException {
+    public void sortParametersByNameDesc() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName())
@@ -331,7 +331,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void getPageOne() throws BonitaException {
+    public void getPageOne() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName())
@@ -360,7 +360,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void getPageTwo() throws BonitaException {
+    public void getPageTwo() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName())
@@ -389,7 +389,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void getPageTwoOutOfBound() throws BonitaException {
+    public void getPageTwoOutOfBound() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName())
@@ -415,7 +415,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void emptyParameterIsAValidValue() throws BonitaException {
+    public void emptyParameterIsAValidValue() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("emptyParameterIsAValidValue", "1.7");
         processBuilder.addParameter("Astronaut", String.class.getCanonicalName()).addUserTask("userTask1", null);
@@ -435,7 +435,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void resolvedDependencies() throws BonitaException {
+    public void resolvedDependencies() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName())
@@ -462,7 +462,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void showResolvedAndUnresolvedParameters() throws BonitaException {
+    public void showResolvedAndUnresolvedParameters() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addDescription("description")

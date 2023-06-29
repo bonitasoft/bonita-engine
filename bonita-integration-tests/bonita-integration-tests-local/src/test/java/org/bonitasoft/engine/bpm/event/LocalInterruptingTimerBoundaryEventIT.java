@@ -27,7 +27,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.event.AbstractEventIT;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -302,7 +301,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
     }
 
     private ProcessDefinition deployAndEnableSimpleProcessWithBoundaryEvent(final String processName,
-            final String userTaskName) throws BonitaException {
+            final String userTaskName) throws Exception {
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
                 "1.0");
         processDefBuilder.addActor(ACTOR_NAME);
@@ -320,7 +319,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
     private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName,
             final String targetProcessName, final String userTaskName,
-            final String callActivityName) throws BonitaException {
+            final String callActivityName) throws Exception {
         final Expression targetProcessNameExpr = new ExpressionBuilder()
                 .createConstantStringExpression(targetProcessName);
 

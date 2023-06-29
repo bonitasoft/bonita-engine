@@ -19,7 +19,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.junit.Test;
 
@@ -75,7 +74,7 @@ public class FlowPatternsIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    ProcessDefinition deployProcessWithInclusiveGateway() throws BonitaException {
+    ProcessDefinition deployProcessWithInclusiveGateway() throws Exception {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("InclusiveProcess",
                 PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);

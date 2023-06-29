@@ -97,7 +97,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         afterSearchProcessDefinitionsUserCanStart();
     }
 
-    private void beforeSearchProcessDefinitionsUserCanStart() throws BonitaException {
+    private void beforeSearchProcessDefinitionsUserCanStart() throws Exception {
         // create users
         users = new ArrayList<>(2);
         final User chico = createUser("chicobento", "bpm");
@@ -149,7 +149,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         getProcessAPI().addProcessDefinitionToCategory(category3.getId(), processDefinition4.getId());
     }
 
-    private void createProcessesDefForSearchProcessUserCanStart() throws BonitaException {
+    private void createProcessesDefForSearchProcessUserCanStart() throws Exception {
         enabledProcessDefinitions = new ArrayList<>(4);
         final String actor1 = ACTOR_NAME;
         final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
@@ -803,7 +803,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
 
     private ProcessDefinition deployProcessWithTestFilter(final DesignProcessDefinition designProcessDefinition,
             final User user)
-            throws BonitaException, IOException {
+            throws Exception {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(
                         designProcessDefinition);

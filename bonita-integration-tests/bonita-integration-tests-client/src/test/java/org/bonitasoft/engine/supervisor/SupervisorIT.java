@@ -80,13 +80,13 @@ public class SupervisorIT extends TestWithTechnicalUser {
         super.after();
     }
 
-    private void createProcessDefinitions() throws BonitaException {
+    private void createProcessDefinitions() throws Exception {
         processDefinitions = new ArrayList<>();
         processDefinitions.add(createProcessDefinition("myProcess1"));
         processDefinitions.add(createProcessDefinition("myProcess2"));
     }
 
-    private ProcessDefinition createProcessDefinition(final String processName) throws BonitaException {
+    private ProcessDefinition createProcessDefinition(final String processName) throws Exception {
         // test process definition with no supervisor
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance(processName, "1.0").done();

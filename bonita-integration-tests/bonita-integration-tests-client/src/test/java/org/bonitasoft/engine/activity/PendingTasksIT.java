@@ -38,7 +38,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
@@ -389,7 +388,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployProcessWithUserTask(final User user1) throws BonitaException {
+    private ProcessDefinition deployProcessWithUserTask(final User user1) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addActor("myActor");
@@ -499,7 +498,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         }
     }
 
-    private ProcessDefinition deployProcessMappedToGroup(final Group mainGroup) throws BonitaException {
+    private ProcessDefinition deployProcessMappedToGroup(final Group mainGroup) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
                 "1.0");
         processBuilder.addActor("myActor");

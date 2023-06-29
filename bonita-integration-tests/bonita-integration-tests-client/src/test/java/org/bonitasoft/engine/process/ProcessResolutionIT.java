@@ -48,7 +48,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void noActorMapping() throws BonitaException {
+    public void noActorMapping() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("resolve", "1.0").addActor("Leader").addUserTask("step1", "Leader");
         final DesignProcessDefinition processDefinition = builder.done();
@@ -69,7 +69,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void resolveActorMapping() throws BonitaException, InterruptedException {
+    public void resolveActorMapping() throws Exception, InterruptedException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("resolve", "1.0").addActor("Leader", true).addUserTask("step1", "Leader");
         final DesignProcessDefinition processDefinition = builder.done();
@@ -126,7 +126,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void deploy2ProcessWithSameDependency() throws BonitaException {
+    public void deploy2ProcessWithSameDependency() throws Exception {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("process", "1.0").addAutomaticTask("step1");
         final DesignProcessDefinition processDefinition1 = builder.done();
@@ -148,7 +148,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void removeLastUserFromActorUnresolvesProcess() throws BonitaException {
+    public void removeLastUserFromActorUnresolvesProcess() throws Exception {
         final User piouPiou = getIdentityAPI().createUser("Piou-piou", "s3cR3t");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String actor = "Dev Leader";
@@ -174,7 +174,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void deleteUserFromActorUnresolvesProcess() throws BonitaException {
+    public void deleteUserFromActorUnresolvesProcess() throws Exception {
         final User piouPiou = getIdentityAPI().createUser("Piou-piou", "s3cR3t");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String actor = "Dev Leader";
@@ -198,7 +198,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void deleteRoleFromActorUnresolvesProcess() throws BonitaException {
+    public void deleteRoleFromActorUnresolvesProcess() throws Exception {
         final Role role = getIdentityAPI().createRole("Tester");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String actor = "Dev Leader";
@@ -222,7 +222,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void deleteGroupFromActorUnresolvesProcess() throws BonitaException {
+    public void deleteGroupFromActorUnresolvesProcess() throws Exception {
         final Group group = getIdentityAPI().createGroup("Tester", null);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String actor = "Dev Leader";
@@ -246,7 +246,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void noConnectorImplementation() throws BonitaException {
+    public void noConnectorImplementation() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("resolve", "1.0").addAutomaticTask("auto").addConnector("exec", "exec-1.0", "1.0",
                 ConnectorEvent.ON_ENTER);

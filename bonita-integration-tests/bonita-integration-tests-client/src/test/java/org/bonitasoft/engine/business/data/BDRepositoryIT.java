@@ -17,16 +17,8 @@ import static java.util.Collections.singletonList;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.fail;
-import static org.bonitasoft.engine.test.BDMTestUtil.buildSimpleBom;
-import static org.bonitasoft.engine.test.BDMTestUtil.businessObject;
-import static org.bonitasoft.engine.test.BDMTestUtil.businessObjectModel;
-import static org.bonitasoft.engine.test.BDMTestUtil.getZip;
-import static org.bonitasoft.engine.test.BDMTestUtil.stringField;
+import static org.assertj.core.api.Assertions.*;
+import static org.bonitasoft.engine.test.BDMTestUtil.*;
 import static org.bonitasoft.engine.test.BuildTestUtil.generateConnectorImplementation;
 
 import java.io.ByteArrayInputStream;
@@ -97,7 +89,6 @@ import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UnavailableLockException;
 import org.bonitasoft.engine.expression.Expression;
@@ -612,7 +603,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     @Test
-    public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException {
+    public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws Exception {
         final Expression stringExpression = new ExpressionBuilder()
                 .createGroovyScriptExpression(
                         "alive",
@@ -1042,8 +1033,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         return sb.toString();
     }
 
-    private ProcessDefinition buildProcessThatUpdateBizDataInsideConnector(final String taskName)
-            throws BonitaException, IOException {
+    private ProcessDefinition buildProcessThatUpdateBizDataInsideConnector(final String taskName) throws Exception {
         final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee",
                 EMPLOYEE_QUALIFIED_NAME);
 

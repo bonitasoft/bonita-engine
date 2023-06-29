@@ -35,7 +35,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ComparisonOperator;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -181,7 +180,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
     }
 
     private ProcessDefinition deployProcessWithScriptAndLibrary(final BarResource myLibrary, final String script)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess",
                 String.valueOf(System.currentTimeMillis()));
@@ -227,7 +226,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployEmptyProcess() throws BonitaException {
+    private ProcessDefinition deployEmptyProcess() throws Exception {
         final DesignProcessDefinition done = new ProcessDefinitionBuilder()
                 .createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()))
                 .done();

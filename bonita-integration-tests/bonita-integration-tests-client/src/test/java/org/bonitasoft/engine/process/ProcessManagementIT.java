@@ -19,7 +19,6 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -69,7 +68,6 @@ import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
@@ -1600,7 +1598,7 @@ public class ProcessManagementIT extends TestWithUser {
             final String watchingOnFinishVar,
             final String watchingOperationsVar, final String watchingTransitionVar, final String countVar,
             final String firstStepName,
-            final String secondStepName) throws BonitaException, IOException {
+            final String secondStepName) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
         //global data
@@ -1865,7 +1863,7 @@ public class ProcessManagementIT extends TestWithUser {
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess)
-            throws BonitaException {
+            throws Exception {
         final List<Long> ids = new ArrayList<>();
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;

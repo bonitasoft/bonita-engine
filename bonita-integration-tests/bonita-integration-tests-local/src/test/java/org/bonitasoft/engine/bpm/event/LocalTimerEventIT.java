@@ -104,7 +104,7 @@ public class LocalTimerEventIT extends CommonAPILocalIT {
 
     private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType,
             final Expression timerValue, final String stepName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My Process with start event", "1.0");
         processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent")

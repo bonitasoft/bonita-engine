@@ -16,13 +16,7 @@ package org.bonitasoft.engine.event;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeNotNull;
 
 import java.util.ArrayList;
@@ -49,7 +43,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -656,7 +649,7 @@ public class MessageEventIT extends AbstractEventIT {
 
     protected void sendMessage(final String messageName, final String targetProcessName,
             final String targetFlowNodeName,
-            final Map<Expression, Expression> messageContent) throws BonitaException {
+            final Map<Expression, Expression> messageContent) throws Exception {
         final Expression targetProcessExpression = new ExpressionBuilder()
                 .createConstantStringExpression(targetProcessName);
         final Expression targetFlowNodeExpression = new ExpressionBuilder()
@@ -666,7 +659,7 @@ public class MessageEventIT extends AbstractEventIT {
 
     private void sendMessage(final String messageName, final String targetProcessName, final String targetFlowNodeName,
             final Map<Expression, Expression> messageContent, final Map<Expression, Expression> correlations)
-            throws BonitaException {
+            throws Exception {
         final Expression targetProcessExpression = new ExpressionBuilder()
                 .createConstantStringExpression(targetProcessName);
         final Expression targetFlowNodeExpression = new ExpressionBuilder()

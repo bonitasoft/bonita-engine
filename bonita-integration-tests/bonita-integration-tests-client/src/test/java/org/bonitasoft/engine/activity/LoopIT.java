@@ -36,7 +36,6 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.connectors.VariableStorage;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -289,7 +288,7 @@ public class LoopIT extends TestWithUser {
 
     private ProcessDefinition deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(
             final String loopName, final String parallelTaskName)
-            throws BonitaException {
+            throws Exception {
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("My proc", "1.0");
         builder.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");

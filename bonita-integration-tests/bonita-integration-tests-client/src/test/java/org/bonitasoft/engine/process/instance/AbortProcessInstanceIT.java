@@ -32,7 +32,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -51,7 +50,7 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
 
     private ProcessDefinition deployProcessWithMultiInstanceCallActivity(final int loopCardinality,
             final String targetProcess, final String targetVersion)
-            throws BonitaException {
+            throws Exception {
         final Expression targetProcExpr = string(targetProcess);
         final Expression targetVersionExpr = string(targetVersion);
 

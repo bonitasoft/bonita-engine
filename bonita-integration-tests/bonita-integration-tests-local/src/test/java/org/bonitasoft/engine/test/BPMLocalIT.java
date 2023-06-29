@@ -320,7 +320,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
 
     private ProcessDefinition deployAndEnableProcessWithOneHumanTask(final String processName, final String actorName,
             final String userTaskName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
         processBuilder.addActor(actorName).addDescription(actorName + " description");

@@ -1,0 +1,35 @@
+dependencies {
+    api("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
+        exclude(group: "javax.activation") //replaced by jakarta
+    }
+    api("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
+        exclude(group: "javax.activation") //replaced by jakarta
+    }
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}" // TODO to remove
+    api project(':bpm:bonita-process-definition-model')
+
+    runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom { pom ->
+                name = 'Bonita Business Archive'
+                description = 'Contains the Bonita Business Archive model and related builders'
+                org.bonitasoft.engine.gradle.PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.filter.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -229,7 +231,7 @@ public class UserFilterIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test(expected = InvalidProcessDefinitionException.class)
+    @Test
     public void filterTaskWithNullInput() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("processWithUserFilterUsingActorName", "1.0");
@@ -239,7 +241,10 @@ public class UserFilterIT extends TestWithTechnicalUser {
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterUsingActorName", "1.0")
                 .addInput("userIds", null);
         designProcessDefinition.addTransition("step1", "step2");
-        deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterUsingActorName");
+        assertThatExceptionOfType(BonitaException.class)
+                .isThrownBy(() -> deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john,
+                        "TestFilterUsingActorName"))
+                .withRootCauseInstanceOf(InvalidProcessDefinitionException.class);
     }
 
     @Test
