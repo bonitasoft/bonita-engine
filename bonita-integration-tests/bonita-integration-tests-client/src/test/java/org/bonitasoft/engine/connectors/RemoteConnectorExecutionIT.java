@@ -68,6 +68,7 @@ import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -205,7 +206,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     private ProcessDefinition deployProcessWithConnectorOnMutiInstance(final String globalDataName,
             final String userTaskName, final String multiTaskName,
             final boolean isSequential, final int nbOfInstances, final ConnectorEvent activationEvent)
-            throws BonitaException, IOException {
+            throws Exception {
         final String localDataName = "localData";
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
@@ -990,7 +991,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
 
     private ProcessDefinition getProcessWithConnectorThatThrowError(final String exceptionType,
             final FailAction failAction, final boolean onProcess,
-            final boolean withUserTask, final boolean onEnter) throws BonitaException, IOException {
+            final boolean withUserTask, final boolean onEnter) throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder()
                 .createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
@@ -1046,19 +1047,19 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
 
     private ProcessDefinition getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter(final String exceptionType,
             final FailAction failAction,
-            final boolean onProcess) throws BonitaException, IOException {
+            final boolean onProcess) throws Exception {
         return getProcessWithConnectorThatThrowError(exceptionType, failAction, onProcess, true, true);
     }
 
     private ProcessDefinition getProcessWithConnectorThatThrowErrorOnAutomaticTaskOnEnter(final String exceptionType,
             final FailAction failAction,
-            final boolean onProcess) throws BonitaException, IOException {
+            final boolean onProcess) throws Exception {
         return getProcessWithConnectorThatThrowError(exceptionType, failAction, onProcess, false, true);
     }
 
     private ProcessDefinition getProcessWithConnectorThatThrowErrorOnAutomaticTaskOnFinish(final String exceptionType,
             final FailAction failAction,
-            final boolean onProcess) throws BonitaException, IOException {
+            final boolean onProcess) throws Exception {
         return getProcessWithConnectorThatThrowError(exceptionType, failAction, onProcess, false, false);
     }
 
@@ -1330,10 +1331,12 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final List<Operation> operations = new ArrayList<>(2);
         // set valueOfInput3
         final Map<String, Serializable> contexts = new HashMap<>();
-        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
+        operations.add(new OperationBuilder().createNewInstance()
+                .setLeftOperand("externalData", LeftOperand.TYPE_EXTERNAL_DATA)
                 .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName()))
                 .setType(OperatorType.ASSIGNMENT).done());
-        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
+        operations.add(new OperationBuilder().createNewInstance()
+                .setLeftOperand("externalDataConst", LeftOperand.TYPE_EXTERNAL_DATA)
                 .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John"))
                 .setType(OperatorType.ASSIGNMENT).done());
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters("param1", mainExp);
@@ -1551,7 +1554,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithFailingConnector() throws BonitaException, IOException {
+    private ProcessDefinition deployAndEnableProcessWithFailingConnector() throws Exception {
         final Expression normal = new ExpressionBuilder()
                 .createConstantStringExpression(TestConnectorThatThrowException.NORMAL);
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");

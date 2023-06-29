@@ -16,6 +16,7 @@ dependencies {
     api("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
+    api project(':bpm:bonita-business-archive')
     runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
@@ -93,17 +94,6 @@ def schemagen = tasks.register('schemagen') {
         try {
             ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
                 classpath { pathelement(path: configurations.schemagen.asPath) }
-                include(name: 'org/bonitasoft/engine/bpm/bar/form/model/*.java')
-                include(name: 'org/bonitasoft/engine/form/*.java')
-            }
-        } catch (Exception e) {
-            def schema = file("$destDir/schema1.xsd")
-            if (!schema.exists()) throw e
-            schema.renameTo(file("$destDir/form-mapping.xsd"))
-        }
-        try {
-            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-                classpath { pathelement(path: configurations.schemagen.asPath) }
                 include(name: 'org/bonitasoft/engine/business/application/xml/**/*.java')
                 exclude(name: '**/*Builder.java')
             }
@@ -135,7 +125,6 @@ def schemagen = tasks.register('schemagen') {
         }
     }
     inputs.dir('src/main/java/')
-    outputs.file("$destDir/form-mapping.xsd")
     outputs.file("$destDir/application.xsd")
     outputs.file("$destDir/bom.xsd")
     outputs.file("$destDir/profiles.xsd")

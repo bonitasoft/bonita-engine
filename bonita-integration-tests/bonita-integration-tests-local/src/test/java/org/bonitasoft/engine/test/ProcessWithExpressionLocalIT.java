@@ -27,7 +27,6 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ComparisonOperator;
@@ -52,7 +51,7 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
 
     private ProcessDefinition processDefinition;
 
-    private ProcessDefinition deployEmptyProcess() throws BonitaException {
+    private ProcessDefinition deployEmptyProcess() throws Exception {
         final DesignProcessDefinition done = new ProcessDefinitionBuilder()
                 .createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()))
                 .done();

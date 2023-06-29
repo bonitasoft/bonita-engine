@@ -121,12 +121,12 @@ public abstract class AbstractEventIT extends TestWithUser {
      * @param normalFlowTaskName
      *        name of human task following the task containing the boundary (normal flow)
      * @return
-     * @throws BonitaException
+     * @throws Exception
      * @throws InvalidProcessDefinitionException
      */
     public ProcessDefinition deployAndEnableProcessWithBoundaryTimerEvent(final long timerValue,
             final boolean interrupting, final String taskWithBoundaryName,
-            final String exceptionTaskName, final String normalFlowTaskName) throws BonitaException {
+            final String exceptionTaskName, final String normalFlowTaskName) throws Exception {
         return deployAndEnableProcessWithBoundaryTimerEvent(TimerType.DURATION, timerValue, interrupting,
                 taskWithBoundaryName, exceptionTaskName,
                 normalFlowTaskName);
@@ -149,14 +149,13 @@ public abstract class AbstractEventIT extends TestWithUser {
      * @param normalFlowTaskName
      *        name of human task following the task containing the boundary (normal flow)
      * @return
-     * @throws BonitaException
      * @throws InvalidProcessDefinitionException
      * @since 6.0
      */
     public ProcessDefinition deployAndEnableProcessWithBoundaryTimerEvent(final TimerType timerType,
             final long timerValue, final boolean interrupting,
             final String taskWithBoundaryName, final String exceptionTaskName, final String normalFlowTaskName)
-            throws BonitaException {
+            throws Exception {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
         return deployAndEnableProcessWithBoundaryTimerEvent(timerType, timerExpr, interrupting, taskWithBoundaryName,
                 exceptionTaskName, normalFlowTaskName);
@@ -179,14 +178,13 @@ public abstract class AbstractEventIT extends TestWithUser {
      * @param normalFlowTaskName
      *        name of human task following the task containing the boundary (normal flow)
      * @return
-     * @throws BonitaException
      * @throws InvalidProcessDefinitionException
      * @since 6.0
      */
     public ProcessDefinition deployAndEnableProcessWithBoundaryTimerEvent(final TimerType timerType,
             final Expression timerExpr, final boolean interrupting,
             final String taskWithBoundaryName, final String exceptionTaskName, final String normalFlowTaskName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("pTimerBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -206,7 +204,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithBoundaryTimerEventOnHumanTask(final long timerValue,
-            final boolean withData) throws BonitaException {
+            final boolean withData) throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("pTimerBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -246,13 +244,12 @@ public abstract class AbstractEventIT extends TestWithUser {
      *        the name of called process
      * @return
      * @throws InvalidExpressionException
-     * @throws BonitaException
      * @throws InvalidProcessDefinitionException
      * @since 6.0
      */
     public ProcessDefinition deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(final long timerDuration,
             final boolean interrupting,
-            final String targetProcessName) throws BonitaException {
+            final String targetProcessName) throws Exception {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerDuration);
         final Expression timerExpr2 = new ExpressionBuilder().createConstantLongExpression(timerDuration + 1000L);
         final Expression targetProcessNameExpr = new ExpressionBuilder()
@@ -298,7 +295,6 @@ public abstract class AbstractEventIT extends TestWithUser {
      * @param exceptionFlowTaskName
      *        the name of the user task reached by the exception flow
      * @return
-     * @throws BonitaException
      * @throws InvalidProcessDefinitionException
      * @since 6.0
      */
@@ -306,7 +302,7 @@ public abstract class AbstractEventIT extends TestWithUser {
             final boolean interrupting,
             final String multiTaskName, final int loopCardinality, final boolean isSequential,
             final String normalFlowTaskName,
-            final String exceptionFlowTaskName) throws BonitaException {
+            final String exceptionFlowTaskName) throws Exception {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
@@ -345,14 +341,13 @@ public abstract class AbstractEventIT extends TestWithUser {
      * @param exceptionFlowStepName
      *        the name of the user task reached by the exception flow
      * @return
-     * @throws BonitaException
      * @throws InvalidProcessDefinitionException
      * @since 6.0
      */
     public ProcessDefinition deployAndEnableProcessWithBoundaryTimerEventOnLoopActivity(final long timerValue,
             final boolean interrupting, final int loopMax,
             final String loopActivityName, final String normalFlowStepName, final String exceptionFlowStepName)
-            throws BonitaException {
+            throws Exception {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
 
@@ -401,7 +396,7 @@ public abstract class AbstractEventIT extends TestWithUser {
             final String taskWithBoundaryName, final String interruptExceptionTaskName,
             final String nonInterruptExceptionTaskName,
             final String interruptTimerName,
-            final String nonInterruptTimerName) throws BonitaException {
+            final String nonInterruptTimerName) throws Exception {
         final String normalFlowTaskName = "normalFlow";
         final Expression interruptTimerExpr = new ExpressionBuilder().createConstantLongExpression(interruptTimer);
         final Expression nonInterruptTimerExpr = new ExpressionBuilder()
@@ -430,7 +425,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithEndThrowErrorEvent(final String processName,
             final String errorCode)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder calledProcess = new ProcessDefinitionBuilder().createNewInstance(processName,
                 "1.0");
         calledProcess.addActor(ACTOR_NAME);
@@ -448,7 +443,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(final String processName,
             final String targetProcessName,
-            final String callActivityName, final String errorCode, final String ACTOR_NAME) throws BonitaException {
+            final String callActivityName, final String errorCode, final String ACTOR_NAME) throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance(processName, "1.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -470,7 +465,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableSubProcessWhichThrowsAnErrorEvent(final String processName,
             final String errorCode)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder process = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
         process.addStartEvent("start");
         process.addEndEvent("end").addErrorEventTrigger(errorCode);
@@ -480,7 +475,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableMidProcessWhichContainsACallActivity(final String processName,
             final String targetProcessName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder process = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
         process.addStartEvent("start");
         process.addCallActivity("ca",
@@ -494,7 +489,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithBoundaryErrorEventOnMICallActivity(final String processName,
             final String targetProcessName,
-            final String errorCode, final String ACTOR_NAME) throws BonitaException {
+            final String errorCode, final String ACTOR_NAME) throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance(processName, "1.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -513,7 +508,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithTimerEventSubProcess(final long timerDuration)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor(ACTOR_NAME);
@@ -534,7 +529,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithTimerEventSubProcessAndData(final long timerDuration)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addShortTextData("content", new ExpressionBuilder().createConstantStringExpression("parentVar"));
@@ -563,7 +558,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithErrorEventSubProcessAndData(final String catchErrorCode,
             final String throwErroCode,
-            final String subProcStartEventName) throws BonitaException {
+            final String subProcStartEventName) throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addShortTextData("content", new ExpressionBuilder().createConstantStringExpression("parentVar"));
@@ -595,7 +590,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     public ProcessDefinition deployAndEnableProcessWithErrorEventSubProcessAndDataOnlyInRoot(final String errorCode,
             final String subProcStartEventName,
             final String rootUserTaskName, final String subProcUserTaskName, final String dataName,
-            final String dataValue) throws BonitaException {
+            final String dataValue) throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression(dataValue));
@@ -619,7 +614,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     public ProcessDefinition deployAndEnableProcessWithErrorEventSubProcessAndDataOnlyInSubProc(final String errorCode,
             final String subProcStartEventName,
             final String rootUserTaskName, final String subProcUserTaskName, final String dataName,
-            final String dataValue) throws BonitaException {
+            final String dataValue) throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor(ACTOR_NAME);
@@ -642,7 +637,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithErrorEventSubProcess(final String catchErrorCode,
             final String throwErrorCode,
-            final String subProcStartEventName) throws BonitaException {
+            final String subProcStartEventName) throws Exception {
         final Expression transitionCondition = new ExpressionBuilder().createDataExpression("throwException",
                 Boolean.class.getName());
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
@@ -682,7 +677,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithBoundaryMessageEvent(final String message)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("pMessageBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -704,7 +699,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithBoundarySignalEvent(final String signalName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("pSignalBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -722,7 +717,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(final int loopMax)
-            throws BonitaException {
+            throws Exception {
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
@@ -749,12 +744,11 @@ public abstract class AbstractEventIT extends TestWithUser {
      * @param userTaskName
      *        the user task name
      * @return
-     * @throws BonitaException
      * @throws InvalidProcessDefinitionException
      * @since 6.0
      */
     public ProcessDefinition deployAndEnableSimpleProcess(final String processName, final String userTaskName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
                 "1.0");
         processBuilder.addActor(ACTOR_NAME).addStartEvent("startCA").addUserTask(userTaskName, ACTOR_NAME)
@@ -763,7 +757,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithBoundaryMessageEventOnCallActivity() throws BonitaException {
+    public ProcessDefinition deployAndEnableProcessWithBoundaryMessageEventOnCallActivity() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("pMessageBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -783,7 +777,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(final int loopCardinality,
             final boolean isSequential)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "processWithBoundaryMessageEventAndMultiInstance",
                 "1.0");
@@ -803,7 +797,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithCallActivity(final String targetProcessName,
-            final String targetVersion) throws BonitaException {
+            final String targetVersion) throws Exception {
         final Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
         final Expression targetVersionExpr = new ExpressionBuilder().createConstantStringExpression(targetVersion);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
@@ -819,7 +813,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         return deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithMessageEventSubProcess() throws BonitaException {
+    public ProcessDefinition deployAndEnableProcessWithMessageEventSubProcess() throws Exception {
         final ProcessDefinitionBuilder builder = buildParentProcessDefinition(false, false);
         buildSubProcessDefinition(builder, false, null, false);
         return deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
@@ -827,7 +821,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithMessageEventSubProcessAndData(
             final List<Entry<Expression, Expression>> correlations)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder builder = buildParentProcessDefinition(false, true);
         buildSubProcessDefinition(builder, true, correlations, false);
         return deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
@@ -913,7 +907,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String targetProcess,
-            final String targetFlowNode) throws BonitaException {
+            final String targetFlowNode) throws Exception {
         return deployAndEnableProcessWithEndMessageEvent(targetProcess, targetFlowNode, null, null, null, null);
     }
 
@@ -921,7 +915,7 @@ public abstract class AbstractEventIT extends TestWithUser {
             final String targetFlowNode,
             final List<Entry<Expression, Expression>> correlations, final Map<String, String> processData,
             final Map<String, String> messageData,
-            final Map<String, String> dataInputMapping) throws BonitaException {
+            final Map<String, String> dataInputMapping) throws Exception {
         return deployAndEnableProcessWithEndMessageEvent("Send message in the end", MESSAGE_NAME, targetProcess,
                 targetFlowNode, correlations, processData,
                 messageData, dataInputMapping);
@@ -931,7 +925,7 @@ public abstract class AbstractEventIT extends TestWithUser {
             final String messageName, final String targetProcess,
             final String targetFlowNode, final List<Entry<Expression, Expression>> correlations,
             final Map<String, String> processData,
-            final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
+            final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(processData, processBuilder);
@@ -993,7 +987,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateThrowMessageEvent(final String targetProcess,
             final String targetFlowNode)
-            throws BonitaException {
+            throws Exception {
         return deployAndEnableProcessWithIntermediateThrowMessageEvent(Collections.singletonList(MESSAGE_NAME),
                 Collections.singletonList(targetProcess),
                 Collections.singletonList(targetFlowNode));
@@ -1001,7 +995,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateThrowMessageEvent(final List<String> messageNames,
             final List<String> targetProcesses,
-            final List<String> targetFlowNodes) throws BonitaException {
+            final List<String> targetFlowNodes) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(SEND_MESSAGE_PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addStartEvent(START_EVENT_NAME);
@@ -1035,14 +1029,14 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final Map<String, String> data,
             final List<Operation> catchMessageOperations)
-            throws BonitaException {
+            throws Exception {
         return deployAndEnableProcessWithStartMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, MESSAGE_NAME, data,
                 catchMessageOperations);
     }
 
     public ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final String processName,
             final String messageName, final Map<String, String> data,
-            final List<Operation> catchMessageOperations) throws BonitaException {
+            final List<Operation> catchMessageOperations) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(data, processBuilder);
@@ -1076,7 +1070,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final String processName,
-            final String messageName) throws BonitaException {
+            final String messageName) throws Exception {
         return deployAndEnableProcessWithStartMessageEvent(processName, messageName,
                 Collections.<String, String> emptyMap(),
                 Collections.<Operation> emptyList());
@@ -1093,7 +1087,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchMessageEvent(
             final List<Entry<Expression, Expression>> correlations,
-            final Map<String, String> processData, final List<Operation> operations) throws BonitaException {
+            final Map<String, String> processData, final List<Operation> operations) throws Exception {
         return deployAndEnableProcessWithIntermediateCatchMessageEvent(CATCH_MESSAGE_PROCESS_NAME, MESSAGE_NAME,
                 correlations, processData, operations);
     }
@@ -1102,7 +1096,7 @@ public abstract class AbstractEventIT extends TestWithUser {
             final String messageName,
             final List<Entry<Expression, Expression>> correlations, final Map<String, String> processData,
             final List<Operation> operations)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(processData, processBuilder);
@@ -1136,14 +1130,14 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithIntraMessageEvent(final String targetProcess,
-            final String targetFlowNode) throws BonitaException {
+            final String targetFlowNode) throws Exception {
         return deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", MESSAGE_NAME, targetProcess,
                 targetFlowNode);
     }
 
     public ProcessDefinition deployAndEnableProcessWithIntraMessageEvent(final String processName,
             final String messageName, final String targetProcess,
-            final String targetFlowNode) throws BonitaException {
+            final String targetFlowNode) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         // create expression for target process/flowNode
         final Expression targetProcessExpression = new ExpressionBuilder()
@@ -1194,7 +1188,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchMessageEventAnd1Correlation()
-            throws BonitaException {
+            throws Exception {
         final Map<String, String> data = new HashMap<>();
         data.put("docRef", Integer.class.getName());
         final ArrayList<Entry<Expression, Expression>> correlations = new ArrayList<Entry<Expression, Expression>>(1);
@@ -1206,7 +1200,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchMessageEventAnd2Correlations()
-            throws BonitaException {
+            throws Exception {
         final Map<String, String> data = new HashMap<>();
         data.put("docRef", Integer.class.getName());
         data.put("name", String.class.getName());
@@ -1222,7 +1216,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         return deployAndEnableProcessWithIntermediateCatchMessageEvent(correlations, data, null);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithEndMessageEventAndCorrelation() throws BonitaException {
+    public ProcessDefinition deployAndEnableProcessWithEndMessageEventAndCorrelation() throws Exception {
         final Map<String, String> data = new HashMap<>();
         data.put("docNumber", Integer.class.getName());
         data.put("lastName", String.class.getName());
@@ -1242,7 +1236,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithBoundarySignalEventOnLoopActivity(final int loopMax)
-            throws BonitaException {
+            throws Exception {
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
@@ -1261,7 +1255,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithBoundarySignalEventOnCallActivity(final String signalName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("pSignalBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -1282,7 +1276,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(final int loopCardinality,
             final boolean isSequential)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "processWithBoundarySignalEventAndMultiInstance",
                 "1.0");
@@ -1302,7 +1296,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithSignalEventSubProcess(final boolean withIntermediateThrowEvent,
             final boolean withData)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder builder = buildParentProcessDefinition(withIntermediateThrowEvent, withData);
         buildSubProcessDefinition(builder, withData, null, true);
         final DesignProcessDefinition processDefinition = builder.done();
@@ -1311,7 +1305,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchTimerEventAndUserTask(final TimerType timerType,
             final Expression timerValue,
-            final String step1Name, final String step2Name) throws BonitaException {
+            final String step1Name, final String step2Name) throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My Process with start event", "1.0")
                 .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent(START_EVENT_NAME)
@@ -1330,7 +1324,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessWithStartTimerEventAndUserTask(final TimerType timerType,
             final Expression timerValue, final String stepName)
-            throws BonitaException {
+            throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My Process with start event", "1.0")
                 .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent(START_EVENT_NAME)
@@ -1347,7 +1341,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public ProcessDefinition deployAndEnableProcessSendingMessageUsingVariableAsTarget(final String targetProcessName,
             final String targetFlowNode,
-            final String messageName) throws BonitaException {
+            final String messageName) throws Exception {
         Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
         Expression targetFlowNodeExpr = new ExpressionBuilder().createConstantStringExpression(targetFlowNode);
         Expression targetProcessVarExpr = new ExpressionBuilder().createDataExpression("targetProcess",

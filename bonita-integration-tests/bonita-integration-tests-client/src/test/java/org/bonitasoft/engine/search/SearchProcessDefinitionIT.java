@@ -28,7 +28,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.junit.After;
@@ -252,7 +251,7 @@ public class SearchProcessDefinitionIT extends TestWithUser {
     }
 
     private void createNbProcessDefinitionWithTwoHumanStepsAndDeployWithActor(final int nbProcess, final User user)
-            throws BonitaException {
+            throws Exception {
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;
             if (i >= 0 && i < 10) {

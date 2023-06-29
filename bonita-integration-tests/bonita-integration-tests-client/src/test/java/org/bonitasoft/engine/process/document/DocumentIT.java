@@ -88,7 +88,7 @@ public class DocumentIT extends TestWithUser {
     private int processVersion = 0;
 
     @Test
-    public void attachADocumentToProcessInstanceTest() throws BonitaException {
+    public void attachADocumentToProcessInstanceTest() throws Exception {
         final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         Document attachment;
         try {
@@ -104,7 +104,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void removeADocument() throws BonitaException {
+    public void removeADocument() throws Exception {
         final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         try {
             //given
@@ -136,7 +136,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void attachADocumentAndItsContentToProcessInstanceTest() throws BonitaException {
+    public void attachADocumentAndItsContentToProcessInstanceTest() throws Exception {
         final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         Document attachment;
         try {
@@ -186,7 +186,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void createProcessWithUrlDocument() throws BonitaException {
+    public void createProcessWithUrlDocument() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("createProcessWithUrlDocument", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME);
@@ -216,7 +216,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void attachAnExternalDocumentReferenceToProcessInstanceTest() throws BonitaException {
+    public void attachAnExternalDocumentReferenceToProcessInstanceTest() throws Exception {
         final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         Document attachment;
         try {
@@ -248,7 +248,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void attachAnExternalDocumentReferenceToProcessInstanceAsNewVersionTest() throws BonitaException {
+    public void attachAnExternalDocumentReferenceToProcessInstanceAsNewVersionTest() throws Exception {
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         Document attachment;
@@ -269,7 +269,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void attachADocumentAndItsContentToProcessInstanceAsNewVersionTest() throws BonitaException {
+    public void attachADocumentAndItsContentToProcessInstanceAsNewVersionTest() throws Exception {
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
 
@@ -769,7 +769,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void getArchivedVersionOfDocuments() throws BonitaException {
+    public void getArchivedVersionOfDocuments() throws Exception {
         // add new document
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
@@ -810,7 +810,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void getArchivedDocument() throws BonitaException {
+    public void getArchivedDocument() throws Exception {
         // add new document
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
@@ -838,7 +838,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void countAttachmentWithSomeAttachments() throws BonitaException {
+    public void countAttachmentWithSomeAttachments() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         final long initialNbOfDocument = getProcessAPI().countAttachments(searchOptionsBuilder.done());
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
@@ -1128,7 +1128,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     private ProcessDefinition deployProcessWithURLDocumentCreateOperation(final String documentName, final String url)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("simpleProcess", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("The doctor");
@@ -1447,7 +1447,7 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(docDefinition);
     }
 
-    public ProcessInstance deployAndEnableWithActorAndStartIt(final User user) throws BonitaException {
+    public ProcessInstance deployAndEnableWithActorAndStartIt(final User user) throws Exception {
         return deployAndEnableProcessWithActorAndStartIt(getNormalBar(), user);
     }
 
@@ -1958,7 +1958,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void removeDocumentFromList() throws BonitaException {
+    public void removeDocumentFromList() throws Exception {
         final ProcessInstance processInstance = deployProcessWithList();
         final List<Document> list1 = getProcessAPI().getDocumentList(processInstance.getId(), "list1", 0, 100);
         final Document document = getProcessAPI().removeDocument(list1.get(1).getId());
@@ -1975,7 +1975,7 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
     }
 
-    private ProcessInstance deployProcessWithList() throws BonitaException {
+    private ProcessInstance deployProcessWithList() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessWithDocToUpdate", "1.0");
         //process with list1 with init value

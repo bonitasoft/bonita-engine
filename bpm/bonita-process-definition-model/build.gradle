@@ -1,0 +1,37 @@
+dependencies {
+    api("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
+        exclude(group: "javax.activation") //replaced by jakarta
+    }
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}" // TODO to remove
+    api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
+    api "com.fasterxml.jackson.core:jackson-annotations"
+    api project(':bpm:bonita-form-mapping-model')
+
+    runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "com.fasterxml.jackson.core:jackson-databind"
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom { pom ->
+                name = 'Bonita Process Definition Model'
+                description = 'Contains the Bonita Process Definition model and related builders'
+                org.bonitasoft.engine.gradle.PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

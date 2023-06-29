@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.junit.Test;
@@ -49,14 +48,14 @@ public class EndEventIT extends AbstractEventIT {
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
-    public void startEventCannotHaveIncomingTransition() throws BonitaException {
+    public void startEventCannotHaveIncomingTransition() throws Exception {
         new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addStartEvent("startEvent")
                 .addAutomaticTask("step1")
                 .addTransition("step1", "startEvent").getProcess();
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
-    public void endEventCannotHaveOutgoingTransition() throws BonitaException {
+    public void endEventCannotHaveOutgoingTransition() throws Exception {
         new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addAutomaticTask("step1")
                 .addEndEvent("endEvent")
                 .addTransition("endEvent", "step1").getProcess();

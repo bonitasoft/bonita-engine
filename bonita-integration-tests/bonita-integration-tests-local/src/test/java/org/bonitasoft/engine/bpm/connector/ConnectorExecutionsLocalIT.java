@@ -52,6 +52,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -356,7 +357,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
     }
 
     private ProcessDefinition deployProcessWithConnectorOnUserTask(final User user, final String taskName)
-            throws BonitaException, IOException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnStartOfAnAutomaticActivity", "1.0");
         processBuilder.addActor(ACTOR_NAME);
@@ -544,7 +545,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
     }
 
     private ProcessDefinition deployProcessWithConnectorOnFinish(final User user, final String taskName)
-            throws BonitaException, IOException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnStartOfAnAutomaticActivity", "1.0");
         processBuilder.addActor(ACTOR_NAME);
@@ -631,7 +632,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                 .addOutput(
                         new OperationBuilder()
                                 .createNewInstance()
-                                .setLeftOperand("value", false)
+                                .setLeftOperand("value", LeftOperand.TYPE_DATA)
                                 .setType(OperatorType.ASSIGNMENT)
                                 .setRightOperand(
                                         new ExpressionBuilder().createGroovyScriptExpression("script",
@@ -671,7 +672,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                 .addConnector("myConnector1", "connectorWithCustomType", "1.0.0", ConnectorEvent.ON_ENTER).addOutput(
                         new OperationBuilder()
                                 .createNewInstance()
-                                .setLeftOperand("value", false)
+                                .setLeftOperand("value", LeftOperand.TYPE_DATA)
                                 .setType(OperatorType.ASSIGNMENT)
                                 .setRightOperand(
                                         new ExpressionBuilder().createGroovyScriptExpression("script",
@@ -755,7 +756,8 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         autoTask.addConnector("nonSerializableFailedConnector",
                 "org.bonitasoft.connector.testConnectorWithNotSerializableOutput", "1.0", connectorEvent)
                 .addOutput(
-                        new OperationBuilder().createNewInstance().setLeftOperand("resultProcess", false)
+                        new OperationBuilder().createNewInstance()
+                                .setLeftOperand("resultProcess", LeftOperand.TYPE_DATA)
                                 .setType(OperatorType.ASSIGNMENT)
                                 .setRightOperand(new ExpressionBuilder().createInputExpression("output1",
                                         Object.class.getName()))

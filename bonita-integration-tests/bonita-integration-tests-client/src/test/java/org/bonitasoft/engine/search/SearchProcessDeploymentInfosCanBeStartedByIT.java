@@ -26,7 +26,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -206,7 +205,7 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends TestWithTechni
         assertEquals(enabledProcessDefinitions.get(2).getId(), searchRes.getResult().get(0).getProcessId());
     }
 
-    private void createProcessesDefForSearchProcessUserCanStart() throws BonitaException {
+    private void createProcessesDefForSearchProcessUserCanStart() throws Exception {
         final String actor1 = ACTOR_NAME;
         final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
                 .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",

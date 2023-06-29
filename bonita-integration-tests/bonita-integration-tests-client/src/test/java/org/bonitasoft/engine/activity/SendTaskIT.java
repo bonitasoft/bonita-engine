@@ -37,7 +37,6 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SendTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.event.AbstractEventIT;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
@@ -60,7 +59,7 @@ public class SendTaskIT extends AbstractEventIT {
     private ProcessDefinition deployAndEnableProcessWithSendTask(final String processName, final String messageName,
             final String targetProcess,
             final String targetFlowNode, final Map<String, String> processData,
-            final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
+            final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
         addProcessData(processData, processBuilder);
@@ -109,7 +108,7 @@ public class SendTaskIT extends AbstractEventIT {
             final String targetProcess,
             final String targetFlowNode, String inputListScript, final Map<String, String> messageData,
             final Map<String, String> dataInputMapping)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
         processBuilder.addStartEvent("startEvent");

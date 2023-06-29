@@ -48,7 +48,6 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ReceiveTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
@@ -342,7 +341,7 @@ public class ReceiveTasksIT extends TestWithUser {
             final String messageName, final String targetProcess,
             final String targetFlowNode, final List<Entry<Expression, Expression>> correlations,
             final Map<String, String> processData,
-            final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
+            final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
         addProcessData(processData, processBuilder);
@@ -374,7 +373,7 @@ public class ReceiveTasksIT extends TestWithUser {
             final String receiveTaskName, final String userTaskName,
             final String actorName, final User user, final String messageName,
             final List<Entry<Expression, Expression>> correlations,
-            final Map<String, String> processData, final List<Operation> operations) throws BonitaException {
+            final Map<String, String> processData, final List<Operation> operations) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
         addProcessData(processData, processBuilder);

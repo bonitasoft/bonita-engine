@@ -60,6 +60,7 @@ import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
@@ -80,6 +81,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
@@ -409,8 +411,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcess(final DesignProcessDefinition designProcessDefinition)
             throws BonitaException {
-        return deployAndEnableProcess(new BusinessArchiveBuilder().createNewBusinessArchive()
-                .setProcessDefinition(designProcessDefinition).done());
+        return deployAndEnableProcess(createNewBusinessArchive(designProcessDefinition));
     }
 
     public ProcessDefinition deployAndEnableProcess(final BusinessArchive businessArchive) throws BonitaException {
@@ -431,9 +432,7 @@ public class APITestUtil extends PlatformTestUtil {
             final String actorName,
             final List<User> users)
             throws BonitaException {
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
-                .setProcessDefinition(designProcessDefinition).done();
-        return deployAndEnableProcessWithActor(businessArchive, actorName, users);
+        return deployAndEnableProcessWithActor(createNewBusinessArchive(designProcessDefinition), actorName, users);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive,
@@ -459,8 +458,7 @@ public class APITestUtil extends PlatformTestUtil {
             final List<String> actorsName,
             final List<User> users) throws BonitaException {
         return deployAndEnableProcessWithActor(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                        .done(),
+                createNewBusinessArchive(designProcessDefinition),
                 actorsName, users);
     }
 
@@ -479,8 +477,7 @@ public class APITestUtil extends PlatformTestUtil {
             final Map<String, List<User>> actorUsers)
             throws BonitaException {
         return deployAndEnableProcessWithActor(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                        .done(),
+                createNewBusinessArchive(designProcessDefinition),
                 actorUsers);
     }
 
@@ -524,18 +521,15 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActorAndParameters(
             final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
             final List<User> users, final Map<String, String> parameters) throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        final BusinessArchive businessArchive = businessArchiveBuilder.setParameters(parameters)
-                .setProcessDefinition(designProcessDefinition).done();
-        return deployAndEnableProcessWithActor(businessArchive, actorsName, users);
+        return deployAndEnableProcessWithActor(
+                createNewBusinessArchive(designProcessDefinition, parameters),
+                actorsName, users);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
             final String actorName, final Group group)
             throws BonitaException {
-        final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                        .done());
+        final ProcessDefinition processDefinition = deployProcess(createNewBusinessArchive(designProcessDefinition));
         getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
@@ -545,9 +539,7 @@ public class APITestUtil extends PlatformTestUtil {
             final String actorName,
             final Group... groups)
             throws BonitaException {
-        final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                        .done());
+        final ProcessDefinition processDefinition = deployProcess(createNewBusinessArchive(designProcessDefinition));
         for (final Group group : groups) {
             getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
         }
@@ -559,8 +551,7 @@ public class APITestUtil extends PlatformTestUtil {
             final String actorName,
             final List<Group> groups, final List<User> users)
             throws BonitaException {
-        final ProcessDefinition processDefinition = deployProcess(
-                aBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+        final ProcessDefinition processDefinition = deployProcess(createNewBusinessArchive(designProcessDefinition));
         for (final Group group : groups) {
             getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
         }
@@ -574,9 +565,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
             final String actorName, final Role role)
             throws BonitaException {
-        final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                        .done());
+        final ProcessDefinition processDefinition = deployProcess(createNewBusinessArchive(designProcessDefinition));
         addMappingOfActorsForRole(actorName, role.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
@@ -585,9 +574,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
             final String actorName, final Role... roles)
             throws BonitaException {
-        final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                        .done());
+        final ProcessDefinition processDefinition = deployProcess(createNewBusinessArchive(designProcessDefinition));
         for (final Role role : roles) {
             addMappingOfActorsForRole(actorName, role.getId(), processDefinition);
         }
@@ -598,9 +585,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
             final String actorName, final Role role,
             final Group group) throws BonitaException {
-        final ProcessDefinition processDefinition = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                        .done());
+        final ProcessDefinition processDefinition = deployProcess(createNewBusinessArchive(designProcessDefinition));
         addMappingOfActorsForRoleAndGroup(actorName, role.getId(), group.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
@@ -609,9 +594,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
             final String actorName, final long userId)
             throws BonitaException {
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
-                .setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = deployProcess(businessArchive);
+        final ProcessDefinition processDefinition = deployProcess(createNewBusinessArchive(designProcessDefinition));
         getProcessAPI().addUserToActor(actorName, processDefinition, userId);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
@@ -621,10 +604,14 @@ public class APITestUtil extends PlatformTestUtil {
             final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies)
             throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
-                .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                        connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
-        return deployAndEnableProcess(businessArchiveBuilder.done());
+        try {
+            final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
+                    .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                            connectorImplementations, generateConnectorDependencies, Collections.emptyList());
+            return deployAndEnableProcess(businessArchiveBuilder.done());
+        } catch (InvalidProcessDefinitionException | InvalidBusinessArchiveFormatException e) {
+            throw new BonitaException(e);
+        }
     }
 
     public ProcessDefinition deployAndEnableProcessWithConnector(
@@ -657,13 +644,17 @@ public class APITestUtil extends PlatformTestUtil {
             final String actorName, final User user, final List<BarResource> connectorImplementations,
             final List<BarResource> generateConnectorDependencies,
             final Map<String, String> parameters) throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
-                .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                        connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
-        if (parameters != null) {
-            businessArchiveBuilder.setParameters(parameters);
+        try {
+            final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
+                    .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                            connectorImplementations, generateConnectorDependencies, Collections.emptyList());
+            if (parameters != null) {
+                businessArchiveBuilder.setParameters(parameters);
+            }
+            return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
+        } catch (InvalidProcessDefinitionException | InvalidBusinessArchiveFormatException e) {
+            throw new BonitaException(e);
         }
-        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndUserFilter(
@@ -671,10 +662,14 @@ public class APITestUtil extends PlatformTestUtil {
             final String actorName, final User user, final List<BarResource> connectorImplementations,
             final List<BarResource> generateConnectorDependencies,
             final List<BarResource> userFilters) throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
-                .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                        connectorImplementations, generateConnectorDependencies, userFilters);
-        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
+        try {
+            final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil
+                    .buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                            connectorImplementations, generateConnectorDependencies, userFilters);
+            return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
+        } catch (InvalidProcessDefinitionException | InvalidBusinessArchiveFormatException e) {
+            throw new BonitaException(e);
+        }
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(
@@ -694,6 +689,25 @@ public class APITestUtil extends PlatformTestUtil {
         return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user,
                 Collections.<BarResource> emptyList(),
                 generateFilterDependencies, userFilters);
+    }
+
+    private static BusinessArchive createNewBusinessArchive(final DesignProcessDefinition designProcessDefinition)
+            throws BonitaException {
+        try {
+            return aBusinessArchive().setProcessDefinition(designProcessDefinition).done();
+        } catch (InvalidBusinessArchiveFormatException e) {
+            throw new BonitaException(e);
+        }
+    }
+
+    private static BusinessArchive createNewBusinessArchive(final DesignProcessDefinition designProcessDefinition,
+            final Map<String, String> parameters)
+            throws BonitaException {
+        try {
+            return aBusinessArchive().setProcessDefinition(designProcessDefinition).setParameters(parameters).done();
+        } catch (InvalidBusinessArchiveFormatException e) {
+            throw new BonitaException(e);
+        }
     }
 
     public void disableAndDeleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
@@ -1527,16 +1541,19 @@ public class APITestUtil extends PlatformTestUtil {
     public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess,
             final User user,
             final List<String> stepNames, final List<Boolean> isHuman) throws BonitaException {
-        final List<ProcessDefinition> processDefinitions = new ArrayList<>();
-        final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil
-                .buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
-                        isHuman);
+        try {
+            final List<ProcessDefinition> processDefinitions = new ArrayList<>();
+            final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil
+                    .buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames, isHuman);
 
-        for (final DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
-            processDefinitions
-                    .add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
+            for (final DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
+                processDefinitions
+                        .add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
+            }
+            return processDefinitions;
+        } catch (InvalidProcessDefinitionException e) {
+            throw new BonitaException(e);
         }
-        return processDefinitions;
     }
 
     protected void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected,

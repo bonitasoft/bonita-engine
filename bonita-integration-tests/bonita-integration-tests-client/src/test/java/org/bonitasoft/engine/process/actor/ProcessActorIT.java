@@ -45,7 +45,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.Group;
@@ -723,7 +722,7 @@ public class ProcessActorIT extends TestWithUser {
 
     private ProcessDefinition deployAndEnableProcessWithHumanTask(final String processName, final String actorName,
             final String userTaskName)
-            throws BonitaException {
+            throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
         processBuilder.addActor(actorName);
@@ -945,7 +944,7 @@ public class ProcessActorIT extends TestWithUser {
         disableAndDeleteProcess(secondDefinition);
     }
 
-    private ProcessDefinition getProcessDefinition(final String processName) throws BonitaException {
+    private ProcessDefinition getProcessDefinition(final String processName) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
                 PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
