@@ -15,13 +15,12 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -31,10 +30,13 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTaskDefinition {
 
     private static final long serialVersionUID = -3069440054837402115L;
+
     @XmlElement(name = "throwMessageEventTrigger")
     private final ThrowMessageEventTriggerDefinitionImpl trigger;
 
@@ -68,32 +70,8 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        SendTaskDefinitionImpl that = (SendTaskDefinitionImpl) o;
-        return Objects.equals(trigger, that.trigger);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), trigger);
-    }
-
-    @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         super.accept(visitor, modelId);
         visitor.find(this, modelId);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("trigger", trigger)
-                .toString();
     }
 }

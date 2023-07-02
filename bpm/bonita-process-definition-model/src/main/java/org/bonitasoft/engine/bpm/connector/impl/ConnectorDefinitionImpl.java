@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -28,7 +27,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.FailAction;
@@ -43,6 +45,9 @@ import org.bonitasoft.engine.operation.impl.OperationImpl;
 /**
  * @author Baptiste Mesta
  */
+@Getter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implements ConnectorDefinition {
 
@@ -61,43 +66,25 @@ public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implemen
     @XmlAttribute
     private final String version;
 
+    @Setter
     @XmlAttribute
     private FailAction failAction = FailAction.FAIL;
+    @Setter
     @XmlAttribute
     private String errorCode;
 
     public ConnectorDefinitionImpl(final String name, final String connectorId, final String version,
-            final ConnectorEvent actiationEvent) {
+            final ConnectorEvent activationEvent) {
         super(name);
         this.connectorId = connectorId;
         this.version = version;
-        this.activationEvent = actiationEvent;
+        this.activationEvent = activationEvent;
     }
 
     public ConnectorDefinitionImpl() {
         this.connectorId = "default id";
         this.version = "default version";
         this.activationEvent = ConnectorEvent.ON_ENTER;
-    }
-
-    @Override
-    public String getConnectorId() {
-        return connectorId;
-    }
-
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    @Override
-    public Map<String, Expression> getInputs() {
-        return inputs;
-    }
-
-    @Override
-    public List<Operation> getOutputs() {
-        return outputs;
     }
 
     public void addInput(final String name, final Expression expression) {
@@ -109,67 +96,7 @@ public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implemen
     }
 
     @Override
-    public ConnectorEvent getActivationEvent() {
-        return activationEvent;
-    }
-
-    @Override
-    public FailAction getFailAction() {
-        return failAction;
-    }
-
-    public void setFailAction(final FailAction failAction) {
-        this.failAction = failAction;
-    }
-
-    public void setErrorCode(final String errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    @Override
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         visitor.find(this, modelId);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        ConnectorDefinitionImpl that = (ConnectorDefinitionImpl) o;
-        return Objects.equals(connectorId, that.connectorId) &&
-                Objects.equals(inputs, that.inputs) &&
-                Objects.equals(outputs, that.outputs) &&
-                Objects.equals(activationEvent, that.activationEvent) &&
-                Objects.equals(version, that.version) &&
-                Objects.equals(failAction, that.failAction) &&
-                Objects.equals(errorCode, that.errorCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), connectorId, inputs, outputs, activationEvent, version, failAction,
-                errorCode);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("connectorId", connectorId)
-                .append("inputs", inputs)
-                .append("outputs", outputs)
-                .append("activationEvent", activationEvent)
-                .append("version", version)
-                .append("failAction", failAction)
-                .append("errorCode", errorCode)
-                .toString();
     }
 }

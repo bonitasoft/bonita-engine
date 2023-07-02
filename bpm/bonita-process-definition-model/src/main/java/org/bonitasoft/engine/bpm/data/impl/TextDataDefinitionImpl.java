@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
@@ -28,50 +30,20 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TextDataDefinitionImpl extends DataDefinitionImpl implements TextDataDefinition {
 
     private static final long serialVersionUID = 1619846767581787465L;
+
     @XmlAttribute
     private boolean longText;
 
-    public TextDataDefinitionImpl() {
-    }
-
     public TextDataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name, defaultValueExpression);
-    }
-
-    @Override
-    public boolean isLongText() {
-        return longText;
-    }
-
-    public void setLongText(final boolean longText) {
-        this.longText = longText;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        TextDataDefinitionImpl that = (TextDataDefinitionImpl) o;
-        return Objects.equals(longText, that.longText);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("longText", longText)
-                .toString();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), longText);
     }
 }

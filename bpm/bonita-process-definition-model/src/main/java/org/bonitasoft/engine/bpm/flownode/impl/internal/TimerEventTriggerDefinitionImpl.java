@@ -15,14 +15,14 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -32,10 +32,14 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 /**
  * @author Elias Ricken de Medeiros
  */
+@EqualsAndHashCode
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinition {
 
     private static final long serialVersionUID = -1000995843357026775L;
+
+    @Getter
     @XmlAttribute(name = "type")
     private final TimerType timerType;
     @XmlElement(type = ExpressionImpl.class, name = "expression")
@@ -52,37 +56,8 @@ public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinit
     }
 
     @Override
-    public TimerType getTimerType() {
-        return timerType;
-    }
-
-    @Override
     public Expression getTimerExpression() {
         return timerValue;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        TimerEventTriggerDefinitionImpl that = (TimerEventTriggerDefinitionImpl) o;
-        return Objects.equals(timerType, that.timerType) &&
-                Objects.equals(timerValue, that.timerValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(timerType, timerValue);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("timerType", timerType)
-                .append("timerValue", timerValue)
-                .toString();
     }
 
     @Override

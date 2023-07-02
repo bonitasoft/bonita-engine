@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.internal;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -23,17 +22,27 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
  * @author Danila Mazour
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class BaseDefinitionElementImpl implements BaseElement {
 
     private static final long serialVersionUID = 1L;
+
     @XmlID
     @XmlJavaTypeAdapter(type = long.class, value = LongToStringAdapter.class)
     @XmlAttribute
@@ -42,39 +51,4 @@ public abstract class BaseDefinitionElementImpl implements BaseElement {
     private long generateId() {
         return Math.abs(UUID.randomUUID().getLeastSignificantBits());
     }
-
-    public BaseDefinitionElementImpl() {
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        BaseDefinitionElementImpl that = (BaseDefinitionElementImpl) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("id", id)
-                .toString();
-    }
-
 }

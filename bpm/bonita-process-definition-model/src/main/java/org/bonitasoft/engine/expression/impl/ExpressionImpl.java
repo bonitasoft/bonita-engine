@@ -25,7 +25,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.internal.LongToStringAdapter;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
@@ -34,6 +38,11 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ExpressionImpl implements Expression {
 
@@ -58,85 +67,6 @@ public class ExpressionImpl implements Expression {
     @XmlElement(type = ExpressionImpl.class, name = "expression")
     private List<Expression> dependencies = new ArrayList<>();
 
-    public ExpressionImpl() {
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getContent() {
-        return content;
-    }
-
-    @Override
-    public String getExpressionType() {
-        return expressionType;
-    }
-
-    @Override
-    public String getReturnType() {
-        return returnType;
-    }
-
-    @Override
-    public String getInterpreter() {
-        return interpreter;
-    }
-
-    @Override
-    public List<Expression> getDependencies() {
-        return dependencies;
-    }
-
-    public void setContent(final String content) {
-        this.content = content;
-    }
-
-    public void setExpressionType(final String expressionType) {
-        this.expressionType = expressionType;
-    }
-
-    public void setReturnType(final String returnType) {
-        this.returnType = returnType;
-    }
-
-    public void setInterpreter(final String interpreter) {
-        this.interpreter = interpreter;
-    }
-
-    public void setDependencies(final List<Expression> dependencies) {
-        this.dependencies = dependencies;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("id", getId())
-                .append("name", name)
-                .append("content", content)
-                .append("expressionType", expressionType)
-                .append("returnType", returnType)
-                .append("interpreter", interpreter)
-                .append("dependencies", dependencies)
-                .toString();
-    }
-
     private long generateId() {
         return Math.abs(UUID.randomUUID().getLeastSignificantBits());
     }
@@ -160,27 +90,6 @@ public class ExpressionImpl implements Expression {
     @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         visitor.find(this, modelId);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof ExpressionImpl))
-            return false;
-        ExpressionImpl that = (ExpressionImpl) o;
-        return id == that.id &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(content, that.content) &&
-                Objects.equals(expressionType, that.expressionType) &&
-                Objects.equals(returnType, that.returnType) &&
-                Objects.equals(interpreter, that.interpreter) &&
-                Objects.equals(dependencies, that.dependencies);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), name, content, expressionType, returnType, interpreter, dependencies);
     }
 
     @Override

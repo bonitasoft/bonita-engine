@@ -16,13 +16,16 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
@@ -32,38 +35,27 @@ import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements EndEventDefinition {
 
     private static final long serialVersionUID = -6726824751097930154L;
+
     @XmlElement(type = ThrowErrorEventTriggerDefinitionImpl.class, name = "throwErrorEventTrigger")
-    private final List<ThrowErrorEventTriggerDefinition> errorEventTriggerDefinitions;
+    private final List<ThrowErrorEventTriggerDefinition> errorEventTriggerDefinitions = new ArrayList<>(1);
+    @Getter
+    @Setter
     @XmlElement(type = TerminateEventTriggerDefinitionImpl.class, name = "terminateEventTrigger")
     private TerminateEventTriggerDefinition terminateEventTriggerDefinition;
 
-    public EndEventDefinitionImpl() {
-        super();
-        errorEventTriggerDefinitions = new ArrayList<>(1);
-    }
-
     public EndEventDefinitionImpl(final String name) {
         super(name);
-        errorEventTriggerDefinitions = new ArrayList<>(1);
     }
 
     public EndEventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        errorEventTriggerDefinitions = new ArrayList<>(1);
-    }
-
-    @Override
-    public TerminateEventTriggerDefinition getTerminateEventTriggerDefinition() {
-        return terminateEventTriggerDefinition;
-    }
-
-    public void setTerminateEventTriggerDefinition(
-            final TerminateEventTriggerDefinition terminateEventTriggerDefinition) {
-        this.terminateEventTriggerDefinition = terminateEventTriggerDefinition;
     }
 
     @Override
@@ -74,31 +66,5 @@ public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements 
     public void addErrorEventTriggerDefinition(final ThrowErrorEventTriggerDefinition errorEventTrigger) {
         errorEventTriggerDefinitions.add(errorEventTrigger);
         addEventTrigger(errorEventTrigger);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("errorEventTriggerDefinitions", errorEventTriggerDefinitions)
-                .append("terminateEventTriggerDefinition", terminateEventTriggerDefinition)
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        EndEventDefinitionImpl that = (EndEventDefinitionImpl) o;
-        return Objects.equals(errorEventTriggerDefinitions, that.errorEventTriggerDefinitions) &&
-                Objects.equals(terminateEventTriggerDefinition, that.terminateEventTriggerDefinition);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), errorEventTriggerDefinitions, terminateEventTriggerDefinition);
     }
 }

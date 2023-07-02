@@ -16,14 +16,15 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.ThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowSignalEventTriggerDefinition;
@@ -34,32 +35,26 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl implements ThrowEventDefinition {
 
     private static final long serialVersionUID = -3142554305988571206L;
+
     @XmlElement(type = ThrowMessageEventTriggerDefinitionImpl.class, name = "throwMessageEventTrigger")
-    private final List<ThrowMessageEventTriggerDefinition> messageEventTriggerDefinitions;
+    private final List<ThrowMessageEventTriggerDefinition> messageEventTriggerDefinitions = new ArrayList<>(1);
     @XmlElement(type = ThrowSignalEventTriggerDefinitionImpl.class, name = "throwSignalEventTrigger")
-    private final List<ThrowSignalEventTriggerDefinition> signalEventTriggerDefinitions;
+    private final List<ThrowSignalEventTriggerDefinition> signalEventTriggerDefinitions = new ArrayList<>(1);
 
     public ThrowEventDefinitionImpl(final String name) {
         super(name);
-        messageEventTriggerDefinitions = new ArrayList<>(1);
-        signalEventTriggerDefinitions = new ArrayList<>(1);
     }
 
     public ThrowEventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        messageEventTriggerDefinitions = new ArrayList<>(1);
-        signalEventTriggerDefinitions = new ArrayList<>(1);
-    }
-
-    public ThrowEventDefinitionImpl() {
-        super();
-        messageEventTriggerDefinitions = new ArrayList<>(1);
-        signalEventTriggerDefinitions = new ArrayList<>(1);
     }
 
     @Override
@@ -81,32 +76,6 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
     public void addSignalEventTriggerDefinition(final ThrowSignalEventTriggerDefinition signalEventTrigger) {
         signalEventTriggerDefinitions.add(signalEventTrigger);
         addEventTrigger(signalEventTrigger);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        ThrowEventDefinitionImpl that = (ThrowEventDefinitionImpl) o;
-        return Objects.equals(messageEventTriggerDefinitions, that.messageEventTriggerDefinitions) &&
-                Objects.equals(signalEventTriggerDefinitions, that.signalEventTriggerDefinitions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), messageEventTriggerDefinitions, signalEventTriggerDefinitions);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("messageEventTriggerDefinitions", messageEventTriggerDefinitions)
-                .append("signalEventTriggerDefinitions", signalEventTriggerDefinitions)
-                .toString();
     }
 
     @Override

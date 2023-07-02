@@ -13,20 +13,24 @@
  **/
 package org.bonitasoft.engine.bpm.parameter.impl;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Getter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implements ParameterDefinition {
 
@@ -35,6 +39,7 @@ public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implemen
     @XmlAttribute(required = true)
     private final String type;
 
+    @Setter
     @XmlElement
     private String description;
 
@@ -47,45 +52,4 @@ public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implemen
         super();
         this.type = "";
     }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        ParameterDefinitionImpl that = (ParameterDefinitionImpl) o;
-        return Objects.equals(type, that.type) &&
-                Objects.equals(description, that.description);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), type, description);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("type", type)
-                .append("description", description)
-                .toString();
-    }
-
 }

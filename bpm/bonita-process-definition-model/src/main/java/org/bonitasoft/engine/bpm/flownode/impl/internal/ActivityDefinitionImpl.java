@@ -18,7 +18,6 @@ import static org.bonitasoft.engine.operation.OperationBuilder.getNonNullCopy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,7 +26,11 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
@@ -47,6 +50,10 @@ import org.bonitasoft.engine.operation.impl.OperationImpl;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@Getter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl implements ActivityDefinition {
@@ -59,61 +66,37 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
             @XmlElement(type = TextDataDefinitionImpl.class, name = "textDataDefinition"),
             @XmlElement(type = XMLDataDefinitionImpl.class, name = "xmlDataDefinition")
     })
-    private final List<DataDefinition> dataDefinitions;
+    private final List<DataDefinition> dataDefinitions = new ArrayList<>();
 
     @XmlElementWrapper(name = "businessDataDefinitions")
     @XmlElement(type = BusinessDataDefinitionImpl.class, name = "businessDataDefinition")
-    private final List<BusinessDataDefinition> businessDataDefinitions;
+    private final List<BusinessDataDefinition> businessDataDefinitions = new ArrayList<>(3);
 
     @XmlElementWrapper(name = "operations")
     @XmlElement(type = OperationImpl.class, name = "operation")
-    private final List<Operation> operations;
+    private final List<Operation> operations = new ArrayList<>();
 
+    @Setter
     @XmlElements({
             @XmlElement(type = StandardLoopCharacteristicsImpl.class, name = "standardLoopCharacteristics"),
             @XmlElement(type = MultiInstanceLoopCharacteristicsImpl.class, name = "multiInstanceLoopCharacteristics")
     })
     private LoopCharacteristics loopCharacteristics;
+
     @XmlElementWrapper(name = "boundaryEvents")
     @XmlElement(type = BoundaryEventDefinitionImpl.class, name = "boundaryEvent")
-    private final List<BoundaryEventDefinition> boundaryEventDefinitions;
+    private final List<BoundaryEventDefinition> boundaryEventDefinitions = new ArrayList<>(1);
 
-    public ActivityDefinitionImpl(final long id, final String name) {
+    protected ActivityDefinitionImpl(final long id, final String name) {
         super(id, name);
-        dataDefinitions = new ArrayList<>();
-        operations = new ArrayList<>();
-        boundaryEventDefinitions = new ArrayList<>(1);
-        businessDataDefinitions = new ArrayList<>(3);
     }
 
-    public ActivityDefinitionImpl(final String name) {
+    protected ActivityDefinitionImpl(final String name) {
         super(name);
-        dataDefinitions = new ArrayList<>();
-        operations = new ArrayList<>();
-        boundaryEventDefinitions = new ArrayList<>(1);
-        businessDataDefinitions = new ArrayList<>(3);
-    }
-
-    public ActivityDefinitionImpl() {
-        super();
-        dataDefinitions = new ArrayList<>();
-        operations = new ArrayList<>();
-        boundaryEventDefinitions = new ArrayList<>(1);
-        businessDataDefinitions = new ArrayList<>(3);
-    }
-
-    @Override
-    public List<DataDefinition> getDataDefinitions() {
-        return dataDefinitions;
     }
 
     public void addDataDefinition(final DataDefinition dataDefinition) {
         dataDefinitions.add(dataDefinition);
-    }
-
-    @Override
-    public List<Operation> getOperations() {
-        return operations;
     }
 
     public void addOperation(final Operation operation) {
@@ -129,55 +112,8 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
         boundaryEventDefinitions.add(boundaryEventDefinition);
     }
 
-    @Override
-    public LoopCharacteristics getLoopCharacteristics() {
-        return loopCharacteristics;
-    }
-
-    public void setLoopCharacteristics(final LoopCharacteristics loopCharacteristics) {
-        this.loopCharacteristics = loopCharacteristics;
-    }
-
-    @Override
-    public List<BusinessDataDefinition> getBusinessDataDefinitions() {
-        return businessDataDefinitions;
-    }
-
     public void addBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
         businessDataDefinitions.add(businessDataDefinition);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        ActivityDefinitionImpl that = (ActivityDefinitionImpl) o;
-        return Objects.equals(dataDefinitions, that.dataDefinitions) &&
-                Objects.equals(businessDataDefinitions, that.businessDataDefinitions) &&
-                Objects.equals(operations, that.operations) &&
-                Objects.equals(loopCharacteristics, that.loopCharacteristics) &&
-                Objects.equals(boundaryEventDefinitions, that.boundaryEventDefinitions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), dataDefinitions, businessDataDefinitions, operations, loopCharacteristics,
-                boundaryEventDefinitions);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("dataDefinitions", dataDefinitions)
-                .append("businessDataDefinitions", businessDataDefinitions)
-                .append("operations", operations)
-                .append("loopCharacteristics", loopCharacteristics)
-                .append("boundaryEventDefinitions", boundaryEventDefinitions)
-                .toString();
     }
 
     @Override

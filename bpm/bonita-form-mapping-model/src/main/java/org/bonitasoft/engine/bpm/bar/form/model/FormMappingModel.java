@@ -23,13 +23,18 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FormMappingModel implements Serializable {
@@ -38,43 +43,10 @@ public class FormMappingModel implements Serializable {
 
     @XmlElementWrapper(name = "form-mappings", required = true)
     @XmlElement(name = "form-mapping", required = false)
-    private List<FormMappingDefinition> formMappings;
-
-    public FormMappingModel() {
-        formMappings = new ArrayList<>();
-    }
-
-    public List<FormMappingDefinition> getFormMappings() {
-        return formMappings;
-    }
-
-    public void setFormMappings(final List<FormMappingDefinition> FormMappings) {
-        formMappings = FormMappings;
-    }
+    private List<FormMappingDefinition> formMappings = new ArrayList<>();
 
     public void addFormMapping(final FormMappingDefinition mapping) {
         formMappings.add(mapping);
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(13, 37).append(formMappings).toHashCode();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof FormMappingModel) {
-            final FormMappingModel other = (FormMappingModel) obj;
-            return new EqualsBuilder().append(formMappings, other.formMappings).isEquals();
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        final ToStringBuilder builder = new ToStringBuilder(this);
-        builder.append("formMappings", formMappings);
-        return builder.toString();
     }
 
 }

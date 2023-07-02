@@ -21,22 +21,24 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.contract.InputContainerDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 
 /**
  * @author Baptiste Mesta
  */
+@NoArgsConstructor
+@Getter
+@EqualsAndHashCode
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InputContainerDefinitionImpl implements InputContainerDefinition {
 
     @XmlElementWrapper(name = "inputDefinitions")
     @XmlElement(type = InputDefinitionImpl.class, name = "inputDefinition")
-    protected final List<InputDefinition> inputs;
-
-    public InputContainerDefinitionImpl() {
-        inputs = new ArrayList<>();
-    }
+    protected List<InputDefinition> inputs = new ArrayList<>();
 
     public InputContainerDefinitionImpl(List<InputDefinition> inputs) {
         this.inputs = inputs;
@@ -44,10 +46,5 @@ public class InputContainerDefinitionImpl implements InputContainerDefinition {
 
     public void addInput(final InputDefinition input) {
         inputs.add(input);
-    }
-
-    @Override
-    public List<InputDefinition> getInputs() {
-        return inputs;
     }
 }

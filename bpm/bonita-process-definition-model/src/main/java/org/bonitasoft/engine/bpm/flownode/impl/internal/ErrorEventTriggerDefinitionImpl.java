@@ -13,25 +13,29 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Getter
+@EqualsAndHashCode
+@ToString
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTriggerDefinition {
 
     private static final long serialVersionUID = -8002085238119587513L;
+
     @XmlAttribute
     private final String errorCode;
 
@@ -41,33 +45,6 @@ public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTrigg
 
     public ErrorEventTriggerDefinitionImpl() {
         this.errorCode = null;
-    }
-
-    @Override
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        ErrorEventTriggerDefinitionImpl that = (ErrorEventTriggerDefinitionImpl) o;
-        return Objects.equals(errorCode, that.errorCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(errorCode);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("errorCode", errorCode)
-                .toString();
     }
 
     @Override

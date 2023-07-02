@@ -13,70 +13,35 @@
  **/
 package org.bonitasoft.engine.bpm.internal;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class NamedDefinitionElementImpl extends BaseDefinitionElementImpl implements NamedElement {
 
     private static final long serialVersionUID = -6260501789773631525L;
+
     @XmlAttribute(required = true)
-    private String name;
-
-    public NamedDefinitionElementImpl(final String name) {
-        this.name = name;
-    }
-
-    public NamedDefinitionElementImpl() {
-        this.name = null;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof NamedDefinitionElementImpl)) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        NamedDefinitionElementImpl that = (NamedDefinitionElementImpl) o;
-        return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), name);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("name", name)
-                .toString();
-    }
-
+    private String name = null;
 }

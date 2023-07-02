@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,7 +23,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.CatchErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
@@ -37,44 +40,34 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl implements CatchEventDefinition {
 
     private static final long serialVersionUID = 250215494961033080L;
+
     @XmlElement(type = TimerEventTriggerDefinitionImpl.class, name = "timerEventTrigger")
-    private final List<TimerEventTriggerDefinition> timerEventTriggers;
+    private final List<TimerEventTriggerDefinition> timerEventTriggers = new ArrayList<>(1);
     @XmlElement(type = CatchMessageEventTriggerDefinitionImpl.class, name = "catchMessageEventTrigger")
-    private final List<CatchMessageEventTriggerDefinition> messageEventTriggers;
+    private final List<CatchMessageEventTriggerDefinition> messageEventTriggers = new ArrayList<>(1);
     @XmlElement(type = CatchSignalEventTriggerDefinitionImpl.class, name = "catchSignalEventTrigger")
-    private final List<CatchSignalEventTriggerDefinition> signalEventTriggers;
+    private final List<CatchSignalEventTriggerDefinition> signalEventTriggers = new ArrayList<>(1);
     @XmlElement(type = CatchErrorEventTriggerDefinitionImpl.class, name = "catchErrorEventTrigger")
-    private final List<CatchErrorEventTriggerDefinition> errorEventTriggers;
+    private final List<CatchErrorEventTriggerDefinition> errorEventTriggers = new ArrayList<>(1);
+    @Getter
+    @Setter
     @XmlAttribute(name = "interrupting")
     private boolean isInterrupting = true;
 
     public CatchEventDefinitionImpl(final String name) {
         super(name);
-        timerEventTriggers = new ArrayList<>(1);
-        messageEventTriggers = new ArrayList<>(1);
-        signalEventTriggers = new ArrayList<>(1);
-        errorEventTriggers = new ArrayList<>(1);
     }
 
     public CatchEventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        timerEventTriggers = new ArrayList<>(1);
-        messageEventTriggers = new ArrayList<>(1);
-        signalEventTriggers = new ArrayList<>(1);
-        errorEventTriggers = new ArrayList<>(1);
-    }
-
-    public CatchEventDefinitionImpl() {
-        super();
-        timerEventTriggers = new ArrayList<>(1);
-        messageEventTriggers = new ArrayList<>(1);
-        signalEventTriggers = new ArrayList<>(1);
-        errorEventTriggers = new ArrayList<>(1);
     }
 
     @Override
@@ -115,48 +108,6 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
     @Override
     public List<CatchErrorEventTriggerDefinition> getErrorEventTriggerDefinitions() {
         return Collections.unmodifiableList(errorEventTriggers);
-    }
-
-    public void setInterrupting(final boolean isInterrupting) {
-        this.isInterrupting = isInterrupting;
-    }
-
-    @Override
-    public boolean isInterrupting() {
-        return isInterrupting;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        CatchEventDefinitionImpl that = (CatchEventDefinitionImpl) o;
-        return Objects.equals(isInterrupting, that.isInterrupting) &&
-                Objects.equals(timerEventTriggers, that.timerEventTriggers) &&
-                Objects.equals(messageEventTriggers, that.messageEventTriggers) &&
-                Objects.equals(signalEventTriggers, that.signalEventTriggers) &&
-                Objects.equals(errorEventTriggers, that.errorEventTriggers);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), timerEventTriggers, messageEventTriggers, signalEventTriggers,
-                errorEventTriggers, isInterrupting);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("timerEventTriggers", timerEventTriggers)
-                .append("messageEventTriggers", messageEventTriggers)
-                .append("signalEventTriggers", signalEventTriggers)
-                .append("errorEventTriggers", errorEventTriggers)
-                .append("isInterrupting", isInterrupting)
-                .toString();
     }
 
     @Override
