@@ -6,10 +6,13 @@ dependencies {
         exclude(group: "javax.activation") //replaced by jakarta
     }
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
-    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}" // TODO to remove
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}" // TODO to remove (used by IOUtil)
     api project(':bpm:bonita-process-definition-model')
 
     runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import static org.bonitasoft.engine.expression.ExpressionBuilder.*;
-
-import java.util.Objects;
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,7 +22,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
@@ -37,6 +37,9 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TransitionDefinitionImpl extends NamedDefinitionElementImpl implements TransitionDefinition {
 
@@ -63,9 +66,6 @@ public class TransitionDefinitionImpl extends NamedDefinitionElementImpl impleme
 
     public TransitionDefinitionImpl(final String name) {
         this(name, null, null);
-    }
-
-    public TransitionDefinitionImpl() {
     }
 
     @Override
@@ -97,37 +97,6 @@ public class TransitionDefinitionImpl extends NamedDefinitionElementImpl impleme
 
     public void setCondition(final Expression expression) {
         this.expression = getNonNullCopy(expression);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("source", source)
-                .append("target", target)
-                .append("expression", expression)
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        TransitionDefinitionImpl that = (TransitionDefinitionImpl) o;
-        return Objects.equals(getSource(), that.getSource()) &&
-                Objects.equals(getTarget(), that.getTarget()) &&
-                Objects.equals(expression, that.expression);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), getSource(), getTarget(), expression);
     }
 
     @Override

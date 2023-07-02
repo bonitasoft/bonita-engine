@@ -2,7 +2,6 @@ dependencies {
     api("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}" // TODO to remove
     api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
     api "com.fasterxml.jackson.core:jackson-annotations"
     api project(':bpm:bonita-form-mapping-model')

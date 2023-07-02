@@ -33,7 +33,9 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
@@ -56,22 +58,31 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@ToString
 @XmlRootElement(name = "processDefinition")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso({ SubProcessDefinitionImpl.class })
 public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Visitable {
 
     private static final long serialVersionUID = -4719128363958199300L;
+
+    @Getter
+    @Setter
     @XmlAttribute
     private String displayName;
+    @Getter
+    @Setter
     @XmlElement
     private String displayDescription;
+    @Getter
     @XmlElementWrapper(name = "parameters")
     @XmlElement(type = ParameterDefinitionImpl.class, name = "parameter")
     private final Set<ParameterDefinition> parameters;
     @XmlElementWrapper(name = "actors")
     @XmlElement(type = ActorDefinitionImpl.class, name = "actor")
     private final List<ActorDefinition> actors;
+    @Getter
+    @Setter
     @XmlIDREF
     @XmlElement(type = ActorDefinitionImpl.class)
     private ActorDefinition actorInitiator;
@@ -80,6 +91,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @XmlElementWrapper(name = "stringIndexes", required = false, nillable = true)
     @XmlElement(name = "stringIndex")
     private IndexLabel[] listIndex = new IndexLabel[5];
+    @Getter
+    @Setter
     @XmlElement(type = ContractDefinitionImpl.class)
     private ContractDefinition contract;
     @XmlElementWrapper(name = "context")
@@ -106,24 +119,6 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         initStringIndexes();
     }
 
-    public void setDisplayName(final String name) {
-        displayName = name;
-    }
-
-    public void setDisplayDescription(final String description) {
-        displayDescription = description;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public String getDisplayDescription() {
-        return displayDescription;
-    }
-
     @Override
     public List<ActorDefinition> getActorsList() {
         return actors;
@@ -135,26 +130,12 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         return new HashSet<>(actors);
     }
 
-    @Override
-    public Set<ParameterDefinition> getParameters() {
-        return parameters;
-    }
-
     public void addParameter(final ParameterDefinition parameter) {
         parameters.add(parameter);
     }
 
     public void addActor(final ActorDefinition actor) {
         actors.add(actor);
-    }
-
-    @Override
-    public ActorDefinition getActorInitiator() {
-        return actorInitiator;
-    }
-
-    public void setActorInitiator(final ActorDefinition actorInitiator) {
-        this.actorInitiator = actorInitiator;
     }
 
     @Override
@@ -244,15 +225,6 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     @Override
-    public ContractDefinition getContract() {
-        return contract;
-    }
-
-    public void setContract(ContractDefinition contract) {
-        this.contract = contract;
-    }
-
-    @Override
     public List<ContextEntry> getContext() {
         if (context == null) {
             return Collections.emptyList();
@@ -296,9 +268,9 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         if (!super.equals(o))
             return false;
         DesignProcessDefinitionImpl that = (DesignProcessDefinitionImpl) o;
-        boolean ArrayCompare = true;
+        boolean arrayCompare = true;
         for (int i = 0; i < 5; i++) {
-            ArrayCompare = ArrayCompare && listIndex[i].equals(that.listIndex[i]);
+            arrayCompare = arrayCompare && listIndex[i].equals(that.listIndex[i]);
         }
         return Objects.equals(displayName, that.displayName) &&
                 Objects.equals(displayDescription, that.displayDescription) &&
@@ -306,7 +278,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
                 Objects.equals(actors, that.actors) &&
                 Objects.equals(actorInitiator, that.actorInitiator) &&
                 Objects.equals(flowElementContainer, that.flowElementContainer) &&
-                ArrayCompare &&
+                arrayCompare &&
                 Objects.equals(contract, that.contract) &&
                 Objects.equals(context, that.context);
     }
@@ -316,20 +288,5 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         return Objects.hash(super.hashCode(), displayName, displayDescription, parameters, actors, actorInitiator,
                 flowElementContainer, listIndex, contract,
                 context);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("displayName", displayName)
-                .append("displayDescription", displayDescription)
-                .append("parameters", parameters)
-                .append("actors", actors)
-                .append("actorInitiator", actorInitiator)
-                .append("flowElementContainer", flowElementContainer)
-                .append("listIndex", listIndex)
-                .append("contract", contract)
-                .append("context", context)
-                .toString();
     }
 }

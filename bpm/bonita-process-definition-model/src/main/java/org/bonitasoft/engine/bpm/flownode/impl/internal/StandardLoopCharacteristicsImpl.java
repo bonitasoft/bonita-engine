@@ -15,14 +15,14 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -33,10 +33,14 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Getter
+@EqualsAndHashCode
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class StandardLoopCharacteristicsImpl implements StandardLoopCharacteristics, LoopCharacteristics {
 
     private static final long serialVersionUID = -8405419721405699090L;
+
     @XmlElement(type = ExpressionImpl.class)
     private final Expression loopCondition;
     @XmlAttribute
@@ -63,44 +67,6 @@ public class StandardLoopCharacteristicsImpl implements StandardLoopCharacterist
         this.testBefore = false;
         this.loopCondition = new ExpressionImpl();
         this.loopMax = null;
-    }
-
-    public Expression getLoopCondition() {
-        return loopCondition;
-    }
-
-    public boolean isTestBefore() {
-        return testBefore;
-    }
-
-    public Expression getLoopMax() {
-        return loopMax;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("loopCondition", loopCondition)
-                .append("testBefore", testBefore)
-                .append("loopMax", loopMax)
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        StandardLoopCharacteristicsImpl that = (StandardLoopCharacteristicsImpl) o;
-        return Objects.equals(testBefore, that.testBefore) &&
-                Objects.equals(loopCondition, that.loopCondition) &&
-                Objects.equals(loopMax, that.loopMax);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(loopCondition, testBefore, loopMax);
     }
 
     @Override

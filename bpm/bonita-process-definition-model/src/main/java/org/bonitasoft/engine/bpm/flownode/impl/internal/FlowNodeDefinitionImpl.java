@@ -18,7 +18,6 @@ import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,7 +25,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
@@ -41,11 +44,15 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl implements FlowNodeDefinition {
 
     private static final long serialVersionUID = 429640943678358154L;
+
     @XmlIDREF
     @XmlElement(type = TransitionDefinitionImpl.class, name = "incomingTransition")
     private final List<TransitionDefinition> incomings = new ArrayList<>();
@@ -54,14 +61,21 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
     private final List<TransitionDefinition> outgoings = new ArrayList<>();
     @XmlElement(type = ConnectorDefinitionImpl.class, name = "connector")
     private final List<ConnectorDefinition> connectors = new ArrayList<>();
+    @Getter
+    @Setter
     @XmlElement
     private String description;
+    @Getter
     @XmlElement(type = ExpressionImpl.class)
     private Expression displayDescription;
+    @Getter
     @XmlElement(type = ExpressionImpl.class)
     private Expression displayName;
+    @Getter
     @XmlElement(type = ExpressionImpl.class)
     private Expression displayDescriptionAfterCompletion;
+    @Getter
+    @Setter
     @XmlIDREF
     @XmlElement(type = TransitionDefinitionImpl.class)
     private TransitionDefinition defaultTransition;
@@ -73,18 +87,6 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
 
     public FlowNodeDefinitionImpl(final String name) {
         super(name);
-    }
-
-    public FlowNodeDefinitionImpl() {
-    }
-
-    @Override
-    public TransitionDefinition getDefaultTransition() {
-        return defaultTransition;
-    }
-
-    public void setDefaultTransition(final TransitionDefinition defaultTransition) {
-        this.defaultTransition = defaultTransition;
     }
 
     @Override
@@ -139,10 +141,6 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
         connectors.add(connectorDefinition);
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
     public void setDisplayDescription(final Expression displayDescription) {
         this.displayDescription = getNonNullCopy(displayDescription);
     }
@@ -153,66 +151,6 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
 
     public void setDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
         this.displayDescriptionAfterCompletion = getNonNullCopy(displayDescriptionAfterCompletion);
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public Expression getDisplayDescription() {
-        return displayDescription;
-    }
-
-    @Override
-    public Expression getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public Expression getDisplayDescriptionAfterCompletion() {
-        return displayDescriptionAfterCompletion;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        FlowNodeDefinitionImpl that = (FlowNodeDefinitionImpl) o;
-        return Objects.equals(incomings, that.incomings) &&
-                Objects.equals(outgoings, that.outgoings) &&
-                Objects.equals(connectors, that.connectors) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(displayDescription, that.displayDescription) &&
-                Objects.equals(displayName, that.displayName) &&
-                Objects.equals(displayDescriptionAfterCompletion, that.displayDescriptionAfterCompletion) &&
-                Objects.equals(defaultTransition, that.defaultTransition);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), incomings, outgoings, connectors, description, displayDescription,
-                displayName, displayDescriptionAfterCompletion,
-                defaultTransition);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("incomings", incomings)
-                .append("outgoings", outgoings)
-                .append("connectors", connectors)
-                .append("description", description)
-                .append("displayDescription", displayDescription)
-                .append("displayName", displayName)
-                .append("displayDescriptionAfterCompletion", displayDescriptionAfterCompletion)
-                .append("defaultTransition", defaultTransition)
-                .toString();
     }
 
     @Override

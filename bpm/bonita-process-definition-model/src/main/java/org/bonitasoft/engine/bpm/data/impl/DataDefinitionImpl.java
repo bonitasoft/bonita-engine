@@ -15,14 +15,16 @@ package org.bonitasoft.engine.bpm.data.impl;
 
 import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -33,10 +35,16 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DataDefinitionImpl extends NamedDefinitionElementImpl implements DataDefinition {
 
     private static final long serialVersionUID = -4126105713210029929L;
+
     @XmlElement
     private String description;
     @XmlAttribute
@@ -48,89 +56,13 @@ public class DataDefinitionImpl extends NamedDefinitionElementImpl implements Da
     @XmlElement(type = ExpressionImpl.class, name = "defaultValue")
     private Expression defaultValueExpression;
 
-    public DataDefinitionImpl() {
-        super();
-    }
-
     public DataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name);
-        this.defaultValueExpression = getNonNullCopy(defaultValueExpression);
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getClassName() {
-        return className;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(final String type) {
-        this.type = type;
-    }
-
-    @Override
-    public boolean isTransientData() {
-        return transientData;
-    }
-
-    @Override
-    public Expression getDefaultValueExpression() {
-        return defaultValueExpression;
-    }
-
-    public void setTransientData(final boolean transientData) {
-        this.transientData = transientData;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
+        setDefaultValueExpression(defaultValueExpression);
     }
 
     public void setDefaultValueExpression(final Expression defaultValueExpression) {
         this.defaultValueExpression = getNonNullCopy(defaultValueExpression);
-    }
-
-    public void setClassName(final String className) {
-        this.className = className;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        DataDefinitionImpl that = (DataDefinitionImpl) o;
-        return Objects.equals(transientData, that.transientData) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(className, that.className) &&
-                Objects.equals(defaultValueExpression, that.defaultValueExpression);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), description, type, transientData, className, defaultValueExpression);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("description", description)
-                .append("type", type)
-                .append("transientData", transientData)
-                .append("className", className)
-                .append("defaultValueExpression", defaultValueExpression)
-                .toString();
     }
 
     @Override

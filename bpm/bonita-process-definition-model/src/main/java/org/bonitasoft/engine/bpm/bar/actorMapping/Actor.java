@@ -25,12 +25,18 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
+@Getter
+@NoArgsConstructor
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Actor implements Serializable {
 
@@ -84,11 +90,12 @@ public class Actor implements Serializable {
 
     @XmlAttribute
     private String name;
+    @Setter
     @XmlAttribute
     private String description;
     @XmlElementWrapper(name = "users", required = false)
     @XmlElement(name = "user")
-    private Set<String> users = new HashSet<>();;
+    private Set<String> users = new HashSet<>();
     @XmlElementWrapper(name = "groups", required = false)
     @XmlElement(name = "group")
     private Set<String> groups = new HashSet<>();
@@ -97,27 +104,10 @@ public class Actor implements Serializable {
     private Set<String> roles = new HashSet<>();
     @XmlElementWrapper(name = "memberships", required = false)
     @XmlElement(name = "membership")
-    private Set<Membership> memberships = null;
+    private Set<Membership> memberships = new HashSet<>();
 
     public Actor(final String name) {
         this.name = name;
-        memberships = new HashSet<>();
-    }
-
-    public Actor() {
-        memberships = new HashSet<>();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
     }
 
     public void addGroup(final String group) {
@@ -128,20 +118,12 @@ public class Actor implements Serializable {
         this.groups = new HashSet<>(groups);
     }
 
-    public Set<String> getGroups() {
-        return groups;
-    }
-
     public void addRole(final String role) {
         roles.add(role);
     }
 
     public void addRoles(final List<String> roles) {
         this.roles = new HashSet<>(roles);
-    }
-
-    public Set<String> getRoles() {
-        return roles;
     }
 
     public void addUser(final String user) {
@@ -152,16 +134,8 @@ public class Actor implements Serializable {
         users = new HashSet<>(userNames);
     }
 
-    public Set<String> getUsers() {
-        return users;
-    }
-
     public void addMembership(final String groupName, final String roleName) {
         memberships.add(new Membership(groupName, roleName));
-    }
-
-    public Set<Membership> getMemberships() {
-        return memberships;
     }
 
     @Override
@@ -182,17 +156,5 @@ public class Actor implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(name, description, users, groups, roles, memberships);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("name", name)
-                .append("description", description)
-                .append("users", users)
-                .append("groups", groups)
-                .append("roles", roles)
-                .append("memberships", memberships)
-                .toString();
     }
 }

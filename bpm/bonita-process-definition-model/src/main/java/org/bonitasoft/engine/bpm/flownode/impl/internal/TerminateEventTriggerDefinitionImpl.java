@@ -13,28 +13,22 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Matthieu Chaffotte
  */
+@NoArgsConstructor
+@ToString
 public class TerminateEventTriggerDefinitionImpl implements TerminateEventTriggerDefinition {
 
     private static final long serialVersionUID = -1494352183532063268L;
 
-    public TerminateEventTriggerDefinitionImpl() {
-    }
-
     @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         // nothing to do here:
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .toString();
     }
 }

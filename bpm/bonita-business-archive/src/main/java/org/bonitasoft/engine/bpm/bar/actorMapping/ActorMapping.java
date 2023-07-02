@@ -16,61 +16,35 @@ package org.bonitasoft.engine.bpm.bar.actorMapping;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author Matthieu Chaffotte
  * @author Danila Mazour
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 @XmlRootElement(name = "actorMappings")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ActorMapping implements Serializable {
 
     @XmlElement(name = "actorMapping", required = false)
-    private List<Actor> actors;
-
-    public ActorMapping() {
-        actors = new ArrayList<>(10);
-    }
-
-    public List<Actor> getActors() {
-        return actors;
-    }
-
-    public void setActors(List<Actor> actors) {
-        this.actors = actors;
-    }
+    private List<Actor> actors = new ArrayList<>(10);
 
     public void addActor(final Actor actor) {
         actors.add(actor);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("actors", actors)
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        ActorMapping that = (ActorMapping) o;
-        return Objects.equals(actors, that.actors);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(actors);
     }
 }

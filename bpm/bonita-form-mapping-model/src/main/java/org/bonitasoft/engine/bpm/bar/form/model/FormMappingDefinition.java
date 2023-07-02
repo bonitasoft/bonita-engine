@@ -19,15 +19,21 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@AllArgsConstructor
+@Getter
+@EqualsAndHashCode(of = { "form", "target", "type" })
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FormMappingDefinition implements Serializable {
 
@@ -36,12 +42,13 @@ public class FormMappingDefinition implements Serializable {
     @XmlAttribute
     private String form;
 
-    @XmlAttribute(required = true)
-    private FormMappingTarget target;
-
     @XmlAttribute
     private FormMappingType type;
 
+    @XmlAttribute(required = true)
+    private FormMappingTarget target;
+
+    @Setter
     @XmlAttribute
     private String taskname;
 
@@ -55,54 +62,6 @@ public class FormMappingDefinition implements Serializable {
         this.form = form;
         this.type = type;
         this.target = target;
-    }
-
-    public FormMappingDefinition(final String form, final FormMappingType type, final FormMappingTarget target,
-            final String taskname) {
-        this(form, type, target);
-        setTaskname(taskname);
-    }
-
-    public String getTaskname() {
-        return taskname;
-    }
-
-    public void setTaskname(final String taskname) {
-        this.taskname = taskname;
-    }
-
-    public String getForm() {
-        return form;
-    }
-
-    public FormMappingTarget getTarget() {
-        return target;
-    }
-
-    public FormMappingType getType() {
-        return type;
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(11, 43).append(form).append(target).append(type).toHashCode();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof FormMappingDefinition) {
-            final FormMappingDefinition other = (FormMappingDefinition) obj;
-            return new EqualsBuilder().append(form, other.form).append(target, other.target).append(type, other.type)
-                    .isEquals();
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        final ToStringBuilder builder = new ToStringBuilder(this);
-        builder.append("page", form).append("target", target).append("type", type).append("taskname", taskname);
-        return builder.toString();
     }
 
 }

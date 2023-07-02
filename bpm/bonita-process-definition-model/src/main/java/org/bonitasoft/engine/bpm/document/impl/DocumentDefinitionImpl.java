@@ -15,14 +15,16 @@ package org.bonitasoft.engine.bpm.document.impl;
 
 import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -32,10 +34,16 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 /**
  * @author Baptiste Mesta
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DocumentDefinitionImpl extends NamedDefinitionElementImpl implements DocumentDefinition {
 
     private static final long serialVersionUID = 2L;
+
     @XmlElement
     private String url;
     @XmlElement
@@ -56,102 +64,13 @@ public class DocumentDefinitionImpl extends NamedDefinitionElementImpl implement
         super(name);
     }
 
-    public DocumentDefinitionImpl() {
-    }
-
-    @Override
-    public String getUrl() {
-        return url;
-    }
-
-    @Override
-    public String getFile() {
-        return file;
-    }
-
     @Override
     public String getContentMimeType() {
         return mimeType;
     }
 
-    /**
-     * @param description the description of the document
-     */
-    public void setDescription(final String description) {
-        this.description = description;
-
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(final String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setUrl(final String url) {
-        this.url = url;
-    }
-
-    public void setFile(final String file) {
-        this.file = file;
-    }
-
-    @Override
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(final String fileName) {
-        this.fileName = fileName;
-    }
-
     public void setInitialValue(Expression initialValue) {
         this.initialValue = getNonNullCopy(initialValue);
-    }
-
-    public Expression getInitialValue() {
-        return initialValue;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        DocumentDefinitionImpl that = (DocumentDefinitionImpl) o;
-        return Objects.equals(url, that.url) &&
-                Objects.equals(file, that.file) &&
-                Objects.equals(mimeType, that.mimeType) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(fileName, that.fileName) &&
-                Objects.equals(initialValue, that.initialValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), url, file, mimeType, description, fileName, initialValue);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("url", url)
-                .append("file", file)
-                .append("mimeType", mimeType)
-                .append("description", description)
-                .append("fileName", fileName)
-                .append("initialValue", initialValue)
-                .toString();
     }
 
     @Override

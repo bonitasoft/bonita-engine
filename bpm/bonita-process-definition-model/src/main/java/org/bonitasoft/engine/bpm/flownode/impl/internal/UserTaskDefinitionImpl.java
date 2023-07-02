@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -23,7 +22,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
@@ -36,6 +38,10 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@Getter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { "incomings", "outgoings", "connectors", "description", "displayDescription", "displayName",
         "displayDescriptionAfterCompletion",
@@ -51,9 +57,6 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
     @XmlElement(name = "contextEntry", type = ContextEntryImpl.class)
     private List<ContextEntry> context = new ArrayList<>();
 
-    public UserTaskDefinitionImpl() {
-    }
-
     public UserTaskDefinitionImpl(final String name, final String actorName) {
         super(name, actorName);
     }
@@ -66,16 +69,6 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
         this.contract = contract;
     }
 
-    @Override
-    public ContractDefinition getContract() {
-        return contract;
-    }
-
-    @Override
-    public List<ContextEntry> getContext() {
-        return context;
-    }
-
     public void addContextEntry(ContextEntry contextEntry) {
         context.add(contextEntry);
     }
@@ -84,31 +77,5 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
     public void accept(ModelFinderVisitor visitor, long modelId) {
         super.accept(visitor, modelId);
         visitor.find(this, modelId);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        UserTaskDefinitionImpl that = (UserTaskDefinitionImpl) o;
-        return Objects.equals(contract, that.contract) &&
-                Objects.equals(context, that.context);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), contract, context);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("contract", contract)
-                .append("context", context)
-                .toString();
     }
 }

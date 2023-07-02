@@ -13,61 +13,36 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.SignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Matthieu Chaffotte
  */
+@RequiredArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class SignalEventTriggerDefinitionImpl implements SignalEventTriggerDefinition {
 
     private static final long serialVersionUID = 7986619065007971291L;
+
     @XmlAttribute(name = "name")
     private final String signalName;
 
-    public SignalEventTriggerDefinitionImpl(final String name) {
-        this.signalName = name;
-    }
-
     public SignalEventTriggerDefinitionImpl() {
         this.signalName = "default name";
-    }
-
-    @Override
-    public String getSignalName() {
-        return signalName;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("signalName", signalName)
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        SignalEventTriggerDefinitionImpl that = (SignalEventTriggerDefinitionImpl) o;
-        return Objects.equals(signalName, that.signalName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(signalName);
     }
 
     @Override

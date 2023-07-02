@@ -15,14 +15,16 @@ package org.bonitasoft.engine.bpm.businessdata.impl;
 
 import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -33,6 +35,11 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Emmanuel Duchastenier
  * @author Romain Bioteau
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BusinessDataDefinitionImpl extends NamedDefinitionElementImpl implements BusinessDataDefinition {
 
@@ -50,78 +57,11 @@ public class BusinessDataDefinitionImpl extends NamedDefinitionElementImpl imple
 
     public BusinessDataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name);
-        this.defaultValueExpression = getNonNullCopy(defaultValueExpression);
-    }
-
-    public BusinessDataDefinitionImpl() {
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
-    public Expression getDefaultValueExpression() {
-        return defaultValueExpression;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
+        setDefaultValueExpression(defaultValueExpression);
     }
 
     public void setDefaultValueExpression(final Expression defaultValueExpression) {
         this.defaultValueExpression = getNonNullCopy(defaultValueExpression);
-    }
-
-    public void setClassName(final String className) {
-        this.className = className;
-    }
-
-    @Override
-    public boolean isMultiple() {
-        return multiple;
-    }
-
-    public void setMultiple(final boolean multiple) {
-        this.multiple = multiple;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("description", description)
-                .append("type", type)
-                .append("className", className)
-                .append("multiple", multiple)
-                .append("defaultValueExpression", defaultValueExpression)
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        BusinessDataDefinitionImpl that = (BusinessDataDefinitionImpl) o;
-        return Objects.equals(multiple, that.multiple) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(className, that.className) &&
-                Objects.equals(defaultValueExpression, that.defaultValueExpression);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), description, type, className, multiple, defaultValueExpression);
     }
 
     @Override

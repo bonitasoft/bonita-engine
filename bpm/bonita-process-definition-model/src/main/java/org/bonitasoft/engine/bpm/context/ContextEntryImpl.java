@@ -15,14 +15,16 @@ package org.bonitasoft.engine.bpm.context;
 
 import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
@@ -30,6 +32,11 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 /**
  * @author Baptiste Mesta
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ContextEntryImpl implements ContextEntry {
 
@@ -38,54 +45,13 @@ public class ContextEntryImpl implements ContextEntry {
     @XmlElement(type = ExpressionImpl.class)
     private Expression expression;
 
-    public ContextEntryImpl() {
-    }
-
     public ContextEntryImpl(String key, Expression expression) {
         this.key = key;
-        this.expression = getNonNullCopy(expression);
-    }
-
-    @Override
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    @Override
-    public Expression getExpression() {
-        return expression;
+        setExpression(expression);
     }
 
     public void setExpression(Expression expression) {
         this.expression = getNonNullCopy(expression);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        ContextEntryImpl that = (ContextEntryImpl) o;
-        return Objects.equals(key, that.key) &&
-                Objects.equals(expression, that.expression);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(key, expression);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("key", key)
-                .append("expression", expression)
-                .toString();
     }
 
     @Override

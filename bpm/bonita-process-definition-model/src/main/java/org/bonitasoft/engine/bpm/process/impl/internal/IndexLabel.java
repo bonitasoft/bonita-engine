@@ -16,20 +16,26 @@ package org.bonitasoft.engine.bpm.process.impl.internal;
 import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 /**
  * @author mazourd
  */
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class IndexLabel implements Serializable {
 
@@ -49,55 +55,5 @@ public class IndexLabel implements Serializable {
     public IndexLabel() {
         this.index = "-1";
         this.value = null;
-    }
-
-    public String getIndex() {
-        return index;
-    }
-
-    public void setIndex(String index) {
-        this.index = index;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public Expression getValue() {
-        return value;
-    }
-
-    public void setValue(Expression value) {
-        this.value = value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        IndexLabel that = (IndexLabel) o;
-        return Objects.equals(index, that.index) &&
-                Objects.equals(label, that.label) &&
-                Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(index, label, value);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("index", index)
-                .append("label", label)
-                .append("value", value)
-                .toString();
     }
 }

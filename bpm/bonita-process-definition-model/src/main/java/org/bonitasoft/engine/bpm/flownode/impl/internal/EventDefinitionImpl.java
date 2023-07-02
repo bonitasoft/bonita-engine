@@ -16,12 +16,13 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.flownode.EventDefinition;
 import org.bonitasoft.engine.bpm.flownode.EventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -30,27 +31,23 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class EventDefinitionImpl extends FlowNodeDefinitionImpl implements EventDefinition {
 
     private static final long serialVersionUID = 2606127153595667535L;
+
     @XmlTransient
-    private final List<EventTriggerDefinition> eventTriggers;
+    private final List<EventTriggerDefinition> eventTriggers = new ArrayList<>();
 
     public EventDefinitionImpl(final String name) {
         super(name);
-        eventTriggers = new ArrayList<>();
     }
 
     public EventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        eventTriggers = new ArrayList<>();
-    }
-
-    public EventDefinitionImpl() {
-        super();
-        eventTriggers = new ArrayList<>();
     }
 
     @Override
@@ -60,23 +57,6 @@ public abstract class EventDefinitionImpl extends FlowNodeDefinitionImpl impleme
 
     public void addEventTrigger(final EventTriggerDefinition eventTrigger) {
         eventTriggers.add(eventTrigger);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        EventDefinitionImpl that = (EventDefinitionImpl) o;
-        return Objects.equals(eventTriggers, that.eventTriggers);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), eventTriggers);
     }
 
     @Override
