@@ -155,28 +155,6 @@ public class IOUtilTest {
     }
 
     @Test
-    public void testReadInputStream() throws Exception {
-        final String content = "theContent" + lineSeparator + "VeryGreatContent";
-        final ByteArrayInputStream inputStream = new ByteArrayInputStream(content.getBytes());
-
-        final String read = IOUtil.read(inputStream);
-        inputStream.close();
-
-        assertEquals(content, read);
-    }
-
-    @Test
-    public void readFile() throws Exception {
-        final File file = File.createTempFile("test", "test");
-        final String content = "theContent" + lineSeparator + "VeryGreatContent";
-        IOUtil.writeContentToFile(content, file);
-
-        assertEquals(content, IOUtil.read(file));
-
-        file.delete();
-    }
-
-    @Test
     public void unzipToFolder() throws Exception {
         final HashMap<String, byte[]> hashMap = new HashMap<String, byte[]>(2);
         hashMap.put("file1.txt", "content1".getBytes());

@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,7 +42,6 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * @author Severin Moussel
@@ -80,7 +80,7 @@ public abstract class ServletCall {
      * @throws IOException
      * @throws FileUploadException
      */
-    public ServletCall(final HttpServletRequest request, final HttpServletResponse response)
+    protected ServletCall(final HttpServletRequest request, final HttpServletResponse response)
             throws FileUploadException, IOException {
         super();
         this.request = request;
@@ -94,15 +94,14 @@ public abstract class ServletCall {
             while (iter.hasNext()) {
                 try {
                     final FileItemStream item = iter.next();
-                    final InputStream stream = item.openStream();
-                    String fieldName = item.getFieldName();
-                    if (fieldName.startsWith(BINARY_PARAMETER)) {
-                        binaryParameters.add(IOUtil.getAllContentFrom(stream));
-                    } else {
-                        String read = IOUtil.read(stream);
-                        parameters.put(fieldName, read);
+                    try (var stream = item.openStream()) {
+                        String fieldName = item.getFieldName();
+                        if (fieldName.startsWith(BINARY_PARAMETER)) {
+                            binaryParameters.add(stream.readAllBytes());
+                        } else {
+                            parameters.put(fieldName, new String(stream.readAllBytes(), StandardCharsets.UTF_8));
+                        }
                     }
-                    stream.close();
                 } catch (final Exception t) {
                     throw new IOException(t);
                 }

@@ -15,9 +15,9 @@ package org.bonitasoft.engine.bpm.bar;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
-import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * @author Emmanuel Duchastenier
@@ -45,7 +45,7 @@ public class ActorMappingContribution extends GenericFileContribution {
     public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
         final File file = new File(barFolder, ACTOR_MAPPING_FILE);
         if (file.exists()) {
-            final byte[] content = IOUtil.getContent(file);
+            final byte[] content = Files.readAllBytes(file.toPath());
             try {
                 businessArchive.setActorMapping(new ActorMappingMarshaller().deserializeFromXML(content));
             } catch (XmlMarshallException e) {
@@ -63,7 +63,7 @@ public class ActorMappingContribution extends GenericFileContribution {
             try {
                 final byte[] fileContent = new ActorMappingMarshaller().serializeToXML(actorMapping);
                 final File file = new File(barFolder, ACTOR_MAPPING_FILE);
-                IOUtil.write(file, fileContent);
+                Files.write(file.toPath(), fileContent);
             } catch (XmlMarshallException e) {
                 throw new IOException("Cannot write Actor Mapping to Bar folder", e);
             }

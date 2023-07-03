@@ -15,11 +15,11 @@ package org.bonitasoft.engine.bpm.bar;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
-import org.bonitasoft.engine.io.IOUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -41,9 +41,9 @@ public class FormMappingContribution implements BusinessArchiveContribution {
 
     @Override
     public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
-        final File file = new File(barFolder, FORM_MAPPING_FILE);
-        if (file.exists()) {
-            final byte[] content = IOUtil.getContent(file);
+        var file = barFolder.toPath().resolve(FORM_MAPPING_FILE);
+        if (Files.exists(file)) {
+            final byte[] content = Files.readAllBytes(file);
             try {
                 businessArchive.setFormMappings(new FormMappingModelMarshaller().deserializeFromXML(content));
             } catch (JAXBException | SAXException e) {
@@ -58,8 +58,7 @@ public class FormMappingContribution implements BusinessArchiveContribution {
         final FormMappingModel formMappingModel = businessArchive.getFormMappingModel();
         try {
             final byte[] fileContent = new FormMappingModelMarshaller().serializeToXML(formMappingModel);
-            final File file = new File(barFolder, FORM_MAPPING_FILE);
-            IOUtil.write(file, fileContent);
+            Files.write(barFolder.toPath().resolve(FORM_MAPPING_FILE), fileContent);
         } catch (JAXBException | SAXException e) {
             throw new IOException("Cannot write Form Mapping Model to Bar folder", e);
         }

@@ -19,8 +19,6 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.io.IOUtil;
-
 /**
  * Deals with the external resources in a BusinessArchive. Is considered external a resource that is not managed by the
  * Bonita Engine.
@@ -54,7 +52,7 @@ public class ExternalResourceContribution implements BusinessArchiveContribution
         for (final Entry<String, byte[]> entry : resources.entrySet()) {
             final File fullPathFile = new File(externalResourceFolder, entry.getKey().substring(beginIndex));
             fullPathFile.getParentFile().mkdirs();
-            IOUtil.write(fullPathFile, entry.getValue());
+            Files.write(fullPathFile.toPath(), entry.getValue());
         }
     }
 

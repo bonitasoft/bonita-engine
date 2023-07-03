@@ -20,11 +20,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
-import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * Read or write {@link BusinessArchive} from/to file system
@@ -49,6 +52,7 @@ public class BusinessArchiveFactory {
     }
 
     private static final BusinessArchiveFactory INSTANCE = new BusinessArchiveFactory();
+    private static final int BUFFER_SIZE = 100000;
 
     /**
      * Create a business archive from an {@link InputStream}
@@ -131,14 +135,14 @@ public class BusinessArchiveFactory {
             throws IOException, InvalidBusinessArchiveFormatException {
         File barFolder = Files.createTempDirectory("tempBarFolder").toFile();
         try {
-            IOUtil.unzipToFolder(inputStream, barFolder);
+            unzipToFolder(inputStream, barFolder);
             return getBusinessArchive(barFolder, contributions);
         } catch (final InvalidBusinessArchiveFormatException e) {
             throw e;
         } catch (final Exception e) {
             throw new InvalidBusinessArchiveFormatException("Invalid format, can't read the BAR file", e);
         } finally {
-            IOUtil.deleteDir(barFolder);
+            deleteDir(barFolder.toPath());
         }
     }
 
@@ -191,7 +195,15 @@ public class BusinessArchiveFactory {
             writeBusinessArchiveToFolder(businessArchive, tempFile);
             zipBarFolder(businessArchiveFile, tempFile);
         } finally {
-            IOUtil.deleteDir(tempFile);
+            deleteDir(tempFile.toPath());
+        }
+    }
+
+    private static void deleteDir(Path directory) throws IOException {
+        try (Stream<Path> pathStream = Files.walk(directory)) {
+            pathStream.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
         }
     }
 
@@ -210,9 +222,90 @@ public class BusinessArchiveFactory {
 
         final FileOutputStream fileOutput = new FileOutputStream(businessArchiveFile);
         try (ZipOutputStream zos = new ZipOutputStream(fileOutput)) {
-            IOUtil.zipDir(folder.getAbsolutePath(), zos, folder.getAbsolutePath());
+            zipDir(folder.getAbsolutePath(), zos, folder.getAbsolutePath());
         } finally {
             fileOutput.close();
+        }
+    }
+
+    private static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
+        try (ZipInputStream zipInputstream = new ZipInputStream(inputStream)) {
+            extractZipEntries(zipInputstream, outputFolder);
+        }
+    }
+
+    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder)
+            throws IOException {
+        ZipEntry zipEntry;
+        while ((zipEntry = zipInputstream.getNextEntry()) != null) {
+            try {
+                // For each entry, a file is created in the output directory "folder"
+                final File outputFile = new File(outputFolder.getAbsolutePath(), zipEntry.getName());
+                // If the entry is a directory, it creates in the output folder, and we go to the next entry (continue).
+                if (zipEntry.isDirectory()) {
+                    if (!outputFile.exists()) {
+                        outputFile.mkdirs();
+                    }
+                    continue;
+                }
+                writeZipInputToFile(zipInputstream, outputFile);
+            } finally {
+                zipInputstream.closeEntry();
+            }
+        }
+    }
+
+    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile)
+            throws IOException {
+        // The input is a file. An FileOutputStream is created to write the content of the new file.
+        if (!outputFile.getParentFile().exists()) {
+            outputFile.getParentFile().mkdirs();
+        }
+        try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
+            // The contents of the new file, that is read from the ZipInputStream using a buffer (byte []), is written.
+            int bytesRead;
+            final byte[] buffer = new byte[BUFFER_SIZE];
+            while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                fileOutputStream.write(buffer, 0, bytesRead);
+            }
+            fileOutputStream.flush();
+        } catch (final IOException ioe) {
+            // In case of error, the file is deleted
+            outputFile.delete();
+            throw ioe;
+        }
+    }
+
+    private static void zipDir(final String dir2zip, final ZipOutputStream zos, final String root) throws IOException {
+        final File zipDir = new File(dir2zip);
+        final byte[] readBuffer = new byte[BUFFER_SIZE];
+
+        for (final String pathName : zipDir.list()) {
+            final File file = new File(zipDir, pathName);
+            final String path = file.getPath();
+            if (file.isDirectory()) {
+                zipDir(path, zos, root);
+                continue;
+            }
+            try {
+                final ZipEntry anEntry = new ZipEntry(path.substring(root.length() + 1, path.length())
+                        .replace(String.valueOf(File.separatorChar), "/"));
+                zos.putNextEntry(anEntry);
+                copyFileToZip(zos, readBuffer, file);
+                zos.flush();
+            } finally {
+                zos.closeEntry();
+            }
+        }
+    }
+
+    private static void copyFileToZip(final ZipOutputStream zos, final byte[] readBuffer, final File file)
+            throws IOException {
+        int bytesIn;
+        try (var fis = Files.newInputStream(file.toPath())) {
+            while ((bytesIn = fis.read(readBuffer)) != -1) {
+                zos.write(readBuffer, 0, bytesIn);
+            }
         }
     }
 

@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
@@ -29,7 +30,6 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -90,10 +90,10 @@ public class ProcessDefinitionBARContributionTest {
         exception.expect(InvalidBusinessArchiveFormatException.class);
         exception.expectMessage(
                 "Wrong version of your process definition, 6.0 namespace is not compatible with your current version. Use the studio to update it.");
-        final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
+        final String allContentFrom = new String(getClass().getResourceAsStream("/old-process.xml").readAllBytes());
         final File createTempFile = temporaryFolder.newFile();
 
-        IOUtil.writeContentToFile(allContentFrom, createTempFile);
+        Files.writeString(createTempFile.toPath(), allContentFrom);
         new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
     }
 
@@ -103,25 +103,25 @@ public class ProcessDefinitionBARContributionTest {
         exception.expectMessage("6.0 namespace is not compatible with your current version");
 
         new ProcessDefinitionBARContribution()
-                .checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
+                .checkVersion(new String((getClass().getResourceAsStream("/old-process.xml").readAllBytes())));
     }
 
     @Test
     public void checkVersion_should_accept_new_7_4_content() throws Exception {
         new ProcessDefinitionBARContribution()
-                .checkVersion(IOUtil.read(getClass().getResourceAsStream("/process_7_4.xml")));
+                .checkVersion(new String((getClass().getResourceAsStream("/process_7_4.xml")).readAllBytes()));
     }
 
     @Test
     public void convertXmlToProcess_should_accept_new_7_2_content() throws Exception {
         new ProcessDefinitionBARContribution()
-                .convertXmlToProcess(IOUtil.read(getClass().getResourceAsStream("/process_7_4.xml")));
+                .convertXmlToProcess(new String(getClass().getResourceAsStream("/process_7_4.xml").readAllBytes()));
     }
 
     @Test
     public void convertXmlToProcess_should_fail_with_invalid_7_4_content() throws Exception {
         // given:
-        final String content = IOUtil.read(getClass().getResourceAsStream("/invalid_7_4_process.xml"));
+        final String content = new String(getClass().getResourceAsStream("/invalid_7_4_process.xml").readAllBytes());
 
         // then:
         exception.expect(IOException.class);

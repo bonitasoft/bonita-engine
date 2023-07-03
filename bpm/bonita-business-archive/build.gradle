@@ -5,8 +5,6 @@ dependencies {
     api("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
-    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}" // TODO to remove (used by IOUtil)
     api project(':bpm:bonita-process-definition-model')
 
     runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"

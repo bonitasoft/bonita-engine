@@ -16,13 +16,12 @@ package org.bonitasoft.engine.bpm.bar;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
-
-import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * @author Laurent Leseigneur
@@ -59,7 +58,7 @@ class BarResourceVisitor extends SimpleFileVisitor<Path> {
         Objects.requireNonNull(file);
         Objects.requireNonNull(attrs);
         businessArchive.addResource(barRootFolder.relativize(file).toString().replace(File.separator, "/"),
-                IOUtil.getAllContentFrom(file.toFile()));
+                Files.readAllBytes(file));
         resourcesCount++;
         return FileVisitResult.CONTINUE;
     }

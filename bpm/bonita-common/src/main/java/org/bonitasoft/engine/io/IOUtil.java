@@ -18,7 +18,6 @@ import static java.util.Collections.emptyList;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
@@ -55,19 +53,9 @@ import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.xml.sax.SAXException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -348,89 +336,6 @@ public class IOUtil {
         }
     }
 
-    /**
-     * Create a structured zip archive recursively.
-     * The string must be OS specific String to represent path.
-     */
-    public static void zipDir(final String dir2zip, final ZipOutputStream zos, final String root) throws IOException {
-        final File zipDir = new File(dir2zip);
-        final byte[] readBuffer = new byte[BUFFER_SIZE];
-
-        for (final String pathName : zipDir.list()) {
-            final File file = new File(zipDir, pathName);
-            final String path = file.getPath();
-            if (file.isDirectory()) {
-                zipDir(path, zos, root);
-                continue;
-            }
-            try {
-                final ZipEntry anEntry = new ZipEntry(path.substring(root.length() + 1, path.length())
-                        .replace(String.valueOf(File.separatorChar), "/"));
-                zos.putNextEntry(anEntry);
-                copyFileToZip(zos, readBuffer, file);
-                zos.flush();
-            } finally {
-                zos.closeEntry();
-            }
-        }
-    }
-
-    private static void copyFileToZip(final ZipOutputStream zos, final byte[] readBuffer, final File file)
-            throws IOException {
-        int bytesIn;
-        try (FileInputStream fis = new FileInputStream(file)) {
-            while ((bytesIn = fis.read(readBuffer)) != -1) {
-                zos.write(readBuffer, 0, bytesIn);
-            }
-        }
-    }
-
-    /**
-     * Read the contents from the given FileInputStream. Return the result as a String.
-     *
-     * @param inputStream the stream to read from
-     * @return the content read from the inputStream, as a String
-     */
-    public static String read(final InputStream inputStream) {
-        if (inputStream == null) {
-            throw new IllegalArgumentException("Input stream is null");
-        }
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(inputStream, FILE_ENCODING);
-            return read(scanner);
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
-        }
-    }
-
-    private static String read(final Scanner scanner) {
-        final StringBuilder text = new StringBuilder();
-        boolean isFirst = true;
-        while (scanner.hasNextLine()) {
-            if (isFirst) {
-                text.append(scanner.nextLine());
-            } else {
-                text.append(LINE_SEPARATOR).append(scanner.nextLine());
-            }
-            isFirst = false;
-        }
-        return text.toString();
-    }
-
-    /**
-     * Read the contents of the given file.
-     *
-     * @param file the file to read
-     */
-    public static String read(final File file) throws IOException {
-        try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            return read(fileInputStream);
-        }
-    }
-
     public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
         try (ZipInputStream zipInputstream = new ZipInputStream(inputStream)) {
             extractZipEntries(zipInputstream, outputFolder);
@@ -512,47 +417,6 @@ public class IOUtil {
             final byte[] bytes = new byte[size];
             buf.get(bytes);
             return bytes;
-        }
-    }
-
-    public static byte[] marshallObjectToXML(final Object jaxbModel, final URL schemaURL)
-            throws JAXBException, IOException, SAXException {
-        if (jaxbModel == null) {
-            return null;
-        }
-        if (schemaURL == null) {
-            throw new IllegalArgumentException("schemaURL is null");
-        }
-        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        final Schema schema = sf.newSchema(schemaURL);
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            final JAXBContext contextObj = JAXBContext.newInstance(jaxbModel.getClass());
-            final Marshaller m = contextObj.createMarshaller();
-            m.setSchema(schema);
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(jaxbModel, baos);
-            return baos.toByteArray();
-        }
-    }
-
-    public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL)
-            throws JAXBException, IOException,
-            SAXException {
-        if (xmlObject == null) {
-            return null;
-        }
-        if (schemaURL == null) {
-            throw new IllegalArgumentException("schemaURL is null");
-        }
-        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        final Schema schema = sf.newSchema(schemaURL);
-        final JAXBContext contextObj = JAXBContext.newInstance(objectClass);
-        final Unmarshaller um = contextObj.createUnmarshaller();
-        um.setSchema(schema);
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(xmlObject)) {
-            final StreamSource ss = new StreamSource(bais);
-            final JAXBElement<T> jaxbElement = um.unmarshal(ss, objectClass);
-            return jaxbElement.getValue();
         }
     }
 

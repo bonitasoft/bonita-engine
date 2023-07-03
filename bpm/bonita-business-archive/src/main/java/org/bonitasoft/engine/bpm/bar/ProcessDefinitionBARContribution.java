@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,7 +50,6 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.StartEventDefinitionImpl
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
-import org.bonitasoft.engine.io.IOUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -89,7 +89,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     public DesignProcessDefinition deserializeProcessDefinition(final File file)
             throws IOException, InvalidBusinessArchiveFormatException {
-        String content = IOUtil.read(file);
+        String content = Files.readString(file.toPath());
         try {
             return convertXmlToProcess(content);
         } catch (final IOException e) {
@@ -121,8 +121,8 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition)
             throws IOException {
         try {
-            IOUtil.writeContentToFile(convertProcessToXml(processDefinition),
-                    new File(barFolder, PROCESS_DEFINITION_XML));
+            Files.writeString(barFolder.toPath().resolve(PROCESS_DEFINITION_XML),
+                    convertProcessToXml(processDefinition));
         } catch (final FileNotFoundException e) {
             throw new IOException(e);
         }
