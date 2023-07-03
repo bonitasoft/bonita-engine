@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Properties;
 
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.io.PropertiesManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -97,7 +96,7 @@ public class ParameterContributionTest {
         new ParameterContribution().saveToBarFolder(businessArchive, temporaryFolder.getRoot());
 
         // then:
-        final Properties properties = PropertiesManager.getProperties(parametersFile);
+        final Properties properties = ParameterContribution.loadProperties(parametersFile);
         assertThat(properties.getProperty(myKeyWithNullValue)).isEqualTo(NULL);
     }
 
@@ -118,13 +117,14 @@ public class ParameterContributionTest {
         new ParameterContribution().saveToBarFolder(businessArchive, temporaryFolder.getRoot());
 
         // then:
-        final Properties properties = PropertiesManager.getProperties(parametersFile);
+        final Properties properties = ParameterContribution.loadProperties(parametersFile);
         assertThat(properties.getProperty(myKeyWithNullValue)).isEqualTo(someValue);
     }
 
     private void writePropertyFile(File file, String key, String value) throws IOException {
         Properties props = new Properties();
         props.setProperty(key, value);
-        PropertiesManager.saveProperties(props, file);
+        ParameterContribution.saveProperties(props, file);
     }
+
 }

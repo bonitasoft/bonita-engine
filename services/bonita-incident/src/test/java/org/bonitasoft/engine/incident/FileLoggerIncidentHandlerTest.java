@@ -16,7 +16,6 @@ package org.bonitasoft.engine.incident;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.incident.BeforeAllLoggerInitializer.INCIDENT_LOG_PATH;
 import static org.bonitasoft.engine.incident.BeforeAllLoggerInitializer.INCIDENT_LOG_PATH_PROP_NAME;
-import static org.bonitasoft.engine.io.IOUtil.read;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,7 +79,7 @@ public class FileLoggerIncidentHandlerTest {
                 .contains(expectedRecoveryProcedureMessage);
 
         // as defined in logback.xml, logs marked with INCIDENT should be logged also in a specific file.
-        String log = read(new File(INCIDENT_LOG_PATH + "/incidents.log"));
+        String log = Files.readString(new File(INCIDENT_LOG_PATH + "/incidents.log").toPath());
 
         assertThat(log).contains(expectedDescription)
                 .contains(cause)

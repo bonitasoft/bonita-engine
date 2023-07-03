@@ -31,11 +31,6 @@ import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
  */
 public class ActorMappingMarshaller {
 
-    private static final String XSD_MODEL = "/actorMapping.xsd";
-
-    public ActorMappingMarshaller() {
-    }
-
     public ActorMapping deserializeFromXML(final byte[] xmlModel) throws XmlMarshallException {
         return unmarshall(xmlModel);
     }

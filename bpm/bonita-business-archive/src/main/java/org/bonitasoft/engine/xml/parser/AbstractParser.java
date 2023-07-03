@@ -33,7 +33,7 @@ public abstract class AbstractParser<T> {
 
     private final JAXBContext jaxbContext;
 
-    public AbstractParser() {
+    protected AbstractParser() {
         try {
             jaxbContext = initJAXBContext();
         } catch (final Exception e) {

@@ -13,10 +13,13 @@
  **/
 package org.bonitasoft.engine.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +62,6 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -485,7 +487,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         if (version == null) {
             // when running tests in eclipse get it from the pom.xml
             final File file = new File("pom.xml");
-            final String pomContent = IOUtil.read(file);
+            final String pomContent = Files.readString(file.toPath());
             final Pattern pattern = Pattern.compile("<version>(.*)</version>");
             final Matcher matcher = pattern.matcher(pomContent);
             matcher.find();

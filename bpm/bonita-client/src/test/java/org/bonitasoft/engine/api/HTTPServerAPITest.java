@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -114,7 +114,7 @@ public class HTTPServerAPITest {
         HttpEntity entity = httpServerAPI.buildEntity(emptyMap(),
                 asList("param1", "param2"),
                 new Object[] { "Välue1", singletonMap("key", "välue") });
-        String content = IOUtil.read(entity.getContent());
+        String content = new String(entity.getContent().readAllBytes(), StandardCharsets.UTF_8);
         String decodedContent = URLDecoder.decode(content, "UTF-8");
         assertThat(decodedContent).as("Decoded content").contains("välue", "Välue1");
     }

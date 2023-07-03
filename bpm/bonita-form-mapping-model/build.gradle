@@ -4,6 +4,9 @@ dependencies {
     api("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
+    api("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
+        exclude(group: "javax.activation") //replaced by jakarta
+    }
 
     runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
 

@@ -15,10 +15,9 @@ package org.bonitasoft.engine.bpm.bar;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * @author Baptiste Mesta
@@ -32,7 +31,7 @@ public abstract class ResourceInSpecificFolderContribution implements BusinessAr
         if (folder.exists() && !folder.isFile()) {
             final File[] listFiles = folder.listFiles();
             for (final File file : listFiles) {
-                final byte[] content = IOUtil.getContent(file);
+                final byte[] content = Files.readAllBytes(file.toPath());
                 businessArchive.addResource(getFolderName() + '/' + file.getName(), content);
             }
             return listFiles.length > 0;
@@ -51,7 +50,7 @@ public abstract class ResourceInSpecificFolderContribution implements BusinessAr
 
         for (final Entry<String, byte[]> entry : resources.entrySet()) {
             final File file = new File(folder, entry.getKey().substring(beginIndex));
-            IOUtil.write(file, entry.getValue());
+            Files.write(file.toPath(), entry.getValue());
         }
     }
 

@@ -15,10 +15,9 @@ package org.bonitasoft.engine.bpm.bar;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * @author Emmanuel Duchastenier
@@ -35,7 +34,7 @@ public abstract class GenericFileContribution implements BusinessArchiveContribu
             return false;
         }
 
-        final byte[] content = IOUtil.getContent(file);
+        final byte[] content = Files.readAllBytes(file.toPath());
         businessArchive.addResource(getFileName(), content);
         return true;
     }
@@ -48,7 +47,7 @@ public abstract class GenericFileContribution implements BusinessArchiveContribu
             final byte[] value = entry.getValue();
             if (value != null) {
                 final File file = new File(barFolder, entry.getKey());
-                IOUtil.write(file, entry.getValue());
+                Files.write(file.toPath(), entry.getValue());
             }
         }
     }

@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -1246,7 +1251,7 @@ public class BusinessArchiveTest {
         BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
 
         final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        String fileContent = IOUtil.read(file);
+        String fileContent = Files.readString(file.toPath());
         fileContent = fileContent.replace("<tns:processDefinition", "<tns:pro_cessDefinition");
         fileContent = fileContent.replace("</tns:processDefinition", "</tns:pro_cessDefinition");
         file.delete();
@@ -1281,7 +1286,7 @@ public class BusinessArchiveTest {
         BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
 
         final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        String fileContent = IOUtil.read(file);
+        String fileContent = Files.readString(file.toPath());
         fileContent = fileContent.replace("<tns:processDefinition", "<tns:pro_typo_cessDefinition");
         file.delete();
         file.createNewFile();

@@ -14,13 +14,13 @@
 package org.bonitasoft.engine.bpm.bar;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-
-import org.bonitasoft.engine.io.PropertiesManager;
 
 /**
  * @author Matthieu Chaffotte
@@ -37,7 +37,7 @@ public class ParameterContribution implements BusinessArchiveContribution {
         if (!file.exists()) {
             return false;
         }
-        final Properties properties = PropertiesManager.getProperties(file);
+        final Properties properties = loadProperties(file);
         final Map<String, String> parameters = new HashMap<>(properties.size());
         for (final Entry<Object, Object> property : properties.entrySet()) {
             parameters.put((String) property.getKey(),
@@ -56,7 +56,7 @@ public class ParameterContribution implements BusinessArchiveContribution {
                 properties.put(entry.getKey(), entry.getValue() == null ? NULL : entry.getValue());
             }
             final File file = new File(barFolder, PARAMETERS_FILE);
-            PropertiesManager.saveProperties(properties, file);
+            saveProperties(properties, file);
         }
     }
 
@@ -68,6 +68,20 @@ public class ParameterContribution implements BusinessArchiveContribution {
     @Override
     public String getName() {
         return "Parameters";
+    }
+
+    static Properties loadProperties(File parametersFile) throws IOException {
+        try (var reader = new FileReader(parametersFile)) {
+            var properties = new Properties();
+            properties.load(reader);
+            return properties;
+        }
+    }
+
+    static void saveProperties(Properties properties, File parametersFile) throws IOException {
+        try (FileOutputStream outputStream = new FileOutputStream(parametersFile)) {
+            properties.store(outputStream, "Storing modified properties");
+        }
     }
 
 }
