@@ -468,7 +468,10 @@ public class DocumentServiceImpl implements DocumentService {
             throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
         final SAMappedDocument archivedDocument = getArchivedDocument(archivedDocumentId);
         final SDocument document = getDocumentWithContent(archivedDocument.getDocumentId());
-        recorder.recordUpdate(UpdateRecord.buildSetFields(document, Collections.singletonMap("content", null)),
+        final HashMap<String, Object> updateFields = new HashMap<>();
+        updateFields.put("content", null);
+        updateFields.put("hasContent", false);
+        recorder.recordUpdate(UpdateRecord.buildSetFields(document, updateFields),
                 DOCUMENT);
     }
 
