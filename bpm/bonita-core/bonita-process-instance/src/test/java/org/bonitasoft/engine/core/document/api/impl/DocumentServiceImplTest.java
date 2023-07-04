@@ -17,24 +17,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
+import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.document.model.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -51,6 +49,8 @@ public class DocumentServiceImplTest {
     @Mock
     private ReadPersistenceService persistenceService;
     @Mock
+    private ReadPersistenceService definitiveArchiveReadPersistenceService;
+    @Mock
     private SDocumentDownloadURLProvider urlProvider;
     @Mock
     private ArchiveService archiveService;
@@ -59,6 +59,8 @@ public class DocumentServiceImplTest {
 
     @Before
     public void setUp() {
+        when(archiveService.getDefinitiveArchiveReadPersistenceService())
+                .thenReturn(definitiveArchiveReadPersistenceService);
         documentService = spy(new DocumentServiceImpl(recorder, persistenceService, urlProvider, archiveService));
     }
 
@@ -105,6 +107,27 @@ public class DocumentServiceImplTest {
         final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45L, 0, 100);
         //then
         assertThat(theList).isEqualTo(documentList1);
+    }
+
+    @Test
+    public void should_call_deletion_with_right_arguments() throws Exception {
+        //given
+        Long sourceObjectId = 5L;
+        final SAMappedDocument mappedDocument = new SAMappedDocument(1L, sourceObjectId);
+        byte[] docContent = "theContent".getBytes();
+        final SDocument document = new SDocument(docContent);
+        ArgumentCaptor<UpdateRecord> argumentCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        when(definitiveArchiveReadPersistenceService.selectById(any()))
+                .thenReturn(mappedDocument);
+        when(persistenceService.selectById(any()))
+                .thenReturn(document);
+
+        //when
+        documentService.deleteContentOfArchivedDocument(sourceObjectId);
+        //then
+        verify(recorder).recordUpdate(argumentCaptor.capture(), any());
+        UpdateRecord record = argumentCaptor.getValue();
+        assertThat(record.getFields()).containsOnlyKeys("content", "hasContent");
     }
 
     private List<SMappedDocument> constructList(final int size) {
