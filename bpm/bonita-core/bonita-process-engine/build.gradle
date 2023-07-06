@@ -96,12 +96,7 @@ dependencies {
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
-    schemagen(
-            "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",
-            "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}",
-            "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}",
-            "org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbVersion}",
-            "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
+    schemagen("org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbJxcVersion}", project(':bpm:bonita-common'))
 }
 
 tasks.register('schemagen') {
@@ -109,16 +104,13 @@ tasks.register('schemagen') {
     doLast {
         destDir.mkdirs()
         ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
-        try {
-            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-                classpath { pathelement(path: configurations.schemagen.asPath) }
-                include(name: 'org/bonitasoft/engine/identity/xml/**/*.java')
-            }
-        } catch (Exception e) {
-            def schema = file("$destDir/schema1.xsd")
-            if (!schema.exists()) throw e
-            schema.renameTo(file("$destDir/organization.xsd"))
+    
+        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+            schema(file: "organization.xsd", namespace: "http://documentation.bonitasoft.com/organization-xml-schema/1.1")
+            classpath { pathelement(path: configurations.schemagen.asPath) }
+            include(name: 'org/bonitasoft/engine/identity/xml/**/*.java')
         }
+
     }
     inputs.dir('src/main/java/')
     outputs.file("$destDir/organization.xsd")

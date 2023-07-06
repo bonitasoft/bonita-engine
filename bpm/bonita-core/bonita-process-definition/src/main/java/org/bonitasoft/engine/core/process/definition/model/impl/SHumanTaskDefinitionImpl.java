@@ -15,7 +15,7 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;

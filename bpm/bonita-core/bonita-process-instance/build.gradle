@@ -29,12 +29,7 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 
-    schemagen(
-            "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",
-            "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}",
-            "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}",
-            "org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbVersion}",
-            "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
+    schemagen("org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbJxcVersion}")
 }
 
 tasks.register('schemagen') {
@@ -42,15 +37,10 @@ tasks.register('schemagen') {
     doLast {
         destDir.mkdirs()
         ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
-        try {
-            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-                classpath { pathelement(path: configurations.schemagen.asPath) }
-                include(name: 'org/bonitasoft/engine/core/connector/parser/*.java')
-            }
-        } catch (Exception e) {
-            def schema = file("$destDir/schema1.xsd")
-            if (!schema.exists()) throw e
-            schema.renameTo(file("$destDir/connectors-impl.xsd"))
+        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+            schema(file: "connectors-impl.xsd", namespace: "http://www.bonitasoft.org/ns/connector/implementation/6.0")
+            classpath { pathelement(path: configurations.schemagen.asPath) }
+            include(name: 'org/bonitasoft/engine/core/connector/parser/*.java')
         }
     }
     inputs.dir('src/main/java/')

@@ -290,7 +290,7 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
                     getFormMappingForHumanTask(activity.getName(), formMappings),
                     FormMappingType.TASK.getId(), activity.getName());
         } else if (activity instanceof SubProcessDefinition) {
-            final org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity)
+            final org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity)
                     .getSubProcessContainer();
             for (ActivityDefinition activityDefinition : subProcessContainer.getActivities()) {
                 createFormMapping(processDefinitionId, formMappingService, formMappings, activityDefinition);
