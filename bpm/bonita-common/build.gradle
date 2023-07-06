@@ -4,20 +4,21 @@ configurations { schemagen }
 
 dependencies {
     api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
+    api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
 
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
     api "com.fasterxml.jackson.core:jackson-databind"
     api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     api "com.fasterxml.jackson.core:jackson-annotations"
-    api("javax.xml.bind:jaxb-api:${Deps.jaxbVersion}") {
+    api("javax.xml.bind:jaxb-api") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    api("org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}") {
+    api("org.glassfish.jaxb:jaxb-runtime") {
         exclude(group: "javax.activation") //replaced by jakarta
     }
-    api project(':bpm:bonita-business-archive')
-    runtimeOnly "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+    api "org.bonitasoft.engine:bonita-business-archive"
+    runtimeOnly "com.sun.activation:jakarta.activation"
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
@@ -31,12 +32,7 @@ dependencies {
     testImplementation project(':bpm:bonita-sap-jco-connector-api')
     testImplementation project(':bpm:bonita-util:bonita-common-util-test')
 
-    schemagen(
-            "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}",
-            "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}",
-            "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}",
-            "org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbVersion}",
-            "com.sun.activation:jakarta.activation:${Deps.activationVersion}")
+    schemagen("org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbJxcVersion}", "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}", "org.slf4j:slf4j-api:${Deps.slf4jVersion}")
 }
 
 def generateInfoProperties = tasks.register("generateInfoProperties") {
@@ -91,37 +87,25 @@ def schemagen = tasks.register('schemagen') {
     doLast {
         destDir.mkdirs()
         ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
-        try {
-            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-                classpath { pathelement(path: configurations.schemagen.asPath) }
-                include(name: 'org/bonitasoft/engine/business/application/xml/**/*.java')
-                exclude(name: '**/*Builder.java')
-            }
-        } catch (Exception e) {
-            def schema = file("$destDir/schema1.xsd")
-            if (!schema.exists()) throw e
-            schema.renameTo(file("$destDir/application.xsd"))
+     
+        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+            schema(file: "application.xsd", namespace: "http://documentation.bonitasoft.com/application-xml-schema/1.0")
+            classpath { pathelement(path: configurations.schemagen.asPath) }
+            include(name: 'org/bonitasoft/engine/business/application/xml/**/*.java')
+            exclude(name: '**/*Builder.java')
         }
-        try {
-            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-                classpath { pathelement(path: configurations.schemagen.asPath) }
-                include(name: 'org/bonitasoft/engine/bdm/model/**/*.java')
-                exclude(name: 'org/bonitasoft/engine/bdm/model/QueryParameterTypes.java')
-            }
-        } catch (Exception e) {
-            def schema = file("$destDir/schema1.xsd")
-            if (!schema.exists()) throw e
-            schema.renameTo(file("$destDir/bom.xsd"))
+  
+        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+            schema(file: "bom.xsd", namespace: "http://documentation.bonitasoft.com/bdm-xml-schema/1.0")
+            classpath { pathelement(path: configurations.schemagen.asPath) }
+            include(name: 'org/bonitasoft/engine/bdm/model/**/*.java')
+            exclude(name: 'org/bonitasoft/engine/bdm/model/QueryParameterTypes.java')
         }
-        try {
-            ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-                classpath { pathelement(path: configurations.schemagen.asPath) }
-                include(name: 'org/bonitasoft/engine/profile/xml/**/*.java')
-            }
-        } catch (Exception e) {
-            def schema = file("$destDir/schema1.xsd")
-            if (!schema.exists()) throw e
-            schema.renameTo(file("$destDir/profiles.xsd"))
+
+        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+            schema(file: "profiles.xsd", namespace: "http://documentation.bonitasoft.com/profile-xml-schema/1.0")
+            classpath { pathelement(path: configurations.schemagen.asPath) }
+            include(name: 'org/bonitasoft/engine/profile/xml/**/*.java')
         }
     }
     inputs.dir('src/main/java/')

@@ -8,6 +8,7 @@ dependencyManagement {
     dependencies {
         imports {
             mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}"
+            mavenBom "org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}"
         }
         dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
             entry 'slf4j-api'
@@ -63,7 +64,6 @@ dependencyManagement {
         dependency "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
         dependency "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
-        dependency "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
         dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
         dependency "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
         dependency "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
