@@ -89,7 +89,7 @@ public class ScriptExecutorIT {
     public void should_be_able_to_create_platform_tables() throws Exception {
         scriptExecutor.createAndInitializePlatformIfNecessary();
         final Integer sequences = jdbcTemplate.queryForObject("select count(*) from sequence", Integer.class);
-        assertThat(sequences).isEqualTo(66);
+        assertThat(sequences).isEqualTo(67);
 
         final int platformRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, "platform");
         assertThat(platformRows).isEqualTo(1);

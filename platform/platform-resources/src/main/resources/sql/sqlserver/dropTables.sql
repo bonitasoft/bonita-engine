@@ -128,6 +128,8 @@ DROP TABLE proc_parameter
 GO
 DROP TABLE bar_resource
 GO
+DROP TABLE temporary_content
+GO
 DROP TABLE tenant_resource
 GO
 DROP TABLE icon

@@ -63,5 +63,6 @@ DROP TABLE page_mapping;
 DROP TABLE process_content;
 DROP TABLE proc_parameter;
 DROP TABLE bar_resource;
+DROP TABLE temporary_content;
 DROP TABLE tenant_resource;
 DROP TABLE icon;

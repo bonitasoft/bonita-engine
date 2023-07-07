@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.web.rest.server.datastore.application;
 
+import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
@@ -37,6 +38,6 @@ public class ApplicationDataStoreCreator {
     }
 
     protected ApplicationItemConverter getApplicationConverter() {
-        return new ApplicationItemConverter();
+        return new ApplicationItemConverter(new BonitaHomeFolderAccessor());
     }
 }

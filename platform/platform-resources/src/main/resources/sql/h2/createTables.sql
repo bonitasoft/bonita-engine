@@ -1009,6 +1009,18 @@ CREATE TABLE bar_resource (
 );
 CREATE INDEX idx_bar_resource ON bar_resource (tenantId, process_id, type, name);
 
+CREATE TABLE temporary_content (
+  id BIGINT NOT NULL,
+  creationDate BIGINT NOT NULL,
+  key_ VARCHAR(255) NOT NULL,
+  fileName VARCHAR(255) NOT NULL,
+  mimeType VARCHAR(255) NOT NULL,
+  content LONGBLOB NOT NULL,
+  UNIQUE (key_),
+  PRIMARY KEY (id)
+);
+CREATE INDEX idx_temporary_content ON temporary_content (key_);
+
 CREATE TABLE tenant_resource (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,

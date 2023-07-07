@@ -52,6 +52,7 @@ dependencies {
     api project(':bpm:bonita-core:bonita-form-mapping')
     api project(':services:bonita-business-data:bonita-business-data-api')
     api project(':services:bonita-resources')
+    api project(':services:bonita-temporary-content')
     api "com.fasterxml.jackson.core:jackson-databind"
     api project(':platform:platform-resources')
     api "commons-io:commons-io:${Deps.commonsIOVersion}"

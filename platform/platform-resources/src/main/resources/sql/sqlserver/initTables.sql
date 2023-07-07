@@ -126,6 +126,8 @@ INSERT INTO sequence VALUES(1, 20050, 1)
     GO
 INSERT INTO sequence VALUES(1, 20210, 1)
     GO
+INSERT INTO sequence VALUES(-1, 20310, 1)
+    GO
 INSERT INTO sequence VALUES(1, 20220, 1)
     GO
 INSERT INTO sequence VALUES(1, 20096, 1)

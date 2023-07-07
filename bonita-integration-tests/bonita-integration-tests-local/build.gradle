@@ -35,3 +35,4 @@ publishing {
 }
 
 databaseIntegrationTest { include "**/BDRepositoryLocalIT.class" }
+databaseIntegrationTest { include "**/TemporaryContentAPILocalIT.class" }

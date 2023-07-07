@@ -24,14 +24,10 @@ public interface CacheService {
     /**
      * Store an object in the cache. If the cache don't exists it will be created.
      *
-     * @param cacheName
-     *        The name of the cache in which the object must be stored
-     * @param key
-     *        The key that will allow to retrieve the object
-     * @param value
-     *        The object to store
-     * @throws SCacheException
-     *         Error thrown if has exceptions during the cache store.
+     * @param cacheName The name of the cache in which the object must be stored
+     * @param key The key that will allow to retrieve the object
+     * @param value The object to store
+     * @throws SCacheException Error thrown if has exceptions during the cache store.
      */
     void store(String cacheName, Serializable key, Object value) throws SCacheException;
 

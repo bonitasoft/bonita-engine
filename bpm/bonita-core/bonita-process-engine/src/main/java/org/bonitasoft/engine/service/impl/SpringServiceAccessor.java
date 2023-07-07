@@ -101,6 +101,7 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
+import org.bonitasoft.engine.temporary.content.TemporaryContentService;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -601,6 +602,11 @@ public class SpringServiceAccessor
     public CacheService getPlatformCacheService() {
         return beanAccessor.getService(CacheService.class);
 
+    }
+
+    @Override
+    public TemporaryContentService getTemporaryContentService() {
+        return beanAccessor.getService(TemporaryContentService.class);
     }
 
     @Override

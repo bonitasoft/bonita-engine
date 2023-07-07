@@ -169,6 +169,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             if (inputParameters != null) {
                 setParameters(query, inputParameters);
             }
+
             return query.executeUpdate();
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);

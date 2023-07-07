@@ -107,6 +107,7 @@
                 <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo</value>
                 <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent</value>
                 <value>org.bonitasoft.engine.core.document.model.SLightDocument</value>
+                <value>org.bonitasoft.engine.temporary.content.STemporaryContent</value>
                 <value>org.bonitasoft.engine.core.document.model.SDocument</value>
                 <value>org.bonitasoft.engine.core.document.model.SDocumentMapping</value>
                 <value>org.bonitasoft.engine.core.document.model.SMappedDocument</value>
@@ -218,6 +219,7 @@
                 <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
+                <value>/org/bonitasoft/engine/temporary/content/hibernate/temporary.content.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
                 <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>

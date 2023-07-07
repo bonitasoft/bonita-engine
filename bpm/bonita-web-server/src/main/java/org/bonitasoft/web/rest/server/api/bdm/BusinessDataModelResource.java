@@ -13,11 +13,9 @@
  **/
 package org.bonitasoft.web.rest.server.api.bdm;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
@@ -95,16 +93,10 @@ public class BusinessDataModelResource extends CommonResource {
 
     private byte[] getBusinessDataModelContent(final BusinessDataModelItem item) {
         try {
-            return IOUtil.getAllContentFrom(new File(getCompleteTempFilePath(item.getFileUpload())));
-        } catch (final UnauthorizedFolderException e) {
-            throw new APIForbiddenException(e.getMessage());
+            return IOUtil.getAllContentFrom(bonitaHomeFolderAccessor.getTempFile(item.getFileUpload()));
         } catch (final IOException e) {
             throw new APIException("Can't read business data model file", e);
         }
-    }
-
-    public String getCompleteTempFilePath(final String path) throws IOException {
-        return bonitaHomeFolderAccessor.getCompleteTenantTempFilePath(path);
     }
 
 }

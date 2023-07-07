@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import org.bonitasoft.engine.session.APISession;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -46,59 +47,57 @@ public class PageUploadServletTest {
     @Spy
     PageUploadServlet pageUploadServlet = new PageUploadServlet();
 
+    @Before
+    public void setUp() throws Exception {
+        pageUploadServlet.pageTmp = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
+
+    }
+
     @Test
     public void should_getPermissions_work_with_valid_zip() throws Exception {
-
-        final File zipFile = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
-
         doReturn("edit").when(request).getParameter("action");
         final Set<String> permissionsSet = new HashSet<>();
         permissionsSet.add("Organisation visualization");
         permissionsSet.add("Organisation management");
-        doReturn(permissionsSet).when(pageUploadServlet).getPagePermissions(request, zipFile, false);
+        doReturn(permissionsSet).when(pageUploadServlet).getPagePermissions(request, false);
 
-        final String[] permissions = pageUploadServlet.getPermissions(request, zipFile);
+        final String[] permissions = pageUploadServlet.getPermissions(request);
 
         assertThat(permissions).containsExactlyInAnyOrder("Organisation visualization", "Organisation management");
     }
 
     @Test
     public void should_getPermissions_work_with_invalid_zip() throws Exception {
-
-        final File zipFile = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
-
         doReturn("add").when(request).getParameter("action");
         final Set<String> permissionsSet = new HashSet<>();
-        doReturn(permissionsSet).when(pageUploadServlet).getPagePermissions(request, zipFile, true);
+        doReturn(permissionsSet).when(pageUploadServlet).getPagePermissions(request, true);
 
-        final String[] permissions = pageUploadServlet.getPermissions(request, zipFile);
+        final String[] permissions = pageUploadServlet.getPermissions(request);
 
         assertThat(permissions).isNotNull().isEmpty();
     }
 
     @Test
     public void should_generateResponseString_work_with_permissions() throws Exception {
-
-        final File zipFile = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
         final String[] permissions = new String[] { "Organisation visualization", "Organisation management" };
-        doReturn(permissions).when(pageUploadServlet).getPermissions(request, zipFile);
+        doReturn(permissions).when(pageUploadServlet).getPermissions(request);
 
-        final String responseString = pageUploadServlet.generateResponseString(request, "fileName", zipFile);
+        final String responseString = pageUploadServlet.generateResponseString(request, "fileName",
+                pageUploadServlet.pageTmp.getName());
 
         assertThat(responseString)
-                .isEqualTo(zipFile.getName() + "::[Organisation visualization,Organisation management]");
+                .isEqualTo(
+                        pageUploadServlet.pageTmp.getName() + "::[Organisation visualization,Organisation management]");
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void should_generateResponseJson_work_with_permissions() throws Exception {
-
-        final File zipFile = new File(getClass().getResource("/pageWithPermissions.zip").toURI());
         final String[] permissions = new String[] { "Organisation visualization", "Organisation management" };
-        doReturn(permissions).when(pageUploadServlet).getPermissions(request, zipFile);
+        doReturn(permissions).when(pageUploadServlet).getPermissions(request);
 
         final String responseString = pageUploadServlet.generateResponseJson(request, "fileName", "application/zip",
-                zipFile);
+                pageUploadServlet.pageTmp.getName());
 
         ObjectReader reader = new ObjectMapper().readerFor(Map.class);
         Map<String, Serializable> responseMap = reader.readValue(responseString);

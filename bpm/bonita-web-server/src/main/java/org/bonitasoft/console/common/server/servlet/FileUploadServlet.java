@@ -37,6 +37,9 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bonitasoft.console.common.server.login.filter.MultiReadHttpServletRequest;
 import org.bonitasoft.console.common.server.utils.DocumentUtil;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.api.TemporaryContentAPI;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +66,6 @@ public abstract class FileUploadServlet extends HttpServlet {
 
     protected static final String SUPPORTED_EXTENSIONS_SEPARATOR = ",";
 
-    protected static final String RETURN_FULL_SERVER_PATH_PARAM = "ReturnFullPath";
-
     protected static final String RETURN_ORIGINAL_FILENAME_PARAM = "ReturnOriginalFilename";
 
     protected static final String CHECK_UPLOADED_FILE_SIZE = "CheckUploadedFileSize";
@@ -89,8 +90,6 @@ public abstract class FileUploadServlet extends HttpServlet {
 
     protected String[] supportedExtensionsList = new String[0];
 
-    protected boolean returnFullPathInResponse = false;
-
     protected boolean alsoReturnOriginalFilename = false;
 
     protected boolean checkUploadedFileSize = false;
@@ -100,22 +99,30 @@ public abstract class FileUploadServlet extends HttpServlet {
     protected String responseContentType = TEXT_CONTENT_TYPE;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    protected TemporaryContentAPI temporaryContentAPI;
 
     @Override
     public void init() throws ServletException {
-
         final String supportedExtensionsParam = getInitParameter(SUPPORTED_EXTENSIONS_PARAM);
         if (supportedExtensionsParam != null) {
             supportedExtensionsList = supportedExtensionsParam.split(SUPPORTED_EXTENSIONS_SEPARATOR);
         }
         alsoReturnOriginalFilename = Boolean.parseBoolean(getInitParameter(RETURN_ORIGINAL_FILENAME_PARAM));
-        returnFullPathInResponse = Boolean.parseBoolean(getInitParameter(RETURN_FULL_SERVER_PATH_PARAM));
         final String responseContentTypeParam = getInitParameter(RESPONSE_CONTENT_TYPE_PARAM);
         if (responseContentTypeParam != null) {
             responseContentType = responseContentTypeParam;
         }
         checkUploadedFileSize = Boolean.parseBoolean(getInitParameter(CHECK_UPLOADED_FILE_SIZE));
         checkUploadedImageSize = Boolean.parseBoolean(getInitParameter(CHECK_UPLOADED_IMAGE_SIZE));
+        temporaryContentAPI = getTemporaryContentAPI();
+    }
+
+    protected TemporaryContentAPI getTemporaryContentAPI() {
+        try {
+            return PlatformAPIAccessor.getTemporaryContentAPI();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected abstract void defineUploadDirectoryPath(final HttpServletRequest request) throws SessionNotFoundException;
@@ -169,14 +176,8 @@ public abstract class FileUploadServlet extends HttpServlet {
                 }
 
                 // Make unique file name
-                final File uploadedFile = makeUniqueFilename(targetDirectory, fileName);
+                final String uploadedFileKey = storeTempFile(fileName, item);
 
-                // Upload file
-                item.write(uploadedFile);
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("File uploaded : " + uploadedFile.getPath());
-                }
-                uploadedFile.deleteOnExit();
                 //Clean multiread wrapper temp file if it exists
                 if (request instanceof MultiReadHttpServletRequest) {
                     ((MultiReadHttpServletRequest) request).cleanMultipartTempContent();
@@ -185,15 +186,16 @@ public abstract class FileUploadServlet extends HttpServlet {
                 // Response
                 final String responseString;
                 if (JSON_CONTENT_TYPE.equals(responseContentType)) {
-                    responseString = generateResponseJson(request, fileName, item.getContentType(), uploadedFile);
+                    responseString = generateResponseJson(request, fileName, item.getContentType(), uploadedFileKey);
                 } else if (TEXT_CONTENT_TYPE.equals(responseContentType)) {
-                    responseString = generateResponseString(request, fileName, uploadedFile);
+                    responseString = generateResponseString(request, fileName, uploadedFileKey);
                 } else {
                     throw new ServletException(
                             "Unsupported content type in servlet configuration : " + responseContentType);
                 }
                 responsePW.print(responseString);
                 responsePW.flush();
+                break;
             }
         } catch (SessionNotFoundException e) {
             final String message = "Session expired";
@@ -220,6 +222,13 @@ public abstract class FileUploadServlet extends HttpServlet {
         }
     }
 
+    protected String storeTempFile(final String fileName, final FileItem item)
+            throws Exception {
+        temporaryContentAPI = PlatformAPIAccessor.getTemporaryContentAPI();
+        return temporaryContentAPI
+                .storeTempFile(new FileContent(fileName, item.getInputStream(), item.getContentType()));
+    }
+
     private void generateFileTooBigError(final HttpServletResponse response, final PrintWriter responsePW,
             final String message) throws JsonProcessingException {
         response.setStatus(HttpURLConnection.HTTP_ENTITY_TOO_LARGE);
@@ -239,13 +248,8 @@ public abstract class FileUploadServlet extends HttpServlet {
     }
 
     protected String generateResponseString(final HttpServletRequest request, final String fileName,
-            final File uploadedFile) throws Exception {
-        String responseString;
-        if (returnFullPathInResponse) {
-            responseString = uploadedFile.getPath();
-        } else {
-            responseString = uploadedFile.getName();
-        }
+            final String uploadedFileName) throws Exception {
+        String responseString = uploadedFileName;
         if (alsoReturnOriginalFilename) {
             responseString = responseString + RESPONSE_SEPARATOR + getFilenameLastSegment(fileName);
         }
@@ -253,40 +257,20 @@ public abstract class FileUploadServlet extends HttpServlet {
     }
 
     protected String generateResponseJson(final HttpServletRequest request, final String fileName, String contentType,
-            final File uploadedFile) throws Exception {
+            final String uploadedFileName) throws Exception {
         final Map<String, Serializable> responseMap = new HashMap<>();
-        fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFile);
+        fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFileName);
         return objectMapper.writeValueAsString(responseMap);
     }
 
     protected void fillJsonResponseMap(HttpServletRequest request, final Map<String, Serializable> responseMap,
             final String fileName,
-            final String contentType, final File uploadedFile) {
+            final String contentType, final String uploadedFileName) {
         if (alsoReturnOriginalFilename) {
             responseMap.put(FILE_NAME_RESPONSE_ATTRIBUTE, getFilenameLastSegment(fileName));
         }
-        if (returnFullPathInResponse) {
-            responseMap.put(TEMP_PATH_RESPONSE_ATTRIBUTE, uploadedFile.getPath());
-        } else {
-            responseMap.put(TEMP_PATH_RESPONSE_ATTRIBUTE, uploadedFile.getName());
-        }
+        responseMap.put(TEMP_PATH_RESPONSE_ATTRIBUTE, uploadedFileName);
         responseMap.put(CONTENT_TYPE_ATTRIBUTE, contentType);
-    }
-
-    protected File makeUniqueFilename(final File targetDirectory, final String fileName) throws IOException {
-        final File uploadedFile = File.createTempFile("tmp_", getExtension(fileName), targetDirectory);
-        uploadedFile.deleteOnExit();
-        return uploadedFile;
-    }
-
-    protected String getExtension(final String fileName) {
-        String extension = "";
-        final String filenameLastSegment = getFilenameLastSegment(fileName);
-        final int dotPos = filenameLastSegment.lastIndexOf('.');
-        if (dotPos > -1) {
-            extension = filenameLastSegment.substring(dotPos);
-        }
-        return extension;
     }
 
     protected String getFilenameLastSegment(final String fileName) {

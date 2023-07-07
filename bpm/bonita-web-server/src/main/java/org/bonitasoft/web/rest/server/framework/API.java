@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.web.rest.server.framework;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +27,6 @@ import org.bonitasoft.web.rest.server.framework.api.DatastoreHasDelete;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasSearch;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
-import org.bonitasoft.web.rest.server.framework.exception.APIFileUploadNotFoundException;
 import org.bonitasoft.web.rest.server.framework.exception.ForbiddenAttributesException;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
@@ -280,82 +276,6 @@ public abstract class API<ITEM extends IItem> {
 
     public final Datastore getDefaultDatastore() {
         return this.defineDefaultDatastore();
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PARAMETERS TOOLS
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    protected final File getUploadedFile(final String attributeName, final String attributeValue) throws IOException {
-        if (attributeValue == null || attributeValue.isEmpty()) {
-            return null;
-        }
-
-        final String tmpIconPath = getCompleteTempFilePath(attributeValue);
-
-        final File file = new File(tmpIconPath);
-        if (!file.exists()) {
-            throw new APIFileUploadNotFoundException(attributeName, attributeValue);
-        }
-        return file;
-    }
-
-    abstract protected String getCompleteTempFilePath(String path) throws IOException;
-
-    /**
-     * Rename and upload the file to the defined directory.
-     *
-     * @param attributeName
-     *        The name of the attribute representing the file.
-     * @param attributeValue
-     *        The value of the attribute representing the file.
-     * @param newDirectory
-     *        The destination directory path.
-     * @param newName
-     *        The name to set to the file without the extension (the original extension will be kept)
-     * @return This method return the file in the destination directory.
-     * @throws IOException
-     */
-    protected final File upload(final String attributeName, final String attributeValue, final String newDirectory,
-            final String newName) throws IOException {
-
-        // Check if the destination directory already exists. If not, creates it.
-        final File destinationDirectory = new File(newDirectory);
-        if (!destinationDirectory.exists()) {
-            destinationDirectory.mkdir();
-        }
-
-        // Construct the destination fileName
-        final File file = getUploadedFile(attributeName, attributeValue);
-        String destinationName = file.getName();
-        if (newName != null) {
-            destinationName = newName + getFileExtension(file.getName());
-        }
-
-        // Move the file
-        final File destinationFile = new File(
-                destinationDirectory.getAbsolutePath() + File.separator + destinationName);
-        try {
-            destinationFile.delete();
-            Files.move(file.toPath(), destinationFile.toPath());
-        } catch (final Exception e) {
-            e.getMessage();
-        }
-
-        return destinationFile;
-    }
-
-    /**
-     * @param fileName
-     * @return
-     */
-    private String getFileExtension(final String fileName) {
-        String extension = "";
-        final int dotPos = fileName.lastIndexOf('.');
-        if (dotPos >= 0) {
-            extension = fileName.substring(dotPos);
-        }
-        return extension;
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

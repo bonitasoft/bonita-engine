@@ -61,8 +61,4 @@ public class APII18nLocale extends API<I18nLocaleItem> {
         return "";
     }
 
-    @Override
-    protected String getCompleteTempFilePath(final String path) {
-        return path;
-    }
 }

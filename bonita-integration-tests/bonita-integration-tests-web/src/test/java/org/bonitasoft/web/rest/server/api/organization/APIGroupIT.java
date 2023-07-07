@@ -17,13 +17,20 @@ import static org.bonitasoft.web.rest.model.builder.organisation.GroupItemBuilde
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.test.toolkit.organization.TestUser;
 import org.bonitasoft.test.toolkit.organization.TestUserFactory;
 import org.bonitasoft.web.rest.model.identity.GroupItem;
 import org.bonitasoft.web.test.AbstractConsoleTest;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,17 +58,9 @@ public class APIGroupIT extends AbstractConsoleTest {
         apiGroup.add(groupItem);
     }
 
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_adding_icon_with_unauthorized_path() {
-        GroupItem input = new GroupItem();
-        input.setName("Developper");
-        input.setDescription("The guys who drink a lot of coffee");
-        input.setIcon(".." + File.separator + ".." + File.separator + ".." + File.separator + "icon.jpg");
-        apiGroup.runAdd(input);
-    }
-
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_updating_icon_with_unauthorized_path() {
+    @Test
+    public void should_update_group_icon()
+            throws ServerAPIException, BonitaHomeNotSetException, UnknownAPITypeException, IOException {
         GroupItem input = new GroupItem();
         input.setName("Developper");
         input.setDescription("The guys who drink a lot of coffee");
@@ -69,8 +68,16 @@ public class APIGroupIT extends AbstractConsoleTest {
         final APIID id = input.getId();
         Assert.assertNotNull("Failed to add a new role", input);
         input = new GroupItem();
-        input.setIcon(".." + File.separator + ".." + File.separator + ".." + File.separator + "icon.jpg");
-        apiGroup.runUpdate(id, input.getAttributes());
+
+        //store icon into database
+        File file = File.createTempFile("tmp", ".png");
+        Files.writeString(file.toPath(), "content");
+        String iconFileKey = PlatformAPIAccessor.getTemporaryContentAPI()
+                .storeTempFile(new FileContent("icon.png", new FileInputStream(file), "img/png"));
+
+        input.setIcon(iconFileKey);
+        input = apiGroup.runUpdate(id, input.getAttributes());
+        Assert.assertNotNull("Failed while updating the group", input);
     }
 
 }

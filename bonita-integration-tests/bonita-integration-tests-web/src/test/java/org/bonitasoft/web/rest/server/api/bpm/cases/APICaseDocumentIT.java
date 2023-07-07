@@ -14,11 +14,14 @@
 package org.bonitasoft.web.rest.server.api.bpm.cases;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.test.toolkit.bpm.TestCase;
 import org.bonitasoft.test.toolkit.bpm.TestProcessFactory;
 import org.bonitasoft.test.toolkit.organization.TestUser;
@@ -151,9 +154,14 @@ public class APICaseDocumentIT extends AbstractConsoleTest {
         tmpDir.mkdirs();
         final File file = new File(tmpDir, "thisismynewfile.doc");
         file.createNewFile();
-        attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, file.getPath());
 
-        apiCaseDocument.update(APIID.makeAPIID(expectedDocument.getId()), attributes);
+        String fileKey = PlatformAPIAccessor.getTemporaryContentAPI()
+                .storeTempFile(new FileContent("thisismynewfile.doc", new FileInputStream(file), "text/plain"));
+
+        attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, fileKey);
+
+        CaseDocumentItem doc = apiCaseDocument.update(APIID.makeAPIID(expectedDocument.getId()), attributes);
+        Assert.assertNotNull("Failed while updating the case document", doc);
     }
 
     @Test(expected = APIException.class)

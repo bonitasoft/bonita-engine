@@ -126,4 +126,9 @@ public class PlatformAPIAccessor {
         return getAPI(PlatformCommandAPI.class, session);
     }
 
+    public static TemporaryContentAPI getTemporaryContentAPI()
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getAPI(TemporaryContentAPI.class);
+    }
+
 }

@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +29,9 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.engine.api.PageAPI;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -126,11 +129,17 @@ public class APIPageIT extends AbstractConsoleTest {
     public void runUpdate_with_new_page_content_change_it() throws Exception {
         // Given
         final PageItem pageToBeUpdated = addNewPage(NEW_PAGE_ZIP);
+        String oldPageKey = pageToBeUpdated.getAttributeValue(PageDatastore.UNMAPPED_ATTRIBUTE_ZIP_FILE);
+        assertNotNull(oldPageKey);
+
+        //store new page zip into database
+        File file = new File(getClass().getResource(NEW_PAGE_ZIP).toURI());
+        String pageZipKey = PlatformAPIAccessor.getTemporaryContentAPI()
+                .storeTempFile(new FileContent(file.getName(), new FileInputStream(file), "application/zip"));
 
         // When
         final Map<String, String> attributes = new HashMap<>();
-        attributes.put(PageDatastore.UNMAPPED_ATTRIBUTE_ZIP_FILE,
-                new File(getClass().getResource(NEW_PAGE_ZIP).toURI()).getName());
+        attributes.put(PageDatastore.UNMAPPED_ATTRIBUTE_ZIP_FILE, pageZipKey);
 
         final PageItem updatedPage = apiPage.update(pageToBeUpdated.getId(), attributes);
         // Validate
