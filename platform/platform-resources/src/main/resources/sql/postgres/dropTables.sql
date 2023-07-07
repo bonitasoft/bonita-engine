@@ -63,5 +63,6 @@ DROP TABLE IF EXISTS page_mapping;
 DROP TABLE IF EXISTS process_content;
 DROP TABLE IF EXISTS proc_parameter;
 DROP TABLE IF EXISTS bar_resource;
+DROP TABLE IF EXISTS temporary_content;
 DROP TABLE IF EXISTS tenant_resource;
 DROP TABLE IF EXISTS icon;

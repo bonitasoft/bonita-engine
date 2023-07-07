@@ -63,5 +63,6 @@ DROP TABLE page_mapping cascade constraints purge;
 DROP TABLE process_content cascade constraints purge;
 DROP TABLE proc_parameter cascade constraints purge;
 DROP TABLE bar_resource cascade constraints purge;
+DROP TABLE temporary_content cascade constraints purge;
 DROP TABLE tenant_resource cascade constraints purge;
 DROP TABLE icon cascade constraints purge;

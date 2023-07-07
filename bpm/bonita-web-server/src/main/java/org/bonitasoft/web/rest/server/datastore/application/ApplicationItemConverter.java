@@ -29,6 +29,12 @@ import org.bonitasoft.web.toolkit.client.data.item.template.ItemHasIcon;
  */
 public class ApplicationItemConverter {
 
+    protected BonitaHomeFolderAccessor bonitaHomeFolderAccessor;
+
+    public ApplicationItemConverter(BonitaHomeFolderAccessor bonitaHomeFolderAccessor) {
+        this.bonitaHomeFolderAccessor = bonitaHomeFolderAccessor;
+    }
+
     public ApplicationItem toApplicationItem(final Application application) {
         final ApplicationItem item = new ApplicationItem();
         item.setId(application.getId());
@@ -108,7 +114,7 @@ public class ApplicationItemConverter {
         }
         if (!MapUtil.isBlank(attributes, ItemHasIcon.ATTRIBUTE_ICON)
                 && !attributes.get(ItemHasIcon.ATTRIBUTE_ICON).startsWith(ApplicationItem.ICON_PATH_API_PREFIX)) {
-            IconDescriptor iconDescriptor = new BonitaHomeFolderAccessor()
+            IconDescriptor iconDescriptor = bonitaHomeFolderAccessor
                     .getIconFromFileSystem(attributes.get(ItemHasIcon.ATTRIBUTE_ICON));
             applicationUpdater.setIcon(iconDescriptor.getFilename(), iconDescriptor.getContent());
         }

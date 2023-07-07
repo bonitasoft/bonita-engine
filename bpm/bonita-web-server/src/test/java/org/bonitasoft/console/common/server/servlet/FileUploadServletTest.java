@@ -14,8 +14,7 @@
 package org.bonitasoft.console.common.server.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.Map;
@@ -24,6 +23,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bonitasoft.engine.api.TemporaryContentAPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -44,13 +44,13 @@ public class FileUploadServletTest {
         final File uploadedFile = mock(File.class);
         when(uploadedFile.getName()).thenReturn("uploadedFile.txt");
         when(fileUploadServlet.getServletConfig()).thenReturn(mock(ServletConfig.class));
+        doReturn(mock(TemporaryContentAPI.class)).when(fileUploadServlet).getTemporaryContentAPI();
         when(fileUploadServlet.getInitParameter(FileUploadServlet.RETURN_ORIGINAL_FILENAME_PARAM)).thenReturn("true");
-        when(fileUploadServlet.getInitParameter(FileUploadServlet.RETURN_FULL_SERVER_PATH_PARAM)).thenReturn("false");
         fileUploadServlet.init();
 
         final String jsonResponse = fileUploadServlet.generateResponseJson(request, "originalFileName",
                 "application/json",
-                uploadedFile);
+                uploadedFile.getName());
         ObjectMapper mapper = new ObjectMapper();
         @SuppressWarnings("unchecked")
         Map<String, String> jsonResponseMap = mapper.readValue(jsonResponse, Map.class);
@@ -65,86 +65,14 @@ public class FileUploadServletTest {
         final File uploadedFile = mock(File.class);
         when(uploadedFile.getName()).thenReturn("uploadedFile.txt");
         when(fileUploadServlet.getServletConfig()).thenReturn(mock(ServletConfig.class));
+        doReturn(mock(TemporaryContentAPI.class)).when(fileUploadServlet).getTemporaryContentAPI();
         when(fileUploadServlet.getInitParameter(FileUploadServlet.RETURN_ORIGINAL_FILENAME_PARAM)).thenReturn("true");
-        when(fileUploadServlet.getInitParameter(FileUploadServlet.RETURN_FULL_SERVER_PATH_PARAM)).thenReturn("false");
         fileUploadServlet.init();
 
         final String responseString = fileUploadServlet.generateResponseString(request, "originalFileName",
-                uploadedFile);
+                uploadedFile.getName());
 
         assertThat(responseString).isEqualTo("uploadedFile.txt::originalFileName");
-    }
-
-    @Test
-    public void getExtension_should_return_proper_extension() {
-        // given
-        final String filename = "C:\\Users\\Desktop\\process.bar";
-
-        // when
-        final String extension = fileUploadServlet.getExtension(filename);
-
-        // then
-        assertThat(extension).isEqualTo(".bar");
-    }
-
-    @Test
-    public void getExtension_should_return_an_empty_extension() {
-        // given
-        final String filename = "C:\\Users\\Desktop\\process";
-
-        // when
-        final String extension = fileUploadServlet.getExtension(filename);
-
-        // then
-        assertThat(extension).isEmpty();
-    }
-
-    @Test
-    public void getExtension_should_return_a_proper_extension_without_taking_care_of_dots() {
-        // given
-        final String filename = "C:\\Users\\Deskt.op\\proc.ess.bar";
-
-        // when
-        final String extension = fileUploadServlet.getExtension(filename);
-
-        // then
-        assertThat(extension).isEqualTo(".bar");
-    }
-
-    @Test
-    public void getExtension_should_return_proper_extension_for_short_filename() {
-        // given
-        final String filename = "process.bar";
-
-        // when
-        final String extension = fileUploadServlet.getExtension(filename);
-
-        // then
-        assertThat(extension).isEqualTo(".bar");
-    }
-
-    @Test
-    public void getExtension_should_return_proper_extension_for_linux_like_paths() {
-        // given
-        final String filename = "/Users/Deskt.op/proc.ess.bar";
-
-        // when
-        final String extension = fileUploadServlet.getExtension(filename);
-
-        // then
-        assertThat(extension).isEqualTo(".bar");
-    }
-
-    @Test
-    public void getExtension_should_return_an_empty_extension_for_parent_folder_filename() {
-        // given
-        final String filename = "../../../";
-
-        // when
-        final String extension = fileUploadServlet.getExtension(filename);
-
-        // then
-        assertThat(extension).isEmpty();
     }
 
     @Test

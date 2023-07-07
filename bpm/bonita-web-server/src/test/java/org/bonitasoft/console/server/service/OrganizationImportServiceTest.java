@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.console.server.service;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-
-import java.io.File;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -59,20 +56,8 @@ public class OrganizationImportServiceTest {
         doReturn(identityAPI).when(organizationImportService).getIdentityAPI();
     }
 
-    @Test
-    public void should_verify_authorisation_for_the_given_location_param() {
-        doReturn(".." + File.separator + ".." + File.separator + ".." + File.separator + "file.txt")
-                .when(organizationImportService).getFileUploadParameter();
-
-        try {
-            organizationImportService.run();
-        } catch (final ServiceException e) {
-            assertTrue(e.getCause().getMessage().startsWith("Unauthorized access to the file"));
-        }
-    }
-
     @Test(expected = ServiceException.class)
-    public void should_genrate_401_when_session_expires() throws Exception {
+    public void should_generate_401_when_session_expires() throws Exception {
         doReturn(new byte[0]).when(organizationImportService).getOrganizationContent(any());
         doReturn("MERGE_DUPLICATES").when(organizationImportService).getParameter(anyString());
 
@@ -87,7 +72,7 @@ public class OrganizationImportServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void should_genrate_400_when_file_is_invalid() throws Exception {
+    public void should_generate_400_when_file_is_invalid() throws Exception {
         doReturn(new byte[0]).when(organizationImportService).getOrganizationContent(any());
         doReturn("MERGE_DUPLICATES").when(organizationImportService).getParameter(anyString());
         doThrow(new InvalidOrganizationFileFormatException("invalid format")).when(identityAPI)

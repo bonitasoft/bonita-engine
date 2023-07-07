@@ -645,6 +645,15 @@
         <constructor-arg name="sequenceId" value="20210" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20210:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.temporary.content.STemporaryContent</value>
+            </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="20310" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10500:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
 
     <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
         <constructor-arg name="sequenceMappingProvider" ref="sequenceMappingProvider" />
@@ -667,6 +676,8 @@
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
                 <!-- bar/tenant resources -->
                 <value>org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
+                <!-- uploads -->
+                <value>org/bonitasoft/engine/temporary/content/hibernate/temporary.content.queries.hbm.xml</value>
                 <!-- supervisor -->
                 <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
                 <!-- scheduler -->
@@ -938,6 +949,7 @@
                 <value>org.bonitasoft.engine.resources.SBARResource</value>
                 <value>org.bonitasoft.engine.resources.STenantResource</value>
                 <value>org.bonitasoft.engine.resources.STenantResourceLight</value>
+                <value>org.bonitasoft.engine.temporary.content.STemporaryContent</value>
                 <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
                 <value>org.bonitasoft.engine.core.form.SFormMapping</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.SProcessInstance</value>

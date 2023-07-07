@@ -17,10 +17,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
 
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
+import org.bonitasoft.engine.io.FileContent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -32,6 +38,9 @@ public class BonitaHomeFolderAccessorTest {
 
     @Mock
     private WebBonitaConstantsUtils webBonitaConstantsUtils;
+
+    @Mock
+    private FileContent fileContent;
 
     @Spy
     private final BonitaHomeFolderAccessor tenantFolder = new BonitaHomeFolderAccessor();
@@ -89,51 +98,26 @@ public class BonitaHomeFolderAccessorTest {
     }
 
     @Test
-    public void should_complete_file_path() throws Exception {
-        final String fileName = "fileName.txt";
-
-        given(tenantFolder.getBonitaTenantConstantUtil()).willReturn(webBonitaConstantsUtils);
-        given(webBonitaConstantsUtils.getTempFolder()).willReturn(new File("." + File.separator + "tempFolder"));
-
-        final String completedPath = tenantFolder.getCompleteTenantTempFilePath(fileName);
-
-        assertThat(new File(completedPath).getCanonicalPath()).isEqualTo(
-                new File("." + File.separator + "tempFolder" + File.separator + "fileName.txt").getCanonicalPath());
-    }
-
-    @Test
-    public void should_verifyAuthorization_file_path() throws Exception {
-        final String fileName = "c:" + File.separator + "tempFolder" + File.separator + "fileName.txt";
-
-        given(tenantFolder.getBonitaTenantConstantUtil()).willReturn(webBonitaConstantsUtils);
-        given(webBonitaConstantsUtils.getTempFolder()).willReturn(new File("c:" + File.separator + "tempFolder"));
-
-        final String completedPath = tenantFolder.getCompleteTenantTempFilePath(fileName);
-
-        assertThat(completedPath).isEqualTo("c:" + File.separator + "tempFolder" + File.separator + "fileName.txt");
-    }
-
-    @Test(expected = UnauthorizedFolderException.class)
-    public void should_UnauthorizedFolder() throws Exception {
-        final String fileName = "c:" + File.separator + "UnauthorizedFolder" + File.separator + "tempFolder"
-                + File.separator + "fileName.txt";
-
-        given(tenantFolder.getBonitaTenantConstantUtil()).willReturn(webBonitaConstantsUtils);
-        given(webBonitaConstantsUtils.getTempFolder()).willReturn(new File("c:" + File.separator + "tempFolder"));
-
-        tenantFolder.getCompleteTenantTempFilePath(fileName);
-    }
-
-    @Test
     public void should_return_completed_temp_file() throws Exception {
-        final String fileName = "fileName.txt";
+        final String originalFilename = "text.txt";
+        final String tempFileName = UUID.randomUUID().toString();
+
+        Path tempFolder = Path.of("." + File.separator + "tempFolder");
+        Files.createDirectories(tempFolder);
 
         given(tenantFolder.getBonitaTenantConstantUtil()).willReturn(webBonitaConstantsUtils);
-        given(webBonitaConstantsUtils.getTempFolder()).willReturn(new File("." + File.separator + "tempFolder"));
+        given(webBonitaConstantsUtils.getTempFolder()).willReturn(tempFolder.toFile());
 
-        final File completedFile = tenantFolder.getTempFile(fileName);
+        File newTmpFile = tenantFolder.makeUniqueFilename(originalFilename);
+        doReturn(newTmpFile).when(tenantFolder).makeUniqueFilename(originalFilename);
+        doReturn(InputStream.nullInputStream()).when(fileContent).getInputStream();
+        doReturn(originalFilename).when(fileContent).getFileName();
+        doReturn(fileContent).when(tenantFolder).retrieveTempFileContent(tempFileName);
+
+        final File completedFile = tenantFolder.getTempFile(tempFileName);
 
         assertThat(completedFile.getCanonicalPath()).isEqualTo(
-                new File("." + File.separator + "tempFolder" + File.separator + "fileName.txt").getCanonicalPath());
+                new File("." + File.separator + "tempFolder" + File.separator + newTmpFile.getName())
+                        .getCanonicalPath());
     }
 }

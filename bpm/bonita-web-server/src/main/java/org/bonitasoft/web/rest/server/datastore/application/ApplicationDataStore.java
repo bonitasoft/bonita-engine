@@ -16,6 +16,7 @@ package org.bonitasoft.web.rest.server.datastore.application;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.business.application.Application;
@@ -157,7 +158,7 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
 
     @Override
     protected ApplicationItem convertEngineToConsoleItem(final Application item) {
-        return new ApplicationItemConverter().toApplicationItem(item);
+        return new ApplicationItemConverter(new BonitaHomeFolderAccessor()).toApplicationItem(item);
     }
 
 }

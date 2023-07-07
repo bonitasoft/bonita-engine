@@ -14,13 +14,17 @@
 package org.bonitasoft.web.rest.server.api.page.builder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 
-import org.apache.commons.io.FileUtils;
-import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.web.rest.model.portal.page.PageItem;
 import org.bonitasoft.web.rest.server.datastore.page.PageDatastore;
@@ -54,7 +58,8 @@ public class PageItemBuilder {
         return new PageItemBuilder();
     }
 
-    public PageItem build() throws IOException, URISyntaxException {
+    public PageItem build() throws IOException, URISyntaxException, ServerAPIException, BonitaHomeNotSetException,
+            UnknownAPITypeException {
         final PageItem item = new PageItem();
         item.setId(id);
         item.setUrlToken(urlToken);
@@ -66,13 +71,15 @@ public class PageItemBuilder {
         item.setLastUpdateDate(last_update_date);
         item.setUpdatedByUserId(updatedBy);
         item.setContentName(contentName);
+
         String zipFileName = "/page.zip";
         final URL zipFileUrl = getClass().getResource(zipFileName);
         final File zipFile = new File(zipFileUrl.toURI());
+        //store page zip into database
+        String pageZipKey = PlatformAPIAccessor.getTemporaryContentAPI()
+                .storeTempFile(new FileContent(zipFile.getName(), new FileInputStream(zipFile), "application/zip"));
 
-        FileUtils.copyFileToDirectory(zipFile, WebBonitaConstantsUtils.getTenantInstance().getTempFolder());
-
-        item.setAttribute(PageDatastore.UNMAPPED_ATTRIBUTE_ZIP_FILE, zipFile.getName());
+        item.setAttribute(PageDatastore.UNMAPPED_ATTRIBUTE_ZIP_FILE, pageZipKey);
         return item;
     }
 

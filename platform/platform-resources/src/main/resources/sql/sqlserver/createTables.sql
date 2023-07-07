@@ -1149,6 +1149,19 @@ CREATE TABLE bar_resource (
 GO
 CREATE INDEX idx_bar_resource ON bar_resource (tenantId, process_id, type, name)
 GO
+CREATE TABLE temporary_content (
+  id NUMERIC(19, 0) NOT NULL,
+  creationDate NUMERIC(19, 0) NOT NULL,
+  key_ NVARCHAR(255) NOT NULL,
+  fileName NVARCHAR(255) NOT NULL,
+  mimeType NVARCHAR(255) NOT NULL,
+  content VARBINARY(MAX) NOT NULL,
+  UNIQUE (key_),
+  PRIMARY KEY (id)
+);
+GO
+CREATE INDEX idx_temporary_content ON temporary_content (key_);
+GO
 CREATE TABLE tenant_resource (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,

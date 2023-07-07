@@ -14,30 +14,28 @@
 package org.bonitasoft.web.rest.server.api.organization;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.test.toolkit.organization.TestUserFactory.getJohnCarpenter;
 import static org.bonitasoft.test.toolkit.organization.TestUserFactory.getMrSpechar;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
 
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.test.toolkit.organization.TestGroup;
-import org.bonitasoft.test.toolkit.organization.TestGroupFactory;
-import org.bonitasoft.test.toolkit.organization.TestMembershipFactory;
-import org.bonitasoft.test.toolkit.organization.TestRole;
-import org.bonitasoft.test.toolkit.organization.TestRoleFactory;
-import org.bonitasoft.test.toolkit.organization.TestUser;
-import org.bonitasoft.test.toolkit.organization.TestUserFactory;
+import org.bonitasoft.engine.io.FileContent;
+import org.bonitasoft.test.toolkit.organization.*;
 import org.bonitasoft.web.rest.model.identity.RoleItem;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.test.AbstractConsoleTest;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.junit.Assert;
 import org.junit.Test;
@@ -88,20 +86,6 @@ public class APIRoleIT extends AbstractConsoleTest {
         Assert.assertNotNull("Role not found", output);
         assertItemEquals("Wrong role found", input, output);
         getAPIRole().runDelete(Arrays.asList(input.getId()));
-    }
-
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_adding_icon_with_unauthorized_path() {
-        // Add
-
-        final APIRole spyApiRole = spy(getAPIRole());
-
-        RoleItem input = new RoleItem();
-        input.setName("Developper");
-        input.setDescription("The guys who drink a lot of coffee");
-        input.setIcon(".." + File.separator + ".." + File.separator + ".." + File.separator + "icon.jpg");
-
-        input = spyApiRole.runAdd(input);
     }
 
     @Test
@@ -213,8 +197,9 @@ public class APIRoleIT extends AbstractConsoleTest {
         getAPIRole().runDelete(Arrays.asList(input.getId()));
     }
 
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_updating_icon_with_unauthorized_path() {
+    @Test
+    public void should_update_role_icon()
+            throws IOException, ServerAPIException, BonitaHomeNotSetException, UnknownAPITypeException {
         // Add
         RoleItem input = new RoleItem();
         final APIRole spyApiRole = spy(getAPIRole());
@@ -222,12 +207,20 @@ public class APIRoleIT extends AbstractConsoleTest {
         input.setDescription("The guys who drink a lot of coffee");
         input = spyApiRole.runAdd(input);
         final APIID id = input.getId();
-        Assert.assertNotNull("Failed to add a new role", input);
+        assertThat(input).isNotNull();
         input = new RoleItem();
-        input.setIcon(".." + File.separator + ".." + File.separator + ".." + File.separator + "icon.jpg");
+
+        //store icon into database
+        File file = File.createTempFile("tmp", ".png");
+        Files.writeString(file.toPath(), "content");
+        String iconFileKey = PlatformAPIAccessor.getTemporaryContentAPI()
+                .storeTempFile(new FileContent("icon.png", new FileInputStream(file), "img/png"));
+
+        input.setIcon(iconFileKey);
 
         try {
             input = spyApiRole.runUpdate(id, input.getAttributes());
+            assertThat(input).isNotNull();
         } finally {
             spyApiRole.runDelete(Arrays.asList(id));
         }

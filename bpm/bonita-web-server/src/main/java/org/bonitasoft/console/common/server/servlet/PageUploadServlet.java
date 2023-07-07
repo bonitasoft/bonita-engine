@@ -14,20 +14,25 @@
 package org.bonitasoft.console.common.server.servlet;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.activation.FileTypeMap;
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.console.common.server.page.CustomPageService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,14 +54,16 @@ public class PageUploadServlet extends TenantFileUploadServlet {
 
     protected static final String PERMISSIONS_RESPONSE_ATTRIBUTE = "permissions";
 
+    protected File pageTmp;
+
     @Override
     protected String generateResponseString(final HttpServletRequest request, final String fileName,
-            final File uploadedFile) throws Exception {
+            final String uploadedFileName) throws Exception {
 
-        final String responseString = super.generateResponseString(request, fileName, uploadedFile);
+        final String responseString = super.generateResponseString(request, fileName, uploadedFileName);
         String permissionString;
         try {
-            final String[] permissions = getPermissions(request, uploadedFile);
+            final String[] permissions = getPermissions(request);
             permissionString = "[" + String.join(",", permissions) + "]";
         } catch (final Exception e) {
             permissionString = getPermissionsError(e);
@@ -66,23 +73,34 @@ public class PageUploadServlet extends TenantFileUploadServlet {
 
     @Override
     protected void fillJsonResponseMap(final HttpServletRequest request, final Map<String, Serializable> responseMap,
-            final String fileName, final String contentType, final File uploadedFile) {
-        super.fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFile);
+            final String fileName, final String contentType, final String uploadedFileKey) {
+        super.fillJsonResponseMap(request, responseMap, fileName, contentType, uploadedFileKey);
         // also add the permissions to the map
         try {
-            final String[] permissions = getPermissions(request, uploadedFile);
+            final String[] permissions = getPermissions(request);
             responseMap.put(PERMISSIONS_RESPONSE_ATTRIBUTE, permissions);
         } catch (final Exception e) {
             responseMap.put(PERMISSIONS_RESPONSE_ATTRIBUTE, getPermissionsError(e));
         }
     }
 
-    protected String[] getPermissions(final HttpServletRequest request, final File uploadedFile)
+    @Override
+    protected String storeTempFile(final String fileName, final FileItem item)
+            throws Exception {
+        pageTmp = File.createTempFile("tmp_page", ".tmp");
+        FileUtils.copyToFile(item.getInputStream(), pageTmp);
+        pageTmp.deleteOnExit();
+        final FileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+        String mimeType = mimetypesFileTypeMap.getContentType(pageTmp);
+        return temporaryContentAPI.storeTempFile(new FileContent(fileName, new FileInputStream(pageTmp), mimeType));
+    }
+
+    protected String[] getPermissions(final HttpServletRequest request)
             throws InvalidPageZipContentException, InvalidPageTokenException, AlreadyExistsException, BonitaException,
             IOException {
         final String action = request.getParameter(ACTION_PARAM_NAME);
         final boolean checkIfItAlreadyExists = ADD_ACTION.equals(action);
-        final Set<String> permissionsSet = getPagePermissions(request, uploadedFile, checkIfItAlreadyExists);
+        final Set<String> permissionsSet = getPagePermissions(request, checkIfItAlreadyExists);
         return permissionsSet != null ? permissionsSet.toArray(new String[permissionsSet.size()]) : new String[0];
     }
 
@@ -93,16 +111,17 @@ public class PageUploadServlet extends TenantFileUploadServlet {
         return e.getClass().getSimpleName();
     }
 
-    protected Set<String> getPagePermissions(final HttpServletRequest request, final File uploadedFile,
-            final boolean checkIfItAlreadyExists)
+    protected Set<String> getPagePermissions(final HttpServletRequest request, final boolean checkIfItAlreadyExists)
             throws BonitaException, IOException {
         final APISession apiSession = getAPISession(request);
         final Long processDefinitionId = getProcessDefinitionId(request);
         final CustomPageService customPageService = new CustomPageService();
         final Properties properties = customPageService.getPageProperties(apiSession,
-                FileUtils.readFileToByteArray(uploadedFile),
+                FileUtils.readFileToByteArray(pageTmp),
                 checkIfItAlreadyExists, processDefinitionId);
-        return customPageService.getCustomPagePermissions(properties, apiSession);
+        Set<String> customPagePermissions = customPageService.getCustomPagePermissions(properties, apiSession);
+        pageTmp.delete();
+        return customPagePermissions;
     }
 
     private Long getProcessDefinitionId(final HttpServletRequest request) {

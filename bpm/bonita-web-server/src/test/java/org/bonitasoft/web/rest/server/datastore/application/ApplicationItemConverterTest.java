@@ -14,16 +14,17 @@
 package org.bonitasoft.web.rest.server.datastore.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
+import org.bonitasoft.console.common.server.utils.IconDescriptor;
 import org.bonitasoft.engine.business.application.*;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.web.rest.model.application.ApplicationItem;
@@ -36,7 +37,7 @@ public class ApplicationItemConverterTest extends APITestWithMock {
     private static final String STATE = ApplicationState.DEACTIVATED.name();
     private static final long UPDATED_BY = 12L;
     private static final long CREATED_BY = 11;
-    private static final String ICON = "icon.jpg";
+    private static final String ICON = UUID.randomUUID().toString();
     private static final String DESCRIPTION = "App description";
     private static final String VERSION = "1.0";
     private static final String TOKEN = "app";
@@ -51,9 +52,11 @@ public class ApplicationItemConverterTest extends APITestWithMock {
 
     private ApplicationItemConverter converter;
 
+    private BonitaHomeFolderAccessor bonitaHomeFolderAccessor = mock(BonitaHomeFolderAccessor.class);
+
     @Before
     public void setUp() throws Exception {
-        converter = new ApplicationItemConverter();
+        converter = new ApplicationItemConverter(bonitaHomeFolderAccessor);
     }
 
     @Test
@@ -207,10 +210,12 @@ public class ApplicationItemConverterTest extends APITestWithMock {
         fields.put(ApplicationItem.ATTRIBUTE_PROFILE_ID, String.valueOf(PROFILE_ID));
         fields.put(ApplicationItem.ATTRIBUTE_HOME_PAGE_ID, String.valueOf(HOME_PAGE_ID));
         fields.put(ApplicationItem.ATTRIBUTE_STATE, STATE);
-        writeIconInBonitaHome();
+
+        IconDescriptor iconDescriptor = new IconDescriptor(ICON, "theContent".getBytes());
+        doReturn(iconDescriptor).when(bonitaHomeFolderAccessor).getIconFromFileSystem(ICON);
 
         //when
-        final ApplicationUpdater updater = converter.toApplicationUpdater(fields);
+        ApplicationUpdater updater = converter.toApplicationUpdater(fields);
 
         //then
         assertThat(updater).isNotNull();
@@ -223,12 +228,6 @@ public class ApplicationItemConverterTest extends APITestWithMock {
         assertThat(updater.getFields().get(ApplicationField.PROFILE_ID)).isEqualTo(PROFILE_ID);
         assertThat(updater.getFields().get(ApplicationField.HOME_PAGE_ID)).isEqualTo(HOME_PAGE_ID);
 
-    }
-
-    private void writeIconInBonitaHome() throws IOException {
-        File tempFolder = new BonitaHomeFolderAccessor().getBonitaTenantConstantUtil().getTempFolder();
-        File file = new File(tempFolder, ICON);
-        Files.write(file.toPath(), "theContent".getBytes());
     }
 
     @Test
