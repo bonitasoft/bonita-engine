@@ -112,7 +112,7 @@ public class BonitaHomeFolderAccessorTest {
         doReturn(newTmpFile).when(tenantFolder).makeUniqueFilename(originalFilename);
         doReturn(InputStream.nullInputStream()).when(fileContent).getInputStream();
         doReturn(originalFilename).when(fileContent).getFileName();
-        doReturn(fileContent).when(tenantFolder).retrieveTempFileContent(tempFileName);
+        doReturn(fileContent).when(tenantFolder).retrieveUploadedTempContent(tempFileName);
 
         final File completedFile = tenantFolder.getTempFile(tempFileName);
 

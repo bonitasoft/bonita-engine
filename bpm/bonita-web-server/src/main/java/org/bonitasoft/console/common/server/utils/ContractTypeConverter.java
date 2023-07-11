@@ -15,35 +15,28 @@ package org.bonitasoft.console.common.server.utils;
 
 import static org.bonitasoft.engine.bpm.contract.InputDefinition.FILE_INPUT_ID;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.converters.DateConverter;
-import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.FileInputValue;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
-import org.bonitasoft.engine.bpm.contract.Type;
+import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.bpm.contract.*;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.document.DocumentException;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.io.FileContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,11 +123,7 @@ public class ContractTypeConverter {
             for (Map.Entry<String, Serializable> element : ((Map<String, Serializable>) inputValue).entrySet()) {
                 if (element.getKey().equals(FILE_TEMP_PATH) && element.getValue() != null) {
                     String path = (String) element.getValue();
-                    try {
-                        deleteFile(bonitaHomeFolderAccessor.getTempFile(path));
-                    } catch (IOException e) {
-                        LOGGER.info("Cannot delete " + path + "in the tenant temp directory.", e);
-                    }
+                    bonitaHomeFolderAccessor.removeUploadedTempContent(path);
                 } else {
                     deleteTemporaryFilesInternal(element.getValue());
                 }
@@ -228,39 +217,28 @@ public class ContractTypeConverter {
         byte[] fileContent = null;
         if (fileTempPath != null) {
             try {
-                final File sourceFile = bonitaHomeFolderAccessor.getTempFile(fileTempPath);
-                if (sourceFile.exists()) {
-                    fileContent = getFileContent(sourceFile);
-                } else {
-                    throw new FileNotFoundException("Cannot find " + fileTempPath + " in the tenant temp directory.");
+                final FileContent sourceFile = bonitaHomeFolderAccessor.retrieveUploadedTempContent(fileTempPath);
+                try (InputStream inputStream = sourceFile.getInputStream()) {
+                    fileContent = getFileContent(inputStream, sourceFile.getSize());
                 }
-            } catch (final FileNotFoundException e) {
-                throw new FileNotFoundException(e.getMessage());
-            } catch (final IOException | DocumentException e) {
+            } catch (final BonitaException e) {
+                throw new FileNotFoundException("Cannot find " + fileTempPath + " temp file.");
+            } catch (final IOException e) {
                 throw new RuntimeException(e);
             }
         }
         return fileContent;
     }
 
-    private byte[] getFileContent(final File sourceFile)
+    private byte[] getFileContent(final InputStream inputStream, long size)
             throws DocumentException, IOException {
         byte[] fileContent;
-        if (sourceFile.length() > maxSizeForTenant * 1048576) {
-            final String errorMessage = "This document is exceeded " + maxSizeForTenant + "Mb";
+        if (size > maxSizeForTenant * 1048576 || size > Integer.MAX_VALUE) { // more than 2 GB
+            final String errorMessage = "This document is exceeded configured max size (" + maxSizeForTenant
+                    + "Mb) or 2GB";
             throw new DocumentException(errorMessage);
         }
-        fileContent = DocumentUtil.getArrayByteFromFile(sourceFile);
-        return fileContent;
-    }
-
-    void deleteFile(final File sourceFile) {
-        if (!sourceFile.delete()) {
-            sourceFile.deleteOnExit();
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Cannot delete " + sourceFile.getPath() + "in the tenant temp directory.");
-            }
-        }
+        return IOUtils.toByteArray(inputStream);
     }
 
     private Map<String, Serializable> createContractInputMap(final List<InputDefinition> inputDefinitions) {

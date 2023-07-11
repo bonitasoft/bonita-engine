@@ -89,6 +89,7 @@ public class OrganizationImportServiceTest {
     public void should_import_organization_with_specified_policy() throws Exception {
         doReturn("organizationXmlContent".getBytes()).when(organizationImportService).getOrganizationContent(any());
         doReturn("IGNORE_DUPLICATES").when(organizationImportService).getParameter("importPolicy");
+        doNothing().when(organizationImportService).cleanTempContent(any());
 
         organizationImportService.run();
 
@@ -99,6 +100,7 @@ public class OrganizationImportServiceTest {
     public void should_import_organization_with_default_policy() throws Exception {
         doReturn("organizationXmlContent".getBytes()).when(organizationImportService).getOrganizationContent(any());
         doReturn(null).when(organizationImportService).getParameter("importPolicy");
+        doNothing().when(organizationImportService).cleanTempContent(any());
 
         organizationImportService.run();
 
@@ -109,6 +111,7 @@ public class OrganizationImportServiceTest {
     public void should_throw_an_error_when_provided_policy_is_not_valid() throws Exception {
         doReturn("organizationXmlContent".getBytes()).when(organizationImportService).getOrganizationContent(any());
         doReturn("INVALID").when(organizationImportService).getParameter("importPolicy");
+        doNothing().when(organizationImportService).cleanTempContent(any());
 
         try {
             organizationImportService.run();

@@ -16,12 +16,9 @@ package org.bonitasoft.console.common.server.utils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.console.common.server.utils.ContractTypeConverter.ISO_8601_DATE_PATTERNS;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -40,6 +37,8 @@ import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.io.FileContent;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -84,6 +83,10 @@ public class ContractTypeConverterTest {
         tempFile.deleteOnExit();
         FileUtils.writeByteArrayToFile(tempFile, fileContentString.getBytes("UTF-8"));
         return tempFile;
+    }
+
+    private FileContent generateTempFileContent() throws IOException {
+        return new FileContent(filename, new ByteArrayInputStream(fileContentString.getBytes()), "text/plain");
     }
 
     @Test
@@ -137,10 +140,10 @@ public class ContractTypeConverterTest {
     public void getProcessedInputs_with_simple_input_should_return_processed_input() throws Exception {
         final List<InputDefinition> inputDefinition = generateSimpleInputDefinition(true);
         when(contractDefinition.getInputs()).thenReturn(inputDefinition);
-        final String tempFilePath = "tempFile";
-        final File tempFile = generateTempFile();
-        doReturn(tempFile).when(bonitaHomeFolderAccessor).getTempFile(tempFilePath);
-        final Map<String, Serializable> input = generateInputMap(tempFilePath);
+        final String tempFileKey = "tempFile";
+        final FileContent tempFile = generateTempFileContent();
+        doReturn(tempFile).when(bonitaHomeFolderAccessor).retrieveUploadedTempContent(tempFileKey);
+        final Map<String, Serializable> input = generateInputMap(tempFileKey);
 
         final Map<String, Serializable> processedInput = contractTypeConverter.getProcessedInput(contractDefinition,
                 input, maxSizeForTenant);
@@ -158,10 +161,10 @@ public class ContractTypeConverterTest {
         final List<InputDefinition> inputDefinition = generateComplexInputDefinition();
         when(contractDefinition.getInputs()).thenReturn(inputDefinition);
         final Map<String, Serializable> input = new HashMap<>();
-        final String tempFilePath = "tempFile";
-        final File tempFile = generateTempFile();
-        doReturn(tempFile).when(bonitaHomeFolderAccessor).getTempFile(tempFilePath);
-        final Map<String, Serializable> complexInput = generateInputMap(tempFilePath);
+        final String tempFileKey = "tempFile";
+        final FileContent tempFile = generateTempFileContent();
+        doReturn(tempFile).when(bonitaHomeFolderAccessor).retrieveUploadedTempContent(tempFileKey);
+        final Map<String, Serializable> complexInput = generateInputMap(tempFileKey);
         input.put("inputComplex", (Serializable) complexInput);
 
         final Map<String, Serializable> processedInput = contractTypeConverter.getProcessedInput(contractDefinition,
@@ -276,37 +279,35 @@ public class ContractTypeConverterTest {
     public void should_not_delete_temporary_files_when_processing_input() throws Exception {
         final List<InputDefinition> inputDefinition = generateSimpleInputDefinition(true);
         when(contractDefinition.getInputs()).thenReturn(inputDefinition);
-        final String tempFilePath = "tempFile";
-        final File tempFile = generateTempFile();
-        doReturn(tempFile).when(bonitaHomeFolderAccessor).getTempFile(tempFilePath);
-        final Map<String, Serializable> input = generateInputMap(tempFilePath);
+        final String tempFileKey = "tempFile";
+        final FileContent tempFile = generateTempFileContent();
+        doReturn(tempFile).when(bonitaHomeFolderAccessor).retrieveUploadedTempContent(tempFileKey);
+        final Map<String, Serializable> input = generateInputMap(tempFileKey);
 
         contractTypeConverter.getProcessedInput(contractDefinition, input, maxSizeForTenant);
 
         //files should not have been deleted
-        verify(contractTypeConverter, times(0)).deleteFile(any(File.class));
+        verify(bonitaHomeFolderAccessor, times(0)).removeUploadedTempContent(anyString());
     }
 
     @Test
     public void should_delete_temporary_files_of_contract_input() throws Exception {
-        final String tempFilePath = "tempFile";
-        final File tempFile = generateTempFile();
-        doReturn(tempFile).when(bonitaHomeFolderAccessor).getTempFile(tempFilePath);
-        final Map<String, Serializable> input = generateInputMap(tempFilePath);
+        final String tempFileKey = "tempFile";
+        final Map<String, Serializable> input = generateInputMap(tempFileKey);
 
         contractTypeConverter.deleteTemporaryFiles(input);
 
-        verify(contractTypeConverter).deleteFile(tempFile);
+        verify(bonitaHomeFolderAccessor).removeUploadedTempContent(tempFileKey);
     }
 
     @Test
     public void should_sanitize_filename_of_contract_input() throws Exception {
         final List<InputDefinition> inputDefinition = generateSimpleInputDefinition(true);
         when(contractDefinition.getInputs()).thenReturn(inputDefinition);
-        final String tempFilePath = "tempFile";
-        final File tempFile = generateTempFile();
-        doReturn(tempFile).when(bonitaHomeFolderAccessor).getTempFile(tempFilePath);
-        final Map<String, Serializable> input = generateInputMap("file<with>forbidden\".txt", tempFilePath);
+        final String tempFileKey = "tempFile";
+        final FileContent tempFile = generateTempFileContent();
+        doReturn(tempFile).when(bonitaHomeFolderAccessor).retrieveUploadedTempContent(tempFileKey);
+        final Map<String, Serializable> input = generateInputMap("file<with>forbidden\".txt", tempFileKey);
 
         final Map<String, Serializable> processedInput = contractTypeConverter.getProcessedInput(contractDefinition,
                 input, maxSizeForTenant);
@@ -357,17 +358,18 @@ public class ContractTypeConverterTest {
         assertThat(((Date) conversionResult).getTime()).isEqualTo(86400000L);
     }
 
-    private Map<String, Serializable> generateInputMapWithFile(final String tempFilePath) throws IOException {
-        final File tempFile = generateTempFile();
-        doReturn(tempFile).when(bonitaHomeFolderAccessor).getTempFile(tempFilePath);
-        return generateInputMap(tempFilePath);
+    private Map<String, Serializable> generateInputMapWithFile(final String tempFileKey)
+            throws IOException, BonitaException {
+        final FileContent tempFile = generateTempFileContent();
+        doReturn(tempFile).when(bonitaHomeFolderAccessor).retrieveUploadedTempContent(tempFileKey);
+        return generateInputMap(tempFileKey);
     }
 
-    private Map<String, Serializable> generateInputMap(final String tempFilePath) {
-        return generateInputMap(filename, tempFilePath);
+    private Map<String, Serializable> generateInputMap(final String tempFileKey) {
+        return generateInputMap(filename, tempFileKey);
     }
 
-    private Map<String, Serializable> generateInputMap(final String filename, final String tempFilePath) {
+    private Map<String, Serializable> generateInputMap(final String filename, final String tempFileKey) {
         final Map<String, Serializable> inputMap = new HashMap<>();
         inputMap.put("inputText", "text");
         inputMap.put("inputBoolean", "true");
@@ -379,7 +381,7 @@ public class ContractTypeConverterTest {
         inputMap.put("inputLocalDateTime", testLocalDateTime.toString());
         final Map<String, Serializable> fileMap = new HashMap<>();
         fileMap.put(InputDefinition.FILE_INPUT_FILENAME, filename);
-        fileMap.put(ContractTypeConverter.FILE_TEMP_PATH, tempFilePath);
+        fileMap.put(ContractTypeConverter.FILE_TEMP_PATH, tempFileKey);
         fileMap.put(ContractTypeConverter.CONTENT_TYPE, "contentType");
         inputMap.put("inputFile", (Serializable) fileMap);
         return inputMap;

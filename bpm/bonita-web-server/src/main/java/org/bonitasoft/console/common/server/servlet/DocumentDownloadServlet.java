@@ -32,7 +32,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.bonitasoft.console.common.server.utils.BPMEngineAPIUtil;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.console.common.server.utils.FormsResourcesUtils;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
@@ -40,6 +39,7 @@ import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,26 +128,29 @@ public class DocumentDownloadServlet extends HttpServlet {
         final String documentId = request.getParameter(DOCUMENT_ID_PARAM);
         String contentStorageId = request.getParameter(CONTENT_STORAGE_ID_PARAM);
         final APISession apiSession = (APISession) request.getSession().getAttribute(API_SESSION_PARAM_KEY);
-        byte[] fileContent = null;
+        byte[] content = null;
         if (filePath != null) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("attachmentPath: " + filePath);
             }
             final BonitaHomeFolderAccessor tempFolderAccessor = new BonitaHomeFolderAccessor();
             try {
-                final File file = tempFolderAccessor.getTempFile(FilenameUtils.separatorsToSystem(filePath));
+                final FileContent fileContent = tempFolderAccessor
+                        .retrieveUploadedTempContent(FilenameUtils.separatorsToSystem(filePath));
                 if (fileName == null) {
-                    fileName = file.getName();
+                    fileName = fileContent.getFileName();
                 }
-                fileContent = getFileContent(file, filePath);
-            } catch (final UnauthorizedFolderException e) {
+                try (InputStream inputStream = fileContent.getInputStream()) {
+                    content = getFileContent(inputStream, filePath, fileContent.getSize());
+                }
+            } catch (final BonitaException e) {
                 throw new ServletException(e.getMessage());
             } catch (final IOException e) {
                 throw new ServletException(e);
             }
         } else if (fileName != null && contentStorageId != null) {
             try {
-                fileContent = bpmEngineAPIUtil.getProcessAPI(apiSession).getDocumentContent(contentStorageId);
+                content = bpmEngineAPIUtil.getProcessAPI(apiSession).getDocumentContent(contentStorageId);
             } catch (final Exception e) {
                 final String errorMessage = "Error while retrieving the document  with content storage ID "
                         + contentStorageId + " from the engine.";
@@ -170,7 +173,7 @@ public class DocumentDownloadServlet extends HttpServlet {
                     contentStorageId = archivedDocument.getContentStorageId();
                 }
                 if (contentStorageId != null && !contentStorageId.isEmpty()) {
-                    fileContent = processAPI.getDocumentContent(contentStorageId);
+                    content = processAPI.getDocumentContent(contentStorageId);
                 }
             } catch (final Exception e) {
                 final String errorMessage = "Error while retrieving the document  with ID " + documentId
@@ -212,7 +215,8 @@ public class DocumentDownloadServlet extends HttpServlet {
                         BUSINESS_ARCHIVE_RESOURCES_DIRECTORY + File.separator + resourcePath);
                 if (resource.exists()) {
                     fileName = resource.getName();
-                    fileContent = getFileContent(resource, filePath);
+                    InputStream resourceInputStream = new FileInputStream(resource);
+                    content = getFileContent(resourceInputStream, fileName, resource.length());
                 } else {
                     final String errorMessage = "The target resource does not exist " + resource.getAbsolutePath();
                     if (LOGGER.isErrorEnabled()) {
@@ -248,11 +252,11 @@ public class DocumentDownloadServlet extends HttpServlet {
                                 + encodedfileName.replace("+", "%20"));
             }
             final OutputStream out = response.getOutputStream();
-            if (fileContent == null) {
+            if (content == null) {
                 response.setContentLength(0);
             } else {
-                response.setContentLength(fileContent.length);
-                out.write(fileContent);
+                response.setContentLength(content.length);
+                out.write(content);
             }
             out.close();
         } catch (final IOException e) {
@@ -263,24 +267,24 @@ public class DocumentDownloadServlet extends HttpServlet {
         }
     }
 
-    protected byte[] getFileContent(final File file, final String filePath) throws ServletException {
+    protected byte[] getFileContent(final InputStream inputStream, final String filePath, final long size)
+            throws ServletException, IOException {
 
         int fileLength = 0;
-        if (file.length() > Integer.MAX_VALUE) {
+        if (size > Integer.MAX_VALUE) {
             throw new ServletException("file " + filePath + " too big !");
         } else {
-            fileLength = (int) file.length();
+            fileLength = (int) size;
         }
 
         byte[] content;
         try {
-            final InputStream fileInput = new FileInputStream(file);
             final byte[] fileContent = new byte[fileLength];
             try {
                 int offset = 0;
                 int length = fileLength;
                 while (length > 0) {
-                    final int read = fileInput.read(fileContent, offset, length);
+                    final int read = inputStream.read(fileContent, offset, length);
                     if (read <= 0) {
                         break;
                     }
@@ -296,7 +300,7 @@ public class DocumentDownloadServlet extends HttpServlet {
                 }
                 throw new ServletException(errorMessage, e);
             } finally {
-                fileInput.close();
+                inputStream.close();
             }
         } catch (final IOException e) {
             final String errorMessage = "Error while reading attachment (file  : " + filePath;

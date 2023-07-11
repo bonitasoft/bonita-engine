@@ -23,7 +23,6 @@ import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.i18n.I18n;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.document.DocumentItem;
 import org.bonitasoft.web.rest.server.api.document.api.impl.DocumentDatastore;
@@ -77,16 +76,6 @@ public class APIDocumentTest {
         doReturn("doc").when(item).getAttributeValue(DocumentItem.DOCUMENT_NAME);
         doReturn("1").when(item).getAttributeValue(DocumentItem.PROCESSINSTANCE_ID);
         doReturn("type").when(item).getAttributeValue(DocumentItem.DOCUMENT_CREATION_TYPE);
-
-    }
-
-    @Test(expected = APIForbiddenException.class)
-    public void should_verify_authorisation_for_the_given_document_path() throws Exception {
-
-        doThrow(new UnauthorizedFolderException("error")).when(documentDatastore).createDocument(any(Long.class),
-                any(String.class), any(String.class),
-                any(String.class), any(BonitaHomeFolderAccessor.class));
-        apiDocument.add(item);
 
     }
 

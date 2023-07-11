@@ -14,13 +14,16 @@
 package org.bonitasoft.web.rest.server.api.document.api.impl;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
-import java.io.File;
+import java.io.InputStream;
 
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.document.DocumentItem;
 import org.junit.Test;
@@ -40,19 +43,37 @@ public class DocumentDatastoreTest {
     @Mock
     private ProcessAPI processAPI;
 
+    @Mock
+    private Document document;
+
+    @Mock
+    private ProcessInstance processInstance;
+
+    @Mock
+    private ProcessDeploymentInfo processDeploymentInfo;
+
     private DocumentDatastore documentDatastore;
 
     @Mock
     private BonitaHomeFolderAccessor tenantFolder;
 
     @Test
-    public void should_verify_authorisation_for_the_given_document_path() throws Exception {
+    public void should_retrieve_temporary_file() throws Exception {
         documentDatastore = spy(new DocumentDatastore(session));
         doReturn(processAPI).when(documentDatastore).getProcessAPI();
-        doReturn(new File("doc.txt")).when(tenantFolder).getTempFile("docPath");
+        FileContent fileContent = new FileContent("doc.txt", InputStream.nullInputStream(), "text/plain");
+        doReturn(fileContent).when(tenantFolder).retrieveUploadedTempContent("docKey");
+        doReturn(1L).when(document).getProcessInstanceId();
+        doReturn(document).when(processAPI).attachDocument(1L, "docName", "doc.txt", "text/plain", new byte[0]);
+        doReturn(processInstance).when(processAPI).getProcessInstance(1L);
+        doReturn(2L).when(processInstance).getProcessDefinitionId();
+        doReturn(processDeploymentInfo).when(processAPI).getProcessDeploymentInfo(2L);
 
-        final DocumentItem item = documentDatastore.createDocument(1L, "docName", "docType", "docPath", tenantFolder);
+        final DocumentItem item = documentDatastore.createDocument(1L, "docName", DocumentDatastore.CREATE_NEW_DOCUMENT,
+                "docKey", tenantFolder);
+
         assertNotNull(item);
+        verify(processAPI).attachDocument(1L, "docName", "doc.txt", "text/plain", new byte[0]);
     }
 
 }

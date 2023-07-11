@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.console.common.server.servlet;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -28,11 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.console.common.server.utils.FormsResourcesUtils;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,16 +65,19 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
         final String resourcePath = request.getParameter(RESOURCE_FILE_NAME_PARAM);
         final String documentId = request.getParameter(DOCUMENT_ID_PARAM);
         final APISession apiSession = (APISession) request.getSession().getAttribute(API_SESSION_PARAM_KEY);
-        byte[] fileContent = null;
+        byte[] content = null;
         if (filePath != null) {
             final BonitaHomeFolderAccessor tempFolderAccessor = new BonitaHomeFolderAccessor();
             try {
-                final File file = tempFolderAccessor.getTempFile(FilenameUtils.separatorsToSystem(filePath));
+                final FileContent fileContent = tempFolderAccessor
+                        .retrieveUploadedTempContent(FilenameUtils.separatorsToSystem(filePath));
                 if (fileName == null) {
-                    fileName = file.getName();
+                    fileName = fileContent.getFileName();
                 }
-                fileContent = getFileContent(file, filePath);
-            } catch (final UnauthorizedFolderException e) {
+                try (InputStream inputStream = fileContent.getInputStream()) {
+                    content = getFileContent(inputStream, filePath, fileContent.getSize());
+                }
+            } catch (final BonitaException e) {
                 throw new ServletException(e.getMessage());
             } catch (final IOException e) {
                 throw new ServletException(e);
@@ -95,7 +97,7 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
                     contentStorageId = archivedDocument.getContentStorageId();
                 }
                 if (contentStorageId != null && !contentStorageId.isEmpty()) {
-                    fileContent = processAPI.getDocumentContent(contentStorageId);
+                    content = processAPI.getDocumentContent(contentStorageId);
                 }
             } catch (final Exception e) {
                 final String errorMessage = "Error while retrieving the document  with ID " + documentId
@@ -137,7 +139,8 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
                         BUSINESS_ARCHIVE_RESOURCES_DIRECTORY + File.separator + resourcePath);
                 if (resource.exists()) {
                     fileName = resource.getName();
-                    fileContent = getFileContent(resource, filePath);
+                    InputStream resourceInputStream = new FileInputStream(resource);
+                    content = getFileContent(resourceInputStream, fileName, resource.length());
                 } else {
                     final String errorMessage = "The target resource does not exist " + resource.getAbsolutePath();
                     if (LOGGER.isErrorEnabled()) {
@@ -176,12 +179,12 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
                             "inline; filename=\"" + encodedfileName + "\"; filename*=UTF-8''"
                                     + encodedfileName);
                 }
-                if (fileContent != null) {
-                    response.setContentLength(fileContent.length);
+                if (content != null) {
+                    response.setContentLength(content.length);
                     OutputStream out = null;
                     try {
                         out = response.getOutputStream();
-                        out.write(fileContent);
+                        out.write(content);
                     } finally {
                         if (out != null) {
                             out.close();

@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.web.rest.server.datastore.bpm.process;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +23,6 @@ import org.bonitasoft.console.common.server.utils.BPMEngineException;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.console.common.server.utils.FormsResourcesUtils;
 import org.bonitasoft.console.common.server.utils.PlatformManagementUtils;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -32,6 +31,8 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -44,14 +45,9 @@ import org.bonitasoft.web.rest.server.datastore.bpm.process.helper.SearchProcess
 import org.bonitasoft.web.rest.server.engineclient.EngineAPIAccessor;
 import org.bonitasoft.web.rest.server.engineclient.EngineClientFactory;
 import org.bonitasoft.web.rest.server.engineclient.ProcessEngineClient;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasAdd;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasDelete;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasSearch;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
+import org.bonitasoft.web.rest.server.framework.api.*;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,34 +81,37 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
     public ProcessItem add(final ProcessItem process) {
         final ProcessEngineClient engineClient = getProcessEngineClient();
 
-        File processFile;
+        FileContent processFile;
         try {
-            processFile = getTenantFolder().getTempFile(process.getAttributes().get(FILE_UPLOAD));
-        } catch (final UnauthorizedFolderException e) {
-            throw new APIForbiddenException(e.getMessage());
-        } catch (final IOException e) {
-            throw new APIException(e);
+            processFile = getTenantFolder().retrieveUploadedTempContent(process.getAttributes().get(FILE_UPLOAD));
+        } catch (final BonitaException e) {
+            throw new APIException("Process file not found", e);
         }
-
-        final BusinessArchive businessArchive = readBusinessArchive(processFile);
-        final ProcessDefinition deployedArchive = engineClient.deploy(businessArchive);
-        final ProcessDeploymentInfo processDeploymentInfo = engineClient
-                .getProcessDeploymentInfo(deployedArchive.getId());
-
+        ProcessItem processItem = null;
         try {
-            FormsResourcesUtils.retrieveApplicationFiles(
-                    getEngineSession(),
-                    processDeploymentInfo.getProcessId(),
-                    processDeploymentInfo.getDeploymentDate());
-        } catch (final IOException e) {
-            throw new APIException("", e);
-        } catch (final ProcessDefinitionNotFoundException e) {
-            throw new APIException("", e);
-        } catch (final BPMEngineException e) {
-            throw new APIException("", e);
-        }
+            //no need to handle the closing of the stream here as it is handled in BusinessArchiveFactory
+            final BusinessArchive businessArchive = readBusinessArchive(processFile.getInputStream());
+            final ProcessDefinition deployedArchive = engineClient.deploy(businessArchive);
+            final ProcessDeploymentInfo processDeploymentInfo = engineClient
+                    .getProcessDeploymentInfo(deployedArchive.getId());
 
-        return convertEngineToConsoleItem(processDeploymentInfo);
+            try {
+                FormsResourcesUtils.retrieveApplicationFiles(
+                        getEngineSession(),
+                        processDeploymentInfo.getProcessId(),
+                        processDeploymentInfo.getDeploymentDate());
+            } catch (final IOException e) {
+                throw new APIException("", e);
+            } catch (final ProcessDefinitionNotFoundException e) {
+                throw new APIException("", e);
+            } catch (final BPMEngineException e) {
+                throw new APIException("", e);
+            }
+
+            return convertEngineToConsoleItem(processDeploymentInfo);
+        } finally {
+            getTenantFolder().removeUploadedTempContent(process.getAttributes().get(FILE_UPLOAD));
+        }
     }
 
     protected BonitaHomeFolderAccessor getTenantFolder() {
@@ -122,9 +121,9 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
     /*
      * Overridden in SP
      */
-    protected BusinessArchive readBusinessArchive(final File file) {
+    protected BusinessArchive readBusinessArchive(final InputStream inputStream) {
         try {
-            return BusinessArchiveFactory.readBusinessArchive(file);
+            return BusinessArchiveFactory.readBusinessArchive(inputStream);
         } catch (final Exception e) {
             throw new APIException(e);
         }

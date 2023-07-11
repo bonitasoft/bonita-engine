@@ -14,13 +14,16 @@
 package org.bonitasoft.web.rest.server.api.bdm;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.UnavailableLockException;
-import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.web.rest.model.bdm.BusinessDataModelItem;
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
 import org.bonitasoft.web.rest.server.api.tenant.TenantResourceItem;
@@ -53,10 +56,11 @@ public class BusinessDataModelResource extends CommonResource {
             return null;
         }
         try {
-            final byte[] businessDataModelContent = getBusinessDataModelContent(businessDataModelItem);
+            final FileContent businessDataModel = getBusinessDataModel(businessDataModelItem);
+            final byte[] businessDataModelContent = getBusinessDataModelContent(businessDataModel.getInputStream());
             tenantAdministrationAPI.updateBusinessDataModel(businessDataModelContent);
             return new TenantResourceItem(tenantAdministrationAPI.getBusinessDataModelResource(),
-                    businessDataModelItem.getFileUpload());
+                    businessDataModel.getFileName());
         } catch (APIForbiddenException e) {
             setStatus(Status.CLIENT_ERROR_FORBIDDEN, e);
             return null;
@@ -75,6 +79,8 @@ public class BusinessDataModelResource extends CommonResource {
             } else {
                 throw e;
             }
+        } finally {
+            bonitaHomeFolderAccessor.removeUploadedTempContent(businessDataModelItem.getFileUpload());
         }
     }
 
@@ -91,10 +97,18 @@ public class BusinessDataModelResource extends CommonResource {
         return tenantAdministrationAPI.isPaused();
     }
 
-    private byte[] getBusinessDataModelContent(final BusinessDataModelItem item) {
+    private FileContent getBusinessDataModel(final BusinessDataModelItem item) {
         try {
-            return IOUtil.getAllContentFrom(bonitaHomeFolderAccessor.getTempFile(item.getFileUpload()));
-        } catch (final IOException e) {
+            return bonitaHomeFolderAccessor.retrieveUploadedTempContent(item.getFileUpload());
+        } catch (final BonitaException e) {
+            throw new APIException("Can't read business data model file", e);
+        }
+    }
+
+    private byte[] getBusinessDataModelContent(InputStream inputStream) {
+        try (inputStream) {
+            return IOUtils.toByteArray(inputStream);
+        } catch (IOException e) {
             throw new APIException("Can't read business data model file", e);
         }
     }

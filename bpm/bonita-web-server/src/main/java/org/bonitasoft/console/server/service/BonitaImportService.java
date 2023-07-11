@@ -13,19 +13,12 @@
  **/
 package org.bonitasoft.console.server.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.common.model.ImportStatusMessages;
 import org.bonitasoft.web.rest.server.framework.json.JacksonSerializer;
@@ -47,10 +40,10 @@ abstract class BonitaImportService extends ConsoleService {
 
     @Override
     public Object run() {
-        File xmlFile;
+        FileContent xmlFile;
         try {
-            xmlFile = getTenantFolder().getTempFile(getFileUploadParamValue());
-        } catch (final IOException e) {
+            xmlFile = getTenantFolder().retrieveUploadedTempContent(getFileUploadParamValue());
+        } catch (final BonitaException e) {
             throw new ServiceException(getToken(), e.getMessage(), e);
         }
 
@@ -58,7 +51,8 @@ abstract class BonitaImportService extends ConsoleService {
 
         try {
             final JacksonSerializer serializer = new JacksonSerializer();
-            final ImportStatusMessages importStatusMessages = importFileContent(readImportFile(xmlFile),
+            final ImportStatusMessages importStatusMessages = importFileContent(
+                    readImportFile(xmlFile.getInputStream()),
                     importPolicyAsString);
             return serializer.serialize(importStatusMessages);
         } catch (final InvalidSessionException e) {
@@ -86,28 +80,17 @@ abstract class BonitaImportService extends ConsoleService {
                 getLogger().error(e.getMessage(), e);
             }
             throw new ServiceException(getToken(), e);
+        } finally {
+            getTenantFolder().removeUploadedTempContent(getFileUploadParamValue());
         }
     }
 
-    protected byte[] readImportFile(final File xmlFile) {
-        InputStream xmlStream = null;
-        byte[] content;
-        try {
-            xmlStream = new FileInputStream(xmlFile);
-            content = IOUtils.toByteArray(xmlStream);
+    protected byte[] readImportFile(final InputStream xmlInputStream) {
+        try (xmlInputStream) {
+            return IOUtils.toByteArray(xmlInputStream);
         } catch (final Exception e) {
             throw new ServiceException(getFileReadingError(), e);
-        } finally {
-            if (xmlStream != null) {
-                try {
-                    xmlStream.close();
-                } catch (final IOException e) {
-                    xmlStream = null;
-                }
-            }
         }
-
-        return content;
     }
 
     protected BonitaHomeFolderAccessor getTenantFolder() {

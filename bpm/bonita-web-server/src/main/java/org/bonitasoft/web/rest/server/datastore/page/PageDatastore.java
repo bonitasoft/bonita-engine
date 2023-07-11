@@ -25,7 +25,6 @@ import org.bonitasoft.console.common.server.page.CustomPageService;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.console.common.server.servlet.FileUploadServlet;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.console.common.server.utils.UnzipUtil;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -53,7 +52,6 @@ import org.bonitasoft.web.rest.server.framework.api.DatastoreHasSearch;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.slf4j.Logger;
@@ -123,10 +121,10 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
             customPageService.writePageToPageDirectory(page, pageResourceProvider, unzipPageTempFolder, engineSession);
             deleteTempDirectory(unzipPageTempFolder);
             return addedPage;
-        } catch (final UnauthorizedFolderException e) {
-            throw new APIForbiddenException(e.getMessage());
         } catch (final Exception e) {
             throw new APIException(e);
+        } finally {
+            tenantFolder.removeUploadedTempContent(filename);
         }
     }
 
@@ -292,6 +290,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
 
     @Override
     public PageItem update(final APIID id, final Map<String, String> attributes) {
+        String filename = null;
         File zipFile = null;
         try {
             Long pageId = id.toLong();
@@ -301,7 +300,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
                 final String zipFileAttribute = attributes.get(UNMAPPED_ATTRIBUTE_ZIP_FILE);
                 if (zipFileAttribute != null && !zipFileAttribute.isEmpty()) {
                     final String[] filenames = zipFileAttribute.split(FileUploadServlet.RESPONSE_SEPARATOR);
-                    final String filename = filenames[0];
+                    filename = filenames[0];
                     String originalFileName = getOriginalFilename(filenames, filename, attributes);
                     final APISession engineSession = getEngineSession();
                     zipFile = tenantFolder.getTempFile(filename);
@@ -322,11 +321,12 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
                 }
             }
             return updatedPage;
-        } catch (final UnauthorizedFolderException e) {
-            throw new APIForbiddenException(e.getMessage());
         } catch (final Exception e) {
             throw new APIException(e);
         } finally {
+            if (filename != null) {
+                tenantFolder.removeUploadedTempContent(filename);
+            }
             if (zipFile != null) {
                 zipFile.delete();
             }
