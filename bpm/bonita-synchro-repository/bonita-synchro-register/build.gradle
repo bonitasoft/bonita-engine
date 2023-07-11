@@ -5,5 +5,5 @@ dependencies {
     compile project(':bpm:bonita-synchro-repository:bonita-synchro-service-impl')
     compile project(':services:bonita-commons')
     compileOnly 'javax.jms:jms-api:1.1-rev-1'
-    compileOnly 'org.apache.activemq:activemq-client:5.8.0'
+    compileOnly 'org.apache.activemq:activemq-client:5.16.6'
 }
