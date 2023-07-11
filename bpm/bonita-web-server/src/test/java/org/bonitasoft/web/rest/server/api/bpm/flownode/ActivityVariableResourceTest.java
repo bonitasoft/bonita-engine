@@ -20,6 +20,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -128,6 +131,13 @@ public class ActivityVariableResourceTest extends RestletTest {
         return dataInstance;
     }
 
+    private DataInstanceImpl createLocalDateDataInstance(String value) {
+        final LocalDateDataInstanceImpl dataInstance = new LocalDateDataInstanceImpl(createDataDefinition(),
+                LocalDate.parse(value));
+        fillIds(dataInstance);
+        return dataInstance;
+    }
+
     private void fillIds(final DataInstanceImpl dataInstance) {
         dataInstance.setId(5L);
         dataInstance.setTenantId(2L);
@@ -176,6 +186,7 @@ public class ActivityVariableResourceTest extends RestletTest {
         checkJsonDataInstance(createFloatDataInstance(123.456F), "floatDataInstance.json");
         checkJsonDataInstance(createDoubleDataInstance(123.5D), "doubleDataInstance.json");
         checkJsonDataInstance(createLongDataInstance(null), "nullDataInstance.json");
+        checkJsonDataInstance(createLocalDateDataInstance("2016-08-16"), "localDateDataInstance.json");
     }
 
     private void checkJsonDataInstance(final DataInstanceImpl dataInstance, final String jsonFile) throws Exception {
@@ -190,4 +201,35 @@ public class ActivityVariableResourceTest extends RestletTest {
         assertJsonEquals(getJson(jsonFile), response.getEntityAsText());
     }
 
+    // Should be in bonita-common, engine side...
+    class LocalDateDataInstanceImpl extends DataInstanceImpl {
+
+        private static final long serialVersionUID = 4369510522836874048L;
+
+        private LocalDate value;
+
+        public LocalDateDataInstanceImpl() {
+            super();
+        }
+
+        public LocalDateDataInstanceImpl(final DataDefinition dataDefinition) {
+            super(dataDefinition);
+        }
+
+        public LocalDateDataInstanceImpl(final DataDefinition dataDefinition, final LocalDate value) {
+            super(dataDefinition);
+            this.value = value;
+        }
+
+        @Override
+        public LocalDate getValue() {
+            return value;
+        }
+
+        @Override
+        public void setValue(final Serializable value) {
+            this.value = (LocalDate) value;
+        }
+
+    }
 }
