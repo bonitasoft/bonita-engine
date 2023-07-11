@@ -13,10 +13,15 @@
  **/
 package org.bonitasoft.web.rest.server.utils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.bonitasoft.engine.bdm.serialization.*;
 import org.restlet.data.MediaType;
 import org.restlet.ext.jackson.JacksonConverter;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -51,6 +56,12 @@ public class BonitaJacksonConverter extends JacksonConverter {
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(new DataInstanceSerializer());
         simpleModule.addSerializer(new TimerEventTriggerInstanceSerializer());
+        simpleModule.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
+        simpleModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
+        simpleModule.addDeserializer(OffsetDateTime.class, new CustomOffsetDateTimeDeserializer());
+        simpleModule.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
+        simpleModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
+        simpleModule.addSerializer(OffsetDateTime.class, new CustomOffsetDateTimeSerializer());
 
         mapper.registerModule(simpleModule);
         return mapper;
