@@ -14,17 +14,13 @@
 package org.bonitasoft.console.server.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 
 import org.bonitasoft.console.common.server.i18n.I18n;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
@@ -36,7 +32,6 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.common.model.ImportStatusMessages;
 import org.bonitasoft.web.rest.server.BonitaRestAPIServlet;
 import org.bonitasoft.web.toolkit.client.common.i18n.AbstractI18n.LOCALE;
-import org.bonitasoft.web.toolkit.server.ServiceException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -131,20 +126,6 @@ public class ApplicationsImportServiceTest {
     @Test
     public void should_getFileUploadParamName_return_expected_name() {
         assertEquals(spiedApplicationImportService.getFileUploadParamName(), "applicationsDataUpload");
-    }
-
-    @Test
-    public void should_verify_authorisation_for_the_given_location_param() throws Exception {
-
-        doReturn(tenantFolder).when(spiedApplicationImportService).getTenantFolder();
-        doReturn("../../../file.xml").when(spiedApplicationImportService).getFileUploadParamValue();
-        doThrow(new UnauthorizedFolderException("error")).when(tenantFolder).getTempFile(any(String.class));
-
-        try {
-            spiedApplicationImportService.run();
-        } catch (final ServiceException e) {
-            assertTrue(e.getCause().getMessage().startsWith("error"));
-        }
     }
 
 }

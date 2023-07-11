@@ -13,28 +13,29 @@
  **/
 package org.bonitasoft.web.rest.server.datastore.bpm.cases;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 import javax.activation.FileTypeMap;
 import javax.activation.MimetypesFileTypeMap;
 
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentException;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.cases.CaseDocumentItem;
-import org.bonitasoft.web.rest.server.api.document.api.impl.DocumentUtil;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.datastore.filter.Filters;
 import org.bonitasoft.web.rest.server.datastore.utils.SearchOptionsCreator;
@@ -45,7 +46,6 @@ import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.common.util.StringUtil;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
@@ -129,18 +129,18 @@ public class CaseDocumentDatastore extends CommonDatastore<CaseDocumentItem, Doc
                 } else {
                     documentValue = buildDocumentValueFromUploadPath(uploadPath, index, item.getFileName());
                 }
-
                 final Document document = processAPI.addDocument(caseId, documentName, documentDescription,
                         documentValue);
                 return convertEngineToConsoleItem(document);
-
             } else {
                 throw new APIException("Error while attaching a new document. Request with bad param value.");
             }
-        } catch (final UnauthorizedFolderException e) {
-            throw new APIForbiddenException(e.getMessage());
         } catch (final Exception e) {
             throw new APIException(e);
+        } finally {
+            if (urlPath == null) {
+                tenantFolder.removeUploadedTempContent(uploadPath);
+            }
         }
     }
 
@@ -170,36 +170,38 @@ public class CaseDocumentDatastore extends CommonDatastore<CaseDocumentItem, Doc
             } else {
                 throw new APIException("Error while attaching a new document. Request with bad param value.");
             }
-        } catch (final UnauthorizedFolderException e) {
-            throw new APIForbiddenException(e.getMessage());
         } catch (final Exception e) {
             throw new APIException(e);
+        } finally {
+            if (attributes.containsKey(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH)) {
+                tenantFolder.removeUploadedTempContent(attributes.get(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH));
+            }
         }
+
     }
 
-    protected DocumentValue buildDocumentValueFromUploadPath(final String uploadPath, final int index, String fileName)
-            throws DocumentException, IOException {
+    protected DocumentValue buildDocumentValueFromUploadPath(final String uploadKey, final int index, String fileName)
+            throws IOException {
 
         String mimeType = null;
         byte[] fileContent = null;
 
-        if (uploadPath != null) {
-            final File theSourceFile = tenantFolder.getTempFile(uploadPath);
-
-            if (theSourceFile.exists()) {
-                if (theSourceFile.length() > maxSizeForTenant * 1048576) {
+        if (uploadKey != null) {
+            try {
+                final FileContent theSourceFile = tenantFolder.retrieveUploadedTempContent(uploadKey);
+                if (theSourceFile.getSize() > maxSizeForTenant * 1048576) {
                     final String errorMessage = "This document is exceeded " + maxSizeForTenant + "Mb";
                     throw new DocumentException(errorMessage);
                 }
-                fileContent = DocumentUtil.getArrayByteFromFile(theSourceFile);
-                if (theSourceFile.isFile()) {
+                try (InputStream inputStream = theSourceFile.getInputStream()) {
+                    fileContent = IOUtils.toByteArray(inputStream);
                     if (StringUtil.isBlank(fileName)) {
-                        fileName = theSourceFile.getName();
+                        fileName = theSourceFile.getFileName();
                     }
-                    mimeType = mimetypesFileTypeMap.getContentType(theSourceFile);
+                    mimeType = theSourceFile.getMimeType();
                 }
-            } else {
-                throw new FileNotFoundException("Cannot find " + uploadPath + " in the tenant temp directory.");
+            } catch (BonitaException e) {
+                throw new FileNotFoundException("Cannot find " + uploadKey + " in the tenant temp directory.");
             }
         }
 

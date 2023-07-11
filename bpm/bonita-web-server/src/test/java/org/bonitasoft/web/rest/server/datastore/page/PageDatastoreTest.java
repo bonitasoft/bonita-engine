@@ -41,7 +41,6 @@ import org.bonitasoft.console.common.server.page.extension.PageResourceProviderI
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.console.common.server.servlet.FileUploadServlet;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -58,7 +57,6 @@ import org.bonitasoft.web.rest.server.datastore.filter.Filters;
 import org.bonitasoft.web.rest.server.datastore.utils.SearchOptionsCreator;
 import org.bonitasoft.web.rest.server.datastore.utils.Sorts;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.junit.Before;
 import org.junit.Rule;
@@ -336,18 +334,6 @@ public class PageDatastoreTest extends APITestWithMock {
                 eq(engineSession));
     }
 
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_adding_page_with_unauthorized_path() throws IOException {
-        // Given
-        pageToBeAdded.setAttribute(PageDatastore.UNMAPPED_ATTRIBUTE_ZIP_FILE, "unauthorized_page.zip");
-
-        doThrow(new UnauthorizedFolderException("error")).when(tenantFolder).getTempFile("unauthorized_page.zip");
-
-        // When
-        pageDatastore.add(pageToBeAdded);
-
-    }
-
     @Test
     public void it_throws_an_exception_when_cannot_write_file_on_add() throws IOException {
         // Given
@@ -360,22 +346,6 @@ public class PageDatastoreTest extends APITestWithMock {
         } catch (final APIException e) {
             assertEquals(e.getMessage(), "java.io.IOException: error");
         }
-
-    }
-
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_updatting_page_with_unauthorized_path()
-            throws IOException, PageNotFoundException {
-        // Given
-        final Map<String, String> attributes = new HashMap<>();
-        attributes.put(PageDatastore.UNMAPPED_ATTRIBUTE_ZIP_FILE, "unauthorized_page.zip");
-
-        pageToBeAdded.setAttribute(PageDatastore.UNMAPPED_ATTRIBUTE_ZIP_FILE, "unauthorized_page.zip");
-        doReturn(mockedPage).when(pageAPI).getPage(TENANT_ID);
-        doThrow(new UnauthorizedFolderException("error")).when(tenantFolder).getTempFile("unauthorized_page.zip");
-
-        // When
-        pageDatastore.update(APIID.makeAPIID(TENANT_ID), attributes);
 
     }
 

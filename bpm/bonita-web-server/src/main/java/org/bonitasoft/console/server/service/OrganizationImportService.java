@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.console.server.service;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -23,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -81,6 +81,8 @@ public class OrganizationImportService extends ConsoleService {
                 LOGGER.error(e.getMessage(), e);
             }
             throw new ServiceException(TOKEN, AbstractI18n.t_("Can't import organization"), e);
+        } finally {
+            cleanTempContent(tenantFolder);
         }
         return "";
     }
@@ -94,10 +96,16 @@ public class OrganizationImportService extends ConsoleService {
         return importPolicy;
     }
 
-    public byte[] getOrganizationContent(final BonitaHomeFolderAccessor tenantFolder) throws IOException {
-        try (InputStream xmlStream = new FileInputStream(tenantFolder.getTempFile(getFileUploadParameter()))) {
+    public byte[] getOrganizationContent(final BonitaHomeFolderAccessor tenantFolder)
+            throws IOException, BonitaException {
+        try (InputStream xmlStream = tenantFolder.retrieveUploadedTempContent(getFileUploadParameter())
+                .getInputStream()) {
             return IOUtils.toByteArray(xmlStream);
         }
+    }
+
+    public void cleanTempContent(final BonitaHomeFolderAccessor tenantFolder) {
+        tenantFolder.removeUploadedTempContent(getFileUploadParameter());
     }
 
     protected IdentityAPI getIdentityAPI()

@@ -14,36 +14,32 @@
 package org.bonitasoft.web.rest.server.datastore.bpm.cases;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.document.Document;
-import org.bonitasoft.engine.bpm.document.DocumentException;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.io.FileContent;
+import org.bonitasoft.engine.io.TemporaryFileNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.cases.CaseDocumentItem;
 import org.bonitasoft.web.rest.server.APITestWithMock;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.junit.Before;
 import org.junit.Rule;
@@ -144,24 +140,26 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
 
     // ---------- buildDocumentValueFromUploadPath TESTS ------------------------------//
     @Test
-    public void it_should_create_documentvalue_with_given_filename() throws DocumentException, IOException {
-        final URL docUrl = getClass().getResource("/doc.jpg");
-        when(tenantFolder.getTempFile(docUrl.getPath())).thenReturn(new File(docUrl.getPath()));
+    public void it_should_create_documentvalue_with_given_filename() throws Exception {
+        String uploadKey = "3544697";
+        when(tenantFolder.retrieveUploadedTempContent(uploadKey))
+                .thenReturn(new FileContent("doc.jpg", InputStream.nullInputStream(), "img/jpg"));
 
         // When
-        final DocumentValue documentValue = documentDatastore.buildDocumentValueFromUploadPath(docUrl.getPath(), 1,
+        final DocumentValue documentValue = documentDatastore.buildDocumentValueFromUploadPath(uploadKey, 1,
                 "fileName");
         // Then
         assertTrue(documentValue.getFileName().equals("fileName"));
     }
 
     @Test
-    public void it_should_create_documentvalue_with_name_of_the_uploaded_file() throws DocumentException, IOException {
-        final URL docUrl = getClass().getResource("/doc.jpg");
-        when(tenantFolder.getTempFile(docUrl.getPath())).thenReturn(new File(docUrl.getPath()));
+    public void it_should_create_documentvalue_with_name_of_the_uploaded_file() throws Exception {
+        String uploadKey = "46645";
+        when(tenantFolder.retrieveUploadedTempContent(uploadKey))
+                .thenReturn(new FileContent("doc.jpg", InputStream.nullInputStream(), "img/jpg"));
 
         // When
-        final DocumentValue documentValue = documentDatastore.buildDocumentValueFromUploadPath(docUrl.getPath(), 1, "");
+        final DocumentValue documentValue = documentDatastore.buildDocumentValueFromUploadPath(uploadKey, 1, "");
         // Then
         assertTrue(documentValue.getFileName().equals("doc.jpg"));
     }
@@ -171,37 +169,39 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
     @Test
     public void it_should_add_a_document_calling_addDocument_with_upload_Path() throws Exception {
         // Given
-        final URL docUrl = getClass().getResource("/doc.jpg");
+        String uploadKey = "1456";
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_CASE_ID, 1L);
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_NAME, "doc 1");
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, docUrl.getPath());
+        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, uploadKey);
 
-        when(tenantFolder.getTempFile(docUrl.getPath())).thenReturn(new File(docUrl.getPath()));
+        when(tenantFolder.retrieveUploadedTempContent(uploadKey))
+                .thenReturn(new FileContent("doc.jpg", InputStream.nullInputStream(), "img/jpg"));
 
         // When
         documentDatastore.add(mockedDocumentItem);
 
         // Then
-        verify(documentDatastore).buildDocumentValueFromUploadPath(docUrl.getPath(), -1, null);
+        verify(documentDatastore).buildDocumentValueFromUploadPath(uploadKey, -1, null);
         verify(processAPI).addDocument(eq(1L), eq("doc 1"), eq(""), any(DocumentValue.class));
     }
 
     @Test
     public void it_should_add_a_document_calling_addDocument_with_upload_Path_and_fileName() throws Exception {
         // Given
-        final URL docUrl = getClass().getResource("/doc.jpg");
+        String uploadKey = "58768";
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_CASE_ID, 1L);
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_NAME, "doc 1");
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_CONTENT_FILENAME, "doc_file_name.jpg");
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, docUrl.getPath());
+        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, uploadKey);
 
-        when(tenantFolder.getTempFile(docUrl.getPath())).thenReturn(new File(docUrl.getPath()));
+        when(tenantFolder.retrieveUploadedTempContent(uploadKey))
+                .thenReturn(new FileContent("doc.jpg", InputStream.nullInputStream(), "img/jpg"));
 
         // When
         documentDatastore.add(mockedDocumentItem);
 
         // Then
-        verify(documentDatastore).buildDocumentValueFromUploadPath(docUrl.getPath(), -1, "doc_file_name.jpg");
+        verify(documentDatastore).buildDocumentValueFromUploadPath(uploadKey, -1, "doc_file_name.jpg");
         verify(processAPI).addDocument(eq(1L), eq("doc 1"), eq(""), any(DocumentValue.class));
     }
 
@@ -209,20 +209,21 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
     public void it_should_add_a_document_calling_addDocument_with_upload_Path_with_index_and_description()
             throws Exception {
         // Given
-        final URL docUrl = getClass().getResource("/doc.jpg");
+        String uploadKey = "546374";
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_CASE_ID, 1L);
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_NAME, "doc 1");
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, docUrl.getPath());
+        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, uploadKey);
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_DESCRIPTION, "This is a description");
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_INDEX, "2");
 
-        when(tenantFolder.getTempFile(docUrl.getPath())).thenReturn(new File(docUrl.getPath()));
+        when(tenantFolder.retrieveUploadedTempContent(uploadKey))
+                .thenReturn(new FileContent("doc.jpg", InputStream.nullInputStream(), "img/jpg"));
 
         // When
         documentDatastore.add(mockedDocumentItem);
 
         // Then
-        verify(documentDatastore).buildDocumentValueFromUploadPath(docUrl.getPath(), 2, null);
+        verify(documentDatastore).buildDocumentValueFromUploadPath(uploadKey, 2, null);
         verify(processAPI).addDocument(eq(1L), eq("doc 1"), eq("This is a description"), any(DocumentValue.class));
     }
 
@@ -233,7 +234,8 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_NAME, "doc 1");
         mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, "unexisting.document");
 
-        when(tenantFolder.getTempFile("unexisting.document")).thenReturn(new File("unexisting.document"));
+        when(tenantFolder.retrieveUploadedTempContent("unexisting.document"))
+                .thenThrow(TemporaryFileNotFoundException.class);
 
         try {
             // When
@@ -281,74 +283,41 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
 
     }
 
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_adding_a_document_with_unauthorized_path() throws IOException {
-        // Given
-        final URL docUrl = getClass().getResource("/doc.jpg");
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_CASE_ID, 1L);
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_NAME, "doc 1");
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, docUrl.getPath());
-
-        when(tenantFolder.getTempFile(docUrl.getPath())).thenThrow(new UnauthorizedFolderException("error"));
-
-        // When
-        documentDatastore.add(mockedDocumentItem);
-
-    }
-
-    @Test(expected = APIException.class)
-    public void it_throws_an_exception_when_cannot_write_file_on_add() throws IOException {
-        // Given
-        final URL docUrl = getClass().getResource("/doc.jpg");
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_CASE_ID, 1L);
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_NAME, "doc 1");
-        mockedDocumentItem.setAttribute(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, docUrl.getPath());
-
-        when(tenantFolder.getTempFile(docUrl.getPath())).thenThrow(new IOException("error"));
-
-        // When
-        try {
-            documentDatastore.add(mockedDocumentItem);
-        } catch (final APIForbiddenException e) {
-            fail("Don't expect the APIException to be an APIForbiddenException");
-        }
-
-    }
-
     // ---------- UPDATE METHOD TESTS ------------------------------//
 
     @Test
     public void it_should_update_a_document_calling_updateDocument_with_upload_Path() throws Exception {
         // Given
+        String uploadKey = "5464187";
         final Map<String, String> attributes = new HashMap<>();
-        final String uploadPath = getClass().getResource("/doc.jpg").getPath();
-        attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, uploadPath);
-
-        when(tenantFolder.getTempFile(uploadPath)).thenReturn(new File(uploadPath));
+        attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, uploadKey);
+        when(tenantFolder.retrieveUploadedTempContent(uploadKey))
+                .thenReturn(new FileContent("doc.jpg", InputStream.nullInputStream(), "img/jpg"));
 
         // When
         documentDatastore.update(APIID.makeAPIID(1L), attributes);
 
         // Then
-        verify(documentDatastore).buildDocumentValueFromUploadPath(uploadPath, -1, null);
+        verify(documentDatastore).buildDocumentValueFromUploadPath(uploadKey, -1, null);
         verify(processAPI).updateDocument(eq(1L), any(DocumentValue.class));
     }
 
     @Test
     public void it_should_update_a_document_calling_updateDocument_with_upload_Path_and_fileName() throws Exception {
         // Given
+        String uploadKey = "357898";
         final Map<String, String> attributes = new HashMap<>();
-        final String uploadPath = getClass().getResource("/doc.jpg").getPath();
-        attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, uploadPath);
+        attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, uploadKey);
         attributes.put(CaseDocumentItem.ATTRIBUTE_CONTENT_FILENAME, "doc_file_name.jpg");
 
-        when(tenantFolder.getTempFile(uploadPath)).thenReturn(new File(uploadPath));
+        when(tenantFolder.retrieveUploadedTempContent(uploadKey))
+                .thenReturn(new FileContent("doc.jpg", InputStream.nullInputStream(), "img/jpg"));
 
         // When
         documentDatastore.update(APIID.makeAPIID(1L), attributes);
 
         // Then
-        verify(documentDatastore).buildDocumentValueFromUploadPath(uploadPath, -1, "doc_file_name.jpg");
+        verify(documentDatastore).buildDocumentValueFromUploadPath(uploadKey, -1, "doc_file_name.jpg");
         verify(processAPI).updateDocument(eq(1L), any(DocumentValue.class));
     }
 
@@ -391,36 +360,6 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
             // Then
             verify(documentDatastore).buildDocumentValueFromUploadPath("unexisting.document", -1, null);
             verify(processAPI, times(0)).updateDocument(eq(1L), any(DocumentValue.class));
-        }
-    }
-
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_updating_a_document_with_unauthorized_path() throws IOException {
-        // Given
-        final Map<String, String> attributes = new HashMap<>();
-        attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, "C:\\doc.jpg");
-
-        when(tenantFolder.getTempFile("C:\\doc.jpg")).thenThrow(new UnauthorizedFolderException("error"));
-
-        // When
-        documentDatastore.update(APIID.makeAPIID(1L), attributes);
-
-    }
-
-    @Test(expected = APIException.class)
-    public void it_throws_an_exception_when_cannot_write_file_on_update() throws IOException {
-        // Given
-        final Map<String, String> attributes = new HashMap<>();
-        attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, "C:\\doc.jpg");
-
-        when(tenantFolder.getTempFile("C:\\doc.jpg")).thenThrow(new IOException("error"));
-
-        // When
-
-        try {
-            documentDatastore.update(APIID.makeAPIID(1L), attributes);
-        } catch (final APIForbiddenException e) {
-            fail("Don't expect the APIException to be an APIForbiddenException");
         }
     }
 

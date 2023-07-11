@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.io.*;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +27,7 @@ import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.tenant.TenantResourceState;
@@ -82,15 +83,16 @@ public class BusinessDataModelResourceTest extends RestletTest {
 
     @Test
     public void should_uninstall_and_install_bdm() throws Exception {
-        final File bdmFile = testBDMFile();
-        byte[] bdmFileContent = getContent(bdmFile);
+        final FileContent bdmFile = testBDMFile();
+        byte[] bdmFileContent = getContent(BusinessDataModelResourceTest.class.getResourceAsStream("bizdatamodel.zip"));
         final BusinessDataModelItem item = new BusinessDataModelItem();
-        item.setFileUpload(bdmFile.getName());
+        String bdmFileKey = "5342343";
+        item.setFileUpload(bdmFileKey);
         final TenantResource tenantResource = new TenantResource(1L, "bizdatamodel", TenantResourceType.BDM, 1L, 1L,
                 TenantResourceState.INSTALLED);
         final String jsonResponse = "{\"id\":\"1\",\"name\":\"bizdatamodel\",\"type\":\"BDM\",\"state\":\"INSTALLED\",\"lastUpdatedBy\":\"1\",\"lastUpdateDate\":\"1970-01-01T00:00:00.001Z\",\"fileUpload\":\"bizdatamodel.zip\"}";
         doReturn(bdmFile).when(bonitaHomeFolderAccessor)
-                .getTempFile(bdmFile.getName());
+                .retrieveUploadedTempContent(bdmFileKey);
         when(tenantAdministrationAPI.updateBusinessDataModel(bdmFileContent)).thenReturn("1.0");
         when(tenantAdministrationAPI.getBusinessDataModelResource()).thenReturn(tenantResource);
 
@@ -101,12 +103,12 @@ public class BusinessDataModelResourceTest extends RestletTest {
         verify(tenantAdministrationAPI).updateBusinessDataModel(bdmFileContent);
     }
 
-    private File testBDMFile() throws URISyntaxException {
-        return new File(BusinessDataModelResourceTest.class.getResource("bizdatamodel.zip").toURI());
+    private FileContent testBDMFile() {
+        return new FileContent("bizdatamodel.zip",
+                BusinessDataModelResourceTest.class.getResourceAsStream("bizdatamodel.zip"), "application/zip");
     }
 
-    private byte[] getContent(final File businessDataModelFile) throws IOException, FileNotFoundException {
-        final FileInputStream input = new FileInputStream(businessDataModelFile);
+    private byte[] getContent(InputStream input) throws IOException {
         try {
             return IOUtils.toByteArray(input);
         } finally {
@@ -115,24 +117,13 @@ public class BusinessDataModelResourceTest extends RestletTest {
     }
 
     @Test
-    public void should_throws_an_exception_when_cannot_write_file_on_add() throws Exception {
-        final BusinessDataModelItem item = new BusinessDataModelItem();
-        item.setFileUpload("../../../bdmFile.zip");
-        doThrow(new IOException("")).when(bonitaHomeFolderAccessor)
-                .getTempFile(any());
-
-        final Response response = request("/tenant/bdm").post(new ObjectMapper().writeValueAsString(item));
-
-        assertThat(response.getStatus()).isEqualTo(Status.SERVER_ERROR_INTERNAL);
-    }
-
-    @Test
     public void install_should_throw_APIException_if_InvalidBusinessDataModelException_occurs() throws Exception {
-        final File bdmFile = testBDMFile();
+        final FileContent bdmFile = testBDMFile();
+        String bdmFileKey = "254566";
         final BusinessDataModelItem item = new BusinessDataModelItem();
-        item.setFileUpload(bdmFile.getName());
+        item.setFileUpload(bdmFileKey);
         doReturn(bdmFile).when(bonitaHomeFolderAccessor)
-                .getTempFile(bdmFile.getName());
+                .retrieveUploadedTempContent(bdmFileKey);
         doThrow(new InvalidBusinessDataModelException(new Exception("invalid model"))).when(tenantAdministrationAPI)
                 .updateBusinessDataModel(any(byte[].class));
 
@@ -144,11 +135,12 @@ public class BusinessDataModelResourceTest extends RestletTest {
     @Test
     public void should_throw_APIException_if_BusinessDataRepositoryDeploymentException_occurs()
             throws Exception {
-        final File bdmFile = testBDMFile();
+        final FileContent bdmFile = testBDMFile();
+        String bdmFileKey = "53456879";
         final BusinessDataModelItem item = new BusinessDataModelItem();
-        item.setFileUpload(bdmFile.getName());
+        item.setFileUpload(bdmFileKey);
         doReturn(bdmFile).when(bonitaHomeFolderAccessor)
-                .getTempFile(bdmFile.getName());
+                .retrieveUploadedTempContent(bdmFileKey);
         doThrow(new BusinessDataRepositoryDeploymentException("repository deployment exception"))
                 .when(tenantAdministrationAPI)
                 .updateBusinessDataModel(any());
@@ -160,9 +152,10 @@ public class BusinessDataModelResourceTest extends RestletTest {
 
     @Test
     public void cant_install_bdm_if_tenant_is_not_paused() throws Exception {
-        final File bdmFile = testBDMFile();
+        final FileContent bdmFile = testBDMFile();
+        String bdmFileKey = "365646846";
         final BusinessDataModelItem item = new BusinessDataModelItem();
-        item.setFileUpload(bdmFile.getName());
+        item.setFileUpload(bdmFileKey);
 
         doReturn(false).when(tenantAdministrationAPI).isPaused();
 

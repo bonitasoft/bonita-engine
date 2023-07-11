@@ -50,7 +50,7 @@ public class BonitaHomeFolderAccessor {
     @Deprecated
     public File getTempFile(final String tempFileKey) throws IOException {
         try {
-            FileContent fileContent = retrieveTempFileContent(tempFileKey);
+            FileContent fileContent = retrieveUploadedTempContent(tempFileKey);
             File file = makeUniqueFilename(fileContent.getFileName());
             try (InputStream inputStream = fileContent.getInputStream()) {
                 Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -61,7 +61,7 @@ public class BonitaHomeFolderAccessor {
         }
     }
 
-    public FileContent retrieveTempFileContent(final String tempFileKey) throws BonitaException {
+    public FileContent retrieveUploadedTempContent(final String tempFileKey) throws BonitaException {
         TemporaryContentAPI temporaryContentAPI = PlatformAPIAccessor.getTemporaryContentAPI();
         try {
             return temporaryContentAPI.retrieveTempFile(tempFileKey);
@@ -78,7 +78,7 @@ public class BonitaHomeFolderAccessor {
         }
     }
 
-    public void removeTempFileContent(final String tempFileKey) {
+    public void removeUploadedTempContent(final String tempFileKey) {
         try {
             TemporaryContentAPI temporaryContentAPI = PlatformAPIAccessor.getTemporaryContentAPI();
             temporaryContentAPI.removeTempFile(tempFileKey);

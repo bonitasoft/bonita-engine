@@ -13,17 +13,16 @@
  **/
 package org.bonitasoft.web.rest.server.api.document.api.impl;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.activation.FileTypeMap;
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletException;
 
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -32,17 +31,9 @@ import org.bonitasoft.engine.bpm.document.ArchivedDocument;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentAttachmentException;
 import org.bonitasoft.engine.bpm.document.DocumentException;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
@@ -104,40 +95,37 @@ public class DocumentDatastore {
 
     public DocumentItem createDocument(final long processInstanceId, final String documentName,
             final String documentCreationType, final String path, final BonitaHomeFolderAccessor tenantFolder)
-            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, DocumentException,
-            IOException, ProcessInstanceNotFoundException, DocumentAttachmentException, InvalidSessionException,
-            ProcessDefinitionNotFoundException, RetrieveException {
+            throws BonitaException, IOException, InvalidSessionException, RetrieveException {
 
         DocumentItem item = new DocumentItem();
         final ProcessAPI processAPI = getProcessAPI();
-        String fileName = null;
-        String mimeType = null;
-        byte[] fileContent = null;
-        final File theSourceFile = tenantFolder.getTempFile(path);
-        if (theSourceFile.exists()) {
+
+        final FileContent theSourceFile = tenantFolder.retrieveUploadedTempContent(path);
+
+        try (InputStream inputStream = theSourceFile.getInputStream()) {
             final long maxSize = PropertiesFactory.getConsoleProperties().getMaxSize();
-            if (theSourceFile.length() > maxSize * 1048576) {
+            if (theSourceFile.getSize() > maxSize * 1048576) {
                 final String errorMessage = "This document is exceeded " + maxSize + "Mo";
                 throw new DocumentException(errorMessage);
             }
-            fileContent = DocumentUtil.getArrayByteFromFile(theSourceFile);
-            if (theSourceFile.isFile()) {
-                fileName = theSourceFile.getName();
-                final FileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-                mimeType = mimetypesFileTypeMap.getContentType(theSourceFile);
+            byte[] fileContent = IOUtils.toByteArray(inputStream);
+            String fileName = theSourceFile.getFileName();
+            String mimeType = theSourceFile.getMimeType();
+
+            // Attach a new document to a case
+            if (CREATE_NEW_DOCUMENT.equals(documentCreationType)) {
+                final Document document = processAPI.attachDocument(processInstanceId, documentName, fileName, mimeType,
+                        fileContent);
+                item = mapToDocumentItem(document);
+            } else if (CREATE_NEW_VERSION_DOCUMENT.equals(documentCreationType)) {
+                final Document document = processAPI.attachNewDocumentVersion(processInstanceId, documentName, fileName,
+                        mimeType, fileContent);
+                item = mapToDocumentItem(document);
             }
+            return item;
+        } finally {
+            tenantFolder.removeUploadedTempContent(path);
         }
-        // Attach a new document to a case
-        if (CREATE_NEW_DOCUMENT.equals(documentCreationType)) {
-            final Document document = processAPI.attachDocument(processInstanceId, documentName, fileName, mimeType,
-                    fileContent);
-            item = mapToDocumentItem(document);
-        } else if (CREATE_NEW_VERSION_DOCUMENT.equals(documentCreationType)) {
-            final Document document = processAPI.attachNewDocumentVersion(processInstanceId, documentName, fileName,
-                    mimeType, fileContent);
-            item = mapToDocumentItem(document);
-        }
-        return item;
     }
 
     protected ProcessAPI getProcessAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {

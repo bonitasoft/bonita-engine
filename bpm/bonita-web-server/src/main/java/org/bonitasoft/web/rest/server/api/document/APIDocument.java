@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.document.ArchivedDocumentsSearchDescriptor;
@@ -33,7 +32,6 @@ import org.bonitasoft.web.rest.server.api.document.api.impl.DocumentDatastore;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.rest.server.framework.utils.SearchOptionsBuilderUtil;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.Definitions;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
@@ -153,8 +151,6 @@ public class APIDocument extends ConsoleAPI<DocumentItem> {
             } else {
                 throw new APIException("Error while attaching a new document. Request with bad param value.");
             }
-        } catch (final UnauthorizedFolderException e) {
-            throw new APIForbiddenException(e.getMessage());
         } catch (final Exception e) {
             throw new APIException(e);
         }

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.web.rest.server.datastore.bpm.process;
 
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -25,7 +24,6 @@ import java.util.List;
 import org.bonitasoft.console.common.server.page.CustomPageService;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.console.common.server.utils.PlatformManagementUtils;
-import org.bonitasoft.console.common.server.utils.UnauthorizedFolderException;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -34,8 +32,6 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.process.ProcessItem;
 import org.bonitasoft.web.rest.server.APITestWithMock;
 import org.bonitasoft.web.rest.server.engineclient.ProcessEngineClient;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIForbiddenException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,34 +70,10 @@ public class ProcessDatastoreTest extends APITestWithMock {
     @Before
     public void setUp() throws Exception {
         processDatastore = spy(new ProcessDatastore(engineSession));
-        doReturn(tenantFolder).when(processDatastore).getTenantFolder();
         doReturn(processEngineClient).when(processDatastore).getProcessEngineClient();
         doReturn(customPageService).when(processDatastore).getCustomPageService();
         doReturn(pageAPI).when(processDatastore).getPageAPI();
         doReturn(searchResult).when(pageAPI).searchPages(any(SearchOptions.class));
-    }
-
-    @Test(expected = APIForbiddenException.class)
-    public void it_throws_an_exception_adding_a_bar_file_with_unauthorized_path() throws IOException {
-        // Given
-        doThrow(new UnauthorizedFolderException("")).when(tenantFolder).getTempFile(any());
-
-        // When
-        processDatastore.add(processItem);
-
-    }
-
-    @Test(expected = APIException.class)
-    public void it_throws_an_exception_adding_a_bar_file_with_ioException() throws IOException {
-        // Given
-        doThrow(new IOException("")).when(tenantFolder).getTempFile(any());
-
-        // When
-        try {
-            processDatastore.add(processItem);
-        } catch (final APIForbiddenException e) {
-            fail("Exception is not supposed to be an APIForbiddenException");
-        }
     }
 
     @Test
