@@ -34,5 +34,7 @@ public interface TemporaryContentService {
 
     void removeAll(List<STemporaryContent> files) throws SRecorderException, SPersistenceException;
 
+    int cleanOutDatedTemporaryContent() throws SPersistenceException;
+
     STemporaryContent get(String key) throws SBonitaReadException, SObjectNotFoundException;
 }

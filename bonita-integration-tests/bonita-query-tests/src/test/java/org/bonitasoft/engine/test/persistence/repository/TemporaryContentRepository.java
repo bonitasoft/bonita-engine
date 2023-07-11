@@ -15,8 +15,9 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.Random;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.temporary.content.STemporaryContent;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -29,16 +30,26 @@ public class TemporaryContentRepository extends TestRepository {
         super(sessionFactory);
     }
 
-    public <T extends PersistentObject> T add(T entity) {
+    public STemporaryContent add(STemporaryContent entity) {
         if (entity.getId() <= 0) {
             entity.setId(new Random().nextLong());
         }
         getSession().save(entity);
-        return (T) getSession().get(entity.getClass(), entity.getId());
+        return getByKey(entity.getKey());
     }
 
-    public <T extends PersistentObject> T getById(final Class<? extends PersistentObject> clazz, long id) {
-        return (T) getSession().get(clazz, id);
+    public STemporaryContent getByKey(String key) {
+        final Query<STemporaryContent> namedQuery = getNamedQuery("getTemporaryResource");
+        namedQuery.setParameter("key", key);
+        STemporaryContent entity = namedQuery.getSingleResult();
+        getSession().refresh(entity);
+        return entity;
+    }
+
+    public int cleanOutDatedTemporaryContent(long creationDate) {
+        final Query<STemporaryContent> namedQuery = getNamedQuery("cleanOutDatedTemporaryResources");
+        namedQuery.setParameter("creationDate", creationDate);
+        return namedQuery.executeUpdate();
     }
 
 }
