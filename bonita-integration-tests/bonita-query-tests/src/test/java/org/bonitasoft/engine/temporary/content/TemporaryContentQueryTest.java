@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
-public class UploadQueryTest {
+public class TemporaryContentQueryTest {
 
     @Inject
     private TemporaryContentRepository repository;
@@ -57,17 +57,44 @@ public class UploadQueryTest {
         String mimeType = "text/plain";
 
         // save
-        STemporaryContent upload = new STemporaryContent(originalFileName, data, mimeType);
-        upload = repository.add(upload);
+        STemporaryContent temporaryContent = new STemporaryContent(originalFileName, data, mimeType);
 
         //when
-        STemporaryContent uploaded = repository.getById(STemporaryContent.class, upload.getId());
+        STemporaryContent savedTemporaryContent = repository.add(temporaryContent);
 
-        InputStream uploadedFileStream = uploaded.getContent().getBinaryStream();
-        assertThat(uploaded.getFileName()).isEqualTo(upload.getFileName());
-        assertThat(uploaded.getMimeType()).isEqualTo(upload.getMimeType());
+        InputStream uploadedFileStream = savedTemporaryContent.getContent().getBinaryStream();
+        assertThat(savedTemporaryContent.getFileName()).isEqualTo(temporaryContent.getFileName());
+        assertThat(savedTemporaryContent.getMimeType()).isEqualTo(temporaryContent.getMimeType());
         assertThat(tempFilePath.toFile().length()).isEqualTo(uploadedFileStream.available());
         assertArrayEquals(IOUtils.toByteArray(uploadedFileStream), "test".getBytes());
     }
 
+    @Test
+    public void shouldCleanOutDatedTemporaryContent() {
+        // given
+        String originalFileName = "originalFileName";
+        String mimeType = "text/plain";
+
+        // save 3 files
+        STemporaryContent temporaryContent1 = new STemporaryContent(originalFileName, null, mimeType);
+        temporaryContent1.setCreationDate(1000000);
+        temporaryContent1 = repository.add(temporaryContent1);
+
+        STemporaryContent temporaryContent2 = new STemporaryContent(originalFileName, null, mimeType);
+        temporaryContent2.setCreationDate(2000000);
+        repository.add(temporaryContent2);
+
+        STemporaryContent temporaryContent3 = new STemporaryContent(originalFileName, null, mimeType);
+        temporaryContent3.setCreationDate(3000000);
+        temporaryContent3 = repository.add(temporaryContent3);
+
+        //when cleanOutDatedTemporaryContent
+        int deletedRows = repository.cleanOutDatedTemporaryContent(temporaryContent1.getCreationDate() + 1);
+        //then
+        assertThat(deletedRows).isEqualTo(1);
+        //when cleanOutDatedTemporaryContent
+        deletedRows = repository.cleanOutDatedTemporaryContent(temporaryContent3.getCreationDate() + 1);
+        //then
+        assertThat(deletedRows).isEqualTo(2);
+    }
 }

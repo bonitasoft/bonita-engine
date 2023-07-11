@@ -16,6 +16,7 @@ package org.bonitasoft.engine.temporary.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.hibernate.engine.jdbc.BlobProxy;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,9 +36,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class TemporaryContentServiceImpl implements TemporaryContentService {
 
+    private final Duration cleanupDelay;
     private final PersistenceService platformPersistenceService;
 
-    public TemporaryContentServiceImpl(PersistenceService platformPersistenceService) {
+    public TemporaryContentServiceImpl(
+            @Value("${bonita.runtime.temporary-content.cleanup.delay:PT30M}") String cleanupDelay,
+            PersistenceService platformPersistenceService) {
+        this.cleanupDelay = Duration.parse(cleanupDelay);
         this.platformPersistenceService = platformPersistenceService;
     }
 
@@ -59,6 +65,13 @@ public class TemporaryContentServiceImpl implements TemporaryContentService {
         for (STemporaryContent file : files) {
             remove(file);
         }
+    }
+
+    @Override
+    public int cleanOutDatedTemporaryContent() throws SPersistenceException {
+        long creationDate = System.currentTimeMillis() - cleanupDelay.toMillis();
+        return platformPersistenceService.update("cleanOutDatedTemporaryResources",
+                Map.of("creationDate", creationDate));
     }
 
     @Override

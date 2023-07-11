@@ -8,4 +8,10 @@
         WHERE u.key = :key
     </query>
 
+    <query name="cleanOutDatedTemporaryResources">
+            DELETE
+            FROM org.bonitasoft.engine.temporary.content.STemporaryContent AS u
+            WHERE u.creationDate &lt; :creationDate
+    </query>
+
 </hibernate-mapping>
