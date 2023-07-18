@@ -7,7 +7,7 @@
         <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
         <property name="properties">
             <props>
-                <prop key="db.hibernate.dialect">org.bonitasoft.engine.persistence.PostgreSQL10ExtendedDialect</prop>
+                <prop key="db.hibernate.dialect">org.hibernate.dialect.PostgreSQL10Dialect</prop>
                 <prop key="db.datasource.classname">org.postgresql.xa.PGXADataSource</prop>
                 <prop key="db.server.name">localhost</prop>
                 <prop key="db.server.port">5432</prop>

@@ -65,11 +65,13 @@ public class TemporaryContentAPILocalIT extends CommonAPIIT {
 
         String tmpFileKey = temporaryContentAPI.storeTempFile(fileContent);
         assertNotNull(tmpFileKey);
-
+        fileContent = new FileContent(originalFileName, new FileInputStream(tempFilePath.toFile()),
+                mimeType);
         // get saved tempFile
         FileContent uploaded = temporaryContentAPI.retrieveTempFile(tmpFileKey);
         assertTrue(uploaded.getFileName().equals(originalFileName));
         assertTrue(uploaded.getMimeType().equals(mimeType));
+        assertEquals(uploaded.getInputStream().available(), fileContent.getInputStream().available());
         assertArrayEquals(IOUtils.toByteArray(uploaded.getInputStream()), "test".getBytes());
 
         // remove temporaryContent

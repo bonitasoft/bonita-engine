@@ -13,7 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.TemporaryContentAPI;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -59,10 +67,21 @@ public class TemporaryContentAPIImpl implements TemporaryContentAPI {
     @Override
     public FileContent retrieveTempFile(String tempFileKey) throws TemporaryFileNotFoundException {
         try {
-            STemporaryContent temporaryContent = transactionService
-                    .executeInTransaction(() -> temporaryContentService.get(tempFileKey));
-            return new FileContent(temporaryContent.getFileName(), temporaryContent.getContent().getBinaryStream(),
-                    temporaryContent.getMimeType(), temporaryContent.getContent().length());
+            return transactionService.executeInTransaction(() -> {
+                STemporaryContent temporaryContent = temporaryContentService.get(tempFileKey);
+
+                InputStream inputStream;
+                if (temporaryContentService.canStreamAfterTransactionCompletes()) {
+                    inputStream = temporaryContent.getContent().getBinaryStream();
+                } else {
+                    // Fix for postgres (clone the Stream in temp file since streaming outside the transaction is not supported)
+                    try (InputStream originalStream = temporaryContent.getContent().getBinaryStream()) {
+                        inputStream = cloneStream(originalStream);
+                    }
+                }
+                return new FileContent(temporaryContent.getFileName(), inputStream,
+                        temporaryContent.getMimeType(), temporaryContent.getContent().length());
+            });
         } catch (SObjectNotFoundException e) {
             throw new TemporaryFileNotFoundException(e);
         } catch (Exception e) {
@@ -83,5 +102,14 @@ public class TemporaryContentAPIImpl implements TemporaryContentAPI {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private InputStream cloneStream(InputStream inputStream) throws IOException {
+        File tempFile = File.createTempFile("bonita-temp-", ".tmp");
+        tempFile.deleteOnExit();
+        try (OutputStream outputStream = Files.newOutputStream(tempFile.toPath())) {
+            IOUtils.copy(inputStream, outputStream);
+        }
+        return Files.newInputStream(tempFile.toPath(), StandardOpenOption.DELETE_ON_CLOSE);
     }
 }

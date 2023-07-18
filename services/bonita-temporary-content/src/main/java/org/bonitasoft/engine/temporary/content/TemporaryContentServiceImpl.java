@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.persistence.*;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -38,6 +39,9 @@ public class TemporaryContentServiceImpl implements TemporaryContentService {
 
     private final Duration cleanupDelay;
     private final PersistenceService platformPersistenceService;
+
+    @Value("${db.vendor}")
+    private String dbVendor;
 
     public TemporaryContentServiceImpl(
             @Value("${bonita.runtime.temporary-content.cleanup.delay:PT30M}") String cleanupDelay,
@@ -75,7 +79,13 @@ public class TemporaryContentServiceImpl implements TemporaryContentService {
     }
 
     @Override
-    public STemporaryContent get(String key) throws SBonitaReadException, SObjectNotFoundException {
+    public boolean canStreamAfterTransactionCompletes() {
+        return !dbVendor.equals("postgres");
+    }
+
+    @Override
+    public STemporaryContent get(String key)
+            throws SBonitaReadException, SObjectNotFoundException {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("key", key);
         STemporaryContent sTemporaryContent = platformPersistenceService.selectOne(
