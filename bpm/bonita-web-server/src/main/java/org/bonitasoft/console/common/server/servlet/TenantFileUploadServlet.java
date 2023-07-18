@@ -50,6 +50,9 @@ public class TenantFileUploadServlet extends FileUploadServlet {
             serviceFileUpload.setFileSizeMax(getConsoleProperties().getImageMaxSizeInKB() * KILOBYTE);
         } else if (checkUploadedFileSize) {
             serviceFileUpload.setFileSizeMax(getConsoleProperties().getMaxSize() * MEGABYTE);
+        } else {
+            //Some db vendor do not support more than 2GB Blobs
+            serviceFileUpload.setFileSizeMax(Integer.MAX_VALUE);
         }
     }
 

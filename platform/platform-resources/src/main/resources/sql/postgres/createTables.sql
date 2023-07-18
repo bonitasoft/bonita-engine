@@ -1015,7 +1015,7 @@ CREATE TABLE temporary_content (
   key_ VARCHAR(255) NOT NULL,
   fileName VARCHAR(255) NOT NULL,
   mimeType VARCHAR(255) NOT NULL,
-  content BYTEA NOT NULL,
+  content OID NOT NULL,
   UNIQUE (key_),
   PRIMARY KEY (id)
 );

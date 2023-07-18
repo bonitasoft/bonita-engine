@@ -36,5 +36,7 @@ public interface TemporaryContentService {
 
     int cleanOutDatedTemporaryContent() throws SPersistenceException;
 
+    boolean canStreamAfterTransactionCompletes();
+
     STemporaryContent get(String key) throws SBonitaReadException, SObjectNotFoundException;
 }
