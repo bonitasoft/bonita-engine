@@ -44,7 +44,7 @@ public class TemporaryContentServiceImpl implements TemporaryContentService {
     private String dbVendor;
 
     public TemporaryContentServiceImpl(
-            @Value("${bonita.runtime.temporary-content.cleanup.delay:PT30M}") String cleanupDelay,
+            @Value("${bonita.runtime.temporary-content.cleanup.delay:PT1H}") String cleanupDelay,
             PersistenceService platformPersistenceService) {
         this.cleanupDelay = Duration.parse(cleanupDelay);
         this.platformPersistenceService = platformPersistenceService;

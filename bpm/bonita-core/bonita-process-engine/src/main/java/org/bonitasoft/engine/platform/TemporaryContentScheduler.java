@@ -38,7 +38,7 @@ public class TemporaryContentScheduler {
      * Runs in fixeDelay defined by the "bonita.runtime.temporary-content.cleanup.delay" property
      * @return a number of deleted Temp Files
      */
-    @Scheduled(fixedDelayString = "${bonita.runtime.temporary-content.cleanup.delay:PT30M}")
+    @Scheduled(fixedDelayString = "${bonita.runtime.temporary-content.cleanup.delay:PT1H}")
     public int cleanOutDatedTempFiles() {
         try {
             int nbrDeletedFiles = transactionService
