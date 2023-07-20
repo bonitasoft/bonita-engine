@@ -345,6 +345,10 @@
     <servlet>
         <servlet-name>fileUploadServlet</servlet-name>
         <servlet-class>org.bonitasoft.console.common.server.servlet.TenantFileUploadServlet</servlet-class>
+        <init-param>
+            <param-name>CheckUploadedFileSize</param-name>
+            <param-value>true</param-value>
+        </init-param>
     </servlet>
     <servlet>
         <servlet-name>formFileUploadServlet</servlet-name>
