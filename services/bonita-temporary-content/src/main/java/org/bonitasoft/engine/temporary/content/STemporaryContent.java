@@ -30,6 +30,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "temporary_content")
+@Cacheable(false)
 public class STemporaryContent implements PersistentObject {
 
     @Id
