@@ -92,8 +92,7 @@ dependencies {
     testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"    // works with Junit5
     testImplementation "org.springframework:spring-test:${Deps.springVersion}"
     compileOnly project(':bpm:bonita-common')
-    testImplementation project(':bpm:bonita-common')
-    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
+    testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 

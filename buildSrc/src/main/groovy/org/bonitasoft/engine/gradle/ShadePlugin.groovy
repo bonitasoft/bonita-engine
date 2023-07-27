@@ -156,7 +156,6 @@ class ShadePlugin implements Plugin<Project> {
 
     /**
      *  get the list of project that are already shaded by other shade
-     *  e.g. bonita-common-util is already shaded by bonita-common
      */
     private Set<Project> getProjectsAlreadyShaded(Project rootProject, ShadeExtension extension) {
         if (!rootProject.ext.has("projectsAlreadyShaded")) { // add property "projectsAlreadyShaded" to act like a cache
