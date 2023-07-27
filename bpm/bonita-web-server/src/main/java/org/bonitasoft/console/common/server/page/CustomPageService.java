@@ -133,7 +133,8 @@ public class CustomPageService {
         final File pageFolder = pageResourceProvider.getPageDirectory();
         if (!pageFolder.exists() || pageFolder.list().length == 0) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Page folder does not seem to be healthy for page: " + pageResourceProvider.getFullPageName());
+                LOGGER.debug(
+                        "Page folder does not seem to be healthy for page: " + pageResourceProvider.getFullPageName());
             }
             removePage(pageResourceProvider, true);
             retrievePageZipContent(apiSession, pageResourceProvider);
