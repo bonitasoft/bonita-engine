@@ -18,7 +18,7 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testImplementation project(':bpm:bonita-util:bonita-common-util-test')
+    testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation project(':services:bonita-business-data:bonita-business-data-api')
 }
 
