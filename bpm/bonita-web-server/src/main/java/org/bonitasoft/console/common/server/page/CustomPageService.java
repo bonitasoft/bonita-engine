@@ -89,6 +89,9 @@ public class CustomPageService {
         synchronized (getPageLock(fullPageName)) {
             File pageDirectory = pageResourceProvider.getPageDirectory();
             if (!pageDirectory.exists() || pageDirectory.list().length == 0) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("No page folder for page: " + fullPageName);
+                }
                 retrievePageZipContent(apiSession, pageResourceProvider);
             }
         }
@@ -105,6 +108,9 @@ public class CustomPageService {
                     final long databaseLastUpdateTimestamp = getPageLastUpdateDateFromEngine(apiSession,
                             pageResourceProvider);
                     if (databaseLastUpdateTimestamp != pageTimestampFromCache) {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Local update will be performed for page: " + fullPageName);
+                        }
                         removePage(pageResourceProvider, true);
                         retrievePageZipContent(apiSession, pageResourceProvider);
                     } else {
@@ -114,6 +120,9 @@ public class CustomPageService {
                 }
             } else {
                 //if the last update date is not in the cache, the page has not been retrieved yet
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Local retrieval of page: " + fullPageName);
+                }
                 retrievePageZipContent(apiSession, pageResourceProvider);
             }
         }
@@ -123,6 +132,9 @@ public class CustomPageService {
             final PageResourceProvider pageResourceProvider) throws IOException, BonitaException {
         final File pageFolder = pageResourceProvider.getPageDirectory();
         if (!pageFolder.exists() || pageFolder.list().length == 0) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Page folder does not seem to be healthy for page: " + pageResourceProvider.getFullPageName());
+            }
             removePage(pageResourceProvider, true);
             retrievePageZipContent(apiSession, pageResourceProvider);
         }
@@ -338,6 +350,9 @@ public class CustomPageService {
 
     protected void retrievePageZipContent(final APISession apiSession, final PageResourceProvider pageResourceProvider)
             throws BonitaException, IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Retrieving page content for page: " + pageResourceProvider.getFullPageName());
+        }
         final PageAPI pageAPI = getPageAPI(apiSession);
         // retrieve page zip content from engine and cache it
         final Page page = pageResourceProvider.getPage(pageAPI);
