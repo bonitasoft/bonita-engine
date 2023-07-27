@@ -85,9 +85,12 @@ public class CustomPageService {
 
     public void ensurePageFolderIsPresent(final APISession apiSession, final PageResourceProvider pageResourceProvider)
             throws BonitaException, IOException {
-        File pageDirectory = pageResourceProvider.getPageDirectory();
-        if (!pageDirectory.exists() || pageDirectory.list().length == 0) {
-            retrievePageZipContent(apiSession, pageResourceProvider);
+        final String fullPageName = pageResourceProvider.getFullPageName();
+        synchronized (getPageLock(fullPageName)) {
+            File pageDirectory = pageResourceProvider.getPageDirectory();
+            if (!pageDirectory.exists() || pageDirectory.list().length == 0) {
+                retrievePageZipContent(apiSession, pageResourceProvider);
+            }
         }
     }
 

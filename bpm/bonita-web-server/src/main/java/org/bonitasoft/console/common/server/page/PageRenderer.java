@@ -73,9 +73,7 @@ public class PageRenderer {
 
     public void ensurePageFolderIsPresent(final APISession apiSession,
             final PageResourceProviderImpl pageResourceProvider) throws BonitaException, IOException {
-        synchronized (PageRenderer.class) {
-            customPageService.ensurePageFolderIsPresent(apiSession, pageResourceProvider);
-        }
+        customPageService.ensurePageFolderIsPresent(apiSession, pageResourceProvider);
     }
 
     private void displayCustomPage(final HttpServletRequest request, final HttpServletResponse response,
