@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.profile.xml;
 
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -80,10 +81,6 @@ public class ProfileNode {
         this.name = name;
     }
 
-    public boolean hasCustomPages() {
-        return false; //FIXME: remove this method and all that is linked (profile auto-update at startup)
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -104,11 +101,11 @@ public class ProfileNode {
 
     @Override
     public String toString() {
-        return "ProfileNode{" +
-                "name='" + name + '\'' +
-                ", isDefault=" + isDefault +
-                ", description='" + description + '\'' +
-                ", profileMapping=" + profileMapping +
-                '}';
+        return new StringJoiner(", ", ProfileNode.class.getSimpleName() + "[", "]")
+                .add("name='" + name + "'")
+                .add("isDefault=" + isDefault)
+                .add("description='" + description + "'")
+                .add("profileMapping=" + profileMapping)
+                .toString();
     }
 }

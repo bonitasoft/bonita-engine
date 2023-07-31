@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.profile.ProfileMember;
 
@@ -111,47 +113,19 @@ public class ProfileMemberImpl extends BaseElementImpl implements ProfileMember 
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (groupId ^ groupId >>> 32);
-        result = prime * result + (int) (profileId ^ profileId >>> 32);
-        result = prime * result + (int) (roleId ^ roleId >>> 32);
-        result = prime * result + (int) (userId ^ userId >>> 32);
-        result = prime * result + (displayNamePart1 == null ? 0 : displayNamePart1.hashCode());
-        result = prime * result + (displayNamePart2 == null ? 0 : displayNamePart2.hashCode());
-        result = prime * result + (displayNamePart3 == null ? 0 : displayNamePart3.hashCode());
-        return result;
+        return Objects.hash(super.hashCode(), profileId, userId, groupId, roleId);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (obj == null) {
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (!super.equals(o))
             return false;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-
-        final ProfileMemberImpl other = (ProfileMemberImpl) obj;
-        if (groupId != other.groupId) {
-            return false;
-        }
-        if (profileId != other.profileId) {
-            return false;
-        }
-        if (roleId != other.roleId) {
-            return false;
-        }
-        if (userId != other.userId) {
-            return false;
-        }
-        return true;
+        ProfileMemberImpl that = (ProfileMemberImpl) o;
+        return profileId == that.profileId && userId == that.userId && groupId == that.groupId && roleId == that.roleId;
     }
 
 }

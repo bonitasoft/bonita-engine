@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.profile.xml;
 
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -33,6 +34,7 @@ public class MembershipNode {
     private String role;
 
     public MembershipNode() {
+        // required by JAXB
     }
 
     public MembershipNode(String group, String role) {
@@ -74,9 +76,9 @@ public class MembershipNode {
 
     @Override
     public String toString() {
-        return "MembershipNode{" +
-                "group='" + group + '\'' +
-                ", role='" + role + '\'' +
-                '}';
+        return new StringJoiner(", ", MembershipNode.class.getSimpleName() + "[", "]")
+                .add("group='" + group + "'")
+                .add("role='" + role + "'")
+                .toString();
     }
 }

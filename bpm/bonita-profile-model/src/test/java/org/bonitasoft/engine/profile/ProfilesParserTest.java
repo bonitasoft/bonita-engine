@@ -17,7 +17,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
@@ -30,13 +29,16 @@ import org.junit.Test;
  */
 public class ProfilesParserTest {
 
-    private ProfilesParser profilesParser = new ProfilesParser();
+    private final ProfilesParser profilesParser = new ProfilesParser();
 
     @Test
     public void should_be_able_to_parse_AllProfilesXml_file() throws Exception {
         //given
-        String allProfilesXml = new String(
-                IOUtils.toByteArray(this.getClass().getResourceAsStream("/AllProfiles.xml")));
+        String allProfilesXml;
+        try (var inputStream = this.getClass().getResourceAsStream("/AllProfiles.xml")) {
+            assertThat(inputStream).isNotNull();
+            allProfilesXml = new String(inputStream.readAllBytes());
+        }
         //when
         ProfilesNode exportedProfiles = profilesParser.convert(allProfilesXml);
 
