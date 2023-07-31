@@ -16,6 +16,11 @@ package org.bonitasoft.engine.api;
 import org.bonitasoft.engine.io.FileContent;
 import org.bonitasoft.engine.io.TemporaryFileNotFoundException;
 
+/**
+ * This API is for internal usage only.
+ * It is used to store temporarily uploaded files so that they can be seen by all nodes of a cluster
+ * ApiAccessType.HTTP mode is not supported as it is using InputStreams (XML serialization cannot work).
+ */
 @NoSessionRequired
 public interface TemporaryContentAPI {
 
