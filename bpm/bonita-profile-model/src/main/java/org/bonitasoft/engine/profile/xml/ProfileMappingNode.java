@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -104,11 +105,11 @@ public class ProfileMappingNode {
 
     @Override
     public String toString() {
-        return "ProfileMappingNode{" +
-                "users=" + users +
-                ", groups=" + groups +
-                ", roles=" + roles +
-                ", memberships=" + memberships +
-                '}';
+        return new StringJoiner(", ", ProfileMappingNode.class.getSimpleName() + "[", "]")
+                .add("users=" + users)
+                .add("groups=" + groups)
+                .add("memberships=" + memberships)
+                .add("roles=" + roles)
+                .toString();
     }
 }

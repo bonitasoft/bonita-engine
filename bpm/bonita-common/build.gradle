@@ -21,6 +21,7 @@ dependencies {
         exclude(group: "javax.activation") //replaced by jakarta
     }
     api "org.bonitasoft.engine:bonita-business-archive"
+    api project(':bpm:bonita-profile-model')
 
     runtimeOnly "com.sun.activation:jakarta.activation"
 
@@ -93,16 +94,9 @@ def schemagen = tasks.register('schemagen') {
             include(name: 'org/bonitasoft/engine/business/application/xml/**/*.java')
             exclude(name: '**/*Builder.java')
         }
-
-        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-            schema(file: "profiles.xsd", namespace: "http://documentation.bonitasoft.com/profile-xml-schema/1.0")
-            classpath { pathelement(path: configurations.schemagen.asPath) }
-            include(name: 'org/bonitasoft/engine/profile/xml/**/*.java')
-        }
     }
     inputs.dir('src/main/java/')
     outputs.file("$destDir/application.xsd")
-    outputs.file("$destDir/profiles.xsd")
     outputs.cacheIf { true }
 }
 tasks.named('processResources', ProcessResources.class).configure {
