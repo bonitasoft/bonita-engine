@@ -162,7 +162,7 @@ public class ClassLoaderIT extends TestWithUser {
     }
 
     @Test
-    public void should_be_able_to_fix_groovy_script_by_updating_dependency_in_platform_classlaoder() throws Exception {
+    public void should_be_able_to_fix_groovy_script_by_updating_dependency_in_platform_classloader() throws Exception {
         PlatformSession session = loginOnPlatform();
         PlatformAPIAccessor.getPlatformCommandAPI(session).addDependency("hello-there-1.0.0.jar", generateJar("Hello",
                 "public class Hello{",

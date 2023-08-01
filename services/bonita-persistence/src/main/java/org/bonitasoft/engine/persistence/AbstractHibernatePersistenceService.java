@@ -71,12 +71,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 enableWordSearch, wordSearchExclusionMappings);
     }
 
-    public AbstractHibernatePersistenceService(final String name,
-            final HibernateConfigurationProvider hbmConfigurationProvider,
+    public AbstractHibernatePersistenceService(final HibernateConfigurationProvider hbmConfigurationProvider,
             final Properties extraHibernateProperties,
-            final SequenceManager sequenceManager, final DataSource datasource, QueryBuilderFactory queryBuilderFactory)
-            throws Exception {
-        super(name, sequenceManager, datasource);
+            final SequenceManager sequenceManager, final DataSource datasource,
+            QueryBuilderFactory queryBuilderFactory) {
+        super(sequenceManager, datasource);
         hbmConfigurationProvider.bootstrap(extraHibernateProperties);
         sessionFactory = hbmConfigurationProvider.getSessionFactory();
 
@@ -128,9 +127,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    void flushStatements(final boolean useTenant) throws SPersistenceException {
-        final Session session = getSession(useTenant);
-        session.flush();
+    public void flushStatements(final boolean useTenant) throws SPersistenceException {
+        getSession(useTenant).flush();
     }
 
     @Override
@@ -352,8 +350,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
             final Session session = getSession(true);
 
-            org.hibernate.query.Query query = queryBuilderFactory.createQueryBuilderFor(session, selectDescriptor)
-                    .tenantId(getTenantId())
+            final QueryBuilder queryBuilder = queryBuilderFactory.createQueryBuilderFor(session, selectDescriptor);
+            if (!PlatformPersistentObject.class.isAssignableFrom(selectDescriptor.getEntityType())) {
+                queryBuilder.tenantId(getTenantId());
+            }
+            org.hibernate.query.Query query = queryBuilder
                     .cache(isCacheEnabled(selectDescriptor.getQueryName()))
                     .build();
 

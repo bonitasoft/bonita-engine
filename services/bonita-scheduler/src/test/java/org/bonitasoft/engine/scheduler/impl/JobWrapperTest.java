@@ -74,7 +74,7 @@ public class JobWrapperTest {
         //when
         jobWrapper.execute();
         //then
-        verify(persistenceService).flushStatements();
+        verify(persistenceService).flushStatements(true);
     }
 
     @Test

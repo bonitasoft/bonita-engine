@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.hibernate.annotations.Type;
 
 @Data
@@ -31,7 +31,7 @@ import org.hibernate.annotations.Type;
 @Builder
 @Entity
 @Table(name = "platform")
-public class SPlatform implements PersistentObject {
+public class SPlatform implements PlatformPersistentObject {
 
     public static final String CREATED_BY = "createdBy";
     public static final String CREATED = "created";

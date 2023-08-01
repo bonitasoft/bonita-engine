@@ -101,10 +101,4 @@ public interface ReadPersistenceService {
             Map<String, Object> parameters)
             throws SBonitaReadException;
 
-    /**
-     * @return
-     *         the name of the persistence service
-     */
-    String getName();
-
 }
