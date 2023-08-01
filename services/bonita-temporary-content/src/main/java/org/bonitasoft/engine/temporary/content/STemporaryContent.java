@@ -20,7 +20,7 @@ import javax.persistence.*;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Haroun EL ALAMI
@@ -31,7 +31,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "temporary_content")
 @Cacheable(false)
-public class STemporaryContent implements PersistentObject {
+public class STemporaryContent implements PlatformPersistentObject {
 
     @Id
     private long id;

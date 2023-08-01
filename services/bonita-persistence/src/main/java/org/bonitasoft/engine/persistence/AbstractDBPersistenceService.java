@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -38,8 +34,6 @@ import org.slf4j.Logger;
  */
 public abstract class AbstractDBPersistenceService implements TenantPersistenceService {
 
-    private final String name;
-
     private final SequenceManager sequenceManager;
 
     protected final DataSource datasource;
@@ -47,21 +41,14 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     protected abstract Logger getLogger();
 
     public AbstractDBPersistenceService(final String name) {
-        this.name = name;
         sequenceManager = null;
         datasource = null;
     }
 
-    public AbstractDBPersistenceService(final String name, final SequenceManager sequenceManager,
+    public AbstractDBPersistenceService(final SequenceManager sequenceManager,
             final DataSource datasource) {
-        this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -132,7 +119,6 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     }
 
     /**
-     * @return
      * @throws STenantIdNotSetException
      */
     protected abstract long getTenantId() throws STenantIdNotSetException;
@@ -154,7 +140,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         }
         if (id == null || id == -1 || id == 0) {
             try {
-                id = getSequenceManager().getNextId(entity.getClass().getName(), getTenantId());
+                final long tenantId = entity instanceof PlatformPersistentObject ? -1 : getTenantId();
+                id = getSequenceManager().getNextId(entity.getClass().getName(), tenantId);
                 ClassReflector.invokeSetter(entity, "setId", long.class, id);
             } catch (final Exception e) {
                 throw new SPersistenceException("Problem while saving entity: " + entity + " with id: " + id, e);

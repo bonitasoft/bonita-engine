@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Zhang Bole
@@ -32,7 +32,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @AllArgsConstructor
 @Entity
 @Table(name = "platformCommand")
-public class SPlatformCommand implements PersistentObject {
+public class SPlatformCommand implements PlatformPersistentObject {
 
     public static final String ID = "id";
     public static final String NAME = "name";

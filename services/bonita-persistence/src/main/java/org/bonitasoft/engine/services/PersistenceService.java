@@ -100,10 +100,7 @@ public interface PersistenceService extends ReadPersistenceService {
      */
     void update(final UpdateDescriptor desc) throws SPersistenceException;
 
-    /**
-     * @throws SPersistenceException
-     */
-    void flushStatements() throws SPersistenceException;
+    void flushStatements(boolean useTenant) throws SPersistenceException;
 
     /**
      * Delete a record from the table by id and its class type.

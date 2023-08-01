@@ -20,12 +20,7 @@ import java.time.Duration;
 
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.PrintTestsStatusRule;
-import org.bonitasoft.engine.api.APIClient;
-import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.*;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -119,8 +114,7 @@ public class PlatformIT extends CommonAPIIT {
         final APISession tenantSession = loginAPI.login("install", "install");
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(tenantSession);
         identityAPI.getNumberOfUsers();
-        platformAPI.stopNode();
-        platformAPI.startNode();
+        restartPlatform();
         try {
             identityAPI.getNumberOfUsers();
             fail("session should not work");
@@ -129,8 +123,13 @@ public class PlatformIT extends CommonAPIIT {
         }
     }
 
+    private static void restartPlatform() throws StopNodeException, StartNodeException {
+        platformAPI.stopNode();
+        platformAPI.startNode();
+    }
+
     @Test
-    public void should_have_processes_with_duration_timer_still_works_after_start() throws Exception {
+    public void should_have_processes_with_duration_timer_still_works_after_restart() throws Exception {
         APIClient apiClient = new APIClient();
         apiClient.login("install", "install");
         ProcessDefinition wait1Sec = apiClient.getProcessAPI()
@@ -144,7 +143,7 @@ public class PlatformIT extends CommonAPIIT {
         }
 
         Thread.sleep(800);
-        stopNodeAndStartNode();
+        restartPlatform();
         apiClient.login("install", "install");
         await().atMost(Duration.ofMinutes(2)).until(() -> apiClient.getProcessAPI().getNumberOfProcessInstances(),
                 (FunctionalMatcher<Long>) it -> it == 0);

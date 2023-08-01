@@ -53,20 +53,19 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
 
     private final ReadSessionAccessor sessionAccessor;
 
-    public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
+    public TenantHibernatePersistenceService(final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
             final SequenceManager sequenceManager, final DataSource datasource,
             HibernateMetricsBinder hibernateMetricsBinder,
-            QueryBuilderFactory queryBuilderFactory)
-            throws Exception {
-        super(name, hbmConfigurationProvider, extraHibernateProperties, sequenceManager, datasource,
+            QueryBuilderFactory queryBuilderFactory) {
+        super(hbmConfigurationProvider, extraHibernateProperties, sequenceManager, datasource,
                 queryBuilderFactory);
         this.sessionAccessor = sessionAccessor;
         hibernateMetricsBinder.bindMetrics(getSessionFactory());
     }
 
     protected void updateTenantFilter(final Session session, final boolean useTenant) throws SPersistenceException {
-        if (useTenant) {
+        if (useTenant && !isTenantIdNull()) {
             try {
                 session.enableFilter(TENANT_FILTER).setParameter(TENANT_ID, getTenantId());
             } catch (final STenantIdNotSetException e) {
@@ -97,9 +96,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             tenantId = getTenantId();
             ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
-        } catch (final SReflectException e) {
-            throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
-        } catch (final STenantIdNotSetException e) {
+        } catch (final SReflectException | STenantIdNotSetException e) {
             throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
         }
     }
@@ -112,12 +109,11 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     }
 
     @Override
-    public void flushStatements() throws SPersistenceException {
-        super.flushStatements(true);
-    }
-
-    @Override
     public void delete(final PersistentObject entity) throws SPersistenceException {
+        if (entity instanceof PlatformPersistentObject) {
+            super.delete(entity);
+            return;
+        }
         try {
             if (getLogger().isDebugEnabled()) {
                 getLogger().debug(
@@ -137,14 +133,18 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
 
     @Override
     public void insert(final PersistentObject entity) throws SPersistenceException {
-        setTenant(entity);
+        if (!(entity instanceof PlatformPersistentObject)) {
+            setTenant(entity);
+        }
         super.insert(entity);
     }
 
     @Override
     public void insertInBatch(final List<? extends PersistentObject> entities) throws SPersistenceException {
         for (final PersistentObject entity : entities) {
-            setTenant(entity);
+            if (!(entity instanceof PlatformPersistentObject)) {
+                setTenant(entity);
+            }
         }
         super.insertInBatch(entities);
     }
@@ -159,14 +159,25 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         return sessionAccessor.getTenantId();
     }
 
+    protected boolean isTenantIdNull() {
+        try {
+            sessionAccessor.getTenantId();
+            return false;
+        } catch (STenantIdNotSetException e) {
+            return true;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor)
             throws SBonitaReadException {
+        if (PlatformPersistentObject.class.isAssignableFrom(selectDescriptor.getEntityType())) {
+            return super.selectById(session, selectDescriptor);
+        }
         try {
             final PersistentObjectId id = new PersistentObjectId(selectDescriptor.getId(), getTenantId());
-            Class<? extends PersistentObject> mappedClass = null;
-            mappedClass = getMappedClass(selectDescriptor.getEntityType());
+            Class<? extends PersistentObject> mappedClass = getMappedClass(selectDescriptor.getEntityType());
             return (T) session.get(mappedClass, id);
         } catch (final STenantIdNotSetException e) {
             return super.selectById(session, selectDescriptor);
