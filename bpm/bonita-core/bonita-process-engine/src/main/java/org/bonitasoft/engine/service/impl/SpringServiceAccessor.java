@@ -76,6 +76,7 @@ import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.platform.PlatformManager;
+import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -634,4 +635,8 @@ public class SpringServiceAccessor
         return beanAccessor.getContext();
     }
 
+    @Override
+    public PlatformRetriever getPlatformRetriever() {
+        return beanAccessor.getService(PlatformRetriever.class);
+    }
 }
