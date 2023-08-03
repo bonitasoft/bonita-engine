@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,10 +14,9 @@
 package org.bonitasoft.engine.business.application;
 
 import org.bonitasoft.engine.bpm.BaseElement;
-import org.bonitasoft.engine.page.Page;
 
 /**
- * Represents the association between a {@link Page} and an {@link Application}
+ * Represents the association between a {@code Page} and an {@link Application}
  *
  * @author Elias Ricken de Medeiros
  */
@@ -32,10 +31,10 @@ public interface ApplicationPage extends BaseElement {
     long getApplicationId();
 
     /**
-     * Retrieves the {@link Page} identifier
+     * Retrieves the {@code Page} identifier
      *
      * @return the <code>Page</code> identifier
-     * @see Page
+     * @see "org.bonitasoft.engine.page.Page"
      */
     long getPageId();
 

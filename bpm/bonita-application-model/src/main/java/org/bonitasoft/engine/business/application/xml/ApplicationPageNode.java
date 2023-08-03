@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.business.application.xml;
 
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -48,14 +48,17 @@ public class ApplicationPageNode {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ApplicationPageNode) {
-            ApplicationPageNode applicationPageNode = (ApplicationPageNode) obj;
-            return new EqualsBuilder()
-                    .append(applicationPageNode.getToken(), token)
-                    .append(applicationPageNode.getCustomPage(), customPage)
-                    .isEquals();
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ApplicationPageNode that = (ApplicationPageNode) o;
+        return Objects.equals(customPage, that.customPage) && Objects.equals(token, that.token);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(customPage, token);
     }
 }

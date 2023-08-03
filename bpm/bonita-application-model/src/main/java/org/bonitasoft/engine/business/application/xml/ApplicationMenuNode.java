@@ -16,14 +16,13 @@ package org.bonitasoft.engine.business.application.xml;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -70,17 +69,18 @@ public class ApplicationMenuNode {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ApplicationMenuNode) {
-            ApplicationMenuNode applicationMenuNode = (ApplicationMenuNode) obj;
-            return new EqualsBuilder()
-                    .append(applicationMenuNode.getDisplayName(), displayName)
-                    .append(applicationMenuNode.getApplicationPage(), applicationPage).isEquals()
-                    && getApplicationMenus().stream()
-                            .allMatch(menu -> applicationMenuNode.getApplicationMenus().stream()
-                                    .anyMatch(menu::equals));
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ApplicationMenuNode that = (ApplicationMenuNode) o;
+        return Objects.equals(displayName, that.displayName) && Objects.equals(applicationPage, that.applicationPage)
+                && Objects.equals(applicationMenus, that.applicationMenus);
+    }
 
-        }
-        return false;
+    @Override
+    public int hashCode() {
+        return Objects.hash(displayName, applicationPage, applicationMenus);
     }
 }

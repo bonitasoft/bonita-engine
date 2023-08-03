@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.business.application.impl;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 
@@ -24,7 +27,7 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
     private static final long serialVersionUID = 5080525289831930498L;
     private final String displayName;
     private final Long applicationPageId;
-    private long applicationId;
+    private final long applicationId;
     private Long parentId;
     private final int index;
 
@@ -66,10 +69,35 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        ApplicationMenuImpl that = (ApplicationMenuImpl) o;
+        return getApplicationId() == that.getApplicationId() && getIndex() == that.getIndex()
+                && Objects.equals(getDisplayName(), that.getDisplayName())
+                && Objects.equals(getApplicationPageId(), that.getApplicationPageId())
+                && Objects.equals(getParentId(), that.getParentId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getDisplayName(), getApplicationPageId(), getApplicationId(),
+                getParentId(), getIndex());
+    }
+
+    @Override
     public String toString() {
-        return "ApplicationMenuImpl [displayName=" + displayName + ", applicationPageId=" + applicationPageId
-                + ", applicationId=" + applicationId
-                + ", parentId=" + parentId + ", index=" + index + "]";
+        return new StringJoiner(", ", ApplicationMenuImpl.class.getSimpleName() + "[", "]")
+                .add("displayName='" + displayName + "'")
+                .add("applicationPageId=" + applicationPageId)
+                .add("applicationId=" + applicationId)
+                .add("parentId=" + parentId)
+                .add("index=" + index)
+                .toString();
     }
 
 }

@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.business.application.impl;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 
@@ -48,47 +51,31 @@ public class ApplicationPageImpl extends BaseElementImpl implements ApplicationP
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (applicationId ^ applicationId >>> 32);
-        result = prime * result + (int) (pageId ^ pageId >>> 32);
-        result = prime * result + (token == null ? 0 : token.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        ApplicationPageImpl that = (ApplicationPageImpl) o;
+        return getApplicationId() == that.getApplicationId() && getPageId() == that.getPageId()
+                && Objects.equals(getToken(), that.getToken());
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ApplicationPageImpl other = (ApplicationPageImpl) obj;
-        if (applicationId != other.applicationId) {
-            return false;
-        }
-        if (pageId != other.pageId) {
-            return false;
-        }
-        if (token == null) {
-            if (other.token != null) {
-                return false;
-            }
-        } else if (!token.equals(other.token)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getApplicationId(), getPageId(), getToken());
     }
 
     @Override
     public String toString() {
-        return "ApplicationPageImpl [applicationId=" + applicationId + ", pageId=" + pageId + ", token=" + token
-                + ", getId()=" + getId() + "]";
+        return new StringJoiner(", ", ApplicationPageImpl.class.getSimpleName() + "[", "]")
+                .add("applicationId=" + applicationId)
+                .add("pageId=" + pageId)
+                .add("token='" + token + "'")
+                .add("id=" + getId())
+                .toString();
     }
 
 }
