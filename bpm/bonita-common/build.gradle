@@ -2,8 +2,6 @@ import org.bonitasoft.engine.gradle.PomUtils
 
 apply plugin: 'java-test-fixtures'
 
-configurations { schemagen }
-
 dependencies {
     api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
     api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
@@ -12,6 +10,7 @@ dependencies {
     api "org.bonitasoft.engine:bonita-business-object-model"
     api "org.bonitasoft.engine:bonita-profile-model"
     api project(':bpm:bonita-organization-model')
+    api project(':bpm:bonita-application-model')
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
     api "com.fasterxml.jackson.core:jackson-databind"
     api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
@@ -37,16 +36,11 @@ dependencies {
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testImplementation 'org.jmockit:jmockit:1.44'
     testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
-    testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"
 
     testFixturesApi("org.bonitasoft.engine:bonita-business-object-model") {
         artifact { classifier = 'tests' }
     }
     testFixturesImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-
-    schemagen("org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbJxcVersion}",
-            "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}",
-            "org.slf4j:slf4j-api:${Deps.slf4jVersion}")
 }
 
 tasks.register("testsJar", Jar) {
@@ -83,28 +77,6 @@ publishing {
             }
         }
     }
-}
-
-def schemagen = tasks.register('schemagen') {
-    def destDir = file("$buildDir/schemas")
-    doLast {
-        destDir.mkdirs()
-        ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
-
-        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-            schema(file: "application.xsd", namespace: "http://documentation.bonitasoft.com/application-xml-schema/1.0")
-            classpath { pathelement(path: configurations.schemagen.asPath) }
-            include(name: 'org/bonitasoft/engine/business/application/xml/**/*.java')
-            exclude(name: '**/*Builder.java')
-        }
-    }
-    inputs.dir('src/main/java/')
-    outputs.file("$destDir/application.xsd")
-    outputs.cacheIf { true }
-}
-tasks.named('processResources', ProcessResources.class).configure {
-    from "$buildDir/schemas"
-    dependsOn(schemagen)
 }
 
 test { jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}" }

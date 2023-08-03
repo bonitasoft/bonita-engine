@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,7 +16,6 @@ package org.bonitasoft.engine.business.application;
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.BaseElement;
-import org.bonitasoft.engine.profile.Profile;
 
 /**
  * Contains the meta information of a Bonita Living Application.
@@ -108,44 +107,44 @@ public interface Application extends BaseElement {
     Long getHomePageId();
 
     /**
-     * Retrieves the identifier of the associated {@link Profile} or null if there is no profile is associated to this
+     * Retrieves the identifier of the associated {@code Profile} or null if there is no profile is associated to this
      * application.
      *
-     * @return the identifier of the associated {@link Profile} or null if there is no profile is associated to this
+     * @return the identifier of the associated {@code Profile} or null if there is no profile is associated to this
      *         application.
-     * @see Profile
+     * @see "org.bonitasoft.engine.profile.Profile"
      */
     Long getProfileId();
 
     /**
-     * Retrieves the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} layout. If no
+     * Retrieves the identifier of the {@code Page} used as {@code Application} layout. If no
      * layout is associated to the current
      * {@code Application} the result will be {@code null}.
      *
-     * @return the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} layout or
+     * @return the identifier of the {@code Page} used as {@code Application} layout or
      *         {@code null} if the current
      *         {@code Application} has no layout.
-     * @see org.bonitasoft.engine.page.Page
+     * @see "org.bonitasoft.engine.page.Page"
      * @since 7.0.0
      */
     Long getLayoutId();
 
     /**
-     * Retrieves the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} theme. If no
+     * Retrieves the identifier of the {@code Page} used as {@code Application} theme. If no
      * theme is associated to the current
      * {@code Application} the result will be {@code null}.
      *
-     * @return the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} theme or
+     * @return the identifier of the {@code Page} used as {@code Application} theme or
      *         {@code null} if the current
      *         {@code Application} has no theme.
-     * @see org.bonitasoft.engine.page.Page
+     * @see "org.bonitasoft.engine.page.Page"
      * @since 7.0.0
      */
     Long getThemeId();
 
     /**
      * Indicate the presence or absence of an {@link Icon} for the Application that can be retrieved using
-     * {@link org.bonitasoft.engine.api.ApplicationAPI#getIconOfApplication(long applicationId)}
+     * {@code org.bonitasoft.engine.api.ApplicationAPI#getIconOfApplication(long applicationId)}
      *
      * @see Icon
      * @return true if there is an icon for this application

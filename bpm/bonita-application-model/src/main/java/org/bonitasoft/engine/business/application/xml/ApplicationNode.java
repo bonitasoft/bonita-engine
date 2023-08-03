@@ -15,10 +15,13 @@ package org.bonitasoft.engine.business.application.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import javax.xml.bind.annotation.*;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -172,18 +175,21 @@ public class ApplicationNode {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-
         if (o == null || getClass() != o.getClass())
             return false;
-
         ApplicationNode that = (ApplicationNode) o;
+        return Objects.equals(token, that.token) && Objects.equals(version, that.version)
+                && Objects.equals(displayName, that.displayName) && Objects.equals(description, that.description)
+                && Objects.equals(profile, that.profile) && Objects.equals(homePage, that.homePage)
+                && Objects.equals(state, that.state) && Objects.equals(layout, that.layout)
+                && Objects.equals(theme, that.theme) && Objects.equals(iconPath, that.iconPath)
+                && Objects.equals(applicationPages, that.applicationPages)
+                && Objects.equals(applicationMenus, that.applicationMenus);
+    }
 
-        return new EqualsBuilder().append(getToken(), that.getToken()).append(getVersion(), that.getVersion())
-                .append(getDisplayName(), that.getDisplayName()).append(getDescription(), that.getDescription())
-                .append(getProfile(), that.getProfile()).append(getHomePage(), that.getHomePage())
-                .append(getState(), that.getState()).append(getLayout(), that.getLayout())
-                .append(getTheme(), that.getTheme()).append(getIconPath(), that.getIconPath())
-                .append(getApplicationPages(), that.getApplicationPages())
-                .append(getApplicationMenus(), that.getApplicationMenus()).isEquals();
+    @Override
+    public int hashCode() {
+        return Objects.hash(token, version, displayName, description, profile, homePage, state, layout, theme, iconPath,
+                applicationPages, applicationMenus);
     }
 }

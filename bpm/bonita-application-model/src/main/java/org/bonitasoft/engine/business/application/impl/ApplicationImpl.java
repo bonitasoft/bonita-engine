@@ -14,10 +14,9 @@
 package org.bonitasoft.engine.business.application.impl;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.StringJoiner;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationVisibility;
@@ -196,31 +195,30 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-
         if (o == null || getClass() != o.getClass())
             return false;
-
+        if (!super.equals(o))
+            return false;
         ApplicationImpl that = (ApplicationImpl) o;
-
-        return new EqualsBuilder().appendSuper(super.equals(o)).append(getCreatedBy(), that.getCreatedBy())
-                .append(getUpdatedBy(), that.getUpdatedBy()).append(hasIcon, that.hasIcon)
-                .append(isEditable(), that.isEditable()).append(getVersion(), that.getVersion())
-                .append(getLayoutId(), that.getLayoutId()).append(getIconPath(), that.getIconPath())
-                .append(getCreationDate(), that.getCreationDate()).append(getLastUpdateDate(), that.getLastUpdateDate())
-                .append(getState(), that.getState()).append(getHomePageId(), that.getHomePageId())
-                .append(getDisplayName(), that.getDisplayName()).append(getProfileId(), that.getProfileId())
-                .append(getThemeId(), that.getThemeId()).append(getDescription(), that.getDescription())
-                .append(getToken(), that.getToken()).append(getVisibility(), that.getVisibility())
-                .isEquals();
+        return getCreatedBy() == that.getCreatedBy() && getUpdatedBy() == that.getUpdatedBy() && hasIcon == that.hasIcon
+                && isEditable() == that.isEditable() && Objects.equals(getVersion(), that.getVersion())
+                && Objects.equals(getLayoutId(), that.getLayoutId())
+                && Objects.equals(getIconPath(), that.getIconPath())
+                && Objects.equals(getCreationDate(), that.getCreationDate())
+                && Objects.equals(getLastUpdateDate(), that.getLastUpdateDate())
+                && Objects.equals(getState(), that.getState()) && Objects.equals(getHomePageId(), that.getHomePageId())
+                && Objects.equals(getDisplayName(), that.getDisplayName())
+                && Objects.equals(getProfileId(), that.getProfileId())
+                && Objects.equals(getThemeId(), that.getThemeId())
+                && Objects.equals(getDescription(), that.getDescription())
+                && Objects.equals(getToken(), that.getToken()) && getVisibility() == that.getVisibility();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(getVersion()).append(getLayoutId())
-                .append(getIconPath()).append(getCreationDate()).append(getCreatedBy()).append(getLastUpdateDate())
-                .append(getUpdatedBy()).append(getState()).append(getHomePageId()).append(getDisplayName())
-                .append(getProfileId()).append(getThemeId()).append(getDescription()).append(getToken()).append(hasIcon)
-                .append(isEditable()).append(getVisibility()).toHashCode();
+        return Objects.hash(super.hashCode(), getVersion(), getLayoutId(), getIconPath(), getCreationDate(),
+                getCreatedBy(), getLastUpdateDate(), getUpdatedBy(), getState(), getHomePageId(), getDisplayName(),
+                getProfileId(), getThemeId(), getDescription(), getToken(), hasIcon, isEditable(), getVisibility());
     }
 
     @Override

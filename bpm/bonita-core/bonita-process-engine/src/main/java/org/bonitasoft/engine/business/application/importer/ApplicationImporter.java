@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.business.application.importer;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +21,7 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
+import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
@@ -32,7 +32,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -133,13 +132,10 @@ public class ApplicationImporter {
     }
 
     public ApplicationNodeContainer getApplicationNodeContainer(byte[] xmlContent) throws ImportException {
-        ApplicationNodeContainer result;
-        final URL resource = ApplicationNodeContainer.class.getResource("/application.xsd");
         try {
-            result = IOUtils.unmarshallXMLtoObject(xmlContent, ApplicationNodeContainer.class, resource);
+            return new ApplicationNodeContainerConverter().unmarshallFromXML(xmlContent);
         } catch (final Exception e) {
             throw new ImportException(e);
         }
-        return result;
     }
 }
