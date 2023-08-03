@@ -1,8 +1,11 @@
 plugins {
     id 'groovy'
 }
-configurations { schemagen }
+
 dependencies {
+    api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
+
+    api "org.bonitasoft.engine:bonita-organization-model"
     api project(':bpm:bonita-core:bonita-home-server')
     api project(':bpm:bonita-core:bonita-actor-mapping')
     api project(':bpm:bonita-core:bonita-category')
@@ -74,7 +77,6 @@ dependencies {
     api "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
     api "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
-    api project(':bpm:bonita-organization-model')
 
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
     api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
@@ -96,32 +98,7 @@ dependencies {
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-
-    schemagen("org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbJxcVersion}", project(':bpm:bonita-common'))
 }
-
-tasks.register('schemagen') {
-    def destDir = file("$buildDir/schemas")
-    doLast {
-        destDir.mkdirs()
-        ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
-    
-        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-            schema(file: "organization.xsd", namespace: "http://documentation.bonitasoft.com/organization-xml-schema/1.1")
-            classpath { pathelement(path: configurations.schemagen.asPath) }
-            include(name: 'org/bonitasoft/engine/identity/xml/**/*.java')
-        }
-
-    }
-    inputs.dir('src/main/java/')
-    outputs.file("$destDir/organization.xsd")
-}
-
-processResources { from "$buildDir/schemas" }
-
-tasks.processResources.dependsOn tasks.schemagen
-
-tasks.schemagen.outputs.cacheIf { true }
 
 test {
     useJUnitPlatform()
