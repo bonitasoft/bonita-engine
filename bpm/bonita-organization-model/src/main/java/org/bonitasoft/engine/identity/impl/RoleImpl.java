@@ -15,6 +15,7 @@ package org.bonitasoft.engine.identity.impl;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import org.bonitasoft.engine.identity.Role;
 
@@ -90,16 +91,6 @@ public class RoleImpl implements Role {
     }
 
     @Override
-    public String getIconName() {
-        return iconId != null ? iconId.toString() : "";
-    }
-
-    @Override
-    public String getIconPath() {
-        return iconId != null ? iconId.toString() : "";
-    }
-
-    @Override
     public long getCreatedBy() {
         return createdBy;
     }
@@ -125,16 +116,16 @@ public class RoleImpl implements Role {
 
     @Override
     public String toString() {
-        return "RoleImpl{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", displayName='" + displayName + '\'' +
-                ", description='" + description + '\'' +
-                ", createdBy=" + createdBy +
-                ", creationDate=" + creationDate +
-                ", lastUpdate=" + lastUpdate +
-                ", iconId=" + iconId +
-                '}';
+        return new StringJoiner(", ", RoleImpl.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("displayName='" + displayName + "'")
+                .add("description='" + description + "'")
+                .add("createdBy=" + createdBy)
+                .add("creationDate=" + creationDate)
+                .add("lastUpdate=" + lastUpdate)
+                .add("iconId=" + iconId)
+                .toString();
     }
 
     @Override

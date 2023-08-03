@@ -302,7 +302,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         }
         final User jack = getIdentityAPI().getUserByUserName("jack");
         final User john = getIdentityAPI().getUserByUserName("john");
-        assertNotSame("bpm", john.getPassword());
         assertEquals("John", john.getFirstName());
         assertEquals("Doe", john.getLastName());
         assertEquals("M", john.getTitle());

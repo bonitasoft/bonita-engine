@@ -15,6 +15,7 @@ package org.bonitasoft.engine.identity.impl;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import org.bonitasoft.engine.identity.User;
 
@@ -34,8 +35,6 @@ public class UserImpl implements User {
 
     private String lastName;
 
-    private final String password;
-
     private final String userName;
 
     private Long iconId;
@@ -52,16 +51,13 @@ public class UserImpl implements User {
 
     private Date lastConnection;
 
-    private String managerUserName;
-
     private long managerUserId;
 
     private boolean enabled;
 
-    public UserImpl(final long id, final String userName, final String password) {
+    public UserImpl(final long id, final String userName) {
         this.id = id;
         this.userName = userName;
-        this.password = password;
     }
 
     public UserImpl(final User user) {
@@ -69,7 +65,6 @@ public class UserImpl implements User {
         userName = user.getUserName();
         firstName = user.getFirstName();
         lastName = user.getLastName();
-        password = user.getPassword();
         title = user.getTitle();
         jobTitle = user.getJobTitle();
         creationDate = user.getCreationDate();
@@ -77,19 +72,12 @@ public class UserImpl implements User {
         lastUpdate = user.getLastUpdate();
         lastConnection = user.getLastConnection();
         managerUserId = user.getManagerUserId();
-        managerUserName = user.getManagerUserName();
         enabled = user.isEnabled();
     }
 
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    @Deprecated
-    public String getPassword() {
-        return password;
     }
 
     @Override
@@ -142,16 +130,6 @@ public class UserImpl implements User {
         return enabled;
     }
 
-    @Override
-    public String getIconName() {
-        return iconId != null ? iconId.toString() : "";
-    }
-
-    @Override
-    public String getIconPath() {
-        return iconId != null ? iconId.toString() : "";
-    }
-
     public void setFirstName(final String firstName) {
         this.firstName = firstName;
     }
@@ -198,15 +176,6 @@ public class UserImpl implements User {
     }
 
     @Override
-    public String getManagerUserName() {
-        return managerUserName;
-    }
-
-    public void setManagerUserName(final String managerUserName) {
-        this.managerUserName = managerUserName;
-    }
-
-    @Override
     public Long getIconId() {
         return iconId;
     }
@@ -217,22 +186,21 @@ public class UserImpl implements User {
 
     @Override
     public String toString() {
-        return "UserImpl{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", userName='" + userName + '\'' +
-                ", iconId=" + iconId +
-                ", title='" + title + '\'' +
-                ", jobTitle='" + jobTitle + '\'' +
-                ", creationDate=" + creationDate +
-                ", createdBy=" + createdBy +
-                ", lastUpdate=" + lastUpdate +
-                ", lastConnection=" + lastConnection +
-                ", managerUserName='" + managerUserName + '\'' +
-                ", managerUserId=" + managerUserId +
-                ", enabled=" + enabled +
-                '}';
+        return new StringJoiner(", ", UserImpl.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("firstName='" + firstName + "'")
+                .add("lastName='" + lastName + "'")
+                .add("userName='" + userName + "'")
+                .add("iconId=" + iconId)
+                .add("title='" + title + "'")
+                .add("jobTitle='" + jobTitle + "'")
+                .add("creationDate=" + creationDate)
+                .add("createdBy=" + createdBy)
+                .add("lastUpdate=" + lastUpdate)
+                .add("lastConnection=" + lastConnection)
+                .add("managerUserId=" + managerUserId)
+                .add("enabled=" + enabled)
+                .toString();
     }
 
     @Override
@@ -248,20 +216,17 @@ public class UserImpl implements User {
                 enabled == user.enabled &&
                 Objects.equals(firstName, user.firstName) &&
                 Objects.equals(lastName, user.lastName) &&
-                Objects.equals(password, user.password) &&
                 Objects.equals(userName, user.userName) &&
                 Objects.equals(iconId, user.iconId) &&
                 Objects.equals(title, user.title) &&
                 Objects.equals(jobTitle, user.jobTitle) &&
                 Objects.equals(creationDate, user.creationDate) &&
-                Objects.equals(lastUpdate, user.lastUpdate) &&
-                Objects.equals(managerUserName, user.managerUserName);
+                Objects.equals(lastUpdate, user.lastUpdate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, password, userName, iconId, title, jobTitle, creationDate,
-                createdBy, lastUpdate, lastConnection,
-                managerUserName, managerUserId, enabled);
+        return Objects.hash(id, firstName, lastName, userName, iconId, title, jobTitle, creationDate, createdBy,
+                lastUpdate, lastConnection, managerUserId, enabled);
     }
 }

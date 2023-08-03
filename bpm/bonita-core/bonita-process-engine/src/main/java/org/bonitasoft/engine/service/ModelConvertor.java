@@ -1032,11 +1032,7 @@ public class ModelConvertor {
     }
 
     public static User toUser(final SUser sUser) {
-        return toUser(sUser, null);
-    }
-
-    public static User toUser(final SUser sUser, final Map<Long, SUser> userIdToUser) {
-        final UserImpl user = new UserImpl(sUser.getId(), sUser.getUserName(), "");
+        final UserImpl user = new UserImpl(sUser.getId(), sUser.getUserName());
         user.setFirstName(sUser.getFirstName());
         user.setLastName(sUser.getLastName());
         user.setTitle(sUser.getTitle());
@@ -1048,9 +1044,6 @@ public class ModelConvertor {
         user.setEnabled(sUser.isEnabled());
         final long managerUserId = sUser.getManagerUserId();
         user.setManagerUserId(managerUserId);
-        if (managerUserId > 0 && userIdToUser != null) {
-            user.setManagerUserName(userIdToUser.get(managerUserId).getUserName());
-        }
         final SUserLogin sUserLogin = sUser.getSUserLogin();
         if (sUserLogin != null && sUserLogin.getLastConnection() != null) {
             user.setLastConnection(new Date(sUserLogin.getLastConnection()));
@@ -1076,19 +1069,15 @@ public class ModelConvertor {
         return contactData;
     }
 
-    public static List<User> toUsers(final List<SUser> sUsers, final Map<Long, SUser> userIdToUser) {
+    public static List<User> toUsers(final List<SUser> sUsers) {
         final List<User> users = new ArrayList<>();
         if (sUsers != null) {
             for (final SUser sUser : sUsers) {
-                final User user = ModelConvertor.toUser(sUser, userIdToUser);
+                final User user = ModelConvertor.toUser(sUser);
                 users.add(user);
             }
         }
         return Collections.unmodifiableList(users);
-    }
-
-    public static List<User> toUsers(final List<SUser> sUsers) {
-        return toUsers(sUsers, null);
     }
 
     public static Role toRole(final SRole sRole) {

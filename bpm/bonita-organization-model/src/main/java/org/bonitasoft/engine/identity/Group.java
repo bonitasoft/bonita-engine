@@ -21,7 +21,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  * Represents a group inside the organization.
  *
  * @author Lu Kai, Bole Zhang, Matthieu Chaffotte
- * @see org.bonitasoft.engine.api.GroupAPI
+ * @see "org.bonitasoft.engine.api.GroupAPI"
  * @since 6.0.0
  */
 public interface Group extends BonitaObject {
@@ -45,19 +45,6 @@ public interface Group extends BonitaObject {
      * @return The description of the group.
      */
     String getDescription();
-
-    /**
-     * @return The group's icon name
-     */
-    @Deprecated
-    String getIconName();
-
-    /**
-     * @return The group's icon file path
-     * @deprecated since 7.3.0, use #getIconId
-     */
-    @Deprecated
-    String getIconPath();
 
     /**
      * @return the id of the icon of this group or null

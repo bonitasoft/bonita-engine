@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.identity.impl;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserWithContactData;
@@ -49,45 +52,25 @@ public class UserWithContactDataImpl implements UserWithContactData {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (contactData == null ? 0 : contactData.hashCode());
-        result = prime * result + (user == null ? 0 : user.hashCode());
-        return result;
+        return Objects.hash(user, contactData);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (obj == null) {
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final UserWithContactDataImpl other = (UserWithContactDataImpl) obj;
-        if (contactData == null) {
-            if (other.contactData != null) {
-                return false;
-            }
-        } else if (!contactData.equals(other.contactData)) {
-            return false;
-        }
-        if (user == null) {
-            if (other.user != null) {
-                return false;
-            }
-        } else if (!user.equals(other.user)) {
-            return false;
-        }
-        return true;
+        UserWithContactDataImpl that = (UserWithContactDataImpl) o;
+        return Objects.equals(user, that.user) && Objects.equals(contactData, that.contactData);
     }
 
     @Override
     public String toString() {
-        return "UserWithContactDataImpl [user=" + user + ", contactData=" + contactData + "]";
+        return new StringJoiner(", ", UserWithContactDataImpl.class.getSimpleName() + "[", "]")
+                .add("user=" + user)
+                .add("contactData=" + contactData)
+                .toString();
     }
 
 }

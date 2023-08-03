@@ -30,7 +30,7 @@ public class UserItemConverter extends ItemConverter<UserItem, User> {
         result.setId(APIID.makeAPIID(user.getId()));
         result.setFirstName(user.getFirstName());
         result.setLastName(user.getLastName());
-        result.setPassword(user.getPassword());
+        result.setPassword(null);
         result.setUserName(user.getUserName());
         result.setManagerId(user.getManagerUserId());
         result.setEnabled(user.isEnabled());
