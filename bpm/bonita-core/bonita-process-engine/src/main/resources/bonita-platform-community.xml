@@ -651,7 +651,7 @@
                 <value>org.bonitasoft.engine.temporary.content.STemporaryContent</value>
             </set>
         </constructor-arg>
-        <constructor-arg name="sequenceId" value="20310" />
+        <constructor-arg name="sequenceId" value="5" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10500:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
 
