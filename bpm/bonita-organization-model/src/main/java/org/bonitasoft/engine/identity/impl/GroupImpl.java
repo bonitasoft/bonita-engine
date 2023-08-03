@@ -15,6 +15,7 @@ package org.bonitasoft.engine.identity.impl;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import org.bonitasoft.engine.identity.Group;
 
@@ -96,16 +97,6 @@ public class GroupImpl implements Group {
     }
 
     @Override
-    public String getIconName() {
-        return iconId != null ? iconId.toString() : "";
-    }
-
-    @Override
-    public String getIconPath() {
-        return iconId != null ? iconId.toString() : "";
-    }
-
-    @Override
     public long getCreatedBy() {
         return createdBy;
     }
@@ -144,17 +135,17 @@ public class GroupImpl implements Group {
 
     @Override
     public String toString() {
-        return "GroupImpl{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", displayName='" + displayName + '\'' +
-                ", description='" + description + '\'' +
-                ", createdBy=" + createdBy +
-                ", parentPath='" + parentPath + '\'' +
-                ", creationDate=" + creationDate +
-                ", lastUpdate=" + lastUpdate +
-                ", iconId=" + iconId +
-                '}';
+        return new StringJoiner(", ", GroupImpl.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("displayName='" + displayName + "'")
+                .add("description='" + description + "'")
+                .add("createdBy=" + createdBy)
+                .add("parentPath='" + parentPath + "'")
+                .add("creationDate=" + creationDate)
+                .add("lastUpdate=" + lastUpdate)
+                .add("iconId=" + iconId)
+                .toString();
     }
 
     @Override

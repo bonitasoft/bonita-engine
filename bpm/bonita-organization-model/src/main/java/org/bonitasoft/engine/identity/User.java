@@ -23,7 +23,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  * @author Celine Souchet
- * @see org.bonitasoft.engine.api.UserAPI
+ * @see "org.bonitasoft.engine.api.UserAPI"
  * @since 6.0.0
  */
 public interface User extends BonitaObject {
@@ -32,14 +32,6 @@ public interface User extends BonitaObject {
      * @return The identifier of the user
      */
     long getId();
-
-    /**
-     * deprecated since 6.3.1
-     *
-     * @return The user's password
-     */
-    @Deprecated
-    String getPassword();
 
     /**
      * @return The user's firstname
@@ -55,18 +47,6 @@ public interface User extends BonitaObject {
      * @return The user's username
      */
     String getUserName();
-
-    /**
-     * @return The user's icon name
-     */
-    @Deprecated
-    String getIconName();
-
-    /**
-     * @return The user's icon path
-     */
-    @Deprecated
-    String getIconPath();
 
     /**
      * @return The user's title
@@ -107,13 +87,6 @@ public interface User extends BonitaObject {
      * @return true if the user is enabled
      */
     boolean isEnabled();
-
-    /**
-     * @deprecated As of 6.0 Use {@link #getManagerUserId()} instead
-     */
-    //FIXME Remove ASAP
-    @Deprecated
-    String getManagerUserName();
 
     /**
      * @return the id of the icon used as avatar

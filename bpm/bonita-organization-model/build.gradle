@@ -1,0 +1,61 @@
+configurations { schemagen }
+
+dependencies {
+    api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
+
+    api "org.bonitasoft.engine:bonita-common-artifacts-model"
+    api("javax.xml.bind:jaxb-api") {
+        exclude(group: "javax.activation") //replaced by jakarta
+    }
+    api("org.glassfish.jaxb:jaxb-runtime") {
+        exclude(group: "javax.activation") //replaced by jakarta
+    }
+
+    runtimeOnly "com.sun.activation:jakarta.activation"
+
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+
+    schemagen("org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbJxcVersion}")
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom { pom ->
+                name = 'Bonita Organization Model'
+                description = 'Contains the Bonita Organization model and related builders'
+                org.bonitasoft.engine.gradle.PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}
+
+tasks.register('schemagen') {
+    def destDir = file("$buildDir/schemas")
+    doLast {
+        destDir.mkdirs()
+        ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
+
+        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
+            schema(file: "organization.xsd", namespace: "http://documentation.bonitasoft.com/organization-xml-schema/1.1")
+            classpath { pathelement(path: configurations.schemagen.asPath) }
+            include(name: 'org/bonitasoft/engine/identity/xml/**/*.java')
+        }
+
+    }
+    inputs.dir('src/main/java/')
+    outputs.file("$destDir/organization.xsd")
+    outputs.cacheIf { true }
+}
+
+tasks.named('processResources', ProcessResources.class).configure {
+    from "$buildDir/schemas"
+    dependsOn schemagen
+}

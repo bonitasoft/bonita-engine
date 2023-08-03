@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,7 +15,8 @@ package org.bonitasoft.engine.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
+import java.io.IOException;
+
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedGroup;
@@ -30,12 +31,12 @@ import org.junit.Test;
  */
 public class OrganizationParserTest {
 
-    private OrganizationParser organizationParser = new OrganizationParser();
+    private final OrganizationParser organizationParser = new OrganizationParser();
 
     @Test
     public void should_parse_organization_work() throws Exception {
         //given
-        String content = IOUtil.read(OrganizationParserTest.class.getResourceAsStream("/complexOrganization.xml"));
+        String content = getResourceContent("/complexOrganization.xml");
         //when
         Organization organization = organizationParser.convert(content);
         //then
@@ -70,7 +71,7 @@ public class OrganizationParserTest {
     @Test
     public void should_parse_simpleOrganization_work() throws Exception {
         //given
-        String content = IOUtil.read(OrganizationParserTest.class.getResourceAsStream("/simpleOrganization.xml"));
+        String content = getResourceContent("/simpleOrganization.xml");
         //when
         Organization organization = organizationParser.convert(content);
         //then
@@ -80,20 +81,19 @@ public class OrganizationParserTest {
     @Test
     public void should_parse_organization_with_both_user_having_mix_encryption_passw_work() throws Exception {
         //given
-        String content = IOUtil.read(OrganizationParserTest.class.getResourceAsStream("/mixOrganization.xml"));
+        String content = getResourceContent("/mixOrganization.xml");
         //when
         Organization organization = organizationParser.convert(content);
         //then
         assertThat(organization).isNotNull();
         assertThat(organization.getUsers().get(0).isPasswordEncrypted()).isTrue();
         assertThat(organization.getUsers().get(1).isPasswordEncrypted()).isFalse();
-
     }
 
     @Test
     public void should_parse_organizationWithCycle_work() throws Exception {
         //given
-        String content = IOUtil.read(OrganizationParserTest.class.getResourceAsStream("/organizationWithCycle.xml"));
+        String content = getResourceContent("/organizationWithCycle.xml");
         //when
         Organization organization = organizationParser.convert(content);
         //then
@@ -103,8 +103,7 @@ public class OrganizationParserTest {
     @Test
     public void should_parse_OrganizationWithSpecialCharacters_work() throws Exception {
         //given
-        String content = IOUtil
-                .read(OrganizationParserTest.class.getResourceAsStream("/OrganizationWithSpecialCharacters.xml"));
+        String content = getResourceContent("/OrganizationWithSpecialCharacters.xml");
         //when
         Organization organization = organizationParser.convert(content);
         //then
@@ -114,7 +113,7 @@ public class OrganizationParserTest {
     @Test
     public void should_parse_ACME_work() throws Exception {
         //given
-        String content = IOUtil.read(OrganizationParserTest.class.getResourceAsStream("/ACME.xml"));
+        String content = getResourceContent("/ACME.xml");
         //when
         Organization organization = organizationParser.convert(content);
         //then
@@ -137,16 +136,16 @@ public class OrganizationParserTest {
 
     private void checkAprilSanchez(ExportedUser aprilSanchez) {
         assertThat(aprilSanchez.getUserName()).isEqualTo("april.sanchez");
-        assertThat(aprilSanchez.isPasswordEncrypted()).isEqualTo(true);
+        assertThat(aprilSanchez.isPasswordEncrypted()).isTrue();
         assertThat(aprilSanchez.getPassword()).isEqualTo("Zmdkc2E1NDM=");
-        assertThat(aprilSanchez.isEnabled()).isEqualTo(false);
+        assertThat(aprilSanchez.isEnabled()).isFalse();
         assertThat(aprilSanchez.getManagerUserName()).isEqualTo("helen.kelly");
     }
 
     private void checkWilliamJobs(ExportedUser williamJobs) {
         assertThat(williamJobs.getUserName()).isEqualTo("william.jobs");
-        assertThat(williamJobs.isPasswordEncrypted()).isEqualTo(false);
-        assertThat(williamJobs.isEnabled()).isEqualTo(true);
+        assertThat(williamJobs.isPasswordEncrypted()).isFalse();
+        assertThat(williamJobs.isEnabled()).isTrue();
         assertThat(williamJobs.getPassword()).isEqualTo("bpm");
         assertThat(williamJobs.getFirstName()).isEqualTo("William");
         assertThat(williamJobs.getLastName()).isEqualTo("Jobs");
@@ -176,4 +175,10 @@ public class OrganizationParserTest {
                 new ExportedCustomUserInfoValue("Skills", "Java"));
     }
 
+    private String getResourceContent(String path) throws IOException {
+        try (var stream = OrganizationParserTest.class.getResourceAsStream(path)) {
+            assertThat(stream).isNotNull();
+            return new String(stream.readAllBytes());
+        }
+    }
 }

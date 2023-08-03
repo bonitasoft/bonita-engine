@@ -13,23 +13,20 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
+import java.io.Serializable;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-/**
- * @author Baptiste Mesta
- */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ExportedGroup {
+public class ExportedRole implements Serializable {
 
     @XmlAttribute
     private String name;
-    @XmlAttribute
-    private String parentPath;
     @XmlElement
     private String displayName;
     @XmlElement
@@ -39,17 +36,19 @@ public class ExportedGroup {
     @XmlElement
     private String iconPath;
 
-    public ExportedGroup() {
+    public ExportedRole() {
     }
 
-    public ExportedGroup(String name, String parentPath, String displayName, String description, String iconName,
-            String iconPath) {
+    public ExportedRole(String name, String displayName, String description, String iconName, String iconPath) {
         this.name = name;
-        this.parentPath = parentPath;
         this.displayName = displayName;
         this.description = description;
         this.iconName = iconName;
         this.iconPath = iconPath;
+    }
+
+    public ExportedRole(String name) {
+        this.name = name;
     }
 
     public String getName() {
@@ -58,14 +57,6 @@ public class ExportedGroup {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getParentPath() {
-        return parentPath;
-    }
-
-    public void setParentPath(String parentPath) {
-        this.parentPath = parentPath;
     }
 
     public String getDisplayName() {
@@ -106,9 +97,8 @@ public class ExportedGroup {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        ExportedGroup that = (ExportedGroup) o;
+        ExportedRole that = (ExportedRole) o;
         return Objects.equals(name, that.name) &&
-                Objects.equals(parentPath, that.parentPath) &&
                 Objects.equals(displayName, that.displayName) &&
                 Objects.equals(description, that.description) &&
                 Objects.equals(iconName, that.iconName) &&
@@ -117,18 +107,17 @@ public class ExportedGroup {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, parentPath, displayName, description, iconName, iconPath);
+        return Objects.hash(name, displayName, description, iconName, iconPath);
     }
 
     @Override
     public String toString() {
-        return "ExportedGroup{" +
-                "name='" + name + '\'' +
-                ", parentPath='" + parentPath + '\'' +
-                ", displayName='" + displayName + '\'' +
-                ", description='" + description + '\'' +
-                ", iconName='" + iconName + '\'' +
-                ", iconPath='" + iconPath + '\'' +
-                '}';
+        return new StringJoiner(", ", ExportedRole.class.getSimpleName() + "[", "]")
+                .add("name='" + name + "'")
+                .add("displayName='" + displayName + "'")
+                .add("description='" + description + "'")
+                .add("iconName='" + iconName + "'")
+                .add("iconPath='" + iconPath + "'")
+                .toString();
     }
 }

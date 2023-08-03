@@ -22,7 +22,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
- * @see org.bonitasoft.engine.api.RoleAPI
+ * @see "org.bonitasoft.engine.api.RoleAPI"
  * @since 6.0.0
  */
 public interface Role extends BonitaObject {
@@ -46,20 +46,6 @@ public interface Role extends BonitaObject {
      * @return the role's description
      */
     String getDescription();
-
-    /**
-     * @return the role's icon name
-     * @deprecated since 7.3.0, use #getIconId
-     */
-    @Deprecated
-    String getIconName();
-
-    /**
-     * @return the role's icon file path
-     * @deprecated since 7.3.0, use #getIconId
-     */
-    @Deprecated
-    String getIconPath();
 
     /**
      * @return the icon id of the role or null if there is no icon

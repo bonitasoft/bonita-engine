@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.identity.xml;
 
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -77,9 +78,9 @@ public class ExportedCustomUserInfoValue {
 
     @Override
     public String toString() {
-        return "ExportedCustomUserInfoValue{" +
-                "name='" + name + '\'' +
-                ", value='" + value + '\'' +
-                '}';
+        return new StringJoiner(", ", ExportedCustomUserInfoValue.class.getSimpleName() + "[", "]")
+                .add("name='" + name + "'")
+                .add("value='" + value + "'")
+                .toString();
     }
 }

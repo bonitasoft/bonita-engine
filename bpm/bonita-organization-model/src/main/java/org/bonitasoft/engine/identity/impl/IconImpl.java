@@ -15,6 +15,7 @@ package org.bonitasoft.engine.identity.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import org.bonitasoft.engine.identity.Icon;
 
@@ -74,14 +75,14 @@ public class IconImpl implements Icon {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, mimeType, content);
+        return Objects.hash(id, mimeType, Arrays.hashCode(content));
     }
 
     @Override
     public String toString() {
-        return "IconImpl{" +
-                "mimeType='" + mimeType + '\'' +
-                ", id=" + id +
-                '}';
+        return new StringJoiner(", ", IconImpl.class.getSimpleName() + "[", "]")
+                .add("mimeType='" + mimeType + "'")
+                .add("id=" + id)
+                .toString();
     }
 }

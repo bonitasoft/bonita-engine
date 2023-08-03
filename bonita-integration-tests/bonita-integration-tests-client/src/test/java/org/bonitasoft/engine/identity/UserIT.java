@@ -102,7 +102,6 @@ public class UserIT extends TestWithTechnicalUser {
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(userCreated);
         assertEquals("bonitasoft", userCreated.getUserName());
-        assertNotSame("123456", userCreated.getPassword());
         final User user = getIdentityAPI().getUserByUserName("bonitasoft");
         assertNotNull(user);
         getIdentityAPI().deleteUser("bonitasoft");
@@ -125,11 +124,9 @@ public class UserIT extends TestWithTechnicalUser {
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(userCreated);
         assertEquals("bonitasoft", userCreated.getUserName());
-        assertNotSame("123456", userCreated.getPassword());
         final User user = getIdentityAPI().getUserByUserName("bonitasoft");
         assertNotNull(user);
         assertEquals("bonitasoft", userCreated.getUserName());
-        assertNotSame("123456", userCreated.getPassword());
         try {
             getIdentityAPI().createUser("bonitasoft", "123456");
         } finally {
@@ -213,7 +210,6 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().createUser("bonita", "password");
         final User user = getIdentityAPI().getUserByUserName("bonita");
         assertEquals("bonita", user.getUserName());
-        assertNotSame("password", user.getPassword());
 
         getIdentityAPI().deleteUser("bonita");
     }
@@ -236,7 +232,6 @@ public class UserIT extends TestWithTechnicalUser {
         final User user = getIdentityAPI().getUser(userCreated.getId());
         assertNotNull(user);
         assertEquals("zhang", user.getUserName());
-        assertNotSame("engine", user.getPassword());
 
         getIdentityAPI().deleteUser("zhang");
     }
@@ -276,10 +271,8 @@ public class UserIT extends TestWithTechnicalUser {
         assertEquals(2, users.size());
 
         assertEquals("zhang", users.get(userCreated1.getId()).getUserName());
-        assertNotSame("engine", users.get(userCreated1.getId()).getPassword());
 
         assertEquals("jmege", users.get(userCreated2.getId()).getUserName());
-        assertNotSame("engine", users.get(userCreated2.getId()).getPassword());
 
         deleteUsers(userCreated1, userCreated2);
     }
@@ -297,7 +290,6 @@ public class UserIT extends TestWithTechnicalUser {
         assertEquals(1, users.size());
 
         assertEquals("zhang", users.get(userCreated1.getId()).getUserName());
-        assertEquals("engine", users.get(userCreated1.getId()).getPassword());
 
         deleteUsers(userCreated1, userCreated2);
     }
@@ -428,7 +420,6 @@ public class UserIT extends TestWithTechnicalUser {
         assertEquals("New job title", updatedUser.getJobTitle());
         assertEquals("Modified Last name", updatedUser.getLastName());
         assertEquals(12354L, updatedUser.getManagerUserId());
-        assertNotSame("Ch4n63D_P455W0RD", updatedUser.getPassword());
         assertEquals("titre", updatedUser.getTitle());
     }
 
@@ -1011,7 +1002,6 @@ public class UserIT extends TestWithTechnicalUser {
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(userCreated);
         assertEquals("bonitasoft", userCreated.getUserName());
-        assertNotSame("123456", userCreated.getPassword());
         final User user = getIdentityAPI().getUserByUserName("bonitasoft");
         assertNotNull(user);
         assertNotNull(user.getCreatedBy());

@@ -17,16 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.service.ModelConvertor.toUserMembership;
 import static org.bonitasoft.engine.tenant.TenantResourceState.INSTALLED;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -77,7 +69,6 @@ import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
@@ -136,10 +127,7 @@ public class ModelConvertorTest {
     @Test
     public void convertSUserToUserDoesntShowPassword() {
         final SUser sUser = mock(SUser.class);
-
-        final User testUser = ModelConvertor.toUser(sUser);
-
-        assertThat(testUser.getPassword()).isEmpty();
+        ModelConvertor.toUser(sUser);
         verify(sUser, never()).getPassword();
     }
 

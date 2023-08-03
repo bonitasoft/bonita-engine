@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.identity.xml;
 
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -101,14 +102,14 @@ public class ExportedUserMembership {
 
     @Override
     public String toString() {
-        return "ExportedUserMembership{" +
-                "userName='" + userName + '\'' +
-                ", roleName='" + roleName + '\'' +
-                ", groupName='" + groupName + '\'' +
-                ", groupParentPath='" + groupParentPath + '\'' +
-                ", assignedBy='" + assignedBy + '\'' +
-                ", assignedDate=" + assignedDate +
-                '}';
+        return new StringJoiner(", ", ExportedUserMembership.class.getSimpleName() + "[", "]")
+                .add("userName='" + userName + "'")
+                .add("roleName='" + roleName + "'")
+                .add("groupName='" + groupName + "'")
+                .add("groupParentPath='" + groupParentPath + "'")
+                .add("assignedBy='" + assignedBy + "'")
+                .add("assignedDate=" + assignedDate)
+                .toString();
     }
 
     @Override
