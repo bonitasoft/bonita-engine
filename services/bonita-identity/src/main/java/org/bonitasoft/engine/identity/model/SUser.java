@@ -29,7 +29,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Anthony Birembaut
@@ -45,7 +44,6 @@ import org.hibernate.annotations.Filter;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "user_")
-@Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 public class SUser implements PersistentObject, SHavingIcon {
 

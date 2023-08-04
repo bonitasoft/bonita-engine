@@ -26,7 +26,6 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusin
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Emmanuel Duchastenier
@@ -34,7 +33,6 @@ import org.hibernate.annotations.Filter;
 @Data
 @NoArgsConstructor
 @Entity
-@Filter(name = "tenantFilter")
 @Table(name = "arch_ref_biz_data_inst")
 @IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")

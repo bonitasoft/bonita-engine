@@ -25,7 +25,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Celine Souchet
@@ -36,7 +35,6 @@ import org.hibernate.annotations.Filter;
 @Builder
 @Entity
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @Table(name = "job_log")
 @Cacheable(false)
 public class SJobLog implements PersistentObject {

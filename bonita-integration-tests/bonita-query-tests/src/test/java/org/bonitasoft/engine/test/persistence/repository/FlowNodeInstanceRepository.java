@@ -44,7 +44,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
     @SuppressWarnings("unchecked")
     public List<Long> getFlowNodeInstanceIdsToRecover(Duration considerElementsOlderThan,
             final QueryOptions queryOptions) {
-        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getFlowNodeInstanceIdsToRecover");
         namedQuery.setMaxResults(queryOptions.getNumberOfResults());
         namedQuery.setFirstResult(queryOptions.getFromIndex());
@@ -55,7 +54,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
     @SuppressWarnings("unchecked")
     public List<Long> getGatewayInstanceIdsToRecover(Duration considerElementsOlderThan,
             final QueryOptions queryOptions) {
-        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getGatewayInstanceIdsToRecover");
         namedQuery.setMaxResults(queryOptions.getNumberOfResults());
         namedQuery.setFirstResult(queryOptions.getFromIndex());
@@ -65,7 +63,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
 
     @SuppressWarnings("unchecked")
     public SGatewayInstance getActiveGatewayInstanceOfProcess(long parentProcessInstanceId, String name) {
-        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getActiveGatewayInstanceOfProcess");
         namedQuery.setParameter("parentProcessInstanceId", parentProcessInstanceId);
         namedQuery.setParameter("name", name);
@@ -74,7 +71,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
 
     public long getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(final long rootProcessDefinitionId,
             final long userId) {
-        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor");
         namedQuery.setParameter("userId", userId);
         namedQuery.setParameter("rootProcessDefinitionId", rootProcessDefinitionId);
@@ -84,7 +80,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
     @SuppressWarnings("unchecked")
     public List<SHumanTaskInstance> searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(
             final long rootProcessDefinitionId, final long userId) {
-        getSessionWithTenantFilter();
         Query namedQuery = getNamedQuery("searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor");
         namedQuery = getSession().createQuery(namedQuery.getQueryString() + " ORDER BY a.name");
         namedQuery.setParameter("userId", userId);
@@ -93,7 +88,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
     }
 
     public long getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(final long rootProcessDefinitionId) {
-        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess");
         namedQuery.setParameter("rootProcessDefinitionId", rootProcessDefinitionId);
         return ((Number) namedQuery.uniqueResult()).longValue();
@@ -102,7 +96,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
     @SuppressWarnings("unchecked")
     public List<SHumanTaskInstance> searchSHumanTaskInstanceAssignedAndPendingByRootProcess(
             final long rootProcessDefinitionId) {
-        getSessionWithTenantFilter();
         Query namedQuery = getNamedQuery("searchSHumanTaskInstanceAssignedAndPendingByRootProcess");
         namedQuery = getSession().createQuery(namedQuery.getQueryString() + " ORDER BY a.name");
         namedQuery.setParameter("rootProcessDefinitionId", rootProcessDefinitionId);
@@ -111,7 +104,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
 
     @SuppressWarnings("unchecked")
     public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlowNodesInAllStates(long processInstanceId) {
-        getSessionWithTenantFilter();
         Query namedQuery = getNamedQuery("getNumberOfArchivedFlowNodesInAllStates");
         namedQuery.setParameter("parentProcessInstanceId", processInstanceId);
         return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();
@@ -119,7 +111,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
 
     @SuppressWarnings("unchecked")
     public List<SFlowNodeInstanceStateCounter> getNumberOfFlowNodesInAllStates(long processInstanceId) {
-        getSessionWithTenantFilter();
         Query namedQuery = getNamedQuery("getNumberOfFlowNodesInAllStates");
         namedQuery.setParameter("parentProcessInstanceId", processInstanceId);
         return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();
@@ -128,7 +119,6 @@ public class FlowNodeInstanceRepository extends TestRepository {
     @SuppressWarnings("unchecked")
     public List<SFlowNodeInstanceStateCounter> getNumberOfFlowNodesOfProcessDefinitionInAllStates(
             long processDefinitionId) {
-        getSessionWithTenantFilter();
         Query namedQuery = getNamedQuery("getNumberOfFlowNodesOfProcessDefinitionInAllStates");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();

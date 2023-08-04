@@ -15,13 +15,7 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.IdClass;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,7 +23,6 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 
 /**
@@ -41,7 +34,6 @@ import org.hibernate.annotations.Type;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @DiscriminatorColumn(name = "kind")
 @Table(name = "arch_contract_data")
 public abstract class SAContractData extends SAPersistenceObjectImpl {

@@ -22,14 +22,12 @@ import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @MappedSuperclass
 public abstract class SAbstractConnectorInstance implements PersistentObject {
 

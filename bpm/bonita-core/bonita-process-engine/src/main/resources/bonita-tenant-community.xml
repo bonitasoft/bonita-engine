@@ -154,9 +154,7 @@
         <constructor-arg name="handlers">
             <map>
                 <entry key="PROCESSINSTANCE_STATE_UPDATED">
-                    <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
-                        <constructor-arg name="tenantId" value="${tenantId}" />
-                    </bean>
+                    <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler" />
                 </entry>
             </map>
         </constructor-arg>

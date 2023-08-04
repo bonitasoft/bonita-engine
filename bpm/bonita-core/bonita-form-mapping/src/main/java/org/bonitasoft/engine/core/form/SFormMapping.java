@@ -30,14 +30,12 @@ import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Filter(name = "tenantFilter")
 @Table(name = "form_mapping")
 @IdClass(PersistentObjectId.class)
 public class SFormMapping implements PersistentObject {

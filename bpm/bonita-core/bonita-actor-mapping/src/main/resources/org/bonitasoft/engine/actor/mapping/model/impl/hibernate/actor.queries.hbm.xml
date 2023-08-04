@@ -176,9 +176,6 @@
             WHERE actor.id = :actorId
             AND actor.id = actormember.actorId
             AND actormember.userId = user_.id
-            AND user_.tenantId = :tenantId
-            AND actor.tenantId = :tenantId
-            AND actormember.tenantId = :tenantId
             UNION (
                 SELECT user_.id, user_.username
                 FROM user_,
@@ -188,10 +185,6 @@
                 WHERE actor.id = :actorId
                 AND um.userId = user_.id
                 AND actor.id = actormember.actorId
-                AND user_.tenantId = :tenantId
-                AND actor.tenantId = :tenantId
-                AND um.tenantId = :tenantId
-                AND actormember.tenantId = :tenantId
                 AND (
         (actormember.groupId = um.groupId AND actormember.roleId = -1)
         OR (actormember.roleId = um.roleId AND actormember.groupId = -1)

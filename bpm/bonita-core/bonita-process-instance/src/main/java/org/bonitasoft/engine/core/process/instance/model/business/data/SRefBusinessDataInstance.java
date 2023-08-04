@@ -24,7 +24,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Matthieu Chaffotte
@@ -32,7 +31,6 @@ import org.hibernate.annotations.Filter;
 @Data
 @NoArgsConstructor
 @Entity
-@Filter(name = "tenantFilter")
 @Table(name = "ref_biz_data_inst")
 @IdClass(PersistentObjectId.class)
 @DiscriminatorColumn(name = "kind")

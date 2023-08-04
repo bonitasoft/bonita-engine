@@ -30,7 +30,6 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
@@ -38,7 +37,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @DiscriminatorColumn(name = "DISCRIMINANT")
 @Table(name = "arch_data_instance")
 public abstract class SADataInstance implements ArchivedPersistentObject {

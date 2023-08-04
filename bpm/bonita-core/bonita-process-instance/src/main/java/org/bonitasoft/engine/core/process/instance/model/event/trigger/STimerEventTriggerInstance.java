@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -27,7 +26,6 @@ import org.hibernate.annotations.Filter;
 @Data
 @NoArgsConstructor
 @Entity
-@Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 @Table(name = "event_trigger_instance")
 public class STimerEventTriggerInstance implements PersistentObject {

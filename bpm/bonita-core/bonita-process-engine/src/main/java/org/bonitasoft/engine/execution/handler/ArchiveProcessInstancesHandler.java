@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.handler;
 
-import java.util.UUID;
-
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -34,17 +32,10 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
 
     private static final long serialVersionUID = 1L;
 
-    private final long tenantId;
-
     private final String identifier;
 
-    public ArchiveProcessInstancesHandler(final long tenantId) {
-        this(tenantId, UUID.randomUUID().toString());
-    }
-
-    public ArchiveProcessInstancesHandler(final long tenantId, final String identifier) {
-        this.tenantId = tenantId;
-        this.identifier = identifier;
+    public ArchiveProcessInstancesHandler() {
+        this.identifier = ArchiveProcessInstancesHandler.class.getName();
     }
 
     @Override

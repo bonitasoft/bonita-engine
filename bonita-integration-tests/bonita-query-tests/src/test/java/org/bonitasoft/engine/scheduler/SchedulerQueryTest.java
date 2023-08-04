@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.test.persistence.builder.JobDescriptorBuilder.aJobDescriptor;
 import static org.bonitasoft.engine.test.persistence.builder.JobLogBuilder.aJobLog;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
 import java.util.List;
 import java.util.Map;
@@ -103,7 +102,7 @@ public class SchedulerQueryTest {
         assertThat(numberOfSJobDescriptor).isEqualTo(1);
         assertThat(searchSJobDescriptor).isEqualTo(jobDescriptor);
         assertThat(jobDescriptorAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", jobDescriptor.getId()),
                 entry("JOBCLASSNAME", "com.bonitasoft.JobClass"),
                 entry("JOBNAME", "job name"),
@@ -127,7 +126,7 @@ public class SchedulerQueryTest {
         assertThat(jobParameterFromQuery).isEqualTo(jobParameter);
 
         assertThat(jobParameterAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", jobParameter.getId()),
                 entry("JOBDESCRIPTORID", 1234L),
                 entry("KEY_", "paramKeyName"),
@@ -150,7 +149,7 @@ public class SchedulerQueryTest {
         assertThat(numberOfSJobLog).isEqualTo(1);
         assertThat(jobLogFromQuery).isEqualTo(jobLog);
         assertThat(jobLogAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", jobLog.getId()),
                 entry("JOBDESCRIPTORID", 1234L),
                 entry("RETRYNUMBER", 13L),

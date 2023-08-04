@@ -100,7 +100,7 @@ public class JobWrapper implements StatelessJob {
             log.debug("Start execution of {}", statelessJob.getName());
             statelessJob.execute();
             //make sure hibernate flush everything we did before going back to quartz code
-            persistenceService.flushStatements(true);
+            persistenceService.flushStatements();
 
             log.debug("Finished execution of {}", statelessJob.getName());
         } catch (final SRetryableException e) {

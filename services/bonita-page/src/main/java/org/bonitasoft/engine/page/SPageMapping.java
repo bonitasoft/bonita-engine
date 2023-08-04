@@ -31,7 +31,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Baptiste Mesta
@@ -44,7 +43,6 @@ import org.hibernate.annotations.Filter;
 @EqualsAndHashCode(exclude = "authorizationRules")
 @Table(name = "page_mapping")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SPageMapping implements PersistentObject {
 
     public static final String COMMA_DELIMITER = ",";

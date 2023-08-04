@@ -16,7 +16,6 @@ package org.bonitasoft.engine.test.persistence.repository;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,10 +26,8 @@ public class SupervisorRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Long> searchSProcessSupervisorWithSUserSGroupSRole(long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
-        Query namedQuery = getNamedQuery("searchSProcessSupervisorwithSUserSGroupSRole");
-        return namedQuery.list();
+    public List<Long> searchSProcessSupervisorWithSUserSGroupSRole() {
+        return getNamedQuery("searchSProcessSupervisorwithSUserSGroupSRole").list();
     }
 
 }

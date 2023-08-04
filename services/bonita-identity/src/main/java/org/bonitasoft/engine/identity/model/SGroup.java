@@ -25,7 +25,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Anthony Birembaut
@@ -38,7 +37,6 @@ import org.hibernate.annotations.Filter;
 @Builder
 @Entity
 @Table(name = "group_")
-@Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 public class SGroup implements PersistentObject, SHavingIcon {
 

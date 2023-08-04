@@ -68,7 +68,7 @@ public class SupervisorQueriesTest {
                 .add(new SProcessSupervisor(supervisorId, tenantId, processDefId, userId, -1, -1));
         repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
-        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
+        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole();
 
         assertThat(sProcessSupervisors).containsOnly(expectedSProcessSupervisor.getId());
     }
@@ -90,7 +90,7 @@ public class SupervisorQueriesTest {
                 .add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId, 0));
         repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
-        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
+        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole();
 
         assertThat(sProcessSupervisors).containsOnly(expectedSProcessSupervisor.getId());
     }
@@ -112,7 +112,7 @@ public class SupervisorQueriesTest {
                 .add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, 0, roleId));
         repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
-        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
+        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole();
 
         assertThat(sProcessSupervisors).containsOnly(expectedSProcessSupervisor.getId());
     }
@@ -135,7 +135,7 @@ public class SupervisorQueriesTest {
                         roleId));
         repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
-        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
+        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole();
 
         assertThat(sProcessSupervisors).containsOnly(expectedSProcessSupervisor.getId());
     }

@@ -21,7 +21,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * Used to get pending activities of a user.
@@ -41,7 +40,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Table(name = "pending_mapping")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SPendingActivityMapping implements PersistentObject {
 
     public static final String ACTOR_ID = "actorId";

@@ -24,14 +24,12 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @Entity
 @IdClass(PersistentObjectId.class)
 @Table(name = "arch_process_instance")
-@Filter(name = "tenantFilter")
 public class SAProcessInstance implements ArchivedPersistentObject {
 
     @Id

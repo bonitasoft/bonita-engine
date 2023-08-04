@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -41,7 +40,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Table(name = "process_instance")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SProcessInstance implements PersistentObject {
 
     private static final long DEFAULT_INTERRUPTING_EVENT_ID = -1L;

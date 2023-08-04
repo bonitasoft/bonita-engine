@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -28,7 +27,6 @@ import org.hibernate.annotations.Filter;
 @NoArgsConstructor
 @Entity
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @Table(name = "message_instance")
 public class SMessageInstance implements PersistentObject {
 

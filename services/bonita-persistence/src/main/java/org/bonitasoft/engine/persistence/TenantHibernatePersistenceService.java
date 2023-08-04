@@ -47,10 +47,6 @@ import org.slf4j.Logger;
 @Slf4j
 public class TenantHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
-    private static final String TENANT_ID = "tenantId";
-
-    private static final String TENANT_FILTER = "tenantFilter";
-
     private final ReadSessionAccessor sessionAccessor;
 
     public TenantHibernatePersistenceService(final ReadSessionAccessor sessionAccessor,
@@ -62,18 +58,6 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
                 queryBuilderFactory);
         this.sessionAccessor = sessionAccessor;
         hibernateMetricsBinder.bindMetrics(getSessionFactory());
-    }
-
-    protected void updateTenantFilter(final Session session, final boolean useTenant) throws SPersistenceException {
-        if (useTenant && !isTenantIdNull()) {
-            try {
-                session.enableFilter(TENANT_FILTER).setParameter(TENANT_ID, getTenantId());
-            } catch (final STenantIdNotSetException e) {
-                throw new SPersistenceException(e);
-            }
-        } else {
-            session.disableFilter(TENANT_FILTER);
-        }
     }
 
     protected void setTenant(final PersistentObject entity) throws SPersistenceException {
@@ -98,36 +82,6 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
         } catch (final SReflectException | STenantIdNotSetException e) {
             throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
-        }
-    }
-
-    @Override
-    protected Session getSession(final boolean useTenant) throws SPersistenceException {
-        final Session session = super.getSession(useTenant);
-        updateTenantFilter(session, useTenant);
-        return session;
-    }
-
-    @Override
-    public void delete(final PersistentObject entity) throws SPersistenceException {
-        if (entity instanceof PlatformPersistentObject) {
-            super.delete(entity);
-            return;
-        }
-        try {
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug(
-                        "[Tenant] Deleting instance of class " + entity.getClass().getSimpleName()
-                                + " with id=" + entity.getId());
-            }
-            final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
-            final Session session = getSession(true);
-            final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), getTenantId()));
-            session.delete(pe);
-        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
-            throw new SRetryableException(e);
-        } catch (final STenantIdNotSetException | HibernateException e) {
-            throw new SPersistenceException(e);
         }
     }
 
@@ -159,15 +113,6 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         return sessionAccessor.getTenantId();
     }
 
-    protected boolean isTenantIdNull() {
-        try {
-            sessionAccessor.getTenantId();
-            return false;
-        } catch (STenantIdNotSetException e) {
-            return true;
-        }
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor)
@@ -191,40 +136,33 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     @Override
     public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters)
             throws SPersistenceException {
-        try {
-            final Session session = getSession(true);
-            final String entityClassName = entityClass.getCanonicalName();
+        final Session session = getSession();
+        final String entityClassName = entityClass.getCanonicalName();
 
-            boolean hasFilters = filters != null && !filters.isEmpty();
-            Map<String, Object> parameters = new HashMap<>();
-            String baseQuery = "DELETE FROM " + entityClassName + " "
-                    + (hasFilters ? getClassAliasMappings().get(entityClassName) : "")
-                    + " WHERE tenantId= :tenantId";
+        boolean hasFilters = filters != null && !filters.isEmpty();
+        Map<String, Object> parameters = new HashMap<>();
+        String baseQuery = "DELETE FROM " + entityClassName + " "
+                + (hasFilters ? getClassAliasMappings().get(entityClassName) : "");
 
-            if (hasFilters) {
-                if (filters.stream().anyMatch(f -> f.getFilterOperationType() == FilterOperationType.LIKE)) {
-                    throw new IllegalStateException("Delete queries do not support queries with LIKE");
-                }
-                QueryGeneratorForFilters.QueryGeneratedFilters whereClause = new QueryGeneratorForFilters(
-                        getClassAliasMappings(), '%'/*
-                                                     * there is no
-                                                     * 'like' in these
-                                                     * delete queries
-                                                     */)
-                                .generate(filters);
-                parameters.putAll(whereClause.getParameters());
-                baseQuery += " AND ( " + whereClause.getFilters() + " )";
+        if (hasFilters) {
+            if (filters.stream().anyMatch(f -> f.getFilterOperationType() == FilterOperationType.LIKE)) {
+                throw new IllegalStateException("Delete queries do not support queries with LIKE");
             }
-            Query query = session.createQuery(baseQuery);
-            query.setLong(TENANT_ID, getTenantId());
-            parameters.forEach(query::setParameter);
-            query.executeUpdate();
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug(
-                        "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
-            }
-        } catch (final STenantIdNotSetException e) {
-            throw new SPersistenceException(e);
+            QueryGeneratorForFilters.QueryGeneratedFilters whereClause = new QueryGeneratorForFilters(
+                    getClassAliasMappings(), '%'/*
+                                                 * there is no
+                                                 * 'like' in these
+                                                 * delete queries
+                                                 */)
+                            .generate(filters);
+            parameters.putAll(whereClause.getParameters());
+            baseQuery += " WHERE ( " + whereClause.getFilters() + " )";
+        }
+        Query query = session.createQuery(baseQuery);
+        parameters.forEach(query::setParameter);
+        query.executeUpdate();
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug("[Tenant] Deleting all instance of class " + entityClass.getSimpleName());
         }
     }
 

@@ -32,7 +32,6 @@ public class JobRepository extends TestRepository {
     }
 
     public List<SFailedJob> getFailedJobs(final QueryOptions queryOptions) {
-        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getFailedJobs");
         namedQuery.setMaxResults(queryOptions.getNumberOfResults());
         namedQuery.setFirstResult(queryOptions.getFromIndex());

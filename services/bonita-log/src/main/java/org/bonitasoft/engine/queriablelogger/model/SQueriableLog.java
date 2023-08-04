@@ -30,7 +30,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Entity
 @Data
@@ -38,7 +37,6 @@ import org.hibernate.annotations.Filter;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @Table(name = "queriable_log")
 public class SQueriableLog implements PersistentObject {
 

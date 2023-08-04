@@ -25,7 +25,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Anthony Birembaut
@@ -39,7 +38,6 @@ import org.hibernate.annotations.Filter;
 @Builder
 @Entity
 @Table(name = "role")
-@Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 public class SRole implements PersistentObject, SHavingIcon {
 

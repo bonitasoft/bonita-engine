@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 
 /**
@@ -33,7 +32,6 @@ import org.hibernate.annotations.Type;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @DiscriminatorColumn(name = "kind")
 @Table(name = "contract_data")
 @SuperBuilder

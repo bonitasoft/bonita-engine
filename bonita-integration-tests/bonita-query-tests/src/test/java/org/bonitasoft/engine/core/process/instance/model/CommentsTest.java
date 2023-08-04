@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.bonitasoft.engine.commons.Pair.pair;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
 import java.util.Map;
 
@@ -78,13 +77,16 @@ public class CommentsTest {
         repository.flush();
 
         Map<String, Object> comment1AsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM process_comment WHERE processInstanceId = " + PROCESS1_ID);
+                .queryForMap(
+                        "SELECT ID, KIND, CONTENT, POSTDATE, PROCESSINSTANCEID, USERID FROM process_comment WHERE processInstanceId = "
+                                + PROCESS1_ID);
         Map<String, Object> comment2AsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM process_comment WHERE processInstanceId = " + PROCESS2_ID);
+                .queryForMap(
+                        "SELECT ID, KIND, CONTENT, POSTDATE, PROCESSINSTANCEID, USERID FROM process_comment WHERE processInstanceId = "
+                                + PROCESS2_ID);
 
         assertThat(comment1AsMap).containsOnly(
                 entry("ID", comment1.getId()),
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("KIND", "human"),
                 entry("CONTENT", "comment1"),
                 entry("POSTDATE", comment1.getPostDate()),
@@ -92,7 +94,6 @@ public class CommentsTest {
                 entry("USERID", JACK_ID));
         assertThat(comment2AsMap).containsOnly(
                 entry("ID", comment2.getId()),
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("KIND", "system"),
                 entry("CONTENT", "comment2"),
                 entry("POSTDATE", comment2.getPostDate()),
@@ -111,15 +112,18 @@ public class CommentsTest {
         PersistentObject comment2FromQuery = repository.selectOne("getArchivedCommentById",
                 pair("id", comment2.getId()));
         Map<String, Object> comment1AsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM arch_process_comment WHERE processInstanceId = " + PROCESS1_ID);
+                .queryForMap(
+                        "SELECT ID, SOURCEOBJECTID, ARCHIVEDATE, CONTENT, POSTDATE, PROCESSINSTANCEID, USERID FROM arch_process_comment WHERE processInstanceId = "
+                                + PROCESS1_ID);
         Map<String, Object> comment2AsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM arch_process_comment WHERE processInstanceId = " + PROCESS2_ID);
+                .queryForMap(
+                        "SELECT ID, SOURCEOBJECTID, ARCHIVEDATE, CONTENT, POSTDATE, PROCESSINSTANCEID, USERID FROM arch_process_comment WHERE processInstanceId = "
+                                + PROCESS2_ID);
 
         assertThat(comment1FromQuery).isEqualTo(comment1);
         assertThat(comment2FromQuery).isEqualTo(comment2);
         assertThat(comment1AsMap).containsOnly(
                 entry("ID", comment1.getId()),
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("SOURCEOBJECTID", 0L),
                 entry("ARCHIVEDATE", 0L),
                 entry("CONTENT", "comment1"),
@@ -128,7 +132,6 @@ public class CommentsTest {
                 entry("USERID", JACK_ID));
         assertThat(comment2AsMap).containsOnly(
                 entry("ID", comment2.getId()),
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("SOURCEOBJECTID", 0L),
                 entry("ARCHIVEDATE", 0L),
                 entry("CONTENT", "comment2"),

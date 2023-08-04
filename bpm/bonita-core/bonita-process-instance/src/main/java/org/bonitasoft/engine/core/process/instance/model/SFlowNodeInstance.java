@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Feng Hui
@@ -35,7 +34,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Table(name = "flownode_instance")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @DiscriminatorColumn(name = "kind")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class SFlowNodeInstance implements PersistentObject {

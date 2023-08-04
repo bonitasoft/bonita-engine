@@ -144,7 +144,6 @@
 							WHERE u.managerUserId = :managerUserId )
 	</query>
 
-	<!-- AND u.tenantId = :tenantId -->
 	<query name="searchSAHumanTaskInstanceManagedBy">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS aa
@@ -517,18 +516,15 @@
 				FROM arch_process_instance ap
 				JOIN (
 					select afi.logicalGroup2 from arch_flownode_instance afi
-						WHERE afi.tenantId = :tenantId
-						AND afi.kind in ('user', 'manual')
+						WHERE afi.kind in ('user', 'manual')
 						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
 						AND afi.stateId = 2
 				) humanTask ON (humanTask.logicalGroup2 = ap.sourceObjectId)
-			WHERE ap.tenantId = :tenantId
-				AND (ap.stateId in (6 , 7 , 3 , 4))
+			WHERE (ap.stateId in (6 , 7 , 3 , 4))
 			UNION
 			SELECT ap.*
 				FROM arch_process_instance ap
-				WHERE ap.tenantId = :tenantId
-					AND (ap.stateId in (6 , 7 , 3 , 4))
+				WHERE (ap.stateId in (6 , 7 , 3 , 4))
 					AND ap.startedBy = :userId
 		) ap
 	</sql-query>
@@ -540,18 +536,15 @@
 				FROM arch_process_instance ap
 				JOIN (
 					select afi.logicalGroup2 from arch_flownode_instance afi
-						WHERE afi.tenantId = :tenantId
-						AND afi.kind in ('user', 'manual')
+						WHERE afi.kind in ('user', 'manual')
 						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
 						AND afi.stateId = 2
 				) humanTask ON (humanTask.logicalGroup2 = ap.sourceObjectId)
-			WHERE ap.tenantId = :tenantId
-				AND (ap.stateId in (6 , 7 , 3 , 4))
+				WHERE (ap.stateId in (6 , 7 , 3 , 4))
 			UNION
 			SELECT ap.*
 				FROM arch_process_instance ap
-				WHERE ap.tenantId = :tenantId
-					AND (ap.stateId in (6 , 7 , 3 , 4))
+					WHERE (ap.stateId in (6 , 7 , 3 , 4))
 					AND ap.startedBy = :userId
 		) ap
 	</sql-query>

@@ -32,7 +32,6 @@ public class DocumentRepository extends TestRepository {
     }
 
     public SMappedDocument getSMappedDocumentOfProcessWithName(String name, long processInstanceId) {
-        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getSMappedDocumentOfProcessWithName");
         namedQuery.setParameter("name", name);
         namedQuery.setParameter("processInstanceId", processInstanceId);
@@ -40,7 +39,6 @@ public class DocumentRepository extends TestRepository {
     }
 
     public SAMappedDocument getSAMappedDocumentOfProcessWithName(String name, long processInstanceId) {
-        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getArchivedDocumentList");
         namedQuery.setParameter("name", name);
         namedQuery.setParameter("processInstanceId", processInstanceId);

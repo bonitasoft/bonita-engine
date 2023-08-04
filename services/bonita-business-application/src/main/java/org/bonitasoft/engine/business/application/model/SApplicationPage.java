@@ -26,7 +26,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -38,7 +37,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Table(name = "business_app_page")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @Cacheable(false)
 public class SApplicationPage implements PersistentObject {
 

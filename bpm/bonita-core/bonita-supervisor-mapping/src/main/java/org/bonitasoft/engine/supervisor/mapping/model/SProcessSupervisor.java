@@ -21,7 +21,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
@@ -30,7 +29,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Table(name = "processsupervisor")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SProcessSupervisor implements PersistentObject {
 
     public static final String ID_KEY = "id";

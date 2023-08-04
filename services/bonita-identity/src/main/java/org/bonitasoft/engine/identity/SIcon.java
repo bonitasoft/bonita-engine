@@ -24,7 +24,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 
 /**
@@ -35,7 +34,6 @@ import org.hibernate.annotations.Type;
 @NoArgsConstructor
 @Entity
 @Table(name = "icon")
-@Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 public class SIcon implements PersistentObject {
 

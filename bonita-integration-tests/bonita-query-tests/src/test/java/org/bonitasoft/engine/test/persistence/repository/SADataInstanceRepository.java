@@ -28,8 +28,7 @@ public class SADataInstanceRepository extends TestRepository {
     }
 
     public List<SADataInstance> getSADataInstancesByDataInstanceIdAndArchiveDate(final List<Long> dataInstanceIds,
-            final long time, final long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+            final long time) {
         final Query namedQuery = getNamedQuery("getSADataInstancesByDataInstanceIdAndArchiveDate");
         namedQuery.setParameterList("dataInstanceIds", dataInstanceIds);
         namedQuery.setParameter("time", time);

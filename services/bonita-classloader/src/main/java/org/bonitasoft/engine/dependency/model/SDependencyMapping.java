@@ -24,14 +24,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 @Table(name = "dependencymapping")
 @Cacheable(false)

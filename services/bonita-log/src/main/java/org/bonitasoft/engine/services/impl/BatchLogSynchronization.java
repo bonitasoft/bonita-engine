@@ -50,7 +50,7 @@ class BatchLogSynchronization implements BonitaTransactionSynchronization {
             try {
                 persistenceService.insertInBatch(logs);
                 // this is mandatory (probably because we are in a synchronization)
-                persistenceService.flushStatements(true);
+                persistenceService.flushStatements();
             } catch (final SPersistenceException e) {
                 throw new SBonitaRuntimeException(e);
             }

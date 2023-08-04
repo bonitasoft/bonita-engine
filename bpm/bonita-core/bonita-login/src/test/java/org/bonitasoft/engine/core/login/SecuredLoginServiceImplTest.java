@@ -23,12 +23,7 @@ import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
@@ -279,7 +274,7 @@ public class SecuredLoginServiceImplTest {
         try {
             securedLoginServiceImpl.login(null);
             fail();
-        } catch (final Exception e) {
+        } catch (final SLoginException | SUserNotFoundException e) {
             assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, map is null");
         }
     }

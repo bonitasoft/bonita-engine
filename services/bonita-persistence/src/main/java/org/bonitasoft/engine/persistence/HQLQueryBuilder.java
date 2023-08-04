@@ -42,11 +42,6 @@ public class HQLQueryBuilder<T> extends QueryBuilder<T> {
     }
 
     @Override
-    public void setTenantId(Query query, long tenantId) {
-        //set using filters
-    }
-
-    @Override
     Query rebuildQuery(AbstractSelectDescriptor<T> selectDescriptor, Session session, Query query) {
         Query generatedQuery = session.createQuery(stringQueryBuilder.toString());
         ParameterMetadata parameterMetadata = generatedQuery.getParameterMetadata();
