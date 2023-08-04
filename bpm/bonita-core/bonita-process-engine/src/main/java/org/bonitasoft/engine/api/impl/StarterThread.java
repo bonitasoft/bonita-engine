@@ -79,7 +79,7 @@ public class StarterThread extends Thread {
 
     STenant getTenant() {
         try {
-            return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
+            return transactionService.executeInTransaction(platformService::getDefaultTenant);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

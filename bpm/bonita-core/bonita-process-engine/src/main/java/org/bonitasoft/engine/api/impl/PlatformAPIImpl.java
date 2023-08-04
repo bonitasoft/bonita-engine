@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,24 +21,11 @@ import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.platform.Platform;
-import org.bonitasoft.engine.platform.PlatformManager;
-import org.bonitasoft.engine.platform.PlatformNotFoundException;
-import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.PlatformState;
-import org.bonitasoft.engine.platform.StartNodeException;
-import org.bonitasoft.engine.platform.StopNodeException;
+import org.bonitasoft.engine.platform.*;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -137,6 +123,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
+    // FIXME: Not necessary anymore, as default tenant is always created by ScriptExecutor at startup
     public boolean isPlatformInitialized() throws PlatformNotFoundException {
         try {
             final ServiceAccessor serviceAccessor = getServiceAccessor();
@@ -196,13 +183,11 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public Map<Long, Map<String, byte[]>> getClientTenantConfigurations() {
+    public Map<String, byte[]> getClientTenantConfigurations() {
         try {
             PlatformService platformService = getServiceAccessor().getPlatformService();
-            STenant tenant = platformService.getDefaultTenant();
-            HashMap<Long, Map<String, byte[]>> conf = new HashMap<>();
-            conf.put(tenant.getId(), getBonitaHomeServer().getTenantPortalConfigurations(tenant.getId()));
-            return conf;
+            long tenantId = platformService.getDefaultTenantId();
+            return getBonitaHomeServer().getTenantPortalConfigurations(tenantId);
         } catch (ReflectiveOperationException | BonitaException | IOException | STenantNotFoundException e) {
             throw new RetrieveException(e);
         }

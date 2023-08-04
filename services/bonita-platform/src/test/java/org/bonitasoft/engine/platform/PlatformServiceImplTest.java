@@ -190,7 +190,8 @@ public class PlatformServiceImplTest {
     @Test
     public void pause_should_update_tenant_state_to_PAUSED() throws SBonitaException {
         doReturn(new STenant()).when(persistenceService)
-                .selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+                .selectOne(argThat(
+                        s -> s.getQueryName().equals("getDefaultTenant") && s.getEntityType() == STenant.class));
 
         platformServiceImpl.pauseTenant(99L);
 
@@ -200,7 +201,8 @@ public class PlatformServiceImplTest {
     @Test
     public void activateTenant_should_update_tenant_state_to_ACTIVATED() throws SBonitaException {
         doReturn(new STenant()).when(persistenceService)
-                .selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+                .selectOne(argThat(
+                        s -> s.getQueryName().equals("getDefaultTenant") && s.getEntityType() == STenant.class));
 
         platformServiceImpl.activateTenant(99L);
 
@@ -211,7 +213,8 @@ public class PlatformServiceImplTest {
     @Test
     public void deactivateTenant_should_update_tenant_state_to_DEACTIVATED() throws SBonitaException {
         doReturn(new STenant()).when(persistenceService)
-                .selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+                .selectOne(argThat(
+                        s -> s.getQueryName().equals("getDefaultTenant") && s.getEntityType() == STenant.class));
 
         platformServiceImpl.deactivateTenant(99L);
 

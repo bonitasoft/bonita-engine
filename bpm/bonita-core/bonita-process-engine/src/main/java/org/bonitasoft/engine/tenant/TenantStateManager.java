@@ -110,7 +110,7 @@ public class TenantStateManager {
     }
 
     private STenant getTenantInTransaction() throws Exception {
-        return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
+        return transactionService.executeInTransaction(() -> platformService.getDefaultTenant());
     }
 
     /**
