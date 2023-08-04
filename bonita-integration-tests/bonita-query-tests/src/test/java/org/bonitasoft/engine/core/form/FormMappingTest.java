@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,6 @@ public class FormMappingTest {
             assertThat(c.get("task")).isEqualTo("task1");
             assertThat(c.get("type")).isEqualTo(3);
             assertThat(c.get("page_mapping_id")).isEqualTo(1L);
-            assertThat(c.get("page_mapping_tenant_id")).isEqualTo(DEFAULT_TENANT_ID);
             assertThat(c.get("lastupdatedate")).isEqualTo(200L);
             assertThat(c.get("lastupdatedby")).isEqualTo(100L);
             assertThat(c.get("process")).isEqualTo(2L);
@@ -69,7 +67,6 @@ public class FormMappingTest {
         assertThat(formMapping).anySatisfy(c -> {
             assertThat(c.get("task")).isEqualTo("task2");
             assertThat(c.get("page_mapping_id")).isEqualTo(1L);
-            assertThat(c.get("page_mapping_tenant_id")).isEqualTo(DEFAULT_TENANT_ID);
             assertThat(c.get("type")).isEqualTo(4);
             assertThat(c.get("process")).isEqualTo(3L);
             assertThat(c.get("target")).isEqualTo("target2");

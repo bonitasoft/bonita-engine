@@ -27,7 +27,6 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.persistence.model.BlobValue;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Nicolas Chabanoles
@@ -40,7 +39,6 @@ import org.hibernate.annotations.Filter;
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @Table(name = "queriableLog_p")
 public class SQueriableLogParameter implements PersistentObject {
 

@@ -36,22 +36,15 @@ public class RoleTest {
     @Inject
     private RoleRepository repository;
 
-    //Those tests currently verify that the queries returning UserMemberships correctly retrieve the groupParentPath when building the Usermembership objects
-
     @Test
-    public void should_get_role_by_tenant() {
-        repository.add(aRole().forTenant(1L).forRoleId(10L).forRoleName("MyRoleOnBothTenants").build());
-        repository.add(aRole().forTenant(2L).forRoleId(10L).forRoleName("MyRoleOnBothTenants").build());
-        repository.add(aRole().forTenant(1L).forRoleId(11L).forRoleName("MyRoleOnTenant1").build());
-        repository.add(aRole().forTenant(2L).forRoleId(12L).forRoleName("MyRoleOnTenant2").build());
+    public void should_get_role_by_name() {
+        repository.add(aRole().forTenant(1L).forRoleId(10L).forRoleName("MyRole10").build());
+        repository.add(aRole().forTenant(1L).forRoleId(11L).forRoleName("MyRole11").build());
 
-        assertThat(repository.getRoleByName(1L, "MyRoleOnBothTenants").getId()).isEqualTo(10L);
-        assertThat(repository.getRoleByName(2L, "MyRoleOnBothTenants").getId()).isEqualTo(10L);
-        assertThat(repository.getRoleByName(1L, "MyRoleOnTenant1").getId()).isEqualTo(11L);
-        assertThat(repository.getRoleByName(2L, "MyRoleOnTenant2").getId()).isEqualTo(12L);
+        assertThat(repository.getRoleByName("MyRole10").getId()).isEqualTo(10L);
+        assertThat(repository.getRoleByName("MyRole11").getId()).isEqualTo(11L);
 
-        assertThat(repository.getRoleByName(1L, "MyRoleOnTenant2")).isNull();
-        assertThat(repository.getRoleByName(2L, "MyRoleOnTenant1")).isNull();
+        assertThat(repository.getRoleByName("NonExistingRole")).isNull();
 
     }
 

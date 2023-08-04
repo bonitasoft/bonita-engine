@@ -25,7 +25,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 
 /**
@@ -38,7 +37,6 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "blob_")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class BlobValue implements PersistentObject {
 
     //FIXME: this class is not used: delete and remove table in migration

@@ -26,7 +26,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -36,7 +35,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @DiscriminatorColumn(name = "kind")
 @Table(name = "process_comment")
 public class SComment implements PersistentObject {

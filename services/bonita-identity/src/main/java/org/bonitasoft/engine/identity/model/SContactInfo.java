@@ -26,7 +26,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * User contact info: can be personal or professional contact information.
@@ -39,7 +38,6 @@ import org.hibernate.annotations.Filter;
 @Builder
 @Entity
 @Table(name = "user_contactinfo")
-@Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 @Cacheable(false)
 public class SContactInfo implements PersistentObject {

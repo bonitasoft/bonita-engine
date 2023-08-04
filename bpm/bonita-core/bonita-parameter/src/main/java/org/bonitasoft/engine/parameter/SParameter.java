@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 
 /**
@@ -30,7 +29,6 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "proc_parameter")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SParameter implements PersistentObject {
 
     @Id

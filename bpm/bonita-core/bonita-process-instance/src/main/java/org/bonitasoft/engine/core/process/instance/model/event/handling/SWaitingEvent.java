@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Zhao Na
@@ -32,7 +31,6 @@ import org.hibernate.annotations.Filter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Filter(name = "tenantFilter")
 @IdClass(PersistentObjectId.class)
 @Table(name = "waiting_event")
 @DiscriminatorColumn(name = "kind")

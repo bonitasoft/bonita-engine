@@ -25,7 +25,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
@@ -34,7 +33,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Table(name = "command")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SCommand implements PersistentObject {
 
     public static final String ID = "id";

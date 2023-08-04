@@ -17,7 +17,6 @@ import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstan
 
 import java.util.List;
 
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
@@ -34,33 +33,28 @@ public class BPMEventRepository extends TestRepository {
 
     @SuppressWarnings("unchecked")
     public List<Long> getInProgressMessageInstances() {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("getInProgressMessageInstances");
         return namedQuery.list();
     }
 
     public int resetProgressMessageInstances() {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("resetProgressMessageInstances");
         return namedQuery.executeUpdate();
     }
 
     @SuppressWarnings("unchecked")
     public List<Long> getInProgressWaitingEvents() {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("getInProgressWaitingEvents");
         return namedQuery.list();
     }
 
     public int resetInProgressWaitingEvents() {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery(QUERY_RESET_IN_PROGRESS_WAITING_EVENTS);
         return namedQuery.executeUpdate();
     }
 
     @SuppressWarnings("unchecked")
     public int deleteMessageInstanceByIds(List<Long> ids) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("deleteMessageInstanceByIds");
 
         namedQuery.setParameterList("ids", ids);
@@ -69,7 +63,6 @@ public class BPMEventRepository extends TestRepository {
 
     @SuppressWarnings("unchecked")
     public List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("getMessageInstanceIdOlderThanCreationDate");
         namedQuery.setParameter("creationDate", creationDate);
         return namedQuery.list();

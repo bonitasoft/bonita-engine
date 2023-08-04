@@ -15,12 +15,7 @@ package org.bonitasoft.engine.persistence;
 
 import static java.util.Collections.emptySet;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -42,7 +37,6 @@ abstract class QueryBuilder<T> {
     StringBuilder stringQueryBuilder;
     private Map<String, String> classAliasMappings;
     private Session session;
-    private long tenantId;
     private boolean cacheEnabled;
     private Map<String, Object> parameters = new HashMap<>();
 
@@ -159,8 +153,6 @@ abstract class QueryBuilder<T> {
         return !baseQuery.getQueryString().equals(stringQueryBuilder.toString());
     }
 
-    public abstract void setTenantId(Query query, long tenantId);
-
     abstract Query rebuildQuery(AbstractSelectDescriptor<T> selectDescriptor, Session session, Query query);
 
     void manageFiltersAndParameters(AbstractSelectDescriptor<T> selectDescriptor, boolean enableWordSearch)
@@ -174,11 +166,6 @@ abstract class QueryBuilder<T> {
             appendOrderByClause(selectDescriptor.getQueryOptions().getOrderByOptions(),
                     selectDescriptor.getEntityType());
         }
-    }
-
-    public QueryBuilder tenantId(long tenantId) {
-        this.tenantId = tenantId;
-        return this;
     }
 
     public QueryBuilder cache(boolean cacheEnabled) {
@@ -204,7 +191,6 @@ abstract class QueryBuilder<T> {
             query = rebuildQuery(selectDescriptor, session, baseQuery);
         }
         addConstantsAsParameters(query);
-        setTenantId(query, tenantId);
         setParameters(query, selectDescriptor.getInputParameters());
         query.setFirstResult(selectDescriptor.getStartIndex());
         query.setMaxResults(selectDescriptor.getPageSize());
@@ -239,8 +225,7 @@ abstract class QueryBuilder<T> {
      */
     static String escapeString(final String term) {
         // 1) escape ' character by adding another ' character
-        return term
-                .replaceAll("'", "''");
+        return term.replaceAll("'", "''");
     }
 
     /*

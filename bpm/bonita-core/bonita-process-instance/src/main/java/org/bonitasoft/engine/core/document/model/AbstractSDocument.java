@@ -24,7 +24,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Emmanuel Duchastenier
@@ -35,7 +34,6 @@ import org.hibernate.annotations.Filter;
 @SuperBuilder
 @MappedSuperclass
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class AbstractSDocument implements PersistentObject {
 
     @Id

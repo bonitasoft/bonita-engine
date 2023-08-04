@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.actor.mapping.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +21,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
@@ -34,7 +29,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Table(name = "actor")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SActor implements PersistentObject {
 
     @Id

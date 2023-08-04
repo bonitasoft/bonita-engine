@@ -17,6 +17,7 @@ import java.util.*;
 
 import javax.sql.DataSource;
 
+import lombok.Getter;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.sequence.SequenceManager;
@@ -42,6 +43,7 @@ import org.hibernate.stat.Statistics;
  */
 public abstract class AbstractHibernatePersistenceService extends AbstractDBPersistenceService {
 
+    @Getter
     private final SessionFactory sessionFactory;
 
     private final Map<String, String> classAliasMappings;
@@ -51,9 +53,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     private final List<Class<? extends PersistentObject>> classMapping;
 
     private final List<String> mappingExclusions;
-    private Statistics statistics;
+    private final Statistics statistics;
     private int stat_display_count;
-    private QueryBuilderFactory queryBuilderFactory;
+    private final QueryBuilderFactory queryBuilderFactory;
 
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory,
             final List<Class<? extends PersistentObject>> classMapping,
@@ -118,7 +120,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         stat_display_count++;
     }
 
-    protected Session getSession(final boolean useTenant) throws SPersistenceException {
+    protected Session getSession() throws SPersistenceException {
         logStats();
         try {
             return sessionFactory.getCurrentSession();
@@ -127,8 +129,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    public void flushStatements(final boolean useTenant) throws SPersistenceException {
-        getSession(useTenant).flush();
+    public void flushStatements() throws SPersistenceException {
+        getSession().flush();
     }
 
     @Override
@@ -137,20 +139,21 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             getLogger().debug(
                     "Deleting instance of class " + entity.getClass().getSimpleName() + " with id=" + entity.getId());
         }
-        final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
-        final Session session = getSession(true);
+        final Session session = getSession();
         try {
             if (session.contains(entity)) {
                 session.delete(entity);
             } else {
+                final long tenantId = (entity instanceof PlatformPersistentObject) ? 0L : getTenantId();
+                final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
                 // Deletion must be performed on the session entity and not on a potential transitional entity.
-                final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), 0));
+                final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), tenantId));
                 session.delete(pe);
             }
         } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
             throw new SRetryableException(e);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
+        } catch (final STenantIdNotSetException | HibernateException e) {
+            throw new SPersistenceException(e);
         }
     }
 
@@ -162,7 +165,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     @Override
     public int update(final String updateQueryName, final Map<String, Object> inputParameters)
             throws SPersistenceException {
-        final Query query = getSession(true).getNamedQuery(updateQueryName);
+        final Query query = getSession().getNamedQuery(updateQueryName);
         try {
             if (inputParameters != null) {
                 setParameters(query, inputParameters);
@@ -177,7 +180,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     @Override
     public void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
-        final Query query = getSession(true).getNamedQuery("deleteAll" + mappedClass.getSimpleName());
+        final Query query = getSession().getNamedQuery("deleteAll" + mappedClass.getSimpleName());
         try {
             query.executeUpdate();
         } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
@@ -191,7 +194,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     public void insert(final PersistentObject entity) throws SPersistenceException {
         final Class<? extends PersistentObject> entityClass = entity.getClass();
         checkClassMapping(entityClass);
-        final Session session = getSession(true);
+        final Session session = getSession();
         setId(entity);
         try {
             session.save(entity);
@@ -205,7 +208,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     @Override
     public void insertInBatch(final List<? extends PersistentObject> entities) throws SPersistenceException {
         if (!entities.isEmpty()) {
-            final Session session = getSession(true);
+            final Session session = getSession();
             for (final PersistentObject entity : entities) {
                 final Class<? extends PersistentObject> entityClass = entity.getClass();
                 checkClassMapping(entityClass);
@@ -221,7 +224,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         final Class<? extends PersistentObject> entityClass = updateDescriptor.getEntity().getClass();
         checkClassMapping(entityClass);
         final PersistentObject entity = updateDescriptor.getEntity();
-        final Session session = getSession(false);
+        final Session session = getSession();
         if (!session.contains(entity)) {
             throw new SPersistenceException("The object cannot be updated because it's disconnected " + entity);
         }
@@ -244,7 +247,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     @Override
     public <T> T selectOne(final SelectOneDescriptor<T> selectDescriptor) throws SBonitaReadException {
         try {
-            return selectOne(getSession(true), selectDescriptor);
+            return selectOne(getSession(), selectDescriptor);
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
@@ -268,7 +271,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor)
             throws SBonitaReadException {
         try {
-            final Session session = getSession(true);
+            final Session session = getSession();
             final T object = this.selectById(session, selectDescriptor);
             if (selectDescriptor.isReadOnly()) {
                 disconnectEntityFromSession(session, object);
@@ -348,13 +351,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final Class<? extends PersistentObject> entityClass = selectDescriptor.getEntityType();
             checkClassMapping(entityClass);
 
-            final Session session = getSession(true);
+            final Session session = getSession();
 
-            final QueryBuilder queryBuilder = queryBuilderFactory.createQueryBuilderFor(session, selectDescriptor);
-            if (!PlatformPersistentObject.class.isAssignableFrom(selectDescriptor.getEntityType())) {
-                queryBuilder.tenantId(getTenantId());
-            }
-            org.hibernate.query.Query query = queryBuilder
+            org.hibernate.query.Query query = queryBuilderFactory.createQueryBuilderFor(session, selectDescriptor)
                     .cache(isCacheEnabled(selectDescriptor.getQueryName()))
                     .build();
 
@@ -367,7 +366,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             return Collections.emptyList();
         } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
             throw new SRetryableException(e);
-        } catch (final HibernateException | SPersistenceException | STenantIdNotSetException e) {
+        } catch (final HibernateException | SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
     }
@@ -406,7 +405,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     public void delete(final long id, final Class<? extends PersistentObject> entityClass)
             throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
-        final Query query = getSession(true).getNamedQuery("delete" + mappedClass.getSimpleName());
+        final Query query = getSession().getNamedQuery("delete" + mappedClass.getSimpleName());
         query.setParameter("id", id);
         try {
             query.executeUpdate();
@@ -421,7 +420,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass)
             throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
-        final Query query = getSession(true).getNamedQuery("deleteByIds" + mappedClass.getSimpleName());
+        final Query query = getSession().getNamedQuery("deleteByIds" + mappedClass.getSimpleName());
         query.setParameterList("ids", ids);
         try {
             query.executeUpdate();
@@ -438,7 +437,4 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         sessionFactory.close();
     }
 
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
 }

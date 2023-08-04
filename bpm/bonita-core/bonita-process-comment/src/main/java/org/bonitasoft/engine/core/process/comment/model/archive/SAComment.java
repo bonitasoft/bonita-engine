@@ -24,18 +24,15 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "arch_process_comment")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SAComment implements ArchivedPersistentObject {
 
     public static final String ID_KEY = "id";
-    public static final String TENANTID_KEY = "tenantId";
     public static final String USERID_KEY = "userId";
     public static final String PROCESSINSTANCEID_KEY = "processInstanceId";
     public static final String POSTDATE_KEY = "postDate";

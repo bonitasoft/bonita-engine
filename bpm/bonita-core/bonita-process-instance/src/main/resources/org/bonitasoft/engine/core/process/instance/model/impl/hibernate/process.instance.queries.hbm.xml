@@ -1787,17 +1787,14 @@
 				FROM process_instance p
 				JOIN (
 					select afi.logicalGroup2 from arch_flownode_instance afi
-						WHERE afi.tenantId = :tenantId
-						AND afi.kind in ('user', 'manual')
+						WHERE afi.kind in ('user', 'manual')
 						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
 						AND afi.stateId = 2
 				) humanTask ON (humanTask.logicalGroup2 = p.id)
-			WHERE p.tenantId = :tenantId
 			UNION
 			SELECT p.*
 				FROM process_instance p
-				WHERE p.tenantId = :tenantId
-					AND p.startedBy = :userId
+				WHERE p.startedBy = :userId
 		) p
 	</sql-query>
 
@@ -1809,17 +1806,14 @@
 				FROM process_instance p
 				JOIN (
 					select afi.logicalGroup2 from arch_flownode_instance afi
-						WHERE afi.tenantId = :tenantId
-						AND afi.kind in ('user', 'manual')
+						WHERE afi.kind in ('user', 'manual')
 						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
 						AND afi.stateId = 2
 				) humanTask ON (humanTask.logicalGroup2 = p.id)
-			WHERE p.tenantId = :tenantId
 			UNION
 			SELECT p.*
 				FROM process_instance p
-				WHERE p.tenantId = :tenantId
-					AND p.startedBy = :userId
+				WHERE p.startedBy = :userId
 		) p
 	</sql-query>
 

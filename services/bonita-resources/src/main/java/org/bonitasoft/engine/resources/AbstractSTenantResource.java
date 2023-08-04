@@ -23,7 +23,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 /**
  * @author Baptiste Mesta
@@ -32,7 +31,6 @@ import org.hibernate.annotations.Filter;
 @NoArgsConstructor
 @MappedSuperclass
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class AbstractSTenantResource implements PersistentObject {
 
     @Id

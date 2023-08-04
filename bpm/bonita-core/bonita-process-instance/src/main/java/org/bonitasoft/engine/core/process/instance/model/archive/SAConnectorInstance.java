@@ -27,12 +27,10 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @Entity
 @Table(name = "arch_connector_instance")
 public class SAConnectorInstance implements ArchivedPersistentObject {

@@ -31,9 +31,7 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SAbstractConnectorInstance> getConnectorInstances(final long containerId, final String containerType,
-            long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+    public List<SAbstractConnectorInstance> getConnectorInstances(final long containerId, final String containerType) {
         Query namedQuery = getNamedQuery("getConnectorInstances");
         namedQuery.setParameter("containerId", containerId);
         namedQuery.setParameter("containerType", containerType);
@@ -42,9 +40,7 @@ public class ConnectorInstanceRepository extends TestRepository {
 
     @SuppressWarnings("unchecked")
     public List<SAbstractConnectorInstance> getConnectorInstancesOrderedById(final long containerId,
-            final String containerType,
-            long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+            final String containerType) {
         Query namedQuery = getNamedQuery("getConnectorInstancesOrderedById");
         namedQuery.setParameter("containerId", containerId);
         namedQuery.setParameter("containerType", containerType);
@@ -52,9 +48,7 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     public List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(final long containerId,
-            final String containerType, String state,
-            long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+            final String containerType, String state) {
         Query namedQuery = getNamedQuery("getConnectorInstancesWithFailureInfoInState");
         namedQuery.setParameter("containerId", containerId);
         namedQuery.setParameter("containerType", containerType);
@@ -62,8 +56,7 @@ public class ConnectorInstanceRepository extends TestRepository {
         return namedQuery.list();
     }
 
-    public long getNumberOfConnectorInstances(final long containerId, final String containerType, long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+    public long getNumberOfConnectorInstances(final long containerId, final String containerType) {
         Query namedQuery = getNamedQuery("getNumberOfConnectorInstances");
         namedQuery.setParameter("containerId", containerId);
         namedQuery.setParameter("containerType", containerType);
@@ -72,9 +65,7 @@ public class ConnectorInstanceRepository extends TestRepository {
 
     @SuppressWarnings("unchecked")
     public SConnectorInstance getNextExecutableConnectorInstance(final long containerId, final String containerType,
-            final ConnectorEvent activationEvent,
-            long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+            final ConnectorEvent activationEvent) {
         Query namedQuery = getNamedQuery("getNextExecutableConnectorInstance");
         namedQuery.setParameter("containerId", containerId);
         namedQuery.setParameter("containerType", containerType);
@@ -84,24 +75,19 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SAbstractConnectorInstance> searchSConnectorInstance(final long containerId, final String containerType,
-            long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+    public List<SAbstractConnectorInstance> searchSConnectorInstance() {
         Query namedQuery = getNamedQuery("searchSConnectorInstance");
         return namedQuery.list();
     }
 
-    public long getNumberOfSConnectorInstance(final long containerId, final String containerType, long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+    public long getNumberOfSConnectorInstance() {
         Query namedQuery = getNamedQuery("getNumberOfSConnectorInstance");
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
 
     @SuppressWarnings("unchecked")
     public List<SAbstractConnectorInstance> getConnectorInstances(final long containerId, final String containerType,
-            final ConnectorEvent activationEvent,
-            String state, long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+            final ConnectorEvent activationEvent, String state) {
         Query namedQuery = getNamedQuery("getConnectorInstancesWithState");
         namedQuery.setParameter("containerId", containerId);
         namedQuery.setParameter("containerType", containerType);
@@ -111,9 +97,7 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SConnectorInstanceWithFailureInfo> getConnectorInstanceWithFailureInfo(final long containerId,
-            long tenantId) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+    public List<SConnectorInstanceWithFailureInfo> getConnectorInstanceWithFailureInfo(final long containerId) {
         Query namedQuery = getNamedQuery("getConnectorInstanceWithFailureInfo");
         namedQuery.setParameter("id", containerId);
         return namedQuery.list();

@@ -30,7 +30,6 @@ public class CustomUserInfoRepository extends TestRepository {
     }
 
     public List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean partialMatch) {
-        getSessionWithTenantFilter();
         Query namedQuery;
         if (partialMatch) {
             namedQuery = getNamedQuery("getUserIdsWithCustomUserInfoContains");

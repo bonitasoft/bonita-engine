@@ -103,9 +103,9 @@ public class TenantResourceServiceQueriesTest {
         repository.add(aTenantResource().withName("MyConnector").withContent("The content".getBytes())
                 .withType(TenantResourceType.BDM).build());
 
-        // This resources should be excluded by the tenantID filter:
-        repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes())
-                .withType(TenantResourceType.BDM).build());
+        // This resources should be excluded by the type filter:
+        repository.add(aTenantResource().withName("excluded").withContent("binary".getBytes())
+                .withType(TenantResourceType.BDM_ACCESS_CTRL).build());
 
         //when
         long myResources = repository.getNumberOfTenantResourcesOfType(TenantResourceType.BDM);
@@ -119,9 +119,9 @@ public class TenantResourceServiceQueriesTest {
         STenantResource resource1 = repository.add(aTenantResource().withName("MyResource")
                 .withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
 
-        // This resources should be excluded by the tenantID filter:
+        // This resources should be excluded by the type filter:
         repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes())
-                .withType(TenantResourceType.BDM).build());
+                .withType(TenantResourceType.BDM_ACCESS_CTRL).build());
 
         STenantResource resource2 = repository.add(aTenantResource().withName("MyResource2")
                 .withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());

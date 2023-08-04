@@ -18,9 +18,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.mapOf;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -98,17 +96,17 @@ public class ArchiveProcessInstanceQueriesTest {
         PersistentObject multiRefBusinessData = repository.selectOne("getSARefBusinessDataInstance",
                 pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "myMultiProcData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM arch_ref_biz_data_inst WHERE orig_proc_inst_id=" + PROCESS_INSTANCE_ID
-                        + " AND name='myMultiProcData'");
+                .queryForMap(
+                        "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, ORIG_PROC_INST_ID, ORIG_FN_INST_ID FROM arch_ref_biz_data_inst WHERE orig_proc_inst_id="
+                                + PROCESS_INSTANCE_ID + " AND name='myMultiProcData'");
         List<Map<String, Object>> dataIds = jdbcTemplate
-                .queryForList("SELECT * FROM arch_multi_biz_data WHERE tenantId=" + DEFAULT_TENANT_ID + " AND id="
+                .queryForList("SELECT ID, IDX, DATA_ID FROM arch_multi_biz_data WHERE id="
                         + multiRefBusinessDataInstance.getId());
 
         assertThat(((SAProcessMultiRefBusinessDataInstance) multiRefBusinessData).getDataIds())
                 .isEqualTo(Arrays.asList(23L, 25L, 27L));
         assertThat(multiRefBusinessData).isEqualTo(multiRefBusinessDataInstance);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("ID", multiRefBusinessDataInstance.getId()),
                 entry("KIND", "proc_multi_ref"),
                 entry("NAME", "myMultiProcData"),
@@ -117,12 +115,9 @@ public class ArchiveProcessInstanceQueriesTest {
                 entry("ORIG_PROC_INST_ID", PROCESS_INSTANCE_ID),
                 entry("ORIG_FN_INST_ID", null));
         assertThat(dataIds).containsExactly(
-                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()),
-                        pair("IDX", 0), pair("DATA_ID", 23L)),
-                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()),
-                        pair("IDX", 1), pair("DATA_ID", 25L)),
-                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()),
-                        pair("IDX", 2), pair("DATA_ID", 27L)));
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 0), pair("DATA_ID", 23L)),
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 1), pair("DATA_ID", 25L)),
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 2), pair("DATA_ID", 27L)));
     }
 
     @Test
@@ -138,11 +133,12 @@ public class ArchiveProcessInstanceQueriesTest {
         PersistentObject singleRefFromQuery = repository.selectOne("getSARefBusinessDataInstance",
                 pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "mySingleData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM arch_ref_biz_data_inst WHERE orig_proc_inst_id=" + PROCESS_INSTANCE_ID
-                        + " AND name='mySingleData'");
+                .queryForMap(
+                        "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, ORIG_PROC_INST_ID, ORIG_FN_INST_ID FROM arch_ref_biz_data_inst WHERE orig_proc_inst_id="
+                                + PROCESS_INSTANCE_ID
+                                + " AND name='mySingleData'");
         assertThat(singleRefFromQuery).isEqualTo(singleRef);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("ID", singleRef.getId()),
                 entry("KIND", "proc_simple_ref"),
                 entry("NAME", "mySingleData"),
@@ -165,11 +161,12 @@ public class ArchiveProcessInstanceQueriesTest {
         PersistentObject singleRefFromQuery = repository.selectOne("getSAFlowNodeRefBusinessDataInstance",
                 pair("flowNodeInstanceId", FLOW_NODE_INSTANCE_ID), pair("name", "mySingleData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM arch_ref_biz_data_inst WHERE orig_fn_inst_id=" + FLOW_NODE_INSTANCE_ID
-                        + " AND name='mySingleData'");
+                .queryForMap(
+                        "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, ORIG_PROC_INST_ID, ORIG_FN_INST_ID FROM arch_ref_biz_data_inst WHERE orig_fn_inst_id="
+                                + FLOW_NODE_INSTANCE_ID
+                                + " AND name='mySingleData'");
         assertThat(singleRefFromQuery).isEqualTo(singleRef);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("ID", singleRef.getId()),
                 entry("KIND", "fn_simple_ref"),
                 entry("NAME", "mySingleData"),

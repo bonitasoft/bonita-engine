@@ -16,7 +16,6 @@ package org.bonitasoft.engine.parameter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.pair;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class ParameterTest {
 
         assertThat(parameterFromQuery).isEqualTo(sParameter);
         assertThat(parameterAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", sParameter.getId()),
                 entry("PROCESS_ID", 12345L),
                 entry("NAME", "parameterName"),

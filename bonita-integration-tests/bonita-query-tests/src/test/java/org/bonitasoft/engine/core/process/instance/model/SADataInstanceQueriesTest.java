@@ -442,7 +442,7 @@ public class SADataInstanceQueriesTest {
         final long time = System.currentTimeMillis();
 
         final List<SADataInstance> dataInstances = repository
-                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time);
 
         assertThat(dataInstances).isEmpty();
     }
@@ -454,7 +454,7 @@ public class SADataInstanceQueriesTest {
         dataInstanceIds.add(4L);
 
         final List<SADataInstance> dataInstances = repository
-                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, 1411051738348L, 1);
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, 1411051738348L);
 
         assertThat(dataInstances).isEmpty();
     }
@@ -470,7 +470,7 @@ public class SADataInstanceQueriesTest {
 
         final long time = 0L;
         final List<SADataInstance> dataInstances = repository
-                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time);
         assertThat(dataInstances).isEmpty();
     }
 
@@ -485,7 +485,7 @@ public class SADataInstanceQueriesTest {
         dataInstanceIds.add(205093L);
 
         final List<SADataInstance> dataInstances = repository
-                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 5000, 1);
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 5000);
         assertThat(dataInstances).hasSize(1);
         assertThat(dataInstances.get(0).getId()).isEqualTo(1025356);
     }
@@ -501,7 +501,7 @@ public class SADataInstanceQueriesTest {
         dataInstanceIds.add(205093L);
 
         final List<SADataInstance> dataInstances = repository
-                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 2000, 1);
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 2000);
         assertThat(dataInstances).hasSize(1);
         assertThat(dataInstances.get(0).getId()).isEqualTo(1025259);
     }

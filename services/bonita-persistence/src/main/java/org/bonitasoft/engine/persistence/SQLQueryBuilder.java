@@ -64,13 +64,6 @@ public class SQLQueryBuilder<T> extends QueryBuilder<T> {
     }
 
     @Override
-    public void setTenantId(Query query, long tenantId) {
-        if (query.getQueryString().contains(":tenantId")) {
-            query.setParameter("tenantId", tenantId);
-        }
-    }
-
-    @Override
     Query rebuildQuery(AbstractSelectDescriptor<T> selectDescriptor, Session session, Query query) {
         String builtQuery = stringQueryBuilder.toString();
         builtQuery = replaceHQLAliasesBySQLAliases(builtQuery);

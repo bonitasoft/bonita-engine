@@ -25,7 +25,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
@@ -34,7 +33,6 @@ import org.hibernate.annotations.Filter;
 @Entity
 @Table(name = "business_app_menu")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class SApplicationMenu implements PersistentObject {
 
     public static String ID = "id";

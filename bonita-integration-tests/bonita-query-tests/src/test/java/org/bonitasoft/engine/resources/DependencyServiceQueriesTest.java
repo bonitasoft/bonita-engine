@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 import static org.junit.Assert.fail;
 
 import java.util.Map;
@@ -26,11 +25,7 @@ import java.util.Random;
 
 import javax.inject.Inject;
 
-import org.bonitasoft.engine.dependency.model.DependencyContent;
-import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.SPlatformDependency;
-import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
+import org.bonitasoft.engine.dependency.model.*;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.DependencyRepository;
 import org.bonitasoft.engine.test.persistence.repository.PlatformRepository;
@@ -144,7 +139,7 @@ public class DependencyServiceQueriesTest {
 
         assertThat(dependencyFromQuery).isEqualTo(aDependency);
         assertThat(dependencyAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", aDependency.getId()),
                 entry("NAME", "dependencyName"),
                 entry("DESCRIPTION", "description of the jar"),
@@ -171,7 +166,7 @@ public class DependencyServiceQueriesTest {
 
         assertThat(dependencyMappingFromQuery).isEqualTo(dependencyMapping);
         assertThat(dependencyMappingAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", dependencyMapping.getId()),
                 entry("ARTIFACTID", 567L),
                 entry("ARTIFACTTYPE", "PROCESS"),

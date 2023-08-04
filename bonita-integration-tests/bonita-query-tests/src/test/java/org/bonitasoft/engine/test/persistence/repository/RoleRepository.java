@@ -28,8 +28,7 @@ public class RoleRepository extends TestRepository {
         super(sessionFactory);
     }
 
-    public SRole getRoleByName(long tenantId, String name) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+    public SRole getRoleByName(String name) {
         Query namedQuery = getNamedQuery("getRoleByName");
         namedQuery.setParameter("name", name);
         return ((SRole) namedQuery.uniqueResult());

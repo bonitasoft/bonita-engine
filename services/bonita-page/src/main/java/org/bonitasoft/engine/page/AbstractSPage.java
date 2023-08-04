@@ -22,14 +22,12 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @MappedSuperclass
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 public class AbstractSPage implements PersistentObject {
 
     @Id

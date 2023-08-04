@@ -15,7 +15,6 @@ package org.bonitasoft.engine.queriablelogger.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
 import java.util.List;
 import java.util.Map;
@@ -92,7 +91,7 @@ public class QueriableLogTest {
                 entry("PRODUCTVERSION", "productVersion1"),
                 entry("SEVERITY", "BUSINESS"),
                 entry("RAWMESSAGE", "message1"),
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("THREADNUMBER", queriableLog.getThreadNumber()),
                 entry("USERID", "userId1"),
                 entry("WEEKOFYEAR", queriableLog.getWeekOfYear()),
@@ -116,7 +115,7 @@ public class QueriableLogTest {
                 entry("PRODUCTVERSION", "productVersion2"),
                 entry("SEVERITY", "BUSINESS"),
                 entry("RAWMESSAGE", "message2"),
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("THREADNUMBER", queriableLog.getThreadNumber()),
                 entry("USERID", "userId2"),
                 entry("WEEKOFYEAR", queriableLog1.getWeekOfYear()),

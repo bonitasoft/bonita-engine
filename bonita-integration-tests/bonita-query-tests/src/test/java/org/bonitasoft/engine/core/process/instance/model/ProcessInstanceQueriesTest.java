@@ -891,14 +891,14 @@ public class ProcessInstanceQueriesTest {
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
                 .queryForMap("SELECT * FROM ref_biz_data_inst WHERE proc_inst_id=" + PROCESS_INSTANCE_ID
                         + " AND name='myMultiProcData'");
-        List<Map<String, Object>> dataIds = jdbcTemplate.queryForList("SELECT * FROM multi_biz_data WHERE tenantId="
-                + DEFAULT_TENANT_ID + " AND id=" + multiRefBusinessDataInstance.getId());
+        List<Map<String, Object>> dataIds = jdbcTemplate.queryForList(
+                "SELECT ID, IDX, DATA_ID FROM multi_biz_data WHERE id=" + multiRefBusinessDataInstance.getId());
 
         assertThat(((SProcessMultiRefBusinessDataInstance) multiRefBusinessData).getDataIds())
                 .isEqualTo(Arrays.asList(23L, 25L, 27L));
         assertThat(multiRefBusinessData).isEqualTo(multiRefBusinessDataInstance);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("TENANTID", 0L), // remove when tenant notion disappears completely
                 entry("ID", multiRefBusinessDataInstance.getId()),
                 entry("KIND", "proc_multi_ref"),
                 entry("NAME", "myMultiProcData"),
@@ -907,12 +907,9 @@ public class ProcessInstanceQueriesTest {
                 entry("PROC_INST_ID", PROCESS_INSTANCE_ID),
                 entry("FN_INST_ID", null));
         assertThat(dataIds).containsExactly(
-                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()),
-                        pair("IDX", 0), pair("DATA_ID", 23L)),
-                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()),
-                        pair("IDX", 1), pair("DATA_ID", 25L)),
-                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()),
-                        pair("IDX", 2), pair("DATA_ID", 27L)));
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 0), pair("DATA_ID", 23L)),
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 1), pair("DATA_ID", 25L)),
+                mapOf(pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 2), pair("DATA_ID", 27L)));
     }
 
     @Test
@@ -928,11 +925,11 @@ public class ProcessInstanceQueriesTest {
         PersistentObject singleRefFromQuery = repository.selectOne("getSRefBusinessDataInstance",
                 pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "mySingleData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM ref_biz_data_inst WHERE proc_inst_id=" + PROCESS_INSTANCE_ID
-                        + " AND name='mySingleData'");
+                .queryForMap(
+                        "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, PROC_INST_ID, FN_INST_ID FROM ref_biz_data_inst WHERE proc_inst_id="
+                                + PROCESS_INSTANCE_ID + " AND name='mySingleData'");
         assertThat(singleRefFromQuery).isEqualTo(singleRef);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("ID", singleRef.getId()),
                 entry("KIND", "proc_simple_ref"),
                 entry("NAME", "mySingleData"),
@@ -956,11 +953,12 @@ public class ProcessInstanceQueriesTest {
         PersistentObject singleRefFromQuery = repository.selectOne("getSFlowNodeRefBusinessDataInstance",
                 pair("flowNodeInstanceId", FLOW_NODE_INSTANCE_ID), pair("name", "mySingleData"));
         Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate
-                .queryForMap("SELECT * FROM ref_biz_data_inst WHERE fn_inst_id=" + FLOW_NODE_INSTANCE_ID
-                        + " AND name='mySingleData'");
+                .queryForMap(
+                        "SELECT ID, KIND, NAME, DATA_CLASSNAME, DATA_ID, PROC_INST_ID, FN_INST_ID FROM ref_biz_data_inst WHERE fn_inst_id="
+                                + FLOW_NODE_INSTANCE_ID
+                                + " AND name='mySingleData'");
         assertThat(singleRefFromQuery).isEqualTo(singleRef);
         assertThat(multiRefBusinessDataAsMap).containsOnly(
-                entry("TENANTID", DEFAULT_TENANT_ID),
                 entry("ID", singleRef.getId()),
                 entry("KIND", "fn_simple_ref"),
                 entry("NAME", "mySingleData"),
@@ -975,14 +973,13 @@ public class ProcessInstanceQueriesTest {
         long now = System.currentTimeMillis();
 
         SProcessInstance oldProcess1 = SProcessInstance.builder().name("oldProcess1").stateId(INITIALIZING.getId())
-                .tenantId(DEFAULT_TENANT_ID).lastUpdate(now().minusSeconds(60).toEpochMilli()).build();
+                .lastUpdate(now().minusSeconds(60).toEpochMilli()).build();
         SProcessInstance oldProcess2 = SProcessInstance.builder().name("oldProcess2").stateId(INITIALIZING.getId())
-                .tenantId(DEFAULT_TENANT_ID).lastUpdate(now().minusSeconds(70).toEpochMilli()).build();
+                .lastUpdate(now().minusSeconds(70).toEpochMilli()).build();
         SProcessInstance recentProcess1 = SProcessInstance.builder().name("recentProcess1")
-                .stateId(INITIALIZING.getId()).tenantId(DEFAULT_TENANT_ID)
-                .lastUpdate(now().minusSeconds(10).toEpochMilli()).build();
+                .stateId(INITIALIZING.getId()).lastUpdate(now().minusSeconds(10).toEpochMilli()).build();
         SProcessInstance recentProcess2 = SProcessInstance.builder().name("recentProcess2")
-                .stateId(INITIALIZING.getId()).tenantId(DEFAULT_TENANT_ID).lastUpdate(now).build();
+                .stateId(INITIALIZING.getId()).lastUpdate(now).build();
 
         repository.add(oldProcess1, oldProcess2, recentProcess1, recentProcess2);
         List<Long> processInstanceIdsToRestart = repository

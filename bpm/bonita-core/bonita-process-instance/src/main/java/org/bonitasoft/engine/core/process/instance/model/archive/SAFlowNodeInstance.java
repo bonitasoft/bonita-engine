@@ -28,14 +28,12 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "arch_flownode_instance")
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @DiscriminatorColumn(name = "kind")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class SAFlowNodeInstance implements ArchivedPersistentObject {

@@ -28,7 +28,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 
 @Data
@@ -37,7 +36,6 @@ import org.hibernate.annotations.Type;
 @Builder
 @Entity
 @IdClass(PersistentObjectId.class)
-@Filter(name = "tenantFilter")
 @Table(name = "job_param")
 @Cacheable(false)
 public class SJobParameter implements PersistentObject {
