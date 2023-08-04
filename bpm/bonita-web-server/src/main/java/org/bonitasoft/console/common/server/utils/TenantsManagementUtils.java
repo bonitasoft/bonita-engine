@@ -30,6 +30,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  */
 public class TenantsManagementUtils {
 
+    public static long defaultTenantId = -1;
+
     /**
      * Check for user's profile
      */
@@ -53,15 +55,17 @@ public class TenantsManagementUtils {
      *         If default tenant id couldn't be retrieved
      */
     public static long getDefaultTenantId() {
-        try {
-            final APISession session = TenantAPIAccessor.getLoginAPI().login(getTechnicalUserUsername(),
-                    getTechnicalUserPassword());
-            final long tenantId = session.getTenantId();
-            TenantAPIAccessor.getLoginAPI().logout(session);
-            return tenantId;
-        } catch (final Exception e) {
-            throw new DefaultTenantIdException(e);
+        if (defaultTenantId == -1) { // Lazy init
+            try {
+                final APISession session = TenantAPIAccessor.getLoginAPI().login(getTechnicalUserUsername(),
+                        getTechnicalUserPassword());
+                defaultTenantId = session.getTenantId();
+                TenantAPIAccessor.getLoginAPI().logout(session);
+            } catch (final Exception e) {
+                throw new DefaultTenantIdException(e);
+            }
         }
+        return defaultTenantId;
     }
 
     public static String getTechnicalUserUsername() {

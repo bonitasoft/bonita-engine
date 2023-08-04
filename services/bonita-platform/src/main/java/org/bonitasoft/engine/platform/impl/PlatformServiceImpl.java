@@ -50,6 +50,8 @@ public class PlatformServiceImpl implements PlatformService {
     private final Recorder recorder;
     private final PlatformRetriever platformRetriever;
 
+    private static Long defaultTenantId = null;
+
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever,
             final Recorder recorder, CacheService cacheService,
             final SPlatformProperties sPlatformProperties) {
@@ -58,7 +60,6 @@ public class PlatformServiceImpl implements PlatformService {
         this.sPlatformProperties = sPlatformProperties;
         this.recorder = recorder;
         this.platformRetriever = platformRetriever;
-
     }
 
     @Override
@@ -103,6 +104,7 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
+    @Deprecated
     public STenant getTenant(final long id) throws STenantNotFoundException {
         STenant tenant;
         try {
@@ -116,6 +118,7 @@ public class PlatformServiceImpl implements PlatformService {
         return tenant;
     }
 
+    // FIXME: Not necessary anymore, as platform is always created by ScriptExecutor at startup
     @Override
     public boolean isPlatformCreated() {
         try {
@@ -142,6 +145,19 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
+    public long getDefaultTenantId() throws STenantNotFoundException {
+        if (defaultTenantId == null) {
+            try {
+                defaultTenantId = platformPersistenceService
+                        .selectOne(new SelectOneDescriptor<>("getDefaultTenantId", null, STenant.class));
+            } catch (final SBonitaReadException e) {
+                throw new STenantNotFoundException("Unable to retrieve default tenant id: " + e.getMessage(), e);
+            }
+        }
+        return defaultTenantId;
+    }
+
+    @Override
     public boolean isDefaultTenantCreated() throws SBonitaReadException {
         return platformPersistenceService
                 .selectOne(new SelectOneDescriptor<STenant>(QUERY_GET_DEFAULT_TENANT, null, STenant.class)) != null;
@@ -159,7 +175,7 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public void activateTenant(final long tenantId) throws STenantNotFoundException, STenantActivationException {
-        final STenant tenant = getTenant(tenantId);
+        final STenant tenant = getDefaultTenant();
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
         desc.addField(STenant.STATUS, STenant.ACTIVATED);
         try {
@@ -171,7 +187,7 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public void deactivateTenant(final long tenantId) throws STenantNotFoundException, STenantDeactivationException {
-        final STenant tenant = getTenant(tenantId);
+        final STenant tenant = getDefaultTenant();
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
         desc.addField(STenant.STATUS, STenant.DEACTIVATED);
         try {
@@ -183,7 +199,7 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public void pauseTenant(long tenantId) throws STenantUpdateException, STenantNotFoundException {
-        final STenant tenant = getTenant(tenantId);
+        final STenant tenant = getDefaultTenant();
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
         desc.addField(STenant.STATUS, STenant.PAUSED);
         try {

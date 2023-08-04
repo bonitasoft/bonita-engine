@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
@@ -30,7 +29,6 @@ import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.UnknownUserException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -56,7 +54,7 @@ public class LoginAPIImpl implements LoginAPI {
     @AvailableWhenTenantIsPaused
     public APISession login(final String userName, final String password) throws LoginException {
         try {
-            return loginInternal(userName, password, null);
+            return loginInternal(userName, password);
         } catch (final LoginException e) {
             throw e;
         } catch (final Exception e) {
@@ -69,7 +67,7 @@ public class LoginAPIImpl implements LoginAPI {
     protected APISession login(final String userName, final String password, final Long tenantId)
             throws LoginException {
         try {
-            return loginInternal(userName, password, tenantId);
+            return loginInternal(userName, password);
         } catch (final LoginException e) {
             throw e;
         } catch (final Exception e) {
@@ -80,15 +78,10 @@ public class LoginAPIImpl implements LoginAPI {
     @Override
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    public APISession login(final Map<String, Serializable> credentials) throws LoginException, UnknownUserException {
+    public APISession login(final Map<String, Serializable> credentials) throws LoginException {
         checkCredentialsAreNotNullOrEmpty(credentials);
         try {
-            final Long tenantId = NumberUtils
-                    .isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))
-                            ? NumberUtils.toLong(String
-                                    .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))
-                            : null;
-            return loginInternal(tenantId, credentials);
+            return loginInternal(credentials);
         } catch (final LoginException e) {
             throw e;
         } catch (final Exception e) {
@@ -96,23 +89,21 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected APISession loginInternal(final String userName, final String password, final Long tenantId)
+    protected APISession loginInternal(final String userName, final String password)
             throws Exception {
         checkUsernameAndPassword(userName, password);
         final Map<String, Serializable> credentials = new HashMap<>();
         credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        return loginInternal(tenantId, credentials);
+        return loginInternal(credentials);
     }
 
-    protected APISession loginInternal(final Long tenantId, final Map<String, Serializable> credentials)
+    protected APISession loginInternal(final Map<String, Serializable> credentials)
             throws Exception {
         final String userName = credentials.get(AuthenticationConstants.BASIC_USERNAME) != null
-                ? String.valueOf(credentials
-                        .get(AuthenticationConstants.BASIC_USERNAME))
-                : null;
+                ? String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME)) : null;
         final ServiceAccessor serviceAccessor = ServiceAccessorFactory.getInstance().createServiceAccessor();
-        final STenant sTenant = getTenant(tenantId, serviceAccessor);
+        final STenant sTenant = getTenant(serviceAccessor);
 
         checkThatWeCanLogin(userName, sTenant, serviceAccessor.getTechnicalUser());
         final LoginService loginService = serviceAccessor.getLoginService();
@@ -133,16 +124,11 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected STenant getTenant(final Long tenantId, final ServiceAccessor serviceAccessor)
+    private STenant getTenant(final ServiceAccessor serviceAccessor)
             throws SBonitaException {
         final PlatformService platformService = serviceAccessor.getPlatformService();
-        final TransactionService transactionService = serviceAccessor.getTransactionService();
         try {
-            if (tenantId == null) {
-                return transactionService.executeInTransaction(platformService::getDefaultTenant);
-            } else {
-                return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
-            }
+            return serviceAccessor.getTransactionService().executeInTransaction(platformService::getDefaultTenant);
         } catch (SBonitaException | RuntimeException e) {
             throw e;
         } catch (Exception e) {

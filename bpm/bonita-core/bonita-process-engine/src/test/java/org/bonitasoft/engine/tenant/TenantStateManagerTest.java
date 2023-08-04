@@ -15,7 +15,8 @@ package org.bonitasoft.engine.tenant;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Map;
@@ -74,7 +75,7 @@ public class TenantStateManagerTest {
                 platformService, nodeConfiguration, sessionService,
                 TENANT_ID, schedulerService, broadcastService, tenantServicesManager);
         tenant = new STenant();
-        when(platformService.getTenant(TENANT_ID)).thenReturn(tenant);
+        when(platformService.getDefaultTenant()).thenReturn(tenant);
     }
 
     private static Map<String, TaskResult<String>> okFuture() {
@@ -137,7 +138,7 @@ public class TenantStateManagerTest {
 
     @Test(expected = STenantNotFoundException.class)
     public void pause_should_throw_STenantNotFoundException_on_a_non_existing_tenant() throws Exception {
-        doThrow(STenantNotFoundException.class).when(platformService).getTenant(TENANT_ID);
+        doThrow(STenantNotFoundException.class).when(platformService).getDefaultTenant();
 
         tenantStateManager.pause();
     }
@@ -224,7 +225,7 @@ public class TenantStateManagerTest {
     private void whenTenantIsInState(final String status) throws STenantNotFoundException {
         STenant sTenant = new STenant("myTenant", "john", 123456789, status, false);
         sTenant.setId(TENANT_ID);
-        when(platformService.getTenant(TENANT_ID)).thenReturn(sTenant);
+        when(platformService.getDefaultTenant()).thenReturn(sTenant);
     }
 
     @Test

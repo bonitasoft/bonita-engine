@@ -66,7 +66,9 @@ public interface PlatformService {
      * @throws STenantNotFoundException
      *         occurs when the identifier does not refer to an existing sTenant
      * @since 6.0
+     * @deprecated There is only one tenant. Use {@link #getDefaultTenant()} instead.
      */
+    @Deprecated
     STenant getTenant(long id) throws STenantNotFoundException;
 
     /**
@@ -78,6 +80,15 @@ public interface PlatformService {
      * @since 6.0
      */
     STenant getDefaultTenant() throws STenantNotFoundException;
+
+    /**
+     * Get the default tenant id
+     * !! Internal use only !! Tenant notion should be removed soon.
+     *
+     * @return the default tenant id
+     * @throws STenantNotFoundException if cannot retrieve tenant from database
+     */
+    long getDefaultTenantId() throws STenantNotFoundException;
 
     /**
      * Is the default tenant already created?

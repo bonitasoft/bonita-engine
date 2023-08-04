@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlatformManager {
 
-    private static Logger logger = LoggerFactory.getLogger(PlatformManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(PlatformManager.class);
     private final BonitaTaskExecutor bonitaTaskExecutor;
     private final NodeConfiguration nodeConfiguration;
     private final UserTransactionService transactionService;
@@ -132,8 +132,8 @@ public class PlatformManager {
         }
     }
 
-    public void activateTenant(long tenantId) throws Exception {
-        STenant tenant = getTenantInTransaction(tenantId);
+    public void activateTenant() throws Exception {
+        STenant tenant = getTenantInTransaction();
         if (!STenant.DEACTIVATED.equals(tenant.getStatus())) {
             throw new STenantActivationException(
                     "Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
@@ -141,16 +141,16 @@ public class PlatformManager {
         getDefaultTenantStateManager().activate();
     }
 
-    public void deactivateTenant(long tenantId) throws Exception {
-        final STenant tenant = getTenantInTransaction(tenantId);
+    public void deactivateTenant() throws Exception {
+        final STenant tenant = getTenantInTransaction();
         if (STenant.DEACTIVATED.equals(tenant.getStatus())) {
             throw new STenantDeactivationException("Tenant deactivation failed. Tenant is already deactivated");
         }
         getDefaultTenantStateManager().deactivate();
     }
 
-    private STenant getTenantInTransaction(long tenantId) throws Exception {
-        return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
+    private STenant getTenantInTransaction() throws Exception {
+        return transactionService.executeInTransaction(() -> platformService.getDefaultTenant());
     }
 
 }

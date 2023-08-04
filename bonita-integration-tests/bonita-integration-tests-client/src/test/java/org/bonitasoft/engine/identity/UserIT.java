@@ -26,14 +26,10 @@ import java.util.stream.Collectors;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.identity.impl.IconImpl;
+import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -1100,13 +1096,7 @@ public class UserIT extends TestWithTechnicalUser {
     }
 
     private String completeWithZeros(final String prefix) {
-
-        final StringBuilder stb = new StringBuilder(prefix);
-        for (int i = 0; i < 255 - prefix.length(); i++) {
-            stb.append("0");
-        }
-
-        return stb.toString();
+        return prefix + "0".repeat(Math.max(0, 255 - prefix.length()));
     }
 
     @Test
@@ -1232,6 +1222,13 @@ public class UserIT extends TestWithTechnicalUser {
         assertThat(updateUser.getIconId()).isNull();
         //cleanup
         getIdentityAPI().deleteUser("userWithIcon");
+    }
+
+    @Test(expected = LoginException.class)
+    public void loginFailsUsingWrongUser() throws BonitaException {
+        final String userName = "hannu";
+        final String password = "install";
+        TenantAPIAccessor.getLoginAPI().login(userName, password);
     }
 
 }

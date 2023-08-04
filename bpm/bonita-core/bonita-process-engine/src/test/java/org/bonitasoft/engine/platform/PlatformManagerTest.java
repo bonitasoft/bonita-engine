@@ -165,50 +165,50 @@ public class PlatformManagerTest {
 
     @Test
     public void should_activate_tenant_using_tenantManager() throws Exception {
-        doReturn(deactivated(tenant)).when(platformService).getTenant(TENANT_ID);
+        doReturn(deactivated(tenant)).when(platformService).getDefaultTenant();
 
-        platformManager.activateTenant(TENANT_ID);
+        platformManager.activateTenant();
 
         verify(tenantManager).activate();
     }
 
     @Test
     public void should_throw_exception_when_activating_already_activated_Tenant() throws Exception {
-        doReturn(activated(new STenant())).when(platformService).getTenant(TENANT_ID);
+        doReturn(activated(new STenant())).when(platformService).getDefaultTenant();
 
-        assertThatThrownBy(() -> platformManager.activateTenant(TENANT_ID))
+        assertThatThrownBy(() -> platformManager.activateTenant())
                 .isInstanceOf(STenantActivationException.class);
     }
 
     @Test
     public void should_throw_exception_when_deactivating_already_deactivated_Tenant() throws Exception {
-        doReturn(deactivated(new STenant())).when(platformService).getTenant(TENANT_ID);
+        doReturn(deactivated(new STenant())).when(platformService).getDefaultTenant();
 
-        assertThatThrownBy(() -> platformManager.deactivateTenant(TENANT_ID))
+        assertThatThrownBy(() -> platformManager.deactivateTenant())
                 .isInstanceOf(STenantDeactivationException.class);
     }
 
     @Test
     public void should_throw_not_found_when_deactivating_non_existing_tenant() throws Exception {
-        doThrow(STenantNotFoundException.class).when(platformService).getTenant(TENANT_ID);
+        doThrow(STenantNotFoundException.class).when(platformService).getDefaultTenant();
 
-        assertThatThrownBy(() -> platformManager.deactivateTenant(TENANT_ID))
+        assertThatThrownBy(() -> platformManager.deactivateTenant())
                 .isInstanceOf(STenantNotFoundException.class);
     }
 
     @Test
     public void should_throw_not_found_when_activating_non_existing_tenant() throws Exception {
-        doThrow(STenantNotFoundException.class).when(platformService).getTenant(TENANT_ID);
+        doThrow(STenantNotFoundException.class).when(platformService).getDefaultTenant();
 
-        assertThatThrownBy(() -> platformManager.activateTenant(TENANT_ID))
+        assertThatThrownBy(() -> platformManager.activateTenant())
                 .isInstanceOf(STenantNotFoundException.class);
     }
 
     @Test
     public void should_deactivate_tenant_using_tenantManager() throws Exception {
-        doReturn(activated(tenant)).when(platformService).getTenant(TENANT_ID);
+        doReturn(activated(tenant)).when(platformService).getDefaultTenant();
 
-        platformManager.deactivateTenant(TENANT_ID);
+        platformManager.deactivateTenant();
 
         verify(tenantManager).deactivate();
     }
@@ -241,16 +241,6 @@ public class PlatformManagerTest {
     private STenant activated(STenant tenant) {
         tenant.setStatus(STenant.ACTIVATED);
         return tenant;
-    }
-
-    @Test
-    public void should_not_warn_when_using_java_11() throws Exception {
-        System.setProperty("java.specification.version", "11");
-
-        platformManager.start();
-
-        assertThat(systemOutRule.getLog())
-                .doesNotContainPattern("WARN.*You are running the platform using java version 8");
     }
 
 }

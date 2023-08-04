@@ -17,11 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.TestWithUser;
@@ -30,20 +26,8 @@ import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ArchivedReceiveTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
-import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ActivationState;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.flownode.*;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ReceiveTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
@@ -53,11 +37,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.operation.LeftOperand;
-import org.bonitasoft.engine.operation.LeftOperandBuilder;
-import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.operation.*;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
@@ -88,7 +68,7 @@ public class ReceiveTasksIT extends TestWithUser {
                 .startProcess(receiveMessageProcess.getId());
         waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
-        // we check after that that the waiting event is still here
+        // we check after that the waiting event is still here
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,

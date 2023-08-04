@@ -24,7 +24,6 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.console.common.server.utils.PlatformManagementUtils;
-import org.bonitasoft.console.common.server.utils.TenantsManagementUtils;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,7 +170,7 @@ public class ConfigurationFilesManager {
     }
 
     Map<String, Properties> getResources() throws IOException {
-        return getPlatformManagementUtils().getTenantConfigurations().get(TenantsManagementUtils.getDefaultTenantId());
+        return getPlatformManagementUtils().getTenantConfigurations();
     }
 
     public void setProperty(String propertiesFilename, String propertyName, String propertyValue) throws IOException {

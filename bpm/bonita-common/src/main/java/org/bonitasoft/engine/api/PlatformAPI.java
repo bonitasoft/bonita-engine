@@ -18,11 +18,7 @@ import java.util.Map;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.platform.Platform;
-import org.bonitasoft.engine.platform.PlatformNotFoundException;
-import org.bonitasoft.engine.platform.PlatformState;
-import org.bonitasoft.engine.platform.StartNodeException;
-import org.bonitasoft.engine.platform.StopNodeException;
+import org.bonitasoft.engine.platform.*;
 
 /**
  * <b>Manage the platform.</b>
@@ -178,15 +174,14 @@ public interface PlatformAPI {
 
     /**
      * INTERNAL USE ONLY
-     * get client configuration files of the tenants. Since 7.16, as there is only 1 tenant, the map only contains
-     * 1 element.
+     * Get client configuration files at tenant level.
+     * Since 7.16, as there is only 1 tenant, the tenantId is not relevant anymore.
      *
-     * @return the client tenants configuration files as a map containing for each tenant id a map with file name and
-     *         file content
+     * @return the client tenants configuration files as a map with file name and file content
      * @since 7.3
      */
     @Internal
-    Map<Long, Map<String, byte[]>> getClientTenantConfigurations();
+    Map<String, byte[]> getClientTenantConfigurations();
 
     /**
      * INTERNAL USE ONLY

@@ -18,18 +18,9 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.*;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourcesService;
@@ -72,7 +63,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     public boolean isPaused() {
         final long tenantId = getTenantId();
         try {
-            return getServiceAccessorNoException().getPlatformService().getTenant(tenantId).isPaused();
+            return getServiceAccessorNoException().getPlatformService().getDefaultTenant().isPaused();
         } catch (final SBonitaException e) {
             throw new RetrieveException("Unable to retrieve the tenant with id " + tenantId, e);
         }

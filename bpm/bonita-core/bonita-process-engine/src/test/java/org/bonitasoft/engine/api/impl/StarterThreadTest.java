@@ -63,7 +63,7 @@ public class StarterThreadTest {
                 .executeInTransaction(any());
         starterThread = new StarterThread(1L, sessionAccessor, transactionService,
                 platformService, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
-        doReturn(tenant).when(platformService).getTenant(1L);
+        doReturn(tenant).when(platformService).getDefaultTenant();
     }
 
     private STenant createTenant() {

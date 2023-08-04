@@ -8,20 +8,16 @@
     FROM org.bonitasoft.engine.platform.model.SPlatform AS platform
   </query>
 
-
   <query name="getDefaultTenant">
     SELECT tenant
     FROM org.bonitasoft.engine.platform.model.STenant AS tenant
     WHERE tenant.defaultTenant = true
   </query>
 
-  <query name="searchSTenant">
-		SELECT tenant
-		FROM org.bonitasoft.engine.platform.model.STenant AS tenant
-  </query>
-	
-  <query name="getNumberOfSTenant">
-    SELECT COUNT(tenant.id)
+  <query name="getDefaultTenantId">
+    SELECT tenant.id
     FROM org.bonitasoft.engine.platform.model.STenant AS tenant
+    WHERE tenant.defaultTenant = true
   </query>
+
 </hibernate-mapping>

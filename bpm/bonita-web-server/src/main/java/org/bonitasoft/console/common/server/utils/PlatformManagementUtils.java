@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.bonitasoft.console.common.server.preferences.properties.ConfigurationFilesManager;
 import org.bonitasoft.engine.api.ApiAccessType;
@@ -90,7 +89,7 @@ public class PlatformManagementUtils {
             throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException,
             InstantiationException {
         final Class<?> api = Class.forName("org.bonitasoft.engine.LocalLoginMechanism");
-        return (PlatformSession) api.getDeclaredMethod("login").invoke(api.newInstance());
+        return (PlatformSession) api.getDeclaredMethod("login").invoke(api.getDeclaredConstructor().newInstance());
     }
 
     void platformLogout(final PlatformSession platformSession) throws BonitaException {
@@ -99,10 +98,7 @@ public class PlatformManagementUtils {
     }
 
     private void retrieveTenantsConfiguration(final PlatformAPI platformAPI) throws IOException {
-        final Map<Long, Map<String, byte[]>> clientTenantConfigurations = platformAPI.getClientTenantConfigurations();
-        for (final Entry<Long, Map<String, byte[]>> tenantConfiguration : clientTenantConfigurations.entrySet()) {
-            configurationFilesManager.setTenantConfigurationFiles(tenantConfiguration.getValue());
-        }
+        configurationFilesManager.setTenantConfigurationFiles(platformAPI.getClientTenantConfigurations());
     }
 
     private void retrievePlatformConfiguration(final PlatformAPI platformAPI) throws IOException {
@@ -134,19 +130,16 @@ public class PlatformManagementUtils {
      * String => configuration file name
      * Properties => content of the configuration file
      */
-    public Map<Long, Map<String, Properties>> getTenantConfigurations() throws IOException {
+    public Map<String, Properties> getTenantConfigurations() throws IOException {
         try {
             final PlatformSession platformSession = platformLogin();
             try {
-                Map<Long, Map<String, byte[]>> clientTenantConfigurations = getPlatformAPI(platformSession)
+                Map<String, byte[]> clientTenantConfigurations = getPlatformAPI(platformSession)
                         .getClientTenantConfigurations();
-                Map<Long, Map<String, Properties>> clientTenantConfigurationProperties = new HashMap<>();
-                for (Entry<Long, Map<String, byte[]>> entry : clientTenantConfigurations.entrySet()) {
-                    final Map<String, byte[]> map = entry.getValue();
+                Map<String, Properties> clientTenantConfigurationProperties = new HashMap<>();
+                for (Entry<String, byte[]> entry : clientTenantConfigurations.entrySet()) {
                     clientTenantConfigurationProperties.put(entry.getKey(),
-                            map.entrySet().stream().collect(Collectors.toMap(
-                                    Entry::getKey,
-                                    v -> ConfigurationFilesManager.getProperties(v.getValue()))));
+                            ConfigurationFilesManager.getProperties(entry.getValue()));
                 }
                 return clientTenantConfigurationProperties;
             } finally {
