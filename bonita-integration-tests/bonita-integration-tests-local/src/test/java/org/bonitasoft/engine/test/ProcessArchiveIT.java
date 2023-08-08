@@ -13,14 +13,13 @@
  **/
 package org.bonitasoft.engine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
@@ -39,6 +38,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
@@ -94,7 +94,9 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         getProcessAPI().addProcessComment(p1.getId(), "A cool comment on p1");
         getProcessAPI().addProcessComment(p2.getId(), "A cool comment on p2");
         getProcessAPI().addProcessComment(p3.getId(), "A cool comment on p3");
-        final List<Comment> comments = getProcessAPI().getComments(p1.getId());
+        final List<Comment> comments = getProcessAPI().searchComments(
+                new SearchOptionsBuilder(0, 10).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, p1.getId()).done())
+                .getResult();
         assertEquals(1, comments.size());
         assertEquals("A cool comment on p1", comments.get(0).getContent());
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved

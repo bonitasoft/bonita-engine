@@ -19,23 +19,12 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.BonitaEngine;
-import org.bonitasoft.engine.api.ApiAccessType;
-import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.*;
 import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -67,7 +56,6 @@ public class EngineStarter {
     private static boolean hasFailed = false;
 
     private boolean dropOnStart = true;
-    private boolean dropOnStop = true;
     private BonitaEngine engine;
 
     protected EngineStarter(BonitaEngine engine) {
@@ -339,11 +327,6 @@ public class EngineStarter {
 
     public boolean isDropOnStart() {
         return dropOnStart;
-    }
-
-    @Deprecated(forRemoval = true, since = "7.15.0")
-    public void setDropOnStop(boolean dropOnStop) {
-        this.dropOnStop = dropOnStop;
     }
 
     public void setBonitaDatabaseConfiguration(BonitaDatabaseConfiguration database) {

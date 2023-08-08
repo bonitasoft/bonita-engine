@@ -71,30 +71,8 @@ public interface OrganizationAPI {
     void importOrganization(String organizationContent) throws OrganizationImportException;
 
     /**
-     * Imports the organization.
-     * <p>
-     * An organization is composed by users, roles, groups and user memberships.
-     * </p>
-     *
-     * @param organizationContent
-     *        the XML content of the organization
-     * @param policy
-     *        the import policy
-     * @throws OrganizationImportException
-     *         If an exception occurs during the organization import
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid (expired, unknown, ...)
-     * @since 6.0.0
-     * @deprecated since 7.5.2, use {@link OrganizationAPI#importOrganizationWithWarnings(String, ImportPolicy)}
-     *             instead.
-     */
-    @Deprecated
-    void importOrganization(String organizationContent, ImportPolicy policy) throws OrganizationImportException;
-
-    /**
      * Imports the organization. Returns the error/info messages about what occurred during the process.
-     * Functionally the same thing that {@link OrganizationAPI#importOrganization(String, ImportPolicy)} but allows
-     * to inform the end-user of particular non-critical events that occurred during the import.
+     * Functionally this method informs the end-user of particular non-critical events that occurred during the import.
      * <p>
      * Ex: If a group in the organization contains an illegal character in their name, the method will import all the
      * other
@@ -114,7 +92,6 @@ public interface OrganizationAPI {
      *         If an exception occurs during the organization import
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @since 7.5.2 Replaces {@link OrganizationAPI#importOrganization(String, ImportPolicy)}
      */
     List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy)
             throws OrganizationImportException;

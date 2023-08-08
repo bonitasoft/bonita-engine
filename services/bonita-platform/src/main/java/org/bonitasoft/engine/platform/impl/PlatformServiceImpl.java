@@ -158,12 +158,6 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public boolean isDefaultTenantCreated() throws SBonitaReadException {
-        return platformPersistenceService
-                .selectOne(new SelectOneDescriptor<STenant>(QUERY_GET_DEFAULT_TENANT, null, STenant.class)) != null;
-    }
-
-    @Override
     public void updateTenant(final STenant tenant, final EntityUpdateDescriptor descriptor)
             throws STenantUpdateException {
         try {

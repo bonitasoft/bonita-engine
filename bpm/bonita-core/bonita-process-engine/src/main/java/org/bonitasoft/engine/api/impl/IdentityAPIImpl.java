@@ -14,12 +14,8 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -27,97 +23,21 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.impl.organization.OrganizationAPIDelegate;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
-import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMembership;
-import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMemberships;
-import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroup;
-import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroups;
-import org.bonitasoft.engine.api.impl.transaction.identity.DeleteRole;
-import org.bonitasoft.engine.api.impl.transaction.identity.DeleteRoles;
-import org.bonitasoft.engine.api.impl.transaction.identity.DeleteUser;
-import org.bonitasoft.engine.api.impl.transaction.identity.DeleteUsers;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetGroups;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetNumberOfInstance;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetNumberOfUserMemberships;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetNumberOfUsersInType;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetRoles;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetSContactInfo;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetUserMembership;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetUserMembershipsOfGroup;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetUserMembershipsOfRole;
-import org.bonitasoft.engine.api.impl.transaction.identity.UpdateGroup;
-import org.bonitasoft.engine.api.impl.transaction.identity.UpdateMembershipByRoleIdAndGroupId;
+import org.bonitasoft.engine.api.impl.transaction.identity.*;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.InvalidGroupNameException;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.identity.ContactData;
-import org.bonitasoft.engine.identity.ContactDataUpdater;
+import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.identity.*;
 import org.bonitasoft.engine.identity.ContactDataUpdater.ContactDataField;
-import org.bonitasoft.engine.identity.CustomUserInfo;
-import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
-import org.bonitasoft.engine.identity.CustomUserInfoValue;
-import org.bonitasoft.engine.identity.ExportOrganization;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupCreator;
-import org.bonitasoft.engine.identity.GroupCriterion;
-import org.bonitasoft.engine.identity.GroupNotFoundException;
-import org.bonitasoft.engine.identity.GroupUpdater;
 import org.bonitasoft.engine.identity.GroupUpdater.GroupField;
-import org.bonitasoft.engine.identity.Icon;
-import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.ImportPolicy;
-import org.bonitasoft.engine.identity.MembershipNotFoundException;
-import org.bonitasoft.engine.identity.OrganizationExportException;
-import org.bonitasoft.engine.identity.OrganizationImportException;
-import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.RoleCreator;
-import org.bonitasoft.engine.identity.RoleCriterion;
-import org.bonitasoft.engine.identity.RoleNotFoundException;
-import org.bonitasoft.engine.identity.RoleUpdater;
 import org.bonitasoft.engine.identity.RoleUpdater.RoleField;
-import org.bonitasoft.engine.identity.SGroupCreationException;
-import org.bonitasoft.engine.identity.SGroupNotFoundException;
-import org.bonitasoft.engine.identity.SIcon;
-import org.bonitasoft.engine.identity.SIdentityException;
-import org.bonitasoft.engine.identity.SRoleNotFoundException;
-import org.bonitasoft.engine.identity.SUserNotFoundException;
-import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserCreator;
-import org.bonitasoft.engine.identity.UserCriterion;
-import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.UserMembershipCriterion;
-import org.bonitasoft.engine.identity.UserNotFoundException;
-import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.identity.UserUpdater.UserField;
-import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.identity.impl.UserWithContactDataImpl;
-import org.bonitasoft.engine.identity.model.SContactInfo;
-import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilder;
-import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilder;
-import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
+import org.bonitasoft.engine.identity.model.*;
+import org.bonitasoft.engine.identity.model.builder.*;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -1528,13 +1448,7 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public void importOrganization(final String organizationContent) throws OrganizationImportException {
-        importOrganization(organizationContent, ImportPolicy.MERGE_DUPLICATES);
-    }
-
-    @Override
-    public void importOrganization(final String organizationContent, final ImportPolicy policy)
-            throws OrganizationImportException {
-        importOrganizationWithWarnings(organizationContent, policy);
+        importOrganizationWithWarnings(organizationContent, ImportPolicy.MERGE_DUPLICATES);
     }
 
     @Override

@@ -29,13 +29,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -70,33 +65,14 @@ import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
-import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
-import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.process.impl.*;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UnavailableLockException;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.ExpressionConstants;
-import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.expression.ExpressionType;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.expression.*;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -172,7 +148,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         assertThatThrownBy(
-                () -> getTenantAdministrationAPI().installBusinessDataModel(getZip(buildBOMWithInvalidQuery())))
+                () -> getTenantAdministrationAPI().updateBusinessDataModel(getZip(buildBOMWithInvalidQuery())))
                         .isInstanceOf(BusinessDataRepositoryDeploymentException.class);
     }
 
@@ -197,14 +173,14 @@ public class BDRepositoryIT extends CommonAPIIT {
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         // the exception should be InvalidBusinessDataModelException
-        assertThatThrownBy(() -> getTenantAdministrationAPI().installBusinessDataModel(getZip(bom)))
+        assertThatThrownBy(() -> getTenantAdministrationAPI().updateBusinessDataModel(getZip(bom)))
                 .isInstanceOf(BusinessDataRepositoryDeploymentException.class)
                 .hasMessageContaining("Unable to create unique key constraint");
         assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNull();
 
         // remove unique constraint & try to re-install - should work
         countryBO.setUniqueConstraints(Collections.emptyList());
-        getTenantAdministrationAPI().installBusinessDataModel(getZip(bom));
+        getTenantAdministrationAPI().updateBusinessDataModel(getZip(bom));
         assertThat(getTenantAdministrationAPI().getBusinessDataModelVersion()).isNotNull();
         getTenantAdministrationAPI().resume();
     }
@@ -322,7 +298,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         Future<String> installOfTheBDM = Executors.newSingleThreadExecutor().submit(() -> {
             try {
-                return getTenantAdministrationAPI().installBusinessDataModel(getZip(businessObjectModel(bom -> {
+                return getTenantAdministrationAPI().updateBusinessDataModel(getZip(businessObjectModel(bom -> {
                     bom.addBusinessObject(businessObject("com.company.ExampleBusinessObject", (businessObject) -> {
                         businessObject.addField(stringField("aField"));
                         businessObject.addQuery("findExampleByAField", "SELECT e FROM ExampleBusinessObject e",
@@ -345,7 +321,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final byte[] zip = getZip(bom);
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        final String businessDataModelVersion = getTenantAdministrationAPI().installBusinessDataModel(zip);
+        final String businessDataModelVersion = getTenantAdministrationAPI().updateBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
         assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
         verifyBdmIsWellDeployed();

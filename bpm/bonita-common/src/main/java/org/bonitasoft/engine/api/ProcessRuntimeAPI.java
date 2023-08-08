@@ -30,35 +30,8 @@ import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.EventCriterion;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.SendEventException;
-import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
-import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.process.Index;
-import org.bonitasoft.engine.bpm.process.ProcessActivationException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.*;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
@@ -2050,21 +2023,6 @@ public interface ProcessRuntimeAPI {
      */
     Comment addProcessCommentOnBehalfOfUser(final long processInstanceId, final String comment, long userId)
             throws CreationException;
-
-    /**
-     * Get the first 20 comments of the specified process instance.
-     *
-     * @param processInstanceId
-     *        The identifier of the process instance.
-     * @return The list of comments found
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid, e.g. the session has expired.
-     * @deprecated use paginated version {@link #searchComments(SearchOptions)} instead, passing a filter on
-     *             processInstanceId field.
-     * @since 6.0
-     */
-    @Deprecated
-    List<Comment> getComments(long processInstanceId);
 
     /**
      * Get all the comments managed by the specified user.

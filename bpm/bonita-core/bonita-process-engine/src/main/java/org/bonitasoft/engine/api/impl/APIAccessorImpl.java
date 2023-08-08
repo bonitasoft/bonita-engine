@@ -22,7 +22,6 @@ import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.ThemeAPI;
 
 /**
  * @author Matthieu Chaffotte
@@ -51,11 +50,6 @@ public class APIAccessorImpl implements APIAccessor {
     @Override
     public ProfileAPI getProfileAPI() {
         return new ProfileAPIImpl();
-    }
-
-    @Override
-    public ThemeAPI getThemeAPI() {
-        return new ThemeAPIImpl();
     }
 
     @Override

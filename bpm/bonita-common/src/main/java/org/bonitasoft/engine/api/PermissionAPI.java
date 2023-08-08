@@ -60,7 +60,7 @@ public interface PermissionAPI {
      * @throws NotFoundException if the script cannot be found under name <quote>className</quote> neither in the
      *         classpath, nor in the custom script folder.
      * @since 6.4.0
-     * @deprecated From version 7.14.0, use {@link #isAuthorized(APICallContext, boolean)} instead
+     * @deprecated From version 7.14.0, use {@link #isAuthorized(APICallContext)} instead
      */
     @Deprecated(forRemoval = true, since = "7.14.0")
     boolean checkAPICallWithScript(String className, APICallContext apiCallContext, boolean reload)

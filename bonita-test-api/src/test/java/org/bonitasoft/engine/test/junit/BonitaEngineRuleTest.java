@@ -30,7 +30,7 @@ public class BonitaEngineRuleTest {
     public BonitaEngineRule bonitaEngineRule = BonitaEngineRule.createWith(testEngineToInject);
 
     @Test
-    public void should_TestEngine_be_started() throws Exception {
+    public void should_TestEngine_be_started() {
         assertThat(testEngineToInject.isStarted).isTrue();
     }
 
@@ -39,39 +39,29 @@ public class BonitaEngineRuleTest {
         public boolean isStarted;
 
         @Override
-        public boolean start() throws Exception {
+        public boolean start() {
             isStarted = true;
             return false;
         }
 
         @Override
-        public void stop() throws Exception {
-
+        public void stop() {
         }
 
         @Override
-        public void clearData() throws Exception {
-
+        public void clearData() {
         }
 
         @Override
         public void setDropOnStart(boolean dropOnStart) {
-
-        }
-
-        @Override
-        public void setDropOnStop(boolean dropOnStop) {
-
         }
 
         @Override
         public void setBonitaDatabaseProperties(BonitaDatabaseConfiguration database) {
-
         }
 
         @Override
         public void setBusinessDataDatabaseProperties(BonitaDatabaseConfiguration database) {
-
         }
     }
 }

@@ -86,11 +86,6 @@ public class PlatformIT extends CommonAPIIT {
     }
 
     @Test
-    public void isPlatformInitialized() throws BonitaException {
-        assertTrue(platformAPI.isPlatformInitialized());
-    }
-
-    @Test
     public void getPlatformState() throws Exception {
         // test started state
         PlatformState state = platformAPI.getPlatformState();

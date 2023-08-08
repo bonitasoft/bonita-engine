@@ -95,12 +95,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    @CustomTransactions
-    @AvailableOnStoppedNode
-    public void cleanPlatform() throws DeletionException {
-    }
-
-    @Override
     @AvailableOnStoppedNode
     public Platform getPlatform() throws PlatformNotFoundException {
         ServiceAccessor platformAccessor;
@@ -118,21 +112,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final SPlatform sPlatform = transactionContent.getResult();
         return ModelConvertor.toPlatform(sPlatform, platformAccessor.getPlatformService().getSPlatformProperties());
-    }
-
-    @Override
-    @CustomTransactions
-    @AvailableOnStoppedNode
-    // FIXME: Not necessary anymore, as default tenant is always created by ScriptExecutor at startup
-    public boolean isPlatformInitialized() throws PlatformNotFoundException {
-        try {
-            final ServiceAccessor serviceAccessor = getServiceAccessor();
-            final PlatformService platformService = serviceAccessor.getPlatformService();
-            return serviceAccessor.getTransactionService()
-                    .executeInTransaction(platformService::isDefaultTenantCreated);
-        } catch (final Exception e) {
-            throw new PlatformNotFoundException("Cannot determine if the default tenant is created", e);
-        }
     }
 
     @Override

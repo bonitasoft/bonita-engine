@@ -212,7 +212,7 @@ public class BDMUpdateIT extends CommonAPIIT {
         final byte[] zip = convertBomToZip(businessObjectModel);
         pauseTenantIfNeeded();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        final String businessDataModelVersion = tenantAdministrationAPI.installBusinessDataModel(zip);
+        final String businessDataModelVersion = tenantAdministrationAPI.updateBusinessDataModel(zip);
         resumeTenant();
         assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
 

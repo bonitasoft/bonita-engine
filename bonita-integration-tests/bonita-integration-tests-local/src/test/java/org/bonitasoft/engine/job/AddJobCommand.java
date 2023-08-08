@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.job;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.command.RuntimeCommand;
@@ -24,7 +22,6 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -41,16 +38,6 @@ public class AddJobCommand extends RuntimeCommand {
                 .jobName("ThrowsExceptionJob")
                 .description("Throw an exception when 'throwException'=true")
                 .build();
-        Boolean throwException = Boolean.TRUE;
-        final Serializable exception = parameters.get("throwException");
-        if (exception != null) {
-            throwException = (Boolean) exception;
-        }
-        final SJobParameter parameter = SJobParameter.builder()
-                .key("throwException")
-                .value(throwException).build();
-        final List<SJobParameter> params = new ArrayList<SJobParameter>(2);
-        params.add(parameter);
         try {
             schedulerService.schedule(jobDescriptor, trigger);
             return null;

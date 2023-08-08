@@ -18,11 +18,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,15 +49,13 @@ public class HTTPServerAPIIT {
 
     private static Server server;
 
-    private final Map<String, Serializable> options = new HashMap<String, Serializable>();
+    private final Map<String, Serializable> options = new HashMap<>();
 
     private final String apiInterfaceName = "someInterface";
 
     private final String methodName = "someMethod";
 
-    final List<String> classNameParameters = new ArrayList<String>();
-
-    final Object[] parametersValues = null;
+    final List<String> classNameParameters = new ArrayList<>();
 
     @BeforeClass
     public static void startJetty() throws Exception {
@@ -83,7 +77,7 @@ public class HTTPServerAPIIT {
         constraint.setAuthenticate(true);
         constraint.setRoles(new String[] { "user", "admin" });
 
-        // Bind contraint
+        // Bind constraint
         ConstraintMapping mapping = new ConstraintMapping();
         mapping.setPathSpec("/*");
         mapping.setConstraint(constraint);
@@ -122,7 +116,7 @@ public class HTTPServerAPIIT {
         configuration.put("basicAuthentication.password", "doe");
 
         final HTTPServerAPI httpServerAPI = new HTTPServerAPI(configuration);
-        httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+        httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, null);
     }
 
     @Test
@@ -136,7 +130,7 @@ public class HTTPServerAPIIT {
 
         final HTTPServerAPI httpServerAPI = new HTTPServerAPI(configuration);
         Throwable thrown = catchThrowable(() -> httpServerAPI.invokeMethod(options, apiInterfaceName, methodName,
-                classNameParameters, parametersValues));
+                classNameParameters, null));
 
         assertThat(thrown).isInstanceOf(ServerWrappedException.class)
                 .hasMessageStartingWith("Error while executing POST request (http code: 401)");

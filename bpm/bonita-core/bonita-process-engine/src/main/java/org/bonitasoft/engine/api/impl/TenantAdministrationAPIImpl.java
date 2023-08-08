@@ -134,11 +134,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
-    @Override
-    @Deprecated
-    @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
-    @WithLock(key = UPDATE_BDM)
-    public String installBusinessDataModel(final byte[] zip)
+    private String installBusinessDataModel(final byte[] zip)
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         log.info("Starting the installation of the BDM.");
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();

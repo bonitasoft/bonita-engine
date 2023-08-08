@@ -42,13 +42,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.BonitaContextException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.TenantStatusException;
-import org.bonitasoft.engine.exception.UnavailableLockException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
@@ -62,11 +56,7 @@ import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.session.InvalidSessionException;
-import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.session.Session;
-import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.*;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.slf4j.Logger;
@@ -548,14 +538,9 @@ public class ServerAPIImpl implements ServerAPI {
         // get the platform to put it in cache if needed
         if (!platformService.isPlatformCreated()) {
             try {
-                serviceAccessor.getTransactionService().executeInTransaction(new Callable<Void>() {
-
-                    @Override
-                    public Void call() throws Exception {
-                        platformService.getPlatform();
-                        return null;
-                    }
-
+                serviceAccessor.getTransactionService().executeInTransaction((Callable<Void>) () -> {
+                    platformService.getPlatform();
+                    return null;
                 });
             } catch (final Exception ignored) {
                 // do not throw exceptions: it's just in case the platform was not in cache

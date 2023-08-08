@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.test.http.BonitaHttpServer;
@@ -22,13 +23,17 @@ import org.bonitasoft.engine.test.internal.EngineStarter;
 /**
  * @author Baptiste Mesta
  */
+@Getter
 @Slf4j
 public class TestEngineImpl implements TestEngine {
 
     private static TestEngineImpl INSTANCE = createTestEngine();
+
     private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
+
     private BonitaDatabaseConfiguration businessDataDatabaseConfiguration;
-    private TestDatabaseConfigurator testDatabaseConfigurator = new TestDatabaseConfigurator();
+
+    private final TestDatabaseConfigurator testDatabaseConfigurator = new TestDatabaseConfigurator();
     BonitaHttpServer httpServer = new BonitaHttpServer();
 
     private static TestEngineImpl createTestEngine() {
@@ -53,10 +58,6 @@ public class TestEngineImpl implements TestEngine {
             throw new IllegalStateException("trying to replace an already started instance");
         }
         INSTANCE = newTestEngine;
-    }
-
-    protected EngineStarter getEngineStarter() {
-        return engineStarter;
     }
 
     /**
@@ -119,11 +120,6 @@ public class TestEngineImpl implements TestEngine {
     }
 
     @Override
-    public void setDropOnStop(boolean dropOnStop) {
-        engineStarter.setDropOnStop(dropOnStop);
-    }
-
-    @Override
     public void setBonitaDatabaseProperties(BonitaDatabaseConfiguration configuration) {
         bonitaDatabaseConfiguration = configuration;
     }
@@ -133,11 +129,4 @@ public class TestEngineImpl implements TestEngine {
         this.businessDataDatabaseConfiguration = database;
     }
 
-    public BonitaDatabaseConfiguration getBonitaDatabaseConfiguration() {
-        return bonitaDatabaseConfiguration;
-    }
-
-    public BonitaDatabaseConfiguration getBusinessDataDatabaseConfiguration() {
-        return businessDataDatabaseConfiguration;
-    }
 }

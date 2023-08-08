@@ -24,7 +24,7 @@ import org.junit.runners.model.Statement;
  */
 public class BonitaEngineRule implements MethodRule {
 
-    private TestEngine testEngine;
+    private final TestEngine testEngine;
     private boolean cleanAfterTest;
 
     protected BonitaEngineRule(TestEngine testEngine) {
@@ -39,7 +39,6 @@ public class BonitaEngineRule implements MethodRule {
         return new BonitaEngineRule(testEngine);
     }
 
-    // Used by bonita-web-sp:
     public BonitaEngineRule withCleanAfterTest() {
         cleanAfterTest = true;
         return this;
@@ -48,12 +47,6 @@ public class BonitaEngineRule implements MethodRule {
     // Used by Migration:
     public BonitaEngineRule reuseExistingPlatform() {
         testEngine.setDropOnStart(false);
-        return this;
-    }
-
-    // Used by Migration:
-    public BonitaEngineRule keepPlatformOnShutdown() {
-        testEngine.setDropOnStop(false);
         return this;
     }
 
@@ -68,8 +61,8 @@ public class BonitaEngineRule implements MethodRule {
 
     private static class WithTestEngine extends Statement {
 
-        private Statement statement;
-        private TestEngine testEngine;
+        private final Statement statement;
+        private final TestEngine testEngine;
 
         public WithTestEngine(Statement statement, TestEngine testEngine) {
             this.statement = statement;
@@ -100,10 +93,10 @@ public class BonitaEngineRule implements MethodRule {
         return testEngine;
     }
 
-    private class WithCleanAfterTest extends Statement {
+    private static class WithCleanAfterTest extends Statement {
 
-        private Statement statement;
-        private TestEngine testEngine;
+        private final Statement statement;
+        private final TestEngine testEngine;
 
         public WithCleanAfterTest(Statement statement, TestEngine testEngine) {
             this.statement = statement;
