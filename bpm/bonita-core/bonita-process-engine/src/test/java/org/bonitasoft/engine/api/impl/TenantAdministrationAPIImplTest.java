@@ -23,11 +23,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.*;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.STenantResourceState;
@@ -131,7 +127,7 @@ public class TenantAdministrationAPIImplTest {
 
     @Test
     public void installBDR_should_be_available_when_tenant_is_paused_ONLY() throws Exception {
-        final Method method = TenantAdministrationAPIImpl.class.getMethod("installBusinessDataModel", byte[].class);
+        final Method method = TenantAdministrationAPIImpl.class.getMethod("updateBusinessDataModel", byte[].class);
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.onlyAvailableWhenPaused();

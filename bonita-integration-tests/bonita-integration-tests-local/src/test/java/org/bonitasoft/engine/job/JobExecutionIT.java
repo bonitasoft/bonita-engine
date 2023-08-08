@@ -78,9 +78,8 @@ public class JobExecutionIT extends CommonAPILocalIT {
             throws Exception {
         //given
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
-        final Map<String, Serializable> parameters = new HashMap<>();
         try {
-            getCommandAPI().execute("except", parameters);
+            getCommandAPI().execute("except", emptyMap());
             final FailedJob failedJob = waitForFailedJob();
             assertThat(failedJob.getJobName()).isEqualTo(THROWS_EXCEPTION_JOB);
             assertThat(failedJob.getRetryNumber()).isEqualTo(0);

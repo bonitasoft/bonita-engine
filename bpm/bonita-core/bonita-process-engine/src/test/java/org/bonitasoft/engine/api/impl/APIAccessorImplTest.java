@@ -15,12 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.api.ApplicationAPI;
-import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.ThemeAPI;
+import org.bonitasoft.engine.api.*;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,14 +60,6 @@ public class APIAccessorImplTest {
         final ProfileAPI profileAPI = apiAccessor.getProfileAPI();
 
         assertThat(profileAPI).isNotNull().isExactlyInstanceOf(ProfileAPIImpl.class);
-    }
-
-    @Test
-    public void getThemeAPI_should_return_the_default_implementation() {
-        initAPIAccessor();
-        final ThemeAPI themeAPI = apiAccessor.getThemeAPI();
-
-        assertThat(themeAPI).isNotNull().isExactlyInstanceOf(ThemeAPIImpl.class);
     }
 
     @Test

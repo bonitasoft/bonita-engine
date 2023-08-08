@@ -188,7 +188,7 @@ public class StringIndexIT extends CommonAPIIT {
         final byte[] zip = converter.zip(bom);
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        final String businessDataModelVersion = getTenantAdministrationAPI().installBusinessDataModel(zip);
+        final String businessDataModelVersion = getTenantAdministrationAPI().updateBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
         assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
     }

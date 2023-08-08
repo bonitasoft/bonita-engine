@@ -31,8 +31,6 @@ public interface TestEngine {
 
     void setDropOnStart(boolean dropOnStart);
 
-    void setDropOnStop(boolean dropOnStop);
-
     void setBonitaDatabaseProperties(BonitaDatabaseConfiguration database);
 
     void setBusinessDataDatabaseProperties(BonitaDatabaseConfiguration database);

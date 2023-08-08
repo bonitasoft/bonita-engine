@@ -139,7 +139,7 @@ public class ClassLoaderIT extends TestWithUser {
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         systemOutRule.clearLog();
-        getTenantAdministrationAPI().installBusinessDataModel(zip);
+        getTenantAdministrationAPI().updateBusinessDataModel(zip);
         String deployBDMLog = systemOutRule.getLog();
         getTenantAdministrationAPI().resume();
 

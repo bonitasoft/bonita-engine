@@ -52,11 +52,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * @author Romain Bioteau
@@ -155,7 +151,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         assertThat(getTenantAdministrationAPI().isPaused()).as("Tenant is paused?").isFalse();
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().installBusinessDataModel(zip);
+        getTenantAdministrationAPI().updateBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);

@@ -62,7 +62,7 @@ public class EngineInitializer {
         final PlatformAPI platformAPI = getPlatformAPI();
 
         try {
-            if (!platformAPI.isPlatformCreated() || !platformAPI.isPlatformInitialized()) {
+            if (!platformAPI.isPlatformCreated()) {
                 throw new PlatformNotFoundException("Can't start or stop platform if it is not created.");
             }
             LOGGER.info("Starting node...");

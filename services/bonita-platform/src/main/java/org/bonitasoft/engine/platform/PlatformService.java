@@ -13,12 +13,7 @@
  **/
 package org.bonitasoft.engine.platform;
 
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
-import org.bonitasoft.engine.platform.exception.STenantActivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
-import org.bonitasoft.engine.platform.exception.STenantUpdateException;
+import org.bonitasoft.engine.platform.exception.*;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -89,15 +84,6 @@ public interface PlatformService {
      * @throws STenantNotFoundException if cannot retrieve tenant from database
      */
     long getDefaultTenantId() throws STenantNotFoundException;
-
-    /**
-     * Is the default tenant already created?
-     *
-     * @return true if the default tenant exists, false otherwise.
-     * @throws SBonitaReadException when we cannot determine if default tenant is created
-     * @since 7.3
-     */
-    boolean isDefaultTenantCreated() throws SBonitaReadException;
 
     /**
      * Set status of the tenant into activated

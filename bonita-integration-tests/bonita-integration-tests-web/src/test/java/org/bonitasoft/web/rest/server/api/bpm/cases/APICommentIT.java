@@ -17,7 +17,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.test.toolkit.bpm.TestCase;
 import org.bonitasoft.test.toolkit.bpm.TestProcessFactory;
 import org.bonitasoft.test.toolkit.organization.TestUser;
@@ -46,10 +49,6 @@ public class APICommentIT extends AbstractConsoleTest {
         testCase = TestProcessFactory.getDefaultHumanTaskProcess().addActor(getInitiator()).startCase();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.bonitasoft.test.toolkit.AbstractJUnitTest#getInitiator()
-     */
     @Override
     protected TestUser getInitiator() {
         return TestUserFactory.getJohnCarpenter();
@@ -60,14 +59,17 @@ public class APICommentIT extends AbstractConsoleTest {
         final CommentItem commentItem = createCommentItem(this.content);
         this.apiComment.add(commentItem);
 
-        assertEquals("Can't add a comment with the APIComment",
+        Assertions.assertThat(
                 TenantAPIAccessor.getProcessAPI(getInitiator().getSession())
-                        .getComments(testCase.getId()).size(),
-                1);
+                        .searchComments(
+                                new SearchOptionsBuilder(0, 10)
+                                        .filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, testCase.getId()).done())
+                        .getCount())
+                .isEqualTo(1);
     }
 
     @Test
-    public void testSearchCommentItem() throws Exception {
+    public void testSearchCommentItem() {
         testCase.addComments(getInitiator(), 3, this.content);
 
         // Set the filters

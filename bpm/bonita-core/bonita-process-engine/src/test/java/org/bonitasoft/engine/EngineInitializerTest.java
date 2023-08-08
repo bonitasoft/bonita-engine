@@ -72,7 +72,6 @@ public class EngineInitializerTest {
     public void initializeEngine_should_start_node() throws Exception {
         // given
         doReturn(true).when(platformAPI).isPlatformCreated();
-        doReturn(true).when(platformAPI).isPlatformInitialized();
         systemOutRule.clearLog();
         final PlatformStartedEvent platformStartEvent = new PlatformStartedEvent();
 
@@ -89,18 +88,6 @@ public class EngineInitializerTest {
     public void should_not_start_node_when_platform_is_not_created() throws Exception {
         //given
         doReturn(false).when(platformAPI).isPlatformCreated();
-        //when
-        final Throwable throwable = catchThrowable(() -> engineInitializer.initializeEngine());
-        //then
-        assertThat(throwable).isInstanceOf(PlatformNotFoundException.class);
-        verify(platformAPI, never()).startNode();
-    }
-
-    @Test
-    public void should_not_start_node_when_platform_is_not_initialized() throws Exception {
-        //given
-        doReturn(true).when(platformAPI).isPlatformCreated();
-        doReturn(false).when(platformAPI).isPlatformInitialized();
         //when
         final Throwable throwable = catchThrowable(() -> engineInitializer.initializeEngine());
         //then

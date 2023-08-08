@@ -13,21 +13,13 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -93,8 +85,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
     private static final String LOCATION_NAME = "Office location";
 
-    private static final String UTF_8 = "UTF-8";
-
     private static Date defaultUserLastUpdateDate = null;
 
     private static Date defaultGroupLastUpdateDate = null;
@@ -110,7 +100,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         importOrganization("simpleOrganization.xml");
 
         // then
-        final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap = checkDefaultCustomUserInfoDefinitons();
+        final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap = checkDefaultCustomUserInfoDefinitions();
         checkDefaultUsers();
         checkDefaultCustomUserInfoValues(userInfoDefinitonsMap);
         checkDefaultGroups();
@@ -183,7 +173,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertThat(customUserInfoValue.getValue()).isEqualTo(expectedValue);
     }
 
-    private Map<String, CustomUserInfoDefinition> checkDefaultCustomUserInfoDefinitons() {
+    private Map<String, CustomUserInfoDefinition> checkDefaultCustomUserInfoDefinitions() {
         final List<CustomUserInfoDefinition> customUserInfoDefinitions = getIdentityAPI()
                 .getCustomUserInfoDefinitions(0, 10);
         assertThat(customUserInfoDefinitions.size()).isEqualTo(2);
@@ -200,7 +190,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         return userInfoDefMap;
     }
 
-    private Map<String, CustomUserInfoDefinition> checkCustomUserInfoDefinitonsAfterUpdate() {
+    private Map<String, CustomUserInfoDefinition> checkCustomUserInfoDefinitionsAfterUpdate() {
         final List<CustomUserInfoDefinition> customUserInfoDefinitions = getIdentityAPI()
                 .getCustomUserInfoDefinitions(0, 10);
         assertThat(customUserInfoDefinitions.size()).isEqualTo(2);
@@ -248,28 +238,24 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
     private void importOrganization(final String fileName) throws IOException, OrganizationImportException {
         try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream(fileName)) {
-            getIdentityAPI().importOrganization(IOUtils.toString(xmlStream, Charset.forName(UTF_8)));
+            getIdentityAPI().importOrganization(IOUtils.toString(xmlStream, UTF_8));
         }
     }
 
     @Test
     public void importOrganizationWithEnabledAndDisabledUsers() throws Exception {
         // create XML file
-        final String jobTitle = WEB_TEAM_MANAGER;
-        final String userName = ANTHONY_USERNAME;
-        final String userName1 = LIUYANYAN_USERNAME;
-
         importOrganization("simpleOrganization.xml");
 
-        final User persistedUser = getIdentityAPI().getUserByUserName(userName);
-        assertEquals(jobTitle, persistedUser.getJobTitle());
-        assertEquals(false, persistedUser.isEnabled());
+        final User persistedUser = getIdentityAPI().getUserByUserName(ANTHONY_USERNAME);
+        assertEquals(WEB_TEAM_MANAGER, persistedUser.getJobTitle());
+        assertFalse(persistedUser.isEnabled());
         // check createdBy for user
         assertEquals(getSession().getUserId(), persistedUser.getCreatedBy());
 
-        final User persistedUser1 = getIdentityAPI().getUserByUserName(userName1);
+        final User persistedUser1 = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         assertNotNull(persistedUser1);
-        assertEquals(true, persistedUser1.isEnabled());
+        assertTrue(persistedUser1.isEnabled());
 
         // clean-up
         getIdentityAPI().deleteUser(persistedUser.getId());
@@ -293,12 +279,9 @@ public class OrganizationIT extends TestWithTechnicalUser {
     @Test
     public void importComplexOrganization() throws Exception {
         // create XML file
-        final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("complexOrganization.xml");
-        try {
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream("complexOrganization.xml")) {
             final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
             getIdentityAPI().importOrganization(new String(organisationContent));
-        } finally {
-            xmlStream.close();
         }
         final User jack = getIdentityAPI().getUserByUserName("jack");
         final User john = getIdentityAPI().getUserByUserName("john");
@@ -406,13 +389,12 @@ public class OrganizationIT extends TestWithTechnicalUser {
     public void importOrganizationWithWarnings_imports_the_correct_groups_if_the_incorrect_one_is_present()
             throws DeletionException, OrganizationImportException, IOException, GroupNotFoundException {
         //given
-        List<String> warnings;
         try (final InputStream xmlStream = OrganizationIT.class
                 .getResourceAsStream("complexOrganizationWithBadGroup.xml")) {
             final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
 
             //when
-            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),
+            getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),
                     ImportPolicy.IGNORE_DUPLICATES);
         }
         //then
@@ -428,15 +410,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
     @Test
     public void importACMEOrganizationTwiceWithDefaultProfile() throws Exception {
-        // create XML file
-
-        final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("ACME.xml");
-        try {
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream("ACME.xml")) {
             final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
             getIdentityAPI().importOrganization(new String(organisationContent));
             getIdentityAPI().importOrganization(new String(organisationContent));
-        } finally {
-            xmlStream.close();
         }
 
         // clean-up
@@ -444,10 +421,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void should_not_update_existing_user_when_importing_orga_in_IGNORE_DUPLICATES() throws Exception {
+    public void should_not_update_existing_user_when_importing_organization_in_IGNORE_DUPLICATES() throws Exception {
         User walter, oldManager, newManager;
 
-        // first upload of ACME orga
+        // first upload of ACME organization
         try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream("ACME.xml")) {
             getIdentityAPI().importOrganizationWithWarnings(new String(IOUtils.toByteArray(xmlStream)),
                     ImportPolicy.IGNORE_DUPLICATES);
@@ -485,12 +462,9 @@ public class OrganizationIT extends TestWithTechnicalUser {
     public void importACMEOrganizationTwiceButRemoveGroupsAndRole() throws Exception {
         // create XML file
 
-        final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("ACME.xml");
         final byte[] organisationContent;
-        try {
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream("ACME.xml")) {
             organisationContent = IOUtils.toByteArray(xmlStream);
-        } finally {
-            xmlStream.close();
         }
         getIdentityAPI().importOrganization(new String(organisationContent));
         final long numberOfGroups = getIdentityAPI().getNumberOfGroups();
@@ -534,55 +508,49 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
     @Test(expected = OrganizationImportException.class)
     public void importOrganizationFailRollBackToOldOrganization() throws Exception {
-        InputStream xmlStream = OrganizationIT.class.getResourceAsStream("organizationFailOnDuplicates.xml");
-        try {
-            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream("organizationFailOnDuplicates.xml")) {
+            byte[] organisationContent = IOUtils.toByteArray(xmlStream);
             final String xmlOrganization = new String(organisationContent);
             getIdentityAPI().importOrganization(xmlOrganization);
 
             // check john is replaced before james is imported (in the xml)
             assertTrue(xmlOrganization, xmlOrganization.indexOf("james") < xmlOrganization.indexOf("john"));
-        } finally {
-            xmlStream.close();
-        }
 
-        // clear organization
-        getIdentityAPI().deleteOrganization();
+            // clear organization
+            getIdentityAPI().deleteOrganization();
 
-        // ensure james does not exist anymore
-        try {
-            getIdentityAPI().getUserByUserName("james");
-            fail("james should not be found.");
-        } catch (final UserNotFoundException unfe) {
-            // ok
-        }
-
-        // we have only "john" as user
-        final User createUser = getIdentityAPI().createUser("john", "bpm", "John", null);
-
-        xmlStream = OrganizationIT.class.getResourceAsStream("organizationFailOnDuplicates.xml");
-        try {
-            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
-            getIdentityAPI().importOrganization(new String(organisationContent), ImportPolicy.FAIL_ON_DUPLICATES);
-        } catch (final OrganizationImportException e) {
-            // check john was not deleted and have old username
+            // ensure james does not exist anymore
             try {
                 getIdentityAPI().getUserByUserName("james");
-                fail("old organisation should be restored");
+                fail("james should not be found.");
             } catch (final UserNotFoundException unfe) {
-                deleteUser(createUser);
-                throw e;
+                // ok
             }
-        } finally {
-            xmlStream.close();
+
+            // we have only "john" as user
+            final User createUser = getIdentityAPI().createUser("john", "bpm", "John", null);
+
+            try {
+                organisationContent = IOUtils.toByteArray(xmlStream);
+                getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),
+                        ImportPolicy.FAIL_ON_DUPLICATES);
+            } catch (final OrganizationImportException e) {
+                // check john was not deleted and have old username
+                try {
+                    getIdentityAPI().getUserByUserName("james");
+                    fail("old organisation should be restored");
+                } catch (final UserNotFoundException unfe) {
+                    deleteUser(createUser);
+                    throw e;
+                }
+            }
         }
 
     }
 
     @Test
     public void importOrganizationWithCycle() throws Exception {
-        final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("organizationWithCycle.xml");
-        try {
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream("organizationWithCycle.xml")) {
             final byte[] bs = IOUtils.toByteArray(xmlStream);
             final String organizationContent = new String(bs);
             getIdentityAPI().importOrganization(organizationContent);
@@ -590,8 +558,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
             // clean-up
             getIdentityAPI().deleteOrganization();
             getIdentityAPI().importOrganization(organizationContent);
-        } finally {
-            xmlStream.close();
         }
 
         final List<User> users = getIdentityAPI().getUsers(0, 10, UserCriterion.USER_NAME_ASC);
@@ -716,11 +682,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final ImportPolicy policy = ImportPolicy.FAIL_ON_DUPLICATES;
 
         final String userName = ANTHONY_USERNAME;
-        final String jobTitle = WEB_TEAM_MANAGER;
         final String roleName = MANAGER;
-        final String roleDisplayName = BONITA_MANAGER;
         final String groupName = WEB_GROUP_NAME;
-        final String groupDisplayName = WEB_TEAM;
 
         final String userName1 = LIUYANYAN_USERNAME;
         final String roleName1 = DEVELOPER;
@@ -744,14 +707,14 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
             final User persistedUser = getIdentityAPI().getUserByUserName(userName);
             assertNotNull(persistedUser);
-            assertEquals(jobTitle, persistedUser.getJobTitle());
+            assertEquals(WEB_TEAM_MANAGER, persistedUser.getJobTitle());
             assertFalse(persistedUser.isEnabled());
             final Role persistedRole = getIdentityAPI().getRoleByName(roleName);
             assertNotNull(persistedRole);
-            assertEquals(roleDisplayName, persistedRole.getDisplayName());
+            assertEquals(BONITA_MANAGER, persistedRole.getDisplayName());
             final Group persistedGroup = getIdentityAPI().getGroupByPath(groupName);
             assertNotNull(persistedGroup);
-            assertEquals(groupDisplayName, persistedGroup.getDisplayName());
+            assertEquals(WEB_TEAM, persistedGroup.getDisplayName());
             final UserMembership persistedMembership = getIdentityAPI()
                     .getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC).get(0);
             assertEquals(groupName, persistedMembership.getGroupName());
@@ -799,11 +762,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final ImportPolicy policy = ImportPolicy.FAIL_ON_DUPLICATES;
 
         final String userName = ANTHONY_USERNAME;
-        final String jobTitle = WEB_TEAM_MANAGER;
         final String roleName = MANAGER;
-        final String roleDisplayName = BONITA_MANAGER;
         final String groupName = WEB_GROUP_NAME;
-        final String groupDisplayName = WEB_TEAM;
 
         final String userName1 = LIUYANYAN_USERNAME;
         final String roleName1 = DEVELOPER;
@@ -823,15 +783,15 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertEquals(3, getIdentityAPI().getNumberOfRoles());
 
         final User persistedUser = getIdentityAPI().getUserByUserName(userName);
-        assertEquals(jobTitle, persistedUser.getJobTitle());
+        assertEquals(WEB_TEAM_MANAGER, persistedUser.getJobTitle());
         // check createdBy for user
         assertEquals(getSession().getUserId(), persistedUser.getCreatedBy());
         final Group persistedGroup = getIdentityAPI().getGroupByPath(groupName);
-        assertEquals(groupDisplayName, persistedGroup.getDisplayName());
+        assertEquals(WEB_TEAM, persistedGroup.getDisplayName());
         // check createdBy for group
         assertEquals(getSession().getUserId(), persistedGroup.getCreatedBy());
         final Role persistedRole = getIdentityAPI().getRoleByName(roleName);
-        assertEquals(roleDisplayName, persistedRole.getDisplayName());
+        assertEquals(BONITA_MANAGER, persistedRole.getDisplayName());
         // check createdBy for role
         assertEquals(getSession().getUserId(), persistedRole.getCreatedBy());
         final UserMembership persistedMembership = getIdentityAPI()
@@ -890,7 +850,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", policy);
 
         // then
-        final Map<String, CustomUserInfoDefinition> infoDefinitonsAfterUpdate = checkCustomUserInfoDefinitonsAfterUpdate();
+        final Map<String, CustomUserInfoDefinition> infoDefinitonsAfterUpdate = checkCustomUserInfoDefinitionsAfterUpdate();
         checkUsersAfterUpdate();
         checkCustomUserInfoValuesAfterUpdate(infoDefinitonsAfterUpdate);
         checkGroupsAfterUpdate();
@@ -991,11 +951,11 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
         final User persistedUser = getIdentityAPI().getUserByUserName(JOHNNYFOOTBALL);
         assertNotNull(persistedUser);
-        assertEquals(false, persistedUser.isEnabled());
+        assertFalse(persistedUser.isEnabled());
 
         final User persistedUser1 = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         assertNotNull(persistedUser1);
-        assertEquals(true, persistedUser1.isEnabled());
+        assertTrue(persistedUser1.isEnabled());
 
         // clean-up
         getIdentityAPI().deleteUser(persistedUser.getId());
@@ -1018,11 +978,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final ImportPolicy policy = ImportPolicy.IGNORE_DUPLICATES;
 
         final String userName = ANTHONY_USERNAME;
-        final String jobTitle = WEB_TEAM_MANAGER;
         final String roleName = MANAGER;
-        final String roleDisplayName = BONITA_MANAGER;
         final String groupName = WEB_GROUP_NAME;
-        final String groupDisplayName = WEB_TEAM;
 
         final String userName1 = LIUYANYAN_USERNAME;
         final String roleName1 = DEVELOPER;
@@ -1042,15 +999,15 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertEquals(3, getIdentityAPI().getNumberOfRoles());
 
         final User persistedUser = getIdentityAPI().getUserByUserName(userName);
-        assertEquals(jobTitle, persistedUser.getJobTitle());
+        assertEquals(WEB_TEAM_MANAGER, persistedUser.getJobTitle());
         // check createdBy for user
         assertEquals(getSession().getUserId(), persistedUser.getCreatedBy());
         final Group persistedGroup = getIdentityAPI().getGroupByPath(groupName);
-        assertEquals(groupDisplayName, persistedGroup.getDisplayName());
+        assertEquals(WEB_TEAM, persistedGroup.getDisplayName());
         // check createdBy for group
         assertEquals(getSession().getUserId(), persistedGroup.getCreatedBy());
         final Role persistedRole = getIdentityAPI().getRoleByName(roleName);
-        assertEquals(roleDisplayName, persistedRole.getDisplayName());
+        assertEquals(BONITA_MANAGER, persistedRole.getDisplayName());
         // check createdBy for role
         assertEquals(getSession().getUserId(), persistedRole.getCreatedBy());
         final UserMembership persistedMembership = getIdentityAPI()
@@ -1142,12 +1099,9 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     private void importOrganizationWithPolicy(final String xmlFile, final ImportPolicy policy) throws Exception {
-        final InputStream xmlStream = OrganizationIT.class.getResourceAsStream(xmlFile);
-        try {
-            final String organizationContent = IOUtils.toString(xmlStream);
-            getIdentityAPI().importOrganization(organizationContent, policy);
-        } finally {
-            xmlStream.close();
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream(xmlFile)) {
+            final String organizationContent = IOUtils.toString(xmlStream, UTF_8);
+            getIdentityAPI().importOrganizationWithWarnings(organizationContent, policy);
         }
     }
 
@@ -1156,9 +1110,9 @@ public class OrganizationIT extends TestWithTechnicalUser {
         importOrganization("simpleOrganizationDuplicates1.xml");
 
         // then
-        final Map<String, CustomUserInfoDefinition> userInfoDefinitons = checkDefaultCustomUserInfoDefinitons();
+        final Map<String, CustomUserInfoDefinition> userInfoDefinitions = checkDefaultCustomUserInfoDefinitions();
         checkDefaultUsers();
-        checkDefaultCustomUserInfoValues(userInfoDefinitons);
+        checkDefaultCustomUserInfoValues(userInfoDefinitions);
         checkDefaultGroups();
         checkDefaultRoles();
         checkDefaultMembership();
@@ -1383,9 +1337,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
     @Test
     public void exportAndImportOrganization() throws Exception {
         // create records for user role, group and membership
-        final String username = LIUYANYAN_USERNAME;
         final String password = "bpm";
-        final User persistedUser1 = getIdentityAPI().createUser(username, password);
+        final User persistedUser1 = getIdentityAPI().createUser(LIUYANYAN_USERNAME, password);
 
         final UserCreator creator = new UserCreator(ANTHONY_USERNAME, password);
         creator.setJobTitle(WEB_TEAM_MANAGER);

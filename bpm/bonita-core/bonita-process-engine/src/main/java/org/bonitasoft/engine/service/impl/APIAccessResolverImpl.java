@@ -38,7 +38,6 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(ProcessAPI.class.getName(), new ProcessAPIImpl());
         apis.put(CommandAPI.class.getName(), new CommandAPIImpl());
         apis.put(ProfileAPI.class.getName(), new ProfileAPIImpl());
-        apis.put(ThemeAPI.class.getName(), new ThemeAPIImpl());
         apis.put(PermissionAPI.class.getName(), new PermissionAPIImpl());
         apis.put(PageAPI.class.getName(), new PageAPIImpl());
         apis.put(ApplicationAPI.class.getName(), new ApplicationAPIImpl());

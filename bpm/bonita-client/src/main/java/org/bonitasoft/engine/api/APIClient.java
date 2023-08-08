@@ -38,7 +38,6 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <ul>
  * <li>{@link IdentityAPI},</li>
  * <li>{@link ProcessAPI},</li>
- * <li>{@link ThemeAPI}</li>
  * <li>{@link CommandAPI},</li>
  * <li>{@link ProfileAPI},</li>
  * <li>{@link TenantAdministrationAPI},</li>
@@ -230,18 +229,6 @@ public class APIClient {
      */
     public ProcessAPI getProcessAPI() {
         return getAPI(ProcessAPI.class);
-    }
-
-    /**
-     * Get API to manage themes (Portal and mobile).
-     *
-     * @since 7.2
-     * @deprecated since 7.13.0, ThemeAPI does nothing. There is no replacement, as it used to serve old removed
-     *             feature.
-     */
-    @Deprecated(since = "7.13.0")
-    public ThemeAPI getThemeAPI() {
-        return getAPI(ThemeAPI.class);
     }
 
     /**

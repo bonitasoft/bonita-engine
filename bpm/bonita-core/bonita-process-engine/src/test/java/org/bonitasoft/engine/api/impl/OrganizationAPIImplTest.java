@@ -107,11 +107,11 @@ public class OrganizationAPIImplTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void deleOrganization_call_services_to_delete_all_organizationInfo() throws Exception {
+    public void deleteOrganization_call_services_to_delete_all_organizationInfo() throws Exception {
         // given
         given(identityService.getCustomUserInfoDefinitions(0, PAGE_SIZE)).willReturn(
                 Collections.singletonList(userInfoDef1),
-                Collections.singletonList(userInfoDef2), Collections.<SCustomUserInfoDefinition> emptyList());
+                Collections.singletonList(userInfoDef2), Collections.emptyList());
 
         // when
         organizationAPIImpl.deleteOrganization();

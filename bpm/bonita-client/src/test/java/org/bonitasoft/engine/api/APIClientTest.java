@@ -101,13 +101,6 @@ public class APIClientTest {
     }
 
     @Test
-    public void should_get_ThemeAPI_from_server() throws LoginException {
-        client.login(VALID_USERNAME, VALID_PASSWORD);
-        ThemeAPI api = client.getThemeAPI();
-        assertThat(api).isNotNull();
-    }
-
-    @Test
     public void should_get_CommandAPI_from_server() throws LoginException {
         client.login(VALID_USERNAME, VALID_PASSWORD);
         CommandAPI api = client.getCommandAPI();
