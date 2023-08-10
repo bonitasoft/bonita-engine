@@ -51,13 +51,16 @@ public class SPlatform implements PlatformPersistentObject {
     private String dbSchemaVersion;
     @Type(type = "materialized_clob")
     private String information;
+    @Column(name = "application_version")
+    private String applicationVersion;
 
     public SPlatform(final String dbSchemaVersion, final String initialBonitaVersion,
-            final String createdBy, final long created) {
+            final String createdBy, final long created, final String applicationVersion) {
         this.dbSchemaVersion = dbSchemaVersion;
         this.initialBonitaVersion = initialBonitaVersion;
         this.createdBy = createdBy;
         this.created = created;
+        this.applicationVersion = applicationVersion;
     }
 
     @Override

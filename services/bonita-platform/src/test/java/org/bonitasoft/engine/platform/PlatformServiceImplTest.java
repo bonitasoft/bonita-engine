@@ -235,7 +235,7 @@ public class PlatformServiceImplTest {
     }
 
     private SPlatform buildPlatform() {
-        return new SPlatform("1.0", "0.5", "me", 654687344687645L);
+        return new SPlatform("1.0", "0.5", "me", 654687344687645L, "0.0.0");
     }
 
 }
