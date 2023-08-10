@@ -96,7 +96,7 @@ public class PlatformManagerTest {
                     return null;
                 });
         doReturn(tenantManager).when(platformManager).getDefaultTenantStateManager();
-        doReturn(new SPlatform("1.3", "1.1.0", "someUser", 123455)).when(platformService).getPlatform();
+        doReturn(new SPlatform("1.3", "1.1.0", "someUser", 123455, "0.0.0")).when(platformService).getPlatform();
         doReturn(new SPlatformPropertiesImpl("1.3.0")).when(platformService).getSPlatformProperties();
         tenant = new STenant();
         tenant.setId(TENANT_ID);

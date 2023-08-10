@@ -106,8 +106,8 @@ public class ScriptExecutor {
         String version = versionService.getPlatformSetupVersion();
         String databaseSchemaVersion = versionService.getSupportedDatabaseSchemaVersion();
         final String sql = String.format("INSERT INTO platform " +
-                "(id, version, initial_bonita_version, created, created_by) " +
-                "VALUES (1, '%s', '%s', %d, 'platformAdmin')",
+                "(id, version, initial_bonita_version, application_version, created, created_by) " +
+                "VALUES (1, '%s', '%s', '0.0.0', %d, 'platformAdmin')",
                 databaseSchemaVersion, version, System.currentTimeMillis());
         new JdbcTemplate(datasource).update(sql);
     }
