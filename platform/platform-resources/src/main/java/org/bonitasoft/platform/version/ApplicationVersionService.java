@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,20 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.platform.version.impl;
+package org.bonitasoft.platform.version;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.springframework.jdbc.core.RowMapper;
+import org.bonitasoft.platform.exception.PlatformException;
 
 /**
- * @author Laurent Leseigneur
+ * @author Danila Mazour
+ * @author Haroun Elalami
  */
-public class PlatformRowMapper implements RowMapper<String> {
+public interface ApplicationVersionService {
 
-    @Override
-    public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return rs.getString("version");
-    }
+    /**
+     * Retrieves the application version in database
+     *
+     * @return platform current application version
+     */
+    String retrieveApplicationVersion() throws PlatformException;
+
+    /**
+     * Updates the application version in database
+     */
+    void updateApplicationVersion(String version) throws PlatformException;
 }

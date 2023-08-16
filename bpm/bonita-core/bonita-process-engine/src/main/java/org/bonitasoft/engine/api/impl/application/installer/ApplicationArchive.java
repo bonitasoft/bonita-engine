@@ -35,6 +35,8 @@ public class ApplicationArchive implements AutoCloseable {
     private List<File> themes = new ArrayList<>();
     private List<File> applications = new ArrayList<>();
 
+    private List<File> ignoredFiles = new ArrayList<>();
+
     public ApplicationArchive addPage(File page) {
         pages.add(page);
         return this;
@@ -62,6 +64,11 @@ public class ApplicationArchive implements AutoCloseable {
 
     public ApplicationArchive addProcess(File process) {
         processes.add(process);
+        return this;
+    }
+
+    public ApplicationArchive addIgnoredFile(File file) {
+        ignoredFiles.add(file);
         return this;
     }
 
@@ -102,6 +109,7 @@ public class ApplicationArchive implements AutoCloseable {
         deletePhysicalFilesFromList(layouts);
         deletePhysicalFilesFromList(themes);
         deletePhysicalFilesFromList(applications);
+        deletePhysicalFilesFromList(ignoredFiles);
     }
 
     protected void deletePhysicalFilesFromList(List<File> list) throws IOException {

@@ -112,6 +112,7 @@ public class ArtifactTypeDetector {
             applicationArchive.setBdm(file);
         } else {
             logger.warn("Ignoring file '{}'.", file.getName());
+            applicationArchive.addIgnoredFile(file);
         }
     }
 

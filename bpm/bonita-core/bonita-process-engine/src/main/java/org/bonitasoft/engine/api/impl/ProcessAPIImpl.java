@@ -3808,20 +3808,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor
-                .getSearchProcessDefinitionsDescriptor();
-        final SearchProcessDeploymentInfos transactionSearch = new SearchProcessDeploymentInfos(
-                processDefinitionService, searchDescriptor, searchOptions);
-        try {
-            transactionSearch.execute();
-        } catch (final SBonitaException e) {
-            throw new SearchException("Can't get processDefinition's executing searchProcessDefinitions()", e);
-        }
-        return transactionSearch.getResult();
+        return processDeploymentAPIDelegate.searchProcessDeploymentInfos(searchOptions);
     }
 
     @Override
