@@ -48,7 +48,7 @@ class Deps {
     //Last version compatible with hibernate 5
     public static String hazelcastHibernateVersion = "2.1.1"
 
-    public static String guavaVersion = "30.1.1-jre"
+    public static String guavaVersion = "32.1.2-jre"
     public static String antlr4RuntimeVersion = "4.7.2"
 
     // bonita-web specific dependencies:
