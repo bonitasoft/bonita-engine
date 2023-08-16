@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.core.filter.impl;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,18 +20,12 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
-import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
@@ -42,8 +33,8 @@ import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterLoadingException;
 import org.bonitasoft.engine.core.filter.model.UserFilterImplementationDescriptor;
+import org.bonitasoft.engine.core.filter.model.UserFilterImplementationParser;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -73,8 +64,7 @@ public class UserFilterServiceImpl implements UserFilterService {
     private final CacheService cacheService;
     private final ExpressionResolverService expressionResolverService;
     private final ProcessResourcesService processResourcesService;
-    private final JAXBContext jaxbContext;
-    private final Schema schema;
+    private final UserFilterImplementationParser userFilterImplementationParser = new UserFilterImplementationParser();
 
     public UserFilterServiceImpl(final ConnectorExecutor connectorExecutor, final CacheService cacheService,
             final ExpressionResolverService expressionResolverService,
@@ -84,14 +74,6 @@ public class UserFilterServiceImpl implements UserFilterService {
         this.cacheService = cacheService;
         this.expressionResolverService = expressionResolverService;
         this.processResourcesService = processResourcesService;
-        try {
-            jaxbContext = JAXBContext.newInstance(UserFilterImplementationDescriptor.class);
-            URL schemaURL = ConnectorService.class.getResource("/connectors-impl.xsd");
-            final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            schema = sf.newSchema(schemaURL);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException("Unable to load unmarshaller for connector implementation descriptor", e);
-        }
     }
 
     @Override
@@ -245,7 +227,8 @@ public class UserFilterServiceImpl implements UserFilterService {
                 name = file.getName();
                 if (pattern.matcher(name).matches()) {
                     UserFilterImplementationDescriptor userFilterImplementationDescriptor;
-                    userFilterImplementationDescriptor = convert(file.getContent());
+                    userFilterImplementationDescriptor = userFilterImplementationParser
+                            .convert(new String(file.getContent()));
                     if (userFilterImplementationDescriptor == null) {
                         throw new SUserFilterLoadingException(
                                 "Can not parse ConnectorImplementation XML. The file name is " + name);
@@ -259,30 +242,13 @@ public class UserFilterServiceImpl implements UserFilterService {
                 }
             }
             return true;
-        } catch (final IOException e) {
+        } catch (final JAXBException e) {
             throw new SUserFilterLoadingException(
                     "Cannot load userFilterImplementationDescriptor XML. The file name is " + name, e);
         } catch (final SCacheException e) {
             throw new SUserFilterLoadingException("Unable to cache the user filter implementation" + name, e);
         } catch (SBonitaReadException e) {
             throw new SUserFilterLoadingException("Unable to list the user filter implementations", e);
-        }
-    }
-
-    private UserFilterImplementationDescriptor convert(byte[] content) throws IOException {
-        try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            unmarshaller.setSchema(schema);
-            String connectorImplementationFileContent = new String(content);
-            connectorImplementationFileContent = connectorImplementationFileContent.replace("<connectorImplementation>",
-                    "<implementation:connectorImplementation xmlns:implementation=\"http://www.bonitasoft.org/ns/connector/implementation/6.0\">");
-            connectorImplementationFileContent = connectorImplementationFileContent.replace(
-                    "</connectorImplementation>",
-                    "</implementation:connectorImplementation>");
-            return (UserFilterImplementationDescriptor) unmarshaller
-                    .unmarshal(new StringReader(connectorImplementationFileContent));
-        } catch (final JAXBException e) {
-            throw new IOException(e);
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,7 +24,6 @@ public class SConnectorImplementationDescriptorTest {
 
     @Test
     public void theConstructorShouldNotGenerateANullFieldForJarsDependencies() {
-
         SConnectorImplementationDescriptor theConnector = new SConnectorImplementationDescriptor(
                 "implementationClassName", "id", "version", "definitionId",
                 "definitionVersion", null);
@@ -39,9 +38,8 @@ public class SConnectorImplementationDescriptorTest {
 
     @Test
     public void theDefaultConstructorShouldNotGenerateANullFieldForJarsDependencies() {
-
         SConnectorImplementationDescriptor theConnector = new SConnectorImplementationDescriptor();
         assertThat(theConnector.getJarDependencies()).isNotNull();
-
     }
+
 }

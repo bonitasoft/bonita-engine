@@ -18,8 +18,6 @@ import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,12 +33,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.cache.CacheService;
@@ -55,6 +48,8 @@ import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
+import org.bonitasoft.engine.core.connector.parser.ConnectorImplementationFieldComparator;
+import org.bonitasoft.engine.core.connector.parser.ConnectorImplementationParser;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -67,7 +62,6 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -102,17 +96,14 @@ public class ConnectorServiceImpl implements ConnectorService {
     private final DependencyService dependencyService;
     private final ClassLoaderService classLoaderService;
     private final TimeTracker timeTracker;
-    private ConnectorExecutionTimeLogger connectorExecutionTimeLogger;
+    private final ConnectorExecutionTimeLogger connectorExecutionTimeLogger;
     private final ProcessResourcesService processResourcesService;
-
-    private final JAXBContext jaxbContext;
-    private final Schema schema;
+    private final ConnectorImplementationParser connectorImplementationParser = new ConnectorImplementationParser();
 
     public ConnectorServiceImpl(final CacheService cacheService, final ConnectorExecutor connectorExecutor,
             final ExpressionResolverService expressionResolverService, final OperationService operationService,
             final DependencyService dependencyService, ClassLoaderService classLoaderService,
-            final TimeTracker timeTracker,
-            ProcessResourcesService processResourcesService,
+            final TimeTracker timeTracker, ProcessResourcesService processResourcesService,
             ConnectorExecutionTimeLogger connectorExecutionTimeLogger) {
         this.cacheService = cacheService;
         this.connectorExecutor = connectorExecutor;
@@ -123,14 +114,6 @@ public class ConnectorServiceImpl implements ConnectorService {
         this.dependencyService = dependencyService;
         this.timeTracker = timeTracker;
         this.connectorExecutionTimeLogger = connectorExecutionTimeLogger;
-        try {
-            jaxbContext = JAXBContext.newInstance(SConnectorImplementationDescriptor.class);
-            URL schemaURL = ConnectorServiceImpl.class.getResource("/connectors-impl.xsd");
-            final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            schema = sf.newSchema(schemaURL);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException("Unable to load unmarshaller for connector implementation descriptor", e);
-        }
     }
 
     /**
@@ -369,9 +352,10 @@ public class ConnectorServiceImpl implements ConnectorService {
                     Integer.MAX_VALUE);
             for (SBARResource connectorImplementationFile : connectorImplementations) {
                 name = connectorImplementationFile.getName();
-                cache(processDefinitionId, convert(connectorImplementationFile.getContent()));
+                cache(processDefinitionId,
+                        connectorImplementationParser.convert(new String(connectorImplementationFile.getContent())));
             }
-        } catch (final IOException e) {
+        } catch (final JAXBException e) {
             throw new SConnectorException("Can not load ConnectorImplementation XML. The file name is <" + name + ">.",
                     e);
         } catch (final SCacheException e) {
@@ -380,23 +364,6 @@ public class ConnectorServiceImpl implements ConnectorService {
             throw new SConnectorException("Unable to list the connector implementations", e);
         }
         return true;
-    }
-
-    private SConnectorImplementationDescriptor convert(byte[] content) throws IOException {
-        try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            unmarshaller.setSchema(schema);
-            String connectorImplementationFileContent = new String(content);
-            connectorImplementationFileContent = connectorImplementationFileContent.replace("<connectorImplementation>",
-                    "<implementation:connectorImplementation xmlns:implementation=\"http://www.bonitasoft.org/ns/connector/implementation/6.0\">");
-            connectorImplementationFileContent = connectorImplementationFileContent.replace(
-                    "</connectorImplementation>",
-                    "</implementation:connectorImplementation>");
-            return (SConnectorImplementationDescriptor) unmarshaller
-                    .unmarshal(new StringReader(connectorImplementationFileContent));
-        } catch (final JAXBException e) {
-            throw new IOException(e);
-        }
     }
 
     @Override
@@ -553,8 +520,8 @@ public class ConnectorServiceImpl implements ConnectorService {
     private SConnectorImplementationDescriptor parseConnectorImplementation(final byte[] bytes)
             throws SInvalidConnectorImplementationException {
         try {
-            return convert(bytes);
-        } catch (final IOException e) {
+            return connectorImplementationParser.convert(new String(bytes));
+        } catch (final JAXBException e) {
             throw new SInvalidConnectorImplementationException("Can not load ConnectorImplementation XML.", e);
         }
     }
@@ -608,19 +575,20 @@ public class ConnectorServiceImpl implements ConnectorService {
             final int numberPerPage, final String field, final OrderByType order) throws SConnectorException {
         final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = getAllConnectorImplementations(
                 processDefinitionId);
-        if (sConnectorImplementationDescriptors != null && sConnectorImplementationDescriptors.size() > 0) {
+        if (sConnectorImplementationDescriptors != null && !sConnectorImplementationDescriptors.isEmpty()) {
             // pagination
             if (sConnectorImplementationDescriptors.size() <= fromIndex) {
                 throw new SConnectorException(
-                        "page out of range excepton. Total size is <" + sConnectorImplementationDescriptors.size()
+                        "page out of range exception. Total size is <" + sConnectorImplementationDescriptors.size()
                                 + ">, but from index is <" + fromIndex + ">");
             }
             // set the comparison field
-            SConnectorImplementationDescriptor.comparedField = field;
-            // sorted: sort with ASC order first
-            Collections.sort(sConnectorImplementationDescriptors);
-            if (order != null && order == OrderByType.DESC) {
-                Collections.reverse(sConnectorImplementationDescriptors);
+            var connectorComparator = new ConnectorImplementationFieldComparator(field);
+            if (order == OrderByType.DESC) {
+                sConnectorImplementationDescriptors.sort(connectorComparator.reversed());
+            } else {
+                // sort with ASC by default
+                sConnectorImplementationDescriptors.sort(connectorComparator);
             }
             // sub list
             int endIndex = fromIndex + numberPerPage;

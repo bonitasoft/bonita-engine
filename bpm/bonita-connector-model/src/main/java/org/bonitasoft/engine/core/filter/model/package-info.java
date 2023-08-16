@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,13 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+@XmlSchema(namespace = "http://www.bonitasoft.org/ns/connector/implementation/6.0", xmlns = {
+        @XmlNs(prefix = "implementation", namespaceURI = "http://www.bonitasoft.org/ns/connector/implementation/6.0") })
+package org.bonitasoft.engine.core.filter.model;
 
-/**
- * @author Baptiste Mesta
- */
-@XmlSchema(namespace = "http://www.bonitasoft.org/ns/connector/implementation/6.0", elementFormDefault = XmlNsForm.UNSET, xmlns = {
-        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://www.bonitasoft.org/ns/connector/implementation/6.0", prefix = "implementation") })
-package org.bonitasoft.engine.core.connector.parser;
-
-import javax.xml.bind.annotation.XmlNsForm;
+import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlSchema;
