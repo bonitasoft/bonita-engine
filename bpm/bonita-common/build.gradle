@@ -10,7 +10,7 @@ dependencies {
     api "org.bonitasoft.engine:bonita-business-object-model"
     api "org.bonitasoft.engine:bonita-profile-model"
     api "org.bonitasoft.engine:bonita-organization-model"
-    api project(':bpm:bonita-application-model')
+    api "org.bonitasoft.engine:bonita-application-model"
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
     api "com.fasterxml.jackson.core:jackson-databind"
     api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
