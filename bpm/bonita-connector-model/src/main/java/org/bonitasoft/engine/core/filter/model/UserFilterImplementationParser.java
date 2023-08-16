@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,14 +10,19 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
-
-/**
- * @author Baptiste Mesta
- */
-@XmlSchema(namespace = "http://www.bonitasoft.org/ns/connector/implementation/6.0", elementFormDefault = XmlNsForm.UNSET, xmlns = {
-        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://www.bonitasoft.org/ns/connector/implementation/6.0", prefix = "implementation") })
+ **/
 package org.bonitasoft.engine.core.filter.model;
 
-import javax.xml.bind.annotation.XmlNsForm;
-import javax.xml.bind.annotation.XmlSchema;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+
+import org.bonitasoft.engine.core.connector.parser.AbstractConnectorImplementationParser;
+
+public class UserFilterImplementationParser
+        extends AbstractConnectorImplementationParser<UserFilterImplementationDescriptor> {
+
+    @Override
+    protected JAXBContext initJAXBContext() throws JAXBException {
+        return JAXBContext.newInstance(UserFilterImplementationDescriptor.class);
+    }
+}

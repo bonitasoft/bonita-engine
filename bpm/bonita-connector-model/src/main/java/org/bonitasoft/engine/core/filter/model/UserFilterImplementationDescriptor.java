@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.filter.model;
 
 import java.io.Serializable;
+import java.util.StringJoiner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -114,14 +115,13 @@ public class UserFilterImplementationDescriptor implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("UserFilterImplementationDescriptor{");
-        sb.append("implementationClassName='").append(implementationClassName).append('\'');
-        sb.append(", id='").append(id).append('\'');
-        sb.append(", version='").append(version).append('\'');
-        sb.append(", definitionId='").append(definitionId).append('\'');
-        sb.append(", definitionVersion='").append(definitionVersion).append('\'');
-        sb.append(", jarDependencies=").append(jarDependencies);
-        sb.append('}');
-        return sb.toString();
+        return new StringJoiner(", ", UserFilterImplementationDescriptor.class.getSimpleName() + "[", "]")
+                .add("implementationClassName='" + implementationClassName + "'")
+                .add("id='" + id + "'")
+                .add("version='" + version + "'")
+                .add("definitionId='" + definitionId + "'")
+                .add("definitionVersion='" + definitionVersion + "'")
+                .add("jarDependencies=" + jarDependencies)
+                .toString();
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.connector.parser;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -31,13 +32,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "connectorImplementation")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {})
-public class SConnectorImplementationDescriptor
-        implements Serializable, Comparable<SConnectorImplementationDescriptor> {
+public class SConnectorImplementationDescriptor implements Serializable {
 
     private static final long serialVersionUID = 1262691234201780432L;
     public static final String IMPLEMENTATION_CLASS_NAME = "implementationClassName";
-    public static final String ID = "id";
-    public static final String VERSION = "version";
+    public static final String IMPLEMENTATION_ID = "id";
+    public static final String IMPLEMENTATION_VERSION = "version";
     public static final String DEFINITION_ID = "definitionId";
     public static final String DEFINITION_VERSION = "definitionVersion";
 
@@ -61,15 +61,13 @@ public class SConnectorImplementationDescriptor
     @XmlElement
     private String description;
 
-    public static String comparedField;
-
     public SConnectorImplementationDescriptor() {
         super();
     }
 
     public SConnectorImplementationDescriptor(final String implementationClassName, final String id,
             final String version, final String definitionId,
-            final String definitionVersion, final ArrayList<String> jarDependencies) {
+            final String definitionVersion, final List<String> jarDependencies) {
         super();
         this.implementationClassName = implementationClassName;
         this.id = id;
@@ -107,30 +105,13 @@ public class SConnectorImplementationDescriptor
 
     @Override
     public String toString() {
-        return "ConnectorImplementation [implementationClassName=" + implementationClassName + ", id=" + id
-                + ", version=" + version + ", definitionId="
-                + definitionId + ", definitionVersion=" + definitionVersion + ", jarDependencies=" + jarDependencies
-                + "]";
+        return new StringJoiner(", ", "ConnectorImplementation [", "]")
+                .add("implementationClassName='" + implementationClassName + "'")
+                .add("id='" + id + "'")
+                .add("version='" + version + "'")
+                .add("definitionId='" + definitionId + "'")
+                .add("definitionVersion='" + definitionVersion + "'")
+                .add("jarDependencies=" + jarDependencies)
+                .toString();
     }
-
-    /*
-     * default compare by id
-     */
-    @Override
-    public int compareTo(final SConnectorImplementationDescriptor connectorImplementation) {
-        if (comparedField != null) {
-            switch (comparedField) {
-                case SConnectorImplementationDescriptor.IMPLEMENTATION_CLASS_NAME:
-                    return implementationClassName.compareTo(connectorImplementation.getImplementationClassName());
-                case SConnectorImplementationDescriptor.VERSION:
-                    return version.compareTo(connectorImplementation.getVersion());
-                case SConnectorImplementationDescriptor.DEFINITION_ID:
-                    return definitionId.compareTo(connectorImplementation.getDefinitionId());
-                case SConnectorImplementationDescriptor.DEFINITION_VERSION:
-                    return definitionVersion.compareTo(connectorImplementation.getDefinitionVersion());
-            }
-        }
-        return id.compareTo(connectorImplementation.getId());
-    }
-
 }

@@ -1,4 +1,3 @@
-configurations { schemagen }
 dependencies {
     api project(':bpm:bonita-common')
     api project(':bpm:bonita-core:bonita-process-definition')
@@ -20,6 +19,7 @@ dependencies {
     api project(':services:bonita-expression')
     api project(':services:bonita-cache')
     api project(':bpm:bonita-core:bonita-contract-data')
+    api project(':bpm:bonita-connector-model')
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
@@ -28,27 +28,4 @@ dependencies {
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
-
-    schemagen("org.glassfish.jaxb:jaxb-jxc:${Deps.jaxbJxcVersion}")
 }
-
-tasks.register('schemagen') {
-    def destDir = file("$buildDir/schemas")
-    doLast {
-        destDir.mkdirs()
-        ant.taskdef(name: 'schemagen', classname: 'com.sun.tools.jxc.SchemaGenTask', classpath: configurations.schemagen.asPath)
-        ant.schemagen(srcdir: new File('src/main/java/'), destdir: destDir, includeAntRuntime: false) {
-            schema(file: "connectors-impl.xsd", namespace: "http://www.bonitasoft.org/ns/connector/implementation/6.0")
-            classpath { pathelement(path: configurations.schemagen.asPath) }
-            include(name: 'org/bonitasoft/engine/core/connector/parser/*.java')
-        }
-    }
-    inputs.dir('src/main/java/')
-    outputs.file("$destDir/connectors-impl.xsd")
-}
-
-processResources { from "$buildDir/schemas" }
-
-tasks.processResources.dependsOn tasks.schemagen
-
-tasks.schemagen.outputs.cacheIf { true }
