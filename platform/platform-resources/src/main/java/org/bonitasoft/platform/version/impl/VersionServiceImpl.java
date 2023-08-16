@@ -46,7 +46,7 @@ public class VersionServiceImpl implements VersionService {
     public String retrieveDatabaseSchemaVersion() throws PlatformException {
         final List<String> strings;
         try {
-            strings = jdbcTemplate.query(SQL_PLATFORM_VERSION, new PlatformRowMapper());
+            strings = jdbcTemplate.queryForList(SQL_PLATFORM_VERSION, String.class);
         } catch (DataAccessException e) {
             throw new PlatformException("Platform is not created. Run 'setup init' first.", e);
         }

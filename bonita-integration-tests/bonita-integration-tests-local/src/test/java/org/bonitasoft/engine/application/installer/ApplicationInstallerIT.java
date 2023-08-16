@@ -73,7 +73,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
                         new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector()));
 
         // when:
-        applicationInstallerImpl.install(applicationArchiveReader.read(applicationAsStream));
+        applicationInstallerImpl.install(applicationArchiveReader.read(applicationAsStream), "1.0.0");
 
         // then:
 
@@ -116,7 +116,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
 
         // then:
         assertThatExceptionOfType(ApplicationInstallationException.class)
-                .isThrownBy(() -> applicationInstaller.install(applicationArchive))
+                .isThrownBy(() -> applicationInstaller.install(applicationArchive, "1.0.0"))
                 .withMessage("The Application Archive contains no valid artifact to install");
     }
 }

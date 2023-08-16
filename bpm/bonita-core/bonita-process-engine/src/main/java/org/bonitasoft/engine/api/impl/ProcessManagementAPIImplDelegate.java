@@ -57,6 +57,12 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 @Slf4j
 public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */ {
 
+    private static final ProcessManagementAPIImplDelegate instance = new ProcessManagementAPIImplDelegate();
+
+    public static ProcessManagementAPIImplDelegate getInstance() {
+        return instance;
+    }
+
     private static ServiceAccessor getServiceAccessor() {
         try {
             return ServiceAccessorFactory.getInstance().createServiceAccessor();

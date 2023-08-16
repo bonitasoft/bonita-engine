@@ -280,4 +280,9 @@ public class TenantStateManager {
         LOGGER.info("Successful synchronized tenant maintenance operation {} for tenant {}", operationName, tenantId);
         return operationReturn;
     }
+
+    public synchronized String getStatus() throws Exception {
+        STenant tenant = getTenantInTransaction();
+        return tenant.getStatus();
+    }
 }

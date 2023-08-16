@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.platform.version.impl;
 
+import static org.bonitasoft.platform.version.impl.ApplicationVersionServiceImpl.SQL_PLATFORM_APPLICATION_VERSION;
+import static org.bonitasoft.platform.version.impl.ApplicationVersionServiceImpl.SQL_PLATFORM_APPLICATION_VERSION_UPDATE;
+import static org.mockito.Mockito.*;
+
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -21,11 +25,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -33,7 +33,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author laurent Leseigneur
  */
 @RunWith(MockitoJUnitRunner.class)
-public class VersionServiceImplTest {
+public class ApplicationVersionServiceImplTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -46,19 +46,33 @@ public class VersionServiceImplTest {
 
     @InjectMocks
     @Spy
-    VersionServiceImpl versionService;
+    ApplicationVersionServiceImpl applicationVersionService;
 
     @Test
-    public void should_return_platform_database_version() throws Exception {
+    public void should_return_application_version_from_database() throws Exception {
         //given
-        Mockito.doReturn(List.of("a.b.c")).when(jdbcTemplate).queryForList(ArgumentMatchers.anyString(),
+        doReturn(List.of("a.b.c")).when(jdbcTemplate).queryForList(eq(SQL_PLATFORM_APPLICATION_VERSION),
                 ArgumentMatchers.eq(String.class));
 
         //when
-        final String platformVersion = versionService.retrieveDatabaseSchemaVersion();
+        final String appVersion = applicationVersionService.retrieveApplicationVersion();
 
         //then
-        Assertions.assertThat(platformVersion).as("should return same version").isEqualTo("a.b.c");
+        verify(jdbcTemplate, times(1)).queryForList(SQL_PLATFORM_APPLICATION_VERSION, String.class);
+        Assertions.assertThat(appVersion).as("should return same version").isEqualTo("a.b.c");
+    }
+
+    @Test
+    public void should_update_application_version() throws Exception {
+        //given
+        doReturn(1).when(jdbcTemplate).update(eq(SQL_PLATFORM_APPLICATION_VERSION_UPDATE),
+                eq("1.1.1"));
+
+        //when
+        applicationVersionService.updateApplicationVersion("1.1.1");
+
+        //then
+        verify(jdbcTemplate, times(1)).update(SQL_PLATFORM_APPLICATION_VERSION_UPDATE, "1.1.1");
     }
 
 }

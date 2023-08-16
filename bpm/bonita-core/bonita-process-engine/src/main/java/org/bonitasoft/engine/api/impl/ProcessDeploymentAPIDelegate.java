@@ -20,13 +20,7 @@ import java.util.Map;
 import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
-import org.bonitasoft.engine.bpm.process.V6FormDeployException;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -37,8 +31,14 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfos;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -166,4 +166,23 @@ public class ProcessDeploymentAPIDelegate {
             throw new RetrieveException(e);
         }
     }
+
+    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(final SearchOptions searchOptions)
+            throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantServiceAccessor();
+
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor
+                .getSearchProcessDefinitionsDescriptor();
+        final SearchProcessDeploymentInfos transactionSearch = new SearchProcessDeploymentInfos(
+                processDefinitionService, searchDescriptor, searchOptions);
+        try {
+            transactionSearch.execute();
+        } catch (final SBonitaException e) {
+            throw new SearchException("Can't get processDefinition's executing searchProcessDefinitions()", e);
+        }
+        return transactionSearch.getResult();
+    }
+
 }
