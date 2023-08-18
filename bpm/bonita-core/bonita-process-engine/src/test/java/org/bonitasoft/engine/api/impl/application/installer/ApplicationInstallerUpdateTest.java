@@ -89,6 +89,8 @@ public class ApplicationInstallerUpdateTest {
 
         // bypass update version
         doNothing().when(applicationInstaller).updateApplicationVersion("1.0.1");
+        doNothing().when(applicationInstaller).pauseTenantInSession();
+        doNothing().when(applicationInstaller).resumeTenantInSession();
     }
 
     @Test
@@ -218,16 +220,12 @@ public class ApplicationInstallerUpdateTest {
         File bdm = createTempFile("bdm", "zip", bdmZipContent);
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.setBdm(bdm);
-            doNothing().when(applicationInstaller).pauseTenant();
             doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
-            doNothing().when(applicationInstaller).resumeTenant();
             doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
 
             applicationInstaller.update(applicationArchive, "1.0.1");
 
-            verify(applicationInstaller).pauseTenant();
             verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
-            verify(applicationInstaller).resumeTenant();
         }
     }
 

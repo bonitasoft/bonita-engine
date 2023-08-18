@@ -220,17 +220,13 @@ public class ApplicationInstallerTest {
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.setBdm(bdm);
             doNothing().when(applicationInstaller).installOrganization(any(), any());
-            doNothing().when(applicationInstaller).pauseTenant();
             doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
-            doNothing().when(applicationInstaller).resumeTenant();
             doReturn(Collections.emptyList()).when(applicationInstaller).installProcesses(any(), any());
             doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
 
             applicationInstaller.install(applicationArchive, "1.0.0");
 
-            verify(applicationInstaller).pauseTenant();
             verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
-            verify(applicationInstaller).resumeTenant();
         }
 
     }
