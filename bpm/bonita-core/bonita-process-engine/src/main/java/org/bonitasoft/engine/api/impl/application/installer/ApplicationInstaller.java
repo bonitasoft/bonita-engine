@@ -183,6 +183,7 @@ public class ApplicationInstaller {
         }
         final ExecutionResult executionResult = new ExecutionResult();
         try {
+            pauseTenantInSession();
             final long startPoint = System.currentTimeMillis();
             log.info("Starting Application Archive installation...");
             installBusinessDataModel(applicationArchive);
@@ -197,10 +198,53 @@ public class ApplicationInstaller {
         } catch (Exception e) {
             logInstallationResult(executionResult);
             throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
+        } finally {
+            try {
+                resumeTenantInSession();
+            } catch (Exception e) {
+                log.error("Error when resuming the tenant after installation");
+                log.error(e.getMessage());
+            }
         }
         if (executionResult.hasErrors()) {
             throw new ApplicationInstallationException("The Application Archive install operation has been aborted");
         }
+    }
+
+    @VisibleForTesting
+    public void resumeTenantInSession() throws Exception {
+        inSession(() -> {
+            try {
+                tenantStateManager.resume();
+                transactionService.executeInTransaction(() -> {
+                    businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getTenantAccessor());
+                    return null;
+                });
+            } catch (Exception e) {
+                throw new UpdateException(e);
+            }
+            return null;
+        });
+    }
+
+    @VisibleForTesting
+    public void pauseTenantInSession() throws Exception {
+        inSession(() -> {
+            try {
+                String status = tenantStateManager.getStatus();
+                if (status.equals("ACTIVATED")) {
+                    tenantStateManager.pause();
+                } else if (status.equals("PAUSED")) {
+                    // do nothing, tenant already paused
+                } else {
+                    throw new UpdateException(
+                            "The default tenant is in state " + status + " and cannot be paused. Aborting.");
+                }
+            } catch (Exception e) {
+                throw new UpdateException(e);
+            }
+            return null;
+        });
     }
 
     protected void updateArtifacts(ApplicationArchive applicationArchive, ExecutionResult executionResult)
@@ -366,33 +410,9 @@ public class ApplicationInstaller {
     @VisibleForTesting
     public void installBusinessDataModel(ApplicationArchive applicationArchive) throws Exception {
         if (applicationArchive.getBdm() != null) {
-            inSession(() -> {
-                pauseTenant();
-                return null;
-            });
-            try {
-                final String bdmVersion = inSession(
-                        () -> inTransaction(() -> updateBusinessDataModel(applicationArchive)));
-                log.info("BDM successfully installed (version({})", bdmVersion);
-            } finally {
-                inSession(() -> {
-                    resumeTenant();
-                    return null;
-                });
-            }
-        }
-    }
-
-    @VisibleForTesting
-    protected void resumeTenant() throws UpdateException {
-        try {
-            tenantStateManager.resume();
-            transactionService.executeInTransaction(() -> {
-                businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getTenantAccessor());
-                return null;
-            });
-        } catch (Exception e) {
-            throw new UpdateException(e);
+            final String bdmVersion = inSession(
+                    () -> inTransaction(() -> updateBusinessDataModel(applicationArchive)));
+            log.info("BDM successfully installed (version({})", bdmVersion);
         }
     }
 
@@ -446,23 +466,6 @@ public class ApplicationInstaller {
             throw e;
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
-        }
-    }
-
-    @VisibleForTesting
-    protected void pauseTenant() throws UpdateException {
-        try {
-            String status = tenantStateManager.getStatus();
-            if (status.equals("ACTIVATED")) {
-                tenantStateManager.pause();
-            } else if (status.equals("PAUSED")) {
-                // do nothing, tenant already paused
-            } else {
-                throw new UpdateException(
-                        "The default tenant is in state " + status + " and cannot be paused. Aborting.");
-            }
-        } catch (Exception e) {
-            throw new UpdateException(e);
         }
     }
 
