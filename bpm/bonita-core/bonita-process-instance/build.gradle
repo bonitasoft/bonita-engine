@@ -1,4 +1,6 @@
 dependencies {
+    api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
+
     api project(':bpm:bonita-common')
     api project(':bpm:bonita-core:bonita-process-definition')
     api project(':services:bonita-identity')
@@ -19,11 +21,13 @@ dependencies {
     api project(':services:bonita-expression')
     api project(':services:bonita-cache')
     api project(':bpm:bonita-core:bonita-contract-data')
-    api project(':bpm:bonita-connector-model')
+    api 'org.bonitasoft.engine:bonita-connector-model'
+
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
