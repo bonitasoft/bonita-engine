@@ -32,6 +32,7 @@ dependencyManagement {
         dependency("org.hibernate:hibernate-ehcache:${Deps.hibernateVersion}") {
             exclude 'net.sf.ehcache:ehcache'
         }
+        dependency "javax.persistence:javax.persistence-api:${Deps.javaxPersistenceApiVersion}"
         dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
         dependency "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
         dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
