@@ -50,6 +50,8 @@ class Deps {
     public static String hazelcastVersion = "5.1.5"
     //Last version compatible with hibernate 5
     public static String hazelcastHibernateVersion = "2.1.1"
+    // javax.persistence-api used by hibernate
+    public static String javaxPersistenceApiVersion = "2.2"
 
     public static String guavaVersion = "32.1.2-jre"
     public static String antlr4RuntimeVersion = "4.7.2"
