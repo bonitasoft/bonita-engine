@@ -14,9 +14,15 @@
 package org.bonitasoft.engine.persistence;
 
 /**
- * Interface for all PersistentObject 's that are not at tenant level
+ * Interface for all PersistentObject 's that are not at tenant level.
+ * /!\ When tenant is completely removed, remove this class and simplify class hierarchy.
  *
  * @author Emmanuel Duchastenier
  */
 public interface PlatformPersistentObject extends PersistentObject {
+
+    @Override
+    default void setTenantId(long id) {
+        // do nothing at platform level
+    }
 }

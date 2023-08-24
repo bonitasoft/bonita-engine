@@ -25,7 +25,6 @@ import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.
 import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
 import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
 import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
-import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
 import static org.bonitasoft.engine.test.persistence.builder.SupervisorBuilder.aSupervisor;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
@@ -670,7 +669,6 @@ public class ProcessInstanceQueriesTest {
 
         final SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
 
@@ -701,7 +699,6 @@ public class ProcessInstanceQueriesTest {
         // Given
         final SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(1, processInstanceWithFailedFlowNode.getId()));
 
@@ -720,7 +717,6 @@ public class ProcessInstanceQueriesTest {
         final SProcessInstance processInstanceWithFailedFlowNode = SProcessInstance.builder().name("process2")
                 .processDefinitionId(10L)
                 .id(2)
-                .tenantId(DEFAULT_TENANT_ID)
                 .build();
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(1, processInstanceWithFailedFlowNode.getId()));
@@ -754,7 +750,6 @@ public class ProcessInstanceQueriesTest {
         // Given
         final SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(1, processInstanceWithFailedFlowNode.getId()));
 
@@ -780,14 +775,12 @@ public class ProcessInstanceQueriesTest {
 
         SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
         repository.add(buildFailedProcessInstance(3, 11L));
 
         processInstanceWithFailedFlowNode = new SProcessInstance("process2", 15L);
         processInstanceWithFailedFlowNode.setId(4);
-        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(853, processInstanceWithFailedFlowNode.getId()));
         repository.add(buildStartedProcessInstance(5, 15L));
@@ -814,14 +807,12 @@ public class ProcessInstanceQueriesTest {
 
         SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
         repository.add(buildFailedProcessInstance(3, 11L));
 
         processInstanceWithFailedFlowNode = new SProcessInstance("process2", 15L);
         processInstanceWithFailedFlowNode.setId(4);
-        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(853, processInstanceWithFailedFlowNode.getId()));
         repository.add(buildStartedProcessInstance(5, 15L));
@@ -841,7 +832,6 @@ public class ProcessInstanceQueriesTest {
         sGatewayInstance.setId(gatewayId);
         sGatewayInstance.setStateId(3);
         sGatewayInstance.setLogicalGroup(3, parentProcessInstanceId);
-        sGatewayInstance.setTenantId(DEFAULT_TENANT_ID);
         return sGatewayInstance;
     }
 
@@ -851,16 +841,13 @@ public class ProcessInstanceQueriesTest {
 
     private SProcessInstance buildStartedProcessInstance(final long processInstanceId, final long processDefinitionId) {
         return SProcessInstance.builder().name("process" + processInstanceId).processDefinitionId(processDefinitionId)
-                .id(processInstanceId)
-                .stateId(STARTED.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
+                .id(processInstanceId).stateId(STARTED.getId()).build();
     }
 
     private SProcessInstance buildFailedProcessInstance(final long processInstanceId, final long processDefinitionId) {
         return SProcessInstance.builder().name("process" + processInstanceId).processDefinitionId(processDefinitionId)
                 .id(processInstanceId)
-                .stateId(7)
-                .tenantId(DEFAULT_TENANT_ID).build();
+                .stateId(7).build();
     }
 
     @Test
@@ -992,21 +979,17 @@ public class ProcessInstanceQueriesTest {
     public void should_return_process_instance_ids_to_restart_are_in_the_expected_states() {
 
         SProcessInstance process1 = SProcessInstance.builder().id(1).name("process1").stateId(INITIALIZING.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
+                .build();
         SProcessInstance process2 = SProcessInstance.builder().id(2).name("process2").stateId(COMPLETING.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
+                .build();
         SProcessInstance process3 = SProcessInstance.builder().id(3).name("process3").stateId(COMPLETED.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
+                .build();
         SProcessInstance process4 = SProcessInstance.builder().id(4).name("process4").stateId(CANCELLED.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
-        SProcessInstance process5 = SProcessInstance.builder().id(5).name("process5").stateId(ABORTED.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
-        SProcessInstance process6 = SProcessInstance.builder().id(6).name("process6").stateId(STARTED.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
-        SProcessInstance process7 = SProcessInstance.builder().id(7).name("process7").stateId(ERROR.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
-        SProcessInstance process8 = SProcessInstance.builder().id(8).name("process8").stateId(ABORTING.getId())
-                .tenantId(DEFAULT_TENANT_ID).build();
+                .build();
+        SProcessInstance process5 = SProcessInstance.builder().id(5).name("process5").stateId(ABORTED.getId()).build();
+        SProcessInstance process6 = SProcessInstance.builder().id(6).name("process6").stateId(STARTED.getId()).build();
+        SProcessInstance process7 = SProcessInstance.builder().id(7).name("process7").stateId(ERROR.getId()).build();
+        SProcessInstance process8 = SProcessInstance.builder().id(8).name("process8").stateId(ABORTING.getId()).build();
 
         repository.add(process1, process2, process3, process4, process5, process6, process7, process8);
 

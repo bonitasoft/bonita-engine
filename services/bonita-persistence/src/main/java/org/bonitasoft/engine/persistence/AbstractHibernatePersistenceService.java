@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import java.io.Serializable;
 import java.util.*;
 
 import javax.sql.DataSource;
@@ -144,10 +145,12 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             if (session.contains(entity)) {
                 session.delete(entity);
             } else {
-                final long tenantId = (entity instanceof PlatformPersistentObject) ? 0L : getTenantId();
                 final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
+                final Serializable id = (entity instanceof PlatformPersistentObject)
+                        ? entity.getId()
+                        : new PersistentObjectId(entity.getId(), getTenantId());
                 // Deletion must be performed on the session entity and not on a potential transitional entity.
-                final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), tenantId));
+                final Object pe = session.get(mappedClass, id);
                 session.delete(pe);
             }
         } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {

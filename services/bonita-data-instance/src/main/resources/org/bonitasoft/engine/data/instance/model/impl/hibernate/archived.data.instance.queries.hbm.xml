@@ -50,7 +50,7 @@
 		FROM org.bonitasoft.engine.data.instance.model.archive.SADataInstance AS sa
 		WHERE sa.containerId = :containerId
 		AND sa.containerType = :containerType
-		ORDER BY sa.tenantId, sa.id
+		ORDER BY sa.id
 	</query>
 
 	<query name="getLastLocalSADataInstances">

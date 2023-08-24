@@ -27,7 +27,6 @@ ALTER TABLE processcategorymapping DROP FOREIGN KEY fk_processcategorymapping_te
 ALTER TABLE process_comment DROP FOREIGN KEY fk_process_comment_tenantId;
 ALTER TABLE process_definition DROP FOREIGN KEY fk_process_definition_tenantId;
 ALTER TABLE process_definition DROP FOREIGN KEY fk_process_definition_content;
-ALTER TABLE process_instance DROP FOREIGN KEY fk_process_instance_tenantId;
 ALTER TABLE processsupervisor DROP FOREIGN KEY fk_processsupervisor_tenantId;
 ALTER TABLE profile DROP FOREIGN KEY fk_profile_tenantId;
 ALTER TABLE profilemember DROP FOREIGN KEY fk_profilemember_tenantId;

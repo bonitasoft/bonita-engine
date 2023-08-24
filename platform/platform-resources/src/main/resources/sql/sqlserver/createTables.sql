@@ -306,7 +306,6 @@ GO
 CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (tenantId, containerId, containerType)
 GO
 CREATE TABLE process_instance (
-  tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(75) NOT NULL,
   processDefinitionId NUMERIC(19, 0) NOT NULL,
@@ -328,11 +327,11 @@ CREATE TABLE process_instance (
   stringIndex3 NVARCHAR(255),
   stringIndex4 NVARCHAR(255),
   stringIndex5 NVARCHAR(255),
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (id)
 )
 GO
 
-CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid)
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (processdefinitionid, stateid)
 GO
 
 CREATE TABLE flownode_instance (
@@ -515,7 +514,7 @@ CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (tenantid, fn_inst_id)
 GO
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data PRIMARY KEY (tenantid, id)
 GO
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (tenantid, proc_inst_id) REFERENCES process_instance(tenantid, id) ON DELETE CASCADE
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (proc_inst_id) REFERENCES process_instance(id) ON DELETE CASCADE
 GO
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE
 GO

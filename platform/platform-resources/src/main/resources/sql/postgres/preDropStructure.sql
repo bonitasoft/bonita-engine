@@ -28,7 +28,6 @@ ALTER TABLE processcategorymapping DROP CONSTRAINT fk_processcategorymapping_ten
 ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_tenantId;
 ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_tenantId;
 ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_content;
-ALTER TABLE process_instance DROP CONSTRAINT fk_process_instance_tenantId;
 ALTER TABLE processsupervisor DROP CONSTRAINT fk_processsupervisor_tenantId;
 ALTER TABLE profile DROP CONSTRAINT fk_profile_tenantId;
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId;

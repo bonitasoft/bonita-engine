@@ -720,8 +720,7 @@
 				and actor.scopeid = :processId
 				and actor.initiator = :trueValue
 			) JOIN user_membership ON (
-				user_membership.tenantid = actormember.tenantid
-				and (
+				 (
                  (actormember.groupId = user_membership.groupId and actormember.roleId = -1)
 					or
                  (actormember.roleId = user_membership.roleId and actormember.groupId = -1)
@@ -756,8 +755,7 @@
 				and actor.scopeid = :processId
 				and actor.initiator = :trueValue
 			) JOIN user_membership ON (
-				user_membership.tenantid = actormember.tenantid
-				and (
+				(
                  (actormember.groupId = user_membership.groupId and actormember.roleId = -1)
 					  or
                  (actormember.roleId = user_membership.roleId and actormember.groupId = -1)

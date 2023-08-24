@@ -22,30 +22,22 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 
 public class SequenceDAO {
 
-    static final String NEXTID = "nextid";
-    static final String SELECT_BY_ID = "SELECT * FROM sequence WHERE tenantid = ? AND id = ?";
+    static final String NEXT_ID = "nextid";
+    static final String SELECT_BY_ID = "SELECT * FROM sequence WHERE id = ?";
 
-    static final String UPDATE_SEQUENCE = "UPDATE sequence SET nextId = ? WHERE tenantid = ? AND id = ?";
+    static final String UPDATE_SEQUENCE = "UPDATE sequence SET nextId = ? WHERE id = ?";
 
-    private Connection connection;
-    private Long tenantId;
+    private final Connection connection;
 
-    public SequenceDAO(Connection connection, Long tenantId) {
+    public SequenceDAO(Connection connection) {
         this.connection = connection;
-        this.tenantId = tenantId;
     }
 
     protected void updateSequence(long nextSequenceId, long id) throws SQLException {
-        PreparedStatement updateSequencePreparedStatement = connection.prepareStatement(UPDATE_SEQUENCE);
-        try {
+        try (PreparedStatement updateSequencePreparedStatement = connection.prepareStatement(UPDATE_SEQUENCE)) {
             updateSequencePreparedStatement.setObject(1, nextSequenceId);
-            updateSequencePreparedStatement.setObject(2, tenantId);
-            updateSequencePreparedStatement.setObject(3, id);
+            updateSequencePreparedStatement.setObject(2, id);
             updateSequencePreparedStatement.executeUpdate();
-        } finally {
-            if (updateSequencePreparedStatement != null) {
-                updateSequencePreparedStatement.close();
-            }
         }
     }
 
@@ -54,10 +46,9 @@ public class SequenceDAO {
         ResultSet resultSet = null;
         try {
             selectByIdPreparedStatement = connection.prepareStatement(SELECT_BY_ID);
-            selectByIdPreparedStatement.setLong(1, tenantId);
-            selectByIdPreparedStatement.setLong(2, id);
+            selectByIdPreparedStatement.setLong(1, id);
             resultSet = selectByIdPreparedStatement.executeQuery();
-            return getNextId(id, tenantId, resultSet);
+            return getNextId(id, resultSet);
         } finally {
             if (selectByIdPreparedStatement != null) {
                 selectByIdPreparedStatement.close();
@@ -68,19 +59,19 @@ public class SequenceDAO {
         }
     }
 
-    private long getNextId(final long id, final long tenantId, final ResultSet resultSet)
+    private long getNextId(final long id, final ResultSet resultSet)
             throws SQLException, SObjectNotFoundException {
         try {
             if (resultSet.next()) {
-                final long nextId = resultSet.getLong(NEXTID);
+                final long nextId = resultSet.getLong(NEXT_ID);
 
                 if (resultSet.wasNull()) {
-                    throw new SQLException("Did not expect a null value for the column " + NEXTID);
+                    throw new SQLException("Did not expect a null value for the column " + NEXT_ID);
                 }
 
                 if (resultSet.next()) {
                     throw new SQLException(
-                            "Did not expect more than one value for tenantId:" + tenantId + " id: " + id);
+                            "Did not expect more than one value for id: " + id);
                 }
 
                 return nextId;
@@ -88,7 +79,7 @@ public class SequenceDAO {
         } finally {
             closeResultSet(resultSet);
         }
-        throw new SObjectNotFoundException("Found no row for tenantId:" + tenantId + " id: " + id);
+        throw new SObjectNotFoundException("Found no row for id: " + id);
     }
 
     private void closeResultSet(final ResultSet resultSet) {

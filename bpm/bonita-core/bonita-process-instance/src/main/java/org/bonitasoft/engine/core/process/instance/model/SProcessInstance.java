@@ -23,8 +23,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -39,8 +38,7 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 @Builder
 @Entity
 @Table(name = "process_instance")
-@IdClass(PersistentObjectId.class)
-public class SProcessInstance implements PersistentObject {
+public class SProcessInstance implements PlatformPersistentObject {
 
     private static final long DEFAULT_INTERRUPTING_EVENT_ID = -1L;
     public static final String STRING_INDEX_KEY = "stringIndex";
@@ -64,8 +62,6 @@ public class SProcessInstance implements PersistentObject {
     public static final String CALLER_ID = "callerId";
     @Id
     private long id;
-    @Id
-    private long tenantId;
     private String name;
     private long processDefinitionId;
     private String description;
