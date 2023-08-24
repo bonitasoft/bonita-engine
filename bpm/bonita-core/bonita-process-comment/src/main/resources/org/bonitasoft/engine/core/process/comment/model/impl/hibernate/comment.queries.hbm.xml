@@ -56,16 +56,13 @@
 				SELECT DISTINCT pi.id
 				FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS pi
 				WHERE pi.processDefinitionId = supervisor.processDefId
-				AND pi.tenantId = supervisor.tenantId
 			)
 			OR comment.processInstanceId IN (
 				SELECT DISTINCT api.sourceObjectId
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS api
 				WHERE api.processDefinitionId = supervisor.processDefId
-				AND api.tenantId = supervisor.tenantId
 			)
 		)
-		AND comment.tenantId = supervisor.tenantId
 	</query>
 
 	<query name="searchSCommentSupervisedBy">
@@ -91,16 +88,13 @@
 				SELECT DISTINCT pi.id
 				FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS pi
 				WHERE pi.processDefinitionId = supervisor.processDefId
-				AND pi.tenantId = supervisor.tenantId
 			)
 			OR comment.processInstanceId IN (
 				SELECT DISTINCT api.sourceObjectId
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS api
 				WHERE api.processDefinitionId = supervisor.processDefId
-				AND api.tenantId = supervisor.tenantId
 			)
 		)
-		AND comment.tenantId = supervisor.tenantId
 	</query>
 
 	<query name="getNumberOfSCommentInvolvingUser">

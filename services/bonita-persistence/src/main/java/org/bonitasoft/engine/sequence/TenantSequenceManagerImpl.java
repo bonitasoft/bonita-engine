@@ -132,7 +132,7 @@ public class TenantSequenceManagerImpl {
                 Connection connection = getConnection();
                 try {
                     connection.setAutoCommit(false);
-                    SequenceDAO sequenceDAO = createDao(connection, tenantId);
+                    SequenceDAO sequenceDAO = createDao(connection);
                     long nextAvailableId = sequenceDAO.selectById(sequenceId);
                     sequenceDAO.updateSequence(nextAvailableId + sequenceIdToRangeSize.get(sequenceId), sequenceId);
                     connection.commit();
@@ -206,8 +206,8 @@ public class TenantSequenceManagerImpl {
         }
     }
 
-    SequenceDAO createDao(Connection connection, Long tenantId) {
-        return new SequenceDAO(connection, tenantId);
+    SequenceDAO createDao(Connection connection) {
+        return new SequenceDAO(connection);
     }
 
     private static void manageException(int attempt, final long sleepTime, final Exception t) {

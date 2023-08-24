@@ -87,7 +87,7 @@ public class TenantSequenceManagerImplTest {
                 classNameToSequenceId, dataSource, RETRIES, 1, 1) {
 
             @Override
-            SequenceDAO createDao(Connection connection, Long tenantId) {
+            SequenceDAO createDao(Connection connection) {
                 return sequenceDAO;
             }
         };

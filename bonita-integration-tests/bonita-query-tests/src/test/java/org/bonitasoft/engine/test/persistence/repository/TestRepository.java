@@ -20,6 +20,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -110,6 +111,20 @@ public class TestRepository {
     }
 
     public <T extends PersistentObject> void add(T... entities) {
+        for (T entity : entities) {
+            add(entity);
+        }
+    }
+
+    public <T extends PlatformPersistentObject> T add(T entity) {
+        if (entity.getId() <= 0) {
+            entity.setId(new Random().nextLong());
+        }
+        getSession().save(entity);
+        return (T) getSession().get(entity.getClass(), entity.getId());
+    }
+
+    public <T extends PlatformPersistentObject> void add(T... entities) {
         for (T entity : entities) {
             add(entity);
         }

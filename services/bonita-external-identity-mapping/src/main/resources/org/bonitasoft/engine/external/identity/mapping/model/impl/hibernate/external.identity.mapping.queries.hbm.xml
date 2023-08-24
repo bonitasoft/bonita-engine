@@ -73,8 +73,7 @@
 					SELECT eim.id
 					FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS eim,
 						 org.bonitasoft.engine.identity.model.SUserMembership AS um
-					WHERE eim.tenantId = ext_ident_mapping.tenantId AND um.tenantId = eim.tenantId
-					AND um.userId = :userId
+					WHERE um.userId = :userId
 					AND (
 						(eim.groupId = um.groupId AND eim.roleId &lt;= 0)
 						OR (eim.roleId = um.roleId AND eim.groupId &lt;= 0)
@@ -97,8 +96,7 @@
 					SELECT eim.id
 					FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS eim,
 						 org.bonitasoft.engine.identity.model.SUserMembership AS um
-					WHERE eim.tenantId = ext_ident_mapping.tenantId AND um.tenantId = eim.tenantId
-					AND um.userId = :userId
+					WHERE um.userId = :userId
 					AND (
 						(eim.groupId = um.groupId AND eim.roleId &lt;= 0)
 						OR (eim.roleId = um.roleId AND eim.groupId &lt;= 0)

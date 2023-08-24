@@ -15,7 +15,7 @@ package org.bonitasoft.engine.sequence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.bonitasoft.engine.sequence.SequenceDAO.NEXTID;
+import static org.bonitasoft.engine.sequence.SequenceDAO.NEXT_ID;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -35,7 +35,6 @@ import org.mockito.junit.MockitoRule;
 
 public class SequenceDAOTest {
 
-    private static final Long TENANT_ID = 2L;
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
@@ -49,7 +48,7 @@ public class SequenceDAOTest {
 
     @Before
     public void before() {
-        sequenceDAO = new SequenceDAO(connection, TENANT_ID);
+        sequenceDAO = new SequenceDAO(connection);
     }
 
     @Test
@@ -57,12 +56,11 @@ public class SequenceDAOTest {
         doReturn(preparedStatement).when(connection).prepareStatement(SequenceDAO.SELECT_BY_ID);
         doReturn(resultSet).when(preparedStatement).executeQuery();
         doReturn(true, false).when(resultSet).next();
-        doReturn(2349L).when(resultSet).getLong(NEXTID);
+        doReturn(2349L).when(resultSet).getLong(NEXT_ID);
 
         long nextId = sequenceDAO.selectById(123L);
 
-        verify(preparedStatement).setLong(1, TENANT_ID);
-        verify(preparedStatement).setLong(2, 123L);
+        verify(preparedStatement).setLong(1, 123L);
         assertThat(nextId).isEqualTo(2349);
     }
 
@@ -74,7 +72,7 @@ public class SequenceDAOTest {
 
         assertThatThrownBy(() -> sequenceDAO.selectById(123L))
                 .isInstanceOf(SQLException.class)
-                .hasMessage("Did not expect more than one value for tenantId:2 id: 123");
+                .hasMessage("Did not expect more than one value for id: 123");
     }
 
     @Test
@@ -85,7 +83,7 @@ public class SequenceDAOTest {
 
         assertThatThrownBy(() -> sequenceDAO.selectById(123L))
                 .isInstanceOf(SObjectNotFoundException.class)
-                .hasMessage("Found no row for tenantId:2 id: 123");
+                .hasMessage("Found no row for id: 123");
     }
 
     @Test
@@ -108,7 +106,6 @@ public class SequenceDAOTest {
         sequenceDAO.updateSequence(11233L, 123L);
 
         verify(preparedStatement).setObject(1, 11233L);
-        verify(preparedStatement).setObject(2, TENANT_ID);
-        verify(preparedStatement).setObject(3, 123L);
+        verify(preparedStatement).setObject(2, 123L);
     }
 }
