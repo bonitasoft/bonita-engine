@@ -306,4 +306,24 @@ public class TestProcessFactory {
     public void add(TestProcess testProcess) {
         getProcessList().put(testProcess.getProcessDefinition().getName(), testProcess);
     }
+
+    /**
+     * @param parameters
+     *        <name, type>
+     */
+    public static TestProcess createProcessWithParameters(Map<String, String> parameters) {
+        ProcessDefinitionBuilder processBuilder = getDefaultProcessDefinitionBuilder("aProcessWithParameters");
+        for (Map.Entry<String, String> parameter : parameters.entrySet()) {
+            processBuilder.addParameter(parameter.getKey(), parameter.getValue());
+        }
+        try {
+            BusinessArchiveBuilder barBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                    .setParameters(parameters).setProcessDefinition(processBuilder.done());
+            final TestProcess testProcess = new TestProcess(barBuilder);
+            getInstance().getProcessList().put(testProcess.getProcessDefinition().getName(), testProcess);
+            return testProcess;
+        } catch (InvalidProcessDefinitionException e) {
+            throw new TestToolkitException("Unable to create a process with parameters", e);
+        }
+    }
 }
