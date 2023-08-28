@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -173,8 +174,8 @@ public class ApplicationInstaller {
         installOrUpdateLayouts(applicationArchive, executionResult);
         installOrUpdateThemes(applicationArchive, executionResult);
         installLivingApplications(applicationArchive, executionResult, FAIL_ON_DUPLICATES);
-        List<Long> processDefinitionIds = installProcesses(applicationArchive, executionResult);
-        enableResolvedProcesses(processDefinitionIds, executionResult);
+        List<Long> newlyInstalledProcessIds = installProcesses(applicationArchive, executionResult);
+        enableResolvedProcesses(newlyInstalledProcessIds, executionResult);
     }
 
     public void update(ApplicationArchive applicationArchive, String version) throws ApplicationInstallationException {
@@ -258,36 +259,10 @@ public class ApplicationInstaller {
 
         installLivingApplications(applicationArchive, executionResult, ApplicationImportPolicy.REPLACE_DUPLICATES);
 
-        List<Long> processDefinitionIds = updateOrInstallProcesses(applicationArchive, executionResult);
+        List<Long> newlyInstalledProcessIds = installProcesses(applicationArchive, executionResult);
 
-        enableResolvedProcesses(processDefinitionIds, executionResult);
-    }
-
-    protected List<Long> updateOrInstallProcesses(ApplicationArchive applicationArchive,
-            ExecutionResult executionResult) throws IOException, InvalidBusinessArchiveFormatException, SearchException,
-            ProcessDeployException, SBonitaException {
-        List<Long> processDefinitionIds = new ArrayList<>();
-
-        for (File processFile : applicationArchive.getProcesses()) {
-            try (var is = new FileInputStream(processFile)) {
-                final BusinessArchive businessArchive = BusinessArchiveFactory
-                        .readBusinessArchive(is);
-                String version = businessArchive.getProcessDefinition().getVersion();
-                String name = businessArchive.getProcessDefinition().getName();
-
-                List<ProcessDeploymentInfo> deployedProcesses = getDeployedProcessesByName(name);
-                if (deployedProcesses.stream().noneMatch(p -> p.getVersion().equals(version))) {
-                    processDefinitionIds.add(deployProcess(businessArchive, executionResult));
-                    for (ProcessDeploymentInfo deployedProcess : deployedProcesses) {
-                        disableProcess(deployedProcess.getProcessId());
-                    }
-                } else {
-                    log.info("Process {} in version {} already exists in the database, it will not be redeployed", name,
-                            version);
-                }
-            }
-        }
-        return processDefinitionIds;
+        disableOldProcesses(newlyInstalledProcessIds, executionResult);
+        enableResolvedProcesses(newlyInstalledProcessIds, executionResult);
     }
 
     @VisibleForTesting
@@ -301,11 +276,41 @@ public class ApplicationInstaller {
     }
 
     @VisibleForTesting
-    List<ProcessDeploymentInfo> getDeployedProcessesByName(String name) throws SearchException {
+    List<Long> getDeployedProcessIds() throws SearchException {
         SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, Integer.MAX_VALUE);
-        optsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.NAME, name);
         return getProcessDeploymentAPIDelegate()
-                .searchProcessDeploymentInfos(optsBuilder.done()).getResult();
+                .searchProcessDeploymentInfos(optsBuilder.done()).getResult()
+                .stream().map(ProcessDeploymentInfo::getProcessId).collect(Collectors.toList());
+    }
+
+    @VisibleForTesting
+    Optional<Long> getDeployedProcessId(String name, String version) {
+        try {
+            return Optional.of(getProcessDeploymentAPIDelegate().getProcessDefinitionId(name, version));
+        } catch (ProcessDefinitionNotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
+    public void disableOldProcesses(List<Long> installedProcessIds, ExecutionResult executionResult)
+            throws SearchException, SBonitaException, ProcessDefinitionNotFoundException {
+        List<Long> deployedProcessIds = getDeployedProcessIds();
+        // remove installed process ids
+        deployedProcessIds.removeAll(installedProcessIds);
+        // disable all processes
+        for (Long processId : deployedProcessIds) {
+            // get process Info
+            ProcessDeploymentInfo info = getProcessDeploymentInfo(processId);
+            disableProcess(processId);
+            executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_DISABLEMENT_OK,
+                    format("Process %s (%s) has been disabled successfully",
+                            info.getDisplayName(), info.getVersion())));
+        }
+    }
+
+    @VisibleForTesting
+    ProcessDeploymentInfo getProcessDeploymentInfo(Long processId) throws ProcessDefinitionNotFoundException {
+        return getProcessDeploymentAPIDelegate().getProcessDeploymentInfo(processId);
     }
 
     public void enableResolvedProcesses(List<Long> processDefinitionIds, ExecutionResult executionResult)
@@ -673,11 +678,27 @@ public class ApplicationInstaller {
             try (var is = new FileInputStream(processFile)) {
                 final BusinessArchive businessArchive = BusinessArchiveFactory
                         .readBusinessArchive(is);
-                processDefinitionIds.add(deployProcess(businessArchive, executionResult));
+                String name = businessArchive.getProcessDefinition().getName();
+                String version = businessArchive.getProcessDefinition().getVersion();
+
+                final Map<String, Serializable> context = new HashMap<>();
+                context.put(PROCESS_NAME_KEY, name);
+                context.put(PROCESS_VERSION_KEY, version);
+
+                Optional<Long> deployedProcessId = getDeployedProcessId(name, version);
+                if (deployedProcessId.isPresent()) {
+                    // skip install
+                    processDefinitionIds.add(deployedProcessId.get());
+                    executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_SKIP_INSTALL,
+                            format("Process %s (%s) already exists in the database. Skipping installation.", name,
+                                    version),
+                            context));
+                } else {
+                    processDefinitionIds.add(deployProcess(businessArchive, executionResult));
+                }
             }
         }
         return processDefinitionIds;
-
     }
 
     protected Long deployProcess(BusinessArchive businessArchive, ExecutionResult executionResult)

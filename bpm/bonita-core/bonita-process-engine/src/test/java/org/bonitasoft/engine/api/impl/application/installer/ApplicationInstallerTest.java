@@ -14,13 +14,11 @@
 package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.bonitasoft.engine.api.result.Status.Level.ERROR;
-import static org.bonitasoft.engine.api.result.Status.Level.WARNING;
-import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PAGE;
-import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_KO;
+import static org.assertj.core.api.Assertions.*;
+import static org.bonitasoft.engine.api.result.Status.Level.*;
+import static org.bonitasoft.engine.api.result.StatusCode.*;
+import static org.bonitasoft.engine.api.result.StatusContext.PROCESS_NAME_KEY;
+import static org.bonitasoft.engine.api.result.StatusContext.PROCESS_VERSION_KEY;
 import static org.bonitasoft.engine.business.application.ApplicationImportPolicy.FAIL_ON_DUPLICATES;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
@@ -31,7 +29,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -39,17 +36,14 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.ProcessDeploymentAPIDelegate;
 import org.bonitasoft.engine.api.result.ExecutionResult;
+import org.bonitasoft.engine.api.result.Status;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
@@ -62,7 +56,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.io.FileOperations;
@@ -197,6 +190,7 @@ public class ApplicationInstallerTest {
 
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
         doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
+        doReturn(Optional.empty()).when(applicationInstaller).getDeployedProcessId(any(), eq("1.0"));
 
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
@@ -239,6 +233,8 @@ public class ApplicationInstallerTest {
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
 
         doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
+        doReturn(Optional.empty()).when(applicationInstaller).getDeployedProcessId(any(), eq("1.0"));
+
         ProcessDefinition myProcess = aProcessDefinition(123L);
         doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
 
@@ -299,29 +295,33 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_throw_exception_if_already_existing_process() throws Exception {
+    public void should_skip_install_process_if_already_existing() throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
-        doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
+        doReturn(Optional.of(1L)).when(applicationInstaller).getDeployedProcessId("myProcess", "1.0");
         ProcessDefinition myProcess = aProcessDefinition(1193L);
-        doThrow(new AlreadyExistsException("already exists"))
-                .doReturn(myProcess)
-                .when(processDeploymentAPIDelegate)
-                .deploy(any());
 
         // when
         try (ApplicationArchive applicationArchive = new ApplicationArchive()) {
             applicationArchive.addProcess(process);
-            assertThatExceptionOfType(ProcessDeployException.class).isThrownBy(
-                    () -> applicationInstaller.installProcesses(applicationArchive, executionResult))
-                    .withMessageContaining("Process myProcess - 1.0 already exists");
+            applicationInstaller.installProcesses(applicationArchive, executionResult);
         }
 
-        verify(applicationInstaller).deployProcess(ArgumentMatchers
-                .argThat(b -> b.getProcessDefinition().getName().equals("myProcess")), any());
-        verify(applicationInstaller, never()).enableResolvedProcesses(any(), any());
+        // verify executionResult
+        assertThat(executionResult.hasInfo()).isTrue();
+        assertThat(executionResult.getAllStatus().get(0))
+                .returns(INFO, from(Status::getLevel))
+                .returns(PROCESS_DEPLOYMENT_SKIP_INSTALL, from(Status::getCode))
+                .returns("myProcess", from(status -> status.getContext().get(PROCESS_NAME_KEY)))
+                .returns("1.0", from(status -> status.getContext().get(PROCESS_VERSION_KEY)));
+
+        // verify deploy never called
+        verify(applicationInstaller, never()).deployProcess(
+                ArgumentMatchers.argThat(b -> b.getProcessDefinition().getName().equals("myProcess")
+                        && b.getProcessDefinition().getVersion().equals("1.0")),
+                any());
     }
 
     @Test
