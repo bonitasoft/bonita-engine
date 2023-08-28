@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
+import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.api.impl.ProcessDeploymentAPIDelegate;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -106,7 +107,7 @@ public class ApplicationInstallerUpdateTest {
                     .addLayout(layout)
                     .addTheme(theme)
                     .addRestAPIExtension(restAPI);
-
+            doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
             doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
 
             applicationInstaller.update(applicationArchive, "1.0.1");
@@ -123,6 +124,7 @@ public class ApplicationInstallerUpdateTest {
     public void should_update_application_containing_living_applications() throws Exception {
         File application = createTempFile("application", "xml", "content".getBytes());
         doReturn(emptyList()).when(applicationInstaller).importApplications(any(), eq(REPLACE_DUPLICATES));
+        doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addApplication(application);
@@ -133,16 +135,25 @@ public class ApplicationInstallerUpdateTest {
     }
 
     @Test
-    public void should_install_and_enable_resolved_process_not_previous_version_existing() throws Exception {
+    public void should_install_and_enable_resolved_process() throws Exception {
         // given
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
-        doReturn(emptyList()).when(applicationInstaller).getDeployedProcessesByName(anyString());
+        doReturn(Optional.empty()).when(applicationInstaller).getDeployedProcessId("myProcess", "1.0");
+        long newProcessId = 123L;
+        doReturn(Lists.newArrayList(newProcessId)).when(applicationInstaller).getDeployedProcessIds();
 
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
         doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
 
-        ProcessDefinition myProcess = aProcessDefinition(123L);
+        final ProcessDeploymentInfo info = mock(ProcessDeploymentInfo.class);
+        doReturn(newProcessId).when(info).getProcessId();
+        doReturn(ConfigurationState.RESOLVED).when(info).getConfigurationState();
+        doReturn(ActivationState.DISABLED).when(info).getActivationState();
+        doReturn(Map.of(newProcessId, info)).when(processDeploymentAPIDelegate)
+                .getProcessDeploymentInfosFromIds(List.of(newProcessId));
+
+        ProcessDefinition myProcess = aProcessDefinition(newProcessId);
         doReturn(myProcess).when(processDeploymentAPIDelegate).deploy(any());
 
         // when
@@ -151,9 +162,11 @@ public class ApplicationInstallerUpdateTest {
             applicationInstaller.update(applicationArchive, "1.0.1");
         }
         // then
-        verify(applicationInstaller).deployProcess(any(), any());
-        verify(processDeploymentAPIDelegate).deploy(any());
-        verify(processDeploymentAPIDelegate, never()).enableProcess(123L);
+        verify(applicationInstaller).deployProcess(
+                ArgumentMatchers.argThat(b -> b.getProcessDefinition().getName().equals("myProcess")
+                        && b.getProcessDefinition().getVersion().equals("1.0")),
+                any());
+        verify(processDeploymentAPIDelegate).enableProcess(newProcessId);
     }
 
     @Test
@@ -162,10 +175,8 @@ public class ApplicationInstallerUpdateTest {
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
 
-        ProcessDeploymentInfo deployedProcess = spy(ProcessDeploymentInfo.class);
-        doReturn("1.0").when(deployedProcess).getVersion();
-
-        doReturn(List.of(deployedProcess)).when(applicationInstaller).getDeployedProcessesByName(anyString());
+        doReturn(Optional.of(1L)).when(applicationInstaller).getDeployedProcessId(anyString(), eq("1.0"));
+        doReturn(Lists.newArrayList(1L)).when(applicationInstaller).getDeployedProcessIds();
 
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
         doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
@@ -186,6 +197,7 @@ public class ApplicationInstallerUpdateTest {
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
 
+        doReturn(Lists.newArrayList(1L, 2L, 123L)).when(applicationInstaller).getDeployedProcessIds();
         doNothing().when(applicationInstaller).disableProcess(anyLong());
 
         ProcessDeploymentInfo deployedProcess1 = spy(ProcessDeploymentInfo.class);
@@ -194,8 +206,11 @@ public class ApplicationInstallerUpdateTest {
         ProcessDeploymentInfo deployedProcess2 = spy(ProcessDeploymentInfo.class);
         doReturn("1.2").when(deployedProcess2).getVersion();
 
-        doReturn(List.of(deployedProcess1, deployedProcess2)).when(applicationInstaller)
-                .getDeployedProcessesByName(anyString());
+        doReturn(deployedProcess1).when(applicationInstaller).getProcessDeploymentInfo(eq(1L));
+        doReturn(deployedProcess2).when(applicationInstaller).getProcessDeploymentInfo(eq(2L));
+
+        doReturn(Optional.empty()).when(applicationInstaller)
+                .getDeployedProcessId(anyString(), any());
 
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
         doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
@@ -222,6 +237,7 @@ public class ApplicationInstallerUpdateTest {
             applicationArchive.setBdm(bdm);
             doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
             doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
+            doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
 
             applicationInstaller.update(applicationArchive, "1.0.1");
 
@@ -234,7 +250,9 @@ public class ApplicationInstallerUpdateTest {
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
 
-        doReturn(emptyList()).when(applicationInstaller).getDeployedProcessesByName(anyString());
+        doReturn(Lists.newArrayList(123L)).when(applicationInstaller).getDeployedProcessIds();
+        doReturn(Optional.empty()).when(applicationInstaller).getDeployedProcessId(anyString(), eq("1.0"));
+
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
         doReturn(processDeploymentAPIDelegate).when(applicationInstaller).getProcessDeploymentAPIDelegate();
 
@@ -265,6 +283,7 @@ public class ApplicationInstallerUpdateTest {
         File organization = createTempFile("org", "xml", "content".getBytes());
         doReturn(emptyList()).when(applicationInstaller).importOrganization(any(), any());
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
+        doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.setOrganization(organization);
             applicationInstaller.update(applicationArchive, "1.0.1");
