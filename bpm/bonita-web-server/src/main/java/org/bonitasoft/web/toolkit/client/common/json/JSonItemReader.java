@@ -25,7 +25,7 @@ import org.bonitasoft.web.toolkit.client.data.item.IItem;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 
 /**
- * This class is just a set of functions used to read the JSon returned by the GWT server side
+ * This class is just a set of functions used to read the JSon returned by the server side
  *
  * @author Séverin Moussel
  */

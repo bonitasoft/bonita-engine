@@ -19,7 +19,7 @@ import java.util.List;
 import org.bonitasoft.web.toolkit.client.data.item.IItem;
 
 /**
- * This class is a set of functions used to write the JSon to return to the GWT client side
+ * This class is a set of functions used to write the JSon to return to the client side
  *
  * @author Séverin Moussel
  * @param <T>
