@@ -31,9 +31,8 @@ public class LocaleUtils {
     public static final String LOCALE_PARAM = "locale";
 
     /**
-     * portal user's locale URL parameter (remove once GWT portal has been removed)
+     * user's locale URL parameter used by the login JSP
      */
-    @Deprecated
     public static final String PORTAL_LOCALE_PARAM = "_l";
 
     public static final String DEFAULT_LOCALE = "en";
