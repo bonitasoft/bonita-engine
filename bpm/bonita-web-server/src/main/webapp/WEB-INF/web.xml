@@ -11,6 +11,10 @@
         <location>/error/500</location>
     </error-page>
     <error-page>
+        <error-code>503</error-code>
+        <location>/error/503</location>
+    </error-page>
+    <error-page>
         <error-code>403</error-code>
         <location>/error/403</location>
     </error-page>
