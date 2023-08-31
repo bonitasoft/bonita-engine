@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.console.common.server.login.filter;
 
-public class TenantIsPausedException extends RuntimeException {
+public class PlatformUnderMaintenanceException extends RuntimeException {
 
     private static final long serialVersionUID = 4836182063504328577L;
 
-    public TenantIsPausedException(final String message) {
+    public PlatformUnderMaintenanceException(final String message) {
         super(message);
     }
 
