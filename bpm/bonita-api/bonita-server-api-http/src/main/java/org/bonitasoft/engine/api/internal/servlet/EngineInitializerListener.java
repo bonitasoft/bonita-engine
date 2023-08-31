@@ -21,10 +21,9 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.GenericWebApplicationContext;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 public class EngineInitializerListener implements ServletContextListener {
 
@@ -40,18 +39,23 @@ public class EngineInitializerListener implements ServletContextListener {
                     .createServiceAccessor()
                     .getContext();
 
-            GenericWebApplicationContext webApplicationContext = new GenericWebApplicationContext(
-                    new DefaultListableBeanFactory(engineContext), event.getServletContext());
-
+            AnnotationConfigWebApplicationContext webApplicationContext = initializeWebContext(event, engineContext);
             webApplicationContext.refresh();
-
-            //A web application context needs to be referenced in the Servlet context so that servlet and filters beans handled by Spring can use it
-            event.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE,
-                    webApplicationContext);
         } catch (final Throwable e) {
             throw new RuntimeException("Error while initializing the Engine", e);
         }
 
+    }
+
+    protected AnnotationConfigWebApplicationContext initializeWebContext(ServletContextEvent event,
+            ApplicationContext engineContext) {
+        AnnotationConfigWebApplicationContext webApplicationContext = new AnnotationConfigWebApplicationContext();
+        webApplicationContext.setParent(engineContext);
+        webApplicationContext.setServletContext(event.getServletContext());
+        //A web application context needs to be referenced in the Servlet context so that servlet and filters beans handled by Spring web can use it
+        event.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE,
+                webApplicationContext);
+        return webApplicationContext;
     }
 
     protected EngineInitializer getEngineInitializer() {
