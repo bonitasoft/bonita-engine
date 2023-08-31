@@ -23,7 +23,7 @@ class Deps {
     // Keep this until all client projects have migrated to jakarta or it will break their builds !
     public static String javaxServletVersion = "4.0.1"
     // The groovy version must be in synch with the runtime-bom artifact
-    public static String groovyVersion = "3.0.10"
+    public static String groovyVersion = "3.0.19"
     public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
     public static String httpComponentsVersion = "4.5.13"
     public static String xstreamVersion = "1.4.20"
