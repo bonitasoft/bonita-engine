@@ -8,6 +8,7 @@ dependencyManagement {
     dependencies {
         imports {
             mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}"
+            mavenBom "org.codehaus.groovy:groovy-bom:${Deps.groovyVersion}"
             mavenBom "org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}"
         }
         dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
@@ -41,22 +42,6 @@ dependencyManagement {
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
         dependency "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
-        dependency "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
-        // groovy-all is not pulled by the engine but we declare it in case a client app depends on groovy-all directly
-        // dependency "org.codehaus.groovy:groovy-all:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-json:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-jmx:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-nio:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-groovysh:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-datetime:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-dateutil:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-docgenerator:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-jsr223:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
-        dependency "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
         dependency "org.javassist:javassist:${Deps.javassistVersion}"
         dependencySet(group: 'org.apache.httpcomponents', version: Deps.httpComponentsVersion) {
             entry 'httpclient'
