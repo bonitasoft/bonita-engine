@@ -19,12 +19,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.operation.pojo.Travel;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,10 +44,7 @@ public class GetBusinessDataByIdCommandTest {
     private GetBusinessDataByIdCommand command;
 
     @Mock
-    private BusinessDataRepository bdrService;
-
-    @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Mock
     private BusinessDataService businessDataService;
@@ -62,13 +58,13 @@ public class GetBusinessDataByIdCommandTest {
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, PARAMETER_IDENTIFIER);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, PARAMETER_CLASS_NAME);
         parameters.put(BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
-        when(tenantServiceAccessor.getBusinessDataService()).thenReturn(businessDataService);
+        when(serviceAccessor.getBusinessDataService()).thenReturn(businessDataService);
     }
 
     @Test
     public void executeCommandWithEntity() throws Exception {
         //when
-        command.execute(parameters, tenantServiceAccessor);
+        command.execute(parameters, serviceAccessor);
 
         //then
         verify(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
@@ -83,7 +79,7 @@ public class GetBusinessDataByIdCommandTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
-        command.execute(parameters, tenantServiceAccessor);
+        command.execute(parameters, serviceAccessor);
     }
 
     @Test(expected = SCommandExecutionException.class)
@@ -96,7 +92,7 @@ public class GetBusinessDataByIdCommandTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
-        command.execute(parameters, tenantServiceAccessor);
+        command.execute(parameters, serviceAccessor);
     }
 
     @Test
@@ -105,7 +101,7 @@ public class GetBusinessDataByIdCommandTest {
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "");
 
         //when
-        command.execute(parameters, tenantServiceAccessor);
+        command.execute(parameters, serviceAccessor);
 
         //then
         verify(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
@@ -118,7 +114,7 @@ public class GetBusinessDataByIdCommandTest {
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, PARAMETER_CHILDNAME);
 
         //when
-        command.execute(parameters, tenantServiceAccessor);
+        command.execute(parameters, serviceAccessor);
 
         //then
         verify(businessDataService).getJsonChildEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER, PARAMETER_CHILDNAME,

@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.test;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,21 +27,16 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.expression.ComparisonOperator;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.expression.*;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.process.Employee;
 import org.bonitasoft.engine.process.Secretary;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.junit.Test;
 
 /**
@@ -152,19 +147,15 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         // evaluate it: it should return the updated value
         assertThat(evaluateTransientDataWithExpression(step1).get("tData")).isEqualTo("The updated value");
         // clear the cache
-        getTenantAccessor().getCacheService().clear("transient_data");
+        getServiceAccessor().getCacheService().clear("transient_data");
         // evaluate it: it should return the default value
         assertThat(evaluateTransientDataWithExpression(step1).get("tData")).isEqualTo("The default value");
 
         disableAndDeleteProcess(processDefinition);
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
+    protected ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
     private void updateDataWithOperation(final HumanTaskInstance step1, final String value, final String name)
@@ -174,16 +165,15 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
                 .setLeftOperand(name, LeftOperand.TYPE_TRANSIENT_DATA)
                 .setRightOperand(new ExpressionBuilder().createConstantStringExpression(value))
                 .setType(OperatorType.ASSIGNMENT).done();
-        getProcessAPI().updateActivityInstanceVariables(Arrays.asList(operation), step1.getId(), null);
+        getProcessAPI().updateActivityInstanceVariables(singletonList(operation), step1.getId(), null);
     }
 
     private Map<String, Serializable> evaluateTransientDataWithExpression(final HumanTaskInstance step1)
             throws ExpressionEvaluationException,
             InvalidExpressionException {
         final Map<Expression, Map<String, Serializable>> expressionMap = new HashMap<>();
-        expressionMap
-                .put(new ExpressionBuilder().createTransientDataExpression("tData", String.class.getName()),
-                        Collections.emptyMap());
+        expressionMap.put(new ExpressionBuilder().createTransientDataExpression("tData", String.class.getName()),
+                Collections.emptyMap());
         return getProcessAPI().evaluateExpressionsOnActivityInstance(step1.getId(), expressionMap);
     }
 

@@ -49,8 +49,7 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
     }
 
     /**
-     * @return tenantServiceAccessor
-     * @throws SHandlerExecutionException
+     * @return ServiceAccessor
      */
     private ServiceAccessor getServiceAccessor() throws SHandlerExecutionException {
         try {

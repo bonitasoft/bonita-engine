@@ -91,12 +91,7 @@ import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.service.BroadcastService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.ServicesResolver;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.*;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -602,7 +597,6 @@ public class SpringServiceAccessor
     @Override
     public CacheService getPlatformCacheService() {
         return beanAccessor.getService(CacheService.class);
-
     }
 
     @Override
@@ -639,4 +633,5 @@ public class SpringServiceAccessor
     public PlatformRetriever getPlatformRetriever() {
         return beanAccessor.getService(PlatformRetriever.class);
     }
+
 }

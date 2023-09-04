@@ -17,7 +17,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.test.TestEngine;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -41,9 +42,10 @@ public class TransactionSynchronizationBenchmark {
     public void setup() throws Exception {
         engine = TestEngineImpl.getInstance();
         engine.start();
-        userTransactionService = TenantServiceSingleton.getInstance().getUserTransactionService();
-        workService = TenantServiceSingleton.getInstance().getWorkService();
-        BPMWorkFactory bpmWorkFactory = TenantServiceSingleton.getInstance().getBPMWorkFactory();
+        final ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
+        userTransactionService = serviceAccessor.getUserTransactionService();
+        workService = serviceAccessor.getWorkService();
+        BPMWorkFactory bpmWorkFactory = serviceAccessor.getBPMWorkFactory();
         bpmWorkFactory.addExtension("BENCHMARK_WORK", workDescriptor -> new BonitaWork() {
 
             @Override

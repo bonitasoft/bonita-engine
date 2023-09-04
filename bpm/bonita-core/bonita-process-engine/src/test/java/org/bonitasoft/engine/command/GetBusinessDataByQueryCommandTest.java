@@ -13,17 +13,16 @@
  **/
 package org.bonitasoft.engine.command;
 
-import static org.assertj.core.api.Fail.fail;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,10 +41,7 @@ public class GetBusinessDataByQueryCommandTest {
     private GetBusinessDataByQueryCommand command;
 
     @Mock
-    private BusinessDataRepository bdrService;
-
-    @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Mock
     private BusinessDataService businessDataService;
@@ -57,10 +53,10 @@ public class GetBusinessDataByQueryCommandTest {
     public void setUp() throws Exception {
         command = new GetBusinessDataByQueryCommand();
 
-        queryParameters = new HashMap<String, Serializable>();
+        queryParameters = new HashMap<>();
         queryParameters.put("param", "value");
 
-        commandParameters = new HashMap<String, Serializable>();
+        commandParameters = new HashMap<>();
         commandParameters.put(GetBusinessDataByQueryCommand.QUERY_NAME, PARAMETER_QUERY_NAME);
         commandParameters.put(GetBusinessDataByQueryCommand.ENTITY_CLASS_NAME, PARAMETER_RETURN_TYPE);
         commandParameters.put(GetBusinessDataByQueryCommand.MAX_RESULTS, PARAMETER_MAX_RESULTS);
@@ -68,13 +64,13 @@ public class GetBusinessDataByQueryCommandTest {
         commandParameters.put(GetBusinessDataByQueryCommand.QUERY_PARAMETERS, (Serializable) queryParameters);
         commandParameters.put(BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN,
                 PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
-        when(tenantServiceAccessor.getBusinessDataService()).thenReturn(businessDataService);
+        when(serviceAccessor.getBusinessDataService()).thenReturn(businessDataService);
     }
 
     @Test
     public void executeCommand_should_call_service() throws Exception {
         //when
-        command.execute(commandParameters, tenantServiceAccessor);
+        command.execute(commandParameters, serviceAccessor);
 
         //then
         verify(businessDataService).getJsonQueryEntities(PARAMETER_RETURN_TYPE, PARAMETER_QUERY_NAME, queryParameters,
@@ -92,7 +88,7 @@ public class GetBusinessDataByQueryCommandTest {
                 PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
 
         //when then exception
-        command.execute(commandParameters, tenantServiceAccessor);
+        command.execute(commandParameters, serviceAccessor);
     }
 
     @Test
@@ -117,7 +113,7 @@ public class GetBusinessDataByQueryCommandTest {
         commandParameters.remove(mandatoryParameter);
 
         //when then exception
-        command.execute(commandParameters, tenantServiceAccessor);
+        command.execute(commandParameters, serviceAccessor);
     }
 
 }

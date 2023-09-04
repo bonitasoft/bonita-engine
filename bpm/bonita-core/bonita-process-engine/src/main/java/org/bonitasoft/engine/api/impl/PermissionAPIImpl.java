@@ -22,8 +22,8 @@ import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * @author Baptiste Mesta
@@ -35,7 +35,7 @@ public class PermissionAPIImpl implements PermissionAPI {
     @Deprecated(forRemoval = true, since = "7.14.0")
     public boolean checkAPICallWithScript(String className, APICallContext context, boolean reload)
             throws ExecutionException, NotFoundException {
-        TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
+        ServiceAccessor serviceAccessor = getServiceAccessor();
         PermissionService permissionService = serviceAccessor.getPermissionService();
         try {
             return permissionService.checkAPICallWithScript(className, context, reload);
@@ -50,7 +50,7 @@ public class PermissionAPIImpl implements PermissionAPI {
 
     @Override
     public boolean isAuthorized(APICallContext apiCallContext) throws ExecutionException {
-        TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
+        ServiceAccessor serviceAccessor = getServiceAccessor();
         try {
             return serviceAccessor.getPermissionService().isAuthorized(apiCallContext);
         } catch (SExecutionException e) {
@@ -60,12 +60,12 @@ public class PermissionAPIImpl implements PermissionAPI {
 
     @Override
     public Set<String> getResourcePermissions(String resourceKey) {
-        TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
+        ServiceAccessor serviceAccessor = getServiceAccessor();
         return serviceAccessor.getPermissionService().getResourcePermissions(resourceKey);
     }
 
-    TenantServiceAccessor getTenantServiceAccessor() {
-        return TenantServiceSingleton.getInstance();
+    ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
 }

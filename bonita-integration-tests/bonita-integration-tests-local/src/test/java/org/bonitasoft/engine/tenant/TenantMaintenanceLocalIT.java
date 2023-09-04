@@ -22,8 +22,8 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
     public void should_pause_tenant_then_stop_start_node_start_pageService_again_but_dont_restart_elements_but_resume_restart_them()
             throws Exception {
         // given: tenant is paused
-        WorkService workService = getTenantAccessor().getWorkService();
+        WorkService workService = getServiceAccessor().getWorkService();
         assertFalse(workService.isStopped());
 
         logoutThenloginAs(USERNAME, PASSWORD);
@@ -69,7 +69,7 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         // assert that provided mandatory pages have re-imported again even though the tenant is paused
         assertTrue(systemOutRule.getLog().contains("Import of Bonita mandatory pages completed"));
         // then: work service is not running
-        workService = getTenantAccessor().getWorkService();
+        workService = getServiceAccessor().getWorkService();
         assertTrue(workService.isStopped());
 
         // cleanup
@@ -80,8 +80,8 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         disableAndDeleteProcess(pd);
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
-        return TenantServiceSingleton.getInstance();
+    protected ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
 }

@@ -80,10 +80,10 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
 
         getProcessAPI().deleteArchivedProcessInstancesInAllStates(processInstances);
 
-        getTenantAccessor().getUserTransactionService().executeInTransaction((Callable<Void>) () -> {
+        getServiceAccessor().getUserTransactionService().executeInTransaction((Callable<Void>) () -> {
             for (Long userTaskInstance : userTaskInstances) {
                 try {
-                    getTenantAccessor().getContractDataService().getArchivedUserTaskDataValue(userTaskInstance,
+                    getServiceAccessor().getContractDataService().getArchivedUserTaskDataValue(userTaskInstance,
                             inputName());
                     fail("should have deleted archived contract data on activity instance");
                 } catch (SContractDataNotFoundException e) {
@@ -92,7 +92,7 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
             }
             for (Long processInstance : processInstances) {
                 try {
-                    getTenantAccessor().getContractDataService().getArchivedProcessDataValue(processInstance,
+                    getServiceAccessor().getContractDataService().getArchivedProcessDataValue(processInstance,
                             "simpleInput1");
                     fail("should have deleted archived contract data on process instance");
                 } catch (SContractDataNotFoundException e) {
@@ -105,19 +105,19 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
                     soft.assertThat(searchAllArchProcessInstances()).isEmpty();
                     soft.assertThat(searchAllArchFlowNodes()).isEmpty();
                     soft.assertThat(
-                            getTenantAccessor().getCommentService().searchArchivedComments(new QueryOptions(0, 1000)))
+                            getServiceAccessor().getCommentService().searchArchivedComments(new QueryOptions(0, 1000)))
                             .isEmpty();
-                    soft.assertThat(getTenantAccessor().getConnectorInstanceService().searchArchivedConnectorInstance(
+                    soft.assertThat(getServiceAccessor().getConnectorInstanceService().searchArchivedConnectorInstance(
                             new QueryOptions(0, 100, SAConnectorInstance.class, null, null),
-                            getTenantAccessor().getReadPersistenceService())).isEmpty();
-                    soft.assertThat(getTenantAccessor().getDocumentService()
+                            getServiceAccessor().getReadPersistenceService())).isEmpty();
+                    soft.assertThat(getServiceAccessor().getDocumentService()
                             .getNumberOfArchivedDocuments(new QueryOptions(0, 100))).isEqualTo(0);
                     for (SAFlowNodeInstance flowNodeInstance : allArchFlowNodesBeforeDelete) {
-                        soft.assertThat(getTenantAccessor().getDataInstanceService().getLocalSADataInstances(
+                        soft.assertThat(getServiceAccessor().getDataInstanceService().getLocalSADataInstances(
                                 flowNodeInstance.getSourceObjectId(), ACTIVITY_INSTANCE.toString(), 0, 1)).isEmpty();
                     }
                     for (SAProcessInstance processInstance : allArchProcessInstancesBeforeDelete) {
-                        soft.assertThat(getTenantAccessor().getDataInstanceService().getLocalSADataInstances(
+                        soft.assertThat(getServiceAccessor().getDataInstanceService().getLocalSADataInstances(
                                 processInstance.getSourceObjectId(), PROCESS_INSTANCE.toString(), 0, 1)).isEmpty();
                     }
                 } catch (Exception e) {
@@ -166,17 +166,17 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
     }
 
     protected List<SAProcessInstance> getAllProcessInstances() throws Exception {
-        return getTenantAccessor()
+        return getServiceAccessor()
                 .getUserTransactionService().executeInTransaction(this::searchAllArchProcessInstances);
     }
 
     protected List<SAFlowNodeInstance> getAllArchFlowNodes() throws Exception {
-        return getTenantAccessor().getUserTransactionService()
+        return getServiceAccessor().getUserTransactionService()
                 .executeInTransaction(this::searchAllArchFlowNodes);
     }
 
     protected List<SFlowNodeInstance> getAllFlowNodes() throws Exception {
-        return getTenantAccessor().getUserTransactionService()
+        return getServiceAccessor().getUserTransactionService()
                 .executeInTransaction(this::searchAllFlowNodes);
     }
 
@@ -241,19 +241,19 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
     }
 
     private List<SAProcessInstance> searchAllArchProcessInstances() throws SBonitaReadException {
-        return getTenantAccessor().getProcessInstanceService()
+        return getServiceAccessor().getProcessInstanceService()
                 .searchArchivedProcessInstances(new QueryOptions(0, 1000));
     }
 
     private List<SAFlowNodeInstance> searchAllArchFlowNodes()
             throws org.bonitasoft.engine.persistence.SBonitaReadException {
-        return getTenantAccessor().getActivityInstanceService()
+        return getServiceAccessor().getActivityInstanceService()
                 .searchArchivedFlowNodeInstances(SAFlowNodeInstance.class, new QueryOptions(0, 1000));
     }
 
     private List<SFlowNodeInstance> searchAllFlowNodes()
             throws org.bonitasoft.engine.persistence.SBonitaReadException {
-        return getTenantAccessor().getActivityInstanceService()
+        return getServiceAccessor().getActivityInstanceService()
                 .searchFlowNodeInstances(SFlowNodeInstance.class, new QueryOptions(0, 1000));
     }
 

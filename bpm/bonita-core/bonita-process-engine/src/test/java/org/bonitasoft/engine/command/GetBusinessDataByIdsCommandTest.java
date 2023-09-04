@@ -21,11 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.operation.pojo.Travel;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,10 +49,7 @@ public class GetBusinessDataByIdsCommandTest {
     private GetBusinessDataByIdsCommand command;
 
     @Mock
-    private BusinessDataRepository bdrService;
-
-    @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Mock
     private BusinessDataService businessDataService;
@@ -67,13 +63,13 @@ public class GetBusinessDataByIdsCommandTest {
         parameters.put(GetBusinessDataByIdsCommand.BUSINESS_DATA_IDS, (Serializable) identifers);
         parameters.put(GetBusinessDataByIdsCommand.ENTITY_CLASS_NAME, PARAMETER_CLASS_NAME);
         parameters.put(BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
-        when(tenantServiceAccessor.getBusinessDataService()).thenReturn(businessDataService);
+        when(serviceAccessor.getBusinessDataService()).thenReturn(businessDataService);
     }
 
     @Test
     public void executeCommandWithEntities() throws Exception {
         //when
-        command.execute(parameters, tenantServiceAccessor);
+        command.execute(parameters, serviceAccessor);
 
         //then
         verify(businessDataService).getJsonEntities(PARAMETER_CLASS_NAME, identifers,
@@ -88,7 +84,7 @@ public class GetBusinessDataByIdsCommandTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
-        command.execute(parameters, tenantServiceAccessor);
+        command.execute(parameters, serviceAccessor);
     }
 
 }

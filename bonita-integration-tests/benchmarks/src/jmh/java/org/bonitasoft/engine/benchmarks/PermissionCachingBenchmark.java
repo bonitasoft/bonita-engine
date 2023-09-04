@@ -16,7 +16,7 @@ package org.bonitasoft.engine.benchmarks;
 import org.bonitasoft.engine.authorization.properties.ConfigurationFilesManager;
 import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.test.TestEngine;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -36,7 +36,7 @@ public class PermissionCachingBenchmark {
     public void setup() throws Exception {
         engine = TestEngineImpl.getInstance();
         engine.start();
-        cacheService = TenantServiceSingleton.getInstance().getCacheService();
+        cacheService = ServiceAccessorSingleton.getInstance().getCacheService();
         resourcesPermissionsMapping = new ResourcesPermissionsMapping(1L, cacheService,
                 new ConfigurationFilesManager());
     }

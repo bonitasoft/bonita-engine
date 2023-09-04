@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.execution.work;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -27,7 +25,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.work.SWorkPreconditionException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +42,7 @@ public class NotifyChildFinishedWorkTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private ActivityInstanceService flowNodeInstanceService;
     @Mock
@@ -60,10 +58,10 @@ public class NotifyChildFinishedWorkTest {
     @Before
     public void before() throws SClassLoaderException {
         doReturn(this.getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
-        context = Collections.singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
+        context = Collections.singletonMap(TenantAwareBonitaWork.SERVICE_ACCESSOR, serviceAccessor);
 
-        doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();
-        doReturn(flowNodeInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
+        doReturn(classLoaderService).when(serviceAccessor).getClassLoaderService();
+        doReturn(flowNodeInstanceService).when(serviceAccessor).getActivityInstanceService();
     }
 
     @Test
@@ -117,7 +115,7 @@ public class NotifyChildFinishedWorkTest {
     public void should_notify_child_finished_if_flow_node_is_completed() throws Exception {
         notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 2, false,
                 false, false);
-        doReturn(containerRegistry).when(tenantServiceAccessor).getContainerRegistry();
+        doReturn(containerRegistry).when(serviceAccessor).getContainerRegistry();
         SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
         flowNodeInstance.setTerminal(true);
         flowNodeInstance.setStateId(2);

@@ -22,7 +22,6 @@ import java.util.Arrays;
 
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +37,6 @@ public class CustomUserInfoDefinitionImporterTest {
     private static final String SKILLS_DESCRIPTION = "The user skills";
 
     private static final String SKILLS_NAME = "Skills";
-
-    @Mock
-    private TenantServiceAccessor serviceAccessor;
 
     @Mock
     private IdentityService identityService;

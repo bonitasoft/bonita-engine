@@ -26,30 +26,27 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.form.SearchFormMappings;
-import org.bonitasoft.engine.service.FormRequiredAnalyzer;
-import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.*;
 
 /**
  * @author Baptiste Mesta
  */
 public class ProcessConfigurationAPIImpl {
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
-            return TenantServiceSingleton.getInstance();
+            return ServiceAccessorSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
     }
 
     public SearchResult<FormMapping> searchFormMappings(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        FormMappingService formMappingService = tenantAccessor.getFormMappingService();
-        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        FormMappingService formMappingService = serviceAccessor.getFormMappingService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchFormMappings searchFormMappings = new SearchFormMappings(formMappingService,
-                getTenantAccessor().getProcessDefinitionService(),
+                getServiceAccessor().getProcessDefinitionService(),
                 searchEntitiesDescriptor.getSearchFormMappingDescriptor(),
                 searchOptions);
         try {
@@ -61,10 +58,10 @@ public class ProcessConfigurationAPIImpl {
     }
 
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
-        final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
+        final FormMappingService formMappingService = getServiceAccessor().getFormMappingService();
         try {
             return ModelConvertor.toFormMapping(formMappingService.get(formMappingId),
-                    new FormRequiredAnalyzer(getTenantAccessor()
+                    new FormRequiredAnalyzer(getServiceAccessor()
                             .getProcessDefinitionService()));
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);

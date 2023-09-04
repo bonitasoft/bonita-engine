@@ -16,8 +16,7 @@ package org.bonitasoft.engine.test;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -27,17 +26,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class CommonAPILocalIT extends CommonAPIIT {
 
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-    }
-
     protected ServiceAccessor getServiceAccessor() {
         try {
-            return ServiceAccessorFactory.getInstance().createServiceAccessor();
+            return ServiceAccessorSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

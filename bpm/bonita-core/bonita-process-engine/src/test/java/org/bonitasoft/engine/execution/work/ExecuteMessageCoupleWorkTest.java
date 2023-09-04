@@ -13,12 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +27,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +47,7 @@ public class ExecuteMessageCoupleWorkTest {
     @Mock
     private EventsHandler eventsHandler;
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private EventInstanceService eventInstanceService;
     @Mock
@@ -60,24 +56,25 @@ public class ExecuteMessageCoupleWorkTest {
     private UserTransactionService userTransactionService;
     @Captor
     private ArgumentCaptor<Callable<?>> callableArgumentCaptor;
-    private Map<String, Object> context = new HashMap<>();
+    private final Map<String, Object> context = new HashMap<>();
 
-    private ExecuteMessageCoupleWork executeMessageCoupleWork = new ExecuteMessageCoupleWork(MESSAGE_INSTANCE_ID,
+    private final ExecuteMessageCoupleWork executeMessageCoupleWork = new ExecuteMessageCoupleWork(MESSAGE_INSTANCE_ID,
             WAITING_MESSAGE_ID);
-    private SWaitingMessageEvent waitingMessageEvent = new SWaitingMessageEvent(SBPMEventType.BOUNDARY_EVENT, 4243252L,
+    private final SWaitingMessageEvent waitingMessageEvent = new SWaitingMessageEvent(SBPMEventType.BOUNDARY_EVENT,
+            4243252L,
             "Process", 5435312, "flownode", "message");
-    private SMessageInstance messageInstance = new SMessageInstance("message", "Process", "flowNode", 4243252L,
+    private final SMessageInstance messageInstance = new SMessageInstance("message", "Process", "flowNode", 4243252L,
             "flownode");
 
     @Before
     public void before() {
         waitingMessageEvent.setId(WAITING_MESSAGE_ID);
         messageInstance.setId(MESSAGE_INSTANCE_ID);
-        context.put(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
-        doReturn(eventsHandler).when(tenantServiceAccessor).getEventsHandler();
-        doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
-        doReturn(dataInstanceService).when(tenantServiceAccessor).getDataInstanceService();
-        doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
+        context.put(TenantAwareBonitaWork.SERVICE_ACCESSOR, serviceAccessor);
+        doReturn(eventsHandler).when(serviceAccessor).getEventsHandler();
+        doReturn(eventInstanceService).when(serviceAccessor).getEventInstanceService();
+        doReturn(dataInstanceService).when(serviceAccessor).getDataInstanceService();
+        doReturn(userTransactionService).when(serviceAccessor).getUserTransactionService();
     }
 
     @Test

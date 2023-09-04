@@ -18,11 +18,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.archive.model.TestLogBuilder;
@@ -32,11 +28,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
@@ -57,8 +49,8 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.BlockingConnector;
@@ -75,9 +67,9 @@ import org.junit.Test;
 @SuppressWarnings("javadoc")
 public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
-            return TenantServiceSingleton.getInstance();
+            return ServiceAccessorSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -725,7 +717,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId());
 
-        final CacheService cacheservice = getTenantAccessor().getCacheService();
+        final CacheService cacheservice = getServiceAccessor().getCacheService();
         cacheservice.clearAll();
         sessionAccessor.deleteSessionId();
 

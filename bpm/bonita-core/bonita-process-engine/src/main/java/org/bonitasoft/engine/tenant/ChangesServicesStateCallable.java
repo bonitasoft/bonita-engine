@@ -16,15 +16,15 @@ package org.bonitasoft.engine.tenant;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * @author Emmanuel Duchastenier
  */
 class ChangesServicesStateCallable implements Callable<Void>, Serializable {
 
-    private TenantServicesManager.ServiceAction action;
+    private final TenantServicesManager.ServiceAction action;
 
     public ChangesServicesStateCallable(TenantServicesManager.ServiceAction action) {
         this.action = action;
@@ -32,9 +32,9 @@ class ChangesServicesStateCallable implements Callable<Void>, Serializable {
 
     @Override
     public Void call() throws Exception {
-        TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance();
-        TenantServicesManager tenantServicesManager = tenantServiceAccessor.getTenantServicesManager();
-        TenantStateManager tenantStateManager = tenantServiceAccessor.getTenantStateManager();
+        ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
+        TenantServicesManager tenantServicesManager = serviceAccessor.getTenantServicesManager();
+        TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
         return tenantStateManager.executeTenantManagementOperation(
                 "Executing received " + action.name().toLowerCase() + " operation", () -> {
                     switch (action) {

@@ -25,7 +25,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEve
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 
 /**
@@ -111,10 +111,10 @@ public class TriggerTimerEventJob extends InternalJob {
         parentProcessInstanceId = (Long) attributes.get("processInstanceId");
         rootProcessInstanceId = (Long) attributes.get("rootProcessInstanceId");
         isInterrupting = (Boolean) attributes.get("isInterrupting");
-        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-        eventsHandler = tenantServiceAccessor.getEventsHandler();
-        tenantServicesManager = tenantServiceAccessor.getTenantServicesManager();
-        eventInstanceService = tenantServiceAccessor.getEventInstanceService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        eventsHandler = serviceAccessor.getEventsHandler();
+        tenantServicesManager = serviceAccessor.getTenantServicesManager();
+        eventInstanceService = serviceAccessor.getEventInstanceService();
         jobDescriptorId = (Long) attributes.get(JOB_DESCRIPTOR_ID);
     }
 }

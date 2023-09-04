@@ -54,7 +54,6 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.*;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -80,7 +79,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ServerAPIImpl implements ServerAPI {
 
-    private static Logger logger = LoggerFactory.getLogger(ServerAPIImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServerAPIImpl.class);
 
     private static final String SESSION = "session";
     private static final long serialVersionUID = -161775388604256321L;
@@ -229,7 +228,7 @@ public class ServerAPIImpl implements ServerAPI {
             ServiceAccessor serviceAccessor, Session session) throws SBonitaException {
         checkTenantSession(serviceAccessor, session);
         long tenantId = ((APISession) session).getTenantId();
-        SessionService sessionService = serviceAccessor.getTenantServiceAccessor().getSessionService();
+        SessionService sessionService = serviceAccessor.getSessionService();
         sessionService.renewSession(session.getId());
         sessionAccessor.setSessionInfo(session.getId(), tenantId);
         return getTenantClassLoader(serviceAccessor, session);
@@ -272,7 +271,7 @@ public class ServerAPIImpl implements ServerAPI {
         Supplier<String> failureMessage = () -> MessageFormat.format(
                 "Operation ''{0}.{1}'' requires exclusive access. Another operation is already launched with the same ''{2}'' access scope. You may try again after the other operation has finished.",
                 apiInterfaceName, methodName, lockKey.orElse(""));
-        try (AutoCloseable functionalLock = withEventualLock(lockKey, session, failureMessage)) {
+        try (AutoCloseable ignored = withEventualLock(lockKey, session, failureMessage)) {
             // No session required means that there is no transaction
             if (method.isAnnotationPresent(CustomTransactions.class)
                     || Class.forName(apiInterfaceName).isAnnotationPresent(NoSessionRequired.class)) {
@@ -458,9 +457,7 @@ public class ServerAPIImpl implements ServerAPI {
                 transactionService = serviceAccessor.getTransactionService();
                 break;
             case API:
-                final TenantServiceAccessor tenantAccessor = serviceAccessor
-                        .getTenantServiceAccessor();
-                transactionService = tenantAccessor.getUserTransactionService();
+                transactionService = serviceAccessor.getUserTransactionService();
                 break;
             default:
                 throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
@@ -499,27 +496,23 @@ public class ServerAPIImpl implements ServerAPI {
         return parameterTypes;
     }
 
-    private void checkTenantSession(final ServiceAccessor platformAccessor, final Session session)
+    private void checkTenantSession(final ServiceAccessor serviceAccessor, final Session session)
             throws SSchedulerException {
-        final SchedulerService schedulerService = platformAccessor.getSchedulerService();
+        final SchedulerService schedulerService = serviceAccessor.getSchedulerService();
         if (!schedulerService.isStarted()) {
             logger.debug("The scheduler is not started!");
         }
         final APISession apiSession = (APISession) session;
-        final TenantServiceAccessor tenantAccessor = platformAccessor
-                .getTenantServiceAccessor();
-        final LoginService tenantLoginService = tenantAccessor.getLoginService();
+        final LoginService tenantLoginService = serviceAccessor.getLoginService();
         if (!tenantLoginService.isValid(apiSession.getId())) {
             throw new InvalidSessionException("Invalid session");
         }
     }
 
-    private ClassLoader getTenantClassLoader(final ServiceAccessor serviceAccessor,
-            final Session session) throws SClassLoaderException {
+    private ClassLoader getTenantClassLoader(final ServiceAccessor serviceAccessor, final Session session)
+            throws SClassLoaderException {
         final APISession apiSession = (APISession) session;
-        final TenantServiceAccessor tenantAccessor = serviceAccessor
-                .getTenantServiceAccessor();
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
         return classLoaderService.getClassLoader(identifier(ScopeType.TENANT, apiSession.getTenantId()));
     }
 

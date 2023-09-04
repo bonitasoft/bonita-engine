@@ -41,14 +41,11 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * @author Emmanuel Duchastenier
@@ -57,8 +54,8 @@ public class ProcessInvolvementDelegate {
 
     private static final int BATCH_SIZE = 100;
 
-    protected TenantServiceAccessor getTenantServiceAccessor() {
-        return APIUtils.getTenantAccessor();
+    protected ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
     private static QueryOptions buildArchivedTasksQueryOptions(final long processInstanceId) {
@@ -116,13 +113,13 @@ public class ProcessInvolvementDelegate {
 
     private boolean isProcessInitiator(long userId, Long processInstanceId)
             throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
-        final ProcessInstanceService processInstanceService = getTenantServiceAccessor().getProcessInstanceService();
+        final ProcessInstanceService processInstanceService = getServiceAccessor().getProcessInstanceService();
         final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
         return userId == processInstance.getStartedBy();
     }
 
     boolean isArchivedProcessInitiator(long userId, long processInstanceId) throws ProcessInstanceNotFoundException {
-        final ProcessInstanceService processInstanceService = getTenantServiceAccessor().getProcessInstanceService();
+        final ProcessInstanceService processInstanceService = getServiceAccessor().getProcessInstanceService();
         final List<OrderByOption> orderByOptions = Arrays.asList(
                 new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE,
                         OrderByType.DESC),
@@ -146,11 +143,11 @@ public class ProcessInvolvementDelegate {
 
     public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId)
             throws BonitaException {
-        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-        final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
-        final IdentityService identityService = tenantServiceAccessor.getIdentityService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ProcessInstanceService processInstanceService = serviceAccessor.getProcessInstanceService();
+        final IdentityService identityService = serviceAccessor.getIdentityService();
         final TaskInvolvementDelegate taskInvolvementDelegate = new TaskInvolvementDelegate();
-        final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
 
         final List<SUser> subordinates = getSubordinates(managerUserId, identityService);
 
@@ -270,7 +267,7 @@ public class ProcessInvolvementDelegate {
     }
 
     private boolean isUserManagerOfProcessInstanceInitiator(final long userId, final long startedByUserId) {
-        final IdentityService identityService = getTenantServiceAccessor().getIdentityService();
+        final IdentityService identityService = getServiceAccessor().getIdentityService();
         SUser sUser;
         try {
             sUser = identityService.getUser(startedByUserId);
@@ -282,10 +279,10 @@ public class ProcessInvolvementDelegate {
 
     public ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId)
             throws SBonitaException {
-        final ProcessInstanceService processInstanceService = getTenantServiceAccessor().getProcessInstanceService();
-        final ProcessDefinitionService processDefinitionService = getTenantServiceAccessor()
+        final ProcessInstanceService processInstanceService = getServiceAccessor().getProcessInstanceService();
+        final ProcessDefinitionService processDefinitionService = getServiceAccessor()
                 .getProcessDefinitionService();
-        final SearchEntitiesDescriptor searchEntitiesDescriptor = getTenantServiceAccessor()
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = getServiceAccessor()
                 .getSearchEntitiesDescriptor();
 
         final GetLastArchivedProcessInstance searchArchivedProcessInstances = new GetLastArchivedProcessInstance(

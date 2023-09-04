@@ -41,16 +41,12 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BDRepositoryLocalIT extends CommonAPIIT {
-
-    private static final Logger log = LoggerFactory.getLogger(BDRepositoryLocalIT.class);
 
     private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
 
@@ -513,9 +509,9 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
     }
 
     private List execute_native_sql(String query) throws Exception {
-        TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance();
-        return tenantServiceAccessor.getUserTransactionService().executeInTransaction(
-                () -> ((JPABusinessDataRepositoryImpl) (tenantServiceAccessor.getBusinessDataRepository()))
+        ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
+        return serviceAccessor.getUserTransactionService().executeInTransaction(
+                () -> ((JPABusinessDataRepositoryImpl) (serviceAccessor.getBusinessDataRepository()))
                         .getEntityManagerFactory().createEntityManager().createNativeQuery(query).getResultList());
     }
 

@@ -30,7 +30,7 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessM
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +42,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class BusinessDataAPIImplTest {
 
     @Mock
-    private TenantServiceAccessor serviceAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Mock
     private RefBusinessDataService refBusinessDataService;
@@ -52,7 +52,7 @@ public class BusinessDataAPIImplTest {
 
     @Before
     public void setUp() {
-        doReturn(serviceAccessor).when(businessDataAPI).getTenantAccessor();
+        doReturn(serviceAccessor).when(businessDataAPI).getServiceAccessor();
         when(serviceAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
     }
 

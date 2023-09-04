@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
@@ -28,7 +26,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,7 +53,7 @@ public class TaskInvolvementDelegateTest {
     private ActivityInstanceService activityInstanceService;
 
     @Mock
-    TenantServiceAccessor tenantServiceAccessor;
+    ServiceAccessor serviceAccessor;
 
     @Mock
     public ProcessAPIImpl processAPI;
@@ -71,8 +69,8 @@ public class TaskInvolvementDelegateTest {
 
     @Before
     public void before() throws SBonitaException {
-        doReturn(tenantServiceAccessor).when(taskInvolvementDelegate).getTenantServiceAccessor();
-        doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
+        doReturn(serviceAccessor).when(taskInvolvementDelegate).getServiceAccessor();
+        doReturn(activityInstanceService).when(serviceAccessor).getActivityInstanceService();
 
         humanTaskInstance = new SUserTaskInstance();
         humanTaskInstance.setId(EXISTING_TASK);

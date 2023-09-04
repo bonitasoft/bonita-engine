@@ -23,7 +23,7 @@ import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.slf4j.Logger;
@@ -110,7 +110,7 @@ public class PlatformManager {
     }
 
     TenantStateManager getDefaultTenantStateManager() {
-        return TenantServiceSingleton.getInstance().getTenantStateManager();
+        return ServiceAccessorSingleton.getInstance().getTenantStateManager();
     }
 
     private void restartHandlersOfPlatform() {

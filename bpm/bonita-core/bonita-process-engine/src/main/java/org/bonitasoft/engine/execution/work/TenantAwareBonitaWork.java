@@ -15,7 +15,7 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -23,14 +23,14 @@ import org.bonitasoft.engine.work.BonitaWork;
  */
 public abstract class TenantAwareBonitaWork extends BonitaWork {
 
-    public static final String TENANT_ACCESSOR = "tenantAccessor";
+    public static final String SERVICE_ACCESSOR = "serviceAccessor";
 
     public TenantAwareBonitaWork() {
         super();
     }
 
-    protected TenantServiceAccessor getTenantAccessor(final Map<String, Object> context) {
-        return (TenantServiceAccessor) context.get(TenantAwareBonitaWork.TENANT_ACCESSOR);
+    protected ServiceAccessor getServiceAccessor(final Map<String, Object> context) {
+        return (ServiceAccessor) context.get(TenantAwareBonitaWork.SERVICE_ACCESSOR);
     }
 
 }

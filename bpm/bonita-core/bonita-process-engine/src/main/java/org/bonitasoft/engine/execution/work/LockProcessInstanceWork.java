@@ -50,7 +50,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
-        final LockService lockService = getTenantAccessor(context).getLockService();
+        final LockService lockService = getServiceAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
         BonitaLock lock = null;

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Bonitasoft S.A.
+ * Copyright (C) 2019-2023 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,26 +11,35 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.jobs;
+package org.bonitasoft.engine.service;
 
-import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
-import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.ServiceAccessorSingleton;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
- * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
-public abstract class InternalJob implements StatelessJob {
+public final class ServiceAccessorSingleton {
 
-    private static final long serialVersionUID = 5627886991070497312L;
+    private static ServiceAccessor instance = null;
 
-    protected ServiceAccessor getServiceAccessor() throws SJobConfigurationException {
+    private ServiceAccessorSingleton() {
+        super();
+    }
+
+    private static synchronized ServiceAccessor createNewInstance() {
         try {
-            return ServiceAccessorSingleton.getInstance();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
-            throw new SJobConfigurationException(e);
+            throw new BonitaRuntimeException(e);
         }
+    }
+
+    public static ServiceAccessor getInstance() {
+        if (instance == null) {
+            instance = createNewInstance();
+        }
+        return instance;
     }
 
 }

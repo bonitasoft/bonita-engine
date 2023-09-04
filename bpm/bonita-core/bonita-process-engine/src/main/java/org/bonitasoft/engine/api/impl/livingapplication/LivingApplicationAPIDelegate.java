@@ -14,13 +14,7 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
-import org.bonitasoft.engine.business.application.Application;
-import org.bonitasoft.engine.business.application.ApplicationCreator;
-import org.bonitasoft.engine.business.application.ApplicationField;
-import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
-import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.ApplicationUpdater;
-import org.bonitasoft.engine.business.application.Icon;
+import org.bonitasoft.engine.business.application.*;
 import org.bonitasoft.engine.business.application.impl.IconImpl;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.business.application.importer.validator.ValidationStatus;
@@ -30,16 +24,11 @@ import org.bonitasoft.engine.business.application.model.SApplicationWithIcon;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -51,7 +40,7 @@ public class LivingApplicationAPIDelegate {
     private final ApplicationService applicationService;
     private final ApplicationTokenValidator tokenValidator;
 
-    public LivingApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationModelConverter converter,
+    public LivingApplicationAPIDelegate(final ServiceAccessor accessor, final ApplicationModelConverter converter,
             final long loggedUserId, final ApplicationTokenValidator tokenValidator) {
         this.tokenValidator = tokenValidator;
         applicationService = accessor.getApplicationService();

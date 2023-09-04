@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.execution.work.TenantAwareBonitaWork;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -40,10 +40,10 @@ public class TriggerSignalWork extends TenantAwareBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        SWaitingSignalEvent listeningSignal = tenantAccessor.getEventInstanceService()
+        ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        SWaitingSignalEvent listeningSignal = serviceAccessor.getEventInstanceService()
                 .getWaitingSignalEvent(signalId);
-        tenantAccessor.getEventsHandler().triggerCatchEvent(listeningSignal, null);
+        serviceAccessor.getEventsHandler().triggerCatchEvent(listeningSignal, null);
         return CompletableFuture.completedFuture(null);
     }
 

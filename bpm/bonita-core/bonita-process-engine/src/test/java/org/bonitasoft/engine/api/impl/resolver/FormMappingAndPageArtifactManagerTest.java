@@ -21,7 +21,14 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -42,7 +49,6 @@ import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
@@ -64,12 +70,10 @@ public class FormMappingAndPageArtifactManagerTest {
     public static final String CUSTOMPAGE_STEP2_ZIP = "custompage_step2.zip";
     public static final String DISPLAY_NAME = "display name";
     public static final String DESCRIPTION = "description";
-    private java.util.Map<java.lang.String, byte[]> ressources;
+    private java.util.Map<java.lang.String, byte[]> resources;
     @Mock
     private Properties properties;
     private FormMappingAndPageArtifactManager formMappingAndPageArtifactManager;
-    @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
     @Mock
     private BusinessArchive businessArchive;
     @Mock
@@ -101,13 +105,13 @@ public class FormMappingAndPageArtifactManagerTest {
 
         doReturn(PROCESS_DEFINITION_ID).when(sDefinition).getId();
 
-        ressources = new HashMap<>();
-        ressources.put("resources/customPages/custompage_step1.zip", CONTENT1);
-        ressources.put("resources/customPages/custompage_step2.zip", CONTENT2);
-        ressources.put("resources/otherResource/data.txt", "data".getBytes());
+        resources = new HashMap<>();
+        resources.put("resources/customPages/custompage_step1.zip", CONTENT1);
+        resources.put("resources/customPages/custompage_step2.zip", CONTENT2);
+        resources.put("resources/otherResource/data.txt", "data".getBytes());
 
-        doReturn(ressources).when(businessArchive).getResources();
-        doReturn(14l).when(sessionService).getLoggedUserFromSession(sessionAccessor);
+        doReturn(resources).when(businessArchive).getResources();
+        doReturn(14L).when(sessionService).getLoggedUserFromSession(sessionAccessor);
         when(businessArchive.getResources(anyString())).thenCallRealMethod();
     }
 

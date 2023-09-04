@@ -60,7 +60,7 @@ public class ProcessDeploymentAPIDelegateTest {
 
         // then:
         verifyNoMoreInteractions(businessArchive);
-        verify(processDeploymentAPIDelegate, times(0)).getTenantServiceAccessor();
+        verify(processDeploymentAPIDelegate, times(0)).getServiceAccessor();
     }
 
 }

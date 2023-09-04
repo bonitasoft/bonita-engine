@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.LockTimeoutException;
 import org.bonitasoft.engine.work.WorkExecutorService;
@@ -40,11 +40,9 @@ public class LockProcessInstanceWorkTest {
 
     private LockProcessInstanceWork lockProcessInstanceWork;
 
-    private TenantServiceAccessor tenantAccessor;
+    private ServiceAccessor serviceAccessor;
 
     private LockService lockService;
-
-    private WorkExecutorService workService;
 
     private static final long TENANT_ID = 1;
 
@@ -52,11 +50,11 @@ public class LockProcessInstanceWorkTest {
     public void before() {
         lockProcessInstanceWork = new LockProcessInstanceWork(wrappedWork, processInstanceId);
         when(wrappedWork.getTenantId()).thenReturn(TENANT_ID);
-        tenantAccessor = mock(TenantServiceAccessor.class);
+        serviceAccessor = mock(ServiceAccessor.class);
         lockService = mock(LockService.class);
-        workService = mock(WorkExecutorService.class);
-        when(tenantAccessor.getLockService()).thenReturn(lockService);
-        when(tenantAccessor.getWorkExecutorService()).thenReturn(workService);
+        WorkExecutorService workService = mock(WorkExecutorService.class);
+        when(serviceAccessor.getLockService()).thenReturn(lockService);
+        when(serviceAccessor.getWorkExecutorService()).thenReturn(workService);
     }
 
     @Test
@@ -65,7 +63,7 @@ public class LockProcessInstanceWorkTest {
         when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID)))
                 .thenReturn(
                         bonitaLock);
-        Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        Map<String, Object> singletonMap = Collections.singletonMap("serviceAccessor", serviceAccessor);
         lockProcessInstanceWork.work(singletonMap);
         verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS),
                 eq(TENANT_ID));
@@ -87,7 +85,7 @@ public class LockProcessInstanceWorkTest {
 
     @Test
     public void handleFailure() throws Throwable {
-        Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        Map<String, Object> context = Collections.singletonMap("serviceAccessor", serviceAccessor);
         Exception e = new Exception();
         lockProcessInstanceWork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
@@ -117,13 +115,13 @@ public class LockProcessInstanceWorkTest {
     }
 
     @Test(expected = LockTimeoutException.class)
-    public void should_thow_exception_when_unable_to_lock() throws Exception {
+    public void should_throw_exception_when_unable_to_lock() throws Exception {
         // On first try to lock : exception to reschedule the work
         // On the second try : return a correct lock
         when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID)))
                 .thenReturn(null);
 
-        lockProcessInstanceWork.work(Collections.singletonMap("tenantAccessor", tenantAccessor));
+        lockProcessInstanceWork.work(Collections.singletonMap("serviceAccessor", serviceAccessor));
     }
 
 }

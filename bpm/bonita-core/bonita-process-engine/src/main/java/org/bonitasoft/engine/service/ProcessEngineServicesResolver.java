@@ -35,8 +35,7 @@ public class ProcessEngineServicesResolver implements ServicesLookup {
             return lookupOnPlatform(serviceName);
         }
         try {
-            TenantServiceAccessor instance = TenantServiceSingleton.getInstance();
-            return instance.lookup(serviceName);
+            return ServiceAccessorSingleton.getInstance().lookup(serviceName);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to find the service " + serviceName, e);
         }

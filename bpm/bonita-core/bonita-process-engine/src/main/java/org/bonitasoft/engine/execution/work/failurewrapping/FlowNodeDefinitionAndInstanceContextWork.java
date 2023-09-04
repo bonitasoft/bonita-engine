@@ -19,7 +19,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Adding context information about Flow Node & Process definition and instance to exception for better logging
@@ -48,8 +48,8 @@ public class FlowNodeDefinitionAndInstanceContextWork extends TxInHandleFailureW
     @Override
     protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context)
             throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
         final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         sBonitaException.setFlowNodeDefinitionIdOnContext(flowNodeInstance.getFlowNodeDefinitionId());
         sBonitaException.setFlowNodeInstanceIdOnContext(flowNodeInstanceId);

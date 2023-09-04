@@ -16,7 +16,7 @@ package org.bonitasoft.engine.execution.work;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.BonitaWork;
 
@@ -36,8 +36,8 @@ public class TxBonitaWork extends WrappingBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final UserTransactionService userTransactionService = serviceAccessor.getUserTransactionService();
         return userTransactionService.executeInTransaction(() -> getWrappedWork().work(context));
     }
 

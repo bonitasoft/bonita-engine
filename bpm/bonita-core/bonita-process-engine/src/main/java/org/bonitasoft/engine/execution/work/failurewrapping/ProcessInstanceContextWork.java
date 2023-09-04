@@ -19,7 +19,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Adding context information about Process definition and instance to exception for better logging
@@ -73,8 +73,8 @@ public class ProcessInstanceContextWork extends TxInHandleFailureWrappingWork {
     protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context)
             throws SBonitaException {
         if (rootProcessInstanceId < 0) {
-            final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-            final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+            final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+            final ProcessInstanceService processInstanceService = serviceAccessor.getProcessInstanceService();
             final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
             rootProcessInstanceId = sProcessInstance.getRootProcessInstanceId();
         }

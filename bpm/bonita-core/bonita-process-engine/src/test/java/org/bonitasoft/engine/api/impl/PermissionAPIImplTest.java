@@ -22,7 +22,7 @@ import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +33,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class PermissionAPIImplTest {
 
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private PermissionService permissionService;
     private PermissionAPIImpl permissionAPI;
@@ -42,8 +42,8 @@ public class PermissionAPIImplTest {
     @Before
     public void before() {
         permissionAPI = spy(new PermissionAPIImpl());
-        doReturn(tenantServiceAccessor).when(permissionAPI).getTenantServiceAccessor();
-        doReturn(permissionService).when(tenantServiceAccessor).getPermissionService();
+        doReturn(serviceAccessor).when(permissionAPI).getServiceAccessor();
+        doReturn(permissionService).when(serviceAccessor).getPermissionService();
         apiCallContext = new APICallContext("GET", "identity", "user", "1", "query", "{\"body\":\"value\"}");
     }
 

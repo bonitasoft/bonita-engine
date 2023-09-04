@@ -27,17 +27,11 @@ import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -49,7 +43,7 @@ public class LivingApplicationPageAPIDelegate {
     private final long loggedUserId;
     private final ApplicationTokenValidator tokenValidator;
 
-    public LivingApplicationPageAPIDelegate(final TenantServiceAccessor accessor,
+    public LivingApplicationPageAPIDelegate(final ServiceAccessor accessor,
             final ApplicationPageModelConverter converter, final long loggedUserId,
             final ApplicationTokenValidator tokenValidator) {
         this.tokenValidator = tokenValidator;
@@ -72,8 +66,7 @@ public class LivingApplicationPageAPIDelegate {
     }
 
     public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token)
-            throws AlreadyExistsException,
-            CreationException {
+            throws CreationException {
         validateToken(token);
         final SApplicationPage.SApplicationPageBuilder pageBuilder = SApplicationPage.builder()
                 .applicationId(applicationId).pageId(pageId).token(token);
@@ -84,8 +77,6 @@ public class LivingApplicationPageAPIDelegate {
                     new SApplicationUpdateBuilder(loggedUserId)
                             .done());
             return converter.toApplicationPage(sAppPage);
-        } catch (final SObjectCreationException e) {
-            throw new CreationException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SBonitaException e) {
@@ -127,8 +118,8 @@ public class LivingApplicationPageAPIDelegate {
     public void deleteApplicationPage(final long applicationPageId) throws DeletionException {
         try {
             final SApplicationPage deletedApplicationPage = applicationService.deleteApplicationPage(applicationPageId);
-            final SApplicationUpdateBuilder appBbuilder = new SApplicationUpdateBuilder(loggedUserId);
-            applicationService.updateApplication(deletedApplicationPage.getApplicationId(), appBbuilder.done());
+            final SApplicationUpdateBuilder appBuilder = new SApplicationUpdateBuilder(loggedUserId);
+            applicationService.updateApplication(deletedApplicationPage.getApplicationId(), appBuilder.done());
         } catch (final SObjectNotFoundException sonfe) {
             throw new DeletionException(new ApplicationPageNotFoundException(sonfe.getMessage()));
         } catch (final SBonitaException e) {
@@ -137,9 +128,8 @@ public class LivingApplicationPageAPIDelegate {
     }
 
     public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
-        SApplicationPage sHomePage;
         try {
-            sHomePage = applicationService.getApplicationHomePage(applicationId);
+            SApplicationPage sHomePage = applicationService.getApplicationHomePage(applicationId);
             return converter.toApplicationPage(sHomePage);
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);

@@ -135,6 +135,7 @@ public class ProfileIT extends AbstractProfileIT {
         // when
         logoutOnTenant();
         loginOnDefaultTenantWith("userName3", "User3Pwd");
+        Thread.sleep(10);
         final ProfileMember createProfileMember = getProfileAPI().createProfileMember(creator);
 
         // then

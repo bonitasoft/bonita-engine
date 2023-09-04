@@ -27,22 +27,12 @@ import org.bonitasoft.engine.command.SRoleProfileMemberAlreadyExistsException;
 import org.bonitasoft.engine.command.SUserMembershipProfileMemberAlreadyExistsException;
 import org.bonitasoft.engine.command.SUserProfileMemberAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.profile.ProfileCriterion;
-import org.bonitasoft.engine.profile.ProfileMember;
-import org.bonitasoft.engine.profile.ProfileMemberNotFoundException;
-import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
-import org.bonitasoft.engine.profile.ProfileNotFoundException;
-import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.*;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -54,8 +44,8 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.profile.SearchProfileMembersForProfile;
 import org.bonitasoft.engine.search.profile.SearchProfiles;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.session.SessionService;
 
 public class ProfileAPIDelegate {
@@ -78,17 +68,17 @@ public class ProfileAPIDelegate {
         this.applicationService = applicationService;
     }
 
-    public static TenantServiceAccessor getTenantAccessor() {
-        return TenantServiceSingleton.getInstance();
+    public static ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
     public static ProfileAPIDelegate getInstance() {
         if (profileAPIDelegate == null) {
-            TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            profileAPIDelegate = new ProfileAPIDelegate(tenantAccessor.getProfileService(),
-                    tenantAccessor.getIdentityService(),
-                    tenantAccessor.getSearchEntitiesDescriptor(),
-                    tenantAccessor.getApplicationService());
+            ServiceAccessor serviceAccessor = getServiceAccessor();
+            profileAPIDelegate = new ProfileAPIDelegate(serviceAccessor.getProfileService(),
+                    serviceAccessor.getIdentityService(),
+                    serviceAccessor.getSearchEntitiesDescriptor(),
+                    serviceAccessor.getApplicationService());
         }
         return profileAPIDelegate;
     }
@@ -165,8 +155,7 @@ public class ProfileAPIDelegate {
     }
 
     public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId,
-            final Long roleId) throws CreationException, AlreadyExistsException {
-
+            final Long roleId) throws CreationException {
         try {
             final MemberType memberType = getMemberType(userId, groupId, roleId);
             final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService,

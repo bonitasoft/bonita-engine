@@ -37,7 +37,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageNotFoundException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.junit.After;
 import org.junit.Before;
@@ -56,7 +56,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
-        applicationInstaller = TenantServiceSingleton.getInstance()
+        applicationInstaller = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);;
         applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
@@ -193,7 +193,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         // fetch application menus
         ApplicationPage healthzPage = getApplicationAPI().searchApplicationPages(
                 new SearchOptionsBuilder(0, Integer.MAX_VALUE)
-                        .filter("applicationId", updatedApplication.getId())
+                        .filter("applicationId", (Long) updatedApplication.getId())
                         .done())
                 .getResult().get(0);
         assertThat(healthzPage.getToken()).isEqualTo("healthz");

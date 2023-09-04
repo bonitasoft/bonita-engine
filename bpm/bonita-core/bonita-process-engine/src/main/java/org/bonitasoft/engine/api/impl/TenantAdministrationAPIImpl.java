@@ -26,8 +26,6 @@ import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.TenantResource;
@@ -73,10 +71,9 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused
     @CustomTransactions
     public void pause() throws UpdateException {
-        TenantServiceAccessor tenantServiceAccessor = getServiceAccessorNoException()
-                .getTenantServiceAccessor();
+        ServiceAccessor serviceAccessor = getServiceAccessorNoException();
         try {
-            tenantServiceAccessor.getTenantStateManager().pause();
+            serviceAccessor.getTenantStateManager().pause();
         } catch (Exception e) {
             throw new UpdateException(e);
         }
@@ -86,11 +83,10 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused
     @CustomTransactions
     public void resume() throws UpdateException {
-        TenantServiceAccessor tenantServiceAccessor = getServiceAccessorNoException()
-                .getTenantServiceAccessor();
+        ServiceAccessor serviceAccessor = getServiceAccessorNoException();
         try {
-            tenantServiceAccessor.getTenantStateManager().resume();
-            tenantServiceAccessor.getUserTransactionService().executeInTransaction(() -> {
+            serviceAccessor.getTenantStateManager().resume();
+            serviceAccessor.getUserTransactionService().executeInTransaction(() -> {
                 resolveDependenciesForAllProcesses();
                 return null;
             });
@@ -100,8 +96,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     private void resolveDependenciesForAllProcesses() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependenciesForAllProcesses(tenantAccessor);
+        getServiceAccessor().getBusinessArchiveArtifactsManager()
+                .resolveDependenciesForAllProcesses(getServiceAccessor());
     }
 
     @Override
@@ -111,7 +107,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     protected TenantResource getTenantResource(TenantResourceType type) {
-        TenantResourcesService tenantResourcesService = getTenantAccessor().getTenantResourcesService();
+        TenantResourcesService tenantResourcesService = getServiceAccessor().getTenantResourcesService();
         org.bonitasoft.engine.resources.TenantResourceType resourceType = org.bonitasoft.engine.resources.TenantResourceType
                 .valueOf(type.name());
         try {
@@ -127,7 +123,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused
     public String getBusinessDataModelVersion() throws BusinessDataRepositoryException {
         try {
-            final BusinessDataModelRepository modelRepository = getTenantAccessor().getBusinessDataModelRepository();
+            final BusinessDataModelRepository modelRepository = getServiceAccessor().getBusinessDataModelRepository();
             return modelRepository.getInstalledBDMVersion();
         } catch (final SBusinessDataRepositoryException e) {
             throw new BusinessDataRepositoryException(e);
@@ -137,7 +133,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     private String installBusinessDataModel(final byte[] zip)
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         log.info("Starting the installation of the BDM.");
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         final long userId;
         try {
             userId = getUserId();
@@ -145,8 +141,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
             throw new BusinessDataRepositoryDeploymentException("Unable to determine user ID");
         }
         try {
-            final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            TenantStateManager tenantStateManager = tenantAccessor.getTenantStateManager();
+            final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
+            TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
             String bdm_version = tenantStateManager.executeTenantManagementOperation("BDM Installation",
                     () -> bdmRepository.install(zip, userId));
             log.info("Installation of the BDM completed.");
@@ -165,12 +161,12 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @WithLock(key = UPDATE_BDM)
     public void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         log.info("Uninstalling the currently deployed BDM");
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         try {
-            final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            TenantStateManager tenantStateManager = tenantAccessor.getTenantStateManager();
+            final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
+            TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
             tenantStateManager.executeTenantManagementOperation("BDM Uninstallation", () -> {
-                bdmRepository.uninstall(tenantAccessor.getTenantId());
+                bdmRepository.uninstall(serviceAccessor.getTenantId());
                 return null;
             });
             log.info("BDM successfully uninstalled");
@@ -203,12 +199,12 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     @WithLock(key = UPDATE_BDM)
     public void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         try {
-            final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            TenantStateManager tenantStateManager = tenantAccessor.getTenantStateManager();
+            final BusinessDataModelRepository bdmRepository = serviceAccessor.getBusinessDataModelRepository();
+            TenantStateManager tenantStateManager = serviceAccessor.getTenantStateManager();
             tenantStateManager.executeTenantManagementOperation("BDM Cleanup and uninstallation", () -> {
-                bdmRepository.dropAndUninstall(tenantAccessor.getTenantId());
+                bdmRepository.dropAndUninstall(serviceAccessor.getTenantId());
                 return null;
             });
         } catch (final SBusinessDataRepositoryException sbdre) {
@@ -221,7 +217,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @Override
     @AvailableWhenTenantIsPaused
     public byte[] getClientBDMZip() throws BusinessDataRepositoryException {
-        final BusinessDataModelRepository bdmRepository = getTenantAccessor().getBusinessDataModelRepository();
+        final BusinessDataModelRepository bdmRepository = getServiceAccessor().getBusinessDataModelRepository();
         try {
             return bdmRepository.getClientBDMZip();
         } catch (final SBusinessDataRepositoryException e) {
@@ -229,9 +225,9 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
-            return TenantServiceSingleton.getInstance();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -244,7 +240,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     protected long getUserId() throws IllegalStateException {
         try {
-            return getTenantAccessor().getSessionService().getSession(getSessionAccessor().getSessionId()).getUserId();
+            return getServiceAccessor().getSessionService().getSession(getSessionAccessor().getSessionId()).getUserId();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e.getMessage());
         }

@@ -24,9 +24,19 @@ import static org.bonitasoft.engine.bpm.process.ActivationState.DISABLED;
 import static org.bonitasoft.engine.bpm.process.ConfigurationState.RESOLVED;
 import static org.bonitasoft.engine.business.application.ApplicationImportPolicy.FAIL_ON_DUPLICATES;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -47,13 +57,28 @@ import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.*;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDeployException;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
-import org.bonitasoft.engine.business.data.*;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.ApplicationInstallationException;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.ImportException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.io.FileOperations;
@@ -62,9 +87,8 @@ import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -218,7 +242,7 @@ public class ApplicationInstaller {
             try {
                 tenantStateManager.resume();
                 transactionService.executeInTransaction(() -> {
-                    businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getTenantAccessor());
+                    businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getServiceAccessor());
                     return null;
                 });
             } catch (Exception e) {
@@ -757,13 +781,8 @@ public class ApplicationInstaller {
         }
     }
 
-    private TenantServiceAccessor getTenantAccessor() {
-        try {
-            ServiceAccessorFactory.getInstance().createSessionAccessor();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return TenantServiceSingleton.getInstance();
+    private ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
     public void logInstallationResult(ExecutionResult result) {

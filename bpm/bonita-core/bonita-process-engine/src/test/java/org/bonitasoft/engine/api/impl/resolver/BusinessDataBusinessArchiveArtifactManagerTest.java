@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SBusinessDataDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +37,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class BusinessDataBusinessArchiveArtifactManagerTest {
 
     @Mock
-    private TenantServiceAccessor tenantAccessor;
-
-    @Mock
     private BusinessDataRepository businessDataRepository;
 
     private BusinessDataBusinessArchiveArtifactManager resolver;
@@ -48,7 +44,7 @@ public class BusinessDataBusinessArchiveArtifactManagerTest {
     @Before
     public void setUp() {
         resolver = new BusinessDataBusinessArchiveArtifactManager(businessDataRepository);
-        final Set<String> entityClassNames = new HashSet<String>();
+        final Set<String> entityClassNames = new HashSet<>();
         entityClassNames.add("com.bonitasoft.Employee");
         entityClassNames.add("com.bonitasoft.LeaveRequest");
 

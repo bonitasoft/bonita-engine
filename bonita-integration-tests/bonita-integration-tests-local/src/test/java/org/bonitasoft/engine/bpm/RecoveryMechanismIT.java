@@ -36,7 +36,7 @@ public class RecoveryMechanismIT extends CommonAPILocalIT {
     @Before
     public void before() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        recoveryService = getTenantAccessor().lookup("recoveryService");
+        recoveryService = getServiceAccessor().lookup("recoveryService");
         recoveryService.setConsiderElementsOlderThan("PT0S");
     }
 
@@ -56,8 +56,8 @@ public class RecoveryMechanismIT extends CommonAPILocalIT {
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         TimeUnit.MILLISECONDS.sleep(100);
 
-        getTenantAccessor().getWorkExecutorService().pause();
-        getTenantAccessor().getWorkExecutorService().resume();
+        getServiceAccessor().getWorkExecutorService().pause();
+        getServiceAccessor().getWorkExecutorService().resume();
 
         TimeUnit.MILLISECONDS.sleep(500);
         assertThat(getProcessAPI().getProcessInstance(processInstance.getId()).getState())

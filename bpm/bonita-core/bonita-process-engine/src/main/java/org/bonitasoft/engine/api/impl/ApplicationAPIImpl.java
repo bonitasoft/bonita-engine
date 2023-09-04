@@ -34,38 +34,15 @@ import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationM
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationsOfUser;
-import org.bonitasoft.engine.business.application.Application;
-import org.bonitasoft.engine.business.application.ApplicationCreator;
-import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
-import org.bonitasoft.engine.business.application.ApplicationMenu;
-import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
-import org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
-import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
-import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
-import org.bonitasoft.engine.business.application.ApplicationPage;
-import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
-import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.ApplicationUpdater;
-import org.bonitasoft.engine.business.application.Icon;
-import org.bonitasoft.engine.business.application.converter.ApplicationMenuToNodeConverter;
-import org.bonitasoft.engine.business.application.converter.ApplicationPageToNodeConverter;
-import org.bonitasoft.engine.business.application.converter.ApplicationToNodeConverter;
-import org.bonitasoft.engine.business.application.converter.ApplicationsToNodeContainerConverter;
-import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
+import org.bonitasoft.engine.business.application.*;
+import org.bonitasoft.engine.business.application.converter.*;
 import org.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
 import org.bonitasoft.engine.business.application.exporter.ApplicationExporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.business.application.importer.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExportException;
-import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -75,11 +52,9 @@ import org.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
 import org.bonitasoft.engine.search.impl.SearchFilter;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -94,8 +69,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     private LivingApplicationAPIDelegate getLivingApplicationAPIDelegate() {
-        return new LivingApplicationAPIDelegate(getTenantAccessor(),
-                getApplicationModelConverter(getTenantAccessor().getPageService()),
+        return new LivingApplicationAPIDelegate(getServiceAccessor(),
+                getApplicationModelConverter(getServiceAccessor().getPageService()),
                 SessionInfos.getUserIdFromSession(), new ApplicationTokenValidator());
     }
 
@@ -104,23 +79,23 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     private LivingApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
-        return new LivingApplicationPageAPIDelegate(getTenantAccessor(), new ApplicationPageModelConverter(),
+        return new LivingApplicationPageAPIDelegate(getServiceAccessor(), new ApplicationPageModelConverter(),
                 SessionInfos.getUserIdFromSession(),
                 new ApplicationTokenValidator());
     }
 
     private LivingApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
-        return new LivingApplicationMenuAPIDelegate(getTenantAccessor(), new ApplicationMenuModelConverter(),
+        return new LivingApplicationMenuAPIDelegate(getServiceAccessor(), new ApplicationMenuModelConverter(),
                 new ApplicationMenuCreatorValidator(),
                 SessionInfos.getUserIdFromSession());
     }
 
     private LivingApplicationExporterDelegate getLivingApplicationExporterDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final PageService pageService = tenantAccessor.getPageService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ApplicationService applicationService = serviceAccessor.getApplicationService();
+        final PageService pageService = serviceAccessor.getPageService();
         ApplicationToNodeConverter applicationToNodeConverter = new ApplicationToNodeConverter(
-                tenantAccessor.getProfileService(), applicationService,
+                serviceAccessor.getProfileService(), applicationService,
                 new ApplicationPageToNodeConverter(pageService), new ApplicationMenuToNodeConverter(applicationService),
                 pageService);
         final ApplicationsToNodeContainerConverter applicationsToNodeContainerConverter = new ApplicationsToNodeContainerConverter(
@@ -128,7 +103,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
         final ApplicationExporter applicationExporter = new ApplicationExporter(applicationsToNodeContainerConverter,
                 applicationContainerExporter);
-        return new LivingApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationExporter);
+        return new LivingApplicationExporterDelegate(serviceAccessor.getApplicationService(), applicationExporter);
     }
 
     protected NodeToApplicationConverter getNodeToApplicationConverter(final PageService pageService,
@@ -159,10 +134,9 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getLivingApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            return TenantServiceSingleton.getInstance();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -170,11 +144,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SearchApplicationDescriptor appSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final SearchApplicationDescriptor appSearchDescriptor = serviceAccessor.getSearchEntitiesDescriptor()
                 .getSearchApplicationDescriptor();
-        final ApplicationModelConverter converter = getApplicationModelConverter(tenantAccessor.getPageService());
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final ApplicationModelConverter converter = getApplicationModelConverter(serviceAccessor.getPageService());
+        final ApplicationService applicationService = serviceAccessor.getApplicationService();
         final Optional<SearchFilter> filterOnUserId = searchOptions.getFilters().stream()
                 .filter(s -> s.getField().equals(USER_ID)).findFirst();
         if (filterOnUserId.isPresent()) {
@@ -214,11 +188,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final SearchApplicationPageDescriptor appPageSearchDescriptor = serviceAccessor.getSearchEntitiesDescriptor()
                 .getSearchApplicationPageDescriptor();
         final ApplicationPageModelConverter converter = new ApplicationPageModelConverter();
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final ApplicationService applicationService = serviceAccessor.getApplicationService();
         final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, converter,
                 appPageSearchDescriptor, searchOptions);
         return getApplicationPageAPIDelegate().searchApplicationPages(searchApplicationPages);
@@ -271,10 +245,10 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ApplicationService applicationService = serviceAccessor.getApplicationService();
         final ApplicationMenuModelConverter converter = new ApplicationMenuModelConverter();
-        final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
+        final SearchApplicationMenuDescriptor searchDescriptor = serviceAccessor.getSearchEntitiesDescriptor()
                 .getSearchApplicationMenuDescriptor();
         final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, converter,
                 searchDescriptor, searchOptions);
@@ -299,7 +273,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException {
-        return getTenantAccessor().getApplicationImporter().importApplications(xmlContent, null, null,
+        return getServiceAccessor().getApplicationImporter().importApplications(xmlContent, null, null,
                 SessionInfos.getUserIdFromSession(),
                 new StrategySelector().selectStrategy(policy));
     }

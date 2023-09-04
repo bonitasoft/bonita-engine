@@ -27,7 +27,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +45,7 @@ public class ProcessManagementAPIImplDelegateTest {
     private ProcessInstanceService processInstanceService;
 
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Spy
     private ProcessManagementAPIImplDelegate delegate;
@@ -58,10 +58,10 @@ public class ProcessManagementAPIImplDelegateTest {
 
     @Before
     public void setUp() {
-        doReturn(tenantServiceAccessor).when(delegate).getTenantAccessor();
-        when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
-        when(tenantServiceAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
-        when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
+        doReturn(serviceAccessor).when(delegate).getServiceAccessor();
+        when(serviceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        when(serviceAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
+        when(serviceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
     }
 
     @Test(expected = ProcessDefinitionNotFoundException.class)

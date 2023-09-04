@@ -22,7 +22,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.*;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * @author Emmanuel Duchastenier
@@ -38,7 +38,7 @@ public class OrganizationAPIDelegate {
 
     public static OrganizationAPIDelegate getInstance() {
         if (organizationAPIDelegate == null) {
-            organizationAPIDelegate = new OrganizationAPIDelegate(TenantServiceSingleton.getInstance()
+            organizationAPIDelegate = new OrganizationAPIDelegate(ServiceAccessorSingleton.getInstance()
                     .getIdentityService());
         }
         return organizationAPIDelegate;
