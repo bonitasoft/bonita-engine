@@ -23,7 +23,7 @@ import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class EngineInitializerTest {
     @Mock
     private ServiceAccessorFactory serviceAccessorFactory;
     @Mock
-    private PlatformServiceAccessor platformService;
+    private ServiceAccessor platformService;
     @Mock
     private PlatformSessionService platformSessionService;
     @Mock
