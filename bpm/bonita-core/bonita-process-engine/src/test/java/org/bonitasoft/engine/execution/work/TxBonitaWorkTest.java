@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 import java.util.Collections;
 import java.util.Map;
 
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
@@ -32,22 +32,21 @@ public class TxBonitaWorkTest {
 
     private TxBonitaWork txBonitawork;
 
-    private TenantServiceAccessor tenantAccessor;
+    private ServiceAccessor serviceAccessor;
 
     private UserTransactionService userTransactionService;
 
     @Before
     public void before() {
         txBonitawork = new TxBonitaWork(wrappedWork);
-        tenantAccessor = mock(TenantServiceAccessor.class);
+        serviceAccessor = mock(ServiceAccessor.class);
         userTransactionService = mock(UserTransactionService.class);
-        when(tenantAccessor.getUserTransactionService()).thenReturn(userTransactionService);
+        when(serviceAccessor.getUserTransactionService()).thenReturn(userTransactionService);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testWork() throws Exception {
-        Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        Map<String, Object> singletonMap = Collections.singletonMap("serviceAccessor", serviceAccessor);
         txBonitawork.work(singletonMap);
         verify(userTransactionService, times(1)).executeInTransaction(any());
     }
@@ -66,7 +65,7 @@ public class TxBonitaWorkTest {
 
     @Test
     public void handleFailure() throws Throwable {
-        Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        Map<String, Object> context = Collections.singletonMap("serviceAccessor", serviceAccessor);
         Exception e = new Exception();
         txBonitawork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
@@ -74,14 +73,14 @@ public class TxBonitaWorkTest {
 
     @Test
     public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12l);
+        when(wrappedWork.getTenantId()).thenReturn(12L);
         assertEquals(12, txBonitawork.getTenantId());
     }
 
     @Test
     public void setTenantId() {
-        txBonitawork.setTenantId(12l);
-        verify(wrappedWork).setTenantId(12l);
+        txBonitawork.setTenantId(12L);
+        verify(wrappedWork).setTenantId(12L);
     }
 
     @Test

@@ -27,14 +27,12 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.connectors.VariableStorage;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.test.CommonAPILocalIT;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -116,9 +114,9 @@ public class JobExecutionIT extends CommonAPILocalIT {
 
     private void searchJobLogs(final long jobDescriptorId, final int nbOfExpectedJobLogs) throws Exception {
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
-        final JobService jobService = tenantAccessor.getJobService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final UserTransactionService transactionService = serviceAccessor.getUserTransactionService();
+        final JobService jobService = serviceAccessor.getJobService();
 
         final QueryOptions options = new QueryOptions(0, 1, null,
                 Collections.singletonList(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId)), null);
@@ -130,9 +128,9 @@ public class JobExecutionIT extends CommonAPILocalIT {
 
     private List<SJobDescriptor> searchJobDescriptors(final int nbOfExpectedJobDescriptors) throws Exception {
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final JobService jobService = tenantAccessor.getJobService();
-        final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final JobService jobService = serviceAccessor.getJobService();
+        final UserTransactionService transactionService = serviceAccessor.getUserTransactionService();
 
         final List<FilterOption> filters = Collections
                 .singletonList(
@@ -214,15 +212,6 @@ public class JobExecutionIT extends CommonAPILocalIT {
             }
         }
         return searchJob;
-    }
-
-    @Override
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
     }
 
 }

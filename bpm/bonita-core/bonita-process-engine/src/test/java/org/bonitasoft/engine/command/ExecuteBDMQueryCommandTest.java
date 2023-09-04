@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.operation.pojo.Employee;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,11 +46,11 @@ public class ExecuteBDMQueryCommandTest {
     private BusinessDataRepository bdmRepository;
 
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Before
     public void setUp() {
-        when(tenantServiceAccessor.getBusinessDataRepository()).thenReturn(bdmRepository);
+        when(serviceAccessor.getBusinessDataRepository()).thenReturn(bdmRepository);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class ExecuteBDMQueryCommandTest {
                 .build();
 
         // when
-        byte[] result = (byte[]) command.execute(parameters, tenantServiceAccessor);
+        byte[] result = (byte[]) command.execute(parameters, serviceAccessor);
 
         // then
         assertThat(new String(result)).isEqualTo(
@@ -85,7 +85,7 @@ public class ExecuteBDMQueryCommandTest {
                 .build();
 
         // when
-        byte[] result = (byte[]) command.execute(parameters, tenantServiceAccessor);
+        byte[] result = (byte[]) command.execute(parameters, serviceAccessor);
 
         // then
         assertThat(new String(result)).isEqualTo(
@@ -107,7 +107,7 @@ public class ExecuteBDMQueryCommandTest {
                 .build();
 
         // when
-        byte[] result = (byte[]) command.execute(parameters, tenantServiceAccessor);
+        byte[] result = (byte[]) command.execute(parameters, serviceAccessor);
 
         // then
         assertThat(new String(result)).as("json result").isEqualTo(
@@ -122,7 +122,7 @@ public class ExecuteBDMQueryCommandTest {
                 .build();
 
         // when
-        Throwable thrown = catchThrowable(() -> command.execute(parameters, tenantServiceAccessor));
+        Throwable thrown = catchThrowable(() -> command.execute(parameters, serviceAccessor));
 
         // then
         assertThat(thrown).isInstanceOf(SCommandParameterizationException.class)
@@ -137,7 +137,7 @@ public class ExecuteBDMQueryCommandTest {
                 .build();
 
         // when
-        Throwable thrown = catchThrowable(() -> command.execute(parameters, tenantServiceAccessor));
+        Throwable thrown = catchThrowable(() -> command.execute(parameters, serviceAccessor));
 
         // then
         assertThat(thrown).isInstanceOf(SCommandParameterizationException.class)

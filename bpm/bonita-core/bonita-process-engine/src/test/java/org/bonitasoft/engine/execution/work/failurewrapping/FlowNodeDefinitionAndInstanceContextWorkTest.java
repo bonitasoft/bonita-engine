@@ -46,9 +46,9 @@ public class FlowNodeDefinitionAndInstanceContextWorkTest extends AbstractContex
     @Override
     @Before
     public void before() throws SBonitaException {
-        when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
+        when(serviceAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
 
-        txBonitawork = spy(new FlowNodeDefinitionAndInstanceContextWork(wrappedWork, FLOW_NODE_INSTANCE_ID));
+        txBonitaWork = spy(new FlowNodeDefinitionAndInstanceContextWork(wrappedWork, FLOW_NODE_INSTANCE_ID));
 
         doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
         doReturn(FLOW_NODE_DEFINITION_ID).when(flowNodeInstance).getFlowNodeDefinitionId();
@@ -58,13 +58,13 @@ public class FlowNodeDefinitionAndInstanceContextWorkTest extends AbstractContex
 
     @Test
     public void handleFailure() throws Throwable {
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Map<String, Object> context = Collections.singletonMap("serviceAccessor", serviceAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
 
-        txBonitawork.handleFailure(e, context);
+        txBonitaWork.handleFailure(e, context);
 
         assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID=" + FLOW_NODE_DEFINITION_ID));
         assertTrue(e.getMessage().contains("FLOW_NODE_NAME=" + FLOW_NODE_NAME));

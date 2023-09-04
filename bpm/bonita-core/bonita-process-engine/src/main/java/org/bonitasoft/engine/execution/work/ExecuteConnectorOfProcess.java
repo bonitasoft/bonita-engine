@@ -42,14 +42,10 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.execution.Filter;
-import org.bonitasoft.engine.execution.FlowNodeIdFilter;
-import org.bonitasoft.engine.execution.FlowNodeSelector;
-import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.StartFlowNodeFilter;
+import org.bonitasoft.engine.execution.*;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -94,10 +90,10 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     @Override
     protected void continueFlow(final Map<String, Object> context) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final ProcessInstanceService processInstanceService = serviceAccessor.getProcessInstanceService();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        final ProcessExecutor processExecutor = serviceAccessor.getProcessExecutor();
 
         final SProcessDefinition sProcessDefinition = processDefinitionService
                 .getProcessDefinition(processDefinitionId);
@@ -119,7 +115,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     @Override
     protected void setContainerInFail(final Map<String, Object> context) throws SBonitaException {
-        final ProcessInstanceService processInstanceService = getTenantAccessor(context).getProcessInstanceService();
+        final ProcessInstanceService processInstanceService = getServiceAccessor(context).getProcessInstanceService();
         final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
         processInstanceService.setState(intTxProcessInstance, ProcessInstanceState.ERROR);
     }
@@ -128,7 +124,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     protected SThrowEventInstance createThrowErrorEventInstance(final Map<String, Object> context,
             final SEndEventDefinition eventDefinition)
             throws SBonitaException {
-        final BPMInstancesCreator bpmInstancesCreator = getTenantAccessor(context).getBPMInstancesCreator();
+        final BPMInstancesCreator bpmInstancesCreator = getServiceAccessor(context).getBPMInstancesCreator();
         final SFlowNodeInstance createFlowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinitionId,
                 rootProcessInstanceId,
                 processInstanceId, SFlowElementsContainerType.PROCESS, eventDefinition, rootProcessInstanceId,
@@ -141,9 +137,9 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition,
             final Throwable exception)
             throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final EventsHandler eventsHandler = serviceAccessor.getEventsHandler();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
 
         setConnectorOnlyToFailed(context, exception);
         // create a fake definition
@@ -164,7 +160,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
                 sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, throwEventInstance);
 
-        tenantAccessor.getBPMArchiverService().archiveAndDeleteFlowNodeInstance(throwEventInstance,
+        serviceAccessor.getBPMArchiverService().archiveAndDeleteFlowNodeInstance(throwEventInstance,
                 sProcessDefinition.getId());
         if (!hasActionToExecute) {
             setConnectorAndContainerToFailed(context, exception);

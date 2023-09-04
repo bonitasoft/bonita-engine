@@ -31,7 +31,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 /**
  * @author Celine Souchet
  */
-@SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest {
 
@@ -55,22 +54,23 @@ public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest {
 
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService)
                 .getProcessDeploymentInfo(PROCESS_DEFINITION_ID);
-        doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
+        doReturn(processDefinitionService).when(serviceAccessor).getProcessDefinitionService();
 
-        txBonitawork = spy(new ProcessDefinitionContextWork(wrappedWork, PROCESS_DEFINITION_ID));
+        txBonitaWork = spy(new ProcessDefinitionContextWork(wrappedWork, PROCESS_DEFINITION_ID));
 
         super.before();
     }
 
     @Test
     public void handleFailure() throws Throwable {
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Map<String, Object> context = Collections.singletonMap("serviceAccessor",
+                serviceAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
 
-        txBonitawork.handleFailure(e, context);
+        txBonitaWork.handleFailure(e, context);
 
         assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID=" + PROCESS_DEFINITION_ID));
         assertTrue(e.getMessage().contains("PROCESS_NAME=" + NAME));

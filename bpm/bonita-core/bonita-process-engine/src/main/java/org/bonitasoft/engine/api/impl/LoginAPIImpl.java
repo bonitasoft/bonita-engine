@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
@@ -32,8 +34,6 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -167,14 +167,18 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected TenantServiceAccessor getTenantServiceAccessor() {
-        return TenantServiceSingleton.getInstance();
+    protected ServiceAccessor getServiceAccessor() {
+        try {
+            return ServiceAccessorFactory.getInstance().createServiceAccessor();
+        } catch (BonitaHomeConfigurationException | IOException | ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     @CustomTransactions
     public void logout(final APISession session) throws LogoutException, SessionNotFoundException {
-        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         try {
             serviceAccessor.getLoginService().logout(session.getId());
         } catch (final SSessionNotFoundException sbe) {

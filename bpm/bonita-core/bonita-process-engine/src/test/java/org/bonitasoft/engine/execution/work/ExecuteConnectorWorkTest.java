@@ -17,10 +17,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,7 +42,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
@@ -73,21 +70,22 @@ public class ExecuteConnectorWorkTest {
     private static final long TENANT_ID = 125L;
 
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private LockService lockService;
     @Mock
     private UserTransactionService userTransactionService;
     @Mock
     private ConnectorInstanceService connectorInstanceService;
-    private SConnectorDefinition sConnectorDefinition = new SConnectorDefinitionImpl("testDef", "connectorDef", "1.0",
+    private final SConnectorDefinition sConnectorDefinition = new SConnectorDefinitionImpl("testDef", "connectorDef",
+            "1.0",
             ConnectorEvent.ON_ENTER);
     private EvaluateOutputCallable evaluateOutput = () -> {
     };
-    private SExpressionContext expressionContext = new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS",
+    private final SExpressionContext expressionContext = new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS",
             PROCESS_DEFINITION_ID);
-    private Map<String, Object> workContext = new HashMap<>();
-    private ExecuteConnectorWork executeConnectorWork = new ExecuteConnectorWork(PROCESS_DEFINITION_ID,
+    private final Map<String, Object> workContext = new HashMap<>();
+    private final ExecuteConnectorWork executeConnectorWork = new ExecuteConnectorWork(PROCESS_DEFINITION_ID,
             CONNECTOR_INSTANCE_ID, CONNECTOR_NAME, expressionContext, PROCESS_INSTANCE_ID) {
 
         @Override
@@ -135,17 +133,17 @@ public class ExecuteConnectorWorkTest {
 
     @Before
     public void before() throws Exception {
-        workContext.put(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
-        doReturn(lockService).when(tenantServiceAccessor).getLockService();
-        doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
+        workContext.put(TenantAwareBonitaWork.SERVICE_ACCESSOR, serviceAccessor);
+        doReturn(lockService).when(serviceAccessor).getLockService();
+        doReturn(userTransactionService).when(serviceAccessor).getUserTransactionService();
         doAnswer(args -> ((Callable) args.getArgument(0)).call()).when(userTransactionService)
                 .executeInTransaction(any());
         executeConnectorWork.setTenantId(TENANT_ID);
-        doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();
+        doReturn(classLoaderService).when(serviceAccessor).getClassLoaderService();
         doReturn(this.getClass().getClassLoader()).when(classLoaderService).getClassLoader(any());
-        doReturn(timeTracker).when(tenantServiceAccessor).getTimeTracker();
-        doReturn(connectorService).when(tenantServiceAccessor).getConnectorService();
-        doReturn(connectorInstanceService).when(tenantServiceAccessor).getConnectorInstanceService();
+        doReturn(timeTracker).when(serviceAccessor).getTimeTracker();
+        doReturn(connectorService).when(serviceAccessor).getConnectorService();
+        doReturn(connectorInstanceService).when(serviceAccessor).getConnectorInstanceService();
     }
 
     @Test

@@ -25,14 +25,14 @@ public class SpringServiceAccessors implements ServiceAccessors {
     private SpringBeanAccessor platform;
 
     //----  Initialize spring contexts
-    protected synchronized SpringBeanAccessor getPlatformBeanAccessor() {
+    protected synchronized SpringBeanAccessor getBeanAccessor() {
         if (platform == null) {
-            platform = createPlatformBeanAccessor();
+            platform = createBeanAccessor();
         }
         return platform;
     }
 
-    protected SpringBeanAccessor createPlatformBeanAccessor() {
+    protected SpringBeanAccessor createBeanAccessor() {
         return new SpringBeanAccessor();
     }
 
@@ -40,22 +40,22 @@ public class SpringServiceAccessors implements ServiceAccessors {
 
     @Override
     public PlatformInitServiceAccessor getPlatformInitServiceAccessor() {
-        return new SpringPlatformInitServiceAccessor(getPlatformBeanAccessor());
+        return new SpringPlatformInitServiceAccessor(getBeanAccessor());
     }
 
     @Override
     public ServiceAccessor getServiceAccessor() {
-        return new SpringServiceAccessor(getPlatformBeanAccessor());
+        return new SpringServiceAccessor(getBeanAccessor());
     }
 
     @Override
     public PlatformServiceAccessor getPlatformServiceAccessor() {
-        return new SpringPlatformServiceAccessor(getPlatformBeanAccessor());
+        return new SpringPlatformServiceAccessor(getBeanAccessor());
     }
 
     @Override
     public TenantServiceAccessor getTenantServiceAccessor() {
-        return new SpringTenantServiceAccessor(getPlatformBeanAccessor());
+        return new SpringTenantServiceAccessor(getBeanAccessor());
     }
 
     @Override

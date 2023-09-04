@@ -16,12 +16,11 @@ package org.bonitasoft.engine.execution.work;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
@@ -36,24 +35,24 @@ public class InSessionBonitaWorkTest {
     @Mock
     private BonitaWork wrappedWork;
     @Mock
-    private TenantServiceAccessor tenantAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private SessionAccessor sessionAccessor;
 
-    private InSessionBonitaWork txBonitawork;
+    private InSessionBonitaWork txBonitaWork;
 
     @Before
     public void before() {
-        txBonitawork = spy(new InSessionBonitaWork(wrappedWork));
+        txBonitaWork = spy(new InSessionBonitaWork(wrappedWork));
 
-        when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
-        doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
+        when(serviceAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
+        doReturn(serviceAccessor).when(txBonitaWork).getServiceAccessor();
     }
 
     @Test
     public void testWork() throws Exception {
         final Map<String, Object> singletonMap = new HashMap<>();
-        txBonitawork.work(singletonMap);
+        txBonitaWork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
     }
 
@@ -61,7 +60,7 @@ public class InSessionBonitaWorkTest {
     public void testWorkFailureIsHandled() throws Throwable {
         final Map<String, Object> singletonMap = new HashMap<>();
         final Exception e = new Exception();
-        txBonitawork.handleFailure(e, singletonMap);
+        txBonitaWork.handleFailure(e, singletonMap);
         verify(wrappedWork).handleFailure(e, singletonMap);
     }
 
@@ -71,61 +70,61 @@ public class InSessionBonitaWorkTest {
         final Exception e1 = new Exception();
         final Exception e2 = new Exception();
         doThrow(e2).when(wrappedWork).handleFailure(e1, singletonMap);
-        txBonitawork.handleFailure(e1, singletonMap);
+        txBonitaWork.handleFailure(e1, singletonMap);
         verify(wrappedWork).handleFailure(e1, singletonMap);
     }
 
     @Test
     public void putInMap() throws Exception {
         final Map<String, Object> singletonMap = new HashMap<>();
-        txBonitawork.work(singletonMap);
-        assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
+        txBonitaWork.work(singletonMap);
+        assertEquals(serviceAccessor, singletonMap.get("serviceAccessor"));
     }
 
     @Test
     public void getDescription() {
         when(wrappedWork.getDescription()).thenReturn("The description");
-        assertEquals("The description", txBonitawork.getDescription());
+        assertEquals("The description", txBonitaWork.getDescription());
     }
 
     @Test
     public void getRecoveryProcedure() {
         when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
-        assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
+        assertEquals("recoveryProcedure", txBonitaWork.getRecoveryProcedure());
     }
 
     @Test
     public void handleFailure() throws Throwable {
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Map<String, Object> context = Map.of("serviceAccessor", serviceAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
-        txBonitawork.handleFailure(e, context);
+        txBonitaWork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
     }
 
     @Test
     public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12l);
-        assertEquals(12, txBonitawork.getTenantId());
+        when(wrappedWork.getTenantId()).thenReturn(12L);
+        assertEquals(12, txBonitaWork.getTenantId());
     }
 
     @Test
     public void setTenantId() {
-        txBonitawork.setTenantId(12l);
-        verify(wrappedWork).setTenantId(12l);
+        txBonitaWork.setTenantId(12L);
+        verify(wrappedWork).setTenantId(12L);
     }
 
     @Test
     public void getWrappedWork() {
-        assertEquals(wrappedWork, txBonitawork.getWrappedWork());
+        assertEquals(wrappedWork, txBonitaWork.getWrappedWork());
     }
 
     @Test
     public void testToString() {
         when(wrappedWork.toString()).thenReturn("the to string");
-        assertEquals("the to string", txBonitawork.toString());
+        assertEquals("the to string", txBonitaWork.toString());
     }
 
     @Test(expected = Exception.class)
@@ -133,7 +132,7 @@ public class InSessionBonitaWorkTest {
         final Map<String, Object> context = new HashMap<>();
         final Exception e = new Exception();
         doThrow(e).when(wrappedWork).work(context);
-        txBonitawork.work(context);
+        txBonitaWork.work(context);
     }
 
 }

@@ -39,7 +39,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.lock.BonitaLock;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -98,7 +98,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             throws SBonitaException;
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
-        return getTenantAccessor(context).getClassLoaderService().getClassLoader(
+        return getServiceAccessor(context).getClassLoaderService().getClassLoader(
                 identifier(ScopeType.PROCESS, processDefinitionId));
     }
 
@@ -110,7 +110,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
     protected void setConnectorOnlyToFailed(final Map<String, Object> context, final Throwable t)
             throws SBonitaException {
-        final ConnectorInstanceService connectorInstanceService = getTenantAccessor(context)
+        final ConnectorInstanceService connectorInstanceService = getServiceAccessor(context)
                 .getConnectorInstanceService();
         final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = connectorInstanceService
                 .getConnectorInstanceWithFailureInfo(connectorInstanceId);
@@ -119,11 +119,11 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result,
-            final SConnectorDefinition sConnectorDefinition,
-            final Long id, final String containerType) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+            final SConnectorDefinition sConnectorDefinition, final Long id, final String containerType)
+            throws SBonitaException {
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final ConnectorInstanceService connectorInstanceService = serviceAccessor.getConnectorInstanceService();
+        final ConnectorService connectorService = serviceAccessor.getConnectorService();
         final List<SOperation> outputs = sConnectorDefinition.getOutputs();
         final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType,
                 processDefinitionId);
@@ -135,12 +135,12 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final long startTime = System.currentTimeMillis();
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final ConnectorService connectorService = tenantAccessor.getConnectorService();
-        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final TimeTracker timeTracker = tenantAccessor.getTimeTracker();
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final ConnectorService connectorService = serviceAccessor.getConnectorService();
+        final ConnectorInstanceService connectorInstanceService = serviceAccessor.getConnectorInstanceService();
+        final UserTransactionService userTransactionService = serviceAccessor.getUserTransactionService();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        final TimeTracker timeTracker = serviceAccessor.getTimeTracker();
         final ClassLoader processClassloader = getClassLoader(context);
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -157,7 +157,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                     connectorImplementationDescriptor, processClassloader,
                     callable.getInputParameters()).thenAccept(r -> {
                         try {
-                            executeOutputOperationsAndContinue(context, tenantAccessor, userTransactionService,
+                            executeOutputOperationsAndContinue(context, serviceAccessor, userTransactionService,
                                     sConnectorDefinition, r);
                         } catch (Exception e) {
                             throw new CompletionException(
@@ -184,11 +184,11 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         }
     }
 
-    private void executeOutputOperationsAndContinue(Map<String, Object> context, TenantServiceAccessor tenantAccessor,
+    private void executeOutputOperationsAndContinue(Map<String, Object> context, ServiceAccessor serviceAccessor,
             UserTransactionService userTransactionService, SConnectorDefinition sConnectorDefinition, ConnectorResult r)
             throws Exception {
         // evaluate output and trigger the execution of the flow node
-        BonitaLock lock = tenantAccessor.getLockService().lock(processInstanceId,
+        BonitaLock lock = serviceAccessor.getLockService().lock(processInstanceId,
                 SFlowElementsContainerType.PROCESS.name(), getTenantId());
         try {
             userTransactionService.executeInTransaction(() -> {
@@ -197,14 +197,14 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                 return null;
             });
         } finally {
-            tenantAccessor.getLockService().unlock(lock, getTenantId());
+            serviceAccessor.getLockService().unlock(lock, getTenantId());
         }
     }
 
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        final UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
-        final ProcessDefinitionService processDefinitionService = getTenantAccessor(context)
+        final UserTransactionService userTransactionService = getServiceAccessor(context).getUserTransactionService();
+        final ProcessDefinitionService processDefinitionService = getServiceAccessor(context)
                 .getProcessDefinitionService();
 
         final HandleConnectorOnFailEventTxContent callable = new HandleConnectorOnFailEventTxContent(e,

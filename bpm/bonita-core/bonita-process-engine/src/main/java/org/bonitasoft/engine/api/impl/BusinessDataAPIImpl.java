@@ -27,23 +27,24 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusin
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class BusinessDataAPIImpl implements BusinessDataAPI {
 
-    protected TenantServiceAccessor getTenantAccessor() {
-        return APIUtils.getTenantAccessor();
+    protected ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
     @Override
     public BusinessDataReference getProcessBusinessDataReference(final String businessDataName,
             final long processInstanceId) throws DataNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         try {
-            final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
+            final RefBusinessDataService refBusinessDataService = serviceAccessor.getRefBusinessDataService();
             final SRefBusinessDataInstance sReference = refBusinessDataService.getRefBusinessDataInstance(
                     businessDataName,
                     processInstanceId);
@@ -64,9 +65,9 @@ public class BusinessDataAPIImpl implements BusinessDataAPI {
     @Override
     public List<BusinessDataReference> getProcessBusinessDataReferences(final long processInstanceId,
             final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         try {
-            final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
+            final RefBusinessDataService refBusinessDataService = serviceAccessor.getRefBusinessDataService();
             final List<SRefBusinessDataInstance> sReferences = refBusinessDataService
                     .getRefBusinessDataInstances(processInstanceId, startIndex, maxResults);
             final List<BusinessDataReference> references = new ArrayList<BusinessDataReference>();

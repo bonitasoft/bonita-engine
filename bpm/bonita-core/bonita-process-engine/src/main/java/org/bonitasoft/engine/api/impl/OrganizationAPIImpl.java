@@ -29,7 +29,7 @@ import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 
 /**
@@ -37,19 +37,19 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
  */
 public class OrganizationAPIImpl {
 
-    private final TenantServiceAccessor tenantAccessor;
+    private final ServiceAccessor serviceAccessor;
 
     private final int pageSize;
 
-    public OrganizationAPIImpl(TenantServiceAccessor tenantAccessor, int pageSize) {
-        this.tenantAccessor = tenantAccessor;
+    public OrganizationAPIImpl(ServiceAccessor serviceAccessor, int pageSize) {
+        this.serviceAccessor = serviceAccessor;
         this.pageSize = pageSize;
     }
 
     public void deleteOrganization() throws DeletionException {
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final SCommentService commentService = tenantAccessor.getCommentService();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ProcessInstanceService processInstanceService = serviceAccessor.getProcessInstanceService();
+        final SCommentService commentService = serviceAccessor.getCommentService();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
 
         try {
             final QueryOptions queryOptions = new QueryOptions(0, 1);
@@ -58,7 +58,7 @@ public class OrganizationAPIImpl {
                     && commentService.getNumberOfComments(queryOptions) == 0;
             if (canDeleteOrganization) {
                 deleteOrganizationElements(activityInstanceService);
-                updateActorProcessDependenciesForAllActors(tenantAccessor);
+                updateActorProcessDependenciesForAllActors(serviceAccessor);
             } else {
                 throw new DeletionException(
                         "Can't delete a organization when a process, a human tasks, or a comment is active !!.");
@@ -70,11 +70,11 @@ public class OrganizationAPIImpl {
 
     private void deleteOrganizationElements(final ActivityInstanceService activityInstanceService)
             throws SBonitaException {
-        final IdentityService identityService = tenantAccessor.getIdentityService();
-        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final ProfileService profileService = tenantAccessor.getProfileService();
-        final SupervisorMappingService supervisorService = tenantAccessor.getSupervisorService();
-        final ExternalIdentityMappingService externalIdentityMappingService = tenantAccessor
+        final IdentityService identityService = serviceAccessor.getIdentityService();
+        final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
+        final ProfileService profileService = serviceAccessor.getProfileService();
+        final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        final ExternalIdentityMappingService externalIdentityMappingService = serviceAccessor
                 .getExternalIdentityMappingService();
 
         deleteCustomUserInfo(identityService);
@@ -110,17 +110,17 @@ public class OrganizationAPIImpl {
     /**
      * Check / update process resolution information, for all processes in a list of actor IDs.
      */
-    private void updateActorProcessDependenciesForAllActors(final TenantServiceAccessor tenantAccessor)
+    private void updateActorProcessDependenciesForAllActors(final ServiceAccessor serviceAccessor)
             throws SBonitaException {
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
         final ActorBusinessArchiveArtifactManager dependencyResolver = new ActorBusinessArchiveArtifactManager(
-                tenantAccessor.getActorMappingService(), tenantAccessor.getIdentityService());
+                serviceAccessor.getActorMappingService(), serviceAccessor.getIdentityService());
         do {
             processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, 100);
             for (final Long processDefinitionId : processDefinitionIds) {
-                tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId,
-                        tenantAccessor, dependencyResolver);
+                serviceAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId,
+                        serviceAccessor, dependencyResolver);
             }
         } while (processDefinitionIds.size() == 100);
     }

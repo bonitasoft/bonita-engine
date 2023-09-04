@@ -22,7 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.work.SWorkPreconditionException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,7 +41,7 @@ public class ExecuteFlowNodeWorkTest {
     public static final long FLOW_NODE_INSTANCE_ID = 564325L;
     public static final long PROCESS_INSTANCE_ID = 34552L;
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private ActivityInstanceService activityInstanceService;
     @Mock
@@ -54,9 +54,9 @@ public class ExecuteFlowNodeWorkTest {
 
     @Before
     public void before() throws Exception {
-        context = Collections.singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
-        doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
-        doReturn(flowNodeExecutor).when(tenantServiceAccessor).getFlowNodeExecutor();
+        context = Collections.singletonMap(TenantAwareBonitaWork.SERVICE_ACCESSOR, serviceAccessor);
+        doReturn(activityInstanceService).when(serviceAccessor).getActivityInstanceService();
+        doReturn(flowNodeExecutor).when(serviceAccessor).getFlowNodeExecutor();
         sHumanTaskInstance = new SUserTaskInstance();
         sHumanTaskInstance.setId(FLOW_NODE_INSTANCE_ID);
         doReturn(sHumanTaskInstance).when(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);

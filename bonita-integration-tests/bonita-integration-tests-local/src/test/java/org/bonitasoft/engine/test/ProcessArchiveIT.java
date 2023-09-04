@@ -39,7 +39,7 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
 import org.junit.Before;
@@ -64,10 +64,10 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
     @Test()
     public void deleteProcessDefinitionDeleteArchivedInstancesWithDataAndComments() throws Exception {
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SCommentService commentService = tenantAccessor.getCommentService();
-        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
-        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final SCommentService commentService = serviceAccessor.getCommentService();
+        final UserTransactionService userTransactionService = serviceAccessor.getUserTransactionService();
+        final DataInstanceService dataInstanceService = serviceAccessor.getDataInstanceService();
         final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("ProcessToDelete", "1.0");

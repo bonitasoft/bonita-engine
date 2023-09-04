@@ -14,10 +14,7 @@
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +25,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,11 +40,12 @@ public class TriggerSignalWorkTest {
 
     public static final long UNREADABLE_SIGNAL_ID = 58923749333L;
     private TriggerSignalWork triggerSignalWork;
-    private String SIGNAL_NAME = "theSignal";
-    private long SIGNAL_ID = 5643261L;
+    private final String SIGNAL_NAME = "theSignal";
+    private final long SIGNAL_ID = 5643261L;
     private Map<String, Object> context;
+
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private EventsHandler eventsHandler;
     @Mock
@@ -57,9 +55,9 @@ public class TriggerSignalWorkTest {
     @Before
     public void before() throws Exception {
         context = new HashMap<>();
-        context.put("tenantAccessor", tenantServiceAccessor);
-        doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
-        doReturn(eventsHandler).when(tenantServiceAccessor).getEventsHandler();
+        context.put("serviceAccessor", serviceAccessor);
+        doReturn(eventInstanceService).when(serviceAccessor).getEventInstanceService();
+        doReturn(eventsHandler).when(serviceAccessor).getEventsHandler();
         waitingSignalEvent = new SWaitingSignalEvent(SBPMEventType.EVENT_SUB_PROCESS, 654223L, "proc", 54362L,
                 "flownode", SIGNAL_NAME);
         doThrow(SEventTriggerInstanceNotFoundException.class).when(eventInstanceService)
@@ -93,7 +91,7 @@ public class TriggerSignalWorkTest {
     }
 
     @Test
-    public void should_give_signal_name_in_recovery_procedure() throws Exception {
+    public void should_give_signal_name_in_recovery_procedure() {
         //given
         triggerSignalWork = new TriggerSignalWork(SIGNAL_ID, SIGNAL_NAME);
         //when

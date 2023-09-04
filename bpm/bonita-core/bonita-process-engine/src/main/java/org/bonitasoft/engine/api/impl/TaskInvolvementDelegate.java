@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,16 +29,13 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserT
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.*;
 import org.bonitasoft.engine.search.AbstractHumanTaskInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * @author Emmanuel Duchastenier
@@ -48,13 +44,13 @@ public class TaskInvolvementDelegate {
 
     private static final int BATCH_SIZE = 100;
 
-    protected TenantServiceAccessor getTenantServiceAccessor() {
-        return APIUtils.getTenantAccessor();
+    protected ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
     public boolean isExecutorOfArchivedTaskOfProcess(long userId, Long rootProcessInstanceId)
             throws SBonitaReadException {
-        final ActivityInstanceService activityInstanceService = getTenantServiceAccessor().getActivityInstanceService();
+        final ActivityInstanceService activityInstanceService = getServiceAccessor().getActivityInstanceService();
 
         QueryOptions archivedQueryOptions = buildArchivedTasksQueryOptions(rootProcessInstanceId);
         List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService
@@ -86,7 +82,7 @@ public class TaskInvolvementDelegate {
 
     public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId)
             throws ActivityInstanceNotFoundException {
-        final ActivityInstanceService activityInstanceService = getTenantServiceAccessor().getActivityInstanceService();
+        final ActivityInstanceService activityInstanceService = getServiceAccessor().getActivityInstanceService();
         try {
             long assigneeId;
             final SHumanTaskInstance humanTaskInstance = activityInstanceService
@@ -107,10 +103,10 @@ public class TaskInvolvementDelegate {
     }
 
     public boolean hasUserPendingOrAssignedTasks(long userId, Long processInstanceId) throws SExecutionException {
-        final ActivityInstanceService activityInstanceService = getTenantServiceAccessor().getActivityInstanceService();
+        final ActivityInstanceService activityInstanceService = getServiceAccessor().getActivityInstanceService();
         // is user assigned or has pending tasks on this process instance:
         final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.EMPTY_LIST,
-                Arrays.asList(new FilterOption(SHumanTaskInstance.class,
+                List.of(new FilterOption(SHumanTaskInstance.class,
                         "logicalGroup2", processInstanceId)),
                 null);
         try {
@@ -122,10 +118,10 @@ public class TaskInvolvementDelegate {
 
     public SearchResult<HumanTaskInstance> searchPendingTasksManagedBy(final long managerUserId,
             final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-        final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
-        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantServiceAccessor.getSearchEntitiesDescriptor();
-        final FlowNodeStateManager flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
+        final FlowNodeStateManager flowNodeStateManager = serviceAccessor.getFlowNodeStateManager();
         return AbstractHumanTaskInstanceSearchEntity.searchHumanTaskInstance(
                 searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
                 searchOptions,

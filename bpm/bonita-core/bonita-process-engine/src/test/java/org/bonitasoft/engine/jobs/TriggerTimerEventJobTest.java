@@ -32,7 +32,7 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,15 +46,15 @@ public class TriggerTimerEventJobTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private TriggerTimerEventJob triggerTimerEventJob = new TriggerTimerEventJob() {
+    private final TriggerTimerEventJob triggerTimerEventJob = new TriggerTimerEventJob() {
 
         @Override
-        protected TenantServiceAccessor getTenantServiceAccessor() {
-            return tenantServiceAccessor;
+        protected ServiceAccessor getServiceAccessor() {
+            return serviceAccessor;
         }
     };
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private ServiceAccessor serviceAccessor;
     @Mock
     private EventsHandler eventsHandler;
     @Mock
@@ -79,11 +79,11 @@ public class TriggerTimerEventJobTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(eventsHandler).when(tenantServiceAccessor).getEventsHandler();
-        doReturn(jobService).when(tenantServiceAccessor).getJobService();
-        doReturn(schedulerService).when(tenantServiceAccessor).getSchedulerService();
-        doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
-        doReturn(tenantServicesManager).when(tenantServiceAccessor).getTenantServicesManager();
+        doReturn(eventsHandler).when(serviceAccessor).getEventsHandler();
+        doReturn(jobService).when(serviceAccessor).getJobService();
+        doReturn(schedulerService).when(serviceAccessor).getSchedulerService();
+        doReturn(eventInstanceService).when(serviceAccessor).getEventInstanceService();
+        doReturn(tenantServicesManager).when(serviceAccessor).getTenantServicesManager();
         doReturn(true).when(tenantServicesManager).isStarted();
     }
 

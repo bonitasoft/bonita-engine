@@ -27,7 +27,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * @author Emmanuel Duchastenier
@@ -70,13 +70,13 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
-        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final EventInstanceService eventInstanceService = serviceAccessor.getEventInstanceService();
+        final DataInstanceService dataInstanceService = serviceAccessor.getDataInstanceService();
         final SWaitingMessageEvent waitingMessage = eventInstanceService.getWaitingMessage(waitingMessageId);
         final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
         if (waitingMessage != null) {
-            tenantAccessor.getEventsHandler().triggerCatchEvent(waitingMessage, messageInstanceId);
+            serviceAccessor.getEventsHandler().triggerCatchEvent(waitingMessage, messageInstanceId);
             eventInstanceService.deleteMessageInstance(messageInstance);
             dataInstanceService.deleteLocalDataInstances(messageInstanceId,
                     DataInstanceContainer.MESSAGE_INSTANCE.name(), true);
@@ -86,9 +86,9 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
 
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        tenantAccessor.getUserTransactionService().executeInTransaction(() -> {
-            resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService());
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        serviceAccessor.getUserTransactionService().executeInTransaction(() -> {
+            resetWaitingMessage(waitingMessageId, serviceAccessor.getEventInstanceService());
             return null;
         });
         log.warn(

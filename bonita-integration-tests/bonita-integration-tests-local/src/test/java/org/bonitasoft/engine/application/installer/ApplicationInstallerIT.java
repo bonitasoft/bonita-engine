@@ -37,7 +37,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
 
         // given:
         final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
-        ApplicationInstaller applicationInstallerImpl = TenantServiceSingleton.getInstance()
+        ApplicationInstaller applicationInstallerImpl = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
@@ -104,7 +104,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
     public void empty_custom_application_should_throw_an_exception() throws Exception {
         // given:
         final InputStream applicationAsStream = this.getClass().getResourceAsStream("/empty-customer-application.zip");
-        ApplicationInstaller applicationInstaller = TenantServiceSingleton.getInstance()
+        ApplicationInstaller applicationInstaller = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),

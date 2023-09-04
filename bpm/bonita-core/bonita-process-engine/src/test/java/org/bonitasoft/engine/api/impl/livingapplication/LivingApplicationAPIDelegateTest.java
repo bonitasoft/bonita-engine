@@ -46,7 +46,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +59,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class LivingApplicationAPIDelegateTest {
 
     @Mock
-    private TenantServiceAccessor accessor;
+    private ServiceAccessor accessor;
 
     @Mock
     private ApplicationModelConverter converter;

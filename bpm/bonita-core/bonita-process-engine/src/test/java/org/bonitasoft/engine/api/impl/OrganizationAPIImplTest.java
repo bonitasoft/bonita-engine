@@ -20,7 +20,6 @@ import static org.mockito.Mockito.verify;
 import java.util.Collections;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -29,7 +28,7 @@ import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingSe
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +46,7 @@ public class OrganizationAPIImplTest {
     private static final long CUSTOM_USER_INFO_DEF_ID2 = 12;
 
     @Mock
-    private TenantServiceAccessor serviceAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Mock
     private ProcessInstanceService processInstanceService;
@@ -75,9 +74,6 @@ public class OrganizationAPIImplTest {
 
     @Mock
     private ProcessDefinitionService processDefinitionService;
-
-    @Mock
-    private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
 
     @Mock
     private SCustomUserInfoDefinition userInfoDef1;

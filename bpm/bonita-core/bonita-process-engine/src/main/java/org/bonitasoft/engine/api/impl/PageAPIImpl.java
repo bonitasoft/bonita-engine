@@ -22,44 +22,21 @@ import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.impl.page.PageAPIDelegate;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.exception.InvalidPageTokenException;
-import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
-import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
-import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
-import org.bonitasoft.engine.exception.InvalidPageZipMissingPropertiesException;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UnauthorizedAccessException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.page.Page;
-import org.bonitasoft.engine.page.PageCreator;
-import org.bonitasoft.engine.page.PageMappingService;
-import org.bonitasoft.engine.page.PageNotFoundException;
-import org.bonitasoft.engine.page.PageURL;
-import org.bonitasoft.engine.page.PageUpdater;
-import org.bonitasoft.engine.page.SAuthorizationException;
+import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.page.*;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 @AvailableWhenTenantIsPaused
 public class PageAPIImpl implements PageAPI {
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            return TenantServiceSingleton.getInstance();
+            return ServiceAccessorSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -154,7 +131,7 @@ public class PageAPIImpl implements PageAPI {
     }
 
     PageMappingService retrievePageMappingService() {
-        return getTenantAccessor().getPageMappingService();
+        return getServiceAccessor().getPageMappingService();
     }
 
 }

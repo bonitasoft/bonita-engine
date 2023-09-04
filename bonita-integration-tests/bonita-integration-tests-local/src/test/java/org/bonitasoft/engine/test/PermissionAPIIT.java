@@ -28,7 +28,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
@@ -132,9 +132,9 @@ public class PermissionAPIIT extends CommonAPILocalIT {
 
         configurationService.storeTenantSecurityScripts(
                 Collections.singletonList(new BonitaConfiguration(path, scriptFileContent.getBytes())),
-                getTenantAccessor().getTenantId());
+                getServiceAccessor().getTenantId());
 
-        final PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();
+        final PermissionService permissionService = ServiceAccessorSingleton.getInstance().getPermissionService();
         //restart the service to reload scripts
         permissionService.stop();
         permissionService.start();

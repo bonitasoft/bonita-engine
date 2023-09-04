@@ -39,18 +39,14 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.execution.Filter;
-import org.bonitasoft.engine.execution.FlowNodeNameFilter;
-import org.bonitasoft.engine.execution.FlowNodeSelector;
-import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.StartFlowNodeFilter;
+import org.bonitasoft.engine.execution.*;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -123,9 +119,9 @@ public class ProcessStarter {
     public ProcessInstance start(final List<ConnectorDefinitionWithInputValues> connectorsWithInput)
             throws SProcessInstanceCreationException,
             SBonitaReadException, SProcessDefinitionException, SContractViolationException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ProcessExecutor processExecutor = serviceAccessor.getProcessExecutor();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
 
         final SProcessDefinition sProcessDefinition = processDefinitionService
                 .getProcessDefinitionIfIsEnabled(processDefinitionId);
@@ -160,7 +156,7 @@ public class ProcessStarter {
 
     protected Map<String, Object> getContext() {
         if (context != null) {
-            return new HashMap<String, Object>(context);
+            return new HashMap<>(context);
         }
         return Collections.emptyMap();
     }
@@ -193,11 +189,11 @@ public class ProcessStarter {
     protected void addSystemCommentOnProcessInstanceWhenStartingProcessFor(final SProcessInstance sProcessInstance,
             final long starterId,
             final long starterSubstituteId) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SCommentService commentService = tenantAccessor.getCommentService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final SCommentService commentService = serviceAccessor.getCommentService();
 
         if (starterId != starterSubstituteId) {
-            final IdentityService identityService = tenantAccessor.getIdentityService();
+            final IdentityService identityService = serviceAccessor.getIdentityService();
             try {
                 final SUser starter = identityService.getUser(starterId);
                 commentService.addSystemComment(sProcessInstance.getId(),
@@ -210,9 +206,9 @@ public class ProcessStarter {
         }
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
-            return TenantServiceSingleton.getInstance();
+            return ServiceAccessorSingleton.getInstance();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

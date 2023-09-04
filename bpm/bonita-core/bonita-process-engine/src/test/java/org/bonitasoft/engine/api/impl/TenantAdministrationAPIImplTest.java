@@ -30,7 +30,6 @@ import org.bonitasoft.engine.resources.STenantResourceState;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -57,8 +56,6 @@ public class TenantAdministrationAPIImplTest {
     @Mock
     private ServiceAccessor serviceAccessor;
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
-    @Mock
     private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     @Mock
     private TenantStateManager tenantStateManager;
@@ -72,16 +69,15 @@ public class TenantAdministrationAPIImplTest {
     @Before
     public void before() throws Exception {
         doReturn(serviceAccessor).when(tenantManagementAPI).getServiceAccessorNoException();
-        doReturn(tenantServiceAccessor).when(tenantManagementAPI).getTenantAccessor();
-        doReturn(tenantResourcesService).when(tenantServiceAccessor).getTenantResourcesService();
-        doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
+        doReturn(serviceAccessor).when(tenantManagementAPI).getServiceAccessor();
+        doReturn(tenantResourcesService).when(serviceAccessor).getTenantResourcesService();
+        doReturn(userTransactionService).when(serviceAccessor).getUserTransactionService();
 
         doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(userTransactionService)
                 .executeInTransaction(any());
-        when(serviceAccessor.getTenantServiceAccessor()).thenReturn(tenantServiceAccessor);
 
-        when(tenantServiceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
-        when(tenantServiceAccessor.getTenantStateManager()).thenReturn(tenantStateManager);
+        when(serviceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
+        when(serviceAccessor.getTenantStateManager()).thenReturn(tenantStateManager);
     }
 
     @Test
@@ -122,7 +118,7 @@ public class TenantAdministrationAPIImplTest {
     public void resume_should_resolve_dependencies_for_deployed_processes() throws Exception {
         tenantManagementAPI.resume();
 
-        verify(businessArchiveArtifactsManager).resolveDependenciesForAllProcesses(tenantServiceAccessor);
+        verify(businessArchiveArtifactsManager).resolveDependenciesForAllProcesses(serviceAccessor);
     }
 
     @Test
@@ -151,7 +147,7 @@ public class TenantAdministrationAPIImplTest {
     public void uninstallBusinessDataModel_should_work() throws Exception {
         // Given
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
-        when(tenantServiceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
+        when(serviceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
         when(tenantStateManager.executeTenantManagementOperation(anyString(), any(Callable.class)))
                 .thenAnswer(invocation -> {
                     Object[] args = invocation.getArguments();
@@ -169,7 +165,7 @@ public class TenantAdministrationAPIImplTest {
     public void uninstallBusinessDataModel_should_throw_BusinessDataRepositoryException() throws Exception {
         // Given
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
-        when(tenantServiceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
+        when(serviceAccessor.getBusinessDataModelRepository()).thenReturn(repository);
         when(tenantStateManager.executeTenantManagementOperation(anyString(), any(Callable.class)))
                 .thenAnswer(invocation -> {
                     Object[] args = invocation.getArguments();

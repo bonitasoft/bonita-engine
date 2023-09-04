@@ -21,8 +21,8 @@ import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
@@ -47,9 +47,9 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
 
     protected APISession getAPISession() {
         if (apiSession == null) {
-            final TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance();
-            final SessionAccessor sessionAccessor = tenantServiceAccessor.getSessionAccessor();
-            final SessionService sessionService = tenantServiceAccessor.getSessionService();
+            final ServiceAccessor serviceAccessor = ServiceAccessorSingleton.getInstance();
+            final SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
+            final SessionService sessionService = serviceAccessor.getSessionService();
             try {
                 final SSession session = sessionService.createSession(tenantId,
                         ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the

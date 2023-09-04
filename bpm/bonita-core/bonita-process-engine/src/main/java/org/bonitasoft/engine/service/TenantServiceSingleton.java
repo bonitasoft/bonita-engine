@@ -16,8 +16,10 @@ package org.bonitasoft.engine.service;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
+ * @deprecated use {@link ServiceAccessorSingleton} instead
  * @author Matthieu Chaffotte
  */
+@Deprecated(since = "9.0.0", forRemoval = true)
 public final class TenantServiceSingleton {
 
     private static TenantServiceAccessor instance = null;

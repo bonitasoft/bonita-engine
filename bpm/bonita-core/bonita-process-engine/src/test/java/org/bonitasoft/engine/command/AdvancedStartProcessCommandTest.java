@@ -29,7 +29,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +45,7 @@ public class AdvancedStartProcessCommandTest {
     private static final long PROCESS_DEFINITION_ID = 1234L;
 
     @Mock
-    private TenantServiceAccessor serviceAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Mock
     private ProcessDefinitionService processDefinitionService;

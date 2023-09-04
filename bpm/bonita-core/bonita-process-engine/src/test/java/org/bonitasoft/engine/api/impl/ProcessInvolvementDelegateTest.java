@@ -26,7 +26,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
@@ -63,7 +63,7 @@ public class ProcessInvolvementDelegateTest {
     SAProcessInstance saProcessInstance;
 
     @Mock
-    TenantServiceAccessor tenantServiceAccessor;
+    ServiceAccessor serviceAccessor;
 
     @Spy
     @InjectMocks
@@ -71,8 +71,8 @@ public class ProcessInvolvementDelegateTest {
 
     @Before
     public void before() {
-        doReturn(tenantServiceAccessor).when(processInvolvementDelegate).getTenantServiceAccessor();
-        doReturn(processInstanceService).when(tenantServiceAccessor).getProcessInstanceService();
+        doReturn(serviceAccessor).when(processInvolvementDelegate).getServiceAccessor();
+        doReturn(processInstanceService).when(serviceAccessor).getProcessInstanceService();
     }
 
     @Test

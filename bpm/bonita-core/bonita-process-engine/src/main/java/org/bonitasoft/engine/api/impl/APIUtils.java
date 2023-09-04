@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
 /**
  * @author Baptiste Mesta
@@ -25,9 +25,9 @@ public class APIUtils {
         return SessionInfos.getUserIdFromSession();
     }
 
-    protected static TenantServiceAccessor getTenantAccessor() {
+    protected static ServiceAccessor getServiceAccessor() {
         try {
-            return TenantServiceSingleton.getInstance();
+            return ServiceAccessorSingleton.getInstance();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

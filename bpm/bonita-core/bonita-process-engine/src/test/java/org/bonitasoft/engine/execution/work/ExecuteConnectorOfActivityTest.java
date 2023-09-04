@@ -26,7 +26,7 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,7 +39,7 @@ public class ExecuteConnectorOfActivityTest {
     private Map<String, Object> context;
 
     @Mock
-    private TenantServiceAccessor accessor;
+    private ServiceAccessor accessor;
 
     @Mock
     private ActivityInstanceService activityInstanceService;
@@ -50,7 +50,7 @@ public class ExecuteConnectorOfActivityTest {
     @Before
     public void setUp() {
         context = new HashMap<String, Object>();
-        context.put(TenantAwareBonitaWork.TENANT_ACCESSOR, accessor);
+        context.put(TenantAwareBonitaWork.SERVICE_ACCESSOR, accessor);
 
         when(accessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(accessor.getEventInstanceService()).thenReturn(eventService);

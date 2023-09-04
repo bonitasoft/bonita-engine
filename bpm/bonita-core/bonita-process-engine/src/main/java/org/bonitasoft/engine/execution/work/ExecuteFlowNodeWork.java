@@ -20,7 +20,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFo
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkPreconditionException;
 
@@ -57,18 +57,17 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-
-        SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(tenantAccessor);
-        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstance, null, null);
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(serviceAccessor);
+        serviceAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstance, null, null);
         return CompletableFuture.completedFuture(null);
     }
 
-    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(TenantServiceAccessor tenantAccessor)
+    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(ServiceAccessor serviceAccessor)
             throws SFlowNodeReadException, SWorkPreconditionException {
         SFlowNodeInstance flowNodeInstance;
         try {
-            flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
+            flowNodeInstance = serviceAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
         } catch (SFlowNodeNotFoundException e) {
             throw new SWorkPreconditionException(String.format("Flow node %d does not exists", flowNodeInstanceId), e);
         }
@@ -91,14 +90,14 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
+        ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final UserTransactionService userTransactionService = serviceAccessor.getUserTransactionService();
         WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(
-                tenantAccessor.getEventInstanceService(),
-                tenantAccessor.getSchedulerService());
+                serviceAccessor.getEventInstanceService(),
+                serviceAccessor.getSchedulerService());
         FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter,
-                tenantAccessor.getActivityInstanceService(),
-                tenantAccessor.getFlowNodeStateManager());
+                serviceAccessor.getActivityInstanceService(),
+                serviceAccessor.getFlowNodeStateManager());
         userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstanceId));
     }
 

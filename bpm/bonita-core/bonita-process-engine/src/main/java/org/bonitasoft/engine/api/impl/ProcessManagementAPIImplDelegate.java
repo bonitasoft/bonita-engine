@@ -47,7 +47,6 @@ import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.ServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
@@ -63,7 +62,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         return instance;
     }
 
-    private static ServiceAccessor getServiceAccessor() {
+    protected ServiceAccessor getServiceAccessor() {
         try {
             return ServiceAccessorFactory.getInstance().createServiceAccessor();
         } catch (final Exception e) {
@@ -77,24 +76,19 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         return processDefinitionService.getProcessDefinition(processDefinitionId);
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
-        return APIUtils.getTenantAccessor();
-    }
-
     public void deleteProcessDefinition(final long processDefinitionId)
             throws SBonitaException, BonitaHomeNotSetException, IOException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        tenantAccessor.getBusinessArchiveService().delete(processDefinitionId);
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        serviceAccessor.getBusinessArchiveService().delete(processDefinitionId);
 
         log.info("The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
                 + processDefinitionId + ">");
     }
 
     public void disableProcess(final long processId) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ServiceAccessor serviceAccessor = getServiceAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        final EventInstanceService eventInstanceService = serviceAccessor.getEventInstanceService();
         final SchedulerService schedulerService = serviceAccessor.getSchedulerService();
 
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId,
@@ -105,21 +99,21 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
     public void purgeClassLoader(final long processDefinitionId)
             throws ProcessDefinitionNotFoundException, UpdateException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         try {
             final SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService
                     .getProcessDeploymentInfo(processDefinitionId);
             if (!ActivationState.DISABLED.name().equals(processDeploymentInfo.getActivationState())) {
                 throw new UpdateException("Purge can only be done on a disabled process");
             }
-            final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+            final ProcessInstanceService processInstanceService = serviceAccessor.getProcessInstanceService();
             final long numberOfProcessInstances = processInstanceService
                     .getNumberOfProcessInstances(processDefinitionId);
             if (numberOfProcessInstances != 0) {
                 throw new UpdateException("Purge can only be done on a disabled process with no running instances");
             }
-            tenantAccessor.getClassLoaderService().removeLocalClassloader(identifier(PROCESS, processDefinitionId));
+            serviceAccessor.getClassLoaderService().removeLocalClassloader(identifier(PROCESS, processDefinitionId));
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaReadException e) {
@@ -131,9 +125,9 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
     public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex,
             final int maxResults, final ParameterCriterion sort) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ParameterService parameterService = tenantAccessor.getParameterService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ParameterService parameterService = serviceAccessor.getParameterService();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         try {
             OrderBy order;
             switch (sort) {
@@ -153,8 +147,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             final List<SParameter> parameters = parameterService.get(processDefinitionId, startIndex, maxResults,
                     order);
             final List<ParameterInstance> parameterInstances = new ArrayList<>();
-            for (int i = 0; i < parameters.size(); i++) {
-                final SParameter parameter = parameters.get(i);
+            for (final SParameter parameter : parameters) {
                 final String name = parameter.getName();
                 final String value = parameter.getValue();
                 final SParameterDefinition parameterDefinition = sProcessDefinition.getParameter(name);
@@ -169,8 +162,8 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     public int getNumberOfParameterInstances(final long processDefinitionId) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         try {
             final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId,
                     processDefinitionService);
@@ -182,9 +175,9 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
     public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName)
             throws NotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ParameterService parameterService = tenantAccessor.getParameterService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ParameterService parameterService = serviceAccessor.getParameterService();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         try {
             final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId,
                     processDefinitionService);

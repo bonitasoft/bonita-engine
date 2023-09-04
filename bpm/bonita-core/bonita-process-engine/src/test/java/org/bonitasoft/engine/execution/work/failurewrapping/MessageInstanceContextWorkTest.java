@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
 public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
 
@@ -41,7 +40,7 @@ public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
     @Override
     @Before
     public void before() throws SBonitaException {
-        txBonitawork = spy(
+        txBonitaWork = spy(
                 new MessageInstanceContextWork(wrappedWork, MESSAGE_INSTANCE_NAME, MESSAGE_INSTANCE_TARGET_PROCESS_NAME,
                         MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, WAITING_MESSAGE_EVENT_TYPE.name()));
         super.before();
@@ -49,13 +48,13 @@ public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
 
     @Test
     public void handleFailure() throws Throwable {
-        final Map<String, Object> context = Collections.singletonMap("tenantAccessor", tenantAccessor);
+        final Map<String, Object> context = Collections.singletonMap("serviceAccessor", serviceAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
 
-        txBonitawork.handleFailure(e, context);
+        txBonitaWork.handleFailure(e, context);
 
         assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME=" + MESSAGE_INSTANCE_NAME));
         assertTrue(e.getMessage()

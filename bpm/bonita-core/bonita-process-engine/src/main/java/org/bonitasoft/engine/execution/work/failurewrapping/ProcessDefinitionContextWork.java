@@ -18,7 +18,7 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -46,8 +46,8 @@ public class ProcessDefinitionContextWork extends TxInHandleFailureWrappingWork 
     @Override
     protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context)
             throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         final SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService
                 .getProcessDeploymentInfo(processDefinitionId);
 

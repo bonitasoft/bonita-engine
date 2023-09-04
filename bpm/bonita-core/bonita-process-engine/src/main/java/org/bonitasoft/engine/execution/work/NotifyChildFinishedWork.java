@@ -25,7 +25,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkPreconditionException;
 
@@ -56,7 +56,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     }
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
-        return getTenantAccessor(context).getClassLoaderService().getClassLoader(
+        return getServiceAccessor(context).getClassLoaderService().getClassLoader(
                 identifier(ScopeType.PROCESS, processDefinitionId));
     }
 
@@ -66,9 +66,9 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
-            TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-            SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(tenantAccessor);
-            final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
+            ServiceAccessor serviceAccessor = getServiceAccessor(context);
+            SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(serviceAccessor);
+            final ContainerRegistry containerRegistry = serviceAccessor.getContainerRegistry();
             containerRegistry.nodeReachedState(flowNodeInstance);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -76,11 +76,11 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         return CompletableFuture.completedFuture(null);
     }
 
-    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(TenantServiceAccessor tenantAccessor)
+    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(ServiceAccessor serviceAccessor)
             throws SWorkPreconditionException, SFlowNodeReadException {
         SFlowNodeInstance flowNodeInstance;
         try {
-            flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
+            flowNodeInstance = serviceAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
         } catch (SFlowNodeNotFoundException e) {
             throw new SWorkPreconditionException(
                     "Flow node " + flowNodeInstanceId + " is already completed ( not found )");
@@ -111,14 +111,14 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
+        ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final UserTransactionService userTransactionService = serviceAccessor.getUserTransactionService();
         WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(
-                tenantAccessor.getEventInstanceService(),
-                tenantAccessor.getSchedulerService());
+                serviceAccessor.getEventInstanceService(),
+                serviceAccessor.getSchedulerService());
         FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter,
-                tenantAccessor.getActivityInstanceService(),
-                tenantAccessor.getFlowNodeStateManager());
+                serviceAccessor.getActivityInstanceService(),
+                serviceAccessor.getFlowNodeStateManager());
         userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstanceId));
     }
 

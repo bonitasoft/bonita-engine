@@ -16,8 +16,8 @@ package org.bonitasoft.engine.execution.work;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
@@ -31,9 +31,9 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
         super(work);
     }
 
-    TenantServiceAccessor getTenantAccessor() {
+    ServiceAccessor getServiceAccessor() {
         try {
-            return TenantServiceSingleton.getInstance();
+            return ServiceAccessorSingleton.getInstance();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -41,9 +41,9 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SessionAccessor sessionAccessor = tenantAccessor.getSessionAccessor();
-        context.put(TENANT_ACCESSOR, tenantAccessor);
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
+        context.put(SERVICE_ACCESSOR, serviceAccessor);
         try {
             sessionAccessor.setTenantId(getTenantId());
             return getWrappedWork().work(context);
@@ -54,8 +54,8 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
 
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        SessionAccessor sessionAccessor = tenantAccessor.getSessionAccessor();
+        ServiceAccessor serviceAccessor = getServiceAccessor();
+        SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
         sessionAccessor.setTenantId(getTenantId());
         try {
             getWrappedWork().handleFailure(e, context);

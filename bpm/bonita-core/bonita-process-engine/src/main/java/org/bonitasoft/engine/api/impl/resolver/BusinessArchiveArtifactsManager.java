@@ -34,7 +34,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
  * Handles the resolution of Process Dependencies. A process can have a list of <code>ProcessDependencyResolver</code>s
@@ -74,20 +74,19 @@ public class BusinessArchiveArtifactsManager {
         return resolved;
     }
 
-    public void resolveDependenciesForAllProcesses(TenantServiceAccessor tenantAccessor) {
+    public void resolveDependenciesForAllProcesses(ServiceAccessor serviceAccessor) {
         try {
-            List<Long> processDefinitionIds = tenantAccessor.getProcessDefinitionService().getProcessDefinitionIds(0,
+            List<Long> processDefinitionIds = serviceAccessor.getProcessDefinitionService().getProcessDefinitionIds(0,
                     Integer.MAX_VALUE);
-            resolveDependencies(processDefinitionIds, tenantAccessor);
+            resolveDependencies(processDefinitionIds, serviceAccessor);
         } catch (SBonitaReadException e) {
             log.error("Unable to retrieve tenant process definitions, dependency resolution aborted");
         }
     }
 
-    private void resolveDependencies(final List<Long> processDefinitionIds,
-            final TenantServiceAccessor tenantAccessor) {
+    private void resolveDependencies(final List<Long> processDefinitionIds, final ServiceAccessor serviceAccessor) {
         for (Long id : processDefinitionIds) {
-            resolveDependencies(id, tenantAccessor);
+            resolveDependencies(id, serviceAccessor);
         }
     }
 
@@ -105,14 +104,14 @@ public class BusinessArchiveArtifactsManager {
      * modification
      * this does not throw exception, it only log because it can be retried after.
      */
-    public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor) {
-        resolveDependencies(processDefinitionId, tenantAccessor,
-                getArtifactManagers().toArray(new BusinessArchiveArtifactManager[getArtifactManagers().size()]));
+    public void resolveDependencies(final long processDefinitionId, final ServiceAccessor serviceAccessor) {
+        resolveDependencies(processDefinitionId, serviceAccessor,
+                getArtifactManagers().toArray(new BusinessArchiveArtifactManager[0]));
     }
 
-    public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor,
+    public void resolveDependencies(final long processDefinitionId, final ServiceAccessor serviceAccessor,
             final BusinessArchiveArtifactManager... resolvers) {
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         try {
             boolean resolved = true;
             for (final BusinessArchiveArtifactManager dependencyResolver : resolvers) {
@@ -122,7 +121,6 @@ public class BusinessArchiveArtifactsManager {
             }
             changeResolutionStatus(processDefinitionId, processDefinitionService, resolved);
         } catch (final SBonitaException e) {
-            final Class<BusinessArchiveArtifactsManager> clazz = BusinessArchiveArtifactsManager.class;
             if (log.isDebugEnabled()) {
                 log.debug(e.toString());
             }

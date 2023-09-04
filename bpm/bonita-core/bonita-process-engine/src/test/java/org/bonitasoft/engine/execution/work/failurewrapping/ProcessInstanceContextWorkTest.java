@@ -50,20 +50,20 @@ public class ProcessInstanceContextWorkTest extends AbstractContextWorkTest {
         doReturn(ROOT_PROCESS_INSTANCE_ID).when(sProcessInstance).getRootProcessInstanceId();
         doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
 
-        doReturn(processInstanceService).when(tenantAccessor).getProcessInstanceService();
-        txBonitawork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
+        doReturn(processInstanceService).when(serviceAccessor).getProcessInstanceService();
+        txBonitaWork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
         super.before();
     }
 
     @Test
     public void handleFailureWithProcessInstanceId() throws Throwable {
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Map<String, Object> context = Collections.singletonMap("serviceAccessor", serviceAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
 
-        txBonitawork.handleFailure(e, context);
+        txBonitaWork.handleFailure(e, context);
 
         assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID=" + PROCESS_INSTANCE_ID));
         assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID=" + ROOT_PROCESS_INSTANCE_ID));
@@ -72,14 +72,14 @@ public class ProcessInstanceContextWorkTest extends AbstractContextWorkTest {
 
     @Test
     public void handleFailureWithProcessInstanceAndRootIds() throws Throwable {
-        txBonitawork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID, 5));
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        txBonitaWork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID, 5));
+        final Map<String, Object> context = Collections.singletonMap("serviceAccessor", serviceAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
 
-        txBonitawork.handleFailure(e, context);
+        txBonitaWork.handleFailure(e, context);
 
         assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID=" + PROCESS_INSTANCE_ID));
         assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID=" + 5));

@@ -42,8 +42,7 @@ public interface Command<T extends ServiceAccessor> {
      *        a map of parameters that can be used by the command and that is given by the client when executing the
      *        command
      * @param serviceAccessor
-     *        the TenantServiceAccessor or PlatformServiceAccessor that provides access to the engine's server-side
-     *        services
+     *        the ServiceAccessor that provides access to the engine's server-side services
      * @return
      *         a result that will be returned to the client
      * @throws SCommandParameterizationException

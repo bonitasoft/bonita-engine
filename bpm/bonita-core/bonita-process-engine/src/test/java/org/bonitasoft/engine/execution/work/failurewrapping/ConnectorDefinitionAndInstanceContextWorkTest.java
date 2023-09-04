@@ -13,20 +13,17 @@
  **/
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -42,29 +39,23 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
     private static final long CONNECTOR_INSTANCE_ID = 10L;
 
-    @Mock
-    private ProcessDefinitionService processDefinitionService;
-
-    @Mock
-    private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
-
     @Override
     @Before
     public void before() throws SBonitaException {
-        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME,
+        txBonitaWork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME,
                 CONNECTOR_INSTANCE_ID));
         super.before();
     }
 
     @Test
     public void handleFailureWithNameAndId() throws Throwable {
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Map<String, Object> context = singletonMap("serviceAccessor", serviceAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
 
-        txBonitawork.handleFailure(e, context);
+        txBonitaWork.handleFailure(e, context);
 
         assertTrue(e.getMessage().contains("CONNECTOR_IMPLEMENTATION_CLASS_NAME=" + CONNECTOR_DEFINITION_NAME));
         assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID=" + CONNECTOR_INSTANCE_ID));
@@ -73,16 +64,16 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
     @Test
     public void handleFailureWithNameAndIdAndActivationEvent() throws Throwable {
-        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME,
+        txBonitaWork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME,
                 CONNECTOR_INSTANCE_ID,
                 ACTIVATION_EVENT));
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Map<String, Object> context = singletonMap("serviceAccessor", serviceAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
 
-        txBonitawork.handleFailure(e, context);
+        txBonitaWork.handleFailure(e, context);
 
         assertTrue(e.getMessage().contains("CONNECTOR_IMPLEMENTATION_CLASS_NAME=" + CONNECTOR_DEFINITION_NAME));
         assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID=" + CONNECTOR_INSTANCE_ID));

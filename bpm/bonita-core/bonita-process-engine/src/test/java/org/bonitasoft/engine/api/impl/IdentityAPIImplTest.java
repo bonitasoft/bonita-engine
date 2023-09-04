@@ -24,7 +24,7 @@ import java.util.List;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +36,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class IdentityAPIImplTest {
 
     @Mock
-    private TenantServiceAccessor tenantAccessor;
+    private ServiceAccessor serviceAccessor;
 
     @Mock
     private IdentityService identityService;
@@ -46,8 +46,8 @@ public class IdentityAPIImplTest {
 
     @Before
     public void setUp() {
-        doReturn(tenantAccessor).when(identityAPI).getTenantAccessor();
-        given(tenantAccessor.getIdentityService()).willReturn(identityService);
+        doReturn(serviceAccessor).when(identityAPI).getServiceAccessor();
+        given(serviceAccessor.getIdentityService()).willReturn(identityService);
     }
 
     @Test

@@ -13,27 +13,23 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -41,9 +37,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class UserImporterTest {
 
     private static final long USER_ID = 10L;
-    private static final long LOCATION_ID = 51L;
-    private static final long SKILLS_ID = 50L;
-    private static final String lOCATION_VALUE = "engineering";
+    private static final String LOCATION_VALUE = "engineering";
     private static final String LOCATION_NAME = "location";
     private static final String SKILLS_VALUE = "Java";
     private static final String FIRST_USER = "first.user";
@@ -54,23 +48,16 @@ public class UserImporterTest {
     @Mock
     private ImportOrganizationStrategy strategy;
     @Mock
-    private TenantServiceAccessor serviceAccessor;
-    @Mock
     private CustomUserInfoValueImporter userInfoValueImporter;
     private UserImporter importer;
-    @Mock
-    private SCustomUserInfoDefinition skills;
-    @Mock
-    private SCustomUserInfoDefinition location;
     @Mock
     private SUser persistedUser;
     private ExportedUser userToImport;
     private ExportedCustomUserInfoValue skillsValue;
     private ExportedCustomUserInfoValue locationValue;
-    @Captor
-    private ArgumentCaptor<SUser> captor;
-    private SUser manager;
-    private SUser currentUser;
+
+    public UserImporterTest() {
+    }
 
     @Before
     public void setUp() throws SUserCreationException {
@@ -79,18 +66,17 @@ public class UserImporterTest {
         given(persistedUser.getId()).willReturn(USER_ID);
 
         skillsValue = new ExportedCustomUserInfoValue(SKILLS_NAME, SKILLS_VALUE);
-        locationValue = new ExportedCustomUserInfoValue(LOCATION_NAME, lOCATION_VALUE);
-        manager = new SUser();
+        locationValue = new ExportedCustomUserInfoValue(LOCATION_NAME, LOCATION_VALUE);
+        SUser manager = new SUser();
         manager.setId(MANAGER_ID);
         manager.setUserName("manager");
-        currentUser = new SUser();
 
-        userToImport = getUser(FIRST_USER, Arrays.asList(skillsValue, locationValue));
+        userToImport = getUser(Arrays.asList(skillsValue, locationValue));
     }
 
-    private ExportedUser getUser(String username, List<ExportedCustomUserInfoValue> userInfoValues) {
+    private ExportedUser getUser(List<ExportedCustomUserInfoValue> userInfoValues) {
         ExportedUser userImpl = new ExportedUser();
-        userImpl.setUserName(username);
+        userImpl.setUserName(UserImporterTest.FIRST_USER);
         for (ExportedCustomUserInfoValue infoValue : userInfoValues) {
             userImpl.addCustomUserInfoValues(infoValue);
         }
@@ -98,13 +84,13 @@ public class UserImporterTest {
     }
 
     @Test
-    public void importUsers_should_call_customUserInfoValueImporter_if_the_user_doesnt_exist() throws Exception {
+    public void importUsers_should_call_customUserInfoValueImporter_if_the_user_does_not_exist() throws Exception {
         // given
         given(identityService.getNumberOfUsers(any(QueryOptions.class))).willReturn(0L);
         given(identityService.createUser(any(SUser.class))).willReturn(persistedUser);
 
         // when
-        importer.importUsers(Arrays.asList(userToImport));
+        importer.importUsers(singletonList(userToImport));
 
         // then
         verify(userInfoValueImporter, times(1)).imporCustomUserInfoValues(Arrays.asList(skillsValue, locationValue),
@@ -112,16 +98,16 @@ public class UserImporterTest {
     }
 
     @Test
-    public void importUsers_shouldnt_call_customUserInfoValueImporter_if_the_user_exists() throws Exception {
+    public void importUsers_should_not_call_customUserInfoValueImporter_if_the_user_exists() throws Exception {
         // given
         given(identityService.getNumberOfUsers(any(QueryOptions.class))).willReturn(1L);
         given(identityService.getUserByUserName(FIRST_USER)).willReturn(persistedUser);
 
         // when
-        importer.importUsers(Collections.singletonList(userToImport));
+        importer.importUsers(singletonList(userToImport));
 
         // then
         verify(userInfoValueImporter, never())
-                .imporCustomUserInfoValues(ArgumentMatchers.<List<ExportedCustomUserInfoValue>> any(), anyLong());
+                .imporCustomUserInfoValues(ArgumentMatchers.any(), anyLong());
     }
 }

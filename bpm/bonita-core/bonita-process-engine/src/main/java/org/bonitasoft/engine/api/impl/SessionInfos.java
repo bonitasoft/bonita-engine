@@ -64,8 +64,7 @@ public class SessionInfos {
 
     private static SessionService getSessionService() {
         try {
-            return ServiceAccessorFactory.getInstance().createServiceAccessor().getTenantServiceAccessor()
-                    .getSessionService();
+            return ServiceAccessorFactory.getInstance().createServiceAccessor().getSessionService();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

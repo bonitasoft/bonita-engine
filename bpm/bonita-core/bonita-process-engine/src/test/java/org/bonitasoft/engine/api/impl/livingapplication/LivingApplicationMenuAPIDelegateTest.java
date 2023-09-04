@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -43,7 +41,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +52,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class LivingApplicationMenuAPIDelegateTest {
 
     @Mock
-    private TenantServiceAccessor accessor;
+    private ServiceAccessor accessor;
 
     @Mock
     private ApplicationMenuModelConverter convertor;

@@ -19,7 +19,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
@@ -40,19 +39,15 @@ import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchCommands;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
@@ -64,20 +59,20 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  */
 public class CommandAPIImpl implements CommandAPI {
 
-    protected static TenantServiceAccessor getTenantAccessor() {
-        return APIUtils.getTenantAccessor();
+    protected static ServiceAccessor getServiceAccessor() {
+        return ServiceAccessorSingleton.getInstance();
     }
 
     @Override
-    public void addDependency(final String name, final byte[] jar) throws AlreadyExistsException, CreationException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+    public void addDependency(final String name, final byte[] jar) throws CreationException {
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final DependencyService dependencyService = serviceAccessor.getDependencyService();
+        final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
         try {
-            dependencyService.createMappedDependency(name, jar, name + ".jar", tenantAccessor.getTenantId(),
+            dependencyService.createMappedDependency(name, jar, name + ".jar", serviceAccessor.getTenantId(),
                     ScopeType.TENANT);
             classLoaderService
-                    .refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, tenantAccessor.getTenantId()));
+                    .refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, serviceAccessor.getTenantId()));
         } catch (final SDependencyAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
         } catch (final SDependencyException | SClassLoaderException sbe) {
@@ -87,13 +82,13 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public void removeDependency(final String name) throws DependencyNotFoundException, DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final DependencyService dependencyService = serviceAccessor.getDependencyService();
+        final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
         try {
             dependencyService.deleteDependency(name);
             classLoaderService
-                    .refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, tenantAccessor.getTenantId()));
+                    .refreshClassLoaderAfterUpdate(identifier(ScopeType.TENANT, serviceAccessor.getTenantId()));
         } catch (final SDependencyNotFoundException e) {
             throw new DependencyNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -103,8 +98,7 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public CommandDescriptor register(final String name, final String description, final String implementation)
-            throws AlreadyExistsException,
-            CreationException {
+            throws CreationException {
         CommandDescriptor existingCommandDescriptor = null;
         try {
             existingCommandDescriptor = getCommand(name);
@@ -114,8 +108,8 @@ public class CommandAPIImpl implements CommandAPI {
         if (existingCommandDescriptor != null) {
             throw new AlreadyExistsException("A command with name \"" + name + "\" already exists");
         }
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CommandService commandService = tenantAccessor.getCommandService();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final CommandService commandService = serviceAccessor.getCommandService();
         final SCommand sCommand = SCommand.builder()
                 .name(name)
                 .description(description)
@@ -129,17 +123,16 @@ public class CommandAPIImpl implements CommandAPI {
     }
 
     private RuntimeCommand fetchRuntimeCommand(final SCommandFetcher commandFetcher,
-            final boolean transactionManagedManually) throws SCommandNotFoundException,
-            SCommandParameterizationException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
+            final boolean transactionManagedManually)
+            throws SCommandNotFoundException, SCommandParameterizationException {
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         try {
             final SCommand sCommand;
             if (transactionManagedManually) {
-                sCommand = commandFetcher.fetchInTransaction(tenantAccessor.getUserTransactionService(),
-                        tenantAccessor.getCommandService());
+                sCommand = commandFetcher.fetchInTransaction(serviceAccessor.getUserTransactionService(),
+                        serviceAccessor.getCommandService());
             } else {
-                sCommand = commandFetcher.fetch(tenantAccessor.getCommandService());
+                sCommand = commandFetcher.fetch(serviceAccessor.getCommandService());
             }
 
             final String runtimeCommandClassName = sCommand.getImplementation();
@@ -196,11 +189,10 @@ public class CommandAPIImpl implements CommandAPI {
             final Map<String, Serializable> parameters,
             final boolean transactionManagedManually)
             throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
         try {
             final RuntimeCommand runtimeCommand = fetchRuntimeCommand(commandFetcher, transactionManagedManually);
-            return runtimeCommand.execute(parameters, tenantAccessor);
+            return runtimeCommand.execute(parameters, serviceAccessor);
         } catch (final SCommandExecutionException scee) {
             throw new CommandExecutionException(scee);
         } catch (final SCommandParameterizationException scpe) {
@@ -212,7 +204,7 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public void unregister(final long commandId) throws CommandNotFoundException, DeletionException {
-        final CommandService commandService = getTenantAccessor().getCommandService();
+        final CommandService commandService = getServiceAccessor().getCommandService();
         final DeleteSCommand deleteCommand = new DeleteSCommand(commandService, commandId);
         unregister(deleteCommand);
     }
@@ -223,7 +215,7 @@ public class CommandAPIImpl implements CommandAPI {
             // FIXME: throw IllegalArgumentException instead, and make bonita interceptor catch all exceptions and wrap it into BonitaRuntimeException:
             throw new DeletionException("Command name can not be null!");
         }
-        final CommandService commandService = getTenantAccessor().getCommandService();
+        final CommandService commandService = getServiceAccessor().getCommandService();
         final DeleteSCommand deleteCommand = new DeleteSCommand(commandService, name);
         unregister(deleteCommand);
     }
@@ -240,7 +232,7 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public void unregisterAll() throws DeletionException {
-        final CommandService commandService = getTenantAccessor().getCommandService();
+        final CommandService commandService = getServiceAccessor().getCommandService();
         try {
             commandService.deleteAll();
         } catch (final SCommandDeletionException sde) {
@@ -259,7 +251,7 @@ public class CommandAPIImpl implements CommandAPI {
     }
 
     private CommandDescriptor getCommand(final SCommandFetcher commandFetcher) throws CommandNotFoundException {
-        final CommandService commandService = getTenantAccessor().getCommandService();
+        final CommandService commandService = getServiceAccessor().getCommandService();
         try {
             final SCommand sCommand = commandFetcher.fetch(commandService);
             return ModelConvertor.toCommandDescriptor(sCommand);
@@ -271,14 +263,14 @@ public class CommandAPIImpl implements CommandAPI {
     @Override
     public List<CommandDescriptor> getAllCommands(final int startIndex, final int maxResults,
             final CommandCriterion sort) {
-        SCommandCriterion sCommandCriterion = null;
+        SCommandCriterion sCommandCriterion;
         if (CommandCriterion.NAME_ASC.equals(sort)) {
             sCommandCriterion = SCommandCriterion.NAME_ASC;
         } else {
             sCommandCriterion = SCommandCriterion.NAME_DESC;
         }
 
-        final CommandService commandService = getTenantAccessor().getCommandService();
+        final CommandService commandService = getServiceAccessor().getCommandService();
         try {
             final List<SCommand> commands = commandService.getAllCommands(startIndex, maxResults, sCommandCriterion);
             return ModelConvertor.toCommandDescriptors(commands);
@@ -305,7 +297,7 @@ public class CommandAPIImpl implements CommandAPI {
 
         final SCommandUpdateBuilderFactory fact = BuilderFactory.get(SCommandUpdateBuilderFactory.class);
         final SCommandUpdateBuilder commandUpdateBuilder = fact.createNewInstance();
-        final CommandService commandService = getTenantAccessor().getCommandService();
+        final CommandService commandService = getServiceAccessor().getCommandService();
         try {
             final EntityUpdateDescriptor changeDescriptor = getCommandUpdateDescriptor(updateDescriptor,
                     commandUpdateBuilder);
@@ -338,7 +330,7 @@ public class CommandAPIImpl implements CommandAPI {
     @Override
     public List<CommandDescriptor> getUserCommands(final int startIndex, final int maxResults,
             final CommandCriterion sort) {
-        final CommandService commandService = getTenantAccessor().getCommandService();
+        final CommandService commandService = getServiceAccessor().getCommandService();
         try {
             final GetCommands getCommands = new GetCommands(commandService, startIndex, maxResults, sort);
             getCommands.execute();
@@ -350,9 +342,9 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public SearchResult<CommandDescriptor> searchCommands(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CommandService commandService = tenantAccessor.getCommandService();
-        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final CommandService commandService = serviceAccessor.getCommandService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchCommands searchCommands = new SearchCommands(commandService,
                 searchEntitiesDescriptor.getSearchCommandDescriptor(), searchOptions);
         try {
@@ -371,17 +363,10 @@ public class CommandAPIImpl implements CommandAPI {
         SCommand fetchInTransaction(final UserTransactionService userTransactionService,
                 final CommandService commandService) throws SCommandNotFoundException {
             try {
-                return userTransactionService.executeInTransaction(new Callable<SCommand>() {
-
-                    @Override
-                    public SCommand call() throws Exception {
-                        return fetch(commandService);
-                    }
-                });
+                return userTransactionService.executeInTransaction(() -> fetch(commandService));
             } catch (final Exception e) {
                 throw new SCommandNotFoundException(e);
             }
-
         }
     }
 

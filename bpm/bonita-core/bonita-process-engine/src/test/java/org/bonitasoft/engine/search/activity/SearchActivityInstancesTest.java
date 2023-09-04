@@ -23,7 +23,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.descriptor.SearchActivityInstanceDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,9 +39,6 @@ public class SearchActivityInstancesTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
-    @Mock
-    TenantServiceAccessor tenantAccessor;
 
     @Mock
     SearchEntitiesDescriptor searchEntitiesDescriptor;
