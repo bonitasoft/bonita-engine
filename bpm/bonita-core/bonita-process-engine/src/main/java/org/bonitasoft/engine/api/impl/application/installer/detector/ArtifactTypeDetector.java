@@ -94,7 +94,13 @@ public class ArtifactTypeDetector {
             applicationArchive.addProcess(file);
         } else if (isOrganization(file)) {
             logger.info("Found organization file: '{}'. ", file.getName());
-            applicationArchive.setOrganization(file);
+            if (applicationArchive.getOrganization() != null) {
+                logger.warn("An organization file has already been set. Using {}",
+                        applicationArchive.getOrganization());
+                ignoreFile(file, applicationArchive);
+            } else {
+                applicationArchive.setOrganization(file);
+            }
         } else if (isPage(file)) {
             logger.info("Found page file: '{}'. ", file.getName());
             applicationArchive.addPage(file);
@@ -111,9 +117,13 @@ public class ArtifactTypeDetector {
             logger.info("Found business data model file: '{}'. ", file.getName());
             applicationArchive.setBdm(file);
         } else {
-            logger.warn("Ignoring file '{}'.", file.getName());
-            applicationArchive.addIgnoredFile(file);
+            ignoreFile(file, applicationArchive);
         }
+    }
+
+    private void ignoreFile(File file, ApplicationArchive applicationArchive) {
+        logger.warn("Ignoring file '{}'.", file.getName());
+        applicationArchive.addIgnoredFile(file);
     }
 
 }

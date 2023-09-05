@@ -307,6 +307,35 @@ public class CustomOrDefaultApplicationInstallerTest {
         assertThat(version).isEmpty();
     }
 
+    @Test
+    public void should_raise_exception_if_more_than_one_configuration_file() throws Exception {
+        //given
+        Resource resource1 = mockResource("resource1", true, true, 1L);
+        Resource resource2 = mockResource("resource2", true, true, 1L);
+
+        doReturn(new Resource[] { resource1, resource2 })
+                .when(listener)
+                .getConfigurationFileResourcesFromClasspath();
+
+        //then
+        assertThatExceptionOfType(ApplicationInstallationException.class)
+                .isThrownBy(listener::detectConfigurationFile)
+                .withMessage("More than one resource of type configuration file .bconf detected. Abort startup.");
+    }
+
+    @Test
+    public void should_return_empty_optional_if_no_configuration_file_found() throws Exception {
+        doReturn(null)
+                .when(listener)
+                .getConfigurationFileResourcesFromClasspath();
+
+        listener.detectConfigurationFile();
+
+        //then
+        assertThat(Optional.empty()).isEqualTo(listener.detectConfigurationFile());
+
+    }
+
     private Resource mockResource(String filename, boolean exists, boolean isReadable, long contentLength)
             throws IOException {
         Resource resource = spy(new FileSystemResource(mock(File.class)));

@@ -206,8 +206,8 @@ public class ApplicationInstallerUpdateTest {
         ProcessDeploymentInfo deployedProcess2 = spy(ProcessDeploymentInfo.class);
         doReturn("1.2").when(deployedProcess2).getVersion();
 
-        doReturn(deployedProcess1).when(applicationInstaller).getProcessDeploymentInfo(eq(1L));
-        doReturn(deployedProcess2).when(applicationInstaller).getProcessDeploymentInfo(eq(2L));
+        doReturn(deployedProcess1).when(applicationInstaller).getProcessDeploymentInfo(1L);
+        doReturn(deployedProcess2).when(applicationInstaller).getProcessDeploymentInfo(2L);
 
         doReturn(Optional.empty()).when(applicationInstaller)
                 .getDeployedProcessId(anyString(), any());

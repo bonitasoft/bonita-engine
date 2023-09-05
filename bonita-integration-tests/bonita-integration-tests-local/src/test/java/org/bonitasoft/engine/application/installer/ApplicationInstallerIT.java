@@ -16,7 +16,7 @@ package org.bonitasoft.engine.application.installer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.io.InputStream;
+import java.util.Optional;
 
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
@@ -64,7 +64,6 @@ public class ApplicationInstallerIT extends CommonAPIIT {
                 .isThrownBy(() -> getApplicationAPI().getApplicationByToken("appsManagerBonita"));
 
         // given:
-        final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
         ApplicationInstaller applicationInstallerImpl = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
@@ -73,7 +72,10 @@ public class ApplicationInstallerIT extends CommonAPIIT {
                         new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector()));
 
         // when:
-        applicationInstallerImpl.install(applicationArchiveReader.read(applicationAsStream), "1.0.0");
+        try (var applicationAsStream = ApplicationInstallerIT.class.getResourceAsStream("/customer-application.zip")) {
+            var applicationArchive = applicationArchiveReader.read(applicationAsStream);
+            applicationInstallerImpl.install(applicationArchive, "1.0.0");
+        }
 
         // then:
 
@@ -101,9 +103,36 @@ public class ApplicationInstallerIT extends CommonAPIIT {
     }
 
     @Test
+    public void custom_application_should_be_installed_with_configuration() throws Exception {
+        // given:
+        ApplicationInstaller applicationInstallerImpl = ServiceAccessorSingleton.getInstance()
+                .lookup(ApplicationInstaller.class);
+        final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
+                new ArtifactTypeDetector(new BdmDetector(),
+                        new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
+                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector()));
+
+        // when:
+        try (var applicationAsStream = ApplicationInstallerIT.class
+                .getResourceAsStream("/simple-app-1.0.0-SNAPSHOT-local.zip");
+                var confStream = ApplicationInstallerIT.class
+                        .getResourceAsStream("/simple-app-1.0.0-SNAPSHOT-local.bconf");) {
+            var applicationArchive = applicationArchiveReader.read(applicationAsStream);
+            applicationArchive.setConfigurationFile(Optional.of(confStream));
+            applicationInstallerImpl.install(applicationArchive, "1.0.0-SNAPSHOT");
+        }
+
+        final long processDefinitionId = getProcessAPI().getProcessDefinitionId("Pool", "1.0");
+        final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
+        assertThat(deploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
+        assertThat(deploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
+        var paramInstance = getProcessAPI().getParameterInstance(processDefinitionId, "hello");
+        assertThat(paramInstance.getValue()).isEqualTo("world_post_install");
+    }
+
+    @Test
     public void empty_custom_application_should_throw_an_exception() throws Exception {
         // given:
-        final InputStream applicationAsStream = this.getClass().getResourceAsStream("/empty-customer-application.zip");
         ApplicationInstaller applicationInstaller = ServiceAccessorSingleton.getInstance()
                 .lookup(ApplicationInstaller.class);
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
@@ -112,11 +141,14 @@ public class ApplicationInstallerIT extends CommonAPIIT {
                         new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(),
                         new LayoutDetector()));
 
-        final ApplicationArchive applicationArchive = applicationArchiveReader.read(applicationAsStream);
+        try (var applicationAsStream = ApplicationInstallerIT.class
+                .getResourceAsStream("/empty-customer-application.zip")) {
+            final ApplicationArchive applicationArchive = applicationArchiveReader.read(applicationAsStream);
 
-        // then:
-        assertThatExceptionOfType(ApplicationInstallationException.class)
-                .isThrownBy(() -> applicationInstaller.install(applicationArchive, "1.0.0"))
-                .withMessage("The Application Archive contains no valid artifact to install");
+            // then:
+            assertThatExceptionOfType(ApplicationInstallationException.class)
+                    .isThrownBy(() -> applicationInstaller.install(applicationArchive, "1.0.0"))
+                    .withMessage("The Application Archive contains no valid artifact to install");
+        }
     }
 }

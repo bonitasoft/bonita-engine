@@ -18,7 +18,10 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
+import org.awaitility.Awaitility;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchiveReader;
@@ -134,9 +137,11 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
 
         // when:
-        final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
-        applicationInstaller.update(applicationArchiveReader.read(applicationAsStream), "1.0.0");
-
+        try (var applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip")) {
+            // Avoid test failure due to instant update.
+            Awaitility.await().timeout(Duration.of(1, ChronoUnit.SECONDS));
+            applicationInstaller.update(applicationArchiveReader.read(applicationAsStream), "1.0.0");
+        }
         // then:
         TenantResource updatedBdm = getTenantAdministrationAPI().getBusinessDataModelResource();
         Application updatedApplication = getApplicationAPI().getApplicationByToken("appsManagerBonita");

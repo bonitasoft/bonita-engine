@@ -309,4 +309,6 @@ public interface ServiceAccessor {
     ApplicationContext getContext();
 
     PlatformRetriever getPlatformRetriever();
+
+    InstallationService getInstallationService();
 }
