@@ -123,26 +123,6 @@ public class PermissionServiceImplTest {
     }
 
     @Test
-    public void should_resume_call_start() throws SBonitaException {
-        //when
-        permissionService.resume();
-        //then
-        verify(permissionService).start();
-    }
-
-    @Test
-    public void should_pause_call_stop() throws SBonitaException {
-        //given
-        permissionService.start();
-
-        //when
-        permissionService.pause();
-
-        //then
-        verify(permissionService).stop();
-    }
-
-    @Test
     public void should_pause_call_stop_tow_times() {
         //when
         permissionService.stop();

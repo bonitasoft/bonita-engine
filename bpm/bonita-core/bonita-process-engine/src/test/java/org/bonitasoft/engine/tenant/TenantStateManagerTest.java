@@ -203,17 +203,7 @@ public class TenantStateManagerTest {
     }
 
     @Test
-    public void pause_should_delete_sessions() throws Exception {
-        whenTenantIsInState(STenant.ACTIVATED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(), eq(TENANT_ID));
-
-        tenantStateManager.pause();
-
-        verify(sessionService).deleteSessionsOfTenantExceptTechnicalUser(TENANT_ID);
-    }
-
-    @Test
-    public void resume_should_delete_sessions() throws Exception {
+    public void resume_should_not_delete_sessions() throws Exception {
         whenTenantIsInState(STenant.PAUSED);
         doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(), eq(TENANT_ID));
 

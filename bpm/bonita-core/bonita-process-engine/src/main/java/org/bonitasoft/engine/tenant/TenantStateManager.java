@@ -126,7 +126,6 @@ public class TenantStateManager {
         if (!tenant.isActivated()) {
             throw new UpdateException("Can't pause a tenant in state " + tenant.getStatus());
         }
-        sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
         pauseTenantInTransaction();
         pauseSchedulerJobsInTransaction(tenantId);
         tenantServicesManager.pause();

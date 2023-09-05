@@ -60,13 +60,4 @@ public class BonitaTaskExecutor implements PlatformLifecycleService {
         }
     }
 
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
 }

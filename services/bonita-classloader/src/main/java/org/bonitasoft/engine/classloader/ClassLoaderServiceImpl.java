@@ -229,14 +229,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
     public boolean addListener(ClassLoaderIdentifier identifier, SingleClassLoaderListener singleClassLoaderListener) {
         log.debug("Added listener {} on {}", singleClassLoaderListener, identifier);
         return getListeners(identifier).add(singleClassLoaderListener);
