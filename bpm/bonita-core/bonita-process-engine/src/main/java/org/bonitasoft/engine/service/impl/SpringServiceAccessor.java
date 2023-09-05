@@ -91,7 +91,13 @@ import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.service.*;
+import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.InstallationService;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServicesResolver;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -634,4 +640,8 @@ public class SpringServiceAccessor
         return beanAccessor.getService(PlatformRetriever.class);
     }
 
+    @Override
+    public InstallationService getInstallationService() {
+        return beanAccessor.getService(InstallationService.class);
+    }
 }

@@ -17,6 +17,7 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.zip.ZipFile;
@@ -24,6 +25,7 @@ import java.util.zip.ZipFile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.MandatoryLivingApplicationImporter;
@@ -32,7 +34,6 @@ import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.bonitasoft.platform.version.ApplicationVersionService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -48,7 +49,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@ConditionalOnSingleCandidate(CustomOrDefaultApplicationInstaller.class)
 public class CustomOrDefaultApplicationInstaller {
 
     public static final String CUSTOM_APPLICATION_DEFAULT_FOLDER = "my-application";
@@ -130,10 +130,6 @@ public class CustomOrDefaultApplicationInstaller {
         }
     }
 
-    protected void findAndUpdateConfiguration() throws ApplicationInstallationException, IOException {
-        // Does nothing
-    }
-
     @VisibleForTesting
     Optional<String> readApplicationVersion(Resource customApplication) throws IOException {
         if (customApplication != null) {
@@ -206,11 +202,24 @@ public class CustomOrDefaultApplicationInstaller {
             throws Exception {
         try (final InputStream applicationZipFileStream = customApplication.getInputStream();
                 ApplicationArchive applicationArchive = getApplicationArchive(applicationZipFileStream)) {
+            setConfigurationFile(applicationArchive);
             applicationInstaller.update(applicationArchive, version);
         } catch (IOException | ApplicationInstallationException e) {
             throw new ApplicationInstallationException(
                     "Unable to update the application " + customApplication.getFilename(), e);
         }
+    }
+
+    private void setConfigurationFile(ApplicationArchive applicationArchive)
+            throws IOException, ApplicationInstallationException {
+        detectConfigurationFile().ifPresent(resource -> {
+            try {
+                log.info("Found application configuration file " + resource.getFilename());
+                applicationArchive.setConfigurationFile(Optional.of(resource.getInputStream()));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        });
     }
 
     /**
@@ -221,6 +230,7 @@ public class CustomOrDefaultApplicationInstaller {
     protected void installCustomApplication(final Resource customApplication, String version) throws Exception {
         try (final InputStream applicationZipFileStream = customApplication.getInputStream();
                 ApplicationArchive applicationArchive = getApplicationArchive(applicationZipFileStream)) {
+            setConfigurationFile(applicationArchive);
             applicationInstaller.install(applicationArchive, version);
         } catch (IOException | ApplicationInstallationException e) {
             throw new ApplicationInstallationException(
@@ -260,6 +270,36 @@ public class CustomOrDefaultApplicationInstaller {
             });
         } catch (Exception e) {
             throw new ApplicationInstallationException("Unable to import default pages", e);
+        }
+    }
+
+    protected Optional<Resource> detectConfigurationFile() throws IOException, ApplicationInstallationException {
+        log.info("Trying to detect configuration file (.bconf file from folder {})", applicationInstallFolder);
+        return Optional.ofNullable(
+                getResourceFromClasspath(getConfigurationFileResourcesFromClasspath(), "configuration file .bconf"));
+    }
+
+    @VisibleForTesting
+    Resource[] getConfigurationFileResourcesFromClasspath() throws IOException {
+        return cpResourceResolver
+                .getResources(
+                        ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + applicationInstallFolder + "/*.bconf");
+    }
+
+    protected void findAndUpdateConfiguration() throws ApplicationInstallationException, IOException {
+        final ExecutionResult executionResult = new ExecutionResult();
+        detectConfigurationFile().ifPresent(resource -> {
+            try {
+                log.info("Found application configuration file " + resource.getFilename());
+                applicationInstaller
+                        .installConfigurationFileIfPresent(Optional.of(resource.getInputStream()), executionResult);
+            } catch (IOException | ApplicationInstallationException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        applicationInstaller.logInstallationResult(executionResult);
+        if (executionResult.hasErrors()) {
+            throw new ApplicationInstallationException("The Application Archive install operation has been aborted");
         }
     }
 }

@@ -14,9 +14,16 @@
 package org.bonitasoft.engine.api.impl.application.installer;
 
 import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.api.result.Status.Level.*;
-import static org.bonitasoft.engine.api.result.StatusCode.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.from;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.bonitasoft.engine.api.result.Status.Level.ERROR;
+import static org.bonitasoft.engine.api.result.Status.Level.INFO;
+import static org.bonitasoft.engine.api.result.Status.Level.WARNING;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PAGE;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_KO;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_SKIP_INSTALL;
 import static org.bonitasoft.engine.api.result.StatusContext.PROCESS_NAME_KEY;
 import static org.bonitasoft.engine.api.result.StatusContext.PROCESS_VERSION_KEY;
 import static org.bonitasoft.engine.business.application.ApplicationImportPolicy.FAIL_ON_DUPLICATES;
@@ -36,14 +43,27 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Callable;
+
+import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.ProcessDeploymentAPIDelegate;
 import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.api.result.Status;
+import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
+import org.bonitasoft.engine.bdm.model.BusinessObject;
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
@@ -60,6 +80,7 @@ import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
+import org.bonitasoft.engine.service.InstallationService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -73,6 +94,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.xml.sax.SAXException;
 
 /**
  * @author Baptiste Mesta.
@@ -85,6 +107,9 @@ public class ApplicationInstallerTest {
 
     @Mock
     private UserTransactionService transactionService;
+
+    @Mock
+    private InstallationService installationService;
 
     @Captor
     ArgumentCaptor<Callable<Object>> callableCaptor;
@@ -246,7 +271,6 @@ public class ApplicationInstallerTest {
         verify(applicationInstaller).deployProcess(any(), any());
         verify(processDeploymentAPIDelegate).deploy(any());
         verify(applicationInstaller).enableResolvedProcesses(eq(Collections.singletonList(123L)), any());
-
     }
 
     @Test
@@ -299,9 +323,7 @@ public class ApplicationInstallerTest {
         final ExecutionResult executionResult = new ExecutionResult();
         byte[] barContent = createValidBusinessArchive();
         File process = createTempFile("process", "bar", barContent);
-        ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
         doReturn(Optional.of(1L)).when(applicationInstaller).getDeployedProcessId("myProcess", "1.0");
-        ProcessDefinition myProcess = aProcessDefinition(1193L);
 
         // when
         try (ApplicationArchive applicationArchive = new ApplicationArchive()) {
@@ -334,7 +356,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_organisation() throws Exception {
+    public void should_install_organization() throws Exception {
         File organization = createTempFile("org", "xml", "content".getBytes());
         doReturn(emptyList()).when(applicationInstaller).importOrganization(any(), any());
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
@@ -344,6 +366,31 @@ public class ApplicationInstallerTest {
         }
 
         verify(applicationInstaller).importOrganization(organization, ImportPolicy.FAIL_ON_DUPLICATES);
+    }
+
+    @Test
+    public void should_not_fail_when_no_organization() throws Exception {
+        var executionResult = new ExecutionResult();
+        try (var applicationArchive = new ApplicationArchive()) {
+            applicationInstaller.installOrganization(applicationArchive, executionResult);
+        }
+
+        assertThat(executionResult.getInfo()).extracting("message")
+                .containsOnly("No organization found. Use the technical user to configure the organization.");
+    }
+
+    @Test
+    public void install_should_call_install_configuration_file_on_installation_service() throws Exception {
+        // given:
+        final ExecutionResult executionResult = new ExecutionResult();
+        final Optional<InputStream> inputStream = Optional.of(mock(InputStream.class));
+        doNothing().when(installationService).install(eq(null), any());
+
+        // when:
+        applicationInstaller.installConfigurationFileIfPresent(inputStream, executionResult);
+
+        // then:
+        verify(installationService).install(eq(null), any());
     }
 
     private ProcessDefinitionImpl aProcessDefinition(long id) {
@@ -363,10 +410,15 @@ public class ApplicationInstallerTest {
         return FileOperations.readFully(businessArchiveFile);
     }
 
-    private byte[] createValidBDMZipFile() throws IOException {
-        return zip(file("bom.xml", ("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<businessObjectModel xmlns=\"http://documentation.bonitasoft.com/bdm-xml-schema/1.0\" modelVersion=\"1.0\" productVersion=\"8.0.0\" />")
-                        .getBytes()));
+    private byte[] createValidBDMZipFile() throws IOException, JAXBException, SAXException {
+        BusinessObjectModel bom = new BusinessObjectModel();
+        BusinessObject businessObject = new BusinessObject("org.bonita.Employee");
+        SimpleField field = new SimpleField();
+        field.setName("name");
+        field.setType(FieldType.STRING);
+        businessObject.addField(field);
+        bom.addBusinessObject(businessObject);
+        return new BusinessObjectModelConverter().marshall(bom);
     }
 
 }
