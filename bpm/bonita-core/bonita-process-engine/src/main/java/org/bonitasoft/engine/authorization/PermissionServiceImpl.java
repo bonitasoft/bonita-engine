@@ -173,16 +173,6 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public void pause() {
-        stop();
-    }
-
-    @Override
-    public void resume() throws SBonitaException {
-        start();
-    }
-
-    @Override
     public boolean isAuthorized(APICallContext apiCallContext) throws SExecutionException {
         if (log.isTraceEnabled()) {
             log.trace("Static REST API permissions check");

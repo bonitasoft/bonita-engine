@@ -97,10 +97,6 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
-    public synchronized void pause() throws SWorkException {
-    }
-
-    @Override
     public synchronized void resume() {
         start();
     }

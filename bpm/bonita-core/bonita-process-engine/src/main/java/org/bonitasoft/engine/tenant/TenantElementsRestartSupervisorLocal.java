@@ -39,10 +39,6 @@ public class TenantElementsRestartSupervisorLocal implements TenantLifecycleServ
     }
 
     @Override
-    public void resume() {
-    }
-
-    @Override
     public boolean shouldRestartElements() {
         return !areTenantsElementsAlreadyRestarted;
     }
