@@ -24,7 +24,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import javax.servlet.RequestDispatcher;
@@ -328,37 +327,4 @@ public class LoginServletTest {
 
         servlet.doPost(req, resp);
     }
-
-    @Test(expected = LoginFailedException.class)
-    public void testTenantInMaintenance() throws Exception {
-        final LoginManager loginManager = mock(LoginManager.class);
-        final LoginServlet servlet = spy(new LoginServlet());
-        doReturn(loginManager).when(servlet).getLoginManager();
-
-        final TenantStatusException tenantInMaintenanceException = new TenantStatusException(
-                "Tenant is in pause, unable to log in with other user than the technical user.");
-        doThrow(tenantInMaintenanceException).when(loginManager).login(req, resp);
-
-        try {
-            servlet.doLogin(req, resp);
-        } finally {
-            verify(req, times(1)).setAttribute(LoginServlet.TENANT_IN_MAINTENACE_MESSAGE,
-                    LoginServlet.TENANT_IN_MAINTENACE_MESSAGE);
-        }
-    }
-
-    @Test
-    public void testTenantNotInMaintenance() throws Exception {
-        final LoginManager loginManager = mock(LoginManager.class);
-        final LoginServlet servlet = spy(new LoginServlet());
-        doReturn(loginManager).when(servlet).getLoginManager();
-        doNothing().when(loginManager).login(req, resp);
-
-        servlet.doLogin(req, resp);
-
-        verify(req, times(0)).setAttribute(LoginServlet.TENANT_IN_MAINTENACE_MESSAGE,
-                LoginServlet.TENANT_IN_MAINTENACE_MESSAGE);
-        verify(loginManager).login(req, resp);
-    }
-
 }

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import org.bonitasoft.engine.TestWithUser;
@@ -41,9 +40,10 @@ public class TenantMaintenanceIT extends TestWithUser {
         pauseTenant();
 
         //then
-        assertCannotLoginOnTenant();
+        assertCanLoginOnTenant();
 
         //when
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         resumeTenant();
 
         // then
@@ -54,13 +54,12 @@ public class TenantMaintenanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    private void assertCannotLoginOnTenant() throws Exception {
+    private void assertCanLoginOnTenant() throws Exception {
         try {
             loginOnDefaultTenantWith(USERNAME, PASSWORD);
-            fail("Expected that user is not able to do login, but he is");
+            logoutOnTenant();
         } catch (LoginException e) {
-            assertThat(e.getMessage())
-                    .contains("is in pause, unable to login with other user than the technical user.");
+            fail("Expected that user is able to log in, but he is not");
         }
     }
 

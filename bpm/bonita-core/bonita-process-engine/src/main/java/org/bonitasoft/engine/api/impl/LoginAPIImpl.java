@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -156,14 +155,6 @@ public class LoginAPIImpl implements LoginAPI {
             throws LoginException {
         if (sTenant.isDeactivated()) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
-        }
-        if (sTenant.isPaused()) {
-            final String technicalUserName = technicalUser.getUserName();
-
-            if (!technicalUserName.equals(userName)) {
-                throw new TenantStatusException("Tenant with ID " + sTenant.getId()
-                        + " is in pause, unable to login with other user than the technical user.");
-            }
         }
     }
 

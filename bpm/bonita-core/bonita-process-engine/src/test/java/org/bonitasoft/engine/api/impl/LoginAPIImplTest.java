@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.core.login.TechnicalUser;
-import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.junit.Test;
@@ -46,17 +45,6 @@ public class LoginAPIImplTest {
         //expected LoginException
         loginAPI.checkThatWeCanLogin("joe", sTenant, new TechnicalUser("techUser", "techPass"));
 
-    }
-
-    @Test(expected = TenantStatusException.class)
-    public void checkThatWeCanLogin_should_refuse_non_technical_user() throws Exception {
-        //given
-        sTenant.setStatus(STenant.PAUSED);
-
-        LoginAPIImpl loginAPI = new LoginAPIImpl();
-
-        //expected TenantStatusException
-        loginAPI.checkThatWeCanLogin("joe", sTenant, new TechnicalUser("techUser", "techPass"));
     }
 
 }

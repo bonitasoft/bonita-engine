@@ -38,7 +38,6 @@
     String noBonitaHomeMessage = request.getAttribute("noBonitaHomeMessage") + "";
 	String noBonitaClientFileMessage = request.getAttribute("noBonitaClientFileMessage") + "";
 	String loginFailMessage = request.getAttribute("loginFailMessage") + "";
-	String tenantInMaintenanceMessage = request.getAttribute("tenantInMaintenanceMessage") + "";
 
     // Technical problems
     if (
@@ -54,10 +53,6 @@
     // No profile for this user
     else if ("noProfileForUser".equals(loginFailMessage)) {
         errorMessage = i18n.t_("Login failed. No profile has been set up for this user. Contact your administrator.");
-    }
- 	// Tenant in Maintenance error
-    else if ("tenantInMaintenanceMessage".equals(tenantInMaintenanceMessage)) {
-        errorMessage = i18n.t_("This service is offline for maintenance. Please try later.");
     }
  	// Login or password error
     else if ("loginFailMessage".equals(loginFailMessage)) {
