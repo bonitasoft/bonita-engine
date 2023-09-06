@@ -35,7 +35,6 @@ import org.bonitasoft.console.common.server.utils.TenantsManagementUtils;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 import org.restlet.data.MediaType;
@@ -62,11 +61,6 @@ public class LoginServlet extends HttpServlet {
      * login fail message
      */
     protected static final String LOGIN_FAIL_MESSAGE = "loginFailMessage";
-
-    /**
-     * the Tenant In maintenance message key
-     */
-    protected static final String TENANT_IN_MAINTENACE_MESSAGE = "tenantInMaintenanceMessage";
 
     /**
      * the URL param for the login page
@@ -211,17 +205,8 @@ public class LoginServlet extends HttpServlet {
     protected void doLogin(final HttpServletRequest request, final HttpServletResponse response)
             throws AuthenticationManagerNotFoundException, LoginFailedException, ServletException,
             AuthenticationFailedException {
-        try {
-            final LoginManager loginManager = getLoginManager();
-            loginManager.login(request, response);
-        } catch (final TenantStatusException e) {
-            final String message = "Tenant is in pause, unable to log in with other user than the technical user.";
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn(message, e);
-            }
-            request.setAttribute(TENANT_IN_MAINTENACE_MESSAGE, TENANT_IN_MAINTENACE_MESSAGE);
-            throw new LoginFailedException(TENANT_IN_MAINTENACE_MESSAGE, e);
-        }
+        final LoginManager loginManager = getLoginManager();
+        loginManager.login(request, response);
     }
 
     protected LoginManager getLoginManager() {
