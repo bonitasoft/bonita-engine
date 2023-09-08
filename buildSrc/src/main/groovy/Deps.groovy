@@ -36,7 +36,7 @@ class Deps {
 
     public static String mysqlVersion = "8.0.29"
     public static String mssqlVersion = "8.4.1.jre8"
-    public static String oracleVersion = "19.3.0.0"
+    public static String oracleVersion = "23.2.0.0"
     public static String postgresqlVersion = "42.4.3"
     public static String lombokVersion = "1.18.24"
 
