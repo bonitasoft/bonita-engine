@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.platform.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -42,10 +40,8 @@ public class PlatformServiceImpl implements PlatformService {
 
     private static final String TENANT = "TENANT";
     private static final String QUERY_GET_DEFAULT_TENANT = "getDefaultTenant";
-    private static final String CACHE_KEY = "PLATFORM";
 
     private final PersistenceService platformPersistenceService;
-    private final CacheService cacheService;
     private final SPlatformProperties sPlatformProperties;
     private final Recorder recorder;
     private final PlatformRetriever platformRetriever;
@@ -53,10 +49,9 @@ public class PlatformServiceImpl implements PlatformService {
     private static Long defaultTenantId = null;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever,
-            final Recorder recorder, CacheService cacheService,
+            final Recorder recorder,
             final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
-        this.cacheService = cacheService;
         this.sPlatformProperties = sPlatformProperties;
         this.recorder = recorder;
         this.platformRetriever = platformRetriever;
@@ -64,36 +59,6 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public SPlatform getPlatform() throws SPlatformNotFoundException {
-        try {
-            SPlatform sPlatform = (SPlatform) cacheService.get(CACHE_KEY, CACHE_KEY);
-            if (sPlatform == null) {
-                // try to read it from database
-                sPlatform = readPlatform();
-                cachePlatform(sPlatform);
-            }
-            return sPlatform;
-        } catch (final SCacheException e) {
-            throw new SPlatformNotFoundException("Platform not present in cache.", e);
-        }
-    }
-
-    /*
-     * *************************
-     * The Platform is stored 1 time for each cache
-     * We do this because the cache service handle
-     * multi tenancy
-     * *************************
-     */
-    private void cachePlatform(final SPlatform platform) {
-        try {
-            cacheService.store(CACHE_KEY, CACHE_KEY, platform);
-        } catch (final SCacheException e) {
-            log.warn("Can't cache the platform, maybe the platform cache service is not started yet: {}",
-                    e.getMessage());
-        }
-    }
-
-    private SPlatform readPlatform() throws SPlatformNotFoundException {
         try {
             return platformRetriever.getPlatform();
         } catch (SPlatformNotFoundException e) {
@@ -206,6 +171,15 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public SPlatformProperties getSPlatformProperties() {
         return sPlatformProperties;
+    }
+
+    @Override
+    public void updatePlatform(final EntityUpdateDescriptor descriptor) throws SPlatformUpdateException {
+        try {
+            recorder.recordUpdate(UpdateRecord.buildSetFields(getPlatform(), descriptor), PLATFORM);
+        } catch (final SRecorderException | SPlatformNotFoundException e) {
+            throw new SPlatformUpdateException("Problem while updating platform: ", e);
+        }
     }
 
 }

@@ -26,6 +26,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface PlatformService {
 
+    String PLATFORM = "PLATFORM";
     String TENANT = "TENANT";
 
     /**
@@ -131,4 +132,6 @@ public interface PlatformService {
      * @since 6.1
      */
     SPlatformProperties getSPlatformProperties();
+
+    void updatePlatform(EntityUpdateDescriptor descriptor) throws SPlatformUpdateException;
 }

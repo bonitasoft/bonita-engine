@@ -24,8 +24,6 @@ import java.io.File;
 
 import javax.sql.DataSource;
 
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -58,9 +56,6 @@ public class PlatformServiceImplTest {
 
     @Mock
     private PlatformRetriever platformRetriever;
-
-    @Mock
-    private CacheService platformCacheService;
 
     @Mock
     private Recorder recorder;
@@ -103,15 +98,6 @@ public class PlatformServiceImplTest {
     }
 
     @Test
-    public final void getPlatform_should_return_platform_from_cache_if_available() throws SBonitaException {
-        final SPlatform sPlatform = buildPlatform();
-        when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
-
-        assertEquals(sPlatform, platformServiceImpl.getPlatform());
-        verifyNoInteractions(platformRetriever);
-    }
-
-    @Test
     public final void getPlatform_should_throw_SPlatformNotFoundException_when_platformRetriever_throws_SPlatformNotFoundException()
             throws SBonitaException {
         //given
@@ -126,49 +112,12 @@ public class PlatformServiceImplTest {
         platformServiceImpl.getPlatform();
     }
 
-    @Test(expected = SPlatformNotFoundException.class)
-    public final void getPlatform_should_throw_SPlatformNotFoundExcpetion_when_cacheSercie_throws_Exception()
-            throws SBonitaException {
-        when(platformCacheService.get(anyString(), anyString())).thenThrow(new SCacheException(""));
-
-        platformServiceImpl.getPlatform();
-    }
-
-    @Test
-    public final void isPlatformCreated_already_in_cache() throws SBonitaException {
-        final SPlatform sPlatform = buildPlatform();
-        when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
-
-        assertTrue(platformServiceImpl.isPlatformCreated());
-    }
-
-    @Test
-    public final void isPlatformCreated_should_return_false_when_platform_is_not_in_cache_neither_in_db()
-            throws SBonitaException {
-        // given
-        when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
-        given(platformRetriever.getPlatform()).willThrow(new SPlatformNotFoundException("not found"));
-
-        // when then
-        assertFalse(platformServiceImpl.isPlatformCreated());
-        verify(platformRetriever, times(1)).getPlatform();
-    }
-
     @Test
     public final void isPlatformCreated() throws SBonitaException {
         final SPlatform sPlatform = buildPlatform();
-        when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
+        when(platformServiceImpl.getPlatform()).thenReturn(sPlatform);
 
         assertTrue(platformServiceImpl.isPlatformCreated());
-    }
-
-    @Test
-    public final void isPlatformCreated_false_when_cache_exception() throws SBonitaException {
-        // given
-        when(platformCacheService.get(anyString(), anyString())).thenThrow(new SCacheException(""));
-
-        // whne then
-        assertFalse(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
@@ -235,7 +184,7 @@ public class PlatformServiceImplTest {
     }
 
     private SPlatform buildPlatform() {
-        return new SPlatform("1.0", "0.5", "me", 654687344687645L, "0.0.0");
+        return new SPlatform("1.0", "0.5", "0.0.0", null, false, "me", 654687344687645L);
     }
 
 }

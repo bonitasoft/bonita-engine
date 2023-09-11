@@ -157,19 +157,6 @@
         <property name="readIntensive" value="${bonita.platform.cache.synchro.readIntensive}" />
     </bean>
 
-    <bean id="platformCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="PLATFORM" />
-        <property name="maxElementsInMemory" value="${bonita.platform.cache.platform.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.platform.cache.platform.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.platform.cache.platform.eternal}" />
-        <property name="evictionPolicy" value="${bonita.platform.cache.platform.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.platform.cache.platform.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.platform.cache.platform.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.platform.cache.platform.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.platform.cache.platform.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.platform.cache.platform.readIntensive}" />
-    </bean>
-
     <bean id="configFilesCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="CONFIGURATION_FILES_CACHE" />
         <property name="maxElementsInMemory" value="${bonita.platform.cache.configfiles.maxElementsInMemory}" />

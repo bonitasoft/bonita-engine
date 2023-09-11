@@ -35,7 +35,6 @@ public class CacheConfigurationIT extends CommonBPMServicesTest {
     public void all_required_cache_configurations_should_exist() {
         assertThat(cacheService.getCacheConfigurationNames()).containsExactlyInAnyOrder(
                 "CONFIGURATION_FILES_CACHE",
-                "PLATFORM",
                 "USER_FILTER",
                 "transient_data",
                 "GROOVY_SCRIPT_CACHE_NAME",
