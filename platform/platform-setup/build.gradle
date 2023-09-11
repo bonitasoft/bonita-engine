@@ -27,7 +27,7 @@ dependencies {
     }
     api "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     api "com.h2database:h2:${Deps.h2Version}"
-    api("com.oracle.database.jdbc:ojdbc11:${Deps.oracleVersion}") {
+    api("com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}") {
         exclude(module: "ons")
         exclude(module: "oraclepki")
         exclude(module: "osdt_cert")
