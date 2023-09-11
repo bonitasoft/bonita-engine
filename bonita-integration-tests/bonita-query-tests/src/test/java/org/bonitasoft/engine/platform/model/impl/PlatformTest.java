@@ -62,6 +62,8 @@ public class PlatformTest {
                 entry("CREATED_BY", "The almighty"),
                 entry("INITIAL_BONITA_VERSION", "5.9.0"),
                 entry("APPLICATION_VERSION", "0.0.0"),
+                entry("MAINTENANCE_MESSAGE", null),
+                entry("MAINTENANCE_MESSAGE_ACTIVE", false),
                 entry("VERSION", "1.2"),
                 entry("INFORMATION", "some infos XYZ"));
     }

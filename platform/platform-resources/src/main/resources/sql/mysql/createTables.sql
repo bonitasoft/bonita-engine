@@ -879,6 +879,8 @@ CREATE TABLE platform (
   version VARCHAR(50) NOT NULL,
   initial_bonita_version VARCHAR(50) NOT NULL,
   application_version VARCHAR(50) NOT NULL,
+  maintenance_message TEXT,
+  maintenance_message_active BOOLEAN NOT NULL,
   created BIGINT NOT NULL,
   created_by VARCHAR(50) NOT NULL,
   information TEXT,

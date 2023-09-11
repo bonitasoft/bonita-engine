@@ -40,6 +40,9 @@ public class SPlatform implements PlatformPersistentObject {
     public static final String PREVIOUS_VERSION = "previousVersion";
     public static final String VERSION = "version";
     public static final String INFORMATION = "information";
+    public static final String MAINTENANCE_MESSAGE = "maintenance_message";
+    public static final String MAINTENANCE_MESSAGE_ACTIVE = "maintenance_message_active";
+
     @Id
     private long id;
     private long created;
@@ -53,14 +56,21 @@ public class SPlatform implements PlatformPersistentObject {
     private String information;
     @Column(name = "application_version")
     private String applicationVersion;
+    @Column(name = "maintenance_message")
+    private String maintenanceMessage;
+    @Column(name = "maintenance_message_active")
+    private boolean maintenanceMessageActive;
 
-    public SPlatform(final String dbSchemaVersion, final String initialBonitaVersion,
-            final String createdBy, final long created, final String applicationVersion) {
+    public SPlatform(final String dbSchemaVersion, final String initialBonitaVersion, final String applicationVersion,
+            final String maintenanceMessage, final boolean maintenanceMessageActive,
+            final String createdBy, final long created) {
         this.dbSchemaVersion = dbSchemaVersion;
         this.initialBonitaVersion = initialBonitaVersion;
+        this.applicationVersion = applicationVersion;
+        this.maintenanceMessage = maintenanceMessage;
+        this.maintenanceMessageActive = maintenanceMessageActive;
         this.createdBy = createdBy;
         this.created = created;
-        this.applicationVersion = applicationVersion;
     }
 
     @Override

@@ -1005,6 +1005,8 @@ CREATE TABLE platform (
   version NVARCHAR(50) NOT NULL,
   initial_bonita_version NVARCHAR(50) NOT NULL,
   application_version NVARCHAR(50) NOT NULL,
+  maintenance_message NVARCHAR(MAX),
+  maintenance_message_active BIT NOT NULL,
   created NUMERIC(19, 0) NOT NULL,
   created_by NVARCHAR(50) NOT NULL,
   information NVARCHAR(MAX),

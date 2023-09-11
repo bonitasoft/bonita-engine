@@ -45,7 +45,9 @@ public interface TenantAdministrationAPI {
      *
      * @throws org.bonitasoft.engine.exception.UpdateException
      *         if the tenant cannot be paused.
+     *         This method is deprecated, use {@link MaintenanceAPI#enableMaintenanceMode()} instead.
      */
+    @Deprecated
     void pause() throws UpdateException;
 
     /**
@@ -53,7 +55,9 @@ public interface TenantAdministrationAPI {
      *
      * @throws org.bonitasoft.engine.exception.UpdateException
      *         if the tenant cannot be resumed.
+     *         This method is deprecated, use {@link MaintenanceAPI#disableMaintenanceMode()} ()} instead.
      */
+    @Deprecated
     void resume() throws UpdateException;
 
     /**

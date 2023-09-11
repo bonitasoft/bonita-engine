@@ -44,6 +44,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(TenantAdministrationAPI.class.getName(), new TenantAdministrationAPIImpl());
         apis.put(BusinessDataAPI.class.getName(), new BusinessDataAPIImpl());
         apis.put(TemporaryContentAPI.class.getName(), new TemporaryContentAPIImpl());
+        apis.put(MaintenanceAPI.class.getName(), new MaintenanceAPIImpl());
     }
 
     @Override
