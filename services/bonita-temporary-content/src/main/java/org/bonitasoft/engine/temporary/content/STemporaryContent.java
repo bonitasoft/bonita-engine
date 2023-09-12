@@ -20,6 +20,8 @@ import javax.persistence.*;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.persistence.PlatformPersistentObject;
 
 /**
@@ -68,7 +70,9 @@ public class STemporaryContent implements PlatformPersistentObject {
 
     public STemporaryContent(final String fileName, Blob content, String mimeType) {
         super();
-        this.key = UUID.randomUUID().toString();
+        String fileExtension = FilenameUtils.getExtension(fileName);
+        String keyUUID = UUID.randomUUID().toString();
+        this.key = StringUtils.isNotBlank(fileExtension) ? keyUUID + "." + fileExtension : keyUUID;
         this.fileName = fileName;
         this.content = content;
         this.creationDate = System.currentTimeMillis();
