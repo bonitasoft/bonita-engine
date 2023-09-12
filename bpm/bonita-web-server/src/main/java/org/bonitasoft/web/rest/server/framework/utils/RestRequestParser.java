@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIMalformedUrlException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
@@ -27,6 +28,9 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
  * @author Baptiste Mesta
  */
 public class RestRequestParser {
+
+    //This constant should match the servlet name of DispatcherServlet as declared in servlet context
+    public static final String SPRING_REST_SERVLET_NAME = "SpringRest";
 
     private final HttpServletRequest request;
     private String apiName;
@@ -50,22 +54,47 @@ public class RestRequestParser {
     }
 
     public RestRequestParser invoke() {
+        if (SPRING_REST_SERVLET_NAME.equals(request.getHttpServletMapping().getServletName())) {
+            return parseSpringMVCAPIRequest();
+        } else {
+            return parseLegacyAPIRequest();
+        }
+    }
+
+    protected RestRequestParser parseLegacyAPIRequest() {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.split("/").length < 3) {
             // it's not an URL like API/bpm/...
             pathInfo = request.getServletPath();
         }
         final String[] path = pathInfo.split("/");
-        // Read API tokens
-        if (path.length < 3) {
+        //ignoring the first segment corresponding to the empty string before the first /
+        return parseRequest(path, 1);
+    }
+
+    protected RestRequestParser parseSpringMVCAPIRequest() {
+        String apiPath = request.getServletPath();
+        String pathInfo = request.getPathInfo();
+        if (!StringUtils.isEmpty(pathInfo)) {
+            // there is an Id in the URL
+            apiPath = apiPath + pathInfo;
+        }
+        final String[] path = apiPath.split("/");
+        //ignoring the 2 first segments corresponding to the /API/ part
+        return parseRequest(path, 2);
+    }
+
+    protected RestRequestParser parseRequest(String[] path, int indexOfAPINameSegment) {
+        int minimalNumberOfPathSegments = indexOfAPINameSegment + 2;
+        if (path.length < minimalNumberOfPathSegments) {
             throw new APIMalformedUrlException("Missing API or resource name [" + request.getRequestURL() + "]");
         }
-        apiName = path[1];
-        resourceName = path[2];
+        apiName = path[indexOfAPINameSegment];
+        resourceName = path[indexOfAPINameSegment + 1];
         // Read id (if defined)
-        if (path.length > 3) {
+        if (path.length > minimalNumberOfPathSegments) {
             final List<String> pathList = Arrays.asList(path);
-            resourceQualifiers = APIID.makeAPIID(pathList.subList(3, pathList.size()));
+            resourceQualifiers = APIID.makeAPIID(pathList.subList(minimalNumberOfPathSegments, pathList.size()));
         } else {
             resourceQualifiers = null;
         }

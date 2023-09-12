@@ -342,6 +342,19 @@
         <servlet-class>org.bonitasoft.web.rest.server.BonitaRestletApplicationServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>SpringRest</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextClass</param-name>
+            <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+        </init-param>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>org.bonitasoft.web.rest.server.SpringWebConfiguration</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
         <servlet-name>ConsoleServiceServlet</servlet-name>
         <servlet-class>org.bonitasoft.console.server.ConsoleServiceServlet</servlet-class>
     </servlet>
@@ -698,6 +711,11 @@
     <servlet-mapping>
         <servlet-name>BonitaRestAPIServlet</servlet-name>
         <url-pattern>/APIToolkit/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SpringRest</servlet-name>
+        <!-- API resource URLs need to be listed here in order to avoid being picked up by Restlet which is bound to /API/* -->
+        <url-pattern>/API/system/maintenance</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>

@@ -28,9 +28,15 @@ dependencies {
     implementation "org.restlet.jse:org.restlet.ext.jackson:${Deps.restletVersion}"
     implementation "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
     implementation "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
-    implementation "org.springframework:spring-web:${Deps.springVersion}"
     implementation "org.springframework:spring-core:${Deps.springVersion}"
+    implementation "org.springframework:spring-context:${Deps.springVersion}"
+    implementation "org.springframework:spring-web:${Deps.springVersion}"
+    implementation "org.springframework:spring-webmvc:${Deps.springVersion}"
     implementation "org.fedorahosted.tennera:jgettext:${Deps.jgettextVersion}"
+
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+
     testImplementation(project(":bpm:bonita-server"))
     testImplementation "net.javacrumbs.json-unit:json-unit:${Deps.jsonUnitVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
