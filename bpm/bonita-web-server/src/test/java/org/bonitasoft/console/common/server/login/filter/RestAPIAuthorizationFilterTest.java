@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 import java.util.regex.Pattern;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpServletMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -57,11 +58,14 @@ public class RestAPIAuthorizationFilterTest {
     private FilterConfig filterConfig;
     @Mock
     private ServletContext servletContext;
+    @Mock
+    private HttpServletMapping httpServletMapping;
 
     private final RestAPIAuthorizationFilter restAPIAuthorizationFilter = new RestAPIAuthorizationFilter();
 
     @Before
     public void setUp() throws Exception {
+        doReturn(httpServletMapping).when(request).getHttpServletMapping();
         doReturn(httpSession).when(request).getSession();
         doReturn("").when(request).getQueryString();
         doReturn(apiSession).when(httpSession).getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
@@ -143,7 +147,7 @@ public class RestAPIAuthorizationFilterTest {
 
     @Test
     public void should_checkPermissions_parse_the_request() throws Exception {
-        doReturn("API/bpm/case/15").when(request).getPathInfo();
+        doReturn("/bpm/case/15").when(request).getPathInfo();
         final RestAPIAuthorizationFilter restAPIAuthorizationFilterSpy = spy(restAPIAuthorizationFilter);
         doReturn(true).when(restAPIAuthorizationFilterSpy).checkPermissions(eq(request), eq("bpm"), eq("case"),
                 eq(APIID.makeAPIID(15L)));

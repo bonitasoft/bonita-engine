@@ -14,17 +14,17 @@
 package org.bonitasoft.web.rest.server.framework;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.HttpServletMapping;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
-import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIIncorrectIdException;
 import org.junit.Before;
@@ -42,9 +42,7 @@ public class APIServletCallTest {
     @Mock
     private HttpServletRequest request;
     @Mock
-    private APISession apiSession;
-    @Mock
-    private HttpSession httpSession;
+    private HttpServletMapping httpServletMapping;
     @Mock
     private API api;
 
@@ -56,13 +54,13 @@ public class APIServletCallTest {
 
     @Before
     public void before() {
+        doReturn(httpServletMapping).when(request).getHttpServletMapping();
         apiServletCall.api = api;
     }
 
     @Test
     public void should_parsePath_request_info_with_id() {
-        final HttpServletRequest request = mock(HttpServletRequest.class);
-        doReturn("API/bpm/case/15").when(request).getPathInfo();
+        doReturn("/bpm/case/15").when(request).getPathInfo();
 
         apiServletCall.parsePath(request);
 
@@ -74,8 +72,7 @@ public class APIServletCallTest {
 
     @Test
     public void should_parsePath_request_info_with_negative_id() {
-        final HttpServletRequest request = mock(HttpServletRequest.class);
-        doReturn("API/identity/user/-1").when(request).getPathInfo();
+        doReturn("/identity/user/-1").when(request).getPathInfo();
         thrown.expect(APIIncorrectIdException.class);
         thrown.expectMessage("Id must be non-zero positive for identity on resource user");
 
