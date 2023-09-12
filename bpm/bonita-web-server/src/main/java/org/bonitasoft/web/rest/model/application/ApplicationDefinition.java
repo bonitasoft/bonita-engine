@@ -45,7 +45,7 @@ public class ApplicationDefinition extends ItemDefinition<ApplicationItem> {
         createAttribute(ApplicationItem.ATTRIBUTE_THEME_ID, ItemAttribute.TYPE.ITEM_ID);
         createAttribute(ApplicationItem.ATTRIBUTE_VERSION, ItemAttribute.TYPE.STRING);
         createAttribute(ApplicationItem.ATTRIBUTE_DESCRIPTION, ItemAttribute.TYPE.TEXT);
-        createAttribute(ApplicationItem.ATTRIBUTE_ICON, ItemAttribute.TYPE.STRING);
+        createAttribute(ApplicationItem.ATTRIBUTE_ICON, ItemAttribute.TYPE.IMAGE);
         createAttribute(ApplicationItem.ATTRIBUTE_CREATION_DATE, ItemAttribute.TYPE.STRING);
         createAttribute(ApplicationItem.ATTRIBUTE_CREATED_BY, ItemAttribute.TYPE.ITEM_ID);
         createAttribute(ApplicationItem.ATTRIBUTE_LAST_UPDATE_DATE, ItemAttribute.TYPE.STRING);
