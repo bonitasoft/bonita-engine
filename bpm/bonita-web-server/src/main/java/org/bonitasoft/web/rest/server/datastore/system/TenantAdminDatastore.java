@@ -15,6 +15,7 @@ package org.bonitasoft.web.rest.server.datastore.system;
 
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.system.TenantAdminItem;
 import org.bonitasoft.web.rest.server.engineclient.EngineAPIAccessor;
@@ -28,11 +29,16 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
 
 /**
  * @author Julien Mege
+ * @deprecated since Bonita 9.0 Use {@link org.bonitasoft.web.rest.server.api.system.MaintenanceController} instead
  */
+@Slf4j
+@Deprecated
 public class TenantAdminDatastore extends Datastore
         implements DatastoreHasUpdate<TenantAdminItem>, DatastoreHasGet<TenantAdminItem> {
 
     protected final APISession apiSession;
+
+    private static boolean hasShownDeprectedLog = false;
 
     public TenantAdminDatastore(final APISession apiSession) {
         this.apiSession = apiSession;
@@ -40,6 +46,7 @@ public class TenantAdminDatastore extends Datastore
 
     @Override
     public TenantAdminItem update(final APIID unusedId, final Map<String, String> attributes) {
+        logDeprecatedAPIUsage();
         final TenantAdminItem tenantAdminItem = new TenantAdminItem();
         try {
             final boolean doPause = Boolean.parseBoolean(attributes.get(TenantAdminItem.ATTRIBUTE_IS_PAUSED));
@@ -57,6 +64,7 @@ public class TenantAdminDatastore extends Datastore
 
     @Override
     public TenantAdminItem get(final APIID id) {
+        logDeprecatedAPIUsage();
         final TenantAdminItem tenantAdminItem = new TenantAdminItem();
         try {
             final boolean tenantPaused = getTenantManagementEngineClient().isTenantPaused();
@@ -64,6 +72,14 @@ public class TenantAdminDatastore extends Datastore
             return tenantAdminItem;
         } catch (final Exception e) {
             throw new APIException(e);
+        }
+    }
+
+    protected void logDeprecatedAPIUsage() {
+        if (!hasShownDeprectedLog && log.isWarnEnabled()) {
+            log.warn(
+                    "API system/tenant is deprecated and will be removed in a future release. Please use API system/maintenance instead.");
+            hasShownDeprectedLog = true;
         }
     }
 
