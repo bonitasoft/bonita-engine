@@ -23,8 +23,9 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
-import org.bonitasoft.engine.maintenance.MaintenanceInfo;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.rest.model.system.MaintenanceDetailsClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -45,10 +46,10 @@ public class MaintenanceController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public MaintenanceInfo getMaintenanceInfo(HttpSession session) {
+    public MaintenanceDetails getMaintenanceDetails(HttpSession session) {
         APISession apiSession = getApiSession(session);
         try {
-            return getMaintenanceAPI(apiSession).getMaintenanceInfo();
+            return getMaintenanceAPI(apiSession).getMaintenanceDetails();
         } catch (BonitaException e) {
             String errorMessage = "Error while getting the maintenance info";
             log.error(errorMessage, e);
@@ -58,21 +59,21 @@ public class MaintenanceController {
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public MaintenanceInfo changeMaintenanceState(@RequestBody MaintenanceInfoClient maintenanceInfo,
+    public MaintenanceDetails changeMaintenanceState(@RequestBody MaintenanceDetailsClient maintenanceInfo,
             HttpSession session) {
         APISession apiSession = getApiSession(session);
         try {
             MaintenanceAPI maintenanceAPI = getMaintenanceAPI(apiSession);
-            MaintenanceInfo currentMaintenanceInfo = maintenanceAPI.getMaintenanceInfo();
-            if (currentMaintenanceInfo.getMaintenanceState() != maintenanceInfo.getMaintenanceState()) {
+            MaintenanceDetails currentMaintenanceDetails = maintenanceAPI.getMaintenanceDetails();
+            if (currentMaintenanceDetails.getMaintenanceState() != maintenanceInfo.getMaintenanceState()) {
                 //only enable/disable maintenance mode if needed
-                if (MaintenanceInfo.State.ENABLED == maintenanceInfo.getMaintenanceState()) {
+                if (MaintenanceDetails.State.ENABLED == maintenanceInfo.getMaintenanceState()) {
                     maintenanceAPI.enableMaintenanceMode();
                 } else {
                     maintenanceAPI.disableMaintenanceMode();
                 }
             }
-            if (currentMaintenanceInfo.isMaintenanceMessageActive() != maintenanceInfo
+            if (currentMaintenanceDetails.isMaintenanceMessageActive() != maintenanceInfo
                     .isMaintenanceMessageActive()) {
                 //only update if different
                 if (maintenanceInfo.isMaintenanceMessageActive()) {
@@ -81,12 +82,12 @@ public class MaintenanceController {
                     maintenanceAPI.disableMaintenanceMessage();
                 }
             }
-            if (currentMaintenanceInfo.getMaintenanceMessage() != maintenanceInfo
+            if (currentMaintenanceDetails.getMaintenanceMessage() != maintenanceInfo
                     .getMaintenanceMessage()) {
                 //only update if different
                 maintenanceAPI.updateMaintenanceMessage(maintenanceInfo.getMaintenanceMessage());
             }
-            return maintenanceAPI.getMaintenanceInfo();
+            return maintenanceAPI.getMaintenanceDetails();
         } catch (BonitaException e) {
             String errorMessage = "Error while setting the maintenance state";
             log.error(errorMessage, e);

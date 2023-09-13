@@ -21,9 +21,10 @@ import javax.servlet.http.HttpSession;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.MaintenanceAPI;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.maintenance.MaintenanceInfo;
-import org.bonitasoft.engine.maintenance.impl.MaintenanceInfoImpl;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
+import org.bonitasoft.engine.maintenance.impl.MaintenanceDetailsImpl;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.web.rest.model.system.MaintenanceDetailsClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -52,16 +53,16 @@ public class MaintenanceControllerTest {
         APISession apiSession = mock(APISession.class);
         doReturn(apiSession).when(maintenanceController).getApiSession(session);
 
-        MaintenanceInfo maintenanceInfo = mock(MaintenanceInfo.class);
+        MaintenanceDetails maintenanceDetails = mock(MaintenanceDetails.class);
         doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
-        doReturn(maintenanceInfo).when(maintenanceAPI).getMaintenanceInfo();
+        doReturn(maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
         //when
-        MaintenanceInfo result = maintenanceController.getMaintenanceInfo(session);
+        MaintenanceDetails result = maintenanceController.getMaintenanceDetails(session);
 
         //then
-        verify(maintenanceAPI).getMaintenanceInfo();
-        assertSame(maintenanceInfo, result);
+        verify(maintenanceAPI).getMaintenanceDetails();
+        assertSame(maintenanceDetails, result);
     }
 
     @Test
@@ -70,16 +71,16 @@ public class MaintenanceControllerTest {
         APISession apiSession = mock(APISession.class);
         doReturn(apiSession).when(maintenanceController).getApiSession(session);
 
-        MaintenanceInfo maintenanceInfo = MaintenanceInfoImpl.builder()
-                .maintenanceState(MaintenanceInfo.State.DISABLED)
+        MaintenanceDetails maintenanceDetails = MaintenanceDetailsImpl.builder()
+                .maintenanceState(MaintenanceDetails.State.DISABLED)
                 .maintenanceMessage(null)
                 .maintenanceMessageActive(false)
                 .build();
         doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
-        doReturn(maintenanceInfo).when(maintenanceAPI).getMaintenanceInfo();
+        doReturn(maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
-        MaintenanceInfoClient maintenanceInfoClient = new MaintenanceInfoClient(
-                MaintenanceInfo.State.ENABLED, "new Scheduled Maintenance msg", true);
+        MaintenanceDetailsClient maintenanceInfoClient = new MaintenanceDetailsClient(
+                MaintenanceDetails.State.ENABLED, "new Scheduled Maintenance msg", true);
 
         //when
         maintenanceController.changeMaintenanceState(maintenanceInfoClient, session);
@@ -98,16 +99,16 @@ public class MaintenanceControllerTest {
         APISession apiSession = mock(APISession.class);
         doReturn(apiSession).when(maintenanceController).getApiSession(session);
 
-        MaintenanceInfo maintenanceInfo = MaintenanceInfoImpl.builder()
-                .maintenanceState(MaintenanceInfo.State.ENABLED)
+        MaintenanceDetails maintenanceDetails = MaintenanceDetailsImpl.builder()
+                .maintenanceState(MaintenanceDetails.State.ENABLED)
                 .maintenanceMessage("msg")
                 .maintenanceMessageActive(true)
                 .build();
         doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
-        doReturn(maintenanceInfo).when(maintenanceAPI).getMaintenanceInfo();
+        doReturn(maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
-        MaintenanceInfoClient maintenanceInfoClient = new MaintenanceInfoClient(
-                MaintenanceInfo.State.DISABLED, "new Scheduled Maintenance msg", false);
+        MaintenanceDetailsClient maintenanceInfoClient = new MaintenanceDetailsClient(
+                MaintenanceDetails.State.DISABLED, "new Scheduled Maintenance msg", false);
 
         //when
         maintenanceController.changeMaintenanceState(maintenanceInfoClient, session);
@@ -126,16 +127,16 @@ public class MaintenanceControllerTest {
         APISession apiSession = mock(APISession.class);
         doReturn(apiSession).when(maintenanceController).getApiSession(session);
 
-        MaintenanceInfo maintenanceInfo = MaintenanceInfoImpl.builder()
-                .maintenanceState(MaintenanceInfo.State.ENABLED)
+        MaintenanceDetails maintenanceDetails = MaintenanceDetailsImpl.builder()
+                .maintenanceState(MaintenanceDetails.State.ENABLED)
                 .maintenanceMessage("msg")
                 .maintenanceMessageActive(true)
                 .build();
         doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
-        doReturn(maintenanceInfo).when(maintenanceAPI).getMaintenanceInfo();
+        doReturn(maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
-        MaintenanceInfoClient maintenanceInfoClient = new MaintenanceInfoClient(
-                MaintenanceInfo.State.DISABLED, "msg", true);
+        MaintenanceDetailsClient maintenanceInfoClient = new MaintenanceDetailsClient(
+                MaintenanceDetails.State.DISABLED, "msg", true);
 
         //when
         maintenanceController.changeMaintenanceState(maintenanceInfoClient, session);
@@ -154,16 +155,16 @@ public class MaintenanceControllerTest {
         APISession apiSession = mock(APISession.class);
         doReturn(apiSession).when(maintenanceController).getApiSession(session);
 
-        MaintenanceInfo maintenanceInfo = MaintenanceInfoImpl.builder()
-                .maintenanceState(MaintenanceInfo.State.DISABLED)
+        MaintenanceDetails maintenanceDetails = MaintenanceDetailsImpl.builder()
+                .maintenanceState(MaintenanceDetails.State.DISABLED)
                 .maintenanceMessage("msg")
                 .maintenanceMessageActive(true)
                 .build();
         doReturn(maintenanceAPI).when(maintenanceController).getMaintenanceAPI(apiSession);
-        doReturn(maintenanceInfo).when(maintenanceAPI).getMaintenanceInfo();
+        doReturn(maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
-        MaintenanceInfoClient maintenanceInfoClient = new MaintenanceInfoClient(
-                MaintenanceInfo.State.DISABLED, "msg", false);
+        MaintenanceDetailsClient maintenanceInfoClient = new MaintenanceDetailsClient(
+                MaintenanceDetails.State.DISABLED, "msg", false);
 
         //when
         maintenanceController.changeMaintenanceState(maintenanceInfoClient, session);
@@ -189,7 +190,7 @@ public class MaintenanceControllerTest {
 
         //when
         exception = assertThrows(ResponseStatusException.class,
-                () -> maintenanceController.getMaintenanceInfo(session));
+                () -> maintenanceController.getMaintenanceDetails(session));
         //then
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
 

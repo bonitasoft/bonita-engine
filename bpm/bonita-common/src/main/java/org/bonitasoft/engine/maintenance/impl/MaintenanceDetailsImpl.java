@@ -11,17 +11,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.maintenance;
+package org.bonitasoft.engine.maintenance.impl;
 
-import org.bonitasoft.engine.exception.NotFoundException;
+import lombok.Builder;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 
-public class MaintenanceInfoNotFoundException extends NotFoundException {
+@Builder
+public class MaintenanceDetailsImpl implements MaintenanceDetails {
 
-    public MaintenanceInfoNotFoundException(String message) {
-        super(message);
+    private State maintenanceState;
+    private String maintenanceMessage;
+    private boolean maintenanceMessageActive;
+
+    public State getMaintenanceState() {
+        return maintenanceState;
     }
 
-    public MaintenanceInfoNotFoundException(final String message, final Throwable cause) {
-        super(message, cause);
+    @Override
+    public String getMaintenanceMessage() {
+        return maintenanceMessage;
+    }
+
+    public boolean isMaintenanceMessageActive() {
+        return maintenanceMessageActive;
     }
 }
