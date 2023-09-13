@@ -146,7 +146,7 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
     protected void checkPlatformMaintenanceState(final HttpServletRequestAccessor requestAccessor)
             throws PlatformUnderMaintenanceException, BonitaException {
         try {
-            if (isPlaformInMaintenance(requestAccessor)) {
+            if (!isLoggedInAsTechnicalUser(requestAccessor) && isPlaformInMaintenance(requestAccessor)) {
                 throw new PlatformUnderMaintenanceException("Platform is under Maintenance");
             }
         } catch (BonitaException e) {
@@ -155,6 +155,10 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
             }
             throw e;
         }
+    }
+
+    protected boolean isLoggedInAsTechnicalUser(HttpServletRequestAccessor requestAccessor) {
+        return requestAccessor.getApiSession() != null && requestAccessor.getApiSession().isTechnicalUser();
     }
 
     protected boolean isPlaformInMaintenance(HttpServletRequestAccessor requestAccessor) throws BonitaException {
