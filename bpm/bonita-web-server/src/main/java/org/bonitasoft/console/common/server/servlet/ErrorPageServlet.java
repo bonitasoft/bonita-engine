@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.console.common.server.utils.PlatformManagementUtils;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
-import org.bonitasoft.console.common.server.utils.TenantsManagementUtils;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +108,7 @@ public class ErrorPageServlet extends HttpServlet {
     protected boolean isPlatformHealthy() {
         try {
             PlatformManagementUtils platformManagementUtils = new PlatformManagementUtils();
-            return platformManagementUtils.isPlatformAvailable() && !TenantsManagementUtils.isDefaultTenantPaused();
+            return platformManagementUtils.isPlatformAvailable();
         } catch (Exception e) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Platform is not healthy.");
