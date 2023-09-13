@@ -35,6 +35,7 @@ import org.bonitasoft.engine.tenant.TenantStateManager;
 /**
  * This API gives access to maintenance administration tasks.
  */
+@AvailableWhenTenantIsPaused
 public class MaintenanceAPIImpl implements MaintenanceAPI {
 
     public MaintenanceAPIImpl() {
