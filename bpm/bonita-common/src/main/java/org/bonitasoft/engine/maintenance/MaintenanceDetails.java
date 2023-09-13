@@ -18,7 +18,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 /**
  * This object holds maintenance details such as maintenance state and message.
  */
-public interface MaintenanceInfo extends BonitaObject {
+public interface MaintenanceDetails extends BonitaObject {
 
     public State getMaintenanceState();
 

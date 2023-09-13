@@ -16,7 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-import org.bonitasoft.engine.maintenance.MaintenanceInfo;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -66,9 +66,9 @@ public class MaintenanceAPIImplTest {
         doReturn(tenant).when(platformService).getDefaultTenant();
         doReturn(platform).when(platformService).getPlatform();
         //when
-        MaintenanceInfo info = maintenanceAPI.getMaintenanceInfo();
+        MaintenanceDetails info = maintenanceAPI.getMaintenanceDetails();
         //then
-        assertThat(info.getMaintenanceState()).isEqualTo(MaintenanceInfo.State.ENABLED);
+        assertThat(info.getMaintenanceState()).isEqualTo(MaintenanceDetails.State.ENABLED);
         assertThat(info.getMaintenanceMessage()).isEqualTo(platform.getMaintenanceMessage());
         assertThat(info.isMaintenanceMessageActive()).isEqualTo(platform.isMaintenanceMessageActive());
     }

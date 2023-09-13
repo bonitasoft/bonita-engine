@@ -11,18 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.web.rest.server.api.system;
+package org.bonitasoft.web.rest.model.system;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.bonitasoft.engine.maintenance.MaintenanceInfo;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 
 /**
  * Client implementation object required for Json deserialization
  */
 @Data
 @AllArgsConstructor
-public class MaintenanceInfoClient implements MaintenanceInfo {
+public class MaintenanceDetailsClient implements MaintenanceDetails {
 
     private State maintenanceState;
     private String maintenanceMessage;

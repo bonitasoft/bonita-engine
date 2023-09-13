@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.maintenance.MaintenanceInfo;
-import org.bonitasoft.engine.maintenance.MaintenanceInfoNotFoundException;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
+import org.bonitasoft.engine.maintenance.MaintenanceDetailsNotFoundException;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 
 /**
@@ -25,13 +25,13 @@ import org.bonitasoft.engine.platform.PlatformNotFoundException;
 public interface MaintenanceAPI {
 
     /**
-     * Retrieve maintenance info details
+     * Retrieve platform maintenance details
      *
      * @return MaintenanceInfo
-     * @throws MaintenanceInfoNotFoundException
+     * @throws MaintenanceDetailsNotFoundException
      * @throws PlatformNotFoundException
      */
-    MaintenanceInfo getMaintenanceInfo() throws MaintenanceInfoNotFoundException, PlatformNotFoundException;
+    MaintenanceDetails getMaintenanceDetails() throws MaintenanceDetailsNotFoundException, PlatformNotFoundException;
 
     /**
      * Enable maintenance mode
