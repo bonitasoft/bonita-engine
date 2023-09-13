@@ -269,6 +269,23 @@ public class AuthenticationFilterTest {
     }
 
     @Test
+    public void testPlatformInMaintenanceWhithTechnicalUser() throws Exception {
+        when(httpRequest.getServletPath()).thenReturn("/apps");
+        when(httpRequest.getPathInfo()).thenReturn("/app/home");
+        doReturn(true).when(authenticationFilter).isPlaformInMaintenance(request);
+        when(httpSession.getAttribute(SessionUtil.API_SESSION_PARAM_KEY)).thenReturn(apiSession);
+        doReturn(true).when(apiSession).isTechnicalUser();
+        authenticationFilter.addRule(createPassingRule());
+
+        authenticationFilter.doAuthenticationFiltering(request, httpResponse, chain);
+
+        verify(authenticationManager, never()).getLoginPageURL(eq(request), anyString());
+        verify(chain).doFilter(httpRequest, httpResponse);
+        verify(authenticationFilter, never()).handlePlatformUnderMaintenanceException(eq(request), eq(httpResponse),
+                any(PlatformUnderMaintenanceException.class));
+    }
+
+    @Test
     public void testRedirectTo() throws Exception {
         final String context = "/bonita";
         when(httpRequest.getContextPath()).thenReturn(context);
