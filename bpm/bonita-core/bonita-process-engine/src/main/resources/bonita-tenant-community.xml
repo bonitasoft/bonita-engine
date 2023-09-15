@@ -17,7 +17,7 @@
     <bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
         <constructor-arg name="applicationName" value="BPM" />
         <!-- set Engine session duration (in ms) : -->
-        <property name="sessionDuration" value="${bonita.tenant.session.duration}" />
+        <property name="sessionDuration" value="${bonita.runtime.session.duration:${bonita.tenant.session.duration:3600000}}" />
     </bean>
 
     <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">

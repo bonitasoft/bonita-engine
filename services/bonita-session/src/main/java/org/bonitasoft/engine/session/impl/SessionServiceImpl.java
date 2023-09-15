@@ -115,9 +115,10 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void setSessionDuration(final long duration) {
         if (duration <= 0) {
-            throw new IllegalArgumentException("The duration must be greater then 0");
+            throw new IllegalArgumentException("The duration must be greater than 0");
         }
         sessionDuration = duration;
+        log.debug("Session duration set to {}", sessionDuration);
     }
 
     @Override

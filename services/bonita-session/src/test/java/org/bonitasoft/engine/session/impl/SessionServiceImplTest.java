@@ -15,10 +15,7 @@ package org.bonitasoft.engine.session.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
@@ -27,13 +24,15 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SessionServiceImplTest {
 
     private static final long SESSION_ID = 1258L;
@@ -53,7 +52,6 @@ public class SessionServiceImplTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         sSession = SSession.builder().id(SESSION_ID).tenantId(TENANT_ID).userName(USER_NAME).userId(USER_ID).build();
     }
 
@@ -93,14 +91,14 @@ public class SessionServiceImplTest {
 
     @Test
     public final void deleteSessionsOfTenant() {
-        sessionServiceImpl.deleteSessionsOfTenant(12l);
-        verify(sessionProvider, times(1)).deleteSessionsOfTenant(12l, false);
+        sessionServiceImpl.deleteSessionsOfTenant(12L);
+        verify(sessionProvider, times(1)).deleteSessionsOfTenant(12L, false);
     }
 
     @Test
     public final void deleteSessionsOfTenantExceptTechnicalUser() {
-        sessionServiceImpl.deleteSessionsOfTenantExceptTechnicalUser(12l);
-        verify(sessionProvider, times(1)).deleteSessionsOfTenant(12l, true);
+        sessionServiceImpl.deleteSessionsOfTenantExceptTechnicalUser(12L);
+        verify(sessionProvider, times(1)).deleteSessionsOfTenant(12L, true);
     }
 
     @Test
@@ -116,10 +114,9 @@ public class SessionServiceImplTest {
 
     @Test
     public final void should_getLoggedUserFromSession_return_minus_1_when_there_is_no_session()
-            throws SessionIdNotSetException, SSessionNotFoundException {
+            throws SessionIdNotSetException {
         //given
         doThrow(SessionIdNotSetException.class).when(sessionAccessor).getSessionId();
-        doReturn(sSession).when(sessionProvider).getSession(SESSION_ID);
         //when
         final long loggedUserFromSession = sessionServiceImpl.getLoggedUserFromSession(sessionAccessor);
         //when
