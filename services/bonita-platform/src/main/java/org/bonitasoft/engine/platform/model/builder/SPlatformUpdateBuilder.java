@@ -20,9 +20,9 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface SPlatformUpdateBuilder {
 
-    String MAINTENANCE_MESSAGE = "maintenance_message";
+    String MAINTENANCE_MESSAGE = "maintenanceMessage";
 
-    String MAINTENANCE_MESSAGE_ACTIVE = "is_maintenance_message_active";
+    String MAINTENANCE_MESSAGE_ACTIVE = "maintenanceMessageActive";
 
     SPlatformUpdateBuilder setMaintenanceMessageActive(boolean state);
 

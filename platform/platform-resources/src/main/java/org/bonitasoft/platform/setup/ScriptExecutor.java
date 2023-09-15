@@ -105,12 +105,12 @@ public class ScriptExecutor {
     protected void insertPlatform() {
         String version = versionService.getPlatformSetupVersion();
         String databaseSchemaVersion = versionService.getSupportedDatabaseSchemaVersion();
-        final String sql = String.format("INSERT INTO platform " +
-                "(id, version, initial_bonita_version, application_version, maintenance_message_active, created, created_by) "
-                +
-                "VALUES (1, '%s', '%s', '0.0.0', false, %d, 'platformAdmin')",
-                databaseSchemaVersion, version, System.currentTimeMillis());
-        new JdbcTemplate(datasource).update(sql);
+
+        final String sql = "INSERT INTO platform (id, version, initial_bonita_version, application_version, maintenance_message_active, created, created_by) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        new JdbcTemplate(datasource).update(sql, 1L, databaseSchemaVersion, version, "0.0.0", false,
+                System.currentTimeMillis(), "platformAdmin");
     }
 
     private void insertTenant() {

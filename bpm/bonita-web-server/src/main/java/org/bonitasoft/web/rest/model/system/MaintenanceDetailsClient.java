@@ -15,18 +15,20 @@ package org.bonitasoft.web.rest.model.system;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 
 /**
  * Client implementation object required for Json deserialization
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class MaintenanceDetailsClient implements MaintenanceDetails {
 
     private State maintenanceState;
     private String maintenanceMessage;
-    private boolean maintenanceMessageActive;
+    private Boolean maintenanceMessageActive;
 
     @Override
     public State getMaintenanceState() {
@@ -39,7 +41,7 @@ public class MaintenanceDetailsClient implements MaintenanceDetails {
     }
 
     @Override
-    public boolean isMaintenanceMessageActive() {
+    public Boolean isMaintenanceMessageActive() {
         return maintenanceMessageActive;
     }
 }

@@ -24,7 +24,7 @@ public interface MaintenanceDetails extends BonitaObject {
 
     public String getMaintenanceMessage();
 
-    public boolean isMaintenanceMessageActive();
+    public Boolean isMaintenanceMessageActive();
 
     /**
      * Activation state of platform maintenance

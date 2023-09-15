@@ -65,7 +65,8 @@ public class MaintenanceController {
         try {
             MaintenanceAPI maintenanceAPI = getMaintenanceAPI(apiSession);
             MaintenanceDetails currentMaintenanceDetails = maintenanceAPI.getMaintenanceDetails();
-            if (currentMaintenanceDetails.getMaintenanceState() != maintenanceInfo.getMaintenanceState()) {
+            if (maintenanceInfo.getMaintenanceState() != null
+                    && currentMaintenanceDetails.getMaintenanceState() != maintenanceInfo.getMaintenanceState()) {
                 //only enable/disable maintenance mode if needed
                 if (MaintenanceDetails.State.ENABLED == maintenanceInfo.getMaintenanceState()) {
                     maintenanceAPI.enableMaintenanceMode();
@@ -73,8 +74,9 @@ public class MaintenanceController {
                     maintenanceAPI.disableMaintenanceMode();
                 }
             }
-            if (currentMaintenanceDetails.isMaintenanceMessageActive() != maintenanceInfo
-                    .isMaintenanceMessageActive()) {
+            if (maintenanceInfo.isMaintenanceMessageActive() != null
+                    && currentMaintenanceDetails.isMaintenanceMessageActive() != maintenanceInfo
+                            .isMaintenanceMessageActive()) {
                 //only update if different
                 if (maintenanceInfo.isMaintenanceMessageActive()) {
                     maintenanceAPI.enableMaintenanceMessage();
@@ -82,8 +84,9 @@ public class MaintenanceController {
                     maintenanceAPI.disableMaintenanceMessage();
                 }
             }
-            if (currentMaintenanceDetails.getMaintenanceMessage() != maintenanceInfo
-                    .getMaintenanceMessage()) {
+            if (maintenanceInfo.getMaintenanceMessage() != null
+                    && currentMaintenanceDetails.getMaintenanceMessage() != maintenanceInfo
+                            .getMaintenanceMessage()) {
                 //only update if different
                 maintenanceAPI.updateMaintenanceMessage(maintenanceInfo.getMaintenanceMessage());
             }
