@@ -23,6 +23,7 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.tenant.TenantStateManager;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,8 @@ public class MaintenanceAPIImplTest {
     private PlatformService platformService;
     @Mock
     private TenantStateManager tenantStateManager;
+    @Mock
+    private TransactionService transactionService;
     @Spy
     @InjectMocks
     private MaintenanceAPIImpl maintenanceAPI;
@@ -51,6 +54,7 @@ public class MaintenanceAPIImplTest {
     public void setup() throws Exception {
         doReturn(platformService).when(serviceAccessor).getPlatformService();
         doReturn(tenantStateManager).when(serviceAccessor).getTenantStateManager();
+        doReturn(transactionService).when(serviceAccessor).getTransactionService();
         doReturn(serviceAccessor).when(maintenanceAPI).getServiceAccessor();
     }
 

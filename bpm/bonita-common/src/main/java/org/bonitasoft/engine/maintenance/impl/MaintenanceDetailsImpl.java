@@ -32,7 +32,7 @@ public class MaintenanceDetailsImpl implements MaintenanceDetails {
         return maintenanceMessage;
     }
 
-    public boolean isMaintenanceMessageActive() {
+    public Boolean isMaintenanceMessageActive() {
         return maintenanceMessageActive;
     }
 }

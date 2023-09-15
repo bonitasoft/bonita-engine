@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.MaintenanceAPI;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.maintenance.MaintenanceDetails;
@@ -71,6 +72,7 @@ public class MaintenanceAPIImpl implements MaintenanceAPI {
     }
 
     @Override
+    @CustomTransactions
     public void enableMaintenanceMode() throws UpdateException {
         try {
             TenantStateManager tenantStateManager = getServiceAccessor().getTenantStateManager();
@@ -81,11 +83,17 @@ public class MaintenanceAPIImpl implements MaintenanceAPI {
     }
 
     @Override
+    @CustomTransactions
     public void disableMaintenanceMode() throws UpdateException {
         try {
             TenantStateManager tenantStateManager = getServiceAccessor().getTenantStateManager();
             tenantStateManager.resume();
-            disableMaintenanceMessage();
+
+            getServiceAccessor().getTransactionService().executeInTransaction(() -> {
+                disableMaintenanceMessage();
+                return null;
+            });
+
         } catch (Exception e) {
             throw new UpdateException(e);
         }

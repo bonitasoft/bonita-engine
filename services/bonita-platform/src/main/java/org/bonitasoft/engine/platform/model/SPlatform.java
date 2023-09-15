@@ -40,8 +40,8 @@ public class SPlatform implements PlatformPersistentObject {
     public static final String PREVIOUS_VERSION = "previousVersion";
     public static final String VERSION = "version";
     public static final String INFORMATION = "information";
-    public static final String MAINTENANCE_MESSAGE = "maintenance_message";
-    public static final String MAINTENANCE_MESSAGE_ACTIVE = "maintenance_message_active";
+    public static final String MAINTENANCE_MESSAGE = "maintenanceMessage";
+    public static final String MAINTENANCE_MESSAGE_ACTIVE = "maintenanceMessageActive";
 
     @Id
     private long id;
