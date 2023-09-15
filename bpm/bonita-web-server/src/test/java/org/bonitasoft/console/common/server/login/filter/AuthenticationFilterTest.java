@@ -253,7 +253,7 @@ public class AuthenticationFilterTest {
     }
 
     @Test
-    public void testPlatformInMaintenance() throws Exception {
+    public void should_redirect_to_503_error_page_in_maintenance() throws Exception {
         when(httpRequest.getServletPath()).thenReturn("/apps");
         when(httpRequest.getPathInfo()).thenReturn("/app/home");
         doReturn(true).when(authenticationFilter).isPlaformInMaintenance(request);
@@ -269,7 +269,21 @@ public class AuthenticationFilterTest {
     }
 
     @Test
-    public void testPlatformInMaintenanceWhithTechnicalUser() throws Exception {
+    public void should_be_able_to_display_error_pages_in_maintenance() throws Exception {
+        when(httpRequest.getServletPath()).thenReturn("/portal/resource/app");
+        when(httpRequest.getPathInfo()).thenReturn("/appDirectoryBonita/error-503/content/");
+        doReturn(true).when(authenticationFilter).isPlaformInMaintenance(request);
+        authenticationFilter.addRule(createPassingRule());
+
+        authenticationFilter.doAuthenticationFiltering(request, httpResponse, chain);
+
+        verify(authenticationManager, never()).getLoginPageURL(eq(request), anyString());
+        verify(chain).doFilter(httpRequest, httpResponse);
+        verify(httpResponse, never()).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE), anyString());
+    }
+
+    @Test
+    public void should_let_technical_user_pass_when_platform_is_in_maintenance() throws Exception {
         when(httpRequest.getServletPath()).thenReturn("/apps");
         when(httpRequest.getPathInfo()).thenReturn("/app/home");
         doReturn(true).when(authenticationFilter).isPlaformInMaintenance(request);

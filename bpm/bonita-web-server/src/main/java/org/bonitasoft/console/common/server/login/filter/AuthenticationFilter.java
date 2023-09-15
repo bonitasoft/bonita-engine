@@ -52,6 +52,8 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
 
     protected static final String USER_NOT_FOUND_JSP = "/usernotfound.jsp";
 
+    public static final String ERROR_PAGE_REQUEST_PATH_REGEX = "/portal/resource/app/appDirectoryBonita/error-\\d+/content/.*";
+
     protected boolean redirectWhenUnauthorized;
 
     /**
@@ -146,7 +148,9 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
     protected void checkPlatformMaintenanceState(final HttpServletRequestAccessor requestAccessor)
             throws PlatformUnderMaintenanceException, BonitaException {
         try {
-            if (!isLoggedInAsTechnicalUser(requestAccessor) && isPlaformInMaintenance(requestAccessor)) {
+            if (!isLoggedInAsTechnicalUser(requestAccessor)
+                    && isPlaformInMaintenance(requestAccessor)
+                    && !isAccessingErrorPage(requestAccessor)) {
                 throw new PlatformUnderMaintenanceException("Platform is under Maintenance");
             }
         } catch (BonitaException e) {
@@ -155,6 +159,15 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
             }
             throw e;
         }
+    }
+
+    protected boolean isAccessingErrorPage(HttpServletRequestAccessor requestAccessor) {
+        HttpServletRequest httpRequest = requestAccessor.asHttpServletRequest();
+        if (httpRequest.getPathInfo() != null) {
+            String requestPath = httpRequest.getServletPath() + httpRequest.getPathInfo();
+            return requestPath.matches(ERROR_PAGE_REQUEST_PATH_REGEX);
+        }
+        return false;
     }
 
     protected boolean isLoggedInAsTechnicalUser(HttpServletRequestAccessor requestAccessor) {
