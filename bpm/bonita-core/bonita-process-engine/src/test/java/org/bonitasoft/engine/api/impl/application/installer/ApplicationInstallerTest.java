@@ -44,7 +44,6 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +75,10 @@ import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
+import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
+import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder.ApplicationBuilder;
+import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.io.FileOperations;
@@ -164,16 +167,18 @@ public class ApplicationInstallerTest {
 
     @Test
     public void should_install_application_containing_living_applications() throws Exception {
-        File application = createTempFile("application", "xml", "content".getBytes());
+        File application = createTempFile("application", "xml",
+                applicationContent(new ApplicationBuilder("myApp", "My App", "1.0").create()));
         doNothing().when(applicationInstaller).installOrganization(any(), any());
-        doReturn(emptyList()).when(applicationInstaller).importApplications(any(), eq(FAIL_ON_DUPLICATES));
+        doReturn(new ImportStatus("application")).when(applicationInstaller).importApplication(any(), any(),
+                eq(FAIL_ON_DUPLICATES));
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addApplication(application);
             applicationInstaller.install(applicationArchive, "1.0.0");
         }
 
-        verify(applicationInstaller).importApplications("content".getBytes(), FAIL_ON_DUPLICATES);
+        verify(applicationInstaller).importApplication(any(), any(), eq(FAIL_ON_DUPLICATES));
     }
 
     @Test
@@ -182,20 +187,20 @@ public class ApplicationInstallerTest {
         final ExecutionResult result = new ExecutionResult();
         ImportStatus importStatus = new ImportStatus("application");
         importStatus.addError(new ImportError("page", ImportError.Type.PAGE));
-        ImportStatus importStatus2 = new ImportStatus("application");
-        importStatus2.addError(new ImportError("test", ImportError.Type.PAGE));
-        List<ImportStatus> importStatuses = Arrays.asList(importStatus, importStatus2);
-        File application = createTempFile("application", "xml", "content".getBytes());
-        doReturn(importStatuses).when(applicationInstaller).importApplications(any(), eq(FAIL_ON_DUPLICATES));
+        importStatus.addError(new ImportError("test", ImportError.Type.PAGE));
+        File applicationFile = createTempFile("application", "xml",
+                applicationContent(new ApplicationBuilder("myApp", "My App", "1.0").create()));
+
+        doReturn(importStatus).when(applicationInstaller).importApplication(any(), any(), eq(FAIL_ON_DUPLICATES));
 
         try (var applicationArchive = new ApplicationArchive()) {
-            applicationArchive.addApplication(application);
+            applicationArchive.addApplication(applicationFile);
             assertThatExceptionOfType(ApplicationInstallationException.class)
                     .isThrownBy(() -> applicationInstaller.installLivingApplications(applicationArchive, result,
                             FAIL_ON_DUPLICATES))
                     .withMessage("At least one application failed to be installed. Canceling installation.");
         }
-        verify(applicationInstaller).importApplications("content".getBytes(), FAIL_ON_DUPLICATES);
+        verify(applicationInstaller).importApplication(any(), any(), eq(FAIL_ON_DUPLICATES));
 
         assertThat(result.getAllStatus()).hasSize(3).extracting("code")
                 .containsOnly(LIVING_APP_REFERENCES_UNKNOWN_PAGE);
@@ -204,6 +209,12 @@ public class ApplicationInstallerTest {
                         ApplicationInstaller.WARNING_MISSING_PAGE_MESSAGE);
         assertThat(result.getAllStatus()).extracting("level")
                 .containsExactly(ERROR, ERROR, WARNING);
+    }
+
+    private byte[] applicationContent(ApplicationNode application) throws JAXBException, IOException, SAXException {
+        var container = new ApplicationNodeContainer();
+        container.addApplication(application);
+        return new ApplicationNodeContainerConverter().marshallToXML(container);
     }
 
     @Test

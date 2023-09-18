@@ -34,7 +34,8 @@ public class ApplicationArchiveReaderTest {
 
     ArtifactTypeDetector artifactTypeDetector = new ArtifactTypeDetector(new BdmDetector(),
             new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
-            new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector());
+            new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector(),
+            new IconDetector());
     private final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
             artifactTypeDetector);
 

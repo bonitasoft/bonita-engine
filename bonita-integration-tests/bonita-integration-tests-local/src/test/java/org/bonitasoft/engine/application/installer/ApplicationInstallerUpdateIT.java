@@ -64,7 +64,8 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
                         new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
-                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector()));
+                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector(),
+                        new IconDetector()));
 
         initFirstInstall();
     }

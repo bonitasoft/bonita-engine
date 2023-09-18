@@ -72,7 +72,7 @@ public class ApplicationImporter {
         }
     }
 
-    ImportStatus importApplication(ApplicationNode applicationNode, boolean editable, long createdBy,
+    public ImportStatus importApplication(ApplicationNode applicationNode, boolean editable, long createdBy,
             byte[] iconContent, String iconMimeType, boolean addIfMissing, ApplicationImportStrategy strategy)
             throws ImportException, AlreadyExistsException {
         try {

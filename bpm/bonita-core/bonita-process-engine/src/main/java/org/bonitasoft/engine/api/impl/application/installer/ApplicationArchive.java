@@ -21,8 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Singular;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,6 +41,7 @@ public class ApplicationArchive implements AutoCloseable {
     private List<File> layouts = new ArrayList<>();
     private List<File> themes = new ArrayList<>();
     private List<File> applications = new ArrayList<>();
+    private List<File> applicationIcons = new ArrayList<>();
 
     private List<File> ignoredFiles = new ArrayList<>();
 
@@ -64,6 +70,11 @@ public class ApplicationArchive implements AutoCloseable {
 
     public ApplicationArchive addApplication(File livingApplication) {
         applications.add(livingApplication);
+        return this;
+    }
+
+    public ApplicationArchive addApplicationIcon(File icon) {
+        applicationIcons.add(icon);
         return this;
     }
 
@@ -114,6 +125,7 @@ public class ApplicationArchive implements AutoCloseable {
         deletePhysicalFilesFromList(layouts);
         deletePhysicalFilesFromList(themes);
         deletePhysicalFilesFromList(applications);
+        deletePhysicalFilesFromList(applicationIcons);
         deletePhysicalFilesFromList(ignoredFiles);
     }
 
