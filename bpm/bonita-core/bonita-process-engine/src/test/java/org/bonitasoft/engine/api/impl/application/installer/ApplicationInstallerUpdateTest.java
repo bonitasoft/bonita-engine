@@ -29,7 +29,10 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
+import javax.xml.bind.JAXBException;
+
 import org.assertj.core.util.Lists;
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.ProcessDeploymentAPIDelegate;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -38,6 +41,10 @@ import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
+import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
+import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder.ApplicationBuilder;
+import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.io.FileOperations;
@@ -50,6 +57,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.xml.sax.SAXException;
 
 /**
  * @author Danila Mazour
@@ -122,8 +130,10 @@ public class ApplicationInstallerUpdateTest {
 
     @Test
     public void should_update_application_containing_living_applications() throws Exception {
-        File application = createTempFile("application", "xml", "content".getBytes());
-        doReturn(emptyList()).when(applicationInstaller).importApplications(any(), eq(REPLACE_DUPLICATES));
+        File application = createTempFile("application", "xml",
+                applicationContent(new ApplicationBuilder("myApp", "My App", "1.0").create()));
+        doReturn(new ImportStatus("application")).when(applicationInstaller).importApplication(any(), any(),
+                eq(REPLACE_DUPLICATES));
         doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
         try (var applicationArchive = new ApplicationArchive()) {
@@ -131,7 +141,13 @@ public class ApplicationInstallerUpdateTest {
             applicationInstaller.update(applicationArchive, "1.0.1");
         }
 
-        verify(applicationInstaller).importApplications("content".getBytes(), REPLACE_DUPLICATES);
+        verify(applicationInstaller).importApplication(any(), any(), eq(REPLACE_DUPLICATES));
+    }
+
+    private byte[] applicationContent(ApplicationNode application) throws JAXBException, IOException, SAXException {
+        var container = new ApplicationNodeContainer();
+        container.addApplication(application);
+        return new ApplicationNodeContainerConverter().marshallToXML(container);
     }
 
     @Test

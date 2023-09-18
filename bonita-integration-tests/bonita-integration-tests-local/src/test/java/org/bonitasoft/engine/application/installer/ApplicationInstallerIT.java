@@ -25,6 +25,7 @@ import org.bonitasoft.engine.api.impl.application.installer.ApplicationInstaller
 import org.bonitasoft.engine.api.impl.application.installer.detector.ArtifactTypeDetector;
 import org.bonitasoft.engine.api.impl.application.installer.detector.BdmDetector;
 import org.bonitasoft.engine.api.impl.application.installer.detector.CustomPageDetector;
+import org.bonitasoft.engine.api.impl.application.installer.detector.IconDetector;
 import org.bonitasoft.engine.api.impl.application.installer.detector.LayoutDetector;
 import org.bonitasoft.engine.api.impl.application.installer.detector.LivingApplicationDetector;
 import org.bonitasoft.engine.api.impl.application.installer.detector.OrganizationDetector;
@@ -69,7 +70,8 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
                         new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
-                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector()));
+                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector(),
+                        new IconDetector()));
 
         // when:
         try (var applicationAsStream = ApplicationInstallerIT.class.getResourceAsStream("/customer-application.zip")) {
@@ -110,7 +112,8 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         final ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(
                 new ArtifactTypeDetector(new BdmDetector(),
                         new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
-                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector()));
+                        new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(), new LayoutDetector(),
+                        new IconDetector()));
 
         // when:
         try (var applicationAsStream = ApplicationInstallerIT.class
@@ -139,7 +142,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
                 new ArtifactTypeDetector(new BdmDetector(),
                         new LivingApplicationDetector(), new OrganizationDetector(), new CustomPageDetector(),
                         new ProcessDetector(), new ThemeDetector(), new PageAndFormDetector(),
-                        new LayoutDetector()));
+                        new LayoutDetector(), new IconDetector()));
 
         try (var applicationAsStream = ApplicationInstallerIT.class
                 .getResourceAsStream("/empty-customer-application.zip")) {

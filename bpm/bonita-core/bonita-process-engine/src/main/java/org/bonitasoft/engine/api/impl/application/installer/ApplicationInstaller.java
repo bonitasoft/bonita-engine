@@ -17,9 +17,29 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.bonitasoft.engine.api.result.Status.*;
-import static org.bonitasoft.engine.api.result.StatusCode.*;
-import static org.bonitasoft.engine.api.result.StatusContext.*;
+import static org.bonitasoft.engine.api.result.Status.errorStatus;
+import static org.bonitasoft.engine.api.result.Status.infoStatus;
+import static org.bonitasoft.engine.api.result.Status.warningStatus;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_DEPLOYMENT;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_APPLICATION_PAGE;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_LAYOUT;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PAGE;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PROFILE;
+import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_THEME;
+import static org.bonitasoft.engine.api.result.StatusCode.ORGANIZATION_IMPORT_WARNING;
+import static org.bonitasoft.engine.api.result.StatusCode.PAGE_DEPLOYMENT_CREATE_NEW;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_CREATE_NEW;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_DISABLEMENT_OK;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_KO;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_OK;
+import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_SKIP_INSTALL;
+import static org.bonitasoft.engine.api.result.StatusContext.LIVING_APPLICATION_IMPORT_STATUS_KEY;
+import static org.bonitasoft.engine.api.result.StatusContext.LIVING_APPLICATION_INVALID_ELEMENT_NAME;
+import static org.bonitasoft.engine.api.result.StatusContext.LIVING_APPLICATION_INVALID_ELEMENT_TYPE;
+import static org.bonitasoft.engine.api.result.StatusContext.LIVING_APPLICATION_TOKEN_KEY;
+import static org.bonitasoft.engine.api.result.StatusContext.PAGE_NAME_KEY;
+import static org.bonitasoft.engine.api.result.StatusContext.PROCESS_NAME_KEY;
+import static org.bonitasoft.engine.api.result.StatusContext.PROCESS_VERSION_KEY;
 import static org.bonitasoft.engine.bpm.process.ActivationState.DISABLED;
 import static org.bonitasoft.engine.bpm.process.ConfigurationState.RESOLVED;
 import static org.bonitasoft.engine.business.application.ApplicationImportPolicy.FAIL_ON_DUPLICATES;
@@ -30,18 +50,24 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBException;
+
+import lombok.Builder;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ImportError;
@@ -64,8 +90,10 @@ import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
+import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
+import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
@@ -104,6 +132,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
+import org.xml.sax.SAXException;
 
 /**
  * Main entry point to deploy an {@link ApplicationArchive}.
@@ -133,6 +162,7 @@ public class ApplicationInstaller {
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     private final ApplicationImporter applicationImporter;
     private final Long tenantId;
+    private final ApplicationNodeContainerConverter appXmlConverter = new ApplicationNodeContainerConverter();
 
     @VisibleForTesting
     static final String WARNING_MISSING_PAGE_MESSAGE = "If your are using pages from Bonita Admin or User applications, "
@@ -509,13 +539,15 @@ public class ApplicationInstaller {
             ApplicationImportPolicy policy)
             throws AlreadyExistsException, ImportException, ApplicationInstallationException {
         try {
+            boolean atLeastOneBlockingProblem = false;
+            var displaySpecificErrorMessage = new AtomicBoolean(false);
             for (File livingApplicationFile : applicationArchive.getApplications()) {
                 log.info("Installing Living Application from file '{}'", livingApplicationFile.getName());
-                final List<ImportStatus> importStatusList = importApplications(
-                        Files.readAllBytes(livingApplicationFile.toPath()), policy);
-                boolean atLeastOneBlockingProblem = false;
-                AtomicBoolean displaySpecificErrorMessage = new AtomicBoolean(false);
-                for (ImportStatus status : importStatusList) {
+                var appContainer = appXmlConverter
+                        .unmarshallFromXML(Files.readAllBytes(livingApplicationFile.toPath()));
+                for (var application : appContainer.getApplications()) {
+                    var status = importApplication(application,
+                            getIconContent(application, applicationArchive), policy);
                     final Map<String, Serializable> context = new HashMap<>();
                     context.put(LIVING_APPLICATION_TOKEN_KEY, status.getName());
                     context.put(LIVING_APPLICATION_IMPORT_STATUS_KEY, status.getStatus());
@@ -535,22 +567,50 @@ public class ApplicationInstaller {
                     }
 
                     executionResult.addStatus(
-                            infoStatus(LIVING_APP_DEPLOYMENT, format("Application '%s' has been %s", status.getName(),
-                                    status.getStatus().name().toLowerCase()), context));
-
-                }
-                if (atLeastOneBlockingProblem) {
-                    if (displaySpecificErrorMessage.get()) {
-                        executionResult.addStatus(
-                                warningStatus(LIVING_APP_REFERENCES_UNKNOWN_PAGE, WARNING_MISSING_PAGE_MESSAGE, null));
-                    }
-                    throw new ApplicationInstallationException(
-                            "At least one application failed to be installed. Canceling installation.");
+                            infoStatus(LIVING_APP_DEPLOYMENT,
+                                    format("Application '%s' has been %s", status.getName(),
+                                            status.getStatus().name().toLowerCase()),
+                                    context));
                 }
             }
-        } catch (IOException e) {
+
+            if (atLeastOneBlockingProblem) {
+                if (displaySpecificErrorMessage.get()) {
+                    executionResult.addStatus(
+                            warningStatus(LIVING_APP_REFERENCES_UNKNOWN_PAGE, WARNING_MISSING_PAGE_MESSAGE,
+                                    null));
+                }
+                throw new ApplicationInstallationException(
+                        "At least one application failed to be installed. Canceling installation.");
+            }
+        } catch (IOException | JAXBException | SAXException e) {
             throw new ImportException(e);
         }
+    }
+
+    private IconContent getIconContent(ApplicationNode application, ApplicationArchive applicationArchive) {
+        var iconPath = application.getIconPath();
+        if (iconPath != null && !iconPath.isBlank()) {
+            var icon = applicationArchive.getApplicationIcons().stream()
+                    .filter(iconFile -> Objects.equals(iconPath, iconFile.getName()))
+                    .findFirst()
+                    .map(File::toPath)
+                    .orElse(null);
+            try {
+                if (icon != null) {
+                    log.info("Application icon {} found for {}", icon.getFileName().toString(),
+                            application.getDisplayName());
+                    var bytes = Files.readAllBytes(icon);
+                    return IconContent.builder()
+                            .bytes(bytes)
+                            .mimeType(URLConnection.guessContentTypeFromName(icon.getFileName().toString()))
+                            .build();
+                }
+            } catch (IOException e) {
+                log.warn("Failed to read icon {}", icon, e);
+            }
+        }
+        return IconContent.builder().build();
     }
 
     private Status buildErrorStatus(ImportError importError, @NonNull String applicationName) {
@@ -584,10 +644,12 @@ public class ApplicationInstaller {
                 context);
     }
 
-    List<ImportStatus> importApplications(final byte[] xmlContent, ApplicationImportPolicy policy)
+    ImportStatus importApplication(final ApplicationNode application, IconContent iconContent,
+            ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException {
-        return applicationImporter.importApplications(xmlContent, null, null,
-                SessionService.SYSTEM_ID,
+        return applicationImporter.importApplication(application, true, SessionService.SYSTEM_ID,
+                iconContent.getBytes(), iconContent.getMimeType(),
+                true,
                 new StrategySelector().selectStrategy(policy));
     }
 
@@ -818,5 +880,13 @@ public class ApplicationInstaller {
             log.info("[{}] - {} - {} - {}", s.getLevel(), s.getCode(), s.getMessage(),
                     s.getContext().toString());
         }
+    }
+
+    @Builder
+    @Data
+    static class IconContent {
+
+        private byte[] bytes;
+        private String mimeType;
     }
 }

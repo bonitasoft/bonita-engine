@@ -38,11 +38,12 @@ public class ArtifactTypeDetector {
     private final ThemeDetector themeDetector;
     private final PageAndFormDetector pageAndFormDetector;
     private final LayoutDetector layoutDetector;
+    private final IconDetector iconDetector;
 
     public ArtifactTypeDetector(BdmDetector bdmDetector, LivingApplicationDetector livingApplicationDetector,
             OrganizationDetector organizationDetector, CustomPageDetector customPageDetector,
             ProcessDetector processDetector, ThemeDetector themeDetector, PageAndFormDetector pageAndFormDetector,
-            LayoutDetector layoutDetector) {
+            LayoutDetector layoutDetector, IconDetector iconDetector) {
         this.bdmDetector = bdmDetector;
         this.livingApplicationDetector = livingApplicationDetector;
         this.organizationDetector = organizationDetector;
@@ -51,10 +52,15 @@ public class ArtifactTypeDetector {
         this.themeDetector = themeDetector;
         this.pageAndFormDetector = pageAndFormDetector;
         this.layoutDetector = layoutDetector;
+        this.iconDetector = iconDetector;
     }
 
     public boolean isApplication(File file) throws IOException {
         return livingApplicationDetector.isCompliant(file);
+    }
+
+    public boolean isApplicationIcon(File file) throws IOException {
+        return iconDetector.isCompliant(file);
     }
 
     public boolean isOrganization(File file) throws IOException {
@@ -89,6 +95,9 @@ public class ArtifactTypeDetector {
         if (isApplication(file)) {
             logger.info("Found application file: '{}'. ", file.getName());
             applicationArchive.addApplication(file);
+        } else if (isApplicationIcon(file)) {
+            logger.info("Found icon file: '{}'. ", file.getName());
+            applicationArchive.addApplicationIcon(file);
         } else if (isProcess(file)) {
             logger.info("Found process file: '{}'. ", file.getName());
             applicationArchive.addProcess(file);
