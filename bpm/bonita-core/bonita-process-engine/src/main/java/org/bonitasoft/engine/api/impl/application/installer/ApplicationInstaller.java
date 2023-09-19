@@ -48,7 +48,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -84,6 +83,7 @@ import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
@@ -236,8 +236,8 @@ public class ApplicationInstaller {
         installOrUpdateThemes(applicationArchive, executionResult);
         installLivingApplications(applicationArchive, executionResult, FAIL_ON_DUPLICATES);
         var installedProcessIds = installProcesses(applicationArchive, executionResult);
-        installConfigurationFileIfPresent(applicationArchive.getConfigurationFile(),
-                executionResult);
+        applicationArchive.getConfigurationFile().ifPresent(configFile -> installConfiguration(configFile,
+                executionResult));
         return installedProcessIds;
     }
 
@@ -323,8 +323,8 @@ public class ApplicationInstaller {
         installLivingApplications(applicationArchive, executionResult, ApplicationImportPolicy.REPLACE_DUPLICATES);
 
         List<Long> newlyInstalledProcessIds = installProcesses(applicationArchive, executionResult);
-        installConfigurationFileIfPresent(applicationArchive.getConfigurationFile(),
-                executionResult);
+        applicationArchive.getConfigurationFile().ifPresent(configFile -> installConfiguration(configFile,
+                executionResult));
         return newlyInstalledProcessIds;
     }
 
@@ -364,10 +364,12 @@ public class ApplicationInstaller {
         for (Long processId : deployedProcessIds) {
             // get process Info
             ProcessDeploymentInfo info = getProcessDeploymentInfo(processId);
-            disableProcess(processId);
-            executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_DISABLEMENT_OK,
-                    format("Process %s (%s) has been disabled successfully",
-                            info.getDisplayName(), info.getVersion())));
+            if (info.getActivationState() == ActivationState.ENABLED) {
+                disableProcess(processId);
+                executionResult.addStatus(infoStatus(PROCESS_DEPLOYMENT_DISABLEMENT_OK,
+                        format("Process %s (%s) has been disabled successfully",
+                                info.getDisplayName(), info.getVersion())));
+            }
         }
     }
 
@@ -795,23 +797,38 @@ public class ApplicationInstaller {
         return processDefinitionIds;
     }
 
-    void installConfigurationFileIfPresent(Optional<InputStream> configurationFileArchive,
+    /**
+     * Must be called in a transaction with active session
+     *
+     * @param configurationFileArchive
+     * @param executionResult
+     * @throws ApplicationInstallationException
+     */
+    void installConfiguration(File configurationFileArchive,
             ExecutionResult executionResult)
             throws ApplicationInstallationException {
-        try {
-            configurationFileArchive.ifPresent(confFile -> {
-                log.info("Installing application configuration from file");
-                try {
-                    installationService.install(null, FileOperations.readFully(confFile));
-                    executionResult.addStatus(Status.infoStatus(Status.okStatus().getCode(),
-                            "Configuration file has been imported"));
-                } catch (IOException | InstallationFailedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        } catch (Exception e) {
+        try (var is = Files.newInputStream(configurationFileArchive.toPath())) {
+            log.info("Installing application configuration from file");
+            installationService.install(null, is.readAllBytes());
+            executionResult.addStatus(Status.infoStatus(Status.okStatus().getCode(),
+                    "Configuration file has been imported"));
+        } catch (IOException | InstallationFailedException e) {
             throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
         }
+    }
+
+    /**
+     * Update configuration with the given bconf file
+     *
+     * @param configurationFileArchive A bconf file
+     * @param executionResult
+     * @throws Exception
+     */
+    public void updateConfiguration(File configurationFileArchive, ExecutionResult executionResult) throws Exception {
+        inSession(() -> inTransaction(() -> {
+            installConfiguration(configurationFileArchive, executionResult);
+            return null;
+        }));
     }
 
     protected Long deployProcess(BusinessArchive businessArchive, ExecutionResult executionResult)
@@ -877,8 +894,23 @@ public class ApplicationInstaller {
     void logInstallationResult(ExecutionResult result) {
         log.info("Result of the installation of the application:");
         for (Status s : result.getAllStatus()) {
-            log.info("[{}] - {} - {} - {}", s.getLevel(), s.getCode(), s.getMessage(),
-                    s.getContext().toString());
+            var message = s.getContext() != null && !s.getContext().isEmpty()
+                    ? String.format("%s - %s - %s", s.getCode(), s.getMessage(),
+                            s.getContext().toString())
+                    : String.format("%s - %s", s.getCode(), s.getMessage());
+            switch (s.getLevel()) {
+                case ERROR:
+                    log.error(message);
+                    break;
+                case WARNING:
+                    log.warn(message);
+                    break;
+                case INFO:
+                case OK:
+                default:
+                    log.info(message);
+                    break;
+            }
         }
     }
 
@@ -889,4 +921,5 @@ public class ApplicationInstaller {
         private byte[] bytes;
         private String mimeType;
     }
+
 }

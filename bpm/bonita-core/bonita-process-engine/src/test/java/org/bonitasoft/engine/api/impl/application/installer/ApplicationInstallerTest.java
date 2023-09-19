@@ -43,7 +43,6 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -394,11 +393,12 @@ public class ApplicationInstallerTest {
     public void install_should_call_install_configuration_file_on_installation_service() throws Exception {
         // given:
         final ExecutionResult executionResult = new ExecutionResult();
-        final Optional<InputStream> inputStream = Optional.of(mock(InputStream.class));
         doNothing().when(installationService).install(eq(null), any());
 
         // when:
-        applicationInstaller.installConfigurationFileIfPresent(inputStream, executionResult);
+        applicationInstaller.installConfiguration(
+                new File(ApplicationInstaller.class.getResource("/RequestLoan_conf_with_null_params.bconf").getFile()),
+                executionResult);
 
         // then:
         verify(installationService).install(eq(null), any());

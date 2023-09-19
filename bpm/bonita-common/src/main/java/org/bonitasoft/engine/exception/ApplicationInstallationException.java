@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.exception;
 
-public class ApplicationInstallationException extends Exception {
+public class ApplicationInstallationException extends RuntimeException {
 
     public ApplicationInstallationException(String message) {
         super(message);

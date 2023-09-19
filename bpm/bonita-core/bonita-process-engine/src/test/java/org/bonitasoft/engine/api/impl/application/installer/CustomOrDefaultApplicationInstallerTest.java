@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl.application.installer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -31,22 +32,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Stream;
 
+import com.vdurmont.semver4j.Semver;
+import com.vdurmont.semver4j.SemverException;
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.bonitasoft.platform.version.ApplicationVersionService;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -55,8 +65,9 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 /**
  * @author Emmanuel Duchastenier
  */
-@RunWith(MockitoJUnitRunner.class)
-public class CustomOrDefaultApplicationInstallerTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class CustomOrDefaultApplicationInstallerTest {
 
     @Captor
     ArgumentCaptor<Callable<Object>> callableCaptor;
@@ -73,14 +84,14 @@ public class CustomOrDefaultApplicationInstallerTest {
     @Spy
     private CustomOrDefaultApplicationInstaller listener;
 
-    @Before
-    public void before() throws Exception {
+    @BeforeEach
+    void before() throws Exception {
         doAnswer(inv -> callableCaptor.getValue().call()).when(tenantServicesManager)
                 .inTenantSessionTransaction(callableCaptor.capture());
     }
 
     @Test
-    public void should_detect_one_custom_application() throws Exception {
+    void should_detect_one_custom_application() throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 1L);
 
@@ -97,7 +108,7 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_raise_exception_if_more_than_one_application() throws Exception {
+    void should_raise_exception_if_more_than_one_application() throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 1L);
         Resource resource2 = mockResource("resource2", true, true, 1L);
@@ -112,10 +123,11 @@ public class CustomOrDefaultApplicationInstallerTest {
                 .withMessage("More than one resource of type application zip detected. Abort startup.");
     }
 
-    @Test
-    public void should_ignore_non_existing_zip_file() throws Exception {
+    @ParameterizedTest
+    @MethodSource("ignoredApplicationResources")
+    void ignoreDetectedCustomApplication(boolean exists, boolean readable, long contentSize) throws Exception {
         //given
-        Resource resource1 = mockResource("resource1", false, true, 1L);
+        Resource resource1 = mockResource("resource1", exists, readable, contentSize);
 
         doReturn(new Resource[] { resource1 })
                 .when(listener)
@@ -128,47 +140,37 @@ public class CustomOrDefaultApplicationInstallerTest {
         assertThat(result).isNull();
     }
 
-    @Test
-    public void should_ignore_non_readable_zip_file() throws Exception {
-        //given
-        Resource resource1 = mockResource("resource1", true, false, 1L);
+    private static Stream<Arguments> ignoredApplicationResources() {
+        return Stream.of(
+                Arguments.of(false, false, 0L), // resource does not exist
+                Arguments.of(true, false, 1L), // resource is not readable
+                Arguments.of(true, true, 0L) // resource has no content
+        );
+    }
 
-        doReturn(new Resource[] { resource1 })
-                .when(listener)
-                .getCustomAppResourcesFromClasspath();
+    @ParameterizedTest
+    @ValueSource(strings = { "SNAPSHOT", "", ".0" })
+    void unsupportedApplicationVersions(String version)
+            throws Exception {
+        assertThrows(SemverException.class, () -> listener.toSemver(version));
+    }
 
-        //when
-        Resource result = listener.detectCustomApplication();
-
-        //then
-        assertThat(result).isNull();
+    @ParameterizedTest
+    @ValueSource(strings = { "9-SNAPSHOT", "5", "2.0", "1.0.0", "2.1-alpha", "3.3.2.beta1" })
+    void supportedApplicationVersions(String version)
+            throws Exception {
+        assertThat(listener.toSemver(version)).isNotNull();
     }
 
     @Test
-    public void should_ignore_empty_zip_file() throws Exception {
-        //given
-        Resource resource1 = mockResource("resource1", true, true, 0L);
-
-        doReturn(new Resource[] { resource1 })
-                .when(listener)
-                .getCustomAppResourcesFromClasspath();
-
-        //when
-        Resource result = listener.detectCustomApplication();
-
-        //then
-        assertThat(result).isNull();
-    }
-
-    @Test
-    public void should_install_custom_application_if_detected_and_platform_first_init_and_install_provided_resources_is_false()
+    void should_install_custom_application_if_detected_and_platform_first_init_and_install_provided_resources_is_false()
             throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 0L);
         InputStream resourceStream1 = mock(InputStream.class);
 
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of("1.0.0")).when(listener).readApplicationVersion(resource1);
+        doReturn(Optional.of(new Semver("1.0.0"))).when(listener).readApplicationVersion(resource1);
         doReturn(resourceStream1).when(resource1).getInputStream();
         final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
         doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
@@ -185,14 +187,14 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_custom_application_and_provided_provide_page_if_detected_and_platform_first_init_and_install_provided_resources_is_true()
+    void should_install_custom_application_and_provided_provide_page_if_detected_and_platform_first_init_and_install_provided_resources_is_true()
             throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 0L);
         InputStream resourceStream1 = mock(InputStream.class);
 
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of("1.0.0")).when(listener).readApplicationVersion(resource1);
+        doReturn(Optional.of(new Semver("1.0.0"))).when(listener).readApplicationVersion(resource1);
         doReturn(resourceStream1).when(resource1).getInputStream();
         final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
         doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
@@ -209,14 +211,14 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_update_custom_application_if_detected_version_superior_to_deployed_version()
+    void should_update_custom_application_if_detected_version_superior_to_deployed_version()
             throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 0L);
         InputStream resourceStream1 = mock(InputStream.class);
 
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of("1.0.1")).when(listener).readApplicationVersion(resource1);
+        doReturn(Optional.of(new Semver("1.0.1"))).when(listener).readApplicationVersion(resource1);
         doReturn(resourceStream1).when(resource1).getInputStream();
         final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
         doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
@@ -232,12 +234,12 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_update_conf_if_detected_version_equal_to_deployed_version()
+    void should_update_conf_if_detected_version_equal_to_deployed_version()
             throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 0L);
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of("1.0.0")).when(listener).readApplicationVersion(resource1);
+        doReturn(Optional.of(new Semver("1.0.0"))).when(listener).readApplicationVersion(resource1);
         doReturn(false).when(listener).isPlatformFirstInitialization();
         doReturn("1.0.0").when(applicationVersionService).retrieveApplicationVersion();
         //when
@@ -251,13 +253,13 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_throw_an_exception_if_detected_version_inferior_to_deployed_version()
+    void should_throw_an_exception_if_detected_version_inferior_to_deployed_version()
             throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 0L);
 
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of("0.0.9-SNAPSHOT")).when(listener).readApplicationVersion(resource1);
+        doReturn(Optional.of(new Semver("0.0.9-SNAPSHOT"))).when(listener).readApplicationVersion(resource1);
         doReturn(false).when(listener).isPlatformFirstInitialization();
         doReturn("1.0.0").when(applicationVersionService).retrieveApplicationVersion();
         //when
@@ -270,7 +272,7 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_default_applications_if_no_custom_app_detected()
+    void should_install_default_applications_if_no_custom_app_detected()
             throws Exception {
         //given
         doReturn(null).when(listener).detectCustomApplication();
@@ -286,7 +288,7 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_read_the_application_version() throws Exception {
+    void should_read_the_application_version() throws Exception {
         ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
                 CustomOrDefaultApplicationInstallerTest.class.getClassLoader());
 
@@ -294,12 +296,12 @@ public class CustomOrDefaultApplicationInstallerTest {
         Resource archive = cpResourceResolver.getResource("/customer-application.zip");
         var version = listener.readApplicationVersion(archive);
 
-        assertThat(version.get()).isEqualTo("1.0.0");
+        assertThat(version).hasValue(new Semver("1.0.0"));
 
         // load second zip, version should be 1.0.1
         archive = cpResourceResolver.getResource("/customer-application-v2.zip");
         version = listener.readApplicationVersion(archive);
-        assertThat(version.get()).isEqualTo("1.0.1");
+        assertThat(version).hasValue(new Semver("1.0.1"));
 
         // load empty zip, expect gracious response of underlying method
         archive = cpResourceResolver.getResource("/empty-customer-application.zip");
@@ -308,7 +310,7 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_raise_exception_if_more_than_one_configuration_file() throws Exception {
+    void should_raise_exception_if_more_than_one_configuration_file() throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 1L);
         Resource resource2 = mockResource("resource2", true, true, 1L);
@@ -324,7 +326,7 @@ public class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    public void should_return_empty_optional_if_no_configuration_file_found() throws Exception {
+    void should_return_empty_optional_if_no_configuration_file_found() throws Exception {
         doReturn(null)
                 .when(listener)
                 .getConfigurationFileResourcesFromClasspath();
