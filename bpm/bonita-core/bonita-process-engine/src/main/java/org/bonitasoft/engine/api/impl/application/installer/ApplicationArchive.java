@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl.application.installer;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +45,7 @@ public class ApplicationArchive implements AutoCloseable {
     private List<File> ignoredFiles = new ArrayList<>();
 
     @Singular
-    private Optional<InputStream> configurationFile = Optional.empty();
+    private Optional<File> configurationFile = Optional.empty();
 
     public ApplicationArchive addPage(File page) {
         pages.add(page);

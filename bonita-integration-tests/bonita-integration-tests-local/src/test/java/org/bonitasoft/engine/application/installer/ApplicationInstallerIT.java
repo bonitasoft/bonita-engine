@@ -16,6 +16,7 @@ package org.bonitasoft.engine.application.installer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import java.io.File;
 import java.util.Optional;
 
 import org.bonitasoft.engine.CommonAPIIT;
@@ -117,11 +118,10 @@ public class ApplicationInstallerIT extends CommonAPIIT {
 
         // when:
         try (var applicationAsStream = ApplicationInstallerIT.class
-                .getResourceAsStream("/simple-app-1.0.0-SNAPSHOT-local.zip");
-                var confStream = ApplicationInstallerIT.class
-                        .getResourceAsStream("/simple-app-1.0.0-SNAPSHOT-local.bconf");) {
+                .getResourceAsStream("/simple-app-1.0.0-SNAPSHOT-local.zip")) {
             var applicationArchive = applicationArchiveReader.read(applicationAsStream);
-            applicationArchive.setConfigurationFile(Optional.of(confStream));
+            applicationArchive.setConfigurationFile(Optional.of(new File(ApplicationInstallerIT.class
+                    .getResource("/simple-app-1.0.0-SNAPSHOT-local.bconf").getFile())));
             applicationInstallerImpl.install(applicationArchive, "1.0.0-SNAPSHOT");
         }
 
