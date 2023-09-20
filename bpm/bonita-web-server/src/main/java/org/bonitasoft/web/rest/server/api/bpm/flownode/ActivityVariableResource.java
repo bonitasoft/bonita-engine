@@ -16,8 +16,11 @@ package org.bonitasoft.web.rest.server.api.bpm.flownode;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemIdMalformedException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIMalformedUrlException;
 import org.restlet.resource.Get;
 
 public class ActivityVariableResource extends CommonResource {
@@ -36,9 +39,20 @@ public class ActivityVariableResource extends CommonResource {
         try {
             final String taskId = getAttribute(ACTIVITYDATA_ACTIVITY_ID);
             final String dataName = getAttribute(ACTIVITYDATA_DATA_NAME);
-            return getTaskVariableInstance(dataName, Long.valueOf(taskId));
-        } catch (final Exception e) {
+            if (taskId == null || dataName == null) {
+                throw new APIMalformedUrlException("missing activity Id and or variable name");
+            }
+            return getTaskVariableInstance(dataName, getActivityInstanceId(taskId));
+        } catch (final BonitaException e) {
             throw new APIException(e);
+        }
+    }
+
+    private Long getActivityInstanceId(String taskId) {
+        try {
+            return Long.valueOf(taskId);
+        } catch (NumberFormatException e) {
+            throw new APIItemIdMalformedException("Long", "long value expected for activity Id");
         }
     }
 

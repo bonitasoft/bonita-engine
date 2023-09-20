@@ -13,10 +13,12 @@
  **/
 package org.bonitasoft.web.rest.server.api.bpm.flownode;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
@@ -55,7 +57,7 @@ public class TimerEventTriggerResource extends CommonResource {
             representation.setCharacterSet(CharacterSet.UTF_8);
             getResponse().setEntity(representation);
             setContentRange(searchResult);
-        } catch (final Exception e) {
+        } catch (final BonitaException | IOException e) {
             throw new APIException(e);
         }
     }

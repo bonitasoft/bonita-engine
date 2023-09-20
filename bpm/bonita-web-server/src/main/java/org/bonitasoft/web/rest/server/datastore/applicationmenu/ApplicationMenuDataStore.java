@@ -19,6 +19,7 @@ import java.util.Map;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
@@ -62,7 +63,7 @@ public class ApplicationMenuDataStore extends CommonDatastore<ApplicationMenuIte
             final ApplicationMenu applicationMenu = applicationAPI
                     .createApplicationMenu(converter.toApplicationMenuCreator(item));
             return converter.toApplicationMenuItem(applicationMenu);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -73,7 +74,7 @@ public class ApplicationMenuDataStore extends CommonDatastore<ApplicationMenuIte
             final ApplicationMenu applicationMenu = applicationAPI.updateApplicationMenu(id.toLong(),
                     converter.toApplicationMenuUpdater(attributes));
             return converter.toApplicationMenuItem(applicationMenu);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -83,7 +84,7 @@ public class ApplicationMenuDataStore extends CommonDatastore<ApplicationMenuIte
         try {
             final ApplicationMenu applicationMenu = applicationAPI.getApplicationMenu(id.toLong());
             return converter.toApplicationMenuItem(applicationMenu);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -94,7 +95,7 @@ public class ApplicationMenuDataStore extends CommonDatastore<ApplicationMenuIte
             for (final APIID id : ids) {
                 applicationAPI.deleteApplicationMenu(id.toLong());
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             if (e.getCause() instanceof ApplicationMenuNotFoundException) {
                 throw new APIItemNotFoundException(ApplicationMenuDefinition.TOKEN);
             } else {

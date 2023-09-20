@@ -62,12 +62,6 @@ public class ActivityVariableResourceTest extends RestletTest {
     }
 
     @Test(expected = APIException.class)
-    public void shouldDoGetWithNothingThowsAnApiException() throws DataNotFoundException {
-        //when
-        activityVariableResource.getTaskVariable();
-    }
-
-    @Test(expected = APIException.class)
     public void should_throw_exception_if_attribute_is_not_found() throws Exception {
         // given:
         doReturn(null).when(activityVariableResource).getAttribute(anyString());

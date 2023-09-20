@@ -18,10 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APISessionInvalidException;
 
 /**
  * @author Vincent Elcrin
@@ -51,9 +50,7 @@ public final class CommandCaller {
     public Serializable run() {
         try {
             return TenantAPIAccessor.getCommandAPI(this.session).execute(this.command, this.parameters);
-        } catch (InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

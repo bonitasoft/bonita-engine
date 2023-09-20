@@ -23,14 +23,17 @@ import java.util.Map;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.cases.CaseVariableItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasSearch;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
+import org.bonitasoft.web.rest.server.framework.utils.converter.ConversionException;
 import org.bonitasoft.web.rest.server.framework.utils.converter.TypeConverter;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIMethodNotAllowedException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
 /**
@@ -62,21 +65,21 @@ public class CaseVariableDatastore extends CommonDatastore<CaseVariableItem, Dat
     protected ProcessAPI getEngineProcessAPI() {
         try {
             return TenantAPIAccessor.getProcessAPI(getEngineSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
 
     @Override
     public CaseVariableItem update(final APIID id, final Map<String, String> attributes) {
-        throw new RuntimeException("Not implemented / No need to / Not used");
+        throw new APIMethodNotAllowedException("Not implemented / No need to / Not used");
     }
 
     @Override
     public ItemSearchResult<CaseVariableItem> search(final int page, final int resultsByPage, final String search,
             final String orders,
             final Map<String, String> filters) {
-        throw new RuntimeException("Not implemented / No need to / Not used");
+        throw new APIMethodNotAllowedException("Not implemented / No need to / Not used");
     }
 
     public void updateVariableValue(final long caseId, final String variableName, final String className,
@@ -84,7 +87,7 @@ public class CaseVariableDatastore extends CommonDatastore<CaseVariableItem, Dat
         try {
             final Serializable converteValue = converter.convert(className, newValue);
             getEngineProcessAPI().updateProcessDataInstance(variableName, caseId, converteValue);
-        } catch (final Exception e) {
+        } catch (final BonitaException | ConversionException e) {
             throw new APIException("Error when updating case variable", e);
         }
     }
@@ -95,23 +98,19 @@ public class CaseVariableDatastore extends CommonDatastore<CaseVariableItem, Dat
                     computeIndex(page, resultsByPage), resultsByPage);
             return new ItemSearchResult<>(page, resultsByPage,
                     countByCaseId(caseId), convert(processDataInstances));
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException("Error when getting case variables", e);
         }
     }
 
-    private long countByCaseId(final long caseId) {
-        try {
-            return getEngineProcessAPI().getNumberOfProcessDataInstances(caseId);
-        } catch (final Exception e) {
-            throw new APIException("Error while getting the number of case variables", e);
-        }
+    private long countByCaseId(final long caseId) throws BonitaException {
+        return getEngineProcessAPI().getNumberOfProcessDataInstances(caseId);
     }
 
     public CaseVariableItem findById(final long caseId, final String variableName) {
         try {
             return convertEngineToConsoleItem(getEngineProcessAPI().getProcessDataInstance(variableName, caseId));
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException("Error while getting case variable", e);
         }
     }

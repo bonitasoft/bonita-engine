@@ -84,7 +84,7 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
             final SearchOptionsBuilder builder = buildSearchOptions(page, resultsByPage, search, orders, filters);
             final SearchResult<ProcessInstance> searchResult = searchProcessInstances(filters, builder.done());
             return convertEngineToConsoleSearch(page, resultsByPage, searchResult);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -162,7 +162,7 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
             return convertEngineToConsoleItem(getProcessAPI().getProcessInstance(id.toLong()));
         } catch (final ProcessInstanceNotFoundException e) {
             return null;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -175,7 +175,7 @@ public class CaseDatastore extends CommonDatastore<CaseItem, ProcessInstance>
                 processApi.deleteProcessInstance(id.toLong());
                 processApi.deleteArchivedProcessInstancesInAllStates(id.toLong());
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             if (e.getCause() instanceof ProcessInstanceNotFoundException) {
                 throw new APIItemNotFoundException(CaseDefinition.TOKEN);
             } else {

@@ -20,6 +20,7 @@ import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConst
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.web.rest.model.bpm.cases.CaseDocumentDefinition;
 import org.bonitasoft.web.rest.model.bpm.cases.CaseDocumentItem;
 import org.bonitasoft.web.rest.server.api.ConsoleAPI;
@@ -93,7 +94,7 @@ public class APICaseDocument extends ConsoleAPI<CaseDocumentItem> {
         ProcessAPI processAPI;
         try {
             processAPI = TenantAPIAccessor.getProcessAPI(getEngineSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
         final WebBonitaConstantsUtils constants = WebBonitaConstantsUtils.getTenantInstance();

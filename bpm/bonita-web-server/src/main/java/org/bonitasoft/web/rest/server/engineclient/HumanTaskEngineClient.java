@@ -15,6 +15,7 @@ package org.bonitasoft.web.rest.server.engineclient;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.web.rest.model.bpm.flownode.HumanTaskItem;
@@ -37,7 +38,7 @@ public class HumanTaskEngineClient {
                 .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, HumanTaskItem.VALUE_STATE_READY).done();
         try {
             return processAPI.searchHumanTaskInstances(search).getCount();
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException("Error when counting opened cases", e);
         }
     }

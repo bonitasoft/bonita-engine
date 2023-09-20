@@ -21,6 +21,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
 import org.bonitasoft.engine.bpm.document.ArchivedDocumentsSearchDescriptor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
@@ -55,7 +56,7 @@ public class APIArchivedDocument extends ConsoleAPI<ArchivedDocumentItem> {
             final DocumentDatastore dataStore = new DocumentDatastore(apiSession);
             final ArchivedDocument document = processAPI.getArchivedProcessDocument(id.toLong());
             item = dataStore.mapToArchivedDocumentItem(document);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
         return item;
@@ -117,7 +118,7 @@ public class APIArchivedDocument extends ConsoleAPI<ArchivedDocumentItem> {
                     items.add(dataStore.mapToArchivedDocumentItem(document));
                 }
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException | IllegalArgumentException e) {
             throw new APIException(e);
         }
         return new ItemSearchResult<>(page, resultsByPage, nbOfDocument, items);

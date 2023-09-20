@@ -19,6 +19,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceNotFoundException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.flownode.ArchivedFlowNodeItem;
@@ -104,14 +105,8 @@ public abstract class AbstractArchivedFlowNodeDatastore<CONSOLE_ITEM extends Arc
 
     @Override
     public CONSOLE_ITEM get(final APIID id) {
-        try {
-            final ENGINE_ITEM archivedFlowNodeInstance = runGet(id);
-            return convertEngineToConsoleItem(archivedFlowNodeInstance);
-        } catch (APIItemNotFoundException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new APIException(e);
-        }
+        final ENGINE_ITEM archivedFlowNodeInstance = runGet(id);
+        return convertEngineToConsoleItem(archivedFlowNodeInstance);
     }
 
     @SuppressWarnings("unchecked")
@@ -127,20 +122,15 @@ public abstract class AbstractArchivedFlowNodeDatastore<CONSOLE_ITEM extends Arc
     public ItemSearchResult<CONSOLE_ITEM> search(final int page, final int resultsByPage, final String search,
             final String orders,
             final Map<String, String> filters) {
-        try {
-            final SearchOptionsCreator creator = makeSearchOptionCreator(page, resultsByPage, search, orders, filters);
+        final SearchOptionsCreator creator = makeSearchOptionCreator(page, resultsByPage, search, orders, filters);
 
-            final SearchResult<ENGINE_ITEM> results = runSearch(creator, filters);
+        final SearchResult<ENGINE_ITEM> results = runSearch(creator, filters);
 
-            return new ItemSearchResult<>(
-                    page,
-                    resultsByPage,
-                    results.getCount(),
-                    convertEngineToConsoleItemsList(results.getResult()));
-
-        } catch (final Exception e) {
-            throw new APIException(e);
-        }
+        return new ItemSearchResult<>(
+                page,
+                resultsByPage,
+                results.getCount(),
+                convertEngineToConsoleItemsList(results.getResult()));
     }
 
     /**
@@ -155,7 +145,7 @@ public abstract class AbstractArchivedFlowNodeDatastore<CONSOLE_ITEM extends Arc
                             creator.create());
 
             return result;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

@@ -53,6 +53,14 @@ public class GroupEngineClient {
         }
     }
 
+    public Group getGroupByPath(String groupPath) {
+        try {
+            return groupAPI.getGroupByPath(groupPath);
+        } catch (GroupNotFoundException e) {
+            throw new APIItemNotFoundException(GroupDefinition.TOKEN, APIID.makeAPIID(groupPath));
+        }
+    }
+
     public String getPath(String groupId) {
         try {
             return groupAPI.getGroup(parseId(groupId)).getPath();

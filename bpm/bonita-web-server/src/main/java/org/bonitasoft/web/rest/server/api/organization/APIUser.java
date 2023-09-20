@@ -25,11 +25,7 @@ import org.bonitasoft.web.rest.server.datastore.bpm.flownode.HumanTaskDatastore;
 import org.bonitasoft.web.rest.server.datastore.organization.PersonalContactDataDatastore;
 import org.bonitasoft.web.rest.server.datastore.organization.ProfessionalContactDataDatastore;
 import org.bonitasoft.web.rest.server.datastore.organization.UserDatastore;
-import org.bonitasoft.web.rest.server.framework.api.APIHasAdd;
-import org.bonitasoft.web.rest.server.framework.api.APIHasDelete;
-import org.bonitasoft.web.rest.server.framework.api.APIHasGet;
-import org.bonitasoft.web.rest.server.framework.api.APIHasSearch;
-import org.bonitasoft.web.rest.server.framework.api.APIHasUpdate;
+import org.bonitasoft.web.rest.server.framework.api.*;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.util.MapUtil;
 import org.bonitasoft.web.toolkit.client.common.util.StringUtil;
@@ -74,11 +70,12 @@ public class APIUser extends ConsoleAPI<UserItem> implements APIHasAdd<UserItem>
         checkPasswordRobustness(item.getPassword());
 
         // Add
-        return getUserDatastore().add(item);
+        return super.add(item);
 
     }
 
-    UserDatastore getUserDatastore() {
+    @Override
+    protected Datastore defineDefaultDatastore() {
         return new UserDatastore(getEngineSession());
     }
 
@@ -124,12 +121,12 @@ public class APIUser extends ConsoleAPI<UserItem> implements APIHasAdd<UserItem>
         if (item.get(UserItem.ATTRIBUTE_PASSWORD) != null) {
             checkPasswordRobustness(item.get(UserItem.ATTRIBUTE_PASSWORD));
         }
-        return getUserDatastore().update(id, item);
+        return super.update(id, item);
     }
 
     @Override
     public UserItem get(final APIID id) {
-        final UserItem item = getUserDatastore().get(id);
+        final UserItem item = super.get(id);
         if (item != null) {
 
             // Do not let the password output from the API
@@ -148,8 +145,7 @@ public class APIUser extends ConsoleAPI<UserItem> implements APIHasAdd<UserItem>
             final String orders,
             final Map<String, String> filters) {
 
-        final ItemSearchResult<UserItem> results = getUserDatastore().search(page, resultsByPage, search, filters,
-                orders);
+        final ItemSearchResult<UserItem> results = super.search(page, resultsByPage, search, orders, filters);
 
         for (final UserItem item : results.getResults()) {
             if (item != null) {
@@ -163,19 +159,19 @@ public class APIUser extends ConsoleAPI<UserItem> implements APIHasAdd<UserItem>
 
     @Override
     public void delete(final List<APIID> ids) {
-        getUserDatastore().delete(ids);
+        super.delete(ids);
     }
 
     @Override
     protected void fillDeploys(final UserItem item, final List<String> deploys) {
         if (isDeployable(UserItem.ATTRIBUTE_MANAGER_ID, deploys, item)) {
             item.setDeploy(UserItem.ATTRIBUTE_MANAGER_ID,
-                    getUserDatastore().get(item.getManagerId()));
+                    ((UserDatastore) getDefaultDatastore()).get(item.getManagerId()));
         }
 
         if (isDeployable(UserItem.ATTRIBUTE_CREATED_BY_USER_ID, deploys, item)) {
             item.setDeploy(UserItem.ATTRIBUTE_CREATED_BY_USER_ID,
-                    getUserDatastore().get(item.getCreatedByUserId()));
+                    ((UserDatastore) getDefaultDatastore()).get(item.getCreatedByUserId()));
         }
 
         if (deploys.contains(UserItem.DEPLOY_PERSONAL_DATA)) {

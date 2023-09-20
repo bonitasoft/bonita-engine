@@ -24,6 +24,7 @@ import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorUpdater;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -89,7 +90,7 @@ public class ActorDatastore extends CommonDatastore<ActorItem, ActorInstance> im
     public ActorItem get(final APIID id) {
         try {
             return convertEngineToConsoleItem(getProcessAPI().getActor(id.toLong()));
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -112,7 +113,7 @@ public class ActorDatastore extends CommonDatastore<ActorItem, ActorInstance> im
                     getProcessAPI().getNumberOfActors(processId),
                     convertEngineToConsoleItemsList(actors));
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -131,7 +132,7 @@ public class ActorDatastore extends CommonDatastore<ActorItem, ActorInstance> im
 
             return convertEngineToConsoleItem(getProcessAPI().updateActor(id.toLong(), updater));
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -143,7 +144,7 @@ public class ActorDatastore extends CommonDatastore<ActorItem, ActorInstance> im
     public Long countUsers(final APIID actorId) {
         try {
             return getProcessAPI().getNumberOfUsersOfActor(actorId.toLong());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -151,7 +152,7 @@ public class ActorDatastore extends CommonDatastore<ActorItem, ActorInstance> im
     public Long countGroups(final APIID actorId) {
         try {
             return getProcessAPI().getNumberOfGroupsOfActor(actorId.toLong());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -159,7 +160,7 @@ public class ActorDatastore extends CommonDatastore<ActorItem, ActorInstance> im
     public Long countRoles(final APIID actorId) {
         try {
             return getProcessAPI().getNumberOfRolesOfActor(actorId.toLong());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -167,7 +168,7 @@ public class ActorDatastore extends CommonDatastore<ActorItem, ActorInstance> im
     public Long countMemberships(final APIID actorId) {
         try {
             return getProcessAPI().getNumberOfMembershipsOfActor(actorId.toLong());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

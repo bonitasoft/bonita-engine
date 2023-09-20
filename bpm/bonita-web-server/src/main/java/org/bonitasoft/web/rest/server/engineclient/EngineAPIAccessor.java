@@ -20,13 +20,9 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APISessionInvalidException;
 
 /**
  * @author Vincent Elcrin
@@ -46,21 +42,15 @@ public class EngineAPIAccessor {
     public ProfileAPI getProfileAPI() {
         try {
             return TenantAPIAccessor.getProfileAPI(getSession());
-        } catch (final InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new APIException(e);
-        } catch (final ServerAPIException e) {
-            throw new APIException(e);
-        } catch (final UnknownAPITypeException e) {
-            throw new APIException(e);
+        } catch (final BonitaException e) {
+            throw new APIException("Error when getting engine process API", e);
         }
     }
 
     public ProcessAPI getProcessAPI() {
         try {
             return TenantAPIAccessor.getProcessAPI(getSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException("Error when getting engine process API", e);
         }
     }
@@ -68,7 +58,7 @@ public class EngineAPIAccessor {
     public IdentityAPI getIdentityAPI() {
         try {
             return TenantAPIAccessor.getIdentityAPI(getSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException("Error when getting engine identity API", e);
         }
     }
@@ -76,7 +66,7 @@ public class EngineAPIAccessor {
     public GroupAPI getGroupAPI() {
         try {
             return TenantAPIAccessor.getIdentityAPI(getSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException("Error when getting engine group API", e);
         }
     }
@@ -84,7 +74,7 @@ public class EngineAPIAccessor {
     public PageAPI getPageAPI() {
         try {
             return TenantAPIAccessor.getCustomPageAPI(getSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException("Error when getting engine page API", e);
         }
     }
@@ -92,7 +82,7 @@ public class EngineAPIAccessor {
     public TenantAdministrationAPI getTenantAdministrationAPI() {
         try {
             return TenantAPIAccessor.getTenantAdministrationAPI(getSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException("Error when getting engine tenant management API", e);
         }
     }

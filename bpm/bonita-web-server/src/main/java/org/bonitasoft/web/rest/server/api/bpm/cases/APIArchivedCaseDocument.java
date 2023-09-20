@@ -19,6 +19,7 @@ import java.util.Map;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.web.rest.model.bpm.cases.ArchivedCaseDocumentDefinition;
 import org.bonitasoft.web.rest.model.bpm.cases.ArchivedCaseDocumentItem;
 import org.bonitasoft.web.rest.server.api.ConsoleAPI;
@@ -82,7 +83,7 @@ public class APIArchivedCaseDocument extends ConsoleAPI<ArchivedCaseDocumentItem
         ProcessAPI processAPI;
         try {
             processAPI = TenantAPIAccessor.getProcessAPI(getEngineSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
         final WebBonitaConstantsUtils constants = WebBonitaConstantsUtils.getTenantInstance();

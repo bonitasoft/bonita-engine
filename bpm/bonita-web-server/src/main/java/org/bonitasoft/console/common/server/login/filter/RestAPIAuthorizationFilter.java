@@ -33,15 +33,12 @@ import org.bonitasoft.console.common.server.preferences.properties.PropertiesFac
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.permission.APICallContext;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.web.rest.server.framework.utils.RestRequestParser;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.common.i18n.model.I18nLocaleDefinition;
 import org.bonitasoft.web.toolkit.client.common.session.SessionDefinition;
 import org.bonitasoft.web.toolkit.client.data.APIID;
@@ -67,8 +64,8 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
     @Override
     public void proceedWithFiltering(ServletRequest request, ServletResponse response, FilterChain chain)
             throws ServletException {
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         try {
-            HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             // body of multi-parts requests is not needed when checking permissions
             if (!ServletFileUpload.isMultipartContent(httpServletRequest)) {
                 //we need to use a MultiReadHttpServletRequest wrapper in order to be able to get the input stream twice (in the filter and in the API servlet)
@@ -86,11 +83,27 @@ public class RestAPIAuthorizationFilter extends ExcludingPatternFilter {
             if (isAuthorized) {
                 chain.doFilter(httpServletRequest, response);
             }
+        } catch (final InvalidSessionException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Invalid Bonita engine session.", e.getMessage());
+            }
+            SessionUtil.sessionLogout(httpServletRequest.getSession());
+            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } catch (final TenantStatusException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Platform is probably under Maintenance : " + e.getMessage());
+            }
+            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         } catch (final Exception e) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error(e.getMessage(), e);
             }
-            throw new ServletException(e);
+            if (e instanceof APIException) {
+                throw new ServletException(e);
+            } else {
+                //wrap exception in APIException to avoid disclose too much information
+                throw new ServletException(new APIException(e));
+            }
         }
     }
 

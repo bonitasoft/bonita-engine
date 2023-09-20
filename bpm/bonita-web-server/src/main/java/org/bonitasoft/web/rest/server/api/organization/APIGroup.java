@@ -14,9 +14,7 @@
 package org.bonitasoft.web.rest.server.api.organization;
 
 import java.util.List;
-import java.util.Map;
 
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCriterion;
 import org.bonitasoft.web.rest.model.identity.GroupDefinition;
@@ -28,8 +26,6 @@ import org.bonitasoft.web.rest.server.framework.api.APIHasDelete;
 import org.bonitasoft.web.rest.server.framework.api.APIHasGet;
 import org.bonitasoft.web.rest.server.framework.api.APIHasSearch;
 import org.bonitasoft.web.rest.server.framework.api.APIHasUpdate;
-import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
-import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 
 /**
@@ -48,18 +44,8 @@ public class APIGroup extends ConsoleAPI<GroupItem> implements
     }
 
     @Override
-    public GroupItem add(final GroupItem item) {
-        return new GroupDatastore(getEngineSession()).add(item);
-    }
-
-    @Override
-    public GroupItem update(final APIID id, final Map<String, String> item) {
-        return new GroupDatastore(getEngineSession()).update(id, item);
-    }
-
-    @Override
-    public GroupItem get(final APIID id) {
-        return new GroupDatastore(getEngineSession()).get(id);
+    protected GroupDatastore defineDefaultDatastore() {
+        return new GroupDatastore(getEngineSession());
     }
 
     @Override
@@ -68,29 +54,12 @@ public class APIGroup extends ConsoleAPI<GroupItem> implements
     }
 
     @Override
-    public ItemSearchResult<GroupItem> search(final int page, final int resultsByPage, final String search,
-            final String orders,
-            final Map<String, String> filters) {
-        return new GroupDatastore(getEngineSession()).search(page, resultsByPage, search, orders, filters);
-    }
-
-    @Override
-    public void delete(final List<APIID> ids) {
-        new GroupDatastore(getEngineSession()).delete(ids);
-    }
-
-    @Override
     protected void fillDeploys(final GroupItem item, final List<String> deploys) {
         if (deploys.contains(GroupItem.ATTRIBUTE_PARENT_GROUP_ID) && item.getParentPath() != null
                 && !item.getParentPath().isEmpty()) {
-            try {
-                Group parentGroup = TenantAPIAccessor.getIdentityAPI(getEngineSession())
-                        .getGroupByPath(item.getParentPath());
-                item.setParentGroupId(String.valueOf(parentGroup.getId()));
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            Group parentGroup = ((GroupDatastore) getDefaultDatastore()).getGroupEngineClient()
+                    .getGroupByPath(item.getParentPath());
+            item.setParentGroupId(String.valueOf(parentGroup.getId()));
         }
     }
 
@@ -98,7 +67,7 @@ public class APIGroup extends ConsoleAPI<GroupItem> implements
     protected void fillCounters(final GroupItem item, final List<String> counters) {
         if (counters.contains(GroupItem.COUNTER_NUMBER_OF_USERS)) {
             item.setAttribute(GroupItem.COUNTER_NUMBER_OF_USERS,
-                    new GroupDatastore(getEngineSession()).getNumberOfUsers(item.getId()));
+                    ((GroupDatastore) getDefaultDatastore()).getNumberOfUsers(item.getId()));
         }
     }
 

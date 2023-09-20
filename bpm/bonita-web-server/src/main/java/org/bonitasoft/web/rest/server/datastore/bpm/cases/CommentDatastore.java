@@ -22,11 +22,11 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.rest.model.bpm.cases.CommentItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasAdd;
@@ -34,7 +34,6 @@ import org.bonitasoft.web.rest.server.framework.api.DatastoreHasSearch;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.rest.server.framework.utils.SearchOptionsBuilderUtil;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APISessionInvalidException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
 /**
@@ -140,9 +139,7 @@ public class CommentDatastore extends CommonDatastore<CommentItem, Comment>
         try {
             final ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(getEngineSession());
             return processAPI.searchCommentsManagedBy(teamManagerId, builder.done());
-        } catch (final InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -158,9 +155,7 @@ public class CommentDatastore extends CommonDatastore<CommentItem, Comment>
         try {
             final ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(getEngineSession());
             return processAPI.searchCommentsInvolvingUser(userId, builder.done());
-        } catch (final InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -175,9 +170,7 @@ public class CommentDatastore extends CommonDatastore<CommentItem, Comment>
         try {
             final ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(getEngineSession());
             return processAPI.searchComments(builder.done());
-        } catch (final InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -208,9 +201,7 @@ public class CommentDatastore extends CommonDatastore<CommentItem, Comment>
             final ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(getEngineSession());
             return convertEngineToConsoleItem(
                     processAPI.addProcessComment(item.getProcessInstanceId().toLong(), item.getContent()));
-        } catch (final InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

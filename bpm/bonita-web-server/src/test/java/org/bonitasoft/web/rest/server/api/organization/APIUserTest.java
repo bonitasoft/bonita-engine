@@ -53,7 +53,7 @@ public class APIUserTest {
     public void before() throws Exception {
         ItemDefinitionFactory.setDefaultFactory(mock(ItemDefinitionFactory.class));
         apiUser = spy(new APIUser());
-        doReturn(userDatastore).when(apiUser).getUserDatastore();
+        doReturn(userDatastore).when(apiUser).getDefaultDatastore();
         doReturn(TestValidator.class.getName()).when(apiUser).getValidatorClassName();
         I18n.getInstance();
         APIServletCall caller = mock(APIServletCall.class);

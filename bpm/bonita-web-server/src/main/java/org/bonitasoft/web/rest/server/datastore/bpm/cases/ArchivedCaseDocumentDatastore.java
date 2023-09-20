@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.document.DocumentException;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.search.SearchResult;
@@ -63,7 +64,7 @@ public class ArchivedCaseDocumentDatastore extends CommonDatastore<ArchivedCaseD
         try {
             final ArchivedDocument documentItem = processAPI.getArchivedProcessDocument(id.toLong());
             return convertEngineToConsoleItem(documentItem);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

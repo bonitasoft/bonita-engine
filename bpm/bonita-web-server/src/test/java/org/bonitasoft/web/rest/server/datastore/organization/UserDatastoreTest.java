@@ -88,7 +88,7 @@ public class UserDatastoreTest {
         Mockito.doReturn(new SearchResultImpl<>(0, Collections.<User> emptyList())).when(identityAPI)
                 .searchUsers(Mockito.any(SearchOptions.class));
         try {
-            datastore.search(0, 1, "search", Collections.emptyMap(), sort);
+            datastore.search(0, 1, "search", sort, Collections.emptyMap());
         } catch (Exception e) {
             Assert.fail("Search should be able to handle multiple sort");
         }

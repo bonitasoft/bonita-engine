@@ -13,10 +13,12 @@
  **/
 package org.bonitasoft.web.rest.server.api.form;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
@@ -56,7 +58,7 @@ public class FormMappingResource extends CommonResource {
             representation.setCharacterSet(CharacterSet.UTF_8);
             getResponse().setEntity(representation);
             setContentRange(searchResult);
-        } catch (final Exception e) {
+        } catch (final BonitaException | IOException e) {
             throw new APIException(e);
         }
     }

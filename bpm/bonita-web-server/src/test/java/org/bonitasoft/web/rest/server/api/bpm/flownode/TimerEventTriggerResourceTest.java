@@ -20,10 +20,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,7 +88,7 @@ public class TimerEventTriggerResourceTest extends RestletTest {
     @Test(expected = APIException.class)
     public void searchTimerEventTriggersShouldThrowExceptionIfParameterNotFound() throws Exception {
         // given:
-        doReturn(null).when(timerEventTriggerResource).getParameter(anyString(), anyBoolean());
+        doThrow(APIException.class).when(timerEventTriggerResource).getParameter(anyString(), anyBoolean());
 
         // when:
         timerEventTriggerResource.searchTimerEventTriggers();

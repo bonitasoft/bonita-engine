@@ -18,13 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
-import org.bonitasoft.engine.bpm.process.V6FormDeployException;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -69,8 +63,6 @@ public class ProcessEngineClient {
             LOGGER.debug("Unable to find process with id " + processId);
             throw new APIItemNotFoundException(org.bonitasoft.web.rest.model.bpm.process.ProcessDefinition.TOKEN,
                     APIID.makeAPIID(processId));
-        } catch (final Exception e) {
-            throw new APIException("Error when getting process deployment information", e);
         }
     }
 
@@ -93,7 +85,7 @@ public class ProcessEngineClient {
                     "Process %appName% in version %version% contains 6.x Legacy artifacts (forms or case overview page). Those are based on Google Web Toolkit (GWT), a technology that is no longer supported by Bonita. To know more, check the documentation.",
                     new Arg("appName", processDefinition.getName()),
                     new Arg("version", processDefinition.getVersion())), e);
-        } catch (final Exception e) {
+        } catch (final ProcessDeployException e) {
             throw new APIException(new T_("Unable to deploy business archive"), e);
         }
     }
@@ -101,7 +93,7 @@ public class ProcessEngineClient {
     public void enableProcess(final long processId) {
         try {
             getProcessApi().enableProcess(processId);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(new T_("Unable to enable process"), e);
         }
     }
@@ -109,7 +101,7 @@ public class ProcessEngineClient {
     public void disableProcess(final long processId) {
         try {
             getProcessApi().disableProcess(processId);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(new T_("Unable to disable process"), e);
         }
     }
@@ -119,7 +111,7 @@ public class ProcessEngineClient {
         try {
             getProcessApi().updateProcessDeploymentInfo(processId, processDeploymentInfoUpdater);
             return getProcessApi().getProcessDeploymentInfo(processId);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(new T_("Error when updating process deployment informations"), e);
         }
     }
@@ -196,7 +188,7 @@ public class ProcessEngineClient {
     public SearchResult<ProcessDeploymentInfo> searchProcessDefinitions(final SearchOptions searchOptions) {
         try {
             return getProcessApi().searchProcessDeploymentInfos(searchOptions);
-        } catch (final Exception e) {
+        } catch (final SearchException e) {
             throw new APIException("Error when searching process definition", e);
         }
     }
@@ -205,7 +197,7 @@ public class ProcessEngineClient {
             final SearchOptions searchOptions) {
         try {
             return getProcessApi().searchProcessDeploymentInfosSupervisedBy(userId, searchOptions);
-        } catch (final Exception e) {
+        } catch (final SearchException e) {
             throw new APIException("Error when searching process definition supervised by user " + userId, e);
         }
     }
@@ -214,7 +206,7 @@ public class ProcessEngineClient {
             final SearchOptions searchOptions) {
         try {
             return getProcessApi().searchUncategorizedProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
-        } catch (final Exception e) {
+        } catch (final SearchException e) {
             throw new APIException(
                     "Error when searching uncategorized process definition which can be started by user " + userId, e);
         }
@@ -224,7 +216,7 @@ public class ProcessEngineClient {
             final SearchOptions searchOptions) {
         try {
             return getProcessApi().searchProcessDeploymentInfosStartedBy(userId, searchOptions);
-        } catch (final Exception e) {
+        } catch (final SearchException e) {
             throw new APIException("Error when searching recently started process by user " + userId, e);
         }
     }
@@ -235,7 +227,7 @@ public class ProcessEngineClient {
                 ProcessItem.VALUE_CONFIGURATION_STATE_RESOLVED);
         try {
             return getProcessApi().searchProcessDeploymentInfos(builder.done()).getCount();
-        } catch (final Exception e) {
+        } catch (final SearchException e) {
             throw new APIException("Error when counting resolved processes", e);
         }
     }

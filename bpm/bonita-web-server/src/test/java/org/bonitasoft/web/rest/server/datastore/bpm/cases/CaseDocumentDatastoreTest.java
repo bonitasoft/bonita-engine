@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -353,6 +354,9 @@ public class CaseDocumentDatastoreTest extends APITestWithMock {
         attributes.put(CaseDocumentItem.ATTRIBUTE_NAME, "Doc 1");
         attributes.put(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH, "unexisting.document");
         final APIID id = APIID.makeAPIID(1L);
+        doThrow(FileNotFoundException.class).when(documentDatastore)
+                .buildDocumentValueFromUploadPath("unexisting.document", -1, null);
+
         try {
             // When
             documentDatastore.update(id, attributes);
