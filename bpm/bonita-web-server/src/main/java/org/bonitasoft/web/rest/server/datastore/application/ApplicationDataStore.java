@@ -24,6 +24,7 @@ import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchResult;
@@ -71,7 +72,7 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
             for (final APIID id : ids) {
                 applicationAPI.deleteApplication(id.toLong());
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             if (e.getCause() instanceof ApplicationNotFoundException) {
                 throw new APIItemNotFoundException(ApplicationDefinition.TOKEN);
             } else {
@@ -85,7 +86,7 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
         try {
             final Application application = applicationAPI.getApplication(id.toLong());
             return converter.toApplicationItem(application);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -103,7 +104,7 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
                     homePageDef.getId(), "home");
             applicationAPI.setApplicationHomePage(application.getId(), appHomePage.getId());
             return converter.toApplicationItem(application);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -114,7 +115,7 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
             final ApplicationUpdater applicationUpdater = converter.toApplicationUpdater(attributes);
             final Application application = applicationAPI.updateApplication(id.toLong(), applicationUpdater);
             return converter.toApplicationItem(application);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

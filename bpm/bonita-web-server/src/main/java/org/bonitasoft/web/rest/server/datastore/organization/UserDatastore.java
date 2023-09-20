@@ -32,7 +32,7 @@ import org.bonitasoft.web.rest.server.engineclient.EngineAPIAccessor;
 import org.bonitasoft.web.rest.server.engineclient.EngineClientFactory;
 import org.bonitasoft.web.rest.server.engineclient.ProcessEngineClient;
 import org.bonitasoft.web.rest.server.engineclient.UserEngineClient;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
+import org.bonitasoft.web.rest.server.framework.api.*;
 import org.bonitasoft.web.rest.server.framework.exception.APIAttributeException;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
@@ -42,7 +42,11 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
  * @author Séverin Moussel
  */
 public class UserDatastore extends CommonDatastore<UserItem, User>
-        implements DatastoreHasGet<UserItem> {
+        implements DatastoreHasAdd<UserItem>,
+        DatastoreHasGet<UserItem>,
+        DatastoreHasSearch<UserItem>,
+        DatastoreHasUpdate<UserItem>,
+        DatastoreHasDelete {
 
     protected EngineClientFactory engineClientFactory;
 
@@ -96,8 +100,9 @@ public class UserDatastore extends CommonDatastore<UserItem, User>
      * @return This method returns an ItemSearch result containing the returned data and information about the total
      *         possible results.
      */
+    @Override
     public ItemSearchResult<UserItem> search(final int page, final int resultsByPage, final String search,
-            final Map<String, String> filters, final String orders) {
+            final String orders, Map<String, String> filters) {
 
         if (filters.containsKey(UserItem.FILTER_PROCESS_ID)) {
             String processId = filters.get(UserItem.FILTER_PROCESS_ID);

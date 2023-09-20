@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformState;
@@ -61,7 +62,7 @@ public class APIPlatform extends org.bonitasoft.web.rest.server.api.PlatformAPI<
                 }
             }
             return get(null);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -85,7 +86,7 @@ public class APIPlatform extends org.bonitasoft.web.rest.server.api.PlatformAPI<
         } catch (final PlatformNotFoundException ex) {
             clientItem = new PlatformItem();
             return clientItem;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -93,7 +94,7 @@ public class APIPlatform extends org.bonitasoft.web.rest.server.api.PlatformAPI<
     private PlatformAPI getPlatformAPI() {
         try {
             return PlatformAPIAccessor.getPlatformAPI(getPlatformSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

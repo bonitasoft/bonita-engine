@@ -25,6 +25,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.process.ProcessConnectorItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
@@ -51,7 +52,7 @@ public class ProcessConnectorDatastore extends CommonDatastore<ProcessConnectorI
     protected ProcessAPI getProcessAPI() {
         try {
             return TenantAPIAccessor.getProcessAPI(getEngineSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -70,7 +71,7 @@ public class ProcessConnectorDatastore extends CommonDatastore<ProcessConnectorI
             connector.setProcessId(id.getPartAsLong(ATTRIBUTE_PROCESS_ID));
 
             return connector;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -80,31 +81,26 @@ public class ProcessConnectorDatastore extends CommonDatastore<ProcessConnectorI
             final String orders,
             final Map<String, String> filters) {
 
-        try {
-            final Long processId = MapUtil.getValueAsLong(filters, ATTRIBUTE_PROCESS_ID);
+        final Long processId = MapUtil.getValueAsLong(filters, ATTRIBUTE_PROCESS_ID);
 
-            final List<ConnectorImplementationDescriptor> connectors = getProcessAPI().getConnectorImplementations(
-                    processId,
-                    SearchOptionsBuilderUtil.computeIndex(page, resultsByPage),
-                    resultsByPage,
-                    ConnectorCriterion.valueOf(orders.toUpperCase().replace(" ", "_")));
+        final List<ConnectorImplementationDescriptor> connectors = getProcessAPI().getConnectorImplementations(
+                processId,
+                SearchOptionsBuilderUtil.computeIndex(page, resultsByPage),
+                resultsByPage,
+                ConnectorCriterion.valueOf(orders.toUpperCase().replace(" ", "_")));
 
-            final List<ProcessConnectorItem> results = new ArrayList<>();
-            for (final ConnectorImplementationDescriptor connector : connectors) {
-                final ProcessConnectorItem result = convertEngineToConsoleItem(connector);
-                // Correct missing element in engine object
-                result.setProcessId(processId);
+        final List<ProcessConnectorItem> results = new ArrayList<>();
+        for (final ConnectorImplementationDescriptor connector : connectors) {
+            final ProcessConnectorItem result = convertEngineToConsoleItem(connector);
+            // Correct missing element in engine object
+            result.setProcessId(processId);
 
-                results.add(result);
-            }
-
-            final long numtotalConnectorImplem = getProcessAPI().getNumberOfConnectorImplementations(processId);
-
-            return new ItemSearchResult<>(page, resultsByPage, numtotalConnectorImplem, results);
-
-        } catch (final Exception e) {
-            throw new APIException(e);
+            results.add(result);
         }
+
+        final long numtotalConnectorImplem = getProcessAPI().getNumberOfConnectorImplementations(processId);
+
+        return new ItemSearchResult<>(page, resultsByPage, numtotalConnectorImplem, results);
     }
 
     @Override

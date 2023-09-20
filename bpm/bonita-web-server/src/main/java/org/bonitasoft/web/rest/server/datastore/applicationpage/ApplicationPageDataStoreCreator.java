@@ -15,6 +15,7 @@ package org.bonitasoft.web.rest.server.datastore.applicationpage;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 
@@ -27,7 +28,7 @@ public class ApplicationPageDataStoreCreator {
         try {
             final ApplicationAPI applicationAPI = TenantAPIAccessor.getLivingApplicationAPI(session);
             return new ApplicationPageDataStore(session, applicationAPI, new ApplicationPageItemConverter());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

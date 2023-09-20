@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.bonitasoft.console.common.server.login.HttpServletRequestAccessor;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.rest.model.ModelFactory;
 import org.bonitasoft.web.rest.server.datastore.bpm.flownode.FlowNodeConverter;
@@ -72,6 +73,11 @@ public class BonitaRestAPIServlet extends APIServlet {
             SessionUtil.sessionLogout(requestAccessor.getHttpSession());
         } else if (exception.getCause() instanceof NotFoundException) {
             outputException(null, req, resp, HttpServletResponse.SC_NOT_FOUND);
+        } else if (exception instanceof TenantStatusException) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Platform is probably under Maintenance : " + exception.getMessage());
+            }
+            outputException(null, req, resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         } else {
             super.catchAllExceptions(exception, req, resp);
         }

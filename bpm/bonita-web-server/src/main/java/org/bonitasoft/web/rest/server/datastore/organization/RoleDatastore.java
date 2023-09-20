@@ -21,10 +21,7 @@ import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.console.common.server.utils.IconDescriptor;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.identity.*;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -72,7 +69,7 @@ public class RoleDatastore extends CommonDatastore<RoleItem, Role> implements
 
             getIdentityAPI().deleteRoles(longIds);
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -100,9 +97,7 @@ public class RoleDatastore extends CommonDatastore<RoleItem, Role> implements
             return convertEngineToConsoleItem(getIdentityAPI().updateRole(id.toLong(), updater));
         } catch (final RoleNotFoundException e) {
             throw new APINotFoundException(new T_("Unable to find role %roleId%", new Arg("roleId", id)));
-        } catch (APIException e) {
-            throw e;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
 
@@ -125,13 +120,11 @@ public class RoleDatastore extends CommonDatastore<RoleItem, Role> implements
             }
 
             return convertEngineToConsoleItem(getIdentityAPI().createRole(creator));
-        } catch (APIException e) {
-            throw e;
         } catch (AlreadyExistsException e) {
             throw new APIForbiddenException(
                     new T_("Can't create role. Role '%roleName%' already exists", new Arg("roleName", role.getName())),
                     e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
 
@@ -161,7 +154,7 @@ public class RoleDatastore extends CommonDatastore<RoleItem, Role> implements
 
             return new ItemSearchResult<>(page, resultsByPage, engineSearchResults.getCount(), consoleSearchResults);
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -172,7 +165,7 @@ public class RoleDatastore extends CommonDatastore<RoleItem, Role> implements
             return convertEngineToConsoleItem(getIdentityAPI().getRole(id.toLong()));
         } catch (final RoleNotFoundException e) {
             throw new APINotFoundException(new T_("Unable to find role %roleId%", new Arg("roleId", id)));
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -180,7 +173,7 @@ public class RoleDatastore extends CommonDatastore<RoleItem, Role> implements
     public Long getNumberOfUsers(final APIID roleId) {
         try {
             return getIdentityAPI().getNumberOfUsersInRole(roleId.toLong());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -83,7 +84,7 @@ public class APIProcessParameter extends ConsoleAPI<ProcessParameterItem> {
             return new ProcessParameterItem(processId, parameterInstance.getName(), parameterInstance.getType(),
                     paramValue, parameterInstance.getDescription(), processDeploy.getDisplayName(),
                     processDef.getVersion());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -121,7 +122,7 @@ public class APIProcessParameter extends ConsoleAPI<ProcessParameterItem> {
                         p.getDescription(), "", ""));
             }
             return new ItemSearchResult<>(page, resultsByPage, parametersCount, items);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

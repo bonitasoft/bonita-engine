@@ -40,10 +40,7 @@ import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.datastore.filter.Filters;
 import org.bonitasoft.web.rest.server.datastore.utils.SearchOptionsCreator;
 import org.bonitasoft.web.rest.server.datastore.utils.Sorts;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasAdd;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasDelete;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
-import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
+import org.bonitasoft.web.rest.server.framework.api.*;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.common.util.StringUtil;
@@ -85,7 +82,7 @@ public class CaseDocumentDatastore extends CommonDatastore<CaseDocumentItem, Doc
         try {
             final Document documentItem = processAPI.getDocument(id.toLong());
             return convertEngineToConsoleItem(documentItem);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -135,7 +132,7 @@ public class CaseDocumentDatastore extends CommonDatastore<CaseDocumentItem, Doc
             } else {
                 throw new APIException("Error while attaching a new document. Request with bad param value.");
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException | IOException e) {
             throw new APIException(e);
         } finally {
             if (urlPath == null) {
@@ -170,7 +167,7 @@ public class CaseDocumentDatastore extends CommonDatastore<CaseDocumentItem, Doc
             } else {
                 throw new APIException("Error while attaching a new document. Request with bad param value.");
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException | IOException e) {
             throw new APIException(e);
         } finally {
             if (attributes.containsKey(CaseDocumentItem.ATTRIBUTE_UPLOAD_PATH)) {
@@ -249,10 +246,9 @@ public class CaseDocumentDatastore extends CommonDatastore<CaseDocumentItem, Doc
             }
             return new ItemSearchResult<>(page, resultsByPage, engineSearchResults.getCount(),
                     convertEngineToConsoleItem(engineSearchResults.getResult()));
-        } catch (final Exception e) {
-            e.printStackTrace();
+        } catch (final BonitaException e) {
+            throw new APIException(e);
         }
-        return null;
     }
 
     protected SearchOptionsCreator buildSearchOptionCreator(final int page, final int resultsByPage,

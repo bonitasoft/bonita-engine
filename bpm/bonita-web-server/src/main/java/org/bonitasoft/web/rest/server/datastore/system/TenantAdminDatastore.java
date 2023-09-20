@@ -24,7 +24,6 @@ import org.bonitasoft.web.rest.server.engineclient.TenantManagementEngineClient;
 import org.bonitasoft.web.rest.server.framework.api.Datastore;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
 /**
@@ -48,31 +47,23 @@ public class TenantAdminDatastore extends Datastore
     public TenantAdminItem update(final APIID unusedId, final Map<String, String> attributes) {
         logDeprecatedAPIUsage();
         final TenantAdminItem tenantAdminItem = new TenantAdminItem();
-        try {
-            final boolean doPause = Boolean.parseBoolean(attributes.get(TenantAdminItem.ATTRIBUTE_IS_PAUSED));
-            if (!doPause) {
-                getTenantManagementEngineClient().resumeTenant();
-            } else {
-                getTenantManagementEngineClient().pauseTenant();
-            }
-            tenantAdminItem.setIsPaused(doPause);
-            return tenantAdminItem;
-        } catch (final Exception e) {
-            throw new APIException(e);
+        final boolean doPause = Boolean.parseBoolean(attributes.get(TenantAdminItem.ATTRIBUTE_IS_PAUSED));
+        if (!doPause) {
+            getTenantManagementEngineClient().resumeTenant();
+        } else {
+            getTenantManagementEngineClient().pauseTenant();
         }
+        tenantAdminItem.setIsPaused(doPause);
+        return tenantAdminItem;
     }
 
     @Override
     public TenantAdminItem get(final APIID id) {
         logDeprecatedAPIUsage();
         final TenantAdminItem tenantAdminItem = new TenantAdminItem();
-        try {
-            final boolean tenantPaused = getTenantManagementEngineClient().isTenantPaused();
-            tenantAdminItem.setIsPaused(tenantPaused);
-            return tenantAdminItem;
-        } catch (final Exception e) {
-            throw new APIException(e);
-        }
+        final boolean tenantPaused = getTenantManagementEngineClient().isTenantPaused();
+        tenantAdminItem.setIsPaused(tenantPaused);
+        return tenantAdminItem;
     }
 
     protected void logDeprecatedAPIUsage() {

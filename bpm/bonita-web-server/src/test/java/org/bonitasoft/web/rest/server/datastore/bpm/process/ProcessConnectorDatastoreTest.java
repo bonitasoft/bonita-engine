@@ -102,14 +102,6 @@ public class ProcessConnectorDatastoreTest extends APITestWithMock {
         this.processConnectorDatastore.get(anAPIID("1", "name", "1"));
     }
 
-    @Test(expected = APIException.class)
-    public void searchThrowExceptionIfProcessDefinitionIsNotFound() throws Exception {
-        when(this.processAPI.getConnectorImplementations(anyLong(), anyInt(), anyInt(), any(ConnectorCriterion.class)))
-                .thenThrow(new NullPointerException());
-
-        this.processConnectorDatastore.search(0, 10, null, null, aProcessIdFilter("1"));
-    }
-
     @Test
     public void searchReturnAllProcessConnectorForAProcessDefinitionId() throws Exception {
         final ConnectorImplementationDescriptor descriptor1 = aConnectorImplementationDescriptor("aName");

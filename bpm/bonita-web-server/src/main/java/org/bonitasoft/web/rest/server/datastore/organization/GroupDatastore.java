@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupSearchDescriptor;
@@ -54,7 +55,7 @@ public class GroupDatastore extends CommonDatastore<GroupItem, Group> implements
         super(engineSession);
     }
 
-    private GroupEngineClient getGroupEngineClient() {
+    public GroupEngineClient getGroupEngineClient() {
         return new EngineClientFactory(new EngineAPIAccessor(getEngineSession()))
                 .createGroupEngineClient();
     }
@@ -84,7 +85,7 @@ public class GroupDatastore extends CommonDatastore<GroupItem, Group> implements
             return new ItemSearchResult<>(page, resultsByPage, engineSearchResults.getCount(),
                     new GroupItemConverter().convert(engineSearchResults.getResult()));
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -112,7 +113,7 @@ public class GroupDatastore extends CommonDatastore<GroupItem, Group> implements
     public Long getNumberOfUsers(final APIID groupId) {
         try {
             return TenantAPIAccessor.getIdentityAPI(getEngineSession()).getNumberOfUsersInGroup(groupId.toLong());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

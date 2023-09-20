@@ -19,6 +19,7 @@ import java.util.*;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.process.ProcessCategoryItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
@@ -67,7 +68,7 @@ public class ProcessCategoryDatastore extends CommonDatastore<ProcessCategoryIte
     private void removeCategoriesFromProcess(Long processId, List<Long> categoriesId) {
         try {
             getProcessAPI().removeCategoriesFromProcess(processId, categoriesId);
-        } catch (Exception e) {
+        } catch (BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -97,7 +98,7 @@ public class ProcessCategoryDatastore extends CommonDatastore<ProcessCategoryIte
             return item;
         } catch (AlreadyExistsException e) {
             throw new APIForbiddenException(new T_("This category has already been added to this process"), e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -105,7 +106,7 @@ public class ProcessCategoryDatastore extends CommonDatastore<ProcessCategoryIte
     protected ProcessAPI getProcessAPI() {
         try {
             return TenantAPIAccessor.getProcessAPI(getEngineSession());
-        } catch (Exception e) {
+        } catch (BonitaException e) {
             throw new APIException(e);
         }
     }

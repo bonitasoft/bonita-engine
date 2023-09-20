@@ -16,19 +16,18 @@ package org.bonitasoft.web.rest.server.datastore.organization;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataUpdater;
 import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.rest.model.identity.PersonalContactDataItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasAdd;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasGet;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APISessionInvalidException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
 /**
@@ -51,9 +50,7 @@ public class PersonalContactDataDatastore extends CommonDatastore<PersonalContac
             return createContactDataItemConverter(id).convert(result);
         } catch (final NotFoundException e) {
             return null;
-        } catch (final InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -107,9 +104,7 @@ public class PersonalContactDataDatastore extends CommonDatastore<PersonalContac
             TenantAPIAccessor.getIdentityAPI(getEngineSession()).updateUser(id.toLong(), userUpdater);
             return get(id);
 
-        } catch (final InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

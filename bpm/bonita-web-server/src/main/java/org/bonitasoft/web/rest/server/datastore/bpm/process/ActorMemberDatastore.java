@@ -21,12 +21,7 @@ import org.bonitasoft.console.common.server.utils.ListUtil;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.rest.model.bpm.process.ActorMemberItem;
@@ -82,7 +77,7 @@ public class ActorMemberDatastore extends CommonDatastore<ActorMemberItem, Actor
             for (final APIID id : ids) {
                 getProcessAPI().removeActorMember(id.toLong());
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -116,7 +111,7 @@ public class ActorMemberDatastore extends CommonDatastore<ActorMemberItem, Actor
                     filteredResults.size(),
                     finalResults);
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -216,7 +211,7 @@ public class ActorMemberDatastore extends CommonDatastore<ActorMemberItem, Actor
             final ActorMemberItem addedItem = convertEngineToConsoleItem(addedActorMember);
             addedItem.setActorId(item.getActorId());
             return addedItem;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

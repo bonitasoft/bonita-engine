@@ -21,6 +21,7 @@ import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -83,7 +84,7 @@ public class CaseEngineClient {
         final SearchOptions search = new SearchOptionsBuilder(0, 0).done();
         try {
             return processAPI.searchOpenProcessInstances(search).getCount();
-        } catch (final Exception e) {
+        } catch (final SearchException e) {
             throw new APIException("Error when counting opened cases", e);
         }
     }

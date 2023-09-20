@@ -23,11 +23,9 @@ import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.rest.model.portal.profile.ProfileDefinition;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemNotFoundException;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APISessionInvalidException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
 /**
@@ -44,8 +42,6 @@ public class ProfileEngineClient {
     public Profile getProfile(Long id) {
         try {
             return profileApi.getProfile(id);
-        } catch (InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
         } catch (RetrieveException e) {
             throw new APIException(e);
         } catch (ProfileNotFoundException e) {
@@ -56,8 +52,6 @@ public class ProfileEngineClient {
     public SearchResult<Profile> searchProfiles(SearchOptions options) {
         try {
             return profileApi.searchProfiles(options);
-        } catch (InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
         } catch (SearchException e) {
             throw new APIException(e);
         }
@@ -66,8 +60,6 @@ public class ProfileEngineClient {
     public List<Profile> listProfilesForUser(long userId) {
         try {
             return profileApi.getProfilesForUser(userId, 0, Integer.MAX_VALUE, ProfileCriterion.ID_ASC);
-        } catch (InvalidSessionException e) {
-            throw new APISessionInvalidException(e);
         } catch (RetrieveException e) {
             throw new APIException(e);
         }

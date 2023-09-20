@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.ServletException;
-
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
@@ -63,8 +61,7 @@ public class DocumentDatastore {
 
     public SearchResult<Document> searchDocuments(final long userId, final String viewType,
             final SearchOptionsBuilder builder) throws InvalidSessionException,
-            BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, SearchException, NotFoundException,
-            ServletException {
+            BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, SearchException, NotFoundException {
         final ProcessAPI processAPI = getProcessAPI();
         if (DocumentItem.VALUE_VIEW_TYPE_ADMINISTRATOR.equals(viewType)
                 || DocumentItem.VALUE_VIEW_TYPE_USER.equals(viewType)) {
@@ -74,14 +71,13 @@ public class DocumentDatastore {
         } else if (DocumentItem.VALUE_VIEW_TYPE_PROCESS_OWNER.equals(viewType)) {
             return processAPI.searchDocumentsSupervisedBy(userId, builder.done());
         }
-        throw new ServletException("Invalid view type.");
+        throw new IllegalArgumentException("Invalid view type.");
     }
 
     public SearchResult<ArchivedDocument> searchArchivedDocuments(final long userId, final String viewType,
             final SearchOptionsBuilder builder)
             throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException,
-            SearchException, NotFoundException,
-            ServletException {
+            SearchException, NotFoundException {
         final ProcessAPI processAPI = getProcessAPI();
         if (DocumentItem.VALUE_VIEW_TYPE_ADMINISTRATOR.equals(viewType)
                 || DocumentItem.VALUE_VIEW_TYPE_USER.equals(viewType)
@@ -90,7 +86,7 @@ public class DocumentDatastore {
         } else if (DocumentItem.VALUE_VIEW_TYPE_PROCESS_OWNER.equals(viewType)) {
             return processAPI.searchArchivedDocumentsSupervisedBy(userId, builder.done());
         }
-        throw new ServletException("Invalid view type.");
+        throw new IllegalArgumentException("Invalid view type.");
     }
 
     public DocumentItem createDocument(final long processInstanceId, final String documentName,

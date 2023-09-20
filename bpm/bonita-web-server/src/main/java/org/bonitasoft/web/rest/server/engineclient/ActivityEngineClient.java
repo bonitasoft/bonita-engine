@@ -20,6 +20,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -45,7 +46,7 @@ public class ActivityEngineClient {
                 .filter(ActivityInstanceSearchDescriptor.STATE_NAME, ActivityItem.VALUE_STATE_FAILED).done();
         try {
             return processAPI.searchActivities(search).getCount();
-        } catch (Exception e) {
+        } catch (SearchException e) {
             throw new APIException("Error when counting failed activities", e);
         }
     }

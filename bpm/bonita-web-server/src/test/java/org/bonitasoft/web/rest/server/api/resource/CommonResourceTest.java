@@ -32,7 +32,6 @@ import org.bonitasoft.web.rest.server.framework.APIServletCall;
 import org.bonitasoft.web.rest.server.utils.FakeResource;
 import org.bonitasoft.web.rest.server.utils.FakeResource.FakeService;
 import org.bonitasoft.web.rest.server.utils.RestletTest;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -137,7 +136,7 @@ public class CommonResourceTest extends RestletTest {
         verify(spy).verifyNotNullParameter(objectInParameterMap, parameterName);
     }
 
-    @Test(expected = APIException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void nullMandatoryParameterIsForbidden() {
         new CommonResource().verifyNotNullParameter(null, "unused");
     }
@@ -272,7 +271,7 @@ public class CommonResourceTest extends RestletTest {
         verify(spy, times(0)).verifyNotNullParameter(anyString(), anyString());
     }
 
-    @Test(expected = APIException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void getQueryParameter_throws_Exception() {
         // given:
         final CommonResource spy = spy(new CommonResource());

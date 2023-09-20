@@ -22,8 +22,10 @@ import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.exception.UnavailableLockException;
 import org.bonitasoft.engine.io.FileContent;
+import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.rest.model.bdm.BusinessDataModelItem;
 import org.bonitasoft.web.rest.server.api.resource.CommonResource;
 import org.bonitasoft.web.rest.server.api.tenant.TenantResourceItem;
@@ -69,6 +71,8 @@ public class BusinessDataModelResource extends CommonResource {
             return null;
         } catch (final BusinessDataRepositoryDeploymentException e) {
             throw new APIException("An error has occurred when deploying Business Data Model.", e);
+        } catch (final TenantStatusException | InvalidSessionException e) {
+            throw e; //handled by REST API Authorization filter
         } catch (Exception e) {
             Throwable cause = e.getCause();
             if (cause instanceof UnavailableLockException) {
@@ -88,6 +92,8 @@ public class BusinessDataModelResource extends CommonResource {
     public TenantResourceItem getBDM() {
         try {
             return new TenantResourceItem(tenantAdministrationAPI.getBusinessDataModelResource());
+        } catch (final TenantStatusException | InvalidSessionException e) {
+            throw e; //handled by REST API Authorization filter
         } catch (final Exception e) {
             throw new APIException(e);
         }

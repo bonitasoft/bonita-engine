@@ -17,6 +17,7 @@ import org.bonitasoft.console.common.server.utils.BonitaHomeFolderAccessor;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 
@@ -32,7 +33,7 @@ public class ApplicationDataStoreCreator {
             applicationAPI = TenantAPIAccessor.getLivingApplicationAPI(session);
             pageAPI = TenantAPIAccessor.getCustomPageAPI(session);
             return new ApplicationDataStore(session, applicationAPI, pageAPI, getApplicationConverter());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

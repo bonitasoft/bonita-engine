@@ -19,6 +19,7 @@ import java.util.Map;
 import org.bonitasoft.console.common.server.preferences.constants.WebBonitaConstantsUtils;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.web.rest.model.portal.page.PageDefinition;
 import org.bonitasoft.web.rest.model.portal.page.PageItem;
 import org.bonitasoft.web.rest.server.api.ConsoleAPI;
@@ -105,7 +106,7 @@ public class APIPage extends ConsoleAPI<PageItem>
         PageAPI pageAPI;
         try {
             pageAPI = TenantAPIAccessor.getCustomPageAPI(getEngineSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
         final WebBonitaConstantsUtils constants = WebBonitaConstantsUtils.getTenantInstance();

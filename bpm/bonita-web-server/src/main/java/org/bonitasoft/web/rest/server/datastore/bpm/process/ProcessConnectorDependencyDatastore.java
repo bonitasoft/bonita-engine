@@ -25,6 +25,7 @@ import org.bonitasoft.console.common.server.utils.ListUtil;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.process.ProcessConnectorDependencyItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
@@ -47,7 +48,7 @@ public class ProcessConnectorDependencyDatastore
     protected ProcessAPI getProcessAPI() {
         try {
             return TenantAPIAccessor.getProcessAPI(getEngineSession());
-        } catch (Exception e) {
+        } catch (BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -81,7 +82,7 @@ public class ProcessConnectorDependencyDatastore
 
             return new ItemSearchResult<>(page, results.size(), jarDependencies.size(), results);
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
 

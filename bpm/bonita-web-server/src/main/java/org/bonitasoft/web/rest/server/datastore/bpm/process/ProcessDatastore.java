@@ -27,6 +27,7 @@ import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
+import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -124,7 +125,7 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
     protected BusinessArchive readBusinessArchive(final InputStream inputStream) {
         try {
             return BusinessArchiveFactory.readBusinessArchive(inputStream);
-        } catch (final Exception e) {
+        } catch (final IOException | InvalidBusinessArchiveFormatException e) {
             throw new APIException(e);
         }
     }
@@ -202,7 +203,7 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
                     getCustomPageService().removePageLocally(page);
                 }
             } while (startIndex < count);
-        } catch (final Exception e) {
+        } catch (final BonitaException | IOException e) {
             if (LOGGER.isWarnEnabled()) {
                 LOGGER.warn("Error when deleting pages for process with ID " + id, e);
             }
@@ -216,7 +217,7 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
     protected PageAPI getPageAPI() {
         try {
             return TenantAPIAccessor.getCustomPageAPI(getEngineSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
