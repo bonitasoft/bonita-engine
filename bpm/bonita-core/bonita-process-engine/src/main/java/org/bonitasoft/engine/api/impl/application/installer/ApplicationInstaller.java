@@ -17,29 +17,9 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.bonitasoft.engine.api.result.Status.errorStatus;
-import static org.bonitasoft.engine.api.result.Status.infoStatus;
-import static org.bonitasoft.engine.api.result.Status.warningStatus;
-import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_DEPLOYMENT;
-import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_APPLICATION_PAGE;
-import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_LAYOUT;
-import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PAGE;
-import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_PROFILE;
-import static org.bonitasoft.engine.api.result.StatusCode.LIVING_APP_REFERENCES_UNKNOWN_THEME;
-import static org.bonitasoft.engine.api.result.StatusCode.ORGANIZATION_IMPORT_WARNING;
-import static org.bonitasoft.engine.api.result.StatusCode.PAGE_DEPLOYMENT_CREATE_NEW;
-import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_CREATE_NEW;
-import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_DISABLEMENT_OK;
-import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_KO;
-import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_ENABLEMENT_OK;
-import static org.bonitasoft.engine.api.result.StatusCode.PROCESS_DEPLOYMENT_SKIP_INSTALL;
-import static org.bonitasoft.engine.api.result.StatusContext.LIVING_APPLICATION_IMPORT_STATUS_KEY;
-import static org.bonitasoft.engine.api.result.StatusContext.LIVING_APPLICATION_INVALID_ELEMENT_NAME;
-import static org.bonitasoft.engine.api.result.StatusContext.LIVING_APPLICATION_INVALID_ELEMENT_TYPE;
-import static org.bonitasoft.engine.api.result.StatusContext.LIVING_APPLICATION_TOKEN_KEY;
-import static org.bonitasoft.engine.api.result.StatusContext.PAGE_NAME_KEY;
-import static org.bonitasoft.engine.api.result.StatusContext.PROCESS_NAME_KEY;
-import static org.bonitasoft.engine.api.result.StatusContext.PROCESS_VERSION_KEY;
+import static org.bonitasoft.engine.api.result.Status.*;
+import static org.bonitasoft.engine.api.result.StatusCode.*;
+import static org.bonitasoft.engine.api.result.StatusContext.*;
 import static org.bonitasoft.engine.bpm.process.ActivationState.DISABLED;
 import static org.bonitasoft.engine.bpm.process.ConfigurationState.RESOLVED;
 import static org.bonitasoft.engine.business.application.ApplicationImportPolicy.FAIL_ON_DUPLICATES;
@@ -60,7 +40,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
@@ -163,14 +142,6 @@ public class ApplicationInstaller {
     private final ApplicationImporter applicationImporter;
     private final Long tenantId;
     private final ApplicationNodeContainerConverter appXmlConverter = new ApplicationNodeContainerConverter();
-
-    @VisibleForTesting
-    static final String WARNING_MISSING_PAGE_MESSAGE = "If your are using pages from Bonita Admin or User applications, "
-            +
-            "ensure to set the Bonita runtime property " +
-            "'bonita.runtime.custom-application.install-provided-pages=true' " +
-            "or the environment variable 'INSTALL_PROVIDED_PAGES=true " +
-            "(if you are in docker context) in order to install those pages";
 
     @Autowired
     public ApplicationInstaller(InstallationService installationService,
@@ -542,7 +513,6 @@ public class ApplicationInstaller {
             throws AlreadyExistsException, ImportException, ApplicationInstallationException {
         try {
             boolean atLeastOneBlockingProblem = false;
-            var displaySpecificErrorMessage = new AtomicBoolean(false);
             for (File livingApplicationFile : applicationArchive.getApplications()) {
                 log.info("Installing Living Application from file '{}'", livingApplicationFile.getName());
                 var appContainer = appXmlConverter
@@ -558,10 +528,6 @@ public class ApplicationInstaller {
                         errors.forEach(error -> {
                             Status errorStatus = buildErrorStatus(error, livingApplicationFile.getName());
                             executionResult.addStatus(errorStatus);
-                            if (!displaySpecificErrorMessage.get()
-                                    && errorStatus.getCode() == LIVING_APP_REFERENCES_UNKNOWN_PAGE) {
-                                displaySpecificErrorMessage.set(true);
-                            }
                         });
 
                         atLeastOneBlockingProblem = true;
@@ -577,11 +543,6 @@ public class ApplicationInstaller {
             }
 
             if (atLeastOneBlockingProblem) {
-                if (displaySpecificErrorMessage.get()) {
-                    executionResult.addStatus(
-                            warningStatus(LIVING_APP_REFERENCES_UNKNOWN_PAGE, WARNING_MISSING_PAGE_MESSAGE,
-                                    null));
-                }
                 throw new ApplicationInstallationException(
                         "At least one application failed to be installed. Canceling installation.");
             }
