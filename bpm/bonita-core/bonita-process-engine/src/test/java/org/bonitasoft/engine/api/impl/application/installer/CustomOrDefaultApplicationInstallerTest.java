@@ -163,7 +163,7 @@ class CustomOrDefaultApplicationInstallerTest {
     }
 
     @Test
-    void should_install_custom_application_if_detected_and_platform_first_init_and_install_provided_resources_is_false()
+    void should_install_custom_application_if_detected_and_platform_first_init()
             throws Exception {
         //given
         Resource resource1 = mockResource("resource1", true, true, 0L);
@@ -175,38 +175,11 @@ class CustomOrDefaultApplicationInstallerTest {
         final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
         doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
         doReturn(true).when(listener).isPlatformFirstInitialization();
-        doReturn(false).when(listener).isAddDefaultPages();
         //when
         listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(defaultLivingApplicationImporter, never()).importDefaultPages();
         verify(applicationInstaller).install(applicationArchive, "1.0.0");
-
-        verify(defaultLivingApplicationImporter, never()).execute();
-    }
-
-    @Test
-    void should_install_custom_application_and_provided_provide_page_if_detected_and_platform_first_init_and_install_provided_resources_is_true()
-            throws Exception {
-        //given
-        Resource resource1 = mockResource("resource1", true, true, 0L);
-        InputStream resourceStream1 = mock(InputStream.class);
-
-        doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of(new Semver("1.0.0"))).when(listener).readApplicationVersion(resource1);
-        doReturn(resourceStream1).when(resource1).getInputStream();
-        final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
-        doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
-        doReturn(true).when(listener).isPlatformFirstInitialization();
-        doReturn(true).when(listener).isAddDefaultPages();
-        //when
-        listener.autoDeployDetectedCustomApplication(any());
-
-        //then
-        InOrder inOrder = inOrder(defaultLivingApplicationImporter, applicationInstaller);
-        inOrder.verify(defaultLivingApplicationImporter).importDefaultPages();
-        inOrder.verify(applicationInstaller).install(applicationArchive, "1.0.0");
         verify(defaultLivingApplicationImporter, never()).execute();
     }
 
@@ -284,7 +257,6 @@ class CustomOrDefaultApplicationInstallerTest {
         //then
         verify(applicationInstaller, never()).install(any(), eq("1.0.0"));
         verify(defaultLivingApplicationImporter).execute();
-        verify(defaultLivingApplicationImporter, never()).importDefaultPages();
     }
 
     @Test
