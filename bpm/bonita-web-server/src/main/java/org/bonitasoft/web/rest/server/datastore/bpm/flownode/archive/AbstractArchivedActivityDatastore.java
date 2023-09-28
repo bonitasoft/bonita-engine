@@ -16,6 +16,7 @@ package org.bonitasoft.web.rest.server.datastore.bpm.flownode.archive;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.flownode.ArchivedActivityItem;
@@ -69,7 +70,7 @@ public abstract class AbstractArchivedActivityDatastore<CONSOLE_ITEM extends Arc
                             creator.create());
 
             return result;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

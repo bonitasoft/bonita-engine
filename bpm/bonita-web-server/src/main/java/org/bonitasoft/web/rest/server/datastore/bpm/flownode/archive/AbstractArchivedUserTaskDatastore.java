@@ -20,7 +20,6 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.flownode.ArchivedUserTaskItem;
 import org.bonitasoft.web.rest.server.datastore.utils.SearchOptionsCreator;
-import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemNotFoundException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
@@ -37,15 +36,11 @@ public abstract class AbstractArchivedUserTaskDatastore<CONSOLE_ITEM extends Arc
     @Override
     protected SearchResult<ENGINE_ITEM> runSearch(final SearchOptionsCreator creator,
             final Map<String, String> filters) {
-        try {
-            if (!filters.containsKey(ArchivedUserTaskItem.ATTRIBUTE_TYPE)) {
-                filters.put(ArchivedUserTaskItem.ATTRIBUTE_TYPE, ArchivedUserTaskItem.VALUE_TYPE_USER_TASK);
-            }
-
-            return super.runSearch(creator, filters);
-        } catch (final Exception e) {
-            throw new APIException(e);
+        if (!filters.containsKey(ArchivedUserTaskItem.ATTRIBUTE_TYPE)) {
+            filters.put(ArchivedUserTaskItem.ATTRIBUTE_TYPE, ArchivedUserTaskItem.VALUE_TYPE_USER_TASK);
         }
+
+        return super.runSearch(creator, filters);
     }
 
     @Override

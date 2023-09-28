@@ -21,6 +21,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -45,7 +46,7 @@ public class ConnectorInstanceDatastore extends CommonDatastore<ConnectorInstanc
     protected ProcessAPI getProcessAPI() {
         try {
             return TenantAPIAccessor.getProcessAPI(getEngineSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -59,7 +60,7 @@ public class ConnectorInstanceDatastore extends CommonDatastore<ConnectorInstanc
         try {
             searchConnectorInstances = getProcessAPI()
                     .searchConnectorInstances(buildSearchOptions(page, resultsByPage, search, orders, filters));
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
 

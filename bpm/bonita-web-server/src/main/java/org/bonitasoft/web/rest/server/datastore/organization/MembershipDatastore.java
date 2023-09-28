@@ -20,10 +20,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.UserMembershipCriterion;
 import org.bonitasoft.engine.session.APISession;
@@ -91,7 +88,7 @@ public class MembershipDatastore extends CommonDatastore<MembershipItem, UserMem
             for (final APIID id : ids) {
                 getIdentityAPI().deleteUserMembership(id.getPartAsLong(0), id.getPartAsLong(1), id.getPartAsLong(2));
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -122,7 +119,7 @@ public class MembershipDatastore extends CommonDatastore<MembershipItem, UserMem
                     total,
                     consoleSearchResults);
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -135,7 +132,7 @@ public class MembershipDatastore extends CommonDatastore<MembershipItem, UserMem
                             item.getRoleId().toLong()));
         } catch (AlreadyExistsException e) {
             throw new APIForbiddenException(new T_("This membership is already added to user"), e);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.flownode.ArchivedHumanTaskItem;
@@ -68,26 +69,21 @@ public abstract class AbstractArchivedHumanTaskDatastore<CONSOLE_ITEM extends Ar
     public ItemSearchResult<CONSOLE_ITEM> search(final int page, final int resultsByPage, final String search,
             final String orders,
             final Map<String, String> filters) {
-        try {
-            // can't use the ArchivedFlowNodeSearchDescriptorConverter to map web filter to engine ones since
-            // the supervisor id filter isn't handle in engine but is a specific method
-            String supervisorIdString = filters.remove(HumanTaskItem.FILTER_SUPERVISOR_ID);
-            final SearchOptionsCreator creator = makeSearchOptionCreator(page, resultsByPage, search, orders, filters);
-            if (StringUtils.isNotBlank(supervisorIdString)) {
-                filters.put(HumanTaskItem.FILTER_SUPERVISOR_ID, supervisorIdString);
-            }
-
-            final SearchResult<ENGINE_ITEM> results = runSearch(creator, filters);
-
-            return new ItemSearchResult<>(
-                    page,
-                    resultsByPage,
-                    results.getCount(),
-                    convertEngineToConsoleItemsList(results.getResult()));
-
-        } catch (final Exception e) {
-            throw new APIException(e);
+        // can't use the ArchivedFlowNodeSearchDescriptorConverter to map web filter to engine ones since
+        // the supervisor id filter isn't handle in engine but is a specific method
+        String supervisorIdString = filters.remove(HumanTaskItem.FILTER_SUPERVISOR_ID);
+        final SearchOptionsCreator creator = makeSearchOptionCreator(page, resultsByPage, search, orders, filters);
+        if (StringUtils.isNotBlank(supervisorIdString)) {
+            filters.put(HumanTaskItem.FILTER_SUPERVISOR_ID, supervisorIdString);
         }
+
+        final SearchResult<ENGINE_ITEM> results = runSearch(creator, filters);
+
+        return new ItemSearchResult<>(
+                page,
+                resultsByPage,
+                results.getCount(),
+                convertEngineToConsoleItemsList(results.getResult()));
     }
 
     @SuppressWarnings("unchecked")
@@ -110,7 +106,7 @@ public abstract class AbstractArchivedHumanTaskDatastore<CONSOLE_ITEM extends Ar
             }
 
             return result;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

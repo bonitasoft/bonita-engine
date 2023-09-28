@@ -32,14 +32,12 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.page.Page;
-import org.bonitasoft.engine.page.PageCreator;
-import org.bonitasoft.engine.page.PageSearchDescriptor;
-import org.bonitasoft.engine.page.PageUpdater;
+import org.bonitasoft.engine.page.*;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.extension.page.PageResourceProvider;
+import org.bonitasoft.web.rest.model.portal.page.PageDefinition;
 import org.bonitasoft.web.rest.model.portal.page.PageItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
 import org.bonitasoft.web.rest.server.datastore.filter.Filters;
@@ -52,6 +50,7 @@ import org.bonitasoft.web.rest.server.framework.api.DatastoreHasSearch;
 import org.bonitasoft.web.rest.server.framework.api.DatastoreHasUpdate;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.exception.api.APIException;
+import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemNotFoundException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.slf4j.Logger;
@@ -121,7 +120,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
             customPageService.writePageToPageDirectory(page, pageResourceProvider, unzipPageTempFolder, engineSession);
             deleteTempDirectory(unzipPageTempFolder);
             return addedPage;
-        } catch (final Exception e) {
+        } catch (final BonitaException | IOException | InvalidPageZipContentException e) {
             throw new APIException(e);
         } finally {
             tenantFolder.removeUploadedTempContent(filename);
@@ -195,7 +194,9 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
         try {
             final Page pageItem = pageAPI.getPage(id.toLong());
             return convertEngineToConsoleItem(pageItem);
-        } catch (final Exception e) {
+        } catch (PageNotFoundException e) {
+            throw new APIItemNotFoundException(PageDefinition.TOKEN, id);
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -211,7 +212,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
                 pageAPI.deletePage(id.toLong());
                 customPageService.removePageLocally(pageResourceProvider);
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException | IOException e) {
             throw new APIException(e);
         }
     }
@@ -321,7 +322,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
                 }
             }
             return updatedPage;
-        } catch (final Exception e) {
+        } catch (final BonitaException | IOException | InvalidPageZipContentException e) {
             throw new APIException(e);
         } finally {
             if (filename != null) {

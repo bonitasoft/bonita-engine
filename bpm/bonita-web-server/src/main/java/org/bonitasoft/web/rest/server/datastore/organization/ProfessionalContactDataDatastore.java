@@ -105,7 +105,7 @@ public class ProfessionalContactDataDatastore extends CommonDatastore<Profession
             TenantAPIAccessor.getIdentityAPI(getEngineSession()).updateUser(id.toLong(), userUpdater);
             return get(id);
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
