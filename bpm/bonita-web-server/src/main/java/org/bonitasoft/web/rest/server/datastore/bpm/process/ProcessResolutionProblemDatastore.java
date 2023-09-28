@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.bpm.process.ProcessResolutionProblemItem;
 import org.bonitasoft.web.rest.server.datastore.CommonDatastore;
@@ -65,7 +66,7 @@ public class ProcessResolutionProblemDatastore extends CommonDatastore<ProcessRe
                                     startIndex,
                                     Math.min(startIndex + resultsByPage, errors.size()))));
 
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

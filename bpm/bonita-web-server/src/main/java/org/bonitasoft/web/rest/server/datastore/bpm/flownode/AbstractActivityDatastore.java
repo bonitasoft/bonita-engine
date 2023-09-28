@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
@@ -84,7 +85,7 @@ public class AbstractActivityDatastore<CONSOLE_ITEM extends ActivityItem, ENGINE
             return convertEngineToConsoleItem(activityInstance);
         } catch (final ActivityInstanceNotFoundException e) {
             throw new APIItemNotFoundException(ActivityDefinition.TOKEN, id);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -97,7 +98,7 @@ public class AbstractActivityDatastore<CONSOLE_ITEM extends ActivityItem, ENGINE
             final SearchResult<ENGINE_ITEM> results = (SearchResult<ENGINE_ITEM>) getProcessAPI()
                     .searchActivities(builder.done());
             return results;
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -169,7 +170,7 @@ public class AbstractActivityDatastore<CONSOLE_ITEM extends ActivityItem, ENGINE
             } else {
                 throw new APIException("Can't update " + item.getClass().getName() + " state to \"" + state + "\"");
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }

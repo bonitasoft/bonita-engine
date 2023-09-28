@@ -19,6 +19,7 @@ import java.util.Map;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
@@ -61,7 +62,7 @@ public class ApplicationPageDataStore extends CommonDatastore<ApplicationPageIte
                     item.getApplicationId().toLong(), item.getPageId().toLong(),
                     item.getToken());
             return converter.toApplicationPageItem(applicationPage);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -71,7 +72,7 @@ public class ApplicationPageDataStore extends CommonDatastore<ApplicationPageIte
         try {
             final ApplicationPage applicationPage = applicationAPI.getApplicationPage(id.toLong());
             return converter.toApplicationPageItem(applicationPage);
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
@@ -82,7 +83,7 @@ public class ApplicationPageDataStore extends CommonDatastore<ApplicationPageIte
             for (final APIID id : ids) {
                 applicationAPI.deleteApplicationPage(id.toLong());
             }
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             if (e.getCause() instanceof ApplicationPageNotFoundException) {
                 throw new APIItemNotFoundException(ApplicationPageDefinition.TOKEN);
             } else {

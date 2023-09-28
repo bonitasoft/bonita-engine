@@ -83,7 +83,7 @@ public abstract class AbstractArchivedFlowNodeDatastore<CONSOLE_ITEM extends Arc
     protected ProcessAPI getProcessAPI() {
         try {
             return TenantAPIAccessor.getProcessAPI(getEngineSession());
-        } catch (final Exception e) {
+        } catch (final BonitaException e) {
             throw new APIException(e);
         }
     }
