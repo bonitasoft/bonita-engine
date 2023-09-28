@@ -193,7 +193,6 @@ public class LivingApplicationPageServletTest {
         String targetURL = "/API/htmlexample1/content/~%60@%5E&*()_%20+1234567890-=%5B%5D%7B%7D'%22%7C.,%3E%3C%C3%A8%C3%A9%C3%A7%C3%A0!";
         given(resourceRenderer.getPathSegments(any())).willReturn(Arrays.asList("adminAppEEBonita",
                 "admin-process-visu", "API", "htmlexample1", "content", "~`@^&*()_+1234567890-=[]{}'\\\"|.,><èéçà!"));
-        doReturn(targetURL).when(hsResponse).encodeRedirectURL(targetURL);
         hsRequest.setContextPath("/bonita");
         hsRequest.setServletPath("/portal/resource/app");
         hsRequest.setPathInfo(UriUtils.decode(targetURL, "UTF-8"));
