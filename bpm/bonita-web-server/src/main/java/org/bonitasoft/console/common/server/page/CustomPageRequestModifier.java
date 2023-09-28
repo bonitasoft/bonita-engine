@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.bonitasoft.web.toolkit.client.common.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriUtils;
 
 /**
  * @author Julien Mege
@@ -53,16 +54,17 @@ public class CustomPageRequestModifier {
     public void forwardIfRequestIsAuthorized(final HttpServletRequest request, final HttpServletResponse response,
             final String apiPathShouldStartWith, final String apiPath) throws IOException, ServletException {
         try {
-            URI uri = new URI(apiPath);
+            String encodedAPIPath = UriUtils.encodePath(apiPath, "UTF-8");
+            URI uri = new URI(encodedAPIPath);
             if (!uri.normalize().toString().startsWith(apiPathShouldStartWith)) {
-                final String message = "attempt to access unauthorized path " + apiPath;
+                final String message = "attempt to access unauthorized path " + encodedAPIPath;
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(message);
                 }
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.flushBuffer();
             } else {
-                request.getRequestDispatcher(apiPath).forward(request, response);
+                request.getRequestDispatcher(encodedAPIPath).forward(request, response);
             }
         } catch (URISyntaxException e) {
             if (LOGGER.isDebugEnabled()) {
