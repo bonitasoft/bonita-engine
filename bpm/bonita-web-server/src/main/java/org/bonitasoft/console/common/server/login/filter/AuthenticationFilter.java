@@ -148,7 +148,10 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
     protected void checkPlatformMaintenanceState(final HttpServletRequestAccessor requestAccessor)
             throws PlatformUnderMaintenanceException, BonitaException {
         try {
-            if (!isLoggedInAsTechnicalUser(requestAccessor)
+            // If redirectWhenUnauthorized is set to false it means we are not trying to access a page
+            // Maintenance state will be Handled at REST API Authorization filter in this case
+            if (redirectWhenUnauthorized
+                    && !isLoggedInAsTechnicalUser(requestAccessor)
                     && isPlaformInMaintenance(requestAccessor)
                     && !isAccessingErrorPage(requestAccessor)) {
                 throw new PlatformUnderMaintenanceException("Platform is under Maintenance");

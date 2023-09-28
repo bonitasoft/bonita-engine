@@ -269,6 +269,29 @@ public class AuthenticationFilterTest {
     }
 
     @Test
+    public void should_not_redirect_to_503_error_page_in_maintenance_for_rest_requests() throws Exception {
+        AuthenticationFilter authenticationFilterWithConfig = spy(new AuthenticationFilter());
+        doReturn(authenticationManager).when(authenticationFilterWithConfig).getAuthenticationManager();
+        FilterConfig filterConfig = mock(FilterConfig.class);
+        when(filterConfig.getServletContext()).thenReturn(servletContext);
+        List<String> initParams = new ArrayList<>();
+        initParams.add(AuthenticationFilter.REDIRECT_PARAM);
+        when(filterConfig.getInitParameterNames()).thenReturn(Collections.enumeration(initParams));
+        when(filterConfig.getInitParameter(AuthenticationFilter.REDIRECT_PARAM)).thenReturn(Boolean.FALSE.toString());
+        authenticationFilterWithConfig.init(filterConfig);
+        when(httpRequest.getServletPath()).thenReturn("/apps");
+        when(httpRequest.getPathInfo()).thenReturn("/app/home");
+        doReturn(true).when(authenticationFilterWithConfig).isPlaformInMaintenance(request);
+        authenticationFilterWithConfig.addRule(createPassingRule());
+
+        authenticationFilterWithConfig.doAuthenticationFiltering(request, httpResponse, chain);
+
+        verify(chain).doFilter(httpRequest, httpResponse);
+        verify(httpResponse, never()).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE), anyString());
+        verify(httpResponse, never()).setStatus(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE));
+    }
+
+    @Test
     public void should_be_able_to_display_error_pages_in_maintenance() throws Exception {
         when(httpRequest.getServletPath()).thenReturn("/portal/resource/app");
         when(httpRequest.getPathInfo()).thenReturn("/appDirectoryBonita/error-503/content/");

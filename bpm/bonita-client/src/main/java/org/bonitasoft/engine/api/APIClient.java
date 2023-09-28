@@ -45,6 +45,7 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link ApplicationAPI},</li>
  * <li>{@link PermissionAPI},</li>
  * <li>{@link BusinessDataAPI} (deprecated as of 7.3),</li>
+ * <li>{@link MaintenanceAPI},</li>
  * </ul>
  *
  * @author Nicolas Chabanoles
@@ -303,5 +304,25 @@ public class APIClient {
      */
     public ApplicationAPI getApplicationAPI() {
         return getAPI(ApplicationAPI.class);
+    }
+
+    /**
+     * Get API to store and retrieve temporary content like uploaded files.
+     * For internal usage only.
+     *
+     * @since 9.0
+     */
+    @Internal
+    public TemporaryContentAPI getTemporaryContentAPI() {
+        return getAPI(TemporaryContentAPI.class);
+    }
+
+    /**
+     * Get API to manage Platform maintenance.
+     *
+     * @since 9.0
+     */
+    public MaintenanceAPI getMaintenanceAPI() {
+        return getAPI(MaintenanceAPI.class);
     }
 }
