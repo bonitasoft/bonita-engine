@@ -48,10 +48,12 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.util.UriUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LivingApplicationPageServletTest {
 
+    @Spy
     MockHttpServletRequest hsRequest = new MockHttpServletRequest();
 
     @Mock
@@ -145,7 +147,7 @@ public class LivingApplicationPageServletTest {
     }
 
     @Test
-    public void should_redirect_to_valide_url_on_missing_slash() throws Exception {
+    public void should_redirect_to_valid_url_on_missing_slash() throws Exception {
         String targetURL = "/bonita/apps/AppToken/pageToken/content/";
         doReturn(targetURL).when(hsResponse).encodeRedirectURL(targetURL);
         hsRequest.setContextPath("/bonita");
@@ -184,6 +186,21 @@ public class LivingApplicationPageServletTest {
         servlet.service(hsRequest, hsResponse);
 
         verify(pageRenderer, times(1)).displayCustomPage(hsRequest, hsResponse, apiSession, "customPage_" + pageToken);
+    }
+
+    @Test
+    public void getResource_should_work_with_special_characters() throws Exception {
+        String targetURL = "/API/htmlexample1/content/~%60@%5E&*()_%20+1234567890-=%5B%5D%7B%7D'%22%7C.,%3E%3C%C3%A8%C3%A9%C3%A7%C3%A0!";
+        given(resourceRenderer.getPathSegments(any())).willReturn(Arrays.asList("adminAppEEBonita",
+                "admin-process-visu", "API", "htmlexample1", "content", "~`@^&*()_+1234567890-=[]{}'\\\"|.,><èéçà!"));
+        hsRequest.setContextPath("/bonita");
+        hsRequest.setServletPath("/portal/resource/app");
+        hsRequest.setPathInfo(UriUtils.decode(targetURL, "UTF-8"));
+
+        // This shouldn't fail
+        servlet.service(hsRequest, hsResponse);
+
+        verify(hsRequest).getRequestDispatcher(targetURL);
     }
 
     @Test
