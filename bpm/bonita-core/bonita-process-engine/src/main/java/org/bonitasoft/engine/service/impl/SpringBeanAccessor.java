@@ -135,16 +135,7 @@ public class SpringBeanAccessor {
     }
 
     protected List<String> getSpringFileFromClassPath(boolean cluster) {
-        List<String> resources = new ArrayList<>();
-        resources.add("bonita-platform-community.xml");
-        resources.add("bonita-platform-sp.xml");
-        resources.add("bonita-tenant-community.xml");
-        resources.add("bonita-tenant-sp.xml");
-        if (cluster) {
-            resources.add("bonita-platform-sp-cluster.xml");
-            resources.add("bonita-tenant-sp-cluster.xml");
-        }
-        return resources;
+        return List.of("bonita-community.xml", "bonita-subscription.xml");
     }
 
     String getPropertyWithPlaceholder(Properties properties, String key, String defaultValue) {
