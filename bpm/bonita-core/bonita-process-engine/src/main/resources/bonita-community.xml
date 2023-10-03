@@ -1023,11 +1023,10 @@
         </property>
     </bean>
 
-    <bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" destroy-method="destroy">
+    <bean id="persistenceService" class="org.bonitasoft.engine.persistence.HibernatePersistenceService" destroy-method="destroy">
         <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
         <constructor-arg name="extraHibernateProperties" ref="extraHibernateProperties" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
-        <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory" />
     </bean>
 

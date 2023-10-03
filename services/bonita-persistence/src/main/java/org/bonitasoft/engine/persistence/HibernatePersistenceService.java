@@ -14,22 +14,37 @@
 package org.bonitasoft.engine.persistence;
 
 import java.io.Serializable;
-import java.util.*;
-
-import javax.sql.DataSource;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.ClassReflector;
+import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
+import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.sequence.SequenceManager;
+import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.bonitasoft.engine.services.Vendor;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.hibernate.*;
+import org.hibernate.AssertionFailure;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.StaleStateException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.query.Query;
 import org.hibernate.stat.Statistics;
+import org.slf4j.Logger;
 
 /**
  * Hibernate implementation of the persistence service
@@ -42,10 +57,13 @@ import org.hibernate.stat.Statistics;
  * @author Laurent Vaills
  * @author Guillaume Rosinosky
  */
-public abstract class AbstractHibernatePersistenceService extends AbstractDBPersistenceService {
+@Slf4j
+public class HibernatePersistenceService implements PersistenceService {
 
     @Getter
     private final SessionFactory sessionFactory;
+
+    private final ReadSessionAccessor sessionAccessor;
 
     private final Map<String, String> classAliasMappings;
 
@@ -55,30 +73,16 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private final List<String> mappingExclusions;
     private final Statistics statistics;
+    private final SequenceManager sequenceManager;
     private int stat_display_count;
     private final QueryBuilderFactory queryBuilderFactory;
 
-    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory,
-            final List<Class<? extends PersistentObject>> classMapping,
-            final Map<String, String> classAliasMappings, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings)
-            throws Exception {
-        super("TEST");
-        this.sessionFactory = sessionFactory;
-        this.classAliasMappings = classAliasMappings;
-        this.classMapping = classMapping;
-        statistics = sessionFactory.getStatistics();
-        cacheQueries = Collections.emptyMap();
-        mappingExclusions = Collections.emptyList();
-        queryBuilderFactory = new QueryBuilderFactory(OrderByCheckingMode.NONE, classAliasMappings, '#',
-                enableWordSearch, wordSearchExclusionMappings);
-    }
-
-    public AbstractHibernatePersistenceService(final HibernateConfigurationProvider hbmConfigurationProvider,
-            final Properties extraHibernateProperties,
-            final SequenceManager sequenceManager, final DataSource datasource,
-            QueryBuilderFactory queryBuilderFactory) {
-        super(sequenceManager, datasource);
+    public HibernatePersistenceService(final ReadSessionAccessor sessionAccessor,
+            final HibernateConfigurationProvider hbmConfigurationProvider,
+            final Properties extraHibernateProperties, final SequenceManager sequenceManager,
+            final QueryBuilderFactory queryBuilderFactory, HibernateMetricsBinder hibernateMetricsBinder) {
+        this.sequenceManager = sequenceManager;
+        this.sessionAccessor = sessionAccessor;
         hbmConfigurationProvider.bootstrap(extraHibernateProperties);
         sessionFactory = hbmConfigurationProvider.getSessionFactory();
 
@@ -91,6 +95,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         classAliasMappings = hbmConfigurationProvider.getClassAliasMappings();
         mappingExclusions = hbmConfigurationProvider.getMappingExclusions();
         cacheQueries = hbmConfigurationProvider.getCacheQueries();
+
+        hibernateMetricsBinder.bindMetrics(getSessionFactory());
     }
 
     /**
@@ -195,6 +201,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     @Override
     public void insert(final PersistentObject entity) throws SPersistenceException {
+        if (!(entity instanceof PlatformPersistentObject)) {
+            setTenant(entity);
+        }
         final Class<? extends PersistentObject> entityClass = entity.getClass();
         checkClassMapping(entityClass);
         final Session session = getSession();
@@ -210,6 +219,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     @Override
     public void insertInBatch(final List<? extends PersistentObject> entities) throws SPersistenceException {
+        for (final PersistentObject entity : entities) {
+            if (!(entity instanceof PlatformPersistentObject)) {
+                setTenant(entity);
+            }
+        }
         if (!entities.isEmpty()) {
             final Session session = getSession();
             for (final PersistentObject entity : entities) {
@@ -291,13 +305,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    @Override
-    protected void setId(PersistentObject entity) throws SPersistenceException {
-        super.setId(entity);
-    }
-
     @SuppressWarnings("unchecked")
-    <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor)
+    <T extends PersistentObject> T selectObjectById(final Session session,
+            final SelectByIdDescriptor<T> selectDescriptor)
             throws SBonitaReadException {
         Class<? extends PersistentObject> mappedClass;
         try {
@@ -311,6 +321,25 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             throw new SRetryableException(e);
         } catch (final HibernateException he) {
             throw new SBonitaReadException(he);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor)
+            throws SBonitaReadException {
+        if (PlatformPersistentObject.class.isAssignableFrom(selectDescriptor.getEntityType())) {
+            return selectObjectById(session, selectDescriptor);
+        }
+        try {
+            final PersistentObjectId id = new PersistentObjectId(selectDescriptor.getId(), getTenantId());
+            Class<? extends PersistentObject> mappedClass = getMappedClass(selectDescriptor.getEntityType());
+            return (T) session.get(mappedClass, id);
+        } catch (final STenantIdNotSetException e) {
+            return selectObjectById(session, selectDescriptor);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
+        } catch (final SPersistenceException | HibernateException e) {
+            throw new SBonitaReadException(e);
         }
     }
 
@@ -440,4 +469,158 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         sessionFactory.close();
     }
 
+    @Override
+    public <T extends PersistentObject> long getNumberOfEntities(final Class<T> entityClass, final QueryOptions options,
+            final Map<String, Object> parameters)
+            throws SBonitaReadException {
+        return getNumberOfEntities(entityClass, null, options, parameters);
+    }
+
+    @Override
+    public <T extends PersistentObject> long getNumberOfEntities(final Class<T> entityClass, final String querySuffix,
+            final QueryOptions options,
+            final Map<String, Object> parameters) throws SBonitaReadException {
+        List<FilterOption> filters;
+        if (options == null) {
+            filters = Collections.emptyList();
+        } else {
+            filters = options.getFilters();
+        }
+        final String queryName = getQueryName("getNumberOf", querySuffix, entityClass, filters);
+
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>(queryName, parameters, entityClass,
+                Long.class, options);
+        return selectList(descriptor).get(0);
+    }
+
+    @Override
+    public <T extends PersistentObject> List<T> searchEntity(final Class<T> entityClass, final QueryOptions options,
+            final Map<String, Object> parameters)
+            throws SBonitaReadException {
+        return searchEntity(entityClass, null, options, parameters);
+    }
+
+    @Override
+    public <T extends PersistentObject> List<T> searchEntity(final Class<T> entityClass, final String querySuffix,
+            final QueryOptions options,
+            final Map<String, Object> parameters) throws SBonitaReadException {
+        final String queryName = getQueryName("search", querySuffix, entityClass, options.getFilters());
+        final SelectListDescriptor<T> descriptor = new SelectListDescriptor<T>(queryName, parameters, entityClass,
+                options);
+        return selectList(descriptor);
+    }
+
+    private <T extends PersistentObject> String getQueryName(final String prefix, final String suffix,
+            final Class<T> entityClass,
+            final List<FilterOption> filters) {
+        final SortedSet<String> query = new TreeSet<String>();
+        for (final FilterOption filter : filters) {
+            // if filter is just an operator, PersistentClass is not defined:
+            if (filter.getPersistentClass() != null) {
+                query.add(filter.getPersistentClass().getSimpleName());
+            }
+        }
+        final String searchOnClassName = entityClass.getSimpleName();
+        query.remove(searchOnClassName);
+        final StringBuilder builder = new StringBuilder(prefix);
+        builder.append(searchOnClassName);
+        if (!query.isEmpty()) {
+            builder.append("with");
+        }
+        for (final String entity : query) {
+            builder.append(entity);
+        }
+        if (suffix != null) {
+            builder.append(suffix);
+        }
+        return builder.toString();
+    }
+
+    protected SequenceManager getSequenceManager() {
+        return sequenceManager;
+    }
+
+    protected void setId(final PersistentObject entity) throws SPersistenceException {
+        if (entity == null) {
+            return;
+        }
+        // if this entity has no id, set it
+        Long id = null;
+        try {
+            id = entity.getId();
+        } catch (final Exception e) {
+            // this is a new object to save
+        }
+        if (id == null || id == -1 || id == 0) {
+            try {
+                final long tenantId = entity instanceof PlatformPersistentObject ? -1 : getTenantId();
+                id = getSequenceManager().getNextId(entity.getClass().getName(), tenantId);
+                ClassReflector.invokeSetter(entity, "setId", long.class, id);
+            } catch (final Exception e) {
+                throw new SPersistenceException("Problem while saving entity: " + entity + " with id: " + id, e);
+            }
+        }
+    }
+
+    protected Logger getLogger() {
+        return log;
+    }
+
+    protected long getTenantId() throws STenantIdNotSetException {
+        return sessionAccessor.getTenantId();
+    }
+
+    protected void setTenant(final PersistentObject entity) throws SPersistenceException {
+        if (entity == null) {
+            return;
+        }
+        // if this entity has no id, set it
+        Long tenantId = null;
+        try {
+            tenantId = ClassReflector.invokeGetter(entity, "getTenantId");
+        } catch (final Exception e) {
+            // this is a new object to save
+        }
+        if (tenantId == null || tenantId == -1 || tenantId == 0) {
+            setTenantByClassReflector(entity, tenantId);
+        }
+    }
+
+    private void setTenantByClassReflector(final PersistentObject entity, Long tenantId) throws SPersistenceException {
+        try {
+            tenantId = getTenantId();
+            ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
+        } catch (final SReflectException | STenantIdNotSetException e) {
+            throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
+        }
+    }
+
+    @Override
+    public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters)
+            throws SPersistenceException {
+        final Session session = getSession();
+        final String entityClassName = entityClass.getCanonicalName();
+
+        boolean hasFilters = filters != null && !filters.isEmpty();
+        Map<String, Object> parameters = new HashMap<>();
+        String baseQuery = "DELETE FROM " + entityClassName + " "
+                + (hasFilters ? getClassAliasMappings().get(entityClassName) : "");
+
+        if (hasFilters) {
+            if (filters.stream().anyMatch(f -> f.getFilterOperationType() == FilterOperationType.LIKE)) {
+                throw new IllegalStateException("Delete queries do not support queries with LIKE");
+            }
+            QueryGeneratorForFilters.QueryGeneratedFilters whereClause = new QueryGeneratorForFilters(
+                    getClassAliasMappings(), '%'/* there is no 'like' in these delete queries */)
+                            .generate(filters);
+            parameters.putAll(whereClause.getParameters());
+            baseQuery += " WHERE ( " + whereClause.getFilters() + " )";
+        }
+        Query query = session.createQuery(baseQuery);
+        parameters.forEach(query::setParameter);
+        query.executeUpdate();
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug("[Tenant] Deleting all instance of class " + entityClass.getSimpleName());
+        }
+    }
 }
