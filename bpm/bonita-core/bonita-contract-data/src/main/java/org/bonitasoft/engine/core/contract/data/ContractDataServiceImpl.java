@@ -25,7 +25,6 @@ import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -55,18 +54,14 @@ public class ContractDataServiceImpl implements ContractDataService {
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final QueriableLoggerService queriableLoggerService;
 
     private final ArchiveService archiveService;
 
     public ContractDataServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService,
             final QueriableLoggerService queriableLoggerService, final ArchiveService archiveService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
         this.queriableLoggerService = queriableLoggerService;
         this.archiveService = archiveService;
     }

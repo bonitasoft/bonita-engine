@@ -66,7 +66,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private final TypeConverterUtil typeConverterUtil;
 
-    private BusinessDataReloader businessDataReloader;
+    private final BusinessDataReloader businessDataReloader;
 
     private final CountQueryProvider countQueryProvider;
 

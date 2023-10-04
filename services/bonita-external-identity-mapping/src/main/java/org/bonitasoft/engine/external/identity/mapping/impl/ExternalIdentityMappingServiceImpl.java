@@ -20,7 +20,6 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingCreationException;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingDeletionException;
@@ -58,16 +57,12 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final QueriableLoggerService queriableLoggerService;
 
     public ExternalIdentityMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService,
             final QueriableLoggerService queriableLoggerService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
         this.queriableLoggerService = queriableLoggerService;
     }
 
@@ -216,14 +211,12 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             final String querySuffix) throws SBonitaReadException {
         log.trace(LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfExternalIdentityMappingsForUser"));
         try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(2);
+            final Map<String, Object> parameters = new HashMap<>(2);
             parameters.put("kind", kind);
             parameters.put("userId", userId);
             parameters.put("externalId", externalId);
-            final long number = persistenceService.getNumberOfEntities(SExternalIdentityMapping.class, querySuffix,
+            return persistenceService.getNumberOfEntities(SExternalIdentityMapping.class, querySuffix,
                     searchOptions, parameters);
-
-            return number;
         } catch (final SBonitaReadException bre) {
             log.debug(LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfExternalIdentityMappingsForUser",
                     bre));
@@ -236,7 +229,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             final String externalId,
             final QueryOptions queryOptions, final String querySuffix) throws SBonitaReadException {
         log.trace(LogUtil.getLogBeforeMethod(this.getClass(), "searchExternalIdentityMappingsForUser"));
-        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        final Map<String, Object> parameters = new HashMap<>(2);
         parameters.put("kind", kind);
         parameters.put("userId", userId);
         parameters.put("externalId", externalId);
@@ -255,7 +248,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
 
         log.trace(LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfExternalIdentityMappings"));
         try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
+            final Map<String, Object> parameters = new HashMap<>(1);
             parameters.put("kind", kind);
             final long number = persistenceService.getNumberOfEntities(SExternalIdentityMapping.class, querySuffix,
                     searchOptions, parameters);
@@ -273,7 +266,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             throws SBonitaReadException {
         log.trace(LogUtil.getLogBeforeMethod(this.getClass(), "searchExternalIdentityMappings"));
         try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
+            final Map<String, Object> parameters = new HashMap<>(1);
             parameters.put("kind", kind);
             final List<SExternalIdentityMapping> listSExternalIdentityMappings = persistenceService.searchEntity(
                     SExternalIdentityMapping.class, querySuffix,
@@ -292,7 +285,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             throws SBonitaReadException {
         log.trace(LogUtil.getLogBeforeMethod(this.getClass(), "searchExternalIdentityMappings"));
         try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(2);
+            final Map<String, Object> parameters = new HashMap<>(2);
             parameters.put("kind", kind);
             parameters.put("externalId", externalId);
             log.trace(LogUtil.getLogAfterMethod(this.getClass(), "searchExternalIdentityMappings"));

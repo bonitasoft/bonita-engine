@@ -35,7 +35,6 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilderFactory;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -68,16 +67,13 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
 
     private final ReadPersistenceService persistenceService;
 
-    private final EventService eventService;
-
     private final ArchiveService archiveService;
 
     public ConnectorInstanceServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final ArchiveService archiveService) {
+            final ArchiveService archiveService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.archiveService = archiveService;
-        this.eventService = eventService;
     }
 
     @Override

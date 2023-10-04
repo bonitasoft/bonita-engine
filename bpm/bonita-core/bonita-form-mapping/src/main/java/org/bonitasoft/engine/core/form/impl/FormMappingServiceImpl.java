@@ -74,8 +74,7 @@ public class FormMappingServiceImpl implements FormMappingService {
     private final String externalUrlAdapter;
     private final String legacyUrlAdapter;
     private final Map<FormMappingType, List<String>> authorizationRulesMap;
-    private QueriableLoggerService queriableLoggerService;
-    private final AuthorizationRuleMapping authorizationRuleMapping;
+    private final QueriableLoggerService queriableLoggerService;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService,
             SessionService sessionService,
@@ -92,7 +91,6 @@ public class FormMappingServiceImpl implements FormMappingService {
         this.externalUrlAdapter = externalUrlAdapter;
         this.legacyUrlAdapter = legacyUrlAdapter;
         this.queriableLoggerService = queriableLoggerService;
-        this.authorizationRuleMapping = authorizationRuleMapping;
 
         authorizationRulesMap = new HashMap<>(3);
         authorizationRulesMap.put(FormMappingType.PROCESS_START, authorizationRuleMapping.getProcessStartRuleKeys());

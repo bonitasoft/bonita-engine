@@ -28,7 +28,7 @@ public class ApplicationVersionServiceImpl implements ApplicationVersionService 
     protected static final String SQL_PLATFORM_APPLICATION_VERSION = "SELECT p.application_version FROM platform p ORDER BY p.id";
     protected static final String SQL_PLATFORM_APPLICATION_VERSION_UPDATE = "UPDATE platform SET application_version = ?";
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public ApplicationVersionServiceImpl(JdbcTemplate jdbcTemplate) {

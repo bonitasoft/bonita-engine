@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 public class EventServiceImpl extends AbstractEventServiceImpl {
 
-    private Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
     /**
      * Contains a list of all events type and their registered handlers
      */
