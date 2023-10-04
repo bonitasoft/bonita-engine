@@ -57,7 +57,11 @@ public class ApplicationMenuDataStore extends CommonDatastore<ApplicationMenuIte
         this.converter = converter;
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application menu should be created at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationMenuItem add(final ApplicationMenuItem item) {
         try {
             final ApplicationMenu applicationMenu = applicationAPI
@@ -68,7 +72,11 @@ public class ApplicationMenuDataStore extends CommonDatastore<ApplicationMenuIte
         }
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application menu should be updated at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationMenuItem update(final APIID id, final Map<String, String> attributes) {
         try {
             final ApplicationMenu applicationMenu = applicationAPI.updateApplicationMenu(id.toLong(),

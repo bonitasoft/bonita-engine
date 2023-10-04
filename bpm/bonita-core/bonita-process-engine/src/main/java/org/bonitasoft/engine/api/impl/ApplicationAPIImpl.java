@@ -62,7 +62,11 @@ import org.bonitasoft.engine.session.SessionService;
 @AvailableWhenTenantIsPaused
 public class ApplicationAPIImpl implements ApplicationAPI {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public Application createApplication(final ApplicationCreator applicationCreator)
             throws CreationException {
         return getLivingApplicationAPIDelegate().createApplication(applicationCreator);
@@ -127,7 +131,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         getLivingApplicationAPIDelegate().deleteApplication(applicationId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater)
             throws ApplicationNotFoundException, UpdateException,
             AlreadyExistsException {
@@ -173,7 +181,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
                         searchOptions, converter));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token)
             throws CreationException {
         return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pageId, token);
@@ -208,7 +220,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         getApplicationPageAPIDelegate().deleteApplicationPage(applicationPageId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public void setApplicationHomePage(final long applicationId, final long applicationPageId)
             throws UpdateException, ApplicationNotFoundException {
         getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
@@ -219,13 +235,21 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getApplicationPageAPIDelegate().getApplicationHomePage(applicationId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator)
             throws CreationException {
         return getApplicationMenuAPIDelegate().createApplicationMenu(applicationMenuCreator);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationMenu updateApplicationMenu(final long applicationMenuId, final ApplicationMenuUpdater updater)
             throws ApplicationMenuNotFoundException,
             UpdateException {
@@ -270,7 +294,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getLivingApplicationExporterDelegate().exportApplications(applicationIds);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException {
         return getServiceAccessor().getApplicationImporter().importApplications(xmlContent, null, null,

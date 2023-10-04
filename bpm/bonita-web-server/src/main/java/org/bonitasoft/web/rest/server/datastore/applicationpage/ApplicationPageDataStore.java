@@ -55,7 +55,11 @@ public class ApplicationPageDataStore extends CommonDatastore<ApplicationPageIte
         this.converter = converter;
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application page should be created at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationPageItem add(final ApplicationPageItem item) {
         try {
             final ApplicationPage applicationPage = applicationAPI.createApplicationPage(

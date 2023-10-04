@@ -91,7 +91,11 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
         }
     }
 
+    /**
+     * @deprecated as of 9.0.0, Applications should be created at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationItem add(final ApplicationItem item) {
 
         try {
@@ -109,7 +113,11 @@ public class ApplicationDataStore extends CommonDatastore<ApplicationItem, Appli
         }
     }
 
+    /**
+     * @deprecated as of 9.0.0, Applications should be updated at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationItem update(final APIID id, final Map<String, String> attributes) {
         try {
             final ApplicationUpdater applicationUpdater = converter.toApplicationUpdater(attributes);

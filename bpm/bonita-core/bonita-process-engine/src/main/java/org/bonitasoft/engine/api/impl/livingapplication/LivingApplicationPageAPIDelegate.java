@@ -28,7 +28,12 @@ import org.bonitasoft.engine.business.application.model.builder.SApplicationUpda
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.ServiceAccessor;
@@ -52,6 +57,10 @@ public class LivingApplicationPageAPIDelegate {
         this.loggedUserId = loggedUserId;
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application home page should be defined at startup.
+     */
+    @Deprecated(since = "9.0.0")
     public void setApplicationHomePage(final long applicationId, final long applicationPageId)
             throws UpdateException, ApplicationNotFoundException {
         final SApplicationUpdateBuilder sApplicationUpdateBuilder = new SApplicationUpdateBuilder(loggedUserId)
@@ -65,6 +74,10 @@ public class LivingApplicationPageAPIDelegate {
         }
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application page should be created at startup.
+     */
+    @Deprecated(since = "9.0.0")
     public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token)
             throws CreationException {
         validateToken(token);
