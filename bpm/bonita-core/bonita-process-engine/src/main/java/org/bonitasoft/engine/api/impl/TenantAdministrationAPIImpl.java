@@ -180,6 +180,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @Override
     @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     @WithLock(key = UPDATE_BDM)
+    @Deprecated(since = "9.0.0")
     public String updateBusinessDataModel(final byte[] zip)
             throws BusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException {
         String bdmVersion;

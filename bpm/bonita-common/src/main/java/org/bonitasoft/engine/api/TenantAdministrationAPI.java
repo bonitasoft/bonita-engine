@@ -78,7 +78,9 @@ public interface TenantAdministrationAPI {
      *         if the Business Data Model content passed as parameter is invalid.
      * @throws BusinessDataRepositoryDeploymentException
      *         if the deployment cannot be fulfilled completely.
+     * @deprecated as of 9.0.0. The BDM should only be updated at startup.
      */
+    @Deprecated(since = "9.0.0")
     String updateBusinessDataModel(final byte[] zip)
             throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
