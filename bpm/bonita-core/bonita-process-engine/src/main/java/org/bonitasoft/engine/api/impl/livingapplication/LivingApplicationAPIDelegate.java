@@ -48,6 +48,10 @@ public class LivingApplicationAPIDelegate {
         this.loggedUserId = loggedUserId;
     }
 
+    /**
+     * @deprecated as of 9.0.0, Applications should be created at startup.
+     */
+    @Deprecated(since = "9.0.0")
     public Application createApplication(final ApplicationCreator applicationCreator)
             throws CreationException {
         try {
@@ -130,6 +134,10 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
+    /**
+     * @deprecated as of 9.0.0, Applications should be updated at startup.
+     */
+    @Deprecated(since = "9.0.0")
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater)
             throws UpdateException,
             AlreadyExistsException, ApplicationNotFoundException {

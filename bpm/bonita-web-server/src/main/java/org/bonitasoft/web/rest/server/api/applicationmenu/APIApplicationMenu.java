@@ -43,7 +43,11 @@ public class APIApplicationMenu extends ConsoleAPI<ApplicationMenuItem>
         this.creator = creator;
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application menu should be created at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationMenuItem add(final ApplicationMenuItem item) {
         return creator.create(getEngineSession()).add(item);
     }
@@ -53,7 +57,11 @@ public class APIApplicationMenu extends ConsoleAPI<ApplicationMenuItem>
         return creator.create(getEngineSession()).get(id);
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application menu should be updated at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationMenuItem update(final APIID id, final Map<String, String> attributes) {
         return creator.create(getEngineSession()).update(id, attributes);
     }

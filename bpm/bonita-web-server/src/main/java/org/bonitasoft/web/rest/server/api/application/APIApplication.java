@@ -51,12 +51,20 @@ public class APIApplication extends ConsoleAPI<ApplicationItem>
         this.applicationDataStoreFactory = applicationDataStoreFactory;
     }
 
+    /**
+     * @deprecated as of 9.0.0, Applications should be created at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationItem add(final ApplicationItem item) {
         return creator.create(getEngineSession()).add(item);
     }
 
+    /**
+     * @deprecated as of 9.0.0, Applications should be updated at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationItem update(final APIID id, final Map<String, String> attributes) {
         return creator.create(getEngineSession()).update(id, attributes);
     }

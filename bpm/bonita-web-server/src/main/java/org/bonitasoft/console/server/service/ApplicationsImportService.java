@@ -36,7 +36,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Julien Mege
+ * @deprecated as of 9.0.0, Applications should be imported at startup.
  */
+@Deprecated(since = "9.0.0")
 public class ApplicationsImportService extends BonitaImportService {
 
     public final static String TOKEN = "/application/import";

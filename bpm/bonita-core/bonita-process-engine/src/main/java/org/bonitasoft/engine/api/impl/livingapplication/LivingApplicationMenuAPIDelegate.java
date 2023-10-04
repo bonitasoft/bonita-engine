@@ -47,6 +47,10 @@ public class LivingApplicationMenuAPIDelegate {
         this.converter = converter;
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application menu should be created at startup.
+     */
+    @Deprecated(since = "9.0.0")
     public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator)
             throws CreationException {
         try {
@@ -66,6 +70,10 @@ public class LivingApplicationMenuAPIDelegate {
         }
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application menu should be updated at startup.
+     */
+    @Deprecated(since = "9.0.0")
     public ApplicationMenu updateApplicationMenu(final long applicationMenuId, final ApplicationMenuUpdater updater)
             throws ApplicationMenuNotFoundException,
             UpdateException {

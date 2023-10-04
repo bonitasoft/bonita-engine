@@ -55,7 +55,9 @@ public interface ApplicationAPI {
      * @throws CreationException if an error occurs during the creation
      * @see Application
      * @see ApplicationCreator
+     * @deprecated as of 9.0.0, Applications should be created at startup.
      */
+    @Deprecated(since = "9.0.0")
     Application createApplication(ApplicationCreator applicationCreator)
             throws AlreadyExistsException, CreationException;
 
@@ -103,7 +105,9 @@ public interface ApplicationAPI {
      * @throws UpdateException if an error occurs during the update
      * @see Application
      * @see ApplicationUpdater
+     * @deprecated as of 9.0.0, Applications should be updated at startup.
      */
+    @Deprecated(since = "9.0.0")
     Application updateApplication(long applicationId, ApplicationUpdater updater)
             throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
 
@@ -143,7 +147,9 @@ public interface ApplicationAPI {
      * @see ApplicationPage
      * @see Application
      * @see org.bonitasoft.engine.page.Page
+     * @deprecated as of 9.0.0, Application page should be created at startup.
      */
+    @Deprecated(since = "9.0.0")
     ApplicationPage createApplicationPage(long applicationId, long pageId, String token)
             throws AlreadyExistsException, CreationException,
             ApplicationNotFoundException;
@@ -210,7 +216,9 @@ public interface ApplicationAPI {
      * @throws ApplicationNotFoundException if no {@code Application} is found with the given id
      * @see Application
      * @see ApplicationPage
+     * @deprecated as of 9.0.0, Application home page should be defined at startup.
      */
+    @Deprecated(since = "9.0.0")
     void setApplicationHomePage(long applicationId, long applicationPageId)
             throws UpdateException, ApplicationNotFoundException;
 
@@ -235,7 +243,9 @@ public interface ApplicationAPI {
      * @throws CreationException if an error occurs during the creation
      * @see ApplicationMenu
      * @see ApplicationMenuCreator
+     * @deprecated as of 9.0.0, Application menu should be created at startup.
      */
+    @Deprecated(since = "9.0.0")
     ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws CreationException;
 
     /**
@@ -257,7 +267,9 @@ public interface ApplicationAPI {
      * @throws UpdateException if an exception occurs during the update
      * @see org.bonitasoft.engine.business.application.ApplicationMenu
      * @see org.bonitasoft.engine.business.application.ApplicationMenuUpdater
+     * @deprecated as of 9.0.0, Application menu should be updated at startup.
      */
+    @Deprecated(since = "9.0.0")
     ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater)
             throws ApplicationMenuNotFoundException, UpdateException;
 
@@ -378,7 +390,9 @@ public interface ApplicationAPI {
      * @see org.bonitasoft.engine.business.application.ApplicationMenu
      * @see org.bonitasoft.engine.profile.Profile
      * @see org.bonitasoft.engine.page.Page
+     * @deprecated as of 9.0.0, Applications should be imported at startup.
      */
+    @Deprecated(since = "9.0.0")
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException;
 

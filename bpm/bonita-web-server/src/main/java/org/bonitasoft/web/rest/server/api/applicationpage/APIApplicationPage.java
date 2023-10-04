@@ -39,7 +39,11 @@ public class APIApplicationPage extends ConsoleAPI<ApplicationPageItem> implemen
         this.factory = factory;
     }
 
+    /**
+     * @deprecated as of 9.0.0, Application page should be created at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ApplicationPageItem add(final ApplicationPageItem item) {
         return factory.createApplicationPageDataStore(getEngineSession()).add(item);
     }
