@@ -51,6 +51,7 @@ public class BusinessDataModelResource extends CommonResource {
     }
 
     @Post("json")
+    @Deprecated(since = "9.0.0")
     public TenantResourceItem addBDM(final BusinessDataModelItem businessDataModelItem) {
         if (!isTenantPaused()) {
             setStatus(Status.CLIENT_ERROR_FORBIDDEN, new APIException(
