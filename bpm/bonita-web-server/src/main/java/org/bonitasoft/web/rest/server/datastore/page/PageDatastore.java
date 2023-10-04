@@ -101,6 +101,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
     }
 
     @Override
+    @Deprecated(since = "9.0.0")
     public PageItem add(final PageItem pageItem) {
         final String zipFileAttribute = pageItem.getAttributeValue(UNMAPPED_ATTRIBUTE_ZIP_FILE);
         final String[] filenames = zipFileAttribute.split(FileUploadServlet.RESPONSE_SEPARATOR);
@@ -290,6 +291,7 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
     }
 
     @Override
+    @Deprecated(since = "9.0.0")
     public PageItem update(final APIID id, final Map<String, String> attributes) {
         String filename = null;
         File zipFile = null;

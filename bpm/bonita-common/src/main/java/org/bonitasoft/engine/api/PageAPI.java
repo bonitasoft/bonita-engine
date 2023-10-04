@@ -125,7 +125,9 @@ public interface PageAPI {
      *         if a page with this name already exists.
      * @throws org.bonitasoft.engine.exception.CreationException
      *         if an error occurs during the creation.
+     * @deprecated as of 9.0.0. Page content should be created at startup.
      */
+    @Deprecated(since = "9.0.0")
     Page createPage(final PageCreator pageCreator, final byte[] content)
             throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException;
@@ -142,7 +144,9 @@ public interface PageAPI {
      *         if an error occurs during the update.
      * @throws org.bonitasoft.engine.exception.AlreadyExistsException
      *         if a page with this name already exists.
+     * @deprecated as of 9.0.0. Page content should be updated at startup.
      */
+    @Deprecated(since = "9.0.0")
     Page updatePage(final long pageId, final PageUpdater pageUpdater)
             throws UpdateException, AlreadyExistsException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException;
@@ -157,7 +161,9 @@ public interface PageAPI {
      *        the binary content of the page.
      * @throws org.bonitasoft.engine.exception.UpdateException
      *         if an error occurs during the update.
+     * @deprecated as of 9.0.0. Page content should be updated at startup.
      */
+    @Deprecated(since = "9.0.0")
     void updatePageContent(final long pageId, final byte[] content)
             throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException;
@@ -201,7 +207,9 @@ public interface PageAPI {
      *         if a page with the same name already exists
      * @throws org.bonitasoft.engine.exception.CreationException
      * @since 6.3.1
+     * @deprecated as of 9.0.0. Page content should be created at startup.
      */
+    @Deprecated(since = "9.0.0")
     Page createPage(String contentName, byte[] content)
             throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException;
