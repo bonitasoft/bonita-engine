@@ -44,7 +44,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -71,8 +70,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     private final SUserTaskInstanceBuilderFactory activityInstanceKeyProvider;
 
-    private final EventService eventService;
-
     private final Recorder recorder;
 
     private final PersistenceService persistenceService;
@@ -80,11 +77,10 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     private final ArchiveService archiveService;
 
     public FlowNodeInstancesServiceImpl(final Recorder recorder, final PersistenceService persistenceService,
-            final EventService eventService, final ArchiveService archiveService) {
+            final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         activityInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-        this.eventService = eventService;
         this.archiveService = archiveService;
     }
 

@@ -44,7 +44,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInst
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -112,9 +111,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     private final SMultiInstanceActivityInstanceBuilderFactory sMultiInstanceActivityInstanceBuilder;
 
     public ActivityInstanceServiceImpl(final Recorder recorder, final PersistenceService persistenceService,
-            final ArchiveService archiveService,
-            final EventService eventService) {
-        super(recorder, persistenceService, eventService, archiveService);
+            final ArchiveService archiveService) {
+        super(recorder, persistenceService, archiveService);
         sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         sMultiInstanceActivityInstanceBuilder = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class);
     }

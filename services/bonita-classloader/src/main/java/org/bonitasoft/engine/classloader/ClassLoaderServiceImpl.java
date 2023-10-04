@@ -93,7 +93,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private void warnOnShuttingDown(final ClassLoaderIdentifier key) {
         if (shuttingDown) {
-            log.warn("Using local classloader on after ClassLoaderService shuttingdown: " + key);
+            log.warn("Using local classloader after ClassLoaderService has already shut down: " + key);
         }
     }
 
@@ -248,8 +248,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     /**
      * Notify listeners that the classloader was destroyed
      * That method do not notify children because we can't destroy a classloader that have children
-     *
-     * @param classLoader
      */
     private void notifyDestroyed(BonitaClassLoader classLoader) {
         getListeners(classLoader.getIdentifier()).forEach(l -> {

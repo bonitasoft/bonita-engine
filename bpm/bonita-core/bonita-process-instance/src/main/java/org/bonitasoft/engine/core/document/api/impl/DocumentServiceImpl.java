@@ -148,8 +148,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     private String incrementVersion(final String version) {
-        final Integer intVersion = Integer.valueOf(version);
-        return String.valueOf(intVersion + 1);
+        return String.valueOf(Integer.parseInt(version) + 1);
     }
 
     private void insertDocument(final SDocument document) throws SRecorderException {

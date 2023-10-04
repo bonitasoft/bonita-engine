@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class ExpressionServiceImpl implements ExpressionService {
 
     private static final Logger log = LoggerFactory.getLogger(ExpressionServiceImpl.class);
-    private Map<ExpressionKind, ExpressionExecutorStrategy> expressionExecutorsMap = new HashMap<>();
+    private final Map<ExpressionKind, ExpressionExecutorStrategy> expressionExecutorsMap = new HashMap<>();
     private boolean checkExpressionReturnType = false;
 
     private final TimeTracker timeTracker;

@@ -37,7 +37,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledP
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -49,15 +48,12 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 public class BusinessArchiveServiceImpl implements BusinessArchiveService {
 
     private final ProcessDefinitionService processDefinitionService;
-    private final DependencyService dependencyService;
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     private final ClassLoaderService classLoaderService;
 
     public BusinessArchiveServiceImpl(ProcessDefinitionService processDefinitionService,
-            DependencyService dependencyService,
             BusinessArchiveArtifactsManager businessArchiveArtifactsManager, ClassLoaderService classLoaderService) {
         this.processDefinitionService = processDefinitionService;
-        this.dependencyService = dependencyService;
         this.businessArchiveArtifactsManager = businessArchiveArtifactsManager;
         this.classLoaderService = classLoaderService;
     }
