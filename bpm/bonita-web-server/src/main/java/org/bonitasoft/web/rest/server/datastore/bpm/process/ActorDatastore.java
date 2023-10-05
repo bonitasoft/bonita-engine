@@ -118,7 +118,11 @@ public class ActorDatastore extends CommonDatastore<ActorItem, ActorInstance> im
         }
     }
 
+    /**
+     * @deprecated as of 9.0.0, Actor should be updated at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ActorItem update(final APIID id, final Map<String, String> attributes) {
         try {
             final ActorUpdater updater = new ActorUpdater();

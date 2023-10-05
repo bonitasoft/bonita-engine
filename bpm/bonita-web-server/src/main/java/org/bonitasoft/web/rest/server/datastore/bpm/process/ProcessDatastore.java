@@ -78,7 +78,11 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
         super(engineSession);
     }
 
+    /**
+     * @deprecated as of 9.0.0, Process should be created at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ProcessItem add(final ProcessItem process) {
         final ProcessEngineClient engineClient = getProcessEngineClient();
 
@@ -88,7 +92,6 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
         } catch (final BonitaException e) {
             throw new APIException("Process file not found", e);
         }
-        ProcessItem processItem = null;
         try {
             //no need to handle the closing of the stream here as it is handled in BusinessArchiveFactory
             final BusinessArchive businessArchive = readBusinessArchive(processFile.getInputStream());
@@ -101,11 +104,7 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
                         getEngineSession(),
                         processDeploymentInfo.getProcessId(),
                         processDeploymentInfo.getDeploymentDate());
-            } catch (final IOException e) {
-                throw new APIException("", e);
-            } catch (final ProcessDefinitionNotFoundException e) {
-                throw new APIException("", e);
-            } catch (final BPMEngineException e) {
+            } catch (IOException | ProcessDefinitionNotFoundException | BPMEngineException e) {
                 throw new APIException("", e);
             }
 
@@ -130,7 +129,11 @@ public class ProcessDatastore extends CommonDatastore<ProcessItem, ProcessDeploy
         }
     }
 
+    /**
+     * @deprecated as of 9.0.0, Process should be updated at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ProcessItem update(final APIID id, final Map<String, String> attributes) {
         final ProcessDeploymentInfoUpdater updater = new ProcessDeploymentInfoUpdater();
 

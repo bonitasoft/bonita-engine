@@ -67,12 +67,20 @@ public class APIProcess extends ConsoleAPI<ProcessItem> implements
         return new ProcessDatastore(getEngineSession());
     }
 
+    /**
+     * @deprecated as of 9.0.0, Process should be created at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ProcessItem add(final ProcessItem item) {
         return getProcessDatastore().add(item);
     }
 
+    /**
+     * @deprecated as of 9.0.0, Process should be updated at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ProcessItem update(final APIID id, final Map<String, String> attributes) {
         return getProcessDatastore().update(id, attributes);
     }
