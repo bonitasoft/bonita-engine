@@ -33,6 +33,7 @@ import org.bonitasoft.web.rest.server.framework.api.Datastore;
 import org.bonitasoft.web.rest.server.framework.exception.APIFilterMandatoryException;
 import org.bonitasoft.web.rest.server.framework.search.ItemSearchResult;
 import org.bonitasoft.web.toolkit.client.common.util.MapUtil;
+import org.bonitasoft.web.toolkit.client.data.APIID;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 
 /**
@@ -103,4 +104,12 @@ public class APIActor extends ConsoleAPI<ActorItem> implements
 
     }
 
+    /**
+     * @deprecated as of 9.0.0, Actor should be updated at startup.
+     */
+    @Override
+    @Deprecated(since = "9.0.0")
+    public ActorItem update(APIID id, Map<String, String> attributes) {
+        return super.update(id, attributes);
+    }
 }
