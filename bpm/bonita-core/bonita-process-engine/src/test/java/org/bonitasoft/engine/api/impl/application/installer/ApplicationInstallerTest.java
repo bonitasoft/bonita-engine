@@ -69,6 +69,7 @@ import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.service.InstallationService;
+import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -98,6 +99,9 @@ public class ApplicationInstallerTest {
 
     @Mock
     private InstallationService installationService;
+
+    @Mock
+    private TenantStateManager tenantStateManager;
 
     @Captor
     ArgumentCaptor<Callable<Object>> callableCaptor;
@@ -133,13 +137,14 @@ public class ApplicationInstallerTest {
                     .addLayout(layout)
                     .addTheme(theme)
                     .addRestAPIExtension(restAPI);
+            applicationArchive.setVersion("1.0.0");
 
             doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
             doNothing().when(applicationInstaller).installOrganization(any(), any());
             doReturn(mock(Page.class)).when(applicationInstaller).createPage(any(), any());
             doReturn(null).when(applicationInstaller).getPageIfExist(any());
 
-            applicationInstaller.install(applicationArchive, "1.0.0");
+            applicationInstaller.install(applicationArchive);
         }
         var captor = ArgumentCaptor.forClass(Properties.class);
         verify(applicationInstaller, times(4)).createPage(any(), captor.capture());
@@ -160,7 +165,8 @@ public class ApplicationInstallerTest {
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addApplication(application);
-            applicationInstaller.install(applicationArchive, "1.0.0");
+            applicationArchive.setVersion("1.0.0");
+            applicationInstaller.install(applicationArchive);
         }
 
         verify(applicationInstaller).importApplication(any(), any(), eq(FAIL_ON_DUPLICATES));
@@ -218,7 +224,8 @@ public class ApplicationInstallerTest {
         // when
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addProcess(process);
-            applicationInstaller.install(applicationArchive, "1.0.0");
+            applicationArchive.setVersion("1.0.0");
+            applicationInstaller.install(applicationArchive);
         }
         // then
         verify(applicationInstaller).deployProcess(any(), any());
@@ -235,12 +242,17 @@ public class ApplicationInstallerTest {
             applicationArchive.setBdm(bdm);
             doNothing().when(applicationInstaller).installOrganization(any(), any());
             doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
+            doReturn(false).when(applicationInstaller).sameBdmContentDeployed(any());
             doReturn(Collections.emptyList()).when(applicationInstaller).installProcesses(any(), any());
             doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
+            doNothing().when(applicationInstaller).pauseTenantInSession();
+            doNothing().when(applicationInstaller).resumeTenantInSession();
+            applicationArchive.setVersion("1.0.0");
+            applicationInstaller.install(applicationArchive);
 
-            applicationInstaller.install(applicationArchive, "1.0.0");
-
+            verify(applicationInstaller).pauseTenantInSession();
             verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
+            verify(applicationInstaller).resumeTenantInSession();
         }
 
     }
@@ -260,7 +272,8 @@ public class ApplicationInstallerTest {
 
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addProcess(process);
-            applicationInstaller.install(applicationArchive, "1.0.0");
+            applicationArchive.setVersion("1.0.0");
+            applicationInstaller.install(applicationArchive);
         }
 
         verify(applicationInstaller).deployProcess(any(), any());
@@ -344,8 +357,9 @@ public class ApplicationInstallerTest {
     @Test
     public void should_throw_exception_if_application_archive_is_empty() throws Exception {
         try (ApplicationArchive applicationArchive = new ApplicationArchive()) {
+            applicationArchive.setVersion("1.0.0");
             assertThatExceptionOfType(ApplicationInstallationException.class)
-                    .isThrownBy(() -> applicationInstaller.install(applicationArchive, "1.0.0"))
+                    .isThrownBy(() -> applicationInstaller.install(applicationArchive))
                     .withMessage("The Application Archive contains no valid artifact to install");
         }
     }
@@ -357,7 +371,8 @@ public class ApplicationInstallerTest {
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.setOrganization(organization);
-            applicationInstaller.install(applicationArchive, "1.0.0");
+            applicationArchive.setVersion("1.0.0");
+            applicationInstaller.install(applicationArchive);
         }
 
         verify(applicationInstaller).importOrganization(organization, ImportPolicy.FAIL_ON_DUPLICATES);

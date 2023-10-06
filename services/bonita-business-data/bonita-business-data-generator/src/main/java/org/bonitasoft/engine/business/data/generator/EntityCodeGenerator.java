@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.business.data.generator;
 
-import java.lang.management.ManagementFactory;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.List;
 
 import javax.persistence.*;
@@ -65,7 +62,6 @@ public class EntityCodeGenerator {
 
     public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
         final String qualifiedName = bo.getQualifiedName();
-        validateClassNotExistsInRuntime(qualifiedName);
 
         JDefinedClass entityClass = codeGenerator.addClass(qualifiedName);
         entityClass = codeGenerator.addInterface(entityClass, org.bonitasoft.engine.bdm.Entity.class.getName());
@@ -175,35 +171,6 @@ public class EntityCodeGenerator {
         final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
         nameQueryAnnotation.param("name", entityClass.name() + "." + name);
         nameQueryAnnotation.param("query", content);
-    }
-
-    private void validateClassNotExistsInRuntime(final String qualifiedName) {
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Class clazz = contextClassLoader.loadClass(qualifiedName);
-            // Here the class is found, which is NOT normal! Let's investigate:
-            final StringBuilder message = new StringBuilder(
-                    "Class " + qualifiedName + " already exists in target runtime environment");
-            final ClassLoader classLoader = clazz.getClassLoader();
-            if (classLoader != null) {
-                if (classLoader instanceof URLClassLoader) {
-                    for (URL url : ((URLClassLoader) classLoader).getURLs()) {
-                        message.append("\n").append(url.toString());
-                    }
-                } else {
-                    message.append("\nCurrent classloader is NOT an URLClassLoader: ").append(classLoader.toString());
-                }
-            }
-            message.append("\nCurrent JVM Id where the class is found: ")
-                    .append(ManagementFactory.getRuntimeMXBean().getName());
-            message.append(
-                    "\nMake sure you did not manually add the jar files bdm-model.jar / bdm-dao.jar somewhere on the classpath.");
-            message.append(
-                    "\nThose jar files are handled by Bonita internally and should not be manipulated outside Bonita.");
-            throw new IllegalArgumentException(message.toString());
-        } catch (final ClassNotFoundException ignored) {
-            // here is the normal behaviour
-        }
     }
 
     public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass, String dbVendor) {

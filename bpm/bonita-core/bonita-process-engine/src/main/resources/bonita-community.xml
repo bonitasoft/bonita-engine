@@ -2177,13 +2177,6 @@
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
-    <bean id="businessDataModelRepository"
-          class="org.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
-        <constructor-arg name="dependencyService" ref="dependencyService" />
-        <constructor-arg name="schemaManager" ref="schemaManager" />
-        <constructor-arg name="tenantResourcesService" ref="tenantResourcesService" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
-    </bean>
 
     <bean id="schemaManager" class="org.bonitasoft.engine.business.data.impl.SchemaManagerUpdate">
         <constructor-arg name="configuration">

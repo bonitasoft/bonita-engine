@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.commons.io.IOUtil.zip;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
 
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -42,6 +43,8 @@ import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.hibernate.tool.schema.spi.CommandAcceptanceException;
@@ -73,12 +76,19 @@ public class BusinessDataModelRepositoryImplTest {
     @Mock
     private SchemaManagerUpdate schemaManager;
 
+    @Mock
+    private PlatformService platformService;
+
+    @Mock
+    private SPlatformProperties platformProperties;
+
     private BusinessDataModelRepositoryImpl businessDataModelRepository;
 
     @Before
     public void setUp() {
-        schemaManager = mock(SchemaManagerUpdate.class);
-        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService,
+        doReturn(platformProperties).when(platformService).getSPlatformProperties();
+        doReturn("1.0").when(platformProperties).getPlatformVersion();
+        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(platformService, dependencyService,
                 classLoaderService, schemaManager, tenantResourcesService, TENANT_ID));
     }
 
@@ -274,6 +284,64 @@ public class BusinessDataModelRepositoryImplTest {
 
         // then:
         assertThat(Arrays.asList(message.split("\n"))).doesNotContain("");
+    }
+
+    @Test
+    public void isDeployedComparesBdmWithSameContent() throws Exception {
+        // given:
+        var bdmArchive = "fake archive content".getBytes();
+        var generatedJarContent = "fake jar content".getBytes();
+        when(dependencyService.getIdOfDependencyOfArtifact(TENANT_ID, ScopeType.TENANT,
+                BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME))
+                        .thenReturn(Optional.of(1L));
+        var deployedBdm = new SDependency();
+        deployedBdm.setValue_(generatedJarContent);
+        when(dependencyService.getDependency(1L)).thenReturn(deployedBdm);
+        doReturn(null).when(businessDataModelRepository).getBusinessObjectModel(bdmArchive);
+        doReturn(generatedJarContent).when(businessDataModelRepository).generateServerBDMJar(any(), eq(false));
+
+        // when:
+        var isDeployed = businessDataModelRepository.isDeployed(bdmArchive);
+
+        // then:
+        assertThat(isDeployed).isTrue();
+    }
+
+    @Test
+    public void isDeployedComparesBdmWithDifferentContent() throws Exception {
+        // given:
+        var bdmArchive = "fake archive content".getBytes();
+        var existingJarContent = "fake existing jar content".getBytes();
+        var generatedJarContent = "fake jar content".getBytes();
+        when(dependencyService.getIdOfDependencyOfArtifact(TENANT_ID, ScopeType.TENANT,
+                BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME))
+                        .thenReturn(Optional.of(1L));
+        var deployedBdm = new SDependency();
+        deployedBdm.setValue_(existingJarContent);
+        when(dependencyService.getDependency(1L)).thenReturn(deployedBdm);
+        doReturn(null).when(businessDataModelRepository).getBusinessObjectModel(bdmArchive);
+        doReturn(generatedJarContent).when(businessDataModelRepository).generateServerBDMJar(any(), eq(false));
+
+        // when:
+        var isDeployed = businessDataModelRepository.isDeployed(bdmArchive);
+
+        // then:
+        assertThat(isDeployed).isFalse();
+    }
+
+    @Test
+    public void isDeployedWithoutBdmDeployed() throws Exception {
+        // given:
+        var bdmArchive = "fake archive content".getBytes();
+        when(dependencyService.getIdOfDependencyOfArtifact(TENANT_ID, ScopeType.TENANT,
+                BusinessDataModelRepositoryImpl.BDR_DEPENDENCY_FILENAME))
+                        .thenReturn(Optional.empty());
+
+        // when:
+        var isDeployed = businessDataModelRepository.isDeployed(bdmArchive);
+
+        // then:
+        assertThat(isDeployed).isFalse();
     }
 
 }

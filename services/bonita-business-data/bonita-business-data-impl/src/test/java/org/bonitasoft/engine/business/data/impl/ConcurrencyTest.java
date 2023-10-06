@@ -31,6 +31,7 @@ import com.company.pojo.Employee;
 import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
@@ -74,9 +75,10 @@ public class ConcurrencyTest {
             jdbcTemplate = new JdbcTemplate(datasource);
         }
         final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration());
-        final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(
-                mock(DependencyService.class),
-                classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
+        final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(
+                new BusinessDataModelRepositoryImpl(mock(PlatformService.class),
+                        mock(DependencyService.class),
+                        classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         final UserTransactionService transactionService = mock(UserTransactionService.class);
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl,

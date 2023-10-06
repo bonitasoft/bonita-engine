@@ -20,10 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Singular;
+import com.vdurmont.semver4j.Semver;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ApplicationArchive implements AutoCloseable {
 
+    private String fileName;
     private File organization;
     private File bdm;
     private List<File> processes = new ArrayList<>();
@@ -41,11 +40,15 @@ public class ApplicationArchive implements AutoCloseable {
     private List<File> themes = new ArrayList<>();
     private List<File> applications = new ArrayList<>();
     private List<File> applicationIcons = new ArrayList<>();
-
     private List<File> ignoredFiles = new ArrayList<>();
 
-    @Singular
-    private Optional<File> configurationFile = Optional.empty();
+    private File configurationFile;
+
+    private String version;
+
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private Semver semver;
 
     public ApplicationArchive addPage(File page) {
         pages.add(page);
@@ -92,6 +95,35 @@ public class ApplicationArchive implements AutoCloseable {
         return this;
     }
 
+    public Optional<File> getConfigurationFile() {
+        return Optional.ofNullable(configurationFile);
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+        if (version != null) {
+            this.semver = new Semver(version, Semver.SemverType.LOOSE);
+        }
+    }
+
+    public boolean hasVersionGreaterThan(String version) {
+        if (semver == null) {
+            return false;
+        }
+        return semver.isGreaterThan(version);
+    }
+
+    public boolean hasVersionEquivalentTo(String version) {
+        if (semver == null) {
+            return false;
+        }
+        return semver.isEquivalentTo(version);
+    }
+
+    public boolean hasVersion() {
+        return semver != null;
+    }
+
     /**
      * @return <code>true</code> if the application archive has no artifact
      */
@@ -133,4 +165,5 @@ public class ApplicationArchive implements AutoCloseable {
             Files.deleteIfExists(f.toPath());
         }
     }
+
 }

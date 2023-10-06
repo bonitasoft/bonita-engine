@@ -45,6 +45,7 @@ import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContai
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder.ApplicationBuilder;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.io.FileOperations;
@@ -74,6 +75,9 @@ public class ApplicationInstallerUpdateTest {
 
     @Captor
     ArgumentCaptor<Callable<Object>> callableCaptor;
+
+    @Mock
+    private BusinessDataModelRepository bdmRepository;
 
     @InjectMocks
     @Spy
@@ -115,10 +119,11 @@ public class ApplicationInstallerUpdateTest {
                     .addLayout(layout)
                     .addTheme(theme)
                     .addRestAPIExtension(restAPI);
+            applicationArchive.setVersion("1.0.1");
             doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
             doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
 
-            applicationInstaller.update(applicationArchive, "1.0.1");
+            applicationInstaller.update(applicationArchive);
         }
         var captor = ArgumentCaptor.forClass(File.class);
         verify(applicationInstaller, times(4)).updatePageContent(captor.capture(), eq(1L));
@@ -137,8 +142,9 @@ public class ApplicationInstallerUpdateTest {
         doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
         try (var applicationArchive = new ApplicationArchive()) {
+            applicationArchive.setVersion("1.0.1");
             applicationArchive.addApplication(application);
-            applicationInstaller.update(applicationArchive, "1.0.1");
+            applicationInstaller.update(applicationArchive);
         }
 
         verify(applicationInstaller).importApplication(any(), any(), eq(REPLACE_DUPLICATES));
@@ -175,7 +181,8 @@ public class ApplicationInstallerUpdateTest {
         // when
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addProcess(process);
-            applicationInstaller.update(applicationArchive, "1.0.1");
+            applicationArchive.setVersion("1.0.1");
+            applicationInstaller.update(applicationArchive);
         }
         // then
         verify(applicationInstaller).deployProcess(
@@ -200,7 +207,8 @@ public class ApplicationInstallerUpdateTest {
         // when
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addProcess(process);
-            applicationInstaller.update(applicationArchive, "1.0.1");
+            applicationArchive.setVersion("1.0.1");
+            applicationInstaller.update(applicationArchive);
         }
         // then
         verify(applicationInstaller, never()).deployProcess(any(), any());
@@ -239,7 +247,8 @@ public class ApplicationInstallerUpdateTest {
         // when
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addProcess(process);
-            applicationInstaller.update(applicationArchive, "1.0.1");
+            applicationArchive.setVersion("1.0.1");
+            applicationInstaller.update(applicationArchive);
         }
         // then
         verify(applicationInstaller).deployProcess(any(), any());
@@ -255,9 +264,11 @@ public class ApplicationInstallerUpdateTest {
             applicationArchive.setBdm(bdm);
             doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
             doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
+            doReturn(false).when(bdmRepository).isDeployed(any(byte[].class));
             doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
+            applicationArchive.setVersion("1.0.1");
 
-            applicationInstaller.update(applicationArchive, "1.0.1");
+            applicationInstaller.update(applicationArchive);
 
             verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
         }
@@ -279,7 +290,8 @@ public class ApplicationInstallerUpdateTest {
 
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.addProcess(process);
-            applicationInstaller.update(applicationArchive, "1.0.1");
+            applicationArchive.setVersion("1.0.1");
+            applicationInstaller.update(applicationArchive);
         }
 
         verify(applicationInstaller).deployProcess(any(), any());
@@ -290,8 +302,9 @@ public class ApplicationInstallerUpdateTest {
     @Test
     public void should_throw_exception_if_application_archive_is_empty() throws Exception {
         try (ApplicationArchive applicationArchive = new ApplicationArchive()) {
+            applicationArchive.setVersion("1.0.1");
             assertThatExceptionOfType(ApplicationInstallationException.class)
-                    .isThrownBy(() -> applicationInstaller.update(applicationArchive, "1.0.1"))
+                    .isThrownBy(() -> applicationInstaller.update(applicationArchive))
                     .withMessage("The Application Archive contains no valid artifact to install");
         }
     }
@@ -304,7 +317,8 @@ public class ApplicationInstallerUpdateTest {
         doNothing().when(applicationInstaller).disableOldProcesses(any(), any());
         try (var applicationArchive = new ApplicationArchive()) {
             applicationArchive.setOrganization(organization);
-            applicationInstaller.update(applicationArchive, "1.0.1");
+            applicationArchive.setVersion("1.0.1");
+            applicationInstaller.update(applicationArchive);
         }
 
         verify(applicationInstaller).importOrganization(organization, ImportPolicy.IGNORE_DUPLICATES);

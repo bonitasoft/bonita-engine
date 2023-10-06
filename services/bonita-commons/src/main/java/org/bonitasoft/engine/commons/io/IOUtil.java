@@ -32,8 +32,12 @@ import java.io.Writer;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -156,38 +160,34 @@ public class IOUtil {
     }
 
     public static byte[] generateJar(final Map<String, byte[]> resources) throws IOException {
-        if (resources == null || resources.size() == 0) {
-            final String message = "No resources available";
-            throw new IOException(message);
+        if (resources == null || resources.isEmpty()) {
+            throw new IOException("No resources available");
         }
 
-        ByteArrayOutputStream baos = null;
-        JarOutputStream jarOutStream = null;
-        try {
-            baos = new ByteArrayOutputStream();
-            jarOutStream = new JarOutputStream(new BufferedOutputStream(baos));
+        try (var baos = new ByteArrayOutputStream();
+                var jarOutStream = new JarOutputStream(new BufferedOutputStream(baos));) {
             for (final Map.Entry<String, byte[]> resource : resources.entrySet()) {
-                jarOutStream.putNextEntry(new JarEntry(resource.getKey()));
+                var entry = new JarEntry(resource.getKey());
+                // Force entry timestamp to an arbitrary date to ease jar content comparison
+                entry.setCreationTime(FileTime.from(Instant.ofEpochMilli(0)));
+                entry.setLastModifiedTime(FileTime.from(Instant.ofEpochMilli(0)));
+                entry.setLastAccessTime(FileTime.from(Instant.ofEpochMilli(0)));
+                entry.setTimeLocal(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC));
+                entry.setTime(0);
+                jarOutStream.putNextEntry(entry);
                 jarOutStream.write(resource.getValue());
             }
             jarOutStream.flush();
             baos.flush();
-        } finally {
-            if (jarOutStream != null) {
-                jarOutStream.close();
-            }
-            if (baos != null) {
-                baos.close();
-            }
+            baos.close();
+            jarOutStream.close();
+            return baos.toByteArray();
         }
-
-        return baos.toByteArray();
     }
 
     public static byte[] generateZip(final Map<String, byte[]> resources) throws IOException {
-        if (resources == null || resources.size() == 0) {
-            final String message = "No resources available";
-            throw new IOException(message);
+        if (resources == null || resources.isEmpty()) {
+            throw new IOException("No resources available");
         }
 
         ByteArrayOutputStream baos = null;

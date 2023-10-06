@@ -84,7 +84,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip");
 
         // when:
-        applicationInstaller.install(applicationArchiveReader.read(applicationAsStream), "1.0.0");
+        applicationInstaller.install(applicationArchiveReader.read(applicationAsStream));
 
         // then:
 
@@ -120,7 +120,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
 
         // then:
         assertThatExceptionOfType(ApplicationInstallationException.class)
-                .isThrownBy(() -> applicationInstaller.update(applicationArchive, "1.0.1"))
+                .isThrownBy(() -> applicationInstaller.update(applicationArchive))
                 .withMessage("The Application Archive contains no valid artifact to install");
     }
 
@@ -141,7 +141,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         try (var applicationAsStream = this.getClass().getResourceAsStream("/customer-application.zip")) {
             // Avoid test failure due to instant update.
             Awaitility.await().timeout(Duration.of(1, ChronoUnit.SECONDS));
-            applicationInstaller.update(applicationArchiveReader.read(applicationAsStream), "1.0.0");
+            applicationInstaller.update(applicationArchiveReader.read(applicationAsStream));
         }
         // then:
         TenantResource updatedBdm = getTenantAdministrationAPI().getBusinessDataModelResource();
@@ -152,8 +152,9 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
         final ProcessDeploymentInfo deploymentInfoAfterUpdate = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinitionId);
 
+        // check that bdm resource has NOT been updated (same content)
+        assertThat(updatedBdm.getLastUpdateDate()).isEqualTo(bdm.getLastUpdateDate());
         // check that resources has been updated
-        assertThat(updatedBdm.getLastUpdateDate().toEpochSecond() > bdm.getLastUpdateDate().toEpochSecond()).isTrue();
         assertThat(updatedApplication.getLastUpdateDate().after(application.getLastUpdateDate())).isTrue();
         assertThat(
                 updatedProcessStarterAPI.getLastModificationDate().after(processStarterAPI.getLastModificationDate()))
@@ -181,7 +182,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
 
         // when:
         final InputStream applicationAsStream = this.getClass().getResourceAsStream("/customer-application-v2.zip");
-        applicationInstaller.update(applicationArchiveReader.read(applicationAsStream), "1.0.1");
+        applicationInstaller.update(applicationArchiveReader.read(applicationAsStream));
 
         // then:
         TenantResource updatedBdm = getTenantAdministrationAPI().getBusinessDataModelResource();
@@ -193,7 +194,7 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
                 .getProcessDeploymentInfo(processDefinitionId);
 
         // check that resources has been updated
-        assertThat(updatedBdm.getLastUpdateDate().toEpochSecond() > bdm.getLastUpdateDate().toEpochSecond()).isTrue();
+        assertThat(updatedBdm.getLastUpdateDate()).isAfter(bdm.getLastUpdateDate());
         // check installed apps
         assertThat(updatedApplication.getLastUpdateDate().after(application.getLastUpdateDate())).isTrue();
         // fetch application menus
@@ -219,6 +220,6 @@ public class ApplicationInstallerUpdateIT extends CommonAPIIT {
 
         // CallHealthCheck Process must not be updated
         assertThat(deploymentInfoAfterUpdate.getLastUpdateDate().after(deploymentInfo.getLastUpdateDate())).isTrue();
-        assertThat(deploymentInfoAfterUpdate.getActivationState().name()).isEqualTo("DISABLED");
+        assertThat(deploymentInfoAfterUpdate.getActivationState()).isEqualTo(ActivationState.DISABLED);
     }
 }

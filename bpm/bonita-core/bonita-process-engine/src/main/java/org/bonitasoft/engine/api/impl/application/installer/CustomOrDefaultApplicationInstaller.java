@@ -16,14 +16,9 @@ package org.bonitasoft.engine.api.impl.application.installer;
 import static java.lang.String.format;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Optional;
-import java.util.Properties;
-import java.util.zip.ZipFile;
 
-import com.vdurmont.semver4j.Semver;
-import com.vdurmont.semver4j.Semver.SemverType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,11 +48,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomOrDefaultApplicationInstaller {
 
-    private static final String VERSION_PROPERTY = "version";
-
     public static final String CUSTOM_APPLICATION_DEFAULT_FOLDER = "my-application";
-
-    public static final String VERSION_FILE_NAME = "application.properties";
 
     @Value("${bonita.runtime.custom-application.install-folder:" + CUSTOM_APPLICATION_DEFAULT_FOLDER + "}")
     @Getter
@@ -90,58 +81,36 @@ public class CustomOrDefaultApplicationInstaller {
             return;
         }
 
-        var newVersion = readApplicationVersion(customApplication)
-                .orElseThrow(() -> new ApplicationInstallationException(
-                        "Application version not found. Abort installation."));
-        log.info("Custom application detected with name '{}' under folder '{}'",
-                customApplication.getFilename(),
-                applicationInstallFolder);
-        if (isPlatformFirstInitialization()) {
-            // install application if it exists and if it is the first init of the platform
-            log.info("Bonita now tries to install it automatically...");
-            installCustomApplication(customApplication, newVersion);
-        } else {
-            var currentVersion = new Semver(applicationVersionService.retrieveApplicationVersion(), SemverType.LOOSE);
-            log.info("Detected application version: '{}'; Current deployed version: '{}'",
-                    newVersion,
-                    currentVersion);
-            if (newVersion.isGreaterThan(currentVersion)) {
-                log.info("Updating the application...");
-                updateCustomApplication(customApplication, newVersion);
-            } else if (newVersion.isEquivalentTo(currentVersion)) {
-                log.info("Updating process configuration only...");
-                findAndUpdateConfiguration();
+        try (var applicationArchive = createApplicationArchive(customApplication)) {
+            if (!applicationArchive.hasVersion()) {
+                throw new ApplicationInstallationException(
+                        "Application version not found. Abort installation.");
+            }
+            log.info("Custom application detected with name '{}' under folder '{}'",
+                    customApplication.getFilename(),
+                    applicationInstallFolder);
+            if (isPlatformFirstInitialization()) {
+                // install application if it exists and if it is the first init of the platform
+                log.info("Bonita now tries to install it automatically...");
+                applicationInstaller.install(applicationArchive);
             } else {
-                throw new ApplicationInstallationException("An application has been detected, but its newVersion "
-                        + newVersion + " is inferior to the one deployed: " + currentVersion
-                        + ". Nothing will be updated, and the Bonita engine startup has been aborted.");
-            }
-        }
-    }
-
-    @VisibleForTesting
-    Optional<Semver> readApplicationVersion(Resource customApplication) throws IOException {
-        if (customApplication != null) {
-            try (var customApplicationZip = new ZipFile(customApplication.getFile())) {
-                var applicationPropertiesEntry = customApplicationZip.getEntry(VERSION_FILE_NAME);
-                if (applicationPropertiesEntry == null) {
-                    return Optional.empty();
+                var currentVersion = applicationVersionService.retrieveApplicationVersion();
+                log.info("Detected application version: '{}'; Current deployed version: '{}'",
+                        applicationArchive.getVersion(),
+                        currentVersion);
+                if (applicationArchive.hasVersionGreaterThan(applicationVersionService.retrieveApplicationVersion())) {
+                    log.info("Updating the application...");
+                    applicationInstaller.update(applicationArchive);
+                } else if (applicationArchive.hasVersionEquivalentTo(currentVersion)) {
+                    log.info("Updating process configuration only...");
+                    findAndUpdateConfiguration();
+                } else {
+                    throw new ApplicationInstallationException("An application has been detected, but its newVersion "
+                            + applicationArchive.getVersion() + " is inferior to the one deployed: " + currentVersion
+                            + ". Nothing will be updated, and the Bonita engine startup has been aborted.");
                 }
-                var properties = new Properties();
-                var applicationPropertiesInputStream = customApplicationZip.getInputStream(applicationPropertiesEntry);
-                properties.load(applicationPropertiesInputStream);
-                return Optional.ofNullable(toSemver(properties.getProperty(VERSION_PROPERTY)));
             }
         }
-        return Optional.empty();
-    }
-
-    @VisibleForTesting
-    Semver toSemver(String version) {
-        if (version == null) {
-            return null;
-        }
-        return new Semver(version, SemverType.LOOSE);
     }
 
     boolean isPlatformFirstInitialization() {
@@ -155,7 +124,7 @@ public class CustomOrDefaultApplicationInstaller {
      */
     @VisibleForTesting
     Resource detectCustomApplication() throws IOException, ApplicationInstallationException {
-        log.info("Trying to detect custom application (.zip file from folder {})", applicationInstallFolder);
+        log.debug("Trying to detect custom application (.zip file from folder {})", applicationInstallFolder);
         return getResourceFromClasspath(getCustomAppResourcesFromClasspath(), "application zip");
     }
 
@@ -170,7 +139,7 @@ public class CustomOrDefaultApplicationInstaller {
                     nbZipApplication++;
                     customRsource = resource;
                 } else {
-                    log.info("A custom resource file '{}' is found but it cannot be read. It will be ignored.",
+                    log.warn("A custom resource file '{}' is found but it cannot be read. It will be ignored.",
                             resource.getFilename());
                 }
             }
@@ -190,57 +159,26 @@ public class CustomOrDefaultApplicationInstaller {
                         ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/" + applicationInstallFolder + "/*.zip");
     }
 
-    /**
-     * @param customApplication custom application resource
-     * @param version version of the custom application
-     * @throws ApplicationInstallationException if unable to install the application
-     */
-    protected void updateCustomApplication(final Resource customApplication, Semver version)
-            throws Exception {
-        try (final InputStream applicationZipFileStream = customApplication.getInputStream();
-                ApplicationArchive applicationArchive = getApplicationArchive(applicationZipFileStream)) {
-            setConfigurationFile(applicationArchive);
-            applicationInstaller.update(applicationArchive, version.getValue());
-        } catch (IOException | ApplicationInstallationException e) {
-            throw new ApplicationInstallationException(
-                    "Unable to update the application " + customApplication.getFilename(), e);
-        }
-    }
-
     private void setConfigurationFile(ApplicationArchive applicationArchive)
-            throws IOException, ApplicationInstallationException {
+            throws IOException {
         detectConfigurationFile().ifPresent(resource -> {
             try {
-                log.info("Found application configuration file " + resource.getFilename());
-                applicationArchive.setConfigurationFile(Optional.of(resource.getFile()));
+                log.debug("Found application configuration file " + resource.getFilename());
+                applicationArchive.setConfigurationFile(resource.getFile());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
         });
     }
 
-    /**
-     * @param customApplication custom application resource
-     * @param version version of the custom application
-     * @throws ApplicationInstallationException if unable to install the application
-     */
-    protected void installCustomApplication(final Resource customApplication, Semver version) throws Exception {
-        try (final InputStream applicationZipFileStream = customApplication.getInputStream();
-                ApplicationArchive applicationArchive = getApplicationArchive(applicationZipFileStream)) {
+    protected ApplicationArchive createApplicationArchive(Resource customApplication) {
+        try (var applicationZipFileStream = customApplication.getInputStream()) {
+            var applicationArchive = applicationArchiveReader.read(applicationZipFileStream);
             setConfigurationFile(applicationArchive);
-            applicationInstaller.install(applicationArchive, version.getValue());
-        } catch (IOException | ApplicationInstallationException e) {
-            throw new ApplicationInstallationException(
-                    "Unable to install the application " + customApplication.getFilename(), e);
-        }
-    }
-
-    protected ApplicationArchive getApplicationArchive(InputStream applicationZipFileStream)
-            throws ApplicationInstallationException {
-        try {
-            return applicationArchiveReader.read(applicationZipFileStream);
+            return applicationArchive;
         } catch (IOException e) {
-            throw new ApplicationInstallationException("Unable to read application archive", e);
+            throw new ApplicationInstallationException(
+                    String.format("Unable to read the %s application archive.", customApplication.getFilename()), e);
         }
     }
 
@@ -257,8 +195,8 @@ public class CustomOrDefaultApplicationInstaller {
         }
     }
 
-    protected Optional<Resource> detectConfigurationFile() throws IOException, ApplicationInstallationException {
-        log.info("Trying to detect configuration file (.bconf file from folder {})", applicationInstallFolder);
+    protected Optional<Resource> detectConfigurationFile() throws IOException {
+        log.debug("Trying to detect configuration file (.bconf file from folder {})", applicationInstallFolder);
         return Optional.ofNullable(
                 getResourceFromClasspath(getConfigurationFileResourcesFromClasspath(), "configuration file .bconf"));
     }
@@ -274,7 +212,7 @@ public class CustomOrDefaultApplicationInstaller {
         final ExecutionResult executionResult = new ExecutionResult();
         detectConfigurationFile().ifPresent(resource -> {
             try {
-                log.info("Found application configuration file " + resource.getFilename());
+                log.debug("Found application configuration file " + resource.getFilename());
                 applicationInstaller.updateConfiguration(resource.getFile(), executionResult);
             } catch (Exception e) {
                 throw new ApplicationInstallationException("Failed to update configuration.", e);
