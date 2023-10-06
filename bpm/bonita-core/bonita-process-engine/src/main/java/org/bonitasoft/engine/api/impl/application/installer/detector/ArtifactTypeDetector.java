@@ -13,19 +13,24 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Objects;
+import java.util.Properties;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnSingleCandidate(ArtifactTypeDetector.class)
+@Slf4j
 public class ArtifactTypeDetector {
 
-    private static final Logger logger = LoggerFactory.getLogger(ArtifactTypeDetector.class);
+    private static final String VERSION_PROPERTY = "version";
+    private static final String APPLICATION_PROPERTIES_FILENAME = "application.properties";
 
     private static final String REST_API_EXTENSION_CONTENT_TYPE = "apiExtension";
 
@@ -91,47 +96,61 @@ public class ArtifactTypeDetector {
         return processDetector.isCompliant(file);
     }
 
+    private boolean isApplicationProperties(File file) {
+        return file.isFile() && Objects.equals(APPLICATION_PROPERTIES_FILENAME, file.getName());
+    }
+
     public void checkFileAndAddToArchive(File file, ApplicationArchive applicationArchive) throws IOException {
         if (isApplication(file)) {
-            logger.info("Found application file: '{}'. ", file.getName());
+            log.debug("Found application file: '{}'. ", file.getName());
             applicationArchive.addApplication(file);
         } else if (isApplicationIcon(file)) {
-            logger.info("Found icon file: '{}'. ", file.getName());
+            log.debug("Found icon file: '{}'. ", file.getName());
             applicationArchive.addApplicationIcon(file);
         } else if (isProcess(file)) {
-            logger.info("Found process file: '{}'. ", file.getName());
+            log.debug("Found process file: '{}'. ", file.getName());
             applicationArchive.addProcess(file);
         } else if (isOrganization(file)) {
-            logger.info("Found organization file: '{}'. ", file.getName());
+            log.debug("Found organization file: '{}'. ", file.getName());
             if (applicationArchive.getOrganization() != null) {
-                logger.warn("An organization file has already been set. Using {}",
+                log.warn("An organization file has already been set. Using {}",
                         applicationArchive.getOrganization());
                 ignoreFile(file, applicationArchive);
             } else {
                 applicationArchive.setOrganization(file);
             }
         } else if (isPage(file)) {
-            logger.info("Found page file: '{}'. ", file.getName());
+            log.debug("Found page file: '{}'. ", file.getName());
             applicationArchive.addPage(file);
         } else if (isLayout(file)) {
-            logger.info("Found layout file: '{}'. ", file.getName());
+            log.debug("Found layout file: '{}'. ", file.getName());
             applicationArchive.addLayout(file);
         } else if (isTheme(file)) {
-            logger.info("Found theme file: '{}'. ", file.getName());
+            log.debug("Found theme file: '{}'. ", file.getName());
             applicationArchive.addTheme(file);
         } else if (isRestApiExtension(file)) {
-            logger.info("Found rest api extension file: '{}'. ", file.getName());
+            log.debug("Found rest api extension file: '{}'. ", file.getName());
             applicationArchive.addRestAPIExtension(file);
         } else if (isBdm(file)) {
-            logger.info("Found business data model file: '{}'. ", file.getName());
+            log.debug("Found business data model file: '{}'. ", file.getName());
             applicationArchive.setBdm(file);
+        } else if (isApplicationProperties(file)) {
+            applicationArchive.setVersion(readVersion(file));
         } else {
             ignoreFile(file, applicationArchive);
         }
     }
 
+    String readVersion(File applicationPropertiesFile) throws IOException {
+        try (var is = Files.newInputStream(applicationPropertiesFile.toPath())) {
+            var properties = new Properties();
+            properties.load(is);
+            return properties.getProperty(VERSION_PROPERTY, null);
+        }
+    }
+
     private void ignoreFile(File file, ApplicationArchive applicationArchive) {
-        logger.warn("Ignoring file '{}'.", file.getName());
+        log.debug("Ignoring file '{}'.", file.getName());
         applicationArchive.addIgnoredFile(file);
     }
 

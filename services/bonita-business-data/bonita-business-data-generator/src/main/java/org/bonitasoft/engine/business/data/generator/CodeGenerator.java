@@ -20,6 +20,9 @@ import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
+import java.lang.management.ManagementFactory;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -58,9 +61,15 @@ import org.bonitasoft.engine.bdm.model.field.SimpleField;
 public class CodeGenerator {
 
     private final JCodeModel model;
+    protected boolean shouldValidateRuntimeClasses = true;
 
     public CodeGenerator() {
         model = new JCodeModel();
+    }
+
+    public CodeGenerator disableRuntimeClassesValidation() {
+        this.shouldValidateRuntimeClasses = false;
+        return this;
     }
 
     public void generate(final File destDir) throws IOException {
@@ -69,25 +78,57 @@ public class CodeGenerator {
         }
     }
 
-    public JDefinedClass addClass(final String fullyqualifiedName) throws JClassAlreadyExistsException {
-        if (fullyqualifiedName == null || fullyqualifiedName.isEmpty()) {
-            throw new IllegalArgumentException("Classname cannot cannot be null or empty");
+    public JDefinedClass addClass(final String fullyQualifiedName) throws JClassAlreadyExistsException {
+        if (fullyQualifiedName == null || fullyQualifiedName.isEmpty()) {
+            throw new IllegalArgumentException("Classname cannot be null or empty");
         }
-        if (!SourceVersion.isName(fullyqualifiedName)) {
-            throw new IllegalArgumentException("Classname " + fullyqualifiedName + " is not a valid qualified name");
+        if (!SourceVersion.isName(fullyQualifiedName)) {
+            throw new IllegalArgumentException("Classname " + fullyQualifiedName + " is not a valid qualified name");
         }
-        return model._class(fullyqualifiedName);
+        if (shouldValidateRuntimeClasses) {
+            validateClassNotExistsInRuntime(fullyQualifiedName);
+        }
+        return model._class(fullyQualifiedName);
     }
 
-    public JDefinedClass addInterface(final JDefinedClass definedClass, final String fullyqualifiedName) {
-        return definedClass._implements(model.ref(fullyqualifiedName));
+    private void validateClassNotExistsInRuntime(final String qualifiedName) {
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            var clazz = contextClassLoader.loadClass(qualifiedName);
+            // Here the class is found, which is NOT normal! Let's investigate:
+            final StringBuilder message = new StringBuilder(
+                    "Class " + qualifiedName + " already exists in target runtime environment");
+            final ClassLoader classLoader = clazz.getClassLoader();
+            if (classLoader != null) {
+                if (classLoader instanceof URLClassLoader) {
+                    for (URL url : ((URLClassLoader) classLoader).getURLs()) {
+                        message.append("\n").append(url.toString());
+                    }
+                } else {
+                    message.append("\nCurrent classloader is NOT an URLClassLoader: ").append(classLoader.toString());
+                }
+            }
+            message.append("\nCurrent JVM Id where the class is found: ")
+                    .append(ManagementFactory.getRuntimeMXBean().getName());
+            message.append(
+                    "\nMake sure you did not manually add the jar files bdm-model.jar / bdm-dao.jar somewhere on the classpath.");
+            message.append(
+                    "\nThose jar files are handled by Bonita internally and should not be manipulated outside Bonita.");
+            throw new IllegalArgumentException(message.toString());
+        } catch (final ClassNotFoundException ignored) {
+            // here is the normal behaviour
+        }
     }
 
-    public JDefinedClass addInterface(final String fullyqualifiedName) throws JClassAlreadyExistsException {
-        if (!fullyqualifiedName.contains(".")) {
-            return model.rootPackage()._class(JMod.PUBLIC, fullyqualifiedName, ClassType.INTERFACE);
+    public JDefinedClass addInterface(final JDefinedClass definedClass, final String fullyQualifiedName) {
+        return definedClass._implements(model.ref(fullyQualifiedName));
+    }
+
+    public JDefinedClass addInterface(final String fullyQualifiedName) throws JClassAlreadyExistsException {
+        if (!fullyQualifiedName.contains(".")) {
+            return model.rootPackage()._class(JMod.PUBLIC, fullyQualifiedName, ClassType.INTERFACE);
         }
-        return model._class(fullyqualifiedName, ClassType.INTERFACE);
+        return model._class(fullyQualifiedName, ClassType.INTERFACE);
     }
 
     public JFieldVar addField(final JDefinedClass definedClass, final String fieldName, final Class<?> type) {

@@ -83,9 +83,9 @@ public class MandatoryLivingApplicationImporter extends LivingApplicationImporte
 
             List<String> createdOrReplaced = getNonSkippedImportedResources(importStatuses);
             if (createdOrReplaced.isEmpty()) {
-                log.info("No mandatory pages updated");
+                log.debug("No mandatory pages updated");
             } else {
-                log.info("Mandatory pages updated or created: {}", createdOrReplaced);
+                log.debug("Mandatory pages updated or created: {}", createdOrReplaced);
             }
         } catch (BonitaException | IOException e) {
             log.error(ExceptionUtils.printLightWeightStacktrace(e));

@@ -15,17 +15,8 @@ package org.bonitasoft.engine.api.impl.application.installer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +25,6 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
-import com.vdurmont.semver4j.Semver;
-import com.vdurmont.semver4j.SemverException;
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
@@ -47,20 +36,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InOrder;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
  * @author Emmanuel Duchastenier
@@ -80,6 +61,9 @@ class CustomOrDefaultApplicationInstallerTest {
     TenantServicesManager tenantServicesManager;
     @Mock
     ApplicationVersionService applicationVersionService;
+
+    @Mock
+    private ApplicationArchiveReader applicationArchiveReader;
     @InjectMocks
     @Spy
     private CustomOrDefaultApplicationInstaller listener;
@@ -148,20 +132,6 @@ class CustomOrDefaultApplicationInstallerTest {
         );
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = { "SNAPSHOT", "", ".0" })
-    void unsupportedApplicationVersions(String version)
-            throws Exception {
-        assertThrows(SemverException.class, () -> listener.toSemver(version));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "9-SNAPSHOT", "5", "2.0", "1.0.0", "2.1-alpha", "3.3.2.beta1" })
-    void supportedApplicationVersions(String version)
-            throws Exception {
-        assertThat(listener.toSemver(version)).isNotNull();
-    }
-
     @Test
     void should_install_custom_application_if_detected_and_platform_first_init()
             throws Exception {
@@ -170,16 +140,16 @@ class CustomOrDefaultApplicationInstallerTest {
         InputStream resourceStream1 = mock(InputStream.class);
 
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of(new Semver("1.0.0"))).when(listener).readApplicationVersion(resource1);
         doReturn(resourceStream1).when(resource1).getInputStream();
-        final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
-        doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
+        final ApplicationArchive applicationArchive = new ApplicationArchive();
+        applicationArchive.setVersion("1.0.0");
+        doReturn(applicationArchive).when(applicationArchiveReader).read(resourceStream1);
         doReturn(true).when(listener).isPlatformFirstInitialization();
         //when
         listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(applicationInstaller).install(applicationArchive, "1.0.0");
+        verify(applicationInstaller).install(applicationArchive);
         verify(defaultLivingApplicationImporter, never()).execute();
     }
 
@@ -191,10 +161,10 @@ class CustomOrDefaultApplicationInstallerTest {
         InputStream resourceStream1 = mock(InputStream.class);
 
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of(new Semver("1.0.1"))).when(listener).readApplicationVersion(resource1);
         doReturn(resourceStream1).when(resource1).getInputStream();
-        final ApplicationArchive applicationArchive = mock(ApplicationArchive.class);
-        doReturn(applicationArchive).when(listener).getApplicationArchive(resourceStream1);
+        final ApplicationArchive applicationArchive = new ApplicationArchive();
+        applicationArchive.setVersion("1.0.1");
+        doReturn(applicationArchive).when(applicationArchiveReader).read(resourceStream1);
         doReturn(false).when(listener).isPlatformFirstInitialization();
         doReturn("1.0.0").when(applicationVersionService).retrieveApplicationVersion();
         //when
@@ -202,7 +172,7 @@ class CustomOrDefaultApplicationInstallerTest {
 
         //then
         InOrder inOrder = inOrder(defaultLivingApplicationImporter, applicationInstaller);
-        inOrder.verify(applicationInstaller).update(applicationArchive, "1.0.1");
+        inOrder.verify(applicationInstaller).update(applicationArchive);
         verify(defaultLivingApplicationImporter, never()).execute();
     }
 
@@ -212,7 +182,9 @@ class CustomOrDefaultApplicationInstallerTest {
         //given
         Resource resource1 = mockResource("resource1", true, true, 0L);
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of(new Semver("1.0.0"))).when(listener).readApplicationVersion(resource1);
+        var applicationArchive = new ApplicationArchive();
+        applicationArchive.setVersion("1.0.0");
+        doReturn(applicationArchive).when(listener).createApplicationArchive(resource1);
         doReturn(false).when(listener).isPlatformFirstInitialization();
         doReturn("1.0.0").when(applicationVersionService).retrieveApplicationVersion();
         //when
@@ -220,7 +192,7 @@ class CustomOrDefaultApplicationInstallerTest {
 
         //then
         InOrder inOrder = inOrder(defaultLivingApplicationImporter, applicationInstaller);
-        inOrder.verify(applicationInstaller, never()).update(any(), any());
+        inOrder.verify(applicationInstaller, never()).update(any());
         verify(listener, times(1)).findAndUpdateConfiguration();
         verify(defaultLivingApplicationImporter, never()).execute();
     }
@@ -232,7 +204,9 @@ class CustomOrDefaultApplicationInstallerTest {
         Resource resource1 = mockResource("resource1", true, true, 0L);
 
         doReturn(resource1).when(listener).detectCustomApplication();
-        doReturn(Optional.of(new Semver("0.0.9-SNAPSHOT"))).when(listener).readApplicationVersion(resource1);
+        var applicationArchive = new ApplicationArchive();
+        applicationArchive.setVersion("0.0.9-SNAPSHOT");
+        doReturn(applicationArchive).when(listener).createApplicationArchive(resource1);
         doReturn(false).when(listener).isPlatformFirstInitialization();
         doReturn("1.0.0").when(applicationVersionService).retrieveApplicationVersion();
         //when
@@ -255,30 +229,8 @@ class CustomOrDefaultApplicationInstallerTest {
         listener.autoDeployDetectedCustomApplication(any());
 
         //then
-        verify(applicationInstaller, never()).install(any(), eq("1.0.0"));
+        verify(applicationInstaller, never()).install(any());
         verify(defaultLivingApplicationImporter).execute();
-    }
-
-    @Test
-    void should_read_the_application_version() throws Exception {
-        ResourcePatternResolver cpResourceResolver = new PathMatchingResourcePatternResolver(
-                CustomOrDefaultApplicationInstallerTest.class.getClassLoader());
-
-        // load first zip, version should be 1.0.0
-        Resource archive = cpResourceResolver.getResource("/customer-application.zip");
-        var version = listener.readApplicationVersion(archive);
-
-        assertThat(version).hasValue(new Semver("1.0.0"));
-
-        // load second zip, version should be 1.0.1
-        archive = cpResourceResolver.getResource("/customer-application-v2.zip");
-        version = listener.readApplicationVersion(archive);
-        assertThat(version).hasValue(new Semver("1.0.1"));
-
-        // load empty zip, expect gracious response of underlying method
-        archive = cpResourceResolver.getResource("/empty-customer-application.zip");
-        version = listener.readApplicationVersion(archive);
-        assertThat(version).isEmpty();
     }
 
     @Test

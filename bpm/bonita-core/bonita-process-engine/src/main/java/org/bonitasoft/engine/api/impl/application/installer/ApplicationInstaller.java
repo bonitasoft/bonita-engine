@@ -24,21 +24,10 @@ import static org.bonitasoft.engine.bpm.process.ActivationState.DISABLED;
 import static org.bonitasoft.engine.bpm.process.ConfigurationState.RESOLVED;
 import static org.bonitasoft.engine.business.application.ApplicationImportPolicy.FAIL_ON_DUPLICATES;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -62,31 +51,15 @@ import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.ActivationState;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
-import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.*;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.ApplicationInstallationException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.io.FileOperations;
@@ -94,6 +67,7 @@ import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.page.PageUpdater;
+import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.service.InstallationFailedException;
 import org.bonitasoft.engine.service.InstallationService;
@@ -106,7 +80,6 @@ import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.version.ApplicationVersionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
@@ -143,7 +116,6 @@ public class ApplicationInstaller {
     private final Long tenantId;
     private final ApplicationNodeContainerConverter appXmlConverter = new ApplicationNodeContainerConverter();
 
-    @Autowired
     public ApplicationInstaller(InstallationService installationService,
             @Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
             UserTransactionService transactionService, @Value("${tenantId}") Long tenantId,
@@ -171,7 +143,7 @@ public class ApplicationInstaller {
         return OrganizationAPIDelegate.getInstance();
     }
 
-    public void install(ApplicationArchive applicationArchive, String version) throws ApplicationInstallationException {
+    public void install(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
         if (applicationArchive.isEmpty()) {
             throw new ApplicationInstallationException("The Application Archive contains no valid artifact to install");
         }
@@ -183,11 +155,11 @@ public class ApplicationInstaller {
             inSession(() -> inTransaction(() -> {
                 var newlyInstalledProcessIds = installArtifacts(applicationArchive, executionResult);
                 enableResolvedProcesses(newlyInstalledProcessIds, executionResult);
-                updateApplicationVersion(version);
+                updateApplicationVersion(applicationArchive.getVersion());
                 return null;
             }));
             log.info("The Application Archive (version {}) has been installed successfully in {} ms.",
-                    version, (System.currentTimeMillis() - startPoint));
+                    applicationArchive.getVersion(), (System.currentTimeMillis() - startPoint));
         } catch (Exception e) {
             throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
         } finally {
@@ -212,13 +184,12 @@ public class ApplicationInstaller {
         return installedProcessIds;
     }
 
-    public void update(ApplicationArchive applicationArchive, String version) throws ApplicationInstallationException {
+    public void update(ApplicationArchive applicationArchive) throws ApplicationInstallationException {
         if (applicationArchive.isEmpty()) {
             throw new ApplicationInstallationException("The Application Archive contains no valid artifact to install");
         }
         final ExecutionResult executionResult = new ExecutionResult();
         try {
-            pauseTenantInSession();
             final long startPoint = System.currentTimeMillis();
             log.info("Starting Application Archive installation...");
             installBusinessDataModel(applicationArchive);
@@ -226,24 +197,18 @@ public class ApplicationInstaller {
                 List<Long> newlyInstalledProcessIds = updateArtifacts(applicationArchive, executionResult);
                 disableOldProcesses(newlyInstalledProcessIds, executionResult);
                 enableResolvedProcesses(newlyInstalledProcessIds, executionResult);
-                updateApplicationVersion(version);
+                updateApplicationVersion(applicationArchive.getVersion());
                 return null;
             }));
             log.info("The Application Archive has been installed successfully in {} ms.",
                     (System.currentTimeMillis() - startPoint));
         } catch (Exception e) {
-            throw new ApplicationInstallationException("The Application Archive install operation has been aborted", e);
+            throw new ApplicationInstallationException("The Application Archive update operation has been aborted", e);
         } finally {
             logInstallationResult(executionResult);
-            try {
-                resumeTenantInSession();
-            } catch (Exception e) {
-                log.error("Error when resuming the tenant after installation");
-                log.error(e.getMessage());
-            }
         }
         if (executionResult.hasErrors()) {
-            throw new ApplicationInstallationException("The Application Archive install operation has been aborted");
+            throw new ApplicationInstallationException("The Application Archive update operation has been aborted");
         }
     }
 
@@ -251,11 +216,13 @@ public class ApplicationInstaller {
     public void resumeTenantInSession() throws Exception {
         inSession(() -> {
             try {
-                tenantStateManager.resume();
-                transactionService.executeInTransaction(() -> {
-                    businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getServiceAccessor());
-                    return null;
-                });
+                if (Objects.equals(STenant.PAUSED, tenantStateManager.getStatus())) {
+                    tenantStateManager.resume();
+                    transactionService.executeInTransaction(() -> {
+                        businessArchiveArtifactsManager.resolveDependenciesForAllProcesses(getServiceAccessor());
+                        return null;
+                    });
+                }
             } catch (Exception e) {
                 throw new UpdateException(e);
             }
@@ -268,11 +235,9 @@ public class ApplicationInstaller {
         inSession(() -> {
             try {
                 String status = tenantStateManager.getStatus();
-                if (status.equals("ACTIVATED")) {
+                if (STenant.ACTIVATED.equals(status)) {
                     tenantStateManager.pause();
-                } else if (status.equals("PAUSED")) {
-                    // do nothing, tenant already paused
-                } else {
+                } else if (!STenant.PAUSED.equals(status)) {
                     throw new UpdateException(
                             "The default tenant is in state " + status + " and cannot be paused. Aborting.");
                 }
@@ -450,10 +415,29 @@ public class ApplicationInstaller {
 
     protected void installBusinessDataModel(ApplicationArchive applicationArchive) throws Exception {
         if (applicationArchive.getBdm() != null) {
-            final String bdmVersion = inSession(
-                    () -> inTransaction(() -> updateBusinessDataModel(applicationArchive)));
-            log.info("BDM successfully installed (version({})", bdmVersion);
+            var alreadyDeployed = sameBdmContentDeployed(applicationArchive.getBdm());
+            if (alreadyDeployed) {
+                log.info("Installed and current BDM are equivalent. No BDM update required.");
+                return;
+            }
+            log.info("BDM must be installed or updated...");
+            pauseTenantInSession();
+            try {
+                final String bdmVersion = inSession(
+                        () -> inTransaction(() -> updateBusinessDataModel(applicationArchive)));
+                log.info("BDM successfully installed (version({})", bdmVersion);
+            } finally {
+                resumeTenantInSession();
+            }
         }
+    }
+
+    boolean sameBdmContentDeployed(File bdmArchive) throws Exception {
+        return inSession(() -> inTransaction(() -> {
+            log.info("Comparing BDM to install with current BDM...");
+            return bdmRepository
+                    .isDeployed(Files.readAllBytes(bdmArchive.toPath()));
+        }));
     }
 
     protected String updateBusinessDataModel(ApplicationArchive applicationArchive)
@@ -830,7 +814,7 @@ public class ApplicationInstaller {
     public <T> T inSession(Callable<T> callable) throws Exception {
         final SSession session = sessionService.createSession(tenantId, SessionService.SYSTEM);
         final long sessionId = session.getId();
-        log.info("Created new session with id {}", sessionId);
+        log.trace("New session created with id {}", sessionId);
         try {
             sessionAccessor.setSessionInfo(sessionId, tenantId);
             return callable.call();

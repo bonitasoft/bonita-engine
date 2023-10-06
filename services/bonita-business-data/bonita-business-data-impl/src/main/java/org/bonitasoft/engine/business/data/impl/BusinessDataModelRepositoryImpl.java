@@ -19,32 +19,27 @@ import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.security.MessageDigest;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.business.data.SchemaManager;
+import org.bonitasoft.engine.business.data.*;
 import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
 import org.bonitasoft.engine.business.data.generator.BDMJarGenerationException;
 import org.bonitasoft.engine.business.data.generator.client.ClientBDMJarBuilder;
 import org.bonitasoft.engine.business.data.generator.client.ResourcesLoader;
 import org.bonitasoft.engine.business.data.generator.filter.OnlyDAOImplementationFileFilter;
 import org.bonitasoft.engine.business.data.generator.filter.WithoutDAOImplementationFileFilter;
+import org.bonitasoft.engine.business.data.generator.server.ServerBDMCodeGenerator;
 import org.bonitasoft.engine.business.data.generator.server.ServerBDMJarBuilder;
 import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -57,16 +52,21 @@ import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 /**
  * @author Colin PUY
  */
+@Slf4j
+@Service("businessDataModelRepository")
 public class BusinessDataModelRepositoryImpl implements BusinessDataModelRepository {
 
     private static final String BDR_DEPENDENCY_NAME = "BDR";
@@ -83,12 +83,15 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     private final ClassLoaderService classLoaderService;
 
     private final SchemaManager schemaManager;
-    private TenantResourcesService tenantResourcesService;
-    private long tenantId;
+    private final TenantResourcesService tenantResourcesService;
+    private final long tenantId;
+    private final PlatformService platformService;
 
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService,
+    public BusinessDataModelRepositoryImpl(final PlatformService platformService,
+            final DependencyService dependencyService,
             ClassLoaderService classLoaderService, final SchemaManager schemaManager,
-            TenantResourcesService tenantResourcesService, long tenantId) {
+            TenantResourcesService tenantResourcesService, @Value("${tenantId}") long tenantId) {
+        this.platformService = platformService;
         this.dependencyService = dependencyService;
         this.classLoaderService = classLoaderService;
         this.schemaManager = schemaManager;
@@ -239,9 +242,23 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     protected byte[] generateServerBDMJar(final BusinessObjectModel model)
             throws SBusinessDataRepositoryDeploymentException {
-        final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder();
+        return generateServerBDMJar(model, true);
+    }
+
+    protected byte[] generateServerBDMJar(final BusinessObjectModel model, boolean validateRuntimeClasses)
+            throws SBusinessDataRepositoryDeploymentException {
+        var generator = new ServerBDMCodeGenerator();
+        if (!validateRuntimeClasses) {
+            generator.disableRuntimeClassesValidation();
+        }
+        final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(generator);
         final IOFileFilter classFileAndXmlFileFilter = new SuffixFileFilter(Arrays.asList(".class", ".xml"));
         try {
+            // Force productVersion to current platform version.
+            // The bom.xml file stored in the generated jar will have the proper product version.
+            // Thus, when comparing these files, a BDM update will be forced if the platform version has changed
+            // between the existing server jar and the new one.
+            model.setProductVersion(platformService.getSPlatformProperties().getPlatformVersion());
             return builder.build(model, classFileAndXmlFileFilter);
         } catch (BDMJarGenerationException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
@@ -332,6 +349,44 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                 throw new SBusinessDataRepositoryException(ioe);
             }
         }
+    }
+
+    @Override
+    public boolean isDeployed(byte[] bdmArchive)
+            throws InvalidBusinessDataModelException, SBusinessDataRepositoryDeploymentException {
+        try {
+            var bdmDependencyId = dependencyService
+                    .getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME);
+            if (bdmDependencyId.isEmpty()) {
+                log.debug("No BDM currently deployed.");
+                return false;
+            }
+            var existingSha3 = sha256ToHex(dependencyService.getDependency(bdmDependencyId.get()).getValue());
+            var newServerJar = generateServerBDMJar(getBusinessObjectModel(bdmArchive), false);
+            var newSha3 = sha256ToHex(newServerJar);
+            log.debug("BDM binary sha3256 comparison: current={}, new={}", existingSha3, newSha3);
+            return Objects.equals(existingSha3, newSha3);
+        } catch (SDependencyNotFoundException e) {
+            log.error("Failed to retrieve existing bdm dependency", e);
+            return false;
+        } catch (SBonitaReadException e) {
+            log.error("Failed to retrieve {} dependency", BDR_DEPENDENCY_FILENAME, e);
+            return false;
+        }
+    }
+
+    @SneakyThrows
+    private static String sha256ToHex(byte[] source) {
+        final MessageDigest digest = MessageDigest.getInstance("SHA3-256");
+        return bytesToHex(digest.digest(source));
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            hexString.append(String.format("%02x", b));
+        }
+        return hexString.toString();
     }
 
 }

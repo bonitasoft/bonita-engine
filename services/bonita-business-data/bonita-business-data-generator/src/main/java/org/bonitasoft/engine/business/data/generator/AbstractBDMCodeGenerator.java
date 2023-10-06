@@ -52,8 +52,14 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     private static final String NEW_INSTANCE_METHOD_NAME = "newInstance";
 
-    public AbstractBDMCodeGenerator() {
+    protected AbstractBDMCodeGenerator() {
         super();
+    }
+
+    @Override
+    public AbstractBDMCodeGenerator disableRuntimeClassesValidation() {
+        super.disableRuntimeClassesValidation();
+        return this;
     }
 
     public void generateBom(final BusinessObjectModel bom, final File destDir)

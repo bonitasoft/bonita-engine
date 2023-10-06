@@ -25,8 +25,6 @@ public interface BusinessDataModelRepository {
      *
      * @param bdmArchive
      *        the Business Data Model, as a jar containing the Business Object classes to deploy.
-     * @param tenantId
-     *        the ID of the tenant to deploy the Business Data Model to.
      * @param userId the ID of the user installing the BDM, typically tenant admin (id=-1)
      * @return the version of the BDM just deployed.
      * @throws SBusinessDataRepositoryDeploymentException
@@ -75,4 +73,16 @@ public interface BusinessDataModelRepository {
      *         if the BDM cannot be retrieved.
      */
     BusinessObjectModel getBusinessObjectModel() throws SBusinessDataRepositoryException;
+
+    /**
+     * Determine if the given BDM archive is equivalent to the currently deployed BDM.
+     *
+     * @param bdmArchive
+     *        the Business Data Model, as a zip containing the Business Object Model.
+     * @return true If the given BDM archive is the same as the one already deployed. False otherwise.
+     * @throws InvalidBusinessDataModelException if the given BDM archive is invalid
+     * @throws SBusinessDataRepositoryDeploymentException if the server jar generation of the given BDM fails
+     */
+    boolean isDeployed(byte[] bdmArchive)
+            throws InvalidBusinessDataModelException, SBusinessDataRepositoryDeploymentException;
 }

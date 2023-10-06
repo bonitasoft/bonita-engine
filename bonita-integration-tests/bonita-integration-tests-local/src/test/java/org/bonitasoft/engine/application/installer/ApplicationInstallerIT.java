@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.File;
-import java.util.Optional;
 
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.impl.application.installer.ApplicationArchive;
@@ -77,7 +76,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         // when:
         try (var applicationAsStream = ApplicationInstallerIT.class.getResourceAsStream("/customer-application.zip")) {
             var applicationArchive = applicationArchiveReader.read(applicationAsStream);
-            applicationInstallerImpl.install(applicationArchive, "1.0.0");
+            applicationInstallerImpl.install(applicationArchive);
         }
 
         // then:
@@ -120,9 +119,9 @@ public class ApplicationInstallerIT extends CommonAPIIT {
         try (var applicationAsStream = ApplicationInstallerIT.class
                 .getResourceAsStream("/simple-app-1.0.0-SNAPSHOT-local.zip")) {
             var applicationArchive = applicationArchiveReader.read(applicationAsStream);
-            applicationArchive.setConfigurationFile(Optional.of(new File(ApplicationInstallerIT.class
-                    .getResource("/simple-app-1.0.0-SNAPSHOT-local.bconf").getFile())));
-            applicationInstallerImpl.install(applicationArchive, "1.0.0-SNAPSHOT");
+            applicationArchive.setConfigurationFile(new File(ApplicationInstallerIT.class
+                    .getResource("/simple-app-1.0.0-SNAPSHOT-local.bconf").getFile()));
+            applicationInstallerImpl.install(applicationArchive);
         }
 
         final long processDefinitionId = getProcessAPI().getProcessDefinitionId("Pool", "1.0");
@@ -150,7 +149,7 @@ public class ApplicationInstallerIT extends CommonAPIIT {
 
             // then:
             assertThatExceptionOfType(ApplicationInstallationException.class)
-                    .isThrownBy(() -> applicationInstaller.install(applicationArchive, "1.0.0"))
+                    .isThrownBy(() -> applicationInstaller.install(applicationArchive))
                     .withMessage("The Application Archive contains no valid artifact to install");
         }
     }

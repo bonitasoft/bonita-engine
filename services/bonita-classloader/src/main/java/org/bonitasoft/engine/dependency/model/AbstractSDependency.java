@@ -16,9 +16,11 @@ package org.bonitasoft.engine.dependency.model;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -44,9 +46,10 @@ public abstract class AbstractSDependency implements PersistentObject {
     private String description;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @Getter(AccessLevel.NONE)
     private byte[] value_;
 
-    public AbstractSDependency(final String name, final String fileName, final byte[] value) {
+    protected AbstractSDependency(final String name, final String fileName, final byte[] value) {
         super();
         this.name = name;
         this.fileName = fileName;

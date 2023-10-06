@@ -61,7 +61,7 @@ public class ForeignKeyAnnotatorTest {
 
     @Before
     public void before() throws Exception {
-        codeGenerator = new ClientBDMCodeGenerator();
+        codeGenerator = new ClientBDMCodeGenerator().disableRuntimeClassesValidation();
         foreignKeyAnnotator = new ForeignKeyAnnotator();
         jDefinedClass = codeGenerator.addClass(EntityPojo.class.getName());
         jFieldVar = codeGenerator.addField(jDefinedClass, "fieldName", EntityPojo.class);

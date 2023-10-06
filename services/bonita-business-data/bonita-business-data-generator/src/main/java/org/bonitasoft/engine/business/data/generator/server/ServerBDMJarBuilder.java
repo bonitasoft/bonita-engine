@@ -14,11 +14,11 @@
 package org.bonitasoft.engine.business.data.generator.server;
 
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
@@ -39,8 +39,8 @@ public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
         super(new ServerBDMCodeGenerator(), compiler);
     }
 
-    public ServerBDMJarBuilder() {
-        super(new ServerBDMCodeGenerator());
+    public ServerBDMJarBuilder(ServerBDMCodeGenerator generator) {
+        super(generator);
     }
 
     @Override
@@ -72,9 +72,7 @@ public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
     private void addBOMFile(final File directory, final BusinessObjectModel bom) throws CodeGenerationException {
         Path file = new File(directory, "bom.xml").toPath();
         try {
-            final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
-            final byte[] bomXML = IOUtils.marshallObjectToXML(bom, resource);
-            Files.write(file, bomXML);
+            Files.write(file, new BusinessObjectModelConverter().marshall(bom));
         } catch (Exception e) {
             throw new CodeGenerationException("Error when adding business object model metadata to server jar", e);
         }
