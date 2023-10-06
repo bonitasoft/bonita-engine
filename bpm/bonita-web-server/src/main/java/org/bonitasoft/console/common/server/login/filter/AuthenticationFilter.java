@@ -52,7 +52,7 @@ public class AuthenticationFilter extends ExcludingPatternFilter {
 
     protected static final String USER_NOT_FOUND_JSP = "/usernotfound.jsp";
 
-    public static final String ERROR_PAGE_REQUEST_PATH_REGEX = "/portal/resource/app/appDirectoryBonita/error-\\d+/content/.*";
+    public static final String ERROR_PAGE_REQUEST_PATH_REGEX = "/portal/resource/app/appDirectoryBonita/error-\\d+/(content|theme)/.*";
 
     protected boolean redirectWhenUnauthorized;
 
