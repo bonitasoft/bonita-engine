@@ -13,16 +13,17 @@
  **/
 package org.bonitasoft.engine.util;
 
-import static org.bonitasoft.engine.api.ApiAccessType.*;
+import static org.bonitasoft.engine.api.ApiAccessType.HTTP;
+import static org.bonitasoft.engine.api.ApiAccessType.LOCAL;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -204,8 +205,8 @@ public class APITypeManager {
         return result;
     }
 
-    private static void addPropertiesFrom(File clientFolder, Properties result, String... strings) throws IOException {
-        File folder = FileUtils.getFile(clientFolder, strings);
+    private static void addPropertiesFrom(File clientFolder, Properties result, String... paths) throws IOException {
+        File folder = Paths.get(clientFolder.getPath(), paths).toFile();
         if (folder.exists()) {
             final Properties defaultProperties = PropertiesManager.getProperties(folder);
             result.putAll(defaultProperties);

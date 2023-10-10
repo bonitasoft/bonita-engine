@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 
@@ -21,6 +21,7 @@ import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@ToString(callSuper = true)
 public class GatewayInstanceImpl extends FlowNodeInstanceImpl implements GatewayInstance {
 
     private static final long serialVersionUID = 8722950382913966260L;
@@ -32,11 +33,6 @@ public class GatewayInstanceImpl extends FlowNodeInstanceImpl implements Gateway
     @Override
     public FlowNodeType getType() {
         return FlowNodeType.GATEWAY;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this).appendSuper(super.toString()).toString();
     }
 
 }

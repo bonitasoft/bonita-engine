@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.Date;
 import java.util.Objects;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@ToString(callSuper = true)
 public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl implements ArchivedFlowNodeInstance {
 
     private static final long serialVersionUID = -6573747806944970703L;
@@ -263,29 +264,5 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
 
     public void setLastUpdateDate(final Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("name", getName())
-                .append("parentContainerId", parentContainerId)
-                .append("archiveDate", archiveDate)
-                .append("state", state)
-                .append("rootContainerId", rootContainerId)
-                .append("processDefinitionId", processDefinitionId)
-                .append("processInstanceId", processInstanceId)
-                .append("parentActivityInstanceId", parentActivityInstanceId)
-                .append("displayName", displayName)
-                .append("displayDescription", displayDescription)
-                .append("sourceObjectId", sourceObjectId)
-                .append("description", description)
-                .append("executedBy", executedBy)
-                .append("executedBySubstitute", executedBySubstitute)
-                .append("flownodeDefinitionId", flownodeDefinitionId)
-                .append("terminal", terminal)
-                .append("reachedStateDate", reachedStateDate)
-                .append("lastUpdateDate", lastUpdateDate)
-                .toString();
     }
 }

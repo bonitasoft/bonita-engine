@@ -13,8 +13,11 @@
  **/
 package org.bonitasoft.engine.io;
 
-import java.io.*;
-import java.net.URL;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,23 +26,14 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * @author Matthieu Chaffotte
@@ -57,47 +51,6 @@ public class IOUtils {
             zos.close();
         }
         return baos.toByteArray();
-    }
-
-    public static byte[] marshallObjectToXML(final Object jaxbModel, final URL schemaURL)
-            throws JAXBException, IOException, SAXException {
-        if (jaxbModel == null) {
-            return null;
-        }
-        if (schemaURL == null) {
-            throw new IllegalArgumentException("schemaURL is null");
-        }
-        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        final Schema schema = sf.newSchema(schemaURL);
-        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            final JAXBContext contextObj = JAXBContext.newInstance(jaxbModel.getClass());
-            final Marshaller m = contextObj.createMarshaller();
-            m.setSchema(schema);
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-            m.marshal(jaxbModel, baos);
-            return baos.toByteArray();
-        }
-    }
-
-    public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL)
-            throws JAXBException, IOException,
-            SAXException {
-        if (xmlObject == null) {
-            return null;
-        }
-        if (schemaURL == null) {
-            throw new IllegalArgumentException("schemaURL is null");
-        }
-        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        final Schema schema = sf.newSchema(schemaURL);
-        final JAXBContext contextObj = JAXBContext.newInstance(objectClass);
-        final Unmarshaller um = contextObj.createUnmarshaller();
-        um.setSchema(schema);
-        try (final ByteArrayInputStream stream = new ByteArrayInputStream(xmlObject)) {
-            final JAXBElement<T> jaxbElement = um.unmarshal(new StreamSource(stream), objectClass);
-            return jaxbElement.getValue();
-        }
     }
 
     public static Map<String, byte[]> unzip(final byte[] zippedContent) throws IOException {

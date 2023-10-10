@@ -13,7 +13,6 @@ dependencies {
     }
     api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     api project(':services:bonita-classloader')
-    runtimeOnly "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 

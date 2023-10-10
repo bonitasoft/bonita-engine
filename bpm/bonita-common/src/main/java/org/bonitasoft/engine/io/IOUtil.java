@@ -31,9 +31,11 @@ import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,18 +56,20 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Slf4j
 public class IOUtil {
 
+    private IOUtil() {
+        // Utility class
+    }
+
     public static final String TMP_DIRECTORY = System.getProperty("java.io.tmpdir");
-    public static final String FILE_ENCODING = "UTF-8";
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final int BUFFER_SIZE = 100000;
     private static final String CLASS_EXT = ".class";
 
@@ -74,7 +78,7 @@ public class IOUtil {
     }
 
     public static byte[] generateJar(String className, String... content) throws IOException {
-        return generateJar(emptyList(), Pair.of(className, String.join("\n", content)));
+        return generateJar(emptyList(), new AbstractMap.SimpleEntry<>(className, String.join("\n", content)));
     }
 
     static class StringJavaFileObject extends SimpleJavaFileObject {
@@ -91,15 +95,16 @@ public class IOUtil {
         }
     }
 
-    public static byte[] generateJar(Pair<String, String>... classFiles) throws IOException {
+    public static byte[] generateJar(Map.Entry<String, String>... classFiles) throws IOException {
         return generateJar(emptyList(), classFiles);
     }
 
     public static byte[] generateJar(List<Path> additionalJar, String className, String... content) throws IOException {
-        return generateJar(additionalJar, Pair.of(className, String.join("\n", content)));
+        return generateJar(additionalJar, new AbstractMap.SimpleEntry<>(className, String.join("\n", content)));
     }
 
-    public static byte[] generateJar(List<Path> additionalJar, Pair<String, String>... classFiles) throws IOException {
+    public static byte[] generateJar(List<Path> additionalJar, Map.Entry<String, String>... classFiles)
+            throws IOException {
         List<StringJavaFileObject> sourceFiles = stream(classFiles).map(classFile -> {
             StringJavaFileObject sourceFile = new StringJavaFileObject(classFile.getKey(), classFile.getValue());
             return sourceFile;
@@ -118,7 +123,7 @@ public class IOUtil {
         }
 
         Map<String, byte[]> resources = new HashMap<>();
-        for (Pair<String, String> classFile : classFiles) {
+        for (Map.Entry<String, String> classFile : classFiles) {
             String className = classFile.getKey();
             JavaFileObject javaFileForInput = standardFileManager.getJavaFileForInput(StandardLocation.CLASS_OUTPUT,
                     className, JavaFileObject.Kind.CLASS);
@@ -262,17 +267,19 @@ public class IOUtil {
 
         mkdirs(tmpDir);
 
-        FileUtils.isSymlink(tmpDir);
+        Files.isSymbolicLink(tmpDir.toPath());
 
         try {
-
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     final boolean deleted = deleteDir(tmpDir);
                     if (!deleted) {
-                        System.err.println(
-                                "Unable to delete directory: " + tmpDir + ". Trying with an alternative force delete.");
-                        FileUtils.forceDelete(tmpDir);
+                        var errorMsg = "Unable to delete directory: " + tmpDir;
+                        log.error(errorMsg);
+                        if (!tmpDir.exists()) {
+                            throw new FileNotFoundException("Directory does not exist: " + tmpDir);
+                        }
+                        throw new IOException(errorMsg);
                     }
                 } catch (final IOException e) {
                     throw new RuntimeException(e);
@@ -393,7 +400,7 @@ public class IOUtil {
 
     public static void writeContentToFileOutputStream(final String content, final FileOutputStream fileOutput)
             throws IOException {
-        try (OutputStreamWriter out = new OutputStreamWriter(fileOutput, FILE_ENCODING)) {
+        try (OutputStreamWriter out = new OutputStreamWriter(fileOutput, StandardCharsets.UTF_8)) {
             out.write(content);
             out.flush();
         } finally {
