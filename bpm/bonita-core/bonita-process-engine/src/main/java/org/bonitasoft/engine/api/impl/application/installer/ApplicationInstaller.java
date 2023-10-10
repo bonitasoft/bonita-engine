@@ -422,13 +422,10 @@ public class ApplicationInstaller {
             }
             log.info("BDM must be installed or updated...");
             pauseTenantInSession();
-            try {
-                final String bdmVersion = inSession(
-                        () -> inTransaction(() -> updateBusinessDataModel(applicationArchive)));
-                log.info("BDM successfully installed (version({})", bdmVersion);
-            } finally {
-                resumeTenantInSession();
-            }
+            final String bdmVersion = inSession(
+                    () -> inTransaction(() -> updateBusinessDataModel(applicationArchive)));
+            log.info("BDM successfully installed (version({})", bdmVersion);
+            resumeTenantInSession();
         }
     }
 
