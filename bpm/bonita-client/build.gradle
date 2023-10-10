@@ -10,8 +10,6 @@ dependencies {
     api "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
     api "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
     api "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"
-    runtimeOnly "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
-    runtimeOnly "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"

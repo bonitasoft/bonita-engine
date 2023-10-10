@@ -43,7 +43,6 @@ class Deps {
 
     public static String narayanaVersion = "5.10.6.Final"
     public static String jaxbVersion = "2.3.1"
-    public static String jaxbJxcVersion = "2.3.8"
     public static String logbackVersion = "1.2.11"
     public static String javaxAnnotationsVersion = "1.3.2"
 

@@ -331,9 +331,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         if (resource != null) {
             try {
                 final byte[] content = IOUtil.getAllContentFrom(resource);
-                final URL xsd = BusinessObjectModel.class.getResource("/bom.xsd");
-                final BusinessObjectModel model = IOUtils.unmarshallXMLtoObject(content, BusinessObjectModel.class,
-                        xsd);
+                final BusinessObjectModel model = new BusinessObjectModelConverter().unmarshall(content);
                 final List<Exception> exceptions = schemaManager.drop(model.getBusinessObjectsClassNames());
                 if (!exceptions.isEmpty()) {
                     if (exceptions.size() == 1) {

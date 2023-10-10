@@ -18,10 +18,11 @@ import static org.assertj.core.api.Assertions.entry;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.junit.After;
@@ -237,7 +238,7 @@ public class APITypeManagerTest {
         File file = new File(
                 bonitaHome.getAbsolutePath() + File.separator + "engine-client" + File.separator + fileName);
         file.getParentFile().mkdirs();
-        FileUtils.write(file, content);
+        Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
     }
 
     @Test(expected = UnknownAPITypeException.class)

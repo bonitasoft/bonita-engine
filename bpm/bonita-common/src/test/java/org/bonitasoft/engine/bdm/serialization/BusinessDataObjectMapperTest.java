@@ -14,18 +14,17 @@
 package org.bonitasoft.engine.bdm.serialization;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.time.LocalDate;
 
-import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bdm.serialization.model.Invoice;
 import org.junit.Test;
 
 public class BusinessDataObjectMapperTest {
 
-    private BusinessDataObjectMapper objectMapper = new BusinessDataObjectMapper();
+    private final BusinessDataObjectMapper objectMapper = new BusinessDataObjectMapper();
 
     @Test
     public void should_serialize_object_with_custom_local_date_and_time_serializers() throws Exception {
@@ -35,17 +34,19 @@ public class BusinessDataObjectMapperTest {
         invoice.setDate(LocalDate.of(2018, 8, 15));
         invoice.setComments(null);
 
+        String expectedJson;
+        try (var inputStream = BusinessDataObjectMapperTest.class.getResourceAsStream("simpleInvoice.json")) {
+            assertThat(inputStream).isNotNull();
+            expectedJson = new String(inputStream.readAllBytes());
+        }
+
         // when:
         StringWriter writer = new StringWriter();
         objectMapper.writeValue(writer, invoice);
 
         // then:
         assertThatJson(writer.toString()).as("Serialization uses date and time custom serializers")
-                .isEqualTo(getJsonContent("simpleInvoice.json"));
-    }
-
-    private static String getJsonContent(String jsonFileName) throws IOException {
-        return new String(IOUtils.toByteArray(BusinessDataObjectMapperTest.class.getResourceAsStream(jsonFileName)));
+                .isEqualTo(expectedJson);
     }
 
 }
