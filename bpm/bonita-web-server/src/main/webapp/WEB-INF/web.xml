@@ -383,6 +383,7 @@
             <param-value>true</param-value>
         </init-param>
     </servlet>
+    <!-- @deprecated as of 9.0.0, Process should be created/updated at startup -->
     <servlet>
         <servlet-name>processUploadServlet</servlet-name>
         <servlet-class>org.bonitasoft.console.common.server.servlet.TenantFileUploadServlet</servlet-class>
@@ -391,6 +392,7 @@
             <param-value>bar</param-value>
         </init-param>
     </servlet>
+    <!-- @deprecated as of 9.0.0, Process should be created/updated at startup -->
     <servlet>
         <servlet-name>apiProcessUploadServlet</servlet-name>
         <servlet-class>org.bonitasoft.console.common.server.servlet.TenantFileUploadServlet</servlet-class>
@@ -601,10 +603,12 @@
         <servlet-name>livingApplicationPageServlet</servlet-name>
         <url-pattern>/portal/resource/app/*</url-pattern>
     </servlet-mapping>
+    <!-- @deprecated as of 9.0.0, Process should be created/updated at startup -->
     <servlet-mapping>
         <servlet-name>processUploadServlet</servlet-name>
         <url-pattern>/portal/processUpload</url-pattern>
     </servlet-mapping>
+    <!-- @deprecated as of 9.0.0, Process should be created/updated at startup -->
     <servlet-mapping>
         <servlet-name>apiProcessUploadServlet</servlet-name>
         <url-pattern>/API/processUpload</url-pattern>
@@ -613,22 +617,27 @@
         <servlet-name>xmlUploadServlet</servlet-name>
         <url-pattern>/portal/organizationUpload</url-pattern>
     </servlet-mapping>
+    <!-- @deprecated as of 9.0.0, Applications should be created/updated at startup -->
     <servlet-mapping>
         <servlet-name>xmlUploadServlet</servlet-name>
         <url-pattern>/portal/applicationsUpload</url-pattern>
     </servlet-mapping>
+    <!-- @deprecated as of 9.0.0, Actors should be created/updated at startup -->
     <servlet-mapping>
         <servlet-name>xmlUploadServlet</servlet-name>
         <url-pattern>/portal/actorsUpload</url-pattern>
     </servlet-mapping>
+    <!-- @deprecated as of 9.0.0, BDM should be created/updated at startup -->
     <servlet-mapping>
         <servlet-name>zipUploadServlet</servlet-name>
         <url-pattern>/portal/bdmUpload</url-pattern>
     </servlet-mapping>
+    <!-- @deprecated as of 9.0.0, Application page should be created/updated at startup -->
     <servlet-mapping>
         <servlet-name>pageUploadServlet</servlet-name>
         <url-pattern>/portal/pageUpload</url-pattern>
     </servlet-mapping>
+    <!-- @deprecated as of 9.0.0, Application page should be created/updated at startup -->
     <servlet-mapping>
         <servlet-name>apiPageUploadServlet</servlet-name>
         <url-pattern>/API/pageUpload</url-pattern>
@@ -645,6 +654,7 @@
         <servlet-name>fileUploadServlet</servlet-name>
         <url-pattern>/portal/fileUpload</url-pattern>
     </servlet-mapping>
+    <!-- @deprecated as of 9.0.0, Process Form should be created/updated at startup -->
     <servlet-mapping>
         <servlet-name>formFileUploadServlet</servlet-name>
         <url-pattern>/API/formFileUpload</url-pattern>

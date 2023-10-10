@@ -23,8 +23,11 @@ import java.util.Set;
 
 import javax.activation.FileTypeMap;
 import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.console.common.server.page.CustomPageService;
@@ -37,6 +40,11 @@ import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated as of 9.0.0, Application page should be created/updated at startup.
+ */
+@Slf4j
+@Deprecated(since = "9.0.0")
 public class PageUploadServlet extends TenantFileUploadServlet {
 
     /**
@@ -55,6 +63,19 @@ public class PageUploadServlet extends TenantFileUploadServlet {
     protected static final String PERMISSIONS_RESPONSE_ATTRIBUTE = "permissions";
 
     protected File pageTmp;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated as of 9.0.0, Application page should be created/updated at startup.
+     */
+    @Override
+    @Deprecated(since = "9.0.0")
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        log.warn("Application Page upload is deprecated! " +
+                "An application page should be created or updated at startup instead.");
+        super.doPost(request, response);
+    }
 
     @Override
     protected String generateResponseString(final HttpServletRequest request, final String fileName,
