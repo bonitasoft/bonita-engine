@@ -32,13 +32,8 @@ public class CustomDataTypesRegistration implements SessionFactoryBuilderFactory
     @Override
     public SessionFactoryBuilder getSessionFactoryBuilder(final MetadataImplementor metadata,
             final SessionFactoryBuilderImplementor defaultBuilder) {
-        //        for (BasicType typeOverride : typeOverrides) {
-        //            logger.info("Registering custom Hibernate data type " + typeOverride);
-        //        }
-        //        metadata.getTypeConfiguration().addBasicTypeRegistrationContributions(
-        //                typeOverrides.stream().map(BasicTypeRegistration::new).collect(toList()));
         for (BasicType typeOverride : typeOverrides) {
-            logger.info("Registering custom Hibernate data type " + typeOverride);
+            logger.debug("Registering custom Hibernate data type {}", typeOverride);
             metadata.getTypeResolver().registerTypeOverride(typeOverride);
         }
         return defaultBuilder;
