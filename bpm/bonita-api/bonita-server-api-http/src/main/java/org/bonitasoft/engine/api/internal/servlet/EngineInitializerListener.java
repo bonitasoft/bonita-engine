@@ -27,24 +27,48 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 
 public class EngineInitializerListener implements ServletContextListener {
 
+    static final String UPDATE_ONLY_STARTUP_PROPERTY = "bonita.runtime.startup.update-only";
     private static final Logger log = LoggerFactory.getLogger(EngineInitializerListener.class);
 
     @Override
     public void contextInitialized(final ServletContextEvent event) {
+        var engineInitializer = getEngineInitializer();
         try {
-
-            PlatformSetupAccessor.getPlatformSetup().init(); // init tables and default configuration
-            getEngineInitializer().initializeEngine();
-            ApplicationContext engineContext = ServiceAccessorFactory.getInstance()
-                    .createServiceAccessor()
-                    .getContext();
-
-            AnnotationConfigWebApplicationContext webApplicationContext = initializeWebContext(event, engineContext);
-            webApplicationContext.refresh();
+            var webApplicationContext = initializeWebApplicationContext(event, engineInitializer);
+            boolean updateOnly = webApplicationContext.getEnvironment().getProperty(UPDATE_ONLY_STARTUP_PROPERTY,
+                    Boolean.class,
+                    Boolean.FALSE);
+            if (updateOnly) {
+                log.info("'{}' enabled. Shutting down JVM.", UPDATE_ONLY_STARTUP_PROPERTY);
+                engineInitializer.unloadEngine();
+                exit(0);
+            }
         } catch (final Throwable e) {
-            throw new RuntimeException("Error while initializing the Engine", e);
+            try {
+                engineInitializer.unloadEngine();
+            } catch (Exception ex) {
+                log.warn("Error while unloading the Engine", ex);
+            }
+            log.error("Error occurred while initializing the Engine. Shutting down JVM...", e);
+            exit(1);
         }
+    }
 
+    AnnotationConfigWebApplicationContext initializeWebApplicationContext(ServletContextEvent event,
+            EngineInitializer engineInitializer) throws Exception {
+        PlatformSetupAccessor.getPlatformSetup().init(); // init tables and default configuration
+        engineInitializer.initializeEngine();
+        ApplicationContext engineContext = ServiceAccessorFactory.getInstance()
+                .createServiceAccessor()
+                .getContext();
+
+        AnnotationConfigWebApplicationContext webApplicationContext = initializeWebContext(event, engineContext);
+        webApplicationContext.refresh();
+        return webApplicationContext;
+    }
+
+    void exit(int code) {
+        System.exit(code);
     }
 
     protected AnnotationConfigWebApplicationContext initializeWebContext(ServletContextEvent event,
