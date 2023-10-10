@@ -15,8 +15,11 @@ package org.bonitasoft.console.common.server.servlet;
 
 import java.util.Optional;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.business.application.Application;
@@ -32,6 +35,7 @@ import org.bonitasoft.web.toolkit.client.common.exception.api.APIItemNotFoundExc
 import org.bonitasoft.web.toolkit.client.common.exception.http.ServerException;
 import org.bonitasoft.web.toolkit.client.data.APIID;
 
+@Slf4j
 public class ApplicationIconServlet extends IconServlet {
 
     @Override
@@ -49,7 +53,26 @@ public class ApplicationIconServlet extends IconServlet {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated as of 9.0.0, Application icon should be deleted/updated at startup.
+     */
     @Override
+    @Deprecated(since = "9.0.0")
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        log.warn("DELETE request on Application Icon is deprecated! " +
+                "An application icon should be deleted or updated at startup instead.");
+        super.doDelete(request, response);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated as of 9.0.0, Application icon should be deleted/updated at startup.
+     */
+    @Override
+    @Deprecated(since = "9.0.0")
     protected void deleteIcon(Long entityId, APISession apiSession, HttpServletRequest request) throws ServerException {
         ApplicationAPI applicationApi = getApplicationApi(apiSession);
         ApplicationUpdater updater = new ApplicationUpdater();
