@@ -29,11 +29,9 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import javax.xml.bind.JAXBException;
@@ -52,47 +50,37 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.process.ActivationState;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
 import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder.ApplicationBuilder;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
+import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
 import org.bonitasoft.engine.identity.ImportPolicy;
-import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.service.InstallationService;
 import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.xml.sax.SAXException;
 
 /**
  * @author Baptiste Mesta.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ApplicationInstallerTest {
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class ApplicationInstallerTest {
 
     @Mock
     private UserTransactionService transactionService;
@@ -110,8 +98,8 @@ public class ApplicationInstallerTest {
     @Spy
     private ApplicationInstaller applicationInstaller;
 
-    @Before
-    public void before() throws Exception {
+    @BeforeEach
+    void before() throws Exception {
         // to bypass the transaction-wrapping part:
         doAnswer(inv -> callableCaptor.getValue().call()).when(transactionService)
                 .executeInTransaction(callableCaptor.capture());
@@ -125,7 +113,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_application_containing_all_kind_of_custom_pages() throws Exception {
+    void should_install_application_containing_all_kind_of_custom_pages() throws Exception {
         File page = createTempFile("page", "zip", zip(file("page.properties", "name=MyPage\ncontentType=page")));
         File layout = createTempFile("layout", "zip",
                 zip(file("page.properties", "name=MyLayout\ncontentType=layout")));
@@ -156,7 +144,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_application_containing_living_applications() throws Exception {
+    void should_install_application_containing_living_applications() throws Exception {
         File application = createTempFile("application", "xml",
                 applicationContent(new ApplicationBuilder("myApp", "My App", "1.0").create()));
         doNothing().when(applicationInstaller).installOrganization(any(), any());
@@ -173,7 +161,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_not_install_living_applications_if_page_missing() throws Exception {
+    void should_not_install_living_applications_if_page_missing() throws Exception {
 
         final ExecutionResult result = new ExecutionResult();
         ImportStatus importStatus = new ImportStatus("application");
@@ -208,9 +196,9 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_and_enable_resolved_process() throws Exception {
+    void should_install_and_enable_resolved_process(@TempDir Path tmpFolder) throws Exception {
         // given
-        byte[] barContent = createValidBusinessArchive();
+        byte[] barContent = createValidBusinessArchive(tmpFolder);
         File process = createTempFile("process", "bar", barContent);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
 
@@ -235,7 +223,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_bdm() throws Exception {
+    void should_install_bdm_in_maintenance_mode() throws Exception {
         byte[] bdmZipContent = createValidBDMZipFile();
         File bdm = createTempFile("bdm", "zip", bdmZipContent);
         try (var applicationArchive = new ApplicationArchive()) {
@@ -258,8 +246,35 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_call_enable_resolved_processes() throws Exception {
-        byte[] barContent = createValidBusinessArchive();
+    void should_keep_maintenance_mode_when_bdm_update_fails() throws Exception {
+        byte[] bdmZipContent = createValidBDMZipFile();
+        File bdm = createTempFile("bdm", "zip", bdmZipContent);
+        try (var applicationArchive = new ApplicationArchive()) {
+            applicationArchive.setBdm(bdm);
+            doNothing().when(applicationInstaller).installOrganization(any(), any());
+            doReturn("1.0").when(applicationInstaller).updateBusinessDataModel(applicationArchive);
+            doReturn(false).when(applicationInstaller).sameBdmContentDeployed(any());
+            doReturn(Collections.emptyList()).when(applicationInstaller).installProcesses(any(), any());
+            doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
+            doNothing().when(applicationInstaller).pauseTenantInSession();
+            doNothing().when(applicationInstaller).resumeTenantInSession();
+            applicationArchive.setVersion("1.0.0");
+            doThrow(BusinessDataRepositoryDeploymentException.class).when(applicationInstaller)
+                    .updateBusinessDataModel(any());
+
+            Assertions.assertThrows(ApplicationInstallationException.class,
+                    () -> applicationInstaller.install(applicationArchive));
+
+            verify(applicationInstaller).pauseTenantInSession();
+            verify(applicationInstaller).updateBusinessDataModel(applicationArchive);
+            verify(applicationInstaller, never()).resumeTenantInSession();
+        }
+
+    }
+
+    @Test
+    void should_call_enable_resolved_processes(@TempDir Path tmpFolder) throws Exception {
+        byte[] barContent = createValidBusinessArchive(tmpFolder);
         File process = createTempFile("process", "bar", barContent);
         doNothing().when(applicationInstaller).installOrganization(any(), any());
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
@@ -282,7 +297,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void enableResolvedProcesses_should_enable_processes_resolved_and_not_already_enabled() throws Exception {
+    void enableResolvedProcesses_should_enable_processes_resolved_and_not_already_enabled() throws Exception {
         // given:
         final ExecutionResult result = new ExecutionResult();
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
@@ -303,7 +318,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void enableResolvedProcesses_should_throw_exception_on_unresolved_process() throws Exception {
+    void enableResolvedProcesses_should_throw_exception_on_unresolved_process() throws Exception {
         // given:
         final ExecutionResult result = new ExecutionResult();
         ProcessDeploymentAPIDelegate processDeploymentAPIDelegate = mock(ProcessDeploymentAPIDelegate.class);
@@ -327,9 +342,9 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_skip_install_process_if_already_existing() throws Exception {
+    void should_skip_install_process_if_already_existing(@TempDir Path tmpFolder) throws Exception {
         final ExecutionResult executionResult = new ExecutionResult();
-        byte[] barContent = createValidBusinessArchive();
+        byte[] barContent = createValidBusinessArchive(tmpFolder);
         File process = createTempFile("process", "bar", barContent);
         doReturn(Optional.of(1L)).when(applicationInstaller).getDeployedProcessId("myProcess", "1.0");
 
@@ -355,7 +370,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_throw_exception_if_application_archive_is_empty() throws Exception {
+    void should_throw_exception_if_application_archive_is_empty() throws Exception {
         try (ApplicationArchive applicationArchive = new ApplicationArchive()) {
             applicationArchive.setVersion("1.0.0");
             assertThatExceptionOfType(ApplicationInstallationException.class)
@@ -365,7 +380,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_install_organization() throws Exception {
+    void should_install_organization() throws Exception {
         File organization = createTempFile("org", "xml", "content".getBytes());
         doReturn(emptyList()).when(applicationInstaller).importOrganization(any(), any());
         doNothing().when(applicationInstaller).enableResolvedProcesses(any(), any());
@@ -379,7 +394,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void should_not_fail_when_no_organization() throws Exception {
+    void should_not_fail_when_no_organization() throws Exception {
         var executionResult = new ExecutionResult();
         try (var applicationArchive = new ApplicationArchive()) {
             applicationInstaller.installOrganization(applicationArchive, executionResult);
@@ -390,7 +405,7 @@ public class ApplicationInstallerTest {
     }
 
     @Test
-    public void install_should_call_install_configuration_file_on_installation_service() throws Exception {
+    void install_should_call_install_configuration_file_on_installation_service() throws Exception {
         // given:
         final ExecutionResult executionResult = new ExecutionResult();
         doNothing().when(installationService).install(eq(null), any());
@@ -410,15 +425,15 @@ public class ApplicationInstallerTest {
         return myProcess;
     }
 
-    private byte[] createValidBusinessArchive()
+    private byte[] createValidBusinessArchive(Path tmpFolder)
             throws InvalidBusinessArchiveFormatException, InvalidProcessDefinitionException, IOException {
         BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").done())
                 .done();
-        File businessArchiveFile = temporaryFolder.newFile();
-        assert businessArchiveFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, businessArchiveFile);
-        return FileOperations.readFully(businessArchiveFile);
+        Path businessArchiveFile = Files.createFile(tmpFolder.resolve("tmpBar.bar"));
+        assert businessArchiveFile.toFile().delete();
+        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, businessArchiveFile.toFile());
+        return Files.readAllBytes(businessArchiveFile);
     }
 
     private byte[] createValidBDMZipFile() throws IOException, JAXBException, SAXException {
