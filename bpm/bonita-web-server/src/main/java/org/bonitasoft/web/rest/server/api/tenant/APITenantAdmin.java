@@ -27,7 +27,9 @@ import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 
 /**
  * @author Julien Reboul
+ * @deprecated since 9.0.0, use {{@link org.bonitasoft.web.rest.server.api.system.MaintenanceController}} instead.
  */
+@Deprecated(since = "9.0.0", forRemoval = true)
 public class APITenantAdmin extends ConsoleAPI<TenantAdminItem>
         implements APIHasGet<TenantAdminItem>, APIHasUpdate<TenantAdminItem> {
 
@@ -52,8 +54,13 @@ public class APITenantAdmin extends ConsoleAPI<TenantAdminItem>
      *
      * @see org.bonitasoft.web.rest.server.framework.API#update(org.bonitasoft.web.toolkit.client.data.APIID,
      *      java.util.Map)
+     * @deprecated since 9.0.0, use
+     *             {@link org.bonitasoft.web.rest.server.api.system.MaintenanceController#changeMaintenanceState(
+     *             org.bonitasoft.web.rest.model.system.MaintenanceDetailsClient, javax.servlet.http.HttpSession)}
+     *             instead.
      */
     @Override
+    @Deprecated(since = "9.0.0", forRemoval = true)
     public TenantAdminItem update(final APIID id, final Map<String, String> attributes) {
         return getTenantAdminDatastore().update(id, attributes);
     }
@@ -62,8 +69,12 @@ public class APITenantAdmin extends ConsoleAPI<TenantAdminItem>
      * get the current Tenant State
      *
      * @see org.bonitasoft.web.rest.server.framework.API#get(org.bonitasoft.web.toolkit.client.data.APIID)
+     * @deprecated since 9.0.0, use
+     *             {@link org.bonitasoft.web.rest.server.api.system.MaintenanceController#getMaintenanceDetails(
+     *             javax.servlet.http.HttpSession)} instead.
      */
     @Override
+    @Deprecated(since = "9.0.0", forRemoval = true)
     public TenantAdminItem get(final APIID id) {
         return getTenantAdminDatastore().get(id);
     }

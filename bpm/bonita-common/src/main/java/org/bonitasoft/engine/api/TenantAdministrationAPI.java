@@ -33,7 +33,9 @@ public interface TenantAdministrationAPI {
     /**
      * @return
      *         true if the tenant is paused.
+     * @deprecated since 9.0.0, use {@link MaintenanceAPI#getMaintenanceDetails()} instead.
      */
+    @Deprecated(since = "9.0.0", forRemoval = true)
     boolean isPaused();
 
     /**
@@ -43,21 +45,21 @@ public interface TenantAdministrationAPI {
      * All users connected are disconnected (apart from the technical user).
      * Only IdentityAPI and ProfileAPI are accessible.
      *
+     * @deprecated since 9.0.0, use {@link MaintenanceAPI#enableMaintenanceMode()} instead.
      * @throws org.bonitasoft.engine.exception.UpdateException
      *         if the tenant cannot be paused.
-     *         This method is deprecated, use {@link MaintenanceAPI#enableMaintenanceMode()} instead.
      */
-    @Deprecated
+    @Deprecated(since = "9.0.0", forRemoval = true)
     void pause() throws UpdateException;
 
     /**
      * Resume the tenant to a normal state after a pause.
      *
+     * @deprecated since 9.0.0, use {@link MaintenanceAPI#disableMaintenanceMode()} instead.
      * @throws org.bonitasoft.engine.exception.UpdateException
      *         if the tenant cannot be resumed.
-     *         This method is deprecated, use {@link MaintenanceAPI#disableMaintenanceMode()} ()} instead.
      */
-    @Deprecated
+    @Deprecated(since = "9.0.0", forRemoval = true)
     void resume() throws UpdateException;
 
     /**
