@@ -45,9 +45,9 @@ public class BonitaHomeFolderAccessor {
      * @param tempFileKey
      * @return
      * @throws IOException
-     * @deprecated use retrieveTempFileContent instead to avoid creating additional temp file
+     * @deprecated use {@link #retrieveUploadedTempContent(String)} instead to avoid creating additional temp file
      */
-    @Deprecated
+    @Deprecated(since = "9.0.0")
     public File getTempFile(final String tempFileKey) throws IOException {
         try {
             FileContent fileContent = retrieveUploadedTempContent(tempFileKey);

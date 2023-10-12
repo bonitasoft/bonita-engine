@@ -39,21 +39,6 @@ public class CommentImpl implements Comment {
         super();
     }
 
-    /**
-     * @deprecated As of 6.1 use {@link #CommentImpl()} and the setters
-     */
-    @Deprecated
-    public CommentImpl(final long id, final long tenantId, final long userId, final long processInstanceId,
-            final long postDate, final String content) {
-        super();
-        this.id = id;
-        this.tenantId = tenantId;
-        this.userId = userId;
-        this.processInstanceId = processInstanceId;
-        this.postDate = postDate;
-        this.content = content;
-    }
-
     @Override
     public Long getUserId() {
         return userId;

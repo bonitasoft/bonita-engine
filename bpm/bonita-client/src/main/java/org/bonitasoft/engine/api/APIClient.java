@@ -292,7 +292,7 @@ public class APIClient {
      * @since 7.2
      * @deprecated as of 7.3, see {@link BusinessDataAPI} for replacements
      */
-    @Deprecated
+    @Deprecated(since = "7.3")
     public BusinessDataAPI getBusinessDataAPI() {
         return getAPI(BusinessDataAPI.class);
     }

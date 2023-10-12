@@ -42,7 +42,6 @@ import org.junit.Test;
 
 // because of waituntil but its the only class where we use failed jobs... so i don't want to add a handler and so on
 // only for jobs
-@SuppressWarnings("deprecation")
 public class JobExecutionIT extends CommonAPILocalIT {
 
     private static final String THROWS_EXCEPTION_JOB = "ThrowsExceptionJob";
@@ -68,7 +67,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
     @Test
     public void getFailedJobs_should_return_zero_when_there_are_no_failed_jobs() {
         final List<FailedJob> failedJobs = getProcessAPI().getFailedJobs(0, 100);
-        assertThat(failedJobs).hasSize(0);
+        assertThat(failedJobs).isEmpty();
     }
 
     @Test
@@ -80,7 +79,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
             getCommandAPI().execute("except", emptyMap());
             final FailedJob failedJob = waitForFailedJob();
             assertThat(failedJob.getJobName()).isEqualTo(THROWS_EXCEPTION_JOB);
-            assertThat(failedJob.getRetryNumber()).isEqualTo(0);
+            assertThat(failedJob.getNumberOfFailures()).isEqualTo(1);
             assertThat(failedJob.getDescription()).isEqualTo("Throw an exception when 'throwException'=true");
 
             final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(1);
@@ -178,7 +177,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
         }.waitUntil();
         final FailedJob failedJob = getFailingJob();
         assertThat(failedJob).isNotNull();
-        assertThat(failedJob.getRetryNumber()).isEqualTo(0);
+        assertThat(failedJob.getNumberOfFailures()).isPositive();
         return failedJob;
     }
 
@@ -197,7 +196,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
 
     private FailedJob getFailedJob() {
         final FailedJob failedJob = getFailingJob();
-        if (failedJob != null && failedJob.getRetryNumber() == 0) {
+        if (failedJob != null && failedJob.getNumberOfFailures() > 0) {
             return failedJob;
         }
         return null;

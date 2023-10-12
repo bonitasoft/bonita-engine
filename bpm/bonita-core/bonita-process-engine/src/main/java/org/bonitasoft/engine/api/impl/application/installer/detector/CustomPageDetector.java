@@ -13,15 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl.application.installer.detector;
 
-import static org.bonitasoft.engine.io.FileOperations.getFileFromZip;
-
-import java.io.*;
-import java.nio.file.Files;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.bonitasoft.engine.io.FileOperations;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -40,7 +40,7 @@ public class CustomPageDetector {
 
     private Optional<Properties> getPageProperties(File file) {
         try {
-            byte[] fileFromZip = getFileFromZip(Files.readAllBytes(file.toPath()), PAGE_PROPERTIES_FILE);
+            byte[] fileFromZip = FileOperations.getFileFromZip(file, PAGE_PROPERTIES_FILE);
             Properties properties = new Properties();
             properties.load(new ByteArrayInputStream(fileFromZip));
             return Optional.of(properties);
@@ -51,7 +51,7 @@ public class CustomPageDetector {
 
     public boolean isFilePresent(File file, String filename) {
         try {
-            getFileFromZip(Files.readAllBytes(file.toPath()), filename);
+            FileOperations.getFileFromZip(file, filename);
             return true;
         } catch (IOException e) {
             return false;

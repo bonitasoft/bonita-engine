@@ -60,14 +60,6 @@ public interface ArchivedFlowNodeInstance extends NamedElement, BaseElement, Arc
      */
     long getExecutedBySubstitute();
 
-    /**
-     * @return The identifier of the substitute user (as Process manager or Administrator) who executed the flow node.
-     * @since 6.0.1
-     * @deprecated since 6.3.0, use {@link ArchivedFlowNodeInstance#getExecutedBySubstitute()}
-     */
-    @Deprecated
-    long getExecutedByDelegate();
-
     String getDescription();
 
     long getFlownodeDefinitionId();

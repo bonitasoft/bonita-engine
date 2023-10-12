@@ -33,7 +33,10 @@ public class ApplicationItem extends Item implements ItemHasUniqueId, ItemHasIco
 
     public static final String ATTRIBUTE_DESCRIPTION = "description";
 
-    @Deprecated
+    /**
+     * @deprecated since 7.13.0, see {@link #getIconPath()} & {@link #setIconPath(String)}
+     */
+    @Deprecated(since = "7.13.0")
     public static final String ATTRIBUTE_ICON_PATH = "iconPath";
 
     public static final String ATTRIBUTE_CREATION_DATE = "creationDate";
@@ -118,17 +121,17 @@ public class ApplicationItem extends Item implements ItemHasUniqueId, ItemHasIco
     }
 
     /**
-     * @deprecated since 7.13, use getIcon instead
+     * @deprecated since 7.13, use {@link #getIcon()} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.13.0")
     public String getIconPath() {
         return getAttributeValue(ATTRIBUTE_ICON_PATH);
     }
 
     /**
-     * @deprecated since 7.13, use setIcon instead
+     * @deprecated since 7.13, use {@link #setIcon(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.13.0")
     public void setIconPath(final String iconPath) {
         setAttribute(ATTRIBUTE_ICON_PATH, iconPath);
     }

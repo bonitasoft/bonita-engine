@@ -33,12 +33,6 @@ public interface FailedJob extends Serializable {
     String getLastMessage();
 
     /**
-     * @deprecated since 7.9, use {@link #getNumberOfFailures()} instead
-     */
-    @Deprecated
-    long getRetryNumber();
-
-    /**
      * @return the number of times a job failed before replaying it manually
      */
     int getNumberOfFailures();

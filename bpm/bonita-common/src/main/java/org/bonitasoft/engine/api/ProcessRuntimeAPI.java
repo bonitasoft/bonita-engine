@@ -2573,7 +2573,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      * @deprecated since 7.9, use {@link #replayFailedJob(long)} instead, parameters should not be modified.
      */
-    @Deprecated
+    @Deprecated(since = "7.9", forRemoval = true)
     void replayFailedJob(final long jobDescriptorId, Map<String, Serializable> parameters) throws ExecutionException;
 
     /**

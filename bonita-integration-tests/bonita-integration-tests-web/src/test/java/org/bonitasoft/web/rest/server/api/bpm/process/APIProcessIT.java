@@ -108,7 +108,7 @@ public class APIProcessIT extends AbstractConsoleTest {
     public void testUpdateProcessItem() throws Exception {
         final APIID processDefinitionId = APIID.makeAPIID(TestProcessFactory.getDefaultHumanTaskProcess()
                 .addActor(getInitiator())
-                .setEnable(true)
+                .enable()
                 .getId());
 
         // assert process is well enabled
@@ -161,7 +161,7 @@ public class APIProcessIT extends AbstractConsoleTest {
     public void testSearchProcessItemForUser() throws Exception {
         final APIID processDefinitionId = APIID.makeAPIID(TestProcessFactory.getDefaultHumanTaskProcess()
                 .addActor(getInitiator())
-                .setEnable(true)
+                .enable()
                 .getId());
 
         // Set the filters
@@ -227,9 +227,9 @@ public class APIProcessIT extends AbstractConsoleTest {
         TestProcessFactory.getInstance().add(p3);
 
         // map actor John Carpenter on the created processes, then set enable
-        p1.addActor(TestUserFactory.getJohnCarpenter()).setEnable(true);
-        p2.addActor(TestUserFactory.getJohnCarpenter()).setEnable(true);
-        p3.addActor(TestUserFactory.getJohnCarpenter()).setEnable(true);
+        p1.addActor(TestUserFactory.getJohnCarpenter()).enable();
+        p2.addActor(TestUserFactory.getJohnCarpenter()).enable();
+        p3.addActor(TestUserFactory.getJohnCarpenter()).enable();
 
         // Set the filters
         final HashMap<String, String> filters = new HashMap<>();

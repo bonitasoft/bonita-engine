@@ -66,18 +66,6 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     long getStartedBySubstitute();
 
     /**
-     * Get the identifier of the substitute user (as Process manager or Administrator) who started this process
-     * instance.
-     *
-     * @return The identifier of the substitute user (as Process manager or Administrator) who started this process
-     *         instance.
-     * @since 6.0.1
-     * @deprecated since 6.3.0, use {@link ProcessInstance#getStartedBySubstitute()}
-     */
-    @Deprecated
-    long getStartedByDelegate();
-
-    /**
      * Get the date when this process instance was finished.
      * It equals to null, if this process instance is not finished.
      *

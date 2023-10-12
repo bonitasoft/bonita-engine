@@ -35,7 +35,7 @@ import org.bonitasoft.engine.business.data.BusinessDataReference;
  *             "yourBusinessDataName_ref" key (business data name as declared in
  *             the process definition followed by "_ref" suffix).
  */
-@Deprecated
+@Deprecated(since = "7.3")
 public interface BusinessDataAPI {
 
     /**
@@ -53,7 +53,7 @@ public interface BusinessDataAPI {
      *         If the specified business data value cannot be found.
      * @deprecated See deprecated comment of {@link BusinessDataAPI}
      */
-    @Deprecated
+    @Deprecated(since = "7.3")
     BusinessDataReference getProcessBusinessDataReference(String businessDataName, long processInstanceId)
             throws DataNotFoundException;
 
@@ -69,7 +69,7 @@ public interface BusinessDataAPI {
      * @return the paginated references of the business data
      * @deprecated See deprecated comment of {@link BusinessDataAPI}
      */
-    @Deprecated
+    @Deprecated(since = "7.3")
     List<BusinessDataReference> getProcessBusinessDataReferences(long processInstanceId, int startIndex,
             int maxResults);
 

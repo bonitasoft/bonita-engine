@@ -183,7 +183,7 @@ public class TestProcessFactory {
                 .addEndEvent("Finish");
         final TestProcess testProcess = new TestProcess(processDefinitionBuidler);
         getInstance().getProcessList().put(processName, testProcess);
-        return testProcess.addActor(initiator).setEnable(true).startCase().getNextHumanTask().assignTo(initiator);
+        return testProcess.addActor(initiator).enable().startCase().getNextHumanTask().assignTo(initiator);
     }
 
     /**

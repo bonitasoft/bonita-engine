@@ -27,7 +27,7 @@ import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 
 /**
  * @author Julien Reboul
- * @deprecated since 9.0.0, use {{@link org.bonitasoft.web.rest.server.api.system.MaintenanceController}} instead.
+ * @deprecated since 9.0.0, use {@link org.bonitasoft.web.rest.server.api.system.MaintenanceController} instead.
  */
 @Deprecated(since = "9.0.0", forRemoval = true)
 public class APITenantAdmin extends ConsoleAPI<TenantAdminItem>

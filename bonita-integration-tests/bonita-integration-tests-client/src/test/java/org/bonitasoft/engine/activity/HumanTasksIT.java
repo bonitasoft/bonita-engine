@@ -438,9 +438,9 @@ public class HumanTasksIT extends TestWithUser {
         assertEquals(ActivityStates.INITIALIZING_STATE, step1.getState());
 
         // test set state by stateName
-        getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.CANCELLING_SUBTASKS_STATE);
+        getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.EXECUTING_STATE);
         step1 = getProcessAPI().getHumanTaskInstance(activityInstanceId);
-        assertEquals(ActivityStates.CANCELLING_SUBTASKS_STATE, step1.getState());
+        assertEquals(ActivityStates.EXECUTING_STATE, step1.getState());
 
         getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.SKIPPED_STATE);
         // will skip task and finish process

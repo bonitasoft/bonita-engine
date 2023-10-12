@@ -30,8 +30,6 @@ public class FailedJobImpl implements FailedJob {
 
     private String description;
 
-    private long retryNumber;
-
     private Date lastUpdateDate;
 
     private String lastMessage;
@@ -79,11 +77,6 @@ public class FailedJobImpl implements FailedJob {
     @Override
     public String getLastMessage() {
         return lastMessage;
-    }
-
-    @Override
-    public long getRetryNumber() {
-        return retryNumber;
     }
 
     @Override
