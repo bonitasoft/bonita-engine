@@ -109,17 +109,6 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
         this.startedBySubstitute = startedBySubstitute;
     }
 
-    @Deprecated
-    @Override
-    public long getStartedByDelegate() {
-        return getStartedBySubstitute();
-    }
-
-    @Deprecated
-    public void setStartedByDelegate(long startedByDelegate) {
-        setStartedBySubstitute(startedByDelegate);
-    }
-
     @Override
     public Date getEndDate() {
         return endDate;

@@ -183,17 +183,6 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         this.executedBySubstitute = executedBySubstitute;
     }
 
-    @Deprecated
-    @Override
-    public long getExecutedByDelegate() {
-        return getExecutedBySubstitute();
-    }
-
-    @Deprecated
-    public void setExecutedByDelegate(long executedBySubstitute) {
-        setExecutedBySubstitute(executedBySubstitute);
-    }
-
     @Override
     public long getFlownodeDefinitionId() {
         return flownodeDefinitionId;

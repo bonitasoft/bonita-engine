@@ -16,16 +16,19 @@ package org.bonitasoft.engine.io;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 /**
  * @author Baptiste Mesta
@@ -38,6 +41,16 @@ public class FileOperations {
         // private constructor
     }
 
+    /**
+     * Retrieve the content of a file inside a ZIP file.
+     *
+     * @param zip ZIP file to parse
+     * @param filePath path of the file to search inside the ZIP
+     * @return the bytes read from the searched file
+     * @throws FileNotFoundException if the ZIP file does not contain the searched file
+     * @throws java.util.zip.ZipException if a ZIP format error has occurred (e.g. the input zip file is not a ZIP)
+     * @throws IOException if an I/O error has occurred
+     */
     public static byte[] getFileFromZip(File zip, String filePath) throws IOException {
         try (var zipFile = new ZipFile(zip)) {
             var entry = zipFile.getEntry(filePath);
@@ -57,30 +70,6 @@ public class FileOperations {
             Path temp = fs.getPath("./temp_" + UUID.randomUUID().toString());
             Files.write(temp, newContent.readAllBytes(), StandardOpenOption.CREATE_NEW);
             Files.move(temp, source, REPLACE_EXISTING);
-        }
-    }
-
-    /**
-     * @deprecated use {@link FileOperations#getFileFromZip(File, String)} instead.
-     */
-    @Deprecated
-    public static byte[] getFileFromZip(byte[] content, String filePath) throws IOException {
-        return getFileFromZip(new ByteArrayInputStream(content), filePath);
-    }
-
-    /**
-     * @deprecated use {@link FileOperations#getFileFromZip(File, String)} instead.
-     */
-    @Deprecated
-    public static byte[] getFileFromZip(InputStream inputStream, String filePath) throws IOException {
-        try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-            ZipEntry zipEntry;
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                if (zipEntry.getName().equals(filePath) && !zipEntry.isDirectory()) {
-                    return zipInputStream.readAllBytes();
-                }
-            }
-            throw new FileNotFoundException(String.format("Entry %s not found in zip", filePath));
         }
     }
 

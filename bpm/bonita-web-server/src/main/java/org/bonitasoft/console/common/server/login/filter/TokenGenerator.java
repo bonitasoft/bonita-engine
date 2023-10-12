@@ -13,12 +13,10 @@
  **/
 package org.bonitasoft.console.common.server.login.filter;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.bonitasoft.console.common.server.api.token.APIToken;
-import org.bonitasoft.console.common.server.login.PortalCookies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,24 +31,10 @@ public class TokenGenerator {
     public static final String X_BONITA_API_TOKEN = "X-Bonita-API-Token";
 
     /**
-     * set the CSRF security token to the HTTP response as cookie.
-     *
-     * @deprecated use
-     *             {@link PortalCookies#addCSRFTokenCookieToResponse(HttpServletRequest, HttpServletResponse, Object)}
-     *             instead
-     */
-    @Deprecated
-    public void setTokenToResponseCookie(HttpServletRequest request, HttpServletResponse res,
-            Object apiTokenFromClient) {
-        PortalCookies portalCookies = new PortalCookies();
-        portalCookies.addCSRFTokenCookieToResponse(request, res, apiTokenFromClient);
-    }
-
-    /**
      * generate and store the CSRF security inside HTTP session
      * or retrieve it token from the HTTP session
      *
-     * @param req the HTTP session
+     * @param session the HTTP session
      * @return the CSRF security token
      */
     public String createOrLoadToken(final HttpSession session) {
@@ -69,7 +53,7 @@ public class TokenGenerator {
      * set the CSRF security token to the HTTP response as HTTP Header.
      *
      * @param res the http response
-     * @param apiTokenFromClient the security token to set
+     * @param token the security token to set
      */
     public void setTokenToResponseHeader(final HttpServletResponse res, final String token) {
         if (res.containsHeader(X_BONITA_API_TOKEN)) {

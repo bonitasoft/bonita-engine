@@ -73,7 +73,7 @@ public class ValidationStatus {
     /**
      * @Deprecated since release 7.7.0, replaced by {@link #getStatuses()}
      */
-    @Deprecated
+    @Deprecated(since = "7.7.0", forRemoval = true)
     public List<String> getErrors() {
         return statusList.stream().filter(status -> Objects.equals(Status.Level.ERROR, status.getLevel()))
                 .map(Status::getMessage).collect(Collectors.toList());
@@ -82,7 +82,7 @@ public class ValidationStatus {
     /**
      * @Deprecated since release 7.7.0, replaced by {@link #getStatuses()}
      */
-    @Deprecated
+    @Deprecated(since = "7.7.0", forRemoval = true)
     public List<String> getWarnings() {
         return statusList.stream().filter(status -> Objects.equals(Status.Level.WARNING, status.getLevel()))
                 .map(Status::getMessage).collect(Collectors.toList());

@@ -43,8 +43,6 @@ public class SearchArchivedHumanTaskInstanceDescriptor extends SearchEntityDescr
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getPriorityKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getProcessDefinitionKey()));
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
-                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getRootProcessInstanceKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getRootProcessInstanceKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,

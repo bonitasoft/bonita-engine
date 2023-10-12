@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.comment.api.impl;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,6 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.SHumanComment;
 import org.bonitasoft.engine.core.process.comment.model.SSystemComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
-import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -93,18 +91,6 @@ public class SCommentServiceImpl implements SCommentService {
     @Override
     public long getNumberOfComments(final QueryOptions options) throws SBonitaReadException {
         return persistenceService.getNumberOfEntities(SComment.class, options, null);
-    }
-
-    @Deprecated
-    @Override
-    public List<SComment> getComments(final long processInstanceId) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("processInstanceId",
-                (Object) processInstanceId);
-        final OrderByOption orderByOption = new OrderByOption(SComment.class, "id", OrderByType.ASC);
-        final QueryOptions queryOptions = new QueryOptions(Arrays.asList(orderByOption));
-        final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments",
-                parameters, SComment.class, queryOptions);
-        return persistenceService.selectList(selectDescriptor);
     }
 
     @Override

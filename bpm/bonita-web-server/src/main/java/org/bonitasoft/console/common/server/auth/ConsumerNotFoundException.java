@@ -19,10 +19,10 @@ import javax.servlet.ServletException;
  * This class cannot be removed without the risk of breaking
  * old {@link AuthenticationManager} implementations that may still use it
  *
- * @deprecated since 7.16.0
+ * @deprecated since 8.0.0
  * @author Chong Zhao
  */
-@Deprecated
+@Deprecated(since = "8.0.0")
 public class ConsumerNotFoundException extends ServletException {
 
     /**

@@ -78,18 +78,6 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
     long getStartedBySubstitute();
 
     /**
-     * Get the identifier of the substitute user (as Process manager or Administrator) who started this process
-     * instance.
-     *
-     * @return The identifier of the substitute user (as Process manager or Administrator) who started this process
-     *         instance.
-     * @since 6.0.1
-     * @deprecated As of version 6.3.0, replaced by {@link ArchivedProcessInstance#getStartedBySubstitute()}
-     */
-    @Deprecated
-    long getStartedByDelegate();
-
-    /**
      * Get the date when this process instance was finished.
      * It equals to null, if this process instance is not finished.
      *

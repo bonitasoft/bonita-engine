@@ -82,6 +82,7 @@ public class ApplicationCreator implements Serializable {
      * @see Application
      * @deprecated since 7.13.0, use {@link #setIcon(String, byte[])}
      */
+    @Deprecated(since = "7.13.0")
     public ApplicationCreator setIconPath(final String iconPath) {
         fields.put(ApplicationField.ICON_PATH, iconPath);
         return this;

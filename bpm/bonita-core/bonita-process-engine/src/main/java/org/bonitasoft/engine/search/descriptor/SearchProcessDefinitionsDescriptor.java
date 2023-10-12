@@ -60,10 +60,6 @@ public class SearchProcessDefinitionsDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.DEPLOYED_BY,
                 new FieldDescriptor(SProcessDefinitionDeployInfo.class, SProcessDefinitionDeployInfo.DEPLOYED_BY_KEY));
 
-        searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.LABEL,
-                new FieldDescriptor(SProcessDefinitionDeployInfo.class,
-                        SProcessDefinitionDeployInfo.LABEL));
-
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.PROCESS_ID,
                 new FieldDescriptor(SProcessDefinitionDeployInfo.class, SProcessDefinitionDeployInfo.PROCESS_ID_KEY));
 

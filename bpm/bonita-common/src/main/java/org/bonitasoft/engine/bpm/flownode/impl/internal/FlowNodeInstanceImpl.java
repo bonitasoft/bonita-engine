@@ -164,17 +164,6 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         this.executedBySubstitute = executedBySubstitute;
     }
 
-    @Deprecated
-    @Override
-    public long getExecutedByDelegate() {
-        return getExecutedBySubstitute();
-    }
-
-    @Deprecated
-    public void setExecutedByDelegate(long executedByDelegate) {
-        setExecutedBySubstitute(executedByDelegate);
-    }
-
     @Override
     public long getFlownodeDefinitionId() {
         return flownodeDefinitionId;

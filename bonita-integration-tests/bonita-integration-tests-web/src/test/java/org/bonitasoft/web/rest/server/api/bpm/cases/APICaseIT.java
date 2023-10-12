@@ -254,8 +254,7 @@ public class APICaseIT extends AbstractConsoleTest {
 
     @Test
     public void we_can_start_a_case() throws Exception {
-        final TestProcess process = TestProcessFactory.getDefaultHumanTaskProcess().addActor(getInitiator())
-                .setEnable(true);
+        final TestProcess process = TestProcessFactory.getDefaultHumanTaskProcess().addActor(getInitiator()).enable();
 
         final CaseItem item = apiCase.runAdd(aCaseItem().withProcessId(process.getId()).build());
 
@@ -266,7 +265,7 @@ public class APICaseIT extends AbstractConsoleTest {
     @Test
     public void we_can_start_a_case_with_user() throws Exception {
         final TestProcess process = TestProcessFactory.getDefaultHumanTaskProcess()
-                .addActor(TestUserFactory.getRidleyScott()).setEnable(true);
+                .addActor(TestUserFactory.getRidleyScott()).enable();
 
         final CaseItem item = apiCase.runAdd(aCaseItem().withProcessId(process.getId())
                 .withUserId(TestUserFactory.getRidleyScott().getId()).build());
@@ -298,7 +297,7 @@ public class APICaseIT extends AbstractConsoleTest {
 
     private TestProcess createProcessWithVariables(final ProcessVariable... processVariables) {
         return TestProcessFactory.createProcessWithVariables("processWithVariables", processVariables)
-                .addActor(getInitiator()).setEnable(true);
+                .addActor(getInitiator()).enable();
     }
 
     private Serializable getProcessDataInstanceValue(final String dataName, final long processInstanceId)

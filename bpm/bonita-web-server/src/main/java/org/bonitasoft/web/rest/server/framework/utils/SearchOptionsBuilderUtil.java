@@ -19,14 +19,18 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 /**
  * @author Haojie Yuan
  */
-public class SearchOptionsBuilderUtil {
+public final class SearchOptionsBuilderUtil {
+
+    private SearchOptionsBuilderUtil() {
+        // Utility class
+    }
 
     /**
      * build SearchOptionsBuilder
      *
-     * @deprecated use org.bonitasoft.web.rest.server.credentials.utils.SearchOptionsCreator
+     * @deprecated use {@link org.bonitasoft.web.rest.server.datastore.utils.SearchOptionsCreator} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.0")
     public static SearchOptionsBuilder buildSearchOptions(final int pageIndex, final int numberOfResults,
             final String sort, final String search) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(computeIndex(pageIndex, numberOfResults),

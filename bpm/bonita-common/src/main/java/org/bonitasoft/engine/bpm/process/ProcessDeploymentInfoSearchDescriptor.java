@@ -87,12 +87,4 @@ public class ProcessDeploymentInfoSearchDescriptor {
      */
     public static final String CATEGORY_ID = "categoryId";
 
-    /**
-     * This field doesn't exist on a process definition.
-     *
-     * @deprecated since 6.3.5
-     */
-    @Deprecated
-    public static final String LABEL = "label";
-
 }

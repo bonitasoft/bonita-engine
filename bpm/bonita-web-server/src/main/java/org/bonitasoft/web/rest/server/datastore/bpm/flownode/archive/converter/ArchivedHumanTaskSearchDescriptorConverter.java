@@ -31,7 +31,7 @@ public class ArchivedHumanTaskSearchDescriptorConverter extends ArchivedActivity
 
     static {
         mapping.put(ArchivedFlowNodeItem.ATTRIBUTE_CASE_ID,
-                ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
+                ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
         mapping.put(ArchivedFlowNodeItem.ATTRIBUTE_ROOT_CASE_ID,
                 ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
         mapping.put(ArchivedFlowNodeItem.ATTRIBUTE_PARENT_CASE_ID,

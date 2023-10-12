@@ -20,6 +20,10 @@ package org.bonitasoft.engine.bpm.flownode;
  */
 public final class ArchivedHumanTaskInstanceSearchDescriptor {
 
+    private ArchivedHumanTaskInstanceSearchDescriptor() {
+        // Utility class
+    }
+
     public static final String NAME = "name";
 
     public static final String PRIORITY = "priority";
@@ -31,9 +35,6 @@ public final class ArchivedHumanTaskInstanceSearchDescriptor {
     public static final String ASSIGNEE_ID = "assigneeId";
 
     public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
-
-    @Deprecated
-    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
     public static final String ORIGINAL_HUMAN_TASK_ID = "sourceObjectId";
 

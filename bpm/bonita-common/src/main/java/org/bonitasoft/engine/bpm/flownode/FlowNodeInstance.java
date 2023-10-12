@@ -126,14 +126,6 @@ public interface FlowNodeInstance extends DescriptionElement, BaseElement {
     long getExecutedBySubstitute();
 
     /**
-     * @return The identifier of the substitute user (as Process manager or Administrator) who executed the flow node.
-     * @since 6.0.1
-     * @deprecated since 6.3.0, use {@link FlowNodeInstance#getExecutedBySubstitute()}
-     */
-    @Deprecated
-    long getExecutedByDelegate();
-
-    /**
      * Returns the ID of the flow node definition of this instance.
      *
      * @return the ID of the flow node definition that this <code>FlowNodeInstance</code> is an instance of.

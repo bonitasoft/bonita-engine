@@ -16,9 +16,7 @@ package org.bonitasoft.engine.api.impl.application.installer.detector;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import org.bonitasoft.engine.io.FileOperations;
 import org.springframework.stereotype.Component;
@@ -30,16 +28,12 @@ public class BdmDetector implements ArtifactDetector {
     public boolean isCompliant(File file) {
         byte[] bdm;
         try {
-            try {
-                bdm = FileOperations.getFileFromZip(Files.readAllBytes(file.toPath()), "bom.xml");
-            } catch (FileNotFoundException e) {
-                return false;
-            }
-            // The bdm doesn't contain its namespace, so we can't perform the usual xml validation.
-            // So we look for the tag 'businessObjectModel', better than nothing:
-            return new String(bdm, UTF_8).contains("<businessObjectModel");
+            bdm = FileOperations.getFileFromZip(file, "bom.xml");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return false;
         }
+        // The bdm doesn't contain its namespace, so we can't perform the usual xml validation.
+        // So we look for the tag 'businessObjectModel', better than nothing:
+        return new String(bdm, UTF_8).contains("<businessObjectModel");
     }
 }

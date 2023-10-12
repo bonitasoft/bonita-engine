@@ -211,14 +211,6 @@ public class TestProcess {
         delete(initiator.getSession());
     }
 
-    /**
-     * Deprecated, use {@link #enable()} or {@link #disable()}
-     */
-    @Deprecated
-    public TestProcess setEnable(final boolean enabled) {
-        return setEnable(TestToolkitCtx.getInstance().getInitiator(), enabled);
-    }
-
     public TestProcess enable() {
         return setEnable(TestToolkitCtx.getInstance().getInitiator(), true);
     }

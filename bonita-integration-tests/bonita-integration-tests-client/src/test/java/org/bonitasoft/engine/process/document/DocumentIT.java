@@ -688,7 +688,7 @@ public class DocumentIT extends TestWithUser {
             assertEquals(1, documentSearch.getCount());
             ArchivedDocument archivedDocument = documentSearch.getResult().get(0);
             assertEquals(processInstance.getId(), archivedDocument.getProcessInstanceId());
-            assertEquals(user.getId(), archivedDocument.getDocumentAuthor());
+            assertEquals(user.getId(), archivedDocument.getAuthor());
 
             // search with term:
             searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -701,7 +701,7 @@ public class DocumentIT extends TestWithUser {
             assertThat(
                     getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 45).searchTerm("doc1").done())
                             .getResult().get(0)
-                            .getDocumentContentFileName()).isEqualTo("doc1.jpg");
+                            .getContentFileName()).isEqualTo("doc1.jpg");
 
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());

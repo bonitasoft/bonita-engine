@@ -79,7 +79,7 @@ public class ActivityStates {
      *
      * @deprecated this should not be used anymore client-side.
      */
-    @Deprecated
+    @Deprecated(since = "7.12.0")
     public static final String CANCELLING_SUBTASKS_STATE = "cancelling subtasks";
 
     /**

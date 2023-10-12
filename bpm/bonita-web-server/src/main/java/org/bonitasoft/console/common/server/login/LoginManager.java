@@ -61,17 +61,6 @@ public class LoginManager {
         loginInternal(requestAccessor, response, getUserLogger(), userCredentials);
     }
 
-    /**
-     * @deprecated use {@link LoginManager#login(HttpServletRequest, HttpServletResponse)} instead. It also deals with
-     *             the cookies creation (CSRF and tenant)
-     */
-    @Deprecated
-    public void login(HttpServletRequestAccessor request, HttpServletResponse response, UserLogger userLoger,
-            Credentials credentials)
-            throws AuthenticationFailedException, ServletException, LoginFailedException {
-        loginInternal(request, response, userLoger, credentials);
-    }
-
     public void loginInternal(HttpServletRequestAccessor request, HttpServletResponse response, UserLogger userLoger,
             Credentials credentials)
             throws AuthenticationFailedException, ServletException, LoginFailedException {

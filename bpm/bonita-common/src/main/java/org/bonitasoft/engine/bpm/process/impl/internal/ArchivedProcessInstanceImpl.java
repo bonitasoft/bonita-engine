@@ -115,17 +115,6 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         this.startedBySubstitute = startedBySubstitute;
     }
 
-    @Deprecated
-    @Override
-    public long getStartedByDelegate() {
-        return getStartedBySubstitute();
-    }
-
-    @Deprecated
-    public void setStartedByDelegate(final long startedByDelegate) {
-        setStartedBySubstitute(startedByDelegate);
-    }
-
     @Override
     public Date getEndDate() {
         return endDate;

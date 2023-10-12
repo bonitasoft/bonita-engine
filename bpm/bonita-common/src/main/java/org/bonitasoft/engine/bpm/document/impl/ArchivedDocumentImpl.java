@@ -37,36 +37,6 @@ public class ArchivedDocumentImpl extends DocumentImpl implements ArchivedDocume
     }
 
     @Override
-    public String getDocumentURL() {
-        return getUrl();
-    }
-
-    @Override
-    public boolean getDocumentHasContent() {
-        return hasContent();
-    }
-
-    @Override
-    public long getDocumentAuthor() {
-        return getAuthor();
-    }
-
-    @Override
-    public String getDocumentContentMimeType() {
-        return getContentMimeType();
-    }
-
-    @Override
-    public String getDocumentContentFileName() {
-        return getFileName();
-    }
-
-    @Override
-    public Date getDocumentCreationDate() {
-        return getCreationDate();
-    }
-
-    @Override
     public Date getArchiveDate() {
         return archiveDate;
     }

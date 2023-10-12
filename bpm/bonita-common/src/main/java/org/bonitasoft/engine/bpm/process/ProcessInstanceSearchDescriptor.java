@@ -79,30 +79,6 @@ public class ProcessInstanceSearchDescriptor {
 
     /**
      * The field corresponding to the identifier of the user who supervised the process instance.
-     *
-     * @deprecated use PROCESS_SUPERVISOR_USER_ID instead
-     */
-    @Deprecated
-    public static final String USER_ID = "userId";
-
-    /**
-     * The field corresponding to the identifier of the group who supervised the process instance.
-     *
-     * @deprecated use PROCESS_SUPERVISOR_GROUP_ID instead
-     */
-    @Deprecated
-    public static final String GROUP_ID = "groupId";
-
-    /**
-     * The field corresponding to the identifier of the role who supervised the process instance.
-     *
-     * @deprecated use PROCESS_SUPERVISOR_ROLE_ID instead
-     */
-    @Deprecated
-    public static final String ROLE_ID = "roleId";
-
-    /**
-     * The field corresponding to the identifier of the user who supervised the process instance.
      */
     public static final String PROCESS_SUPERVISOR_USER_ID = "userId";
 

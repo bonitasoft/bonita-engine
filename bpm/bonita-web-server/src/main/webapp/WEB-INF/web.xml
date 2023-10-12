@@ -275,7 +275,6 @@
     <filter-mapping>
         <filter-name>CacheFilter</filter-name>
         <url-pattern>/login.jsp</url-pattern>
-        <url-pattern>/portal/pageResource</url-pattern>
         <url-pattern>/platformloginservice</url-pattern>
         <url-pattern>/platformlogoutservice</url-pattern>
         <url-pattern>/API/system/i18ntranslation</url-pattern>
@@ -527,13 +526,6 @@
         <servlet-name>CustomPageServlet</servlet-name>
         <servlet-class>org.bonitasoft.console.common.server.page.CustomPageServlet</servlet-class>
     </servlet>
-    <!--This pageResource servlet is deprecated.
-        You can now access your resources through their relative URL.
-        see the custom page documentation.-->
-    <servlet>
-        <servlet-name>pageResource</servlet-name>
-        <servlet-class>org.bonitasoft.console.common.server.page.PageResourceServlet</servlet-class>
-    </servlet>
     <servlet>
         <servlet-name>pageDownload</servlet-name>
         <servlet-class>org.bonitasoft.console.common.server.page.PageDownloadServlet</servlet-class>
@@ -736,13 +728,6 @@
     <servlet-mapping>
         <servlet-name>CustomPageServlet</servlet-name>
         <url-pattern>/portal/custom-page/*</url-pattern>
-    </servlet-mapping>
-    <!--This pageResource servlet is deprecated.
-        You can now access your resources through their relative URL.
-        see the custom page documentation.-->
-    <servlet-mapping>
-        <servlet-name>pageResource</servlet-name>
-        <url-pattern>/portal/pageResource</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>pageDownload</servlet-name>
