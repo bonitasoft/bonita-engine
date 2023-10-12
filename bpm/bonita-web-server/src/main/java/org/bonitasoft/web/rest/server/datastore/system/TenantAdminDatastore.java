@@ -28,22 +28,31 @@ import org.bonitasoft.web.toolkit.client.data.APIID;
 
 /**
  * @author Julien Mege
- * @deprecated since Bonita 9.0 Use {@link org.bonitasoft.web.rest.server.api.system.MaintenanceController} instead
+ * @deprecated since 9.0.0, use {@link org.bonitasoft.web.rest.server.api.system.MaintenanceController} instead.
  */
 @Slf4j
-@Deprecated
+@Deprecated(since = "9.0.0", forRemoval = true)
 public class TenantAdminDatastore extends Datastore
         implements DatastoreHasUpdate<TenantAdminItem>, DatastoreHasGet<TenantAdminItem> {
 
     protected final APISession apiSession;
 
-    private static boolean hasShownDeprectedLog = false;
+    private static boolean hasShownDeprecatedLog = false;
 
     public TenantAdminDatastore(final APISession apiSession) {
         this.apiSession = apiSession;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated since 9.0.0, use
+     *             {@link org.bonitasoft.web.rest.server.api.system.MaintenanceController#changeMaintenanceState(
+     *             org.bonitasoft.web.rest.model.system.MaintenanceDetailsClient, javax.servlet.http.HttpSession)}
+     *             instead.
+     */
     @Override
+    @Deprecated(since = "9.0.0", forRemoval = true)
     public TenantAdminItem update(final APIID unusedId, final Map<String, String> attributes) {
         logDeprecatedAPIUsage();
         final TenantAdminItem tenantAdminItem = new TenantAdminItem();
@@ -57,7 +66,15 @@ public class TenantAdminDatastore extends Datastore
         return tenantAdminItem;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated since 9.0.0, use
+     *             {@link org.bonitasoft.web.rest.server.api.system.MaintenanceController#getMaintenanceDetails(
+     *             javax.servlet.http.HttpSession)} instead.
+     */
     @Override
+    @Deprecated(since = "9.0.0", forRemoval = true)
     public TenantAdminItem get(final APIID id) {
         logDeprecatedAPIUsage();
         final TenantAdminItem tenantAdminItem = new TenantAdminItem();
@@ -66,11 +83,11 @@ public class TenantAdminDatastore extends Datastore
         return tenantAdminItem;
     }
 
-    protected void logDeprecatedAPIUsage() {
-        if (!hasShownDeprectedLog && log.isWarnEnabled()) {
+    private static void logDeprecatedAPIUsage() {
+        if (!hasShownDeprecatedLog && log.isWarnEnabled()) {
             log.warn(
                     "API system/tenant is deprecated and will be removed in a future release. Please use API system/maintenance instead.");
-            hasShownDeprectedLog = true;
+            hasShownDeprecatedLog = true;
         }
     }
 
