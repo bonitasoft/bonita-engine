@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 60594\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2023-05-13 01:28\n"
+"PO-Revision-Date: 2023-10-13 01:28\n"
 
 msgid "1 case has been deleted"
 msgstr "1 cas a été supprimé"
@@ -67,11 +67,11 @@ msgstr "Ajouter des pages à la navigation"
 msgid "Add top-level menu"
 msgstr "Ajouter un menu "
 
+msgid "Adding on apply"
+msgstr "Appliquer pour ajouter"
+
 msgid "Address"
 msgstr "Adresse"
-
-msgid "Aggregates tasks in states ready, waiting,<br>executing, completing, and initializing"
-msgstr "Regroupe les tâches en états ready, waiting,<br>executing, completing, et initializing"
 
 msgid "All"
 msgstr "Tous"
@@ -104,8 +104,8 @@ msgstr "Une erreur s'est produite lors de la soumission du formulaire."
 msgid "An error occurred while submitting the form.<br/>The task may not be available anymore."
 msgstr "Une erreur s’est produite lors de l’envoi du formulaire. <br/> Il se peut que la tâche ne soit plus disponible."
 
-msgid "Anyone"
-msgstr "Tout le monde"
+msgid "An error occurred with the requested operation."
+msgstr "Une erreur s'est produite lors de l'opération demandée"
 
 msgid "Application XML file"
 msgstr "Fichier XML de l'application"
@@ -137,9 +137,6 @@ msgstr "Assignée le"
 msgid "Available or My tasks"
 msgstr "Disponible ou dans Mes tâches"
 
-msgid "Available tasks"
-msgstr "Tâches disponibles"
-
 msgid "BDM access control file can now be installed."
 msgstr "Le fichier de contrôle d’accès aux données métier peut maintenant être installé."
 
@@ -151,9 +148,6 @@ msgstr "Le Business Data Model n’a pas été mis à jour. Le système n’éta
 
 msgid "BDM successfully updated."
 msgstr "Le Modèle de Données Métier a été mis à jour avec succès."
-
-msgid "BPM Services must be paused. Go to \"BPM Services\" menu option."
-msgstr "Les services BPM doivent être suspendus. Aller dans menu « BPM Services »."
 
 msgid "Back"
 msgstr "Retour"
@@ -203,20 +197,11 @@ msgstr "Commentaires du cas"
 msgid "Case id: {{caseId}} - Process: {{processName}} ({{processVersion}})"
 msgstr "Cas : {{caseId}} - Processus : {{processName}} ({{processVersion}})"
 
-msgid "Case list"
-msgstr "Liste des cas"
-
 msgid "Case overview"
 msgstr "Page de synthèse du cas"
 
 msgid "Case start"
 msgstr "Démarrage d'un cas"
-
-msgid "Case state"
-msgstr "Etat du cas"
-
-msgid "Cases"
-msgstr "Cas"
 
 msgid "Cases with failures"
 msgstr "Cas en erreur"
@@ -239,6 +224,18 @@ msgstr "Cliquez ici pour choisir le fichier .xml"
 msgid "Click here to choose your .zip file"
 msgstr "Cliquez ici pour choisir le fichier .zip"
 
+msgid "Click on Cancel to remain on this page and try to execute the operation again once you logged back in (e.g. in another tab)."
+msgstr "Cliquez sur Annuler pour rester sur cette page et essayer d'exécuter à nouveau l'opération après vous être reconnecté (e.g. dans un autre onglet)."
+
+msgid "Click on Cancel to remain on this page and wait for the maintenance to end."
+msgstr "Cliquez sur Annuler pour rester sur cette page et attendre la fin des opérations de maintenance."
+
+msgid "Click on OK to be redirected and log back in."
+msgstr "Cliquez sur OK pour être redirigé et vous reconnecter."
+
+msgid "Click on OK to be redirected to the maintenance page."
+msgstr "Cliquez sur OK pour être redirigé vers la page de maintenance."
+
 msgid "Close"
 msgstr "Fermer"
 
@@ -259,9 +256,6 @@ msgstr "Instances en état completed (faites)"
 
 msgid "Configuration state"
 msgstr "Etat de la configuration"
-
-msgid "Confirm delete?"
-msgstr "Confirmer la suppression ?"
 
 msgid "Confirm new Password"
 msgstr "Confirmez le nouveau mot de passe"
@@ -332,9 +326,6 @@ msgstr "Désactiver"
 msgid "Display name"
 msgstr "Nom métier"
 
-msgid "Don't forget to start BPM Services again."
-msgstr "N’oubliez pas de redémarrer les Services BPM."
-
 msgid "Done tasks"
 msgstr "Tâches terminées"
 
@@ -362,11 +353,8 @@ msgstr "Activer"
 msgid "Enable all"
 msgstr "Tout associer"
 
-msgid "End date"
-msgstr "Date de fin "
-
-msgid "Enter a new category name and press \"Enter\" key to create a new category and assign it to the current process."
-msgstr "Saisissez le nom de la nouvelle catégorie puis faites « Entrée » pour finaliser sa création et l'assigner au processus."
+msgid "Enter a new category name and click \"Add\" button to create a new category."
+msgstr "Entrez un nouveau nom de catégorie et cliquez sur le bouton \"Ajouter\" pour créer une nouvelle catégorie."
 
 msgid "Enter the user to start the case for..."
 msgstr "Saisissez le nom de l'utilisateur pour qui vous allez démarrer le cas..."
@@ -403,12 +391,6 @@ msgstr "Exporter le descripteur d’application"
 
 msgid "Expression content has been updated"
 msgstr "Le contenu de l'expression a été mis à jour"
-
-msgid "Failed"
-msgstr "En échec"
-
-msgid "Failed Flow Nodes"
-msgstr "Flow nodes en erreur"
 
 msgid "Failed instances"
 msgstr "Instances en état failed (en échec)"
@@ -467,9 +449,6 @@ msgstr "Cependant, en raison de l'utilisation de Hibernate pour la persistance d
 msgid "I have read and understood the previous warning message. I have prepared a database backup so I can rollback this operation."
 msgstr "J'ai lu et compris le message d'avertissement précédent, j'ai préparé une sauvegarde de la base de données pour pouvoir annuler cette opération."
 
-msgid "ID"
-msgstr "Id"
-
 msgid "IN ANY CASE, you MUST CREATE A BACKUP of the current BDM database before undergoing a BDM update."
 msgstr "DANS TOUS LES CAS, vous DEVEZ CRÉER UNE BACKUP de la base de données BDM actuelle avant de subir une mise à jour BDM."
 
@@ -524,8 +503,8 @@ msgstr "En cours d'installation"
 msgid "Installing Business Data Model"
 msgstr "Installation du Modèle de Données Métier (BDM)"
 
-msgid "Installing or updating the BDM implies to be logged in as Technical User, and to shut down all BPM services."
-msgstr "Installer ou mettre à jour le BDM nécessite d'être authentifié en tant qu'Utilisateur Technique et d'avoir mis en pause les services BPM."
+msgid "Installing or updating the BDM implies to be logged in as Technical User, and to activate the maintenance mode."
+msgstr "Installer ou mettre à jour le BDM nécessite d'être authentifié en tant qu'Utilisateur Technique et d'avoir activé le mode maintenance."
 
 msgid "Items per page"
 msgstr "Eléments par page"
@@ -566,6 +545,9 @@ msgstr "DD MMM LT"
 msgid "Make sure all artifacts enabled on the platform are compatible with the new BDM."
 msgstr "Assurez-vous que tous les artefacts activés sur la plate-forme sont compatibles avec le nouveau BDM."
 
+msgid "Make sure to deactivate the maintenance mode."
+msgstr "Assurez-vous de désactiver le mode maintenance."
+
 msgid "Make this task available to other team members again"
 msgstr "Libérer - rendre cette tâche à nouveau disponible pour les autres membres de l’équipe"
 
@@ -578,11 +560,11 @@ msgstr "Gérer les catégories"
 msgid "Manager"
 msgstr "Responsable"
 
+msgid "Mapped categories"
+msgstr "Catégories associées"
+
 msgid "Maximum size 255 characters"
 msgstr "Taille maximum de 255 caractères"
-
-msgid "Me"
-msgstr "Moi"
 
 msgid "Membership has not been added. Please retry later or contact an administrator"
 msgstr "L'adhésion n’a pas été mise à jour. Veuillez réessayer ultérieurement ou contacter un administrateur"
@@ -635,9 +617,6 @@ msgstr "Aucune application définie."
 msgid "No application found with id:"
 msgstr "Aucune application ne semble correspondre à l'identifiant :"
 
-msgid "No cases to display"
-msgstr "Aucun cas à afficher"
-
 msgid "No comment on this case yet. To add one, use the input field at the bottom of this panel"
 msgstr "Aucun commentaire sur ce cas pour l'instant. Le champ de saisie se trouve en bas de ce panneau"
 
@@ -668,14 +647,11 @@ msgstr "Pas de profil"
 msgid "No profile mapped to this application"
 msgstr "Cette application n'a pas de profil associé"
 
-msgid "No updates have been made on categories. Don't forget to press \"Enter\" key after selecting a category."
-msgstr "Aucune mise à jour n’a été faite sur les catégories. Appuyez bien sur « Entrée » après avoir sélectionné une catégorie."
+msgid "No updates have been made on categories. For more details, check logs."
+msgstr "Aucune mise à jour n'a été faite sur les catégories. Pour plus de détails, consultez les logs."
 
 msgid "No user found with id:"
 msgstr "Aucun utilisateur n'a été trouvé avec l'id :"
-
-msgid "No value"
-msgstr "Aucune valeur"
 
 msgid "Normal"
 msgstr "Normale"
@@ -683,8 +659,8 @@ msgstr "Normale"
 msgid "Not installed"
 msgstr "Non installé"
 
-msgid "One or more connectors on case start or case end failed"
-msgstr "Un ou plusieurs connecteurs, en démarrage ou en fin de cas, sont en erreur"
+msgid "OK"
+msgstr "OK"
 
 msgid "One or more tasks are not available anymore. The list is now up to date."
 msgstr "Une ou plusieurs tâches ne sont plus disponibles. La liste est maintenant à jour."
@@ -695,8 +671,8 @@ msgstr "Lien vers une page"
 msgid "Only I can do this task"
 msgstr "Je suis le seul en mesure de faire cette tâche"
 
-msgid "Only cases from root processes are displayed in the table below. No details are available for cases started by call activities."
-msgstr "Le tableau ci-dessous affiche uniquement les cas provenant de processus racines. Le détail des cas démarrés par des activités appelantes n'est pas disponible."
+msgid "Only available when the platform is under maintenance. Go to the \"Platform maintenance\" page to activate the maintenance mode."
+msgstr "Uniquement disponible lorsque la plateforme est en maintenance. Allez sur la page \"Maintenance de la plate-forme\" pour activer le mode maintenance."
 
 msgid "Only one Business Data Model (BDM) can be active at a time."
 msgstr "Il ne peut y avoir qu'un seul Modèle de Données Métier (BDM) actif à la fois."
@@ -736,9 +712,6 @@ msgstr "Le mot de passe a été mis à jour avec succès"
 
 msgid "Passwords don't match"
 msgstr "Les mots de passe ne correspondent pas"
-
-msgid "Pending Flow Nodes"
-msgstr "Flow nodes en attente"
 
 msgid "Personal information"
 msgstr "Informations personnelles"
@@ -785,9 +758,6 @@ msgstr "Profils / Adhésions"
 msgid "Ready, waiting instances"
 msgstr "Instances en état ready, waiting (en attente)"
 
-msgid "Refresh"
-msgstr "Rafraîchir"
-
 msgid "Refresh data"
 msgstr "Actualiser les données"
 
@@ -800,6 +770,9 @@ msgstr "Supprimer"
 msgid "Remove all"
 msgstr "Tout supprimer"
 
+msgid "Removing on apply"
+msgstr "Appliquer pour supprimer"
+
 msgid "Reset"
 msgstr "Réinitialiser"
 
@@ -811,24 +784,6 @@ msgstr "Rôles"
 
 msgid "Save"
 msgstr "Enregistrer"
-
-msgid "Search Key 1"
-msgstr "Clé de recherche 1"
-
-msgid "Search Key 2"
-msgstr "Clé de recherche 2"
-
-msgid "Search Key 3"
-msgstr "Clé de recherche 3"
-
-msgid "Search Key 4"
-msgstr "Clé de recherche 4"
-
-msgid "Search Key 5"
-msgstr "Clé de recherche 5"
-
-msgid "Search by process name or search keys"
-msgstr "Rechercher par nom de processus ou clé de recherche"
 
 msgid "Search..."
 msgstr "Chercher..."
@@ -863,6 +818,9 @@ msgstr "Sélectionnez la page"
 msgid "Select users..."
 msgstr "Sélectionnez des utilisateurs ..."
 
+msgid "Server is under maintenance."
+msgstr "Une maintenance est en cours sur le serveur."
+
 msgid "Set as Home page"
 msgstr "Définir en tant que page d'accueil"
 
@@ -871,12 +829,6 @@ msgstr "Afficher le Menu"
 
 msgid "Show all the tasks I can do: both personal tasks and tasks available to other team members"
 msgstr "Afficher toutes les tâches que je peux faire : mes tâches personnelles et les tâches disponibles pour moi et les autres membres de l’équipe"
-
-msgid "Show available tasks in task list for archived case"
-msgstr "Afficher les tâches disponibles dans la liste des tâches pour les cas archivés"
-
-msgid "Show available tasks in task list for case"
-msgstr "Afficher les tâches disponibles dans la liste des tâches pour le cas"
 
 msgid "Show menu"
 msgstr "Afficher le menu"
@@ -914,15 +866,6 @@ msgstr "Trier par version"
 msgid "Specify the menu structure."
 msgstr "Définir le menu de navigation."
 
-msgid "Start date"
-msgstr "Débuté le"
-
-msgid "Started"
-msgstr "Démarré"
-
-msgid "Started by"
-msgstr "Démarré par"
-
 msgid "State"
 msgstr "Etat"
 
@@ -940,9 +883,6 @@ msgstr "Soumettre"
 
 msgid "Successfully updated categories"
 msgstr "Les catégories ont été mises à jour avec succès"
-
-msgid "System"
-msgstr "Système"
 
 msgid "Table settings"
 msgstr "Paramètres du tableau"
@@ -995,17 +935,14 @@ msgstr "Le cas est archivé. Il n'est plus possible d'ajouter de nouveaux commen
 msgid "The case {{caseId}} has been started successfully."
 msgstr "Le cas {{caseId}} a été démarré avec succès."
 
+msgid "The category cannot be removed and added at the same time."
+msgstr "La catégorie ne peut pas être supprimée et ajoutée en même temps."
+
 msgid "The current process has no connectors defined."
 msgstr "Aucun connecteur n'a été défini pour ce processus."
 
 msgid "The current process has no parameters defined."
 msgstr "Aucun paramètre n'a été défini pour ce processus."
-
-msgid "The deleted case will be permanently deleted and will not be stored in the archives."
-msgstr "Le cas supprimés le seront définitivement et ne seront pas stockés dans les archives."
-
-msgid "The deleted case will be permanently deleted from the archives."
-msgstr "Le cas supprimé sera définitivement supprimé des archives."
 
 msgid "The file you are trying to upload has the wrong mime type"
 msgstr "Le fichier que vous essayez de charger n'a pas le bon type MIME"
@@ -1028,8 +965,8 @@ msgstr "Le nom de l'URL doit commencer par custompage_ puis contenir uniquement 
 msgid "The task has been submitted but an error occurred while adding the comment"
 msgstr "La tâche a été soumise, mais une erreur s'est produite à l'ajout du commentaire"
 
-msgid "The whole list of such changes is listed <a ng-href=\"https://documentation.bonitasoft.com/bonita/{{bonitaVersion}}/bdm-management-in-bonita-bpm-portal\" target=\"_blank\" translate>here</a>."
-msgstr "La liste complète de ces modifications est listée <a ng-href=\"https://documentation.bonitasoft.com/bonita/{{bonitaVersion}}/bdm-management-in-bonita-bpm-portal\" target=\"_blank\" translate>ici</a>."
+msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">here</a>."
+msgstr "La liste complète de ces changements est disponible <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">ici</a>."
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "Les mots 'content', 'API' et 'theme' sont réservés pour un usage interne. Ils ne doivent pas être utilisés dans l'URL d'une page ou d'une application."
@@ -1040,12 +977,6 @@ msgstr " Thème"
 msgid "Then for each user, fill out the custom information value, in the Studio (<i>List of users</i> tab of the organization), or right on this Portal page."
 msgstr "Puis pour chaque utilisateur, remplissez la valeur des informations spécifiques, soit dans le studio (onglet <i>Liste des utilisateurs</i> de l’organisation), ou directement sur cette page du portail."
 
-msgid "These deleted cases will be permanently deleted and will not be stored in the archives."
-msgstr "Ces cas supprimés le seront définitivement et ne seront pas stockés dans les archives."
-
-msgid "These deleted cases will be permanently deleted from the archives."
-msgstr "Ces cas supprimés disparaîtront définitivement des archives."
-
 msgid "They will be removed from the database permanently."
 msgstr "Ils seront définitivement effacés de la base de données."
 
@@ -1055,11 +986,11 @@ msgstr "Cette URL est déjà utilisée"
 msgid "This application is core to the Bonita platform. To keep it working as it should, it must remain available and its menu should stay as it is."
 msgstr "Cette application est le cœur de la plate-forme Bonita. Pour qu'il fonctionne comme il le devrait, il doit rester disponible et son menu doit rester tel qu'il est."
 
+msgid "This category has already been added to this process."
+msgstr "Cette catégorie a déjà été ajoutée à ce processus."
+
 msgid "This field is mandatory"
 msgstr "Ce champ est obligatoire"
-
-msgid "This filters the case list only by process name. The display name is shown for information purposes."
-msgstr "Filtre la liste des cas par nom (technique) de processus uniquement. Le nom métier n'est proposé qu'à des fins d'information."
 
 msgid "This is the task details panel. No information to display"
 msgstr "Cette zone est dédiée aux détails d'une tâche. Aucune information à afficher pour l'instant"
@@ -1109,9 +1040,6 @@ msgstr "Pour cela, déconnectez-vous puis reconnectez-vous en tant qu’Utilisat
 msgid "To fill out the form, you need to take this task. This means you will be the only one able to do it. To make it available to the team again, release it."
 msgstr "Pour remplir le formulaire, vous devez \"prendre\" cette tâche. Cela signifie que vous serez le(la) seul(e) à pouvoir la faire. Pour la rendre à nouveau disponible à l'équipe, \"libérez\"-la."
 
-msgid "To personalize the display of search keys (and columns in general), use the table settings button on the right. You can search on up to 5 search keys."
-msgstr "Pour personnaliser l'affichage des clés de recherche (et des colonnes en général), utilisez le bouton Paramètres du tableau sur la droite. Vous pouvez effectuer des recherches sur les valeurs des clés (entre 1 et 5 clés)."
-
 msgid "To use this feature, create a new version of the process in Bonita Studio version 6.4 and above, then create and install the new .bar file in the Portal."
 msgstr "Pour utiliser cette fonctionnalité, créez une nouvelle version du processus dans un Bonita Studio version 6.4 ou ultérieure, générez le fichier .bar puis déployez-le dans le portail."
 
@@ -1132,6 +1060,9 @@ msgstr "URL"
 
 msgid "Unable to add the comment. Refresh your task list and try again. If the problem persists, contact your administrator"
 msgstr "Impossible d'ajouter le commentaire. Actualisez votre liste de tâches, puis réessayez. Si le problème persiste, contactez votre administrateur"
+
+msgid "Unable to map category:"
+msgstr "Impossible d'associer la catégorie:"
 
 msgid "Unassign. This will make it available to team again"
 msgstr "Désassigner. Cela la rendra à nouveau disponible pour les membres de l'équipe"
@@ -1196,12 +1127,6 @@ msgstr "Version"
 msgid "View application details"
 msgstr "Voir les détails de l'application"
 
-msgid "View case details"
-msgstr "Voir les détails du cas"
-
-msgid "View case overview"
-msgstr "Afficher la page de synthèse du cas"
-
 msgid "View task"
 msgstr "Voir la tâche"
 
@@ -1217,9 +1142,6 @@ msgstr "Nous n'avons pas trouvé ce que vous recherchez."
 msgid "When you export an application descriptor, pages and profiles are not exported in the file."
 msgstr "Lorsque vous exportez un descripteur d'application, les pages et profil associés ne sont pas exportés dans le fichier."
 
-msgid "With failures"
-msgstr "Avec erreurs"
-
 msgid "You are about to export the descriptor of the application"
 msgstr "Vous allez exporter le descripteur de l'application"
 
@@ -1234,6 +1156,9 @@ msgstr "Vous devez ajouter une page avant de pouvoir la référencer dans un men
 
 msgid "Your personal task list is empty. You can take a task from the ​<a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\">To do</a> list."
 msgstr "Votre liste de tâches personnelles est vide. Vous pouvez prendre une tâche dans la liste <a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\">A faire</a>."
+
+msgid "Your session is no longer active."
+msgstr "Votre session n'est plus active."
 
 msgid "Zip code"
 msgstr "Code postal"
@@ -1258,33 +1183,6 @@ msgstr "ici"
 
 msgid "of"
 msgstr "de"
-
-msgid "sort by End date ascending"
-msgstr "tri par Date de fin, croissant"
-
-msgid "sort by End date descending"
-msgstr "tri par Date de fin, décroissant"
-
-msgid "sort by ID ascending"
-msgstr "tri par Id, croissant"
-
-msgid "sort by ID descending"
-msgstr "tri par Id, décroissant"
-
-msgid "sort by Process name ascending"
-msgstr "tri par Nom du Processus, croissant"
-
-msgid "sort by Process name descending"
-msgstr "tri par Nom du Processus, décroissant"
-
-msgid "sort by Start date ascending"
-msgstr "tri par Date de début, croissant"
-
-msgid "sort by Start date descending"
-msgstr "tri par Date de début, décroissant"
-
-msgid "username:"
-msgstr "nom d'utilisateur :"
 
 msgid "will be permanently deleted."
 msgstr "va être supprimée définitivement"
@@ -1327,7 +1225,4 @@ msgstr "{} autres"
 
 msgid "{} of {}"
 msgstr "{} de {}"
-
-msgid "{}-{} of {}"
-msgstr "{}-{} de {}"
 

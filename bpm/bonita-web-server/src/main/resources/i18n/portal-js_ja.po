@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 60594\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2023-05-13 01:28\n"
+"PO-Revision-Date: 2023-10-12 15:54\n"
 
 msgid "1 case has been deleted"
 msgstr "1 案件が削除されました"
@@ -67,11 +67,11 @@ msgstr "ナビゲーションにページを追加します"
 msgid "Add top-level menu"
 msgstr "最上位のメニューを追加します"
 
+msgid "Adding on apply"
+msgstr ""
+
 msgid "Address"
 msgstr "住所"
-
-msgid "Aggregates tasks in states ready, waiting,<br>executing, completing, and initializing"
-msgstr "レディ、待機、実行、完了および初期化状態のタスクを集約"
 
 msgid "All"
 msgstr "すべて"
@@ -104,8 +104,8 @@ msgstr "フォームの送信中にエラーが発生しました。"
 msgid "An error occurred while submitting the form.<br/>The task may not be available anymore."
 msgstr "フォームの送信中にエラーが発生しました。 <br/>このタスクはもう利用できません。"
 
-msgid "Anyone"
-msgstr "すべて"
+msgid "An error occurred with the requested operation."
+msgstr "要求された操作でエラーが発生しました。"
 
 msgid "Application XML file"
 msgstr "アプリケーションのXMLファイル"
@@ -137,9 +137,6 @@ msgstr "アサイン日時"
 msgid "Available or My tasks"
 msgstr "このマークはあなただけに指名されたタスクを示します"
 
-msgid "Available tasks"
-msgstr "応受援タスク"
-
 msgid "BDM access control file can now be installed."
 msgstr "BDM のアクセス コントロール ファイルをインストールできるようになりました。"
 
@@ -153,10 +150,6 @@ msgstr "BDMはアップロードされていません。\n"
 
 msgid "BDM successfully updated."
 msgstr "BDMは正常に更新されました。"
-
-msgid "BPM Services must be paused. Go to \"BPM Services\" menu option."
-msgstr "BPMサービスを一時停止する必要があります。 \n"
-"「BPMサービス」メニューオプションに移動します。"
 
 msgid "Back"
 msgstr "戻る"
@@ -206,20 +199,11 @@ msgstr "案件コメント"
 msgid "Case id: {{caseId}} - Process: {{processName}} ({{processVersion}})"
 msgstr "案件ID: {{caseId}} - プロセス: {{processName}} ({{processVersion}})"
 
-msgid "Case list"
-msgstr "案件リスト"
-
 msgid "Case overview"
 msgstr "案件概況"
 
 msgid "Case start"
 msgstr "案件の開始"
-
-msgid "Case state"
-msgstr "案件の状態"
-
-msgid "Cases"
-msgstr "案件"
 
 msgid "Cases with failures"
 msgstr "ケース エラー"
@@ -242,6 +226,18 @@ msgstr ".xml ファイルを選択するにはここをクリック"
 msgid "Click here to choose your .zip file"
 msgstr ".zip  ファイルを選択しクリックしてください。"
 
+msgid "Click on Cancel to remain on this page and try to execute the operation again once you logged back in (e.g. in another tab)."
+msgstr "キャンセルをクリックしてこのページのまま、再度ログインしてから (別のタブなどで) 操作を再度実行してください。"
+
+msgid "Click on Cancel to remain on this page and wait for the maintenance to end."
+msgstr "このページのまま、メンテナンスが終了するまで待つには［キャンセル]をクリックしてください。"
+
+msgid "Click on OK to be redirected and log back in."
+msgstr "OKをクリックするとリダイレクトされ、再度ログインします。"
+
+msgid "Click on OK to be redirected to the maintenance page."
+msgstr "OKをクリックすると、メンテナンス ページにリダイレクトされます。"
+
 msgid "Close"
 msgstr "閉じる"
 
@@ -262,9 +258,6 @@ msgstr "実行完了"
 
 msgid "Configuration state"
 msgstr "構成設定の状態"
-
-msgid "Confirm delete?"
-msgstr "削除していいですか？"
 
 msgid "Confirm new Password"
 msgstr "新しいパスワードを確認"
@@ -335,9 +328,6 @@ msgstr "無効にする"
 msgid "Display name"
 msgstr "表示名"
 
-msgid "Don't forget to start BPM Services again."
-msgstr "BPMサービスを再開することを忘れないでください。"
-
 msgid "Done tasks"
 msgstr "完了したタスク"
 
@@ -365,11 +355,8 @@ msgstr "有効にする"
 msgid "Enable all"
 msgstr "すべて有効にする"
 
-msgid "End date"
-msgstr "終了日"
-
-msgid "Enter a new category name and press \"Enter\" key to create a new category and assign it to the current process."
-msgstr "新しいカテゴリ名を入力し、\"Enter\"キーを押して新しいカテゴリを作成したうえで、現在のプロセスにそれをアサインします。"
+msgid "Enter a new category name and click \"Add\" button to create a new category."
+msgstr ""
 
 msgid "Enter the user to start the case for..."
 msgstr "案件を開始するユーザーを入力..."
@@ -406,12 +393,6 @@ msgstr "アプリケーション記述子をエクスポート"
 
 msgid "Expression content has been updated"
 msgstr "式のコンテンツが更新されました"
-
-msgid "Failed"
-msgstr "エラー"
-
-msgid "Failed Flow Nodes"
-msgstr "作業中にエラー発生"
 
 msgid "Failed instances"
 msgstr "エラーがあった"
@@ -470,9 +451,6 @@ msgstr "ただし、データの永続化にHibernateを使用するため、デ
 msgid "I have read and understood the previous warning message. I have prepared a database backup so I can rollback this operation."
 msgstr "以前の警告メッセージを読んで理解しました。 この操作をロールバックできるように、データベースのバックアップを準備しました。"
 
-msgid "ID"
-msgstr "id"
-
 msgid "IN ANY CASE, you MUST CREATE A BACKUP of the current BDM database before undergoing a BDM update."
 msgstr "いずれの場合も、BDMの更新を行う前に現在のBDMデータベースのバックアップを作成する必要があります。"
 
@@ -527,8 +505,8 @@ msgstr "インストール中 "
 msgid "Installing Business Data Model"
 msgstr "ビジネス データ モデルのインストール "
 
-msgid "Installing or updating the BDM implies to be logged in as Technical User, and to shut down all BPM services."
-msgstr "BDM のインストールまたは更新はテクニカルユーザーとしてログインし、すべての BPM サービスをシャットダウンすることを意味します。"
+msgid "Installing or updating the BDM implies to be logged in as Technical User, and to activate the maintenance mode."
+msgstr ""
 
 msgid "Items per page"
 msgstr "ページあたりの表示件数"
@@ -569,6 +547,9 @@ msgstr "MMM Do LT "
 msgid "Make sure all artifacts enabled on the platform are compatible with the new BDM."
 msgstr "プラットフォームで有効にされているすべてのアーティファクトが新しいBDMと互換性があることを確認してください。 "
 
+msgid "Make sure to deactivate the maintenance mode."
+msgstr ""
+
 msgid "Make this task available to other team members again"
 msgstr "このタスクは他のチーム メンバーでも行えるようにする"
 
@@ -581,11 +562,11 @@ msgstr "カテゴリを管理"
 msgid "Manager"
 msgstr "マネージャ"
 
+msgid "Mapped categories"
+msgstr ""
+
 msgid "Maximum size 255 characters"
 msgstr "最大 255 文字"
-
-msgid "Me"
-msgstr "自分"
 
 msgid "Membership has not been added. Please retry later or contact an administrator"
 msgstr "所属が追加されませんでした。後で再試行するか管理者に問い合わせてください。 "
@@ -638,9 +619,6 @@ msgstr "利用可能なアプリケーションはありません。"
 msgid "No application found with id:"
 msgstr "ID付きのアプリケーションが見つかりません:"
 
-msgid "No cases to display"
-msgstr "表示する案件はありません"
-
 msgid "No comment on this case yet. To add one, use the input field at the bottom of this panel"
 msgstr "まだこの案件に対するコメントがありません。追加するには、このパネルの下部にあるコメント入力フィールドを使用します。"
 
@@ -671,14 +649,11 @@ msgstr "プロファイルがありません"
 msgid "No profile mapped to this application"
 msgstr "このアプリケーションにマップされているプロファイルはありません。"
 
-msgid "No updates have been made on categories. Don't forget to press \"Enter\" key after selecting a category."
-msgstr "カテゴリは更新されていません。カテゴリを選択後、「Enter」キーを押すことを忘れないでください。"
+msgid "No updates have been made on categories. For more details, check logs."
+msgstr ""
 
 msgid "No user found with id:"
 msgstr "ID付ユーザーが見つかりません:"
-
-msgid "No value"
-msgstr "値なし "
 
 msgid "Normal"
 msgstr "普通"
@@ -686,8 +661,8 @@ msgstr "普通"
 msgid "Not installed"
 msgstr "インストールされていません。"
 
-msgid "One or more connectors on case start or case end failed"
-msgstr "案件の開始または終了時に、1 つ、または複数のコネクタでエラーが発生しました"
+msgid "OK"
+msgstr "OK"
 
 msgid "One or more tasks are not available anymore. The list is now up to date."
 msgstr "1つ以上のタスクは、もうご使用いただけません。タスク一覧が新しくなっています。"
@@ -698,8 +673,8 @@ msgstr "1 ページ メニュー"
 msgid "Only I can do this task"
 msgstr "私だけがこのタスクを実行できる"
 
-msgid "Only cases from root processes are displayed in the table below. No details are available for cases started by call activities."
-msgstr "ルート親プロセスの案件だけが、次の表に表示されます。コール アクティビティによって開始された案件詳細は表示されません。"
+msgid "Only available when the platform is under maintenance. Go to the \"Platform maintenance\" page to activate the maintenance mode."
+msgstr ""
 
 msgid "Only one Business Data Model (BDM) can be active at a time."
 msgstr "一度にアクティブにできるビジネスデータモデル（BDM）は1つだけです。"
@@ -739,9 +714,6 @@ msgstr "パスワードが正常に更新されました"
 
 msgid "Passwords don't match"
 msgstr "パスワードが一致しません"
-
-msgid "Pending Flow Nodes"
-msgstr "作業実行を待機中"
 
 msgid "Personal information"
 msgstr "個人情報"
@@ -788,9 +760,6 @@ msgstr "プロファイル /  所属"
 msgid "Ready, waiting instances"
 msgstr "作業開始を待機中"
 
-msgid "Refresh"
-msgstr "リフレッシュ"
-
 msgid "Refresh data"
 msgstr "データを再読み込み"
 
@@ -803,6 +772,9 @@ msgstr "削除"
 msgid "Remove all"
 msgstr "すべて削除"
 
+msgid "Removing on apply"
+msgstr ""
+
 msgid "Reset"
 msgstr "リセット"
 
@@ -814,24 +786,6 @@ msgstr "役割"
 
 msgid "Save"
 msgstr "保存"
-
-msgid "Search Key 1"
-msgstr "検索キー 1"
-
-msgid "Search Key 2"
-msgstr "検索キー 2"
-
-msgid "Search Key 3"
-msgstr "検索キー 3"
-
-msgid "Search Key 4"
-msgstr "検索キー 4"
-
-msgid "Search Key 5"
-msgstr "検索キー 5"
-
-msgid "Search by process name or search keys"
-msgstr "プロセス名または検索キーで検索"
 
 msgid "Search..."
 msgstr "検索..."
@@ -866,6 +820,9 @@ msgstr "ページを選択します"
 msgid "Select users..."
 msgstr "ユーザーを選択..."
 
+msgid "Server is under maintenance."
+msgstr "サーバーはメンテナンス中です。"
+
 msgid "Set as Home page"
 msgstr "ホーム ページとして設定します"
 
@@ -874,12 +831,6 @@ msgstr "メニューを表示"
 
 msgid "Show all the tasks I can do: both personal tasks and tasks available to other team members"
 msgstr "自分が行うことができるすべてのタスクを表示する： 自分だけにアサインされたタスクおよび他のチーム メンバーでも行えるタスクの両方を表示"
-
-msgid "Show available tasks in task list for archived case"
-msgstr "完了済み案件タスク リスト内の応受援タスクを表示"
-
-msgid "Show available tasks in task list for case"
-msgstr "案件タスク リスト内の応受援タスクを表示"
 
 msgid "Show menu"
 msgstr "メニューを表示"
@@ -917,15 +868,6 @@ msgstr "バージョンで並び替え"
 msgid "Specify the menu structure."
 msgstr "メニュー構造を指定します"
 
-msgid "Start date"
-msgstr "起案日"
-
-msgid "Started"
-msgstr "開始済み"
-
-msgid "Started by"
-msgstr "起案者"
-
 msgid "State"
 msgstr "状態"
 
@@ -943,9 +885,6 @@ msgstr "送信"
 
 msgid "Successfully updated categories"
 msgstr "正常に更新されたカテゴリ"
-
-msgid "System"
-msgstr "システム"
 
 msgid "Table settings"
 msgstr "テーブルの設定"
@@ -998,17 +937,14 @@ msgstr "この案件は完了しています。もうコメントを追加する
 msgid "The case {{caseId}} has been started successfully."
 msgstr "案件ID： %caseId% が正常に開始されました。"
 
+msgid "The category cannot be removed and added at the same time."
+msgstr ""
+
 msgid "The current process has no connectors defined."
 msgstr "現在のプロセスには、コネクタが定義されていません。"
 
 msgid "The current process has no parameters defined."
 msgstr "現在のプロセスには、パラメータが定義されていません。"
-
-msgid "The deleted case will be permanently deleted and will not be stored in the archives."
-msgstr "削除された案件は完全に削除され、アーカイブには格納されません。"
-
-msgid "The deleted case will be permanently deleted from the archives."
-msgstr "削除された案件は、アーカイブから完全に削除されます。"
 
 msgid "The file you are trying to upload has the wrong mime type"
 msgstr "アップロードしようとしているファイルのmimeタイプが間違っています"
@@ -1031,8 +967,8 @@ msgstr "URL の名前は、英数字のみが続く custompage_ で始まらな�
 msgid "The task has been submitted but an error occurred while adding the comment"
 msgstr "タスクが送信されましたが、コメントを追加するときにエラーが発生しました。"
 
-msgid "The whole list of such changes is listed <a ng-href=\"https://documentation.bonitasoft.com/bonita/{{bonitaVersion}}/bdm-management-in-bonita-bpm-portal\" target=\"_blank\" translate>here</a>."
-msgstr "このような変更の一覧はこちら <a ng-href=\"https://documentation.bonitasoft.com/bonita/{{bonitaVersion}}/bdm-management-in-bonita-bpm-portal\" target=\"_blank\" translate></a>に掲載されています。"
+msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">here</a>."
+msgstr ""
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "'content'、'API' 、 'theme' の単語は、内部使用のため予約されています。アプリケーション、またはページの URL にそれらを使用してはいけません。"
@@ -1043,12 +979,6 @@ msgstr "テーマ"
 msgid "Then for each user, fill out the custom information value, in the Studio (<i>List of users</i> tab of the organization), or right on this Portal page."
 msgstr "Studioの組織の <i>ユーザーリスト</i> タブ、またはこのポータル ページの右側で、各ユーザーのカスタム情報の値を入力します。"
 
-msgid "These deleted cases will be permanently deleted and will not be stored in the archives."
-msgstr "これらの削除された案件は完全に削除され、アーカイブには格納されません。"
-
-msgid "These deleted cases will be permanently deleted from the archives."
-msgstr "これらの削除された案件は、アーカイブから完全に削除されます。"
-
 msgid "They will be removed from the database permanently."
 msgstr "それらは完全にデータベースから削除されます。"
 
@@ -1058,11 +988,11 @@ msgstr "この URL は、既に使用中"
 msgid "This application is core to the Bonita platform. To keep it working as it should, it must remain available and its menu should stay as it is."
 msgstr "このアプリケーションは、Bonitaプラットフォームの中核です。 正常に機能し続けるには、使用可能な状態を維持し、メニューをそのままにしておく必要があります。"
 
+msgid "This category has already been added to this process."
+msgstr ""
+
 msgid "This field is mandatory"
 msgstr "このフィールドは必須です"
-
-msgid "This filters the case list only by process name. The display name is shown for information purposes."
-msgstr "案件リストをプロセス名でフィルタします。表示名は情報目的で表示されます。"
 
 msgid "This is the task details panel. No information to display"
 msgstr "これは、タスクの詳細パネルです。表示する情報がありません。"
@@ -1113,9 +1043,6 @@ msgstr "そのためにログアウトし、Bonita プラットフォーム の�
 msgid "To fill out the form, you need to take this task. This means you will be the only one able to do it. To make it available to the team again, release it."
 msgstr "フォームに記入するには、このタスクを引き受ける必要があります。つまり、あなただけがこのタスクを実行できることになります。もう一度、チームで実行できるようにする（つまり、応受援タスクにする）には、そのタスクを手放します。"
 
-msgid "To personalize the display of search keys (and columns in general), use the table settings button on the right. You can search on up to 5 search keys."
-msgstr "検索キー の表示（および一般的な表示列）をカスタマイズしたい場合は、右側にある [テーブルの設定] ボタンを使用します。最大 5 つの検索キーで検索できます。"
-
 msgid "To use this feature, create a new version of the process in Bonita Studio version 6.4 and above, then create and install the new .bar file in the Portal."
 msgstr "この機能を使用するには、Bonita Studio バージョン 6.4 以上でプロセスの新しいバージョンを作成し、その新しい .bar ファイルをポータルにインストールします。"
 
@@ -1136,6 +1063,9 @@ msgstr "URL"
 
 msgid "Unable to add the comment. Refresh your task list and try again. If the problem persists, contact your administrator"
 msgstr "コメントを追加することができません。タスク一覧を更新し、もう一度やり直してください。問題が解決しない場合はシステム管理者に問い合わせてください。"
+
+msgid "Unable to map category:"
+msgstr ""
 
 msgid "Unassign. This will make it available to team again"
 msgstr "アサインを解除します。このタスクはもう一度、応受援タスクに戻ります。"
@@ -1200,12 +1130,6 @@ msgstr "バージョン"
 msgid "View application details"
 msgstr "アプリケーションの詳細表示"
 
-msgid "View case details"
-msgstr "案件詳細を表示"
-
-msgid "View case overview"
-msgstr "案件概況を表示"
-
 msgid "View task"
 msgstr "タスクを見る"
 
@@ -1221,9 +1145,6 @@ msgstr "お探しのものが見つかりませんでした。"
 msgid "When you export an application descriptor, pages and profiles are not exported in the file."
 msgstr "アプリケーション記述子をエクスポートする場合、ページとプロファイルはそのファイルにエクスポートされません。"
 
-msgid "With failures"
-msgstr "エラー発生"
-
 msgid "You are about to export the descriptor of the application"
 msgstr "アプリケーションの記述子をエクスポートしようとしています"
 
@@ -1238,6 +1159,9 @@ msgstr "それをメニューで参照する前に、ページを追加する必
 
 msgid "Your personal task list is empty. You can take a task from the ​<a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\">To do</a> list."
 msgstr "マイタスク リストは空です。​<a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\">To do</a> リストからタスクを選ぶことができます。"
+
+msgid "Your session is no longer active."
+msgstr "セッションは既にアクティブではありません。"
 
 msgid "Zip code"
 msgstr "郵便番号"
@@ -1262,33 +1186,6 @@ msgstr "こちら"
 
 msgid "of"
 msgstr "日目/"
-
-msgid "sort by End date ascending"
-msgstr "終了日を昇順で並べ替える"
-
-msgid "sort by End date descending"
-msgstr "終了日を降順で並べ替える"
-
-msgid "sort by ID ascending"
-msgstr "ID を昇順で並べ替える"
-
-msgid "sort by ID descending"
-msgstr "ID を降順で並べ替える"
-
-msgid "sort by Process name ascending"
-msgstr "プロセス名を昇順で並べ替える"
-
-msgid "sort by Process name descending"
-msgstr "プロセス名を降順で並べ替える"
-
-msgid "sort by Start date ascending"
-msgstr "開始日を昇順で並べ替える"
-
-msgid "sort by Start date descending"
-msgstr "開始日を降順で並べ替える"
-
-msgid "username:"
-msgstr "ユーザー名:"
 
 msgid "will be permanently deleted."
 msgstr "恒久的に削除されます。"
@@ -1331,7 +1228,4 @@ msgstr "{} 以上"
 
 msgid "{} of {}"
 msgstr "{} / {}"
-
-msgid "{}-{} of {}"
-msgstr "{}-{} / {}"
 

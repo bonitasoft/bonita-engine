@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 60594\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2023-03-16 02:30\n"
+"PO-Revision-Date: 2023-10-12 15:56\n"
 
 msgid "1 case has been deleted"
 msgstr "1 caso foi excluído"
@@ -67,11 +67,11 @@ msgstr "Acione as páginas de navegação"
 msgid "Add top-level menu"
 msgstr "Adicionar menu de nível superior"
 
+msgid "Adding on apply"
+msgstr ""
+
 msgid "Address"
 msgstr "Endereço"
-
-msgid "Aggregates tasks in states ready, waiting,<br>executing, completing, and initializing"
-msgstr "Agrega as tarefas em Estados pronto, esperando,<br>executando, completando e inicializando"
 
 msgid "All"
 msgstr "Todos"
@@ -103,8 +103,8 @@ msgstr "Ocorreu um erro ao enviar o formulário."
 msgid "An error occurred while submitting the form.<br/>The task may not be available anymore."
 msgstr "Ocorreu um erro ao enviar o formulário. <br/> A tarefa pode não estar disponível mais."
 
-msgid "Anyone"
-msgstr "Qualquer um"
+msgid "An error occurred with the requested operation."
+msgstr "Ocorreu um erro com a operação solicitada"
 
 msgid "Application XML file"
 msgstr "Arquivo XML do aplicativo"
@@ -136,9 +136,6 @@ msgstr "Atribuído para"
 msgid "Available or My tasks"
 msgstr "Disponível ou minhas tarefas"
 
-msgid "Available tasks"
-msgstr "Tarefas disponíveis"
-
 msgid "BDM access control file can now be installed."
 msgstr "Arquivo de controle de acesso BDM agora pode ser instalado."
 
@@ -150,9 +147,6 @@ msgstr "BDM não foi carregado. Sistema não foi capaz de fazer upload de arquiv
 
 msgid "BDM successfully updated."
 msgstr "Arquivo BDM atualizado com sucesso."
-
-msgid "BPM Services must be paused. Go to \"BPM Services\" menu option."
-msgstr "Serviços de BPM devem ser pausados. Vá para a opção do menu \"Serviços de BPM\"."
 
 msgid "Back"
 msgstr "Voltar"
@@ -202,20 +196,11 @@ msgstr "Comentários da instância"
 msgid "Case id: {{caseId}} - Process: {{processName}} ({{processVersion}})"
 msgstr "Caso: {{caseId}} - Processo: {{processName}} ({{processVersion}})"
 
-msgid "Case list"
-msgstr "Lista de casos"
-
 msgid "Case overview"
 msgstr "Visão geral do caso"
 
 msgid "Case start"
 msgstr "Iniciar Instância"
-
-msgid "Case state"
-msgstr "Estado da Instância"
-
-msgid "Cases"
-msgstr "Instâncias"
 
 msgid "Cases with failures"
 msgstr "Casos com erros"
@@ -238,6 +223,19 @@ msgstr "Clique aqui para escolher o arquivo .xml"
 msgid "Click here to choose your .zip file"
 msgstr "Clique aqui para escolher o arquivo .zip"
 
+msgid "Click on Cancel to remain on this page and try to execute the operation again once you logged back in (e.g. in another tab)."
+msgstr "Clique em Cancelar para permanecer nesta página e tente executar a operação novamente depois de fazer login novamente (por exemplo, em outra guia).\n"
+""
+
+msgid "Click on Cancel to remain on this page and wait for the maintenance to end."
+msgstr "Clique em Cancelar para permanecer nesta página e aguardar o término da manutenção."
+
+msgid "Click on OK to be redirected and log back in."
+msgstr "Clique em OK para ser redirecionado e faça login novamente."
+
+msgid "Click on OK to be redirected to the maintenance page."
+msgstr "Clique em OK para ser redirecionado para a página de manutenção."
+
 msgid "Close"
 msgstr "Fechar"
 
@@ -258,9 +256,6 @@ msgstr "Instâncias concluídas"
 
 msgid "Configuration state"
 msgstr "Estado da configuração"
-
-msgid "Confirm delete?"
-msgstr "Confirmar exclusão?"
 
 msgid "Confirm new Password"
 msgstr "Confirmar nova senha"
@@ -331,9 +326,6 @@ msgstr "Desativar"
 msgid "Display name"
 msgstr "Nome de exibição"
 
-msgid "Don't forget to start BPM Services again."
-msgstr "Não se esqueça de iniciar serviços de BPM novamente."
-
 msgid "Done tasks"
 msgstr "Tarefas arquivadas"
 
@@ -361,11 +353,8 @@ msgstr "Ativar"
 msgid "Enable all"
 msgstr "Ativar Tudo"
 
-msgid "End date"
-msgstr "Data de término"
-
-msgid "Enter a new category name and press \"Enter\" key to create a new category and assign it to the current process."
-msgstr "Insira um novo nome de categoria e pressione a tecla \"Enter\" para criar uma nova categoria e atribuí-la ao processo atual."
+msgid "Enter a new category name and click \"Add\" button to create a new category."
+msgstr ""
 
 msgid "Enter the user to start the case for..."
 msgstr "Digite o usuário para o qual o caso será iniciado..."
@@ -402,12 +391,6 @@ msgstr "Descritor de aplicativos de exportação"
 
 msgid "Expression content has been updated"
 msgstr "O conteúdo da expressão foi atualizado"
-
-msgid "Failed"
-msgstr "Falhou"
-
-msgid "Failed Flow Nodes"
-msgstr "Etapas com erro"
 
 msgid "Failed instances"
 msgstr "Instâncias em erro"
@@ -466,9 +449,6 @@ msgstr "No entanto, devido ao uso da Hibernate para a persistência de dados, al
 msgid "I have read and understood the previous warning message. I have prepared a database backup so I can rollback this operation."
 msgstr "Eu li e entendi a mensagem de aviso anterior. Eu preparei um backup de banco de dados para poder reverter esta operação."
 
-msgid "ID"
-msgstr "ID"
-
 msgid "IN ANY CASE, you MUST CREATE A BACKUP of the current BDM database before undergoing a BDM update."
 msgstr "EM QUALQUER CASE, você DEVE CRIAR UM BACKUP da base de dados BDM atual antes de passar por uma atualização BDM."
 
@@ -523,8 +503,8 @@ msgstr "Instalando"
 msgid "Installing Business Data Model"
 msgstr "Instalando o Modelo de Dados de Negócios"
 
-msgid "Installing or updating the BDM implies to be logged in as Technical User, and to shut down all BPM services."
-msgstr "Instalando ou atualizando o BDM implica estar logado como usuário técnico, e encerrar todos os serviços BPM."
+msgid "Installing or updating the BDM implies to be logged in as Technical User, and to activate the maintenance mode."
+msgstr ""
 
 msgid "Items per page"
 msgstr "Itens por página"
@@ -565,6 +545,9 @@ msgstr "MMM DD LT"
 msgid "Make sure all artifacts enabled on the platform are compatible with the new BDM."
 msgstr "Certifique-se de todos os artefatos habilitados na plataforma são compatíveis com o novo BDM."
 
+msgid "Make sure to deactivate the maintenance mode."
+msgstr ""
+
 msgid "Make this task available to other team members again"
 msgstr "Disponibilizar esta tarefa para outros membros da equipe novamente"
 
@@ -577,11 +560,11 @@ msgstr "Gerenciar categorias"
 msgid "Manager"
 msgstr "Gerente"
 
+msgid "Mapped categories"
+msgstr ""
+
 msgid "Maximum size 255 characters"
 msgstr "Tamanho máximo 255 caracteres"
-
-msgid "Me"
-msgstr "Eu"
 
 msgid "Membership has not been added. Please retry later or contact an administrator"
 msgstr "Membros não foram atualizados. Por favor, tente novamente mais tarde ou entre em contato com o administrador"
@@ -634,9 +617,6 @@ msgstr "Nenhuma aplicação disponível."
 msgid "No application found with id:"
 msgstr "Nenhum aplicativo encontrado com o ID:"
 
-msgid "No cases to display"
-msgstr "Nenhum Instância para exibir"
-
 msgid "No comment on this case yet. To add one, use the input field at the bottom of this panel"
 msgstr "Nenhum comentário sobre este caso ainda. Para adicionar um, use o campo de entrada na parte inferior deste painel"
 
@@ -667,14 +647,11 @@ msgstr "Sem perfis"
 msgid "No profile mapped to this application"
 msgstr "Sem perfil mapeado para esta aplicação"
 
-msgid "No updates have been made on categories. Don't forget to press \"Enter\" key after selecting a category."
-msgstr "Nenhuma atualização foi feita nas categorias. Não esqueça de pressionar a tecla \"Enter\" depois de selecionar uma categoria."
+msgid "No updates have been made on categories. For more details, check logs."
+msgstr ""
 
 msgid "No user found with id:"
 msgstr "Nenhum usuário encontrado com o ID:"
-
-msgid "No value"
-msgstr "Nenhum valor"
 
 msgid "Normal"
 msgstr "Normal"
@@ -682,8 +659,8 @@ msgstr "Normal"
 msgid "Not installed"
 msgstr "Não Instalado"
 
-msgid "One or more connectors on case start or case end failed"
-msgstr "Um ou mais conectores de início ou fim de caso falharam"
+msgid "OK"
+msgstr "OK"
 
 msgid "One or more tasks are not available anymore. The list is now up to date."
 msgstr "Uma ou mais tarefas não estão mais disponíveis. A lista agora esta atualizada."
@@ -694,8 +671,8 @@ msgstr "Menu de uma página"
 msgid "Only I can do this task"
 msgstr "Só eu posso fazer essa tarefa"
 
-msgid "Only cases from root processes are displayed in the table below. No details are available for cases started by call activities."
-msgstr "Somente os casos de processos raiz são exibidos na tabela abaixo. Sem detalhes disponíveis para os casos iniciados por chamada de atividades."
+msgid "Only available when the platform is under maintenance. Go to the \"Platform maintenance\" page to activate the maintenance mode."
+msgstr ""
 
 msgid "Only one Business Data Model (BDM) can be active at a time."
 msgstr "Somente um Modelo de Dados de Negócios (BDM) pode ser ativado no momento."
@@ -735,9 +712,6 @@ msgstr "Senha atualizada com sucesso"
 
 msgid "Passwords don't match"
 msgstr "Senhas não coincidem"
-
-msgid "Pending Flow Nodes"
-msgstr "Etapas pendentes"
 
 msgid "Personal information"
 msgstr "Informações pessoais"
@@ -784,9 +758,6 @@ msgstr "Perfis / Membros"
 msgid "Ready, waiting instances"
 msgstr "Instâncias prontas, ou em espera"
 
-msgid "Refresh"
-msgstr "Atualizar"
-
 msgid "Refresh data"
 msgstr "Atualizar dados"
 
@@ -799,6 +770,9 @@ msgstr "Remover"
 msgid "Remove all"
 msgstr "Remover tudo"
 
+msgid "Removing on apply"
+msgstr ""
+
 msgid "Reset"
 msgstr "Restaurar"
 
@@ -810,24 +784,6 @@ msgstr "Funções"
 
 msgid "Save"
 msgstr "Salvar"
-
-msgid "Search Key 1"
-msgstr "Chave de pesquisa 1"
-
-msgid "Search Key 2"
-msgstr "Chave de pesquisa 2"
-
-msgid "Search Key 3"
-msgstr "Chave de pesquisa 3"
-
-msgid "Search Key 4"
-msgstr "Chave de pesquisa 4"
-
-msgid "Search Key 5"
-msgstr "Chave de pesquisa 5"
-
-msgid "Search by process name or search keys"
-msgstr "Pesquisar por nome do processo ou chaves de busca"
 
 msgid "Search..."
 msgstr "Pesquisar..."
@@ -862,6 +818,9 @@ msgstr "Selecionar a página"
 msgid "Select users..."
 msgstr "Selecione usuários..."
 
+msgid "Server is under maintenance."
+msgstr "O servidor está em manutenção."
+
 msgid "Set as Home page"
 msgstr "Definir como página principal"
 
@@ -870,12 +829,6 @@ msgstr "Mostrar Menu"
 
 msgid "Show all the tasks I can do: both personal tasks and tasks available to other team members"
 msgstr "Mostrar todas as tarefas que pode fazer: tanto pessoais, tarefas e tarefas disponíveis para outros membros da equipe"
-
-msgid "Show available tasks in task list for archived case"
-msgstr "Mostrar tarefas disponíveis na lista de tarefas para caso arquivado"
-
-msgid "Show available tasks in task list for case"
-msgstr "Mostrar tarefas disponíveis na lista de tarefas para o caso"
 
 msgid "Show menu"
 msgstr "Mostrar menu"
@@ -913,15 +866,6 @@ msgstr "Ordenar por versão"
 msgid "Specify the menu structure."
 msgstr "Defina a estrutura do menu."
 
-msgid "Start date"
-msgstr "Data de início"
-
-msgid "Started"
-msgstr "Iniciado"
-
-msgid "Started by"
-msgstr "Iniciado por"
-
 msgid "State"
 msgstr "Estado"
 
@@ -939,9 +883,6 @@ msgstr "Enviar"
 
 msgid "Successfully updated categories"
 msgstr "As categorias foram atualizadas com sucesso"
-
-msgid "System"
-msgstr "Sistema"
 
 msgid "Table settings"
 msgstr "Parâmetros da tabela"
@@ -994,17 +935,14 @@ msgstr "O instância esta arquivada. Não é possível adicionar comentários ma
 msgid "The case {{caseId}} has been started successfully."
 msgstr "A instância {{caseId}} foi iniciada com êxito."
 
+msgid "The category cannot be removed and added at the same time."
+msgstr ""
+
 msgid "The current process has no connectors defined."
 msgstr "O processo atual tem os conectores não definidos."
 
 msgid "The current process has no parameters defined."
 msgstr "O processo atual não tem parâmetros definidos."
-
-msgid "The deleted case will be permanently deleted and will not be stored in the archives."
-msgstr "O caso será permanentemente excluído e não será armazenado nos arquivos."
-
-msgid "The deleted case will be permanently deleted from the archives."
-msgstr "O caso será excluído dos arquivos permanentemente."
 
 msgid "The file you are trying to upload has the wrong mime type"
 msgstr "O arquivo que você está tentando carregar tem um tipo errado de mime"
@@ -1027,8 +965,8 @@ msgstr "O nome da URL deve começar com custompage_ seguido somente por caracter
 msgid "The task has been submitted but an error occurred while adding the comment"
 msgstr "A tarefa foi apresentada, mas ocorreu um erro ao adicionar o comentário"
 
-msgid "The whole list of such changes is listed <a ng-href=\"https://documentation.bonitasoft.com/bonita/{{bonitaVersion}}/bdm-management-in-bonita-bpm-portal\" target=\"_blank\" translate>here</a>."
-msgstr "A lista inteira de tais alterações é listada <a ng-href=\"https://documentation.bonitasoft.com/bonita/{{bonitaVersion}}/bdm-management-in-bonita-bpm-portal\" target=\"_blank\" translate>aqui</a>."
+msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">here</a>."
+msgstr ""
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "As palavras 'conteúdo', 'API' e 'tema' são reservados para uso interno. Eles não devem ser usados em um aplicativo ou a URL da página."
@@ -1039,12 +977,6 @@ msgstr "Tema"
 msgid "Then for each user, fill out the custom information value, in the Studio (<i>List of users</i> tab of the organization), or right on this Portal page."
 msgstr "Então para cada usuário, preencha o valor da informação personalizada, no Studio (<i>Lista de usuários</i> aba da organização), ou na direita da página do Portal."
 
-msgid "These deleted cases will be permanently deleted and will not be stored in the archives."
-msgstr "Estes casos serão permanentemente excluídos e não serão armazenado nos arquivos."
-
-msgid "These deleted cases will be permanently deleted from the archives."
-msgstr "Estes casos serão excluídos dos arquivos permanentemente."
-
 msgid "They will be removed from the database permanently."
 msgstr "Eles serão removidos permanentemente do banco de dados."
 
@@ -1054,11 +986,11 @@ msgstr "Essa URL já está em uso"
 msgid "This application is core to the Bonita platform. To keep it working as it should, it must remain available and its menu should stay as it is."
 msgstr "Essa aplicação é essencial para a plataforma Bonita. Para que continue a funcionar como deve ser, tem de permanecer disponível e o seu menu deve permanecer como está."
 
+msgid "This category has already been added to this process."
+msgstr ""
+
 msgid "This field is mandatory"
 msgstr "Este campo é obrigatório"
-
-msgid "This filters the case list only by process name. The display name is shown for information purposes."
-msgstr "Isso filtra a lista de casos apenas pelo nome do processo. O nome de exibição é mostrado para fins de informação."
 
 msgid "This is the task details panel. No information to display"
 msgstr "Este é o painel de detalhes de tarefa. Nenhuma informação para exibir"
@@ -1108,9 +1040,6 @@ msgstr "Para fazer isso, efetue logout e, em seguida, efetue login novamente com
 msgid "To fill out the form, you need to take this task. This means you will be the only one able to do it. To make it available to the team again, release it."
 msgstr "Para preencher o formulário, você precisa assumir esta tarefa. Isto significa que você será o único capaz de fazê-la. Para torná-la disponível para a equipe novamente, clique no botão liberar."
 
-msgid "To personalize the display of search keys (and columns in general), use the table settings button on the right. You can search on up to 5 search keys."
-msgstr "Para personalizar a exibição de chaves de pesquisa (e colunas em geral), utilize o botão de configuração da tabela, à direita. Você pode pesquisar em até 5 chaves de busca."
-
 msgid "To use this feature, create a new version of the process in Bonita Studio version 6.4 and above, then create and install the new .bar file in the Portal."
 msgstr "Para usar esse recurso, crie uma nova versão do processo no Bonita Studio com versão 6.4 ou superior , então crie e instale o novo arquivo .bar no Portal."
 
@@ -1131,6 +1060,9 @@ msgstr "URL"
 
 msgid "Unable to add the comment. Refresh your task list and try again. If the problem persists, contact your administrator"
 msgstr "Não é possível adicionar o comentário. Atualizar sua lista de tarefas e tente novamente. Se o problema persistir, contate o administrador"
+
+msgid "Unable to map category:"
+msgstr ""
 
 msgid "Unassign. This will make it available to team again"
 msgstr "Cancelar a atribuição. Isto tornará disponível a equipe novamente"
@@ -1195,12 +1127,6 @@ msgstr "Versão"
 msgid "View application details"
 msgstr "Detalhes do aplicativo"
 
-msgid "View case details"
-msgstr "Ver detalhes do casos"
-
-msgid "View case overview"
-msgstr "Visão geral do caso"
-
 msgid "View task"
 msgstr "Visualizar tarefas"
 
@@ -1216,9 +1142,6 @@ msgstr "Não encontramos o que você está procurando."
 msgid "When you export an application descriptor, pages and profiles are not exported in the file."
 msgstr "Quando você exporta um descritor de aplicativo, páginas e perfis não são exportados no arquivo."
 
-msgid "With failures"
-msgstr "Com erros"
-
 msgid "You are about to export the descriptor of the application"
 msgstr "Você está prestes a exportar o descritor da aplicação"
 
@@ -1233,6 +1156,9 @@ msgstr "Você deve adicionar uma página antes de poder referenciá-la em um men
 
 msgid "Your personal task list is empty. You can take a task from the ​<a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\">To do</a> list."
 msgstr "Sua lista de tarefas pessoais está vazia. Você pode tomar uma tarefa da lista <a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\"> para fazer</a>."
+
+msgid "Your session is no longer active."
+msgstr "Sua sessão não está mais ativa."
 
 msgid "Zip code"
 msgstr "Cep"
@@ -1257,33 +1183,6 @@ msgstr "aqui"
 
 msgid "of"
 msgstr "de"
-
-msgid "sort by End date ascending"
-msgstr "ordena por data fim, crescente"
-
-msgid "sort by End date descending"
-msgstr "ordena por data fim, decrescente"
-
-msgid "sort by ID ascending"
-msgstr "ordena por Id, crescente"
-
-msgid "sort by ID descending"
-msgstr "ordena por Id, decrescente"
-
-msgid "sort by Process name ascending"
-msgstr "ordena por nome, crescente"
-
-msgid "sort by Process name descending"
-msgstr "ordena por nome, decrescente"
-
-msgid "sort by Start date ascending"
-msgstr "ordena por data de início, crescente"
-
-msgid "sort by Start date descending"
-msgstr "ordena por data de início, decrescente"
-
-msgid "username:"
-msgstr "nome de usuário:"
 
 msgid "will be permanently deleted."
 msgstr "será excluída permanentemente."
@@ -1326,7 +1225,4 @@ msgstr "{} mais"
 
 msgid "{} of {}"
 msgstr "{} de {}"
-
-msgid "{}-{} of {}"
-msgstr "{}-{} de {}"
 
