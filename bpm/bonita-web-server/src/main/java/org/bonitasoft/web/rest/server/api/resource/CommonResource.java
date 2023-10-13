@@ -29,6 +29,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
@@ -195,6 +196,9 @@ public class CommonResource extends ServerResource {
         } else if (t instanceof InvalidSessionException) {
             status = Status.CLIENT_ERROR_UNAUTHORIZED;
             SessionUtil.sessionLogout(getHttpSession());
+        } else if (t instanceof TenantStatusException) {
+            status = Status.SERVER_ERROR_SERVICE_UNAVAILABLE;
+            errorMessage.setMessage("Platform is under maintenance");
         } else {
             super.doCatch(t);
             status = getStatus();
