@@ -215,10 +215,10 @@ public class BonitaHomeServer {
                 Properties properties = new Properties();
                 properties.load(new ByteArrayInputStream(bonitaConfiguration.getResourceContent()));
                 if (userName != null) {
-                    properties.setProperty("userName", userName);
+                    properties.setProperty("bonita.runtime.admin.username", userName);
                 }
                 if (password != null) {
-                    properties.setProperty("userPassword", password);
+                    properties.setProperty("bonita.runtime.admin.password", password);
                 }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 properties.store(out, "");

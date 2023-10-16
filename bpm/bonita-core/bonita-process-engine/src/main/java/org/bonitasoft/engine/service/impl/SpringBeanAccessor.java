@@ -29,6 +29,7 @@ import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.StandardEnvironment;
 
 /**
  * Spring bean accessor that get its configuration from configuration file in classpath and in database
@@ -89,7 +90,20 @@ public class SpringBeanAccessor {
         }
 
         MutablePropertySources propertySources = context.getEnvironment().getPropertySources();
-        propertySources.addFirst(new PropertiesPropertySource("contextProperties", getProperties()));
+        final boolean legacyMode = context.getEnvironment().getProperty("bonita.runtime.properties.order.legacy-mode",
+                boolean.class, false);
+        if (legacyMode) {
+            // continue to have properties files from database with the higher priority order.
+            propertySources.addFirst(new PropertiesPropertySource("contextProperties", getProperties()));
+        } else {
+            // Make values from database be easily overridable with default Spring mechanism.
+            // This is achieved by adding Bonita properties from database with a priority just AFTER
+            // OS environment variables and Java System properties.
+            // For default Spring property order, see
+            // https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config
+            propertySources.addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+                    new PropertiesPropertySource("contextProperties", getProperties()));
+        }
     }
 
     protected BonitaSpringContext createContext() {

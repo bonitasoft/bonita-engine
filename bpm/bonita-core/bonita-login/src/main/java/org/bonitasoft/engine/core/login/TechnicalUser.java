@@ -13,34 +13,25 @@
  **/
 package org.bonitasoft.engine.core.login;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
  * @author Matthieu Chaffotte
  */
+@lombok.Data
+@Component
 public class TechnicalUser {
 
     private String userName;
 
     private String password;
 
-    public TechnicalUser(final String userName, final String password) {
+    public TechnicalUser(
+            @Value("${bonita.runtime.admin.username}") final String userName,
+            @Value("${bonita.runtime.admin.password}") final String password) {
         super();
         this.userName = userName;
-        this.password = password;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
     }
 }
