@@ -100,6 +100,9 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
         this.pageContentValidator = new CustomPageContentValidator();
     }
 
+    /**
+     * @deprecated as of 9.0.0, a page should be created at startup.
+     */
     @Override
     @Deprecated(since = "9.0.0")
     public PageItem add(final PageItem pageItem) {
@@ -290,6 +293,9 @@ public class PageDatastore extends CommonDatastore<PageItem, Page>
         return pageAPI.searchPages(creator.create());
     }
 
+    /**
+     * @deprecated as of 9.0.0, a page should be updated at startup.
+     */
     @Override
     @Deprecated(since = "9.0.0")
     public PageItem update(final APIID id, final Map<String, String> attributes) {

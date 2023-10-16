@@ -50,6 +50,9 @@ public class BusinessDataModelResource extends CommonResource {
         this.tenantAdministrationAPI = tenantAdministrationAPI;
     }
 
+    /**
+     * @deprecated as of 9.0.0. The BDM should only be updated at startup.
+     */
     @Post("json")
     @Deprecated(since = "9.0.0")
     public TenantResourceItem addBDM(final BusinessDataModelItem businessDataModelItem) {

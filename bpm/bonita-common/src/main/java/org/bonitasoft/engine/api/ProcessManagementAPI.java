@@ -277,7 +277,9 @@ public interface ProcessManagementAPI {
      * @throws UpdateException
      *         If an exception occurs when updating the process deployment information.
      * @since 6.0
+     * @deprecated as of 9.0.0, Process should be updated at startup.
      */
+    @Deprecated(since = "9.0.0")
     void updateProcessDeploymentInfo(long processDefinitionId,
             ProcessDeploymentInfoUpdater processDeploymentInfoUpdater)
             throws ProcessDefinitionNotFoundException, UpdateException;
@@ -423,7 +425,9 @@ public interface ProcessManagementAPI {
      * @throws UpdateException
      *         If an exception occurs when updating the actor.
      * @since 6.0
+     * @deprecated as of 9.0.0, Actor should be updated at startup.
      */
+    @Deprecated(since = "9.0.0")
     ActorInstance updateActor(long actorId, ActorUpdater actorUpdater) throws ActorNotFoundException, UpdateException;
 
     /**
