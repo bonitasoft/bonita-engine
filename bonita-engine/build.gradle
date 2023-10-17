@@ -82,6 +82,8 @@ dependencyManagement {
         dependency "com.bonitasoft.engine:bonita-client-sp:${project.version}"
 
         // Web extensions dependencies:
+        dependency "org.bonitasoft.console:bonita-web-server:${project.version}"
+        dependency "org.bonitasoft.console:bonita-web-server-sp:${project.version}"
         dependency "org.bonitasoft.web:bonita-web-extensions:${project.version}"
         dependency "com.bonitasoft.web:bonita-web-extensions-sp:${project.version}"
 
