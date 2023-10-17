@@ -764,7 +764,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         return getNumber.getResult();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public ActorInstance updateActor(final long actorId, final ActorUpdater descriptor)
             throws ActorNotFoundException, UpdateException {
         if (descriptor == null || descriptor.getFields().isEmpty()) {
@@ -2748,7 +2752,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated(since = "9.0.0")
     public void updateProcessDeploymentInfo(final long processDefinitionId,
             final ProcessDeploymentInfoUpdater processDeploymentInfoUpdater)
             throws ProcessDefinitionNotFoundException, UpdateException {

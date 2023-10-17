@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.web.rest.server.framework.APIServletCall;
 import org.bonitasoft.web.rest.server.utils.FakeResource;
@@ -290,6 +291,17 @@ public class CommonResourceTest extends RestletTest {
         assertThat(response).hasStatus(Status.CLIENT_ERROR_BAD_REQUEST);
         assertThat(response).hasJsonEntityEqualTo(
                 "{\"exception\":\"class java.lang.IllegalArgumentException\",\"message\":\"an error message\"}'");
+    }
+
+    @Test
+    public void should_respond_503_service_unavailable_if_TenantStatusException_occurs() throws Exception {
+        when(fakeService.saySomething()).thenThrow(new TenantStatusException("an error message"));
+
+        final Response response = request("/test").get();
+
+        assertThat(response).hasStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE);
+        assertThat(response).hasJsonEntityEqualTo(
+                "{\"exception\":\"class org.bonitasoft.engine.exception.TenantStatusException\",\"message\":\"Platform is under maintenance\"}'");
     }
 
     @Test

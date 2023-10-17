@@ -1954,11 +1954,6 @@
         <constructor-arg name="pageMappingService" ref="pageMappingService" />
     </bean>
 
-    <bean id="technicalUser" class="org.bonitasoft.engine.core.login.TechnicalUser">
-        <constructor-arg name="userName" value="${userName}" />
-        <constructor-arg name="password" value="${userPassword}" />
-    </bean>
-
     <bean id="genericAuthenticationServiceAccessor"
           class="org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor">
         <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
