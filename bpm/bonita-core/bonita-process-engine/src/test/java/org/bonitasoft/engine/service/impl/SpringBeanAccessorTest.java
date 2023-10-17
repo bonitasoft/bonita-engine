@@ -122,9 +122,32 @@ public class SpringBeanAccessorTest {
     }
 
     @Test
-    public void should_create_context_with_properties_from_database_that_override_env() {
+    public void should_create_context_with_properties_from_env_that_override_database() {
         contextProperties.setProperty("myProperty", "databaseValue");
         envVar.set("myProperty", "envValue");
+        createSpringContext();
+
+        ApplicationContext context = springBeanAccessor.getContext();
+
+        assertThat(context.getEnvironment().getProperty("myProperty")).isEqualTo("envValue");
+    }
+
+    @Test
+    public void should_create_context_with_properties_from_system_properties_that_override_database() {
+        contextProperties.setProperty("myProperty", "databaseValue");
+        System.setProperty("myProperty", "sysPropValue");
+        createSpringContext();
+
+        ApplicationContext context = springBeanAccessor.getContext();
+
+        assertThat(context.getEnvironment().getProperty("myProperty")).isEqualTo("sysPropValue");
+    }
+
+    @Test
+    public void should_property_from_database_take_precedence_on_env_if_legacy_mode() {
+        contextProperties.setProperty("myProperty", "databaseValue");
+        envVar.set("myProperty", "envValue");
+        envVar.set("BONITA_RUNTIME_PROPERTIES_ORDER_LEGACY_MODE", "true");
         createSpringContext();
 
         ApplicationContext context = springBeanAccessor.getContext();
@@ -133,9 +156,10 @@ public class SpringBeanAccessorTest {
     }
 
     @Test
-    public void should_create_context_with_properties_from_database_that_override_system_properties() {
+    public void should_property_from_database_take_precedence_on_sysProp_if_legacy_mode() {
         contextProperties.setProperty("myProperty", "databaseValue");
         System.setProperty("myProperty", "sysPropValue");
+        System.setProperty("bonita.runtime.properties.order.legacy-mode", "true");
         createSpringContext();
 
         ApplicationContext context = springBeanAccessor.getContext();
