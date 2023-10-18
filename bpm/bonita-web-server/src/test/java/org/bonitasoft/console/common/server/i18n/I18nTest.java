@@ -30,13 +30,14 @@ public class I18nTest {
     @Test
     public void getStreams_should_read_from_classpath() {
         final List<InputStream> streams = I18n.getInstance().getStreams(AbstractI18n.LOCALE.fr);
-        assertThat(streams).hasSize(3);
+        //retrieving resources from both src/test/resources and src/main/resources
+        assertThat(streams).hasSize(6);
         assertThat(streams.get(0)).isNotNull();
     }
 
     @Test
     public void getStreams_should_not_fail_if_no_resource_found() {
-        final List<InputStream> streams = I18n.getInstance().getStreams(AbstractI18n.LOCALE.es);
+        final List<InputStream> streams = I18n.getInstance().getStreams(AbstractI18n.LOCALE.de);
         assertThat(streams).isEmpty();
     }
 
