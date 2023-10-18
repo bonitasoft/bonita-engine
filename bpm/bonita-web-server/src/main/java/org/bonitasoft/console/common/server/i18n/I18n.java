@@ -96,7 +96,7 @@ public class I18n extends AbstractI18n {
     public List<InputStream> getStreams(LOCALE locale) {
         ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
         try {
-            Resource[] resources = patternResolver.getResources("classpath:/i18n/" + getLocaleRegexForResource(locale));
+            Resource[] resources = patternResolver.getResources("classpath*:i18n/" + getLocaleRegexForResource(locale));
             List<InputStream> streams = new ArrayList<>(resources.length);
             for (Resource resource : resources) {
                 InputStream stream = resource.getInputStream();
