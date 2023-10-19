@@ -28,8 +28,8 @@ import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicat
 import org.bonitasoft.engine.business.application.importer.MandatoryLivingApplicationImporter;
 import org.bonitasoft.engine.event.PlatformStartedEvent;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
-import org.bonitasoft.platform.version.ApplicationVersionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -65,7 +65,7 @@ public class CustomOrDefaultApplicationInstaller {
             CustomOrDefaultApplicationInstaller.class.getClassLoader());
     private final ApplicationArchiveReader applicationArchiveReader;
 
-    private final ApplicationVersionService applicationVersionService;
+    private final PlatformService platformService;
 
     @EventListener
     public void autoDeployDetectedCustomApplication(PlatformStartedEvent event)
@@ -94,11 +94,11 @@ public class CustomOrDefaultApplicationInstaller {
                 log.info("Bonita now tries to install it automatically...");
                 applicationInstaller.install(applicationArchive);
             } else {
-                var currentVersion = applicationVersionService.retrieveApplicationVersion();
+                var currentVersion = platformService.getPlatform().getApplicationVersion();
                 log.info("Detected application version: '{}'; Current deployed version: '{}'",
                         applicationArchive.getVersion(),
                         currentVersion);
-                if (applicationArchive.hasVersionGreaterThan(applicationVersionService.retrieveApplicationVersion())) {
+                if (applicationArchive.hasVersionGreaterThan(currentVersion)) {
                     log.info("Updating the application...");
                     applicationInstaller.update(applicationArchive);
                 } else if (applicationArchive.hasVersionEquivalentTo(currentVersion)) {

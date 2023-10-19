@@ -18,8 +18,8 @@ import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
 import org.bonitasoft.engine.business.application.importer.MandatoryLivingApplicationImporter;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
-import org.bonitasoft.platform.version.ApplicationVersionService;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -48,7 +48,7 @@ public class CustomOrDefaultApplicationInstallerConfigTest {
                 return new CustomOrDefaultApplicationInstaller(mock(ApplicationInstaller.class),
                         mock(DefaultLivingApplicationImporter.class), mock(MandatoryLivingApplicationImporter.class),
                         mock(TenantServicesManager.class), mock(ApplicationArchiveReader.class),
-                        mock(ApplicationVersionService.class));
+                        mock(PlatformService.class));
             }
         }
     }
