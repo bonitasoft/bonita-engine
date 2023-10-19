@@ -20,9 +20,13 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface SPlatformUpdateBuilder {
 
+    String APPLICATION_VERSION = "applicationVersion";
+
     String MAINTENANCE_MESSAGE = "maintenanceMessage";
 
     String MAINTENANCE_MESSAGE_ACTIVE = "maintenanceMessageActive";
+
+    SPlatformUpdateBuilder setApplicationVersion(String version);
 
     SPlatformUpdateBuilder setMaintenanceMessageActive(boolean state);
 
