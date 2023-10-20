@@ -97,10 +97,15 @@ artifacts {
 
 publishing {
     publications {
-        maven(MavenPublication) {
-            from(components.java)
+        mavenJava(MavenPublication) {
+            from components.java
             artifact testsJar
             artifact buildZip
+            pom { pom ->
+                name = 'Bonita Web Server'
+                description = 'Web API implementation module'
+                org.bonitasoft.engine.gradle.PomUtils.pomCommunityPublication(pom)
+            }
         }
     }
 }

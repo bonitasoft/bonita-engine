@@ -30,6 +30,12 @@ public class SPlatformUpdateBuilderImpl implements SPlatformUpdateBuilder {
     }
 
     @Override
+    public SPlatformUpdateBuilder setApplicationVersion(String version) {
+        descriptor.addField(APPLICATION_VERSION, version);
+        return this;
+    }
+
+    @Override
     public SPlatformUpdateBuilder setMaintenanceMessage(final String name) {
         descriptor.addField(MAINTENANCE_MESSAGE, name);
         return this;

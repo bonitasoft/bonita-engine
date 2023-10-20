@@ -11,25 +11,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.platform.version;
+package org.bonitasoft.web.rest.server.api;
 
-import org.bonitasoft.platform.exception.PlatformException;
+import javax.servlet.http.HttpSession;
+
+import org.bonitasoft.console.common.server.utils.SessionUtil;
+import org.bonitasoft.engine.session.APISession;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
- * @author Danila Mazour
- * @author Haroun Elalami
+ * Parent class providing common methods for Bonita REST Controllers
  */
-public interface ApplicationVersionService {
+public abstract class AbstractRESTController {
 
-    /**
-     * Retrieves the application version in database
-     *
-     * @return platform current application version
-     */
-    String retrieveApplicationVersion() throws PlatformException;
-
-    /**
-     * Updates the application version in database
-     */
-    void updateApplicationVersion(String version) throws PlatformException;
+    public APISession getApiSession(HttpSession session) {
+        APISession apiSession = (APISession) session.getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
+        if (apiSession == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Not authenticated");
+        }
+        return apiSession;
+    }
 }

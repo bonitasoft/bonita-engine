@@ -67,7 +67,12 @@ import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.page.PageUpdater;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
 import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.builder.SPlatformUpdateBuilder;
+import org.bonitasoft.engine.platform.model.builder.impl.SPlatformUpdateBuilderImpl;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.service.InstallationFailedException;
 import org.bonitasoft.engine.service.InstallationService;
@@ -79,7 +84,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.platform.exception.PlatformException;
-import org.bonitasoft.platform.version.ApplicationVersionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
@@ -110,7 +114,6 @@ public class ApplicationInstaller {
     private final TenantStateManager tenantStateManager;
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
-    private final ApplicationVersionService applicationVersionService;
     private final BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     private final ApplicationImporter applicationImporter;
     private final Long tenantId;
@@ -119,8 +122,7 @@ public class ApplicationInstaller {
     public ApplicationInstaller(InstallationService installationService,
             @Qualifier("businessDataModelRepository") BusinessDataModelRepository bdmRepository,
             UserTransactionService transactionService, @Value("${tenantId}") Long tenantId,
-            SessionAccessor sessionAccessor, SessionService sessionService,
-            ApplicationVersionService applicationVersionService, TenantStateManager tenantStateManager,
+            SessionAccessor sessionAccessor, SessionService sessionService, TenantStateManager tenantStateManager,
             @Qualifier("dependencyResolver") BusinessArchiveArtifactsManager businessArchiveArtifactsManager,
             ApplicationImporter applicationImporter) {
         this.installationService = installationService;
@@ -129,7 +131,6 @@ public class ApplicationInstaller {
         this.tenantId = tenantId;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
-        this.applicationVersionService = applicationVersionService;
         this.tenantStateManager = tenantStateManager;
         this.businessArchiveArtifactsManager = businessArchiveArtifactsManager;
         this.applicationImporter = applicationImporter;
@@ -266,7 +267,19 @@ public class ApplicationInstaller {
 
     @VisibleForTesting
     public void updateApplicationVersion(String version) throws PlatformException {
-        applicationVersionService.updateApplicationVersion(version);
+        try {
+            PlatformService platformService = getServiceAccessor().getPlatformService();
+            platformService.updatePlatform(getPlatformUpdateBuilder()
+                    .setApplicationVersion(version).done());
+        } catch (SPlatformUpdateException e) {
+            throw new PlatformException("Error when updating Platform application version", e);
+        }
+    }
+
+    protected SPlatformUpdateBuilder getPlatformUpdateBuilder() {
+        return SPlatformUpdateBuilderImpl.builder()
+                .descriptor(new EntityUpdateDescriptor())
+                .build();
     }
 
     @VisibleForTesting
