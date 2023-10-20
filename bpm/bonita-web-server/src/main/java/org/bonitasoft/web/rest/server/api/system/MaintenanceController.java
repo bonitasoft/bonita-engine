@@ -16,7 +16,6 @@ package org.bonitasoft.web.rest.server.api.system;
 import javax.servlet.http.HttpSession;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.api.MaintenanceAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -26,6 +25,7 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.web.rest.model.system.MaintenanceDetailsClient;
+import org.bonitasoft.web.rest.server.api.AbstractRESTController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -34,16 +34,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Slf4j
 @RestController
 @RequestMapping("/API/system/maintenance")
-public class MaintenanceController {
-
-    APISession getApiSession(HttpSession session) {
-        APISession apiSession = (APISession) session.getAttribute(SessionUtil.API_SESSION_PARAM_KEY);
-        if (apiSession == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "Not authenticated");
-        }
-        return apiSession;
-    }
+public class MaintenanceController extends AbstractRESTController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public MaintenanceDetails getMaintenanceDetails(HttpSession session) {
