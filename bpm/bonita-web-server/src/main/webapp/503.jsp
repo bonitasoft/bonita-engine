@@ -16,7 +16,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html"><head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title>Error 500</title>
+  <title>Error 503</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
