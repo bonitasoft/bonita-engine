@@ -254,7 +254,6 @@ public class DocumentDownloadServlet extends HttpServlet {
                 response.setContentLength(fileContent.length);
                 out.write(fileContent);
             }
-            out.close();
         } catch (final IOException e) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("Error while generating the response.", e);
