@@ -94,7 +94,7 @@ public class CustomOrDefaultApplicationInstaller {
                 log.info("Bonita now tries to install it automatically...");
                 applicationInstaller.install(applicationArchive);
             } else {
-                var currentVersion = platformService.getPlatform().getApplicationVersion();
+                var currentVersion = getInstalledApplicationVersion();
                 log.info("Detected application version: '{}'; Current deployed version: '{}'",
                         applicationArchive.getVersion(),
                         currentVersion);
@@ -111,6 +111,11 @@ public class CustomOrDefaultApplicationInstaller {
                 }
             }
         }
+    }
+
+    String getInstalledApplicationVersion() throws Exception {
+        return applicationInstaller.inSession(
+                () -> applicationInstaller.inTransaction(() -> platformService.getPlatform().getApplicationVersion()));
     }
 
     boolean isPlatformFirstInitialization() {

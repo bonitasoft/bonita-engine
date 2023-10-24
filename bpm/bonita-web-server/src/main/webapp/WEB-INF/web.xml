@@ -153,7 +153,7 @@
         <filter-class>org.bonitasoft.console.common.server.filter.CacheFilter</filter-class>
         <init-param>
             <param-name>duration</param-name>
-            <param-value>15768000</param-value>
+            <param-value>36000</param-value>
         </init-param>
         <init-param>
             <param-name>alwaysCaching</param-name>
