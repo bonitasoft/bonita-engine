@@ -174,8 +174,6 @@ public abstract class ResourceServlet extends HttpServlet {
             response.setBufferSize(content.length);
             final OutputStream out = response.getOutputStream();
             out.write(content, 0, content.length);
-            response.flushBuffer();
-            out.close();
         } catch (FileNotFoundException e) {
             if (LOGGER.isWarnEnabled()) {
                 LOGGER.warn(e.getMessage());

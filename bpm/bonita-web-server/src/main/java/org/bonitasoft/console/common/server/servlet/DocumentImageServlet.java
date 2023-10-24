@@ -178,15 +178,8 @@ public class DocumentImageServlet extends DocumentDownloadServlet {
                 }
                 if (fileContent != null) {
                     response.setContentLength(fileContent.length);
-                    OutputStream out = null;
-                    try {
-                        out = response.getOutputStream();
-                        out.write(fileContent);
-                    } finally {
-                        if (out != null) {
-                            out.close();
-                        }
-                    }
+                    OutputStream out = response.getOutputStream();
+                    out.write(fileContent);
                 }
             } catch (final IOException e) {
                 if (LOGGER.isErrorEnabled()) {

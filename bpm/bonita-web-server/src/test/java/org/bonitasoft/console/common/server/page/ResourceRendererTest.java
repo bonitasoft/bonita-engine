@@ -16,6 +16,7 @@ package org.bonitasoft.console.common.server.page;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -89,8 +90,8 @@ public class ResourceRendererTest {
         verify(res).setContentLength((int) contentLength);
         verify(res).setBufferSize((int) contentLength);
         verify(outputStream).write(any(byte[].class), eq(0), eq((int) contentLength));
-        verify(res).flushBuffer();
-        verify(outputStream).close();
+        verify(res, never()).flushBuffer();
+        verify(outputStream, never()).close();
     }
 
     private File getResourceFile() throws URISyntaxException {
