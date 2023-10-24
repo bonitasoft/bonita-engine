@@ -27,8 +27,6 @@ import java.util.stream.Stream;
 
 import org.bonitasoft.engine.business.application.importer.DefaultLivingApplicationImporter;
 import org.bonitasoft.engine.exception.ApplicationInstallationException;
-import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,10 +58,6 @@ class CustomOrDefaultApplicationInstallerTest {
     DefaultLivingApplicationImporter defaultLivingApplicationImporter;
     @Mock
     TenantServicesManager tenantServicesManager;
-    @Mock
-    PlatformService platformService;
-    @Mock
-    SPlatform platform;
 
     @Mock
     private ApplicationArchiveReader applicationArchiveReader;
@@ -75,7 +69,6 @@ class CustomOrDefaultApplicationInstallerTest {
     void before() throws Exception {
         doAnswer(inv -> callableCaptor.getValue().call()).when(tenantServicesManager)
                 .inTenantSessionTransaction(callableCaptor.capture());
-        doReturn(platform).when(platformService).getPlatform();
     }
 
     @Test
@@ -170,7 +163,7 @@ class CustomOrDefaultApplicationInstallerTest {
         applicationArchive.setVersion("1.0.1");
         doReturn(applicationArchive).when(applicationArchiveReader).read(resourceStream1);
         doReturn(false).when(listener).isPlatformFirstInitialization();
-        doReturn("1.0.0").when(platform).getApplicationVersion();
+        doReturn("1.0.0").when(listener).getInstalledApplicationVersion();
         //when
         listener.autoDeployDetectedCustomApplication(any());
 
@@ -190,7 +183,7 @@ class CustomOrDefaultApplicationInstallerTest {
         applicationArchive.setVersion("1.0.0");
         doReturn(applicationArchive).when(listener).createApplicationArchive(resource1);
         doReturn(false).when(listener).isPlatformFirstInitialization();
-        doReturn("1.0.0").when(platform).getApplicationVersion();
+        doReturn("1.0.0").when(listener).getInstalledApplicationVersion();
         //when
         listener.autoDeployDetectedCustomApplication(any());
 
@@ -212,7 +205,7 @@ class CustomOrDefaultApplicationInstallerTest {
         applicationArchive.setVersion("0.0.9-SNAPSHOT");
         doReturn(applicationArchive).when(listener).createApplicationArchive(resource1);
         doReturn(false).when(listener).isPlatformFirstInitialization();
-        doReturn("1.0.0").when(platform).getApplicationVersion();
+        doReturn("1.0.0").when(listener).getInstalledApplicationVersion();
         //when
         String exceptionMessage = Assertions.assertThrows(ApplicationInstallationException.class,
                 () -> listener.autoDeployDetectedCustomApplication(any())).getMessage();
