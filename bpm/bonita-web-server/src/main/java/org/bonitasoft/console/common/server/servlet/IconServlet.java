@@ -61,7 +61,8 @@ public abstract class IconServlet extends HttpServlet {
         } catch (UnsupportedEncodingException e) {
             logAndThrowException(e, "Error while generating the headers.");
         }
-        try (OutputStream out = response.getOutputStream()) {
+        try {
+            OutputStream out = response.getOutputStream();
             response.setContentLength(iconContent.get().getContent().length);
             out.write(iconContent.get().getContent());
         } catch (final IOException e) {

@@ -57,7 +57,6 @@ abstract class BonitaExportServlet extends HttpServlet {
             setResponseHeaders(request, response);
             out = response.getOutputStream();
             out.write(resourceBytes);
-            out.flush();
 
         } catch (final InvalidSessionException e) {
             String message = "Session expired. Please log in again.";
@@ -76,14 +75,6 @@ abstract class BonitaExportServlet extends HttpServlet {
                 getLogger().error(e.getMessage(), e);
             }
             throw new ServletException(e.getMessage(), e);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (final IOException e) {
-                getLogger().error(e.getMessage(), e);
-            }
         }
     }
 
