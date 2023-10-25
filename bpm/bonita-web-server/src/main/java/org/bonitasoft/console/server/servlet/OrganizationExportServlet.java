@@ -79,7 +79,6 @@ public class OrganizationExportServlet extends HttpServlet {
                 response.setContentLength(organizationContent.getBytes().length);
             }
             out.write(organizationContent.getBytes());
-            out.flush();
 
         } catch (final InvalidSessionException e) {
             final String message = "Session expired. Please log in again.";
@@ -92,14 +91,7 @@ public class OrganizationExportServlet extends HttpServlet {
                 LOGGER.error(e.getMessage(), e);
             }
             throw new ServletException(e.getMessage(), e);
-        } finally {
-            try {
-                out.close();
-            } catch (final Exception e) {
-                out = null;
-            }
         }
-
     }
 
     private IdentityAPI getIdentityAPI(final APISession apiSession)

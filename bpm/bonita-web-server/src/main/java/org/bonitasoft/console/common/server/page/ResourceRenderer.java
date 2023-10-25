@@ -66,16 +66,14 @@ public class ResourceRenderer {
             response.setContentLength(content.length);
             response.setBufferSize(content.length);
 
-            try (OutputStream out = response.getOutputStream()) {
-                out.write(content, 0, content.length);
-            }
-            response.flushBuffer();
+            OutputStream out = response.getOutputStream();
+            out.write(content, 0, content.length);
+
         } catch (final FileNotFoundException e) {
             if (isPage) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.flushBuffer();
             }
         } catch (final IOException e) {
             if (LOGGER.isErrorEnabled()) {

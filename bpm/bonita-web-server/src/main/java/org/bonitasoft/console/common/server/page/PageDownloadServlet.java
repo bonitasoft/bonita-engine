@@ -88,7 +88,6 @@ public class PageDownloadServlet extends HttpServlet {
                 response.setContentLength(pageContent.length);
             }
             out.write(pageContent);
-            out.flush();
 
         } catch (final InvalidSessionException e) {
             final String message = "Session expired. Please login again.";
@@ -97,7 +96,6 @@ public class PageDownloadServlet extends HttpServlet {
             }
             try {
                 out.write(message.getBytes());
-                out.flush();
             } catch (final IOException e1) {
                 throw new ServletException(e1);
             }
@@ -108,18 +106,10 @@ public class PageDownloadServlet extends HttpServlet {
             }
             try {
                 out.write("An exception occured. Please contact an administrator".getBytes());
-                out.flush();
             } catch (final IOException e1) {
                 throw new ServletException(e1);
             }
-        } finally {
-            try {
-                out.close();
-            } catch (final Exception e) {
-                out = null;
-            }
         }
-
     }
 
     private PageAPI getPageAPI(final APISession apiSession)
