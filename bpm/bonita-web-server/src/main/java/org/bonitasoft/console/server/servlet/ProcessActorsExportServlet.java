@@ -79,7 +79,6 @@ public class ProcessActorsExportServlet extends HttpServlet {
                 response.setContentLength(actorContent.length());
             }
             out.write(actorContent.getBytes());
-            out.flush();
 
         } catch (final InvalidSessionException e) {
             final String message = "Session expires. Please login again.";
@@ -92,12 +91,6 @@ public class ProcessActorsExportServlet extends HttpServlet {
                 LOGGER.error(e.getMessage(), e);
             }
             throw new ServletException(e.getMessage(), e);
-        } finally {
-            try {
-                out.close();
-            } catch (final Exception e) {
-                out = null;
-            }
         }
 
     }
