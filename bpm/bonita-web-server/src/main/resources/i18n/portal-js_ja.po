@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 72230\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2023-10-16 14:12\n"
+"PO-Revision-Date: 2023-10-30 02:29\n"
 
 msgid "1 case has been deleted"
 msgstr "1 案件が削除されました"
@@ -68,7 +68,7 @@ msgid "Add top-level menu"
 msgstr "最上位のメニューを追加します"
 
 msgid "Adding on apply"
-msgstr ""
+msgstr "適用時に追加"
 
 msgid "Address"
 msgstr "住所"
@@ -227,7 +227,7 @@ msgid "Click here to choose your .zip file"
 msgstr ".zip  ファイルを選択しクリックしてください。"
 
 msgid "Click on Cancel to remain on this page and try to execute the operation again once you logged back in (e.g. in another tab)."
-msgstr "キャンセルをクリックしてこのページのまま、再度ログインしてから (別のタブなどで) 操作を再度実行してください。"
+msgstr "「キャンセル」をクリックすると、このページが表示されたままとなり、ログインし直した後（別のタブなどで）、再度操作を実行することができます。"
 
 msgid "Click on Cancel to remain on this page and wait for the maintenance to end."
 msgstr "このページのまま、メンテナンスが終了するまで待つには［キャンセル]をクリックしてください。"
@@ -356,7 +356,7 @@ msgid "Enable all"
 msgstr "すべて有効にする"
 
 msgid "Enter a new category name and click \"Add\" button to create a new category."
-msgstr ""
+msgstr "新しいカテゴリ名を入力し、「追加」ボタンをクリックして新しいカテゴリを作成します。"
 
 msgid "Enter the user to start the case for..."
 msgstr "案件を開始するユーザーを入力..."
@@ -506,7 +506,7 @@ msgid "Installing Business Data Model"
 msgstr "ビジネス データ モデルのインストール "
 
 msgid "Installing or updating the BDM implies to be logged in as Technical User, and to activate the maintenance mode."
-msgstr ""
+msgstr "BDM をインストールまたはアップデートするには、テクニカルユーザーとしてログインし、メンテナンスモードを有効にする必要があります。"
 
 msgid "Items per page"
 msgstr "ページあたりの表示件数"
@@ -548,7 +548,7 @@ msgid "Make sure all artifacts enabled on the platform are compatible with the n
 msgstr "プラットフォームで有効にされているすべてのアーティファクトが新しいBDMと互換性があることを確認してください。 "
 
 msgid "Make sure to deactivate the maintenance mode."
-msgstr ""
+msgstr "メンテナンスモードを無効にしてください。"
 
 msgid "Make this task available to other team members again"
 msgstr "このタスクは他のチーム メンバーでも行えるようにする"
@@ -563,7 +563,7 @@ msgid "Manager"
 msgstr "マネージャ"
 
 msgid "Mapped categories"
-msgstr ""
+msgstr "マップされたカテゴリ"
 
 msgid "Maximum size 255 characters"
 msgstr "最大 255 文字"
@@ -650,7 +650,7 @@ msgid "No profile mapped to this application"
 msgstr "このアプリケーションにマップされているプロファイルはありません。"
 
 msgid "No updates have been made on categories. For more details, check logs."
-msgstr ""
+msgstr "カテゴリに関する更新はありません。詳細についてはログを確認してください。"
 
 msgid "No user found with id:"
 msgstr "ID付ユーザーが見つかりません:"
@@ -674,7 +674,7 @@ msgid "Only I can do this task"
 msgstr "私だけがこのタスクを実行できる"
 
 msgid "Only available when the platform is under maintenance. Go to the \"Platform maintenance\" page to activate the maintenance mode."
-msgstr ""
+msgstr "プラットフォームがメンテナンス中の場合のみ利用可能です。「プラットフォームのメンテナンス」ページでメンテナンスモードを有効にしてください。"
 
 msgid "Only one Business Data Model (BDM) can be active at a time."
 msgstr "一度にアクティブにできるビジネスデータモデル（BDM）は1つだけです。"
@@ -773,7 +773,7 @@ msgid "Remove all"
 msgstr "すべて削除"
 
 msgid "Removing on apply"
-msgstr ""
+msgstr "適用時の削除"
 
 msgid "Reset"
 msgstr "リセット"
@@ -938,7 +938,7 @@ msgid "The case {{caseId}} has been started successfully."
 msgstr "案件ID： %caseId% が正常に開始されました。"
 
 msgid "The category cannot be removed and added at the same time."
-msgstr ""
+msgstr "カテゴリーの削除と追加を同時に行うことはできません。"
 
 msgid "The current process has no connectors defined."
 msgstr "現在のプロセスには、コネクタが定義されていません。"
@@ -968,7 +968,7 @@ msgid "The task has been submitted but an error occurred while adding the commen
 msgstr "タスクが送信されましたが、コメントを追加するときにエラーが発生しました。"
 
 msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">here</a>."
-msgstr ""
+msgstr "このような変更の一覧はこちら <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\"></a>です。"
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "'content'、'API' 、 'theme' の単語は、内部使用のため予約されています。アプリケーション、またはページの URL にそれらを使用してはいけません。"
@@ -989,7 +989,7 @@ msgid "This application is core to the Bonita platform. To keep it working as it
 msgstr "このアプリケーションは、Bonitaプラットフォームの中核です。 正常に機能し続けるには、使用可能な状態を維持し、メニューをそのままにしておく必要があります。"
 
 msgid "This category has already been added to this process."
-msgstr ""
+msgstr "このカテゴリは既にこのプロセスに追加されています。"
 
 msgid "This field is mandatory"
 msgstr "このフィールドは必須です"
@@ -1065,7 +1065,7 @@ msgid "Unable to add the comment. Refresh your task list and try again. If the p
 msgstr "コメントを追加することができません。タスク一覧を更新し、もう一度やり直してください。問題が解決しない場合はシステム管理者に問い合わせてください。"
 
 msgid "Unable to map category:"
-msgstr ""
+msgstr "カテゴリをマッピングができません："
 
 msgid "Unassign. This will make it available to team again"
 msgstr "アサインを解除します。このタスクはもう一度、応受援タスクに戻ります。"
