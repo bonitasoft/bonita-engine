@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 60594\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2023-10-30 02:29\n"
+"PO-Revision-Date: 2023-10-30 14:52\n"
 
 msgid "1 case has been deleted"
 msgstr "1 案件が削除されました"
@@ -230,7 +230,7 @@ msgid "Click on Cancel to remain on this page and try to execute the operation a
 msgstr "「キャンセル」をクリックすると、このページが表示されたままとなり、ログインし直した後（別のタブなどで）、再度操作を実行することができます。"
 
 msgid "Click on Cancel to remain on this page and wait for the maintenance to end."
-msgstr "このページのまま、メンテナンスが終了するまで待つには［キャンセル]をクリックしてください。"
+msgstr "キャンセルをクリックしてこのページに留まり、メンテナンスが終了するのを待ちます。"
 
 msgid "Click on OK to be redirected and log back in."
 msgstr "OKをクリックするとリダイレクトされ、再度ログインします。"
