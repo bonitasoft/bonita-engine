@@ -28,7 +28,7 @@ class Deps {
     public static String javassistVersion = "3.27.0-GA" //version used by hibernate 5.4.32.Final
     public static String httpComponentsVersion = "4.5.13"
     public static String xstreamVersion = "1.4.20"
-    public static String ehcacheVersion = "2.10.10.8.4"
+    public static String ehcacheVersion = "2.10.10.12.7"
     public static String eclipseCompilerVersion = "3.20.0"
     public static String jbcryptVersion = "0.4"
     public static String activationVersion = "1.2.2"
@@ -47,7 +47,7 @@ class Deps {
     public static String javaxAnnotationsVersion = "1.3.2"
 
     // extensions versions
-    public static String hazelcastVersion = "5.3.2"
+    public static String hazelcastVersion = "5.3.5"
     //Last version compatible with hibernate 5
     public static String hazelcastHibernateVersion = "2.1.1"
     // javax.persistence-api used by hibernate
