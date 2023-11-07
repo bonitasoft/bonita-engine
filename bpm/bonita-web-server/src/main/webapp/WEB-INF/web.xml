@@ -718,6 +718,7 @@
         <servlet-name>SpringRest</servlet-name>
         <!-- API resource URLs need to be listed here in order to avoid being picked up by Restlet which is bound to /API/* -->
         <url-pattern>/API/system/maintenance</url-pattern>
+        <url-pattern>/API/bpm/processInfo/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConsoleServiceServlet</servlet-name>
