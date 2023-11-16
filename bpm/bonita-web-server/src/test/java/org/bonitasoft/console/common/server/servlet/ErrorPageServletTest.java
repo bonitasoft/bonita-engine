@@ -92,7 +92,7 @@ public class ErrorPageServletTest {
 
         assertThat(stringWriter.toString()).contains("Error 404");
         assertThat(stringWriter.toString()).contains(
-                "src=\"/bonita/portal/resource/app/appDirectoryBonita/error-404/content/?_l=fr&amp;app=appDirectoryBonita\"");
+                "src=\"/bonita/portal/resource/app/appDirectoryBonita/error-404/content/?app=appDirectoryBonita\"");
         assertThat(stringWriter.toString()).contains("width=\"100%\"");
     }
 
@@ -105,7 +105,7 @@ public class ErrorPageServletTest {
         errorServlet.doGet(request, response);
 
         assertThat(stringWriter.toString()).contains(
-                "src=\"/portal/resource/app/appDirectoryBonita/error-500/content/?_l=fr&amp;app=appDirectoryBonita\"");
+                "src=\"/portal/resource/app/appDirectoryBonita/error-500/content/?app=appDirectoryBonita\"");
     }
 
     @Test
