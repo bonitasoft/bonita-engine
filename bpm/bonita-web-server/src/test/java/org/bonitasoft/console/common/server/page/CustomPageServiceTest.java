@@ -386,6 +386,7 @@ public class CustomPageServiceTest {
         File pageDirectory = spy(new File("target/bonita/home/client/tenants/1/pages/page2"));
         doReturn(new String[0]).when(pageDirectory).list();
         doReturn(true).when(pageDirectory).exists();
+        doReturn("target/bonita/home/client/tenants/1/pages/page2").when(pageDirectory).getPath();
         initializePageMocks(pageDirectory);
         doNothing().when(customPageService).removePage(pageResourceProvider, true);
         doNothing().when(customPageService).retrievePageZipContent(apiSession, pageResourceProvider);

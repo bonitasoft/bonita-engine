@@ -166,6 +166,7 @@ class DockerDatabaseContainerTasksCreator {
                 group = "Verification"
                 description = "Runs slow integration test suite on $vendor.name database."
                 systemProperty "bonita.version", project.version
+                jvmArgs += ['--add-opens','java.base/java.util=ALL-UNNAMED','--add-opens','java.base/java.lang=ALL-UNNAMED','-Dfile.encoding=UTF-8']
                 classpath += project.files(project.configurations.drivers)
 
                 doFirst {
