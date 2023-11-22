@@ -313,7 +313,9 @@ public class CustomPageService {
         GroovyClassLoader pageClassLoader = new GroovyClassLoader(getParentClassloader(pageName,
                 new CustomPageDependenciesResolver(pageName, pageDirectory, getWebBonitaConstantsUtils()),
                 bdmDependenciesResolver));
-        pageClassLoader.addClasspath(pageDirectory.getPath());
+        if (pageDirectory.exists()) {
+            pageClassLoader.addClasspath(pageDirectory.getPath());
+        }
         return pageClassLoader;
     }
 

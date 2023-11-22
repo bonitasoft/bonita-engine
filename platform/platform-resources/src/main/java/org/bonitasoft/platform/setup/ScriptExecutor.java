@@ -27,10 +27,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.version.VersionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -45,6 +44,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Emmanuel Duchastenier
  */
+@Slf4j
 @Component
 @PropertySource("classpath:/application.properties")
 public class ScriptExecutor {
@@ -52,8 +52,6 @@ public class ScriptExecutor {
     private static final boolean CONTINUE_ON_ERROR = true;
 
     public static final boolean FAIL_ON_ERROR = false;
-
-    private final Logger logger = LoggerFactory.getLogger(ScriptExecutor.class);
 
     private final String sqlFolder;
 
@@ -71,7 +69,7 @@ public class ScriptExecutor {
         }
         this.dbVendor = dbVendor;
         this.datasource = datasource;
-        logger.info("configuration for Database vendor: " + dbVendor);
+        log.info("configuration for Database vendor: " + dbVendor);
         this.sqlFolder = "/sql/" + dbVendor;
         this.versionService = versionService;
     }
@@ -98,7 +96,7 @@ public class ScriptExecutor {
             insertPlatform();
             insertTenant();
         } else {
-            logger.info("Bonita platform already exists. Nothing to do. Stopping.");
+            log.info("Bonita platform already exists. Nothing to do. Stopping.");
         }
     }
 
@@ -161,7 +159,7 @@ public class ScriptExecutor {
             return new FileSystemResource(file);
         } else {
             final String msg = "SQL resource file not found in filesystem: " + file.getAbsolutePath();
-            logger.error(msg);
+            log.error(msg);
             throw new RuntimeException(msg);
         }
     }
@@ -173,7 +171,7 @@ public class ScriptExecutor {
             return new UrlResource(url);
         } else {
             final String msg = "SQL resource file not found in classpath: " + resourcePath;
-            logger.warn(msg);
+            log.warn(msg);
             throw new RuntimeException(msg);
         }
     }
@@ -191,7 +189,7 @@ public class ScriptExecutor {
         populate.addScript(sqlResource);
         populate.setSeparator(getSeparator());
         populate.execute(datasource);
-        logger.info("Executed SQL script " + sqlResource.getURL().getFile());
+        log.info("Executed SQL script " + sqlResource.getURL().getFile());
     }
 
     private String getSeparator() {

@@ -14,10 +14,7 @@
 package org.bonitasoft.console.common.server.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.InputStream;
@@ -28,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,13 +50,6 @@ public class CustomPageChildFirstClassLoaderTest {
     @Before
     public void setUp() throws Exception {
         when(customPageDependenciesResolver.getTempFolder()).thenReturn(tmpRule.newFolder());
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        if (classLoader != null) {
-            classLoader.close();
-        }
     }
 
     @Test
