@@ -246,4 +246,6 @@ public interface ConfigurationService {
     List<Long> getAllTenants();
 
     void storeConfigurationsIfNotExist(List<FullBonitaConfiguration> configurations);
+
+    long getDefaultTenantId();
 }
