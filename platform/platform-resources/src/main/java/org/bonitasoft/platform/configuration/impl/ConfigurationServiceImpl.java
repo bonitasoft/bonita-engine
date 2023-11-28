@@ -325,4 +325,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     public void storeConfigurationsIfNotExist(List<FullBonitaConfiguration> configurations) {
         transactionTemplate.execute(new StoreConfigurationsIfNotExist(jdbcTemplate, dbVendor, configurations));
     }
+
+    @Override
+    public long getDefaultTenantId() {
+        return jdbcTemplate.queryForObject("select distinct tenant_id from configuration where tenant_id <> 0",
+                Long.class);
+    }
 }
