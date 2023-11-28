@@ -120,7 +120,7 @@ public class SpringBeanAccessor {
 
     protected Properties getProperties() throws IOException {
         Properties platformProperties = BONITA_HOME_SERVER.getPlatformProperties();
-        platformProperties.putAll(BONITA_HOME_SERVER.getTenantProperties(1));
+        platformProperties.putAll(BONITA_HOME_SERVER.getTenantProperties(BONITA_HOME_SERVER.getDefaultTenantId()));
         platformProperties.setProperty("bonita.conf.folder", bonita_conf.getAbsolutePath());
         return platformProperties;
     }
@@ -144,7 +144,7 @@ public class SpringBeanAccessor {
         }
 
         bonitaConfigurations.addAll(platformConfiguration);
-        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getTenantConfiguration(1));
+        bonitaConfigurations.addAll(BONITA_HOME_SERVER.getTenantConfiguration(BONITA_HOME_SERVER.getDefaultTenantId()));
         return bonitaConfigurations;
     }
 
