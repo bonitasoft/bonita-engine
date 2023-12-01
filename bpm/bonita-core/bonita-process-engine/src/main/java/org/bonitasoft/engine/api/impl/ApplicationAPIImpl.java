@@ -59,7 +59,7 @@ import org.bonitasoft.engine.session.SessionService;
 /**
  * @author Elias Ricken de Medeiros
  */
-@AvailableWhenTenantIsPaused
+@AvailableInMaintenanceMode
 public class ApplicationAPIImpl implements ApplicationAPI {
 
     /**

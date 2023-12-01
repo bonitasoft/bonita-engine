@@ -35,7 +35,7 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 /**
  * @author Elias Ricken de Medeiros
  */
-@AvailableWhenTenantIsPaused
+@AvailableInMaintenanceMode
 public class OrganizationAPIImpl {
 
     private final ServiceAccessor serviceAccessor;

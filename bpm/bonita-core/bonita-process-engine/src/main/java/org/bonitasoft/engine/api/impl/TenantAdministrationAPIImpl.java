@@ -57,7 +57,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     public boolean isPaused() {
         final long tenantId = getTenantId();
         try {
@@ -68,7 +68,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     @CustomTransactions
     public void pause() throws UpdateException {
         ServiceAccessor serviceAccessor = getServiceAccessorNoException();
@@ -80,7 +80,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     @CustomTransactions
     public void resume() throws UpdateException {
         ServiceAccessor serviceAccessor = getServiceAccessorNoException();
@@ -101,7 +101,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     public TenantResource getBusinessDataModelResource() {
         return getTenantResource(TenantResourceType.BDM);
     }
@@ -120,7 +120,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     //visible for testing
     @Override
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     public String getBusinessDataModelVersion() throws BusinessDataRepositoryException {
         try {
             final BusinessDataModelRepository modelRepository = getServiceAccessor().getBusinessDataModelRepository();
@@ -157,7 +157,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
+    @AvailableInMaintenanceMode(onlyAvailableInMaintenanceMode = true)
     @WithLock(key = UPDATE_BDM)
     public void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         log.info("Uninstalling the currently deployed BDM");
@@ -178,7 +178,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
+    @AvailableInMaintenanceMode(onlyAvailableInMaintenanceMode = true)
     @WithLock(key = UPDATE_BDM)
     @Deprecated(since = "9.0.0")
     public String updateBusinessDataModel(final byte[] zip)
@@ -197,7 +197,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
+    @AvailableInMaintenanceMode(onlyAvailableInMaintenanceMode = true)
     @WithLock(key = UPDATE_BDM)
     public void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         final ServiceAccessor serviceAccessor = getServiceAccessor();
@@ -216,7 +216,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     public byte[] getClientBDMZip() throws BusinessDataRepositoryException {
         final BusinessDataModelRepository bdmRepository = getServiceAccessor().getBusinessDataModelRepository();
         try {

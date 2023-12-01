@@ -50,7 +50,7 @@ public class LoginAPIImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     public APISession login(final String userName, final String password) throws LoginException {
         try {
             return loginInternal(userName, password);
@@ -62,7 +62,7 @@ public class LoginAPIImpl implements LoginAPI {
     }
 
     @CustomTransactions
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     protected APISession login(final String userName, final String password, final Long tenantId)
             throws LoginException {
         try {
@@ -76,7 +76,7 @@ public class LoginAPIImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
-    @AvailableWhenTenantIsPaused
+    @AvailableInMaintenanceMode
     public APISession login(final Map<String, Serializable> credentials) throws LoginException {
         checkCredentialsAreNotNullOrEmpty(credentials);
         try {

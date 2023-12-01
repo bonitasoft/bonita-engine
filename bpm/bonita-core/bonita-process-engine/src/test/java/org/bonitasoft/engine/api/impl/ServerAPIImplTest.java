@@ -28,15 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.api.MaintenanceAPI;
 import org.bonitasoft.engine.api.NoSessionRequired;
 import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
@@ -101,14 +102,16 @@ public class ServerAPIImplTest {
     private ServerAPIImpl serverAPIImpl;
     private MyApiImplementation myApi = new MyApiImplementation();
     private MyApiWithNoSessionImpl myApiWithNoSession = new MyApiWithNoSessionImpl();
-    private ApiFullyAccessibleWhenTenantIsPausedImpl myApiFullyAccessibleWhenTenantIsPaused = new ApiFullyAccessibleWhenTenantIsPausedImpl();
+    private ApiFullyAccessibleWhenMaintenanceModeIsEnabledImpl myApiFullyAccessibleWhenMaintenanceModeIsEnabled = new ApiFullyAccessibleWhenMaintenanceModeIsEnabledImpl();
     private APIAccessResolver accessResolver;
     @Mock
     private PlatformAPI platformApi;
     @Mock
-    private TenantAdministrationAPI tenantAdministrationApi;
+    private MaintenanceAPI maintenanceAPI;
+    @Mock
+    MaintenanceDetails maintenanceDetails;
 
-    private boolean isTenantPaused = false;
+    private boolean isMaintenanceEnabled = false;
 
     @Before
     public void createServerAPI() throws Exception {
@@ -127,8 +130,10 @@ public class ServerAPIImplTest {
 
         doReturn(true).when(tenantLoginService).isValid(TENANT_SESSION_ID);
         doReturn(true).when(platformLoginService).isValid(PLATFORM_SESSION_ID);
-
-        doAnswer(invocation -> isTenantPaused).when(tenantAdministrationApi).isPaused();
+        doAnswer(invocation -> (isMaintenanceEnabled ? MaintenanceDetails.State.ENABLED
+                : MaintenanceDetails.State.DISABLED))
+                        .when(maintenanceDetails).getMaintenanceState();
+        doAnswer(invocation -> maintenanceDetails).when(maintenanceAPI).getMaintenanceDetails();
 
         accessResolver = new APIAccessResolver() {
 
@@ -138,12 +143,12 @@ public class ServerAPIImplTest {
                     return (T) myApi;
                 } else if (apiInterface.equals(MyApiWithNoSession.class)) {
                     return (T) myApiWithNoSession;
-                } else if (apiInterface.equals(ApiFullyAccessibleWhenTenantIsPaused.class)) {
-                    return (T) myApiFullyAccessibleWhenTenantIsPaused;
+                } else if (apiInterface.equals(ApiFullyAccessibleWhenMaintenanceModeIsEnabled.class)) {
+                    return (T) myApiFullyAccessibleWhenMaintenanceModeIsEnabled;
                 } else if (apiInterface.equals(PlatformAPI.class)) {
                     return (T) platformApi;
-                } else if (apiInterface.equals(TenantAdministrationAPI.class)) {
-                    return (T) tenantAdministrationApi;
+                } else if (apiInterface.equals(MaintenanceAPI.class)) {
+                    return (T) maintenanceAPI;
                 } else {
                     throw new APIImplementationNotFoundException("not the FakeApi");
                 }
@@ -193,7 +198,7 @@ public class ServerAPIImplTest {
                 null);
 
         assertThat(myApi.customTxAPIMethodCalled).isTrue();
-        //only one call: "tenantAdministrationApi.isTenantPaused"
+        //only one call: "maintenanceAPI.getMaintenanceDetails()"
         verify(userTransactionService, only()).executeInTransaction(any());
     }
 
@@ -223,8 +228,8 @@ public class ServerAPIImplTest {
     }
 
     @Test
-    public void should_not_be_able_to_call_normal_method_when_tenant_is_paused() throws Exception {
-        isTenantPaused = true;
+    public void should_not_be_able_to_call_normal_method_when_maintenance_mode_is_enabled() throws Exception {
+        isMaintenanceEnabled = true;
 
         expectedException.expectCause(instanceOf(TenantStatusException.class));
         serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
@@ -232,65 +237,67 @@ public class ServerAPIImplTest {
     }
 
     @Test
-    public void should_be_able_to_call_method_with_AvailableWhenTenantIsPaused_when_tenant_is_paused()
+    public void should_be_able_to_call_method_with_AvailableInMaintenanceMode_when_maintenance_mode_is_enabled()
             throws Exception {
-        isTenantPaused = true;
+        isMaintenanceEnabled = true;
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableWhenTenantIsPaused",
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableInMaintenanceMode",
                 emptyList(), null);
 
-        assertThat(myApi.availableWhenTenantIsPausedCalled).isTrue();
+        assertThat(myApi.availableInMaintenanceModeCalled).isTrue();
     }
 
     @Test
-    public void should_be_able_to_call_method_with_AvailableWhenTenantIsPaused_when_tenant_is_not_paused()
+    public void should_be_able_to_call_method_with_AvailableInMaintenanceMode_when_maintenance_mode_is_disabled()
             throws Exception {
-        isTenantPaused = false;
+        isMaintenanceEnabled = false;
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableWhenTenantIsPaused",
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableInMaintenanceMode",
                 emptyList(), null);
 
-        assertThat(myApi.availableWhenTenantIsPausedCalled).isTrue();
+        assertThat(myApi.availableInMaintenanceModeCalled).isTrue();
     }
 
     @Test
-    public void should_not_be_able_to_call_method_with_OnlyAvailableWhenTenantIsPaused_when_tenant_is_not_paused()
+    public void should_not_be_able_to_call_method_with_OnlyAvailableInMaintenanceMode_when_maintenance_mode_is_disabled()
             throws Exception {
-        isTenantPaused = false;
+        isMaintenanceEnabled = false;
 
         expectedException.expectCause(instanceOf(TenantStatusException.class));
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableWhenTenantIsPaused",
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableInMaintenanceMode",
                 emptyList(), null);
     }
 
     @Test
-    public void should_be_able_to_call_method_with_OnlyAvailableWhenTenantIsPaused_when_tenant_is_paused()
+    public void should_be_able_to_call_method_with_OnlyAvailableInMaintenanceMode_when_maintenance_mode_is_enabled()
             throws Exception {
-        isTenantPaused = true;
+        isMaintenanceEnabled = true;
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableWhenTenantIsPaused",
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableInMaintenanceMode",
                 emptyList(), null);
 
-        assertThat(myApi.onlyAvailableWhenTenantIsPausedCalled).isTrue();
+        assertThat(myApi.onlyAvailableInMaintenanceModeCalled).isTrue();
     }
 
     @Test
-    public void should_be_able_to_call_method_of_api_fully_available_when_tenant_is_paused() throws Exception {
-        isTenantPaused = true;
+    public void should_be_able_to_call_method_of_api_fully_available_when_maintenance_mode_is_enabled()
+            throws Exception {
+        isMaintenanceEnabled = true;
 
-        //There is no real check in server API whether it is a tenant or a platform api, we only check the type of session
-        serverAPIImpl.invokeMethod(options(tenantSession), ApiFullyAccessibleWhenTenantIsPaused.class.getName(),
+        //There is no real check in server API whether it is a tenant or a platform API, we only check the type of session
+        serverAPIImpl.invokeMethod(options(tenantSession),
+                ApiFullyAccessibleWhenMaintenanceModeIsEnabled.class.getName(),
                 "aMethod", emptyList(), null);
 
-        assertThat(myApiFullyAccessibleWhenTenantIsPaused.aMethodCalled).isTrue();
+        assertThat(myApiFullyAccessibleWhenMaintenanceModeIsEnabled.aMethodCalled).isTrue();
     }
 
     @Test
-    public void should_be_able_to_call_platform_apis_when_tenant_is_paused() throws Exception {
-        isTenantPaused = true;
+    public void should_be_able_to_call_platform_apis_when_maintenance_mode_is_enabled() throws Exception {
+        isMaintenanceEnabled = true;
 
-        //There is no real check in server API whether it is a tenant or a platform api, we only check the type of session
+        //There is no real check in server API whether it is a tenant or a platform API, we only check the type of session
         serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
                 null);
 
@@ -379,13 +386,14 @@ public class ServerAPIImplTest {
     // APIS for tests
     // ----
 
-    interface ApiFullyAccessibleWhenTenantIsPaused {
+    interface ApiFullyAccessibleWhenMaintenanceModeIsEnabled {
 
         void aMethod();
     }
 
-    @AvailableWhenTenantIsPaused
-    static class ApiFullyAccessibleWhenTenantIsPausedImpl implements ApiFullyAccessibleWhenTenantIsPaused {
+    @AvailableInMaintenanceMode
+    static class ApiFullyAccessibleWhenMaintenanceModeIsEnabledImpl
+            implements ApiFullyAccessibleWhenMaintenanceModeIsEnabled {
 
         boolean aMethodCalled;
 
@@ -420,9 +428,9 @@ public class ServerAPIImplTest {
         @AvailableOnStoppedNode
         void callMeNew();
 
-        void availableWhenTenantIsPaused();
+        void availableInMaintenanceMode();
 
-        void onlyAvailableWhenTenantIsPaused();
+        void onlyAvailableInMaintenanceMode();
 
         void customTxAPIMethod();
 
@@ -435,8 +443,8 @@ public class ServerAPIImplTest {
 
         boolean customTxAPIMethodCalled;
         boolean notAnnotatedMethodCalled;
-        boolean availableWhenTenantIsPausedCalled;
-        boolean onlyAvailableWhenTenantIsPausedCalled;
+        boolean availableInMaintenanceModeCalled;
+        boolean onlyAvailableInMaintenanceModeCalled;
 
         @Deprecated
         @AvailableOnStoppedNode
@@ -449,14 +457,14 @@ public class ServerAPIImplTest {
 
         }
 
-        @AvailableWhenTenantIsPaused
-        public void availableWhenTenantIsPaused() {
-            availableWhenTenantIsPausedCalled = true;
+        @AvailableInMaintenanceMode
+        public void availableInMaintenanceMode() {
+            availableInMaintenanceModeCalled = true;
         }
 
-        @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
-        public void onlyAvailableWhenTenantIsPaused() {
-            onlyAvailableWhenTenantIsPausedCalled = true;
+        @AvailableInMaintenanceMode(onlyAvailableInMaintenanceMode = true)
+        public void onlyAvailableInMaintenanceMode() {
+            onlyAvailableInMaintenanceModeCalled = true;
         }
 
         @CustomTransactions
