@@ -29,7 +29,7 @@ import org.bonitasoft.engine.service.ServiceAccessorSingleton;
  * @author Baptiste Mesta
  */
 @Slf4j
-@AvailableWhenTenantIsPaused
+@AvailableInMaintenanceMode
 public class PermissionAPIImpl implements PermissionAPI {
 
     @Override

@@ -84,8 +84,8 @@ public class TenantAdministrationAPIImplTest {
     public void resume_should_have_annotation_available_when_tenant_is_paused() throws Exception {
         final Method method = TenantAdministrationAPIImpl.class.getMethod("resume");
 
-        final boolean present = method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
-                || TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
+        final boolean present = method.isAnnotationPresent(AvailableInMaintenanceMode.class)
+                || TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableInMaintenanceMode.class);
 
         assertThat(present).as(
                 "Annotation @AvailableWhenTenantIsPaused should be present on API method 'resume' or directly on class TenantManagementAPIExt")
@@ -96,8 +96,8 @@ public class TenantAdministrationAPIImplTest {
     public void pause_should_have_annotation_available_when_tenant_is_paused() throws Exception {
         final Method method = TenantAdministrationAPIImpl.class.getMethod("pause");
 
-        final boolean present = method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
-                || TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
+        final boolean present = method.isAnnotationPresent(AvailableInMaintenanceMode.class)
+                || TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableInMaintenanceMode.class);
 
         assertThat(present).as(
                 "Annotation @AvailableWhenTenantIsPaused should be present on API method 'pause' or directly on class TenantManagementAPIExt")
@@ -110,7 +110,7 @@ public class TenantAdministrationAPIImplTest {
         final Class<PageAPIImpl> classPageApiExt = PageAPIImpl.class;
 
         // then:
-        assertThat(classPageApiExt.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
+        assertThat(classPageApiExt.isAnnotationPresent(AvailableInMaintenanceMode.class)).as(
                 "Annotation @AvailableOnMaintenanceTenant should be present on PageAPIIml");
     }
 
@@ -124,9 +124,9 @@ public class TenantAdministrationAPIImplTest {
     @Test
     public void installBDR_should_be_available_when_tenant_is_paused_ONLY() throws Exception {
         final Method method = TenantAdministrationAPIImpl.class.getMethod("updateBusinessDataModel", byte[].class);
-        final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
+        final AvailableInMaintenanceMode annotation = method.getAnnotation(AvailableInMaintenanceMode.class);
 
-        final boolean present = annotation != null && annotation.onlyAvailableWhenPaused();
+        final boolean present = annotation != null && annotation.onlyAvailableInMaintenanceMode();
         assertThat(present).as(
                 "Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataModel(byte[])'")
                 .isTrue();
@@ -135,9 +135,9 @@ public class TenantAdministrationAPIImplTest {
     @Test
     public void uninstallBDR_should_be_available_when_tenant_is_paused_ONLY() throws Exception {
         final Method method = TenantAdministrationAPIImpl.class.getMethod("uninstallBusinessDataModel");
-        final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
+        final AvailableInMaintenanceMode annotation = method.getAnnotation(AvailableInMaintenanceMode.class);
 
-        final boolean present = annotation != null && annotation.onlyAvailableWhenPaused();
+        final boolean present = annotation != null && annotation.onlyAvailableInMaintenanceMode();
         assertThat(present).as(
                 "Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataModel()'")
                 .isTrue();

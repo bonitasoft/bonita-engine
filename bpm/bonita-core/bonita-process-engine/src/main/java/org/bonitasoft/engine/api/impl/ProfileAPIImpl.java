@@ -38,7 +38,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-@AvailableWhenTenantIsPaused
+@AvailableInMaintenanceMode
 public class ProfileAPIImpl implements ProfileAPI {
 
     @VisibleForTesting

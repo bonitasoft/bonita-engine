@@ -63,7 +63,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
  * @author Hongwen Zang
  * @author Celine Souchet
  */
-@AvailableWhenTenantIsPaused
+@AvailableInMaintenanceMode
 @Slf4j
 public class IdentityAPIImpl implements IdentityAPI {
 

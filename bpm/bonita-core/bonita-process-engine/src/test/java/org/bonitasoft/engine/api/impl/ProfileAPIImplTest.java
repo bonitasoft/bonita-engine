@@ -83,7 +83,7 @@ public class ProfileAPIImplTest {
 
     @Test
     public void should_profile_api_be_available_when_tenant_is_paused() throws Exception {
-        assertThat(ProfileAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class))
+        assertThat(ProfileAPIImpl.class.isAnnotationPresent(AvailableInMaintenanceMode.class))
                 .as("should profile api be available when tenant is paused")
                 .isTrue();
     }

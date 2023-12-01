@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.AvailableWhenTenantIsPaused;
+import org.bonitasoft.engine.api.impl.AvailableInMaintenanceMode;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.profile.CreateProfileMember;
 import org.bonitasoft.engine.business.application.ApplicationService;
@@ -153,7 +153,7 @@ public class ProfileAPIIDelegateTest {
 
     @Test
     public void should_profile_api_be_available_when_tenant_is_paused() throws Exception {
-        assertThat(ProfileAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class))
+        assertThat(ProfileAPIImpl.class.isAnnotationPresent(AvailableInMaintenanceMode.class))
                 .as("should profile api be available when tenant is paused")
                 .isTrue();
     }

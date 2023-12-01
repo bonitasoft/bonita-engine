@@ -28,9 +28,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import org.bonitasoft.engine.api.MaintenanceAPI;
 import org.bonitasoft.engine.api.NoSessionRequired;
 import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
@@ -45,6 +45,7 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.maintenance.MaintenanceDetails;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.PlatformState;
@@ -69,10 +70,11 @@ import org.slf4j.LoggerFactory;
  * valid, is on the right scope (tenant or platform), and renew it</li>
  * <li>When the method is <b>NOT</b> annotated with {@link CustomTransactions}, it opens a transaction</li>
  * <li>When the method is deprecated, it print a warning</li>
- * <li>When the method or class is annotated with {@link AvailableWhenTenantIsPaused}, it verifies the tenant is
- * paused</li>
- * <li>When the method or class is annotated with {@link AvailableWhenTenantIsPaused} and onlyAvailableWhenPaused is set
- * to true, it verifies the tenant is running</li>
+ * <li>When the method or class is annotated with {@link AvailableInMaintenanceMode}, it verifies the maintenance mode
+ * is enabled</li>
+ * <li>When the method or class is annotated with {@link AvailableInMaintenanceMode} and onlyAvailableInMaintenanceMode
+ * is set
+ * to true, it verifies the maintenance mode is enabled</li>
  * <li>When the method is <b>NOT</b> annotated with {@link AvailableOnStoppedNode}, it verifies the platform is
  * running</li>
  * </ul>
@@ -335,53 +337,53 @@ public class ServerAPIImpl implements ServerAPI {
                     apiInterfaceName, method.getName(), method.getDeclaringClass().getName());
             throw new NodeNotStartedException();
         }
-        // we don't check if tenant is in pause mode at platform level and when there is no session
+        // we don't check maintenance mode at platform level and when there is no session
         // when there is no session means that we are trying to log in, in this case it is the LoginApiExt that check if the user is the technical user
         // For tenant level method call:
         if (!(session instanceof APISession)) {
             return;
         }
 
-        final long tenantId = ((APISession) session).getTenantId();
-        if (methodAvailability.isAvailableOnPausedTenant && methodAvailability.isAvailableOnRunningTenant) {
-            //method can be called on paused and running tenant.
+        if (methodAvailability.isAvailableInMaintenanceMode
+                && methodAvailability.isAvailableWhenMaintenanceModeIsDisabled) {
+            //method can be called when maintenance is enabled or disabled.
             return;
         }
-        boolean tenantIsPaused = isTenantPaused(tenantId, session, isAlreadyInTransaction);
-        if (tenantIsPaused && !methodAvailability.isAvailableOnPausedTenant) {
+        boolean isMaintenanceModeEnabled = isMaintenanceModeEnabled(session, isAlreadyInTransaction);
+        if (isMaintenanceModeEnabled && !methodAvailability.isAvailableInMaintenanceMode) {
             throw new TenantStatusException(
-                    MessageFormat.format("Unable to call API method {0}.{1}, The tenant {2} is paused.",
-                            apiInterfaceName, method.getName(), tenantId));
+                    MessageFormat.format("Unable to call API method {0}.{1}, Maintenance mode is enabled.",
+                            apiInterfaceName, method.getName()));
         }
-        if (!tenantIsPaused && !methodAvailability.isAvailableOnRunningTenant) {
+        if (!isMaintenanceModeEnabled && !methodAvailability.isAvailableWhenMaintenanceModeIsDisabled) {
             throw new TenantStatusException(MessageFormat.format(
-                    "Unable to call API method {0}.{1}, The tenant {2} is running and this method can only be called when tenant is paused.",
-                    apiInterfaceName, method.getName(), tenantId));
+                    "Unable to call API method {0}.{1}, Maintenance mode is disabled and this method can only be called when Maintenance mode is enabled.",
+                    apiInterfaceName, method.getName()));
         }
     }
 
     private static class MethodAvailability {
 
         boolean isDeprecated;
-        boolean isAvailableOnRunningTenant = true;
-        boolean isAvailableOnPausedTenant = true;
+        boolean isAvailableWhenMaintenanceModeIsDisabled = true;
+        boolean isAvailableInMaintenanceMode = true;
         boolean isAvailableWhenPlatformIsStopped;
     }
 
     private MethodAvailability getMethodAvailability(Object apiInstance, Method method) {
-        AvailableWhenTenantIsPaused availableWhenTenantIsPaused = Optional
-                .ofNullable(method.getAnnotation(AvailableWhenTenantIsPaused.class))
-                .orElseGet(() -> apiInstance.getClass().getAnnotation(AvailableWhenTenantIsPaused.class));
+        AvailableInMaintenanceMode availableInMaintenanceMode = Optional
+                .ofNullable(method.getAnnotation(AvailableInMaintenanceMode.class))
+                .orElseGet(() -> apiInstance.getClass().getAnnotation(AvailableInMaintenanceMode.class));
         AvailableOnStoppedNode availableOnStoppedNode = method.getAnnotation(AvailableOnStoppedNode.class);
         MethodAvailability methodAvailability = new MethodAvailability();
         // Deprecation
         methodAvailability.isDeprecated = method.isAnnotationPresent(Deprecated.class);
 
-        // Tenant status
-        if (availableWhenTenantIsPaused == null) {
-            methodAvailability.isAvailableOnPausedTenant = false;
-        } else if (availableWhenTenantIsPaused.onlyAvailableWhenPaused()) {
-            methodAvailability.isAvailableOnRunningTenant = false;
+        // Maintenance mode
+        if (availableInMaintenanceMode == null) {
+            methodAvailability.isAvailableInMaintenanceMode = false;
+        } else if (availableInMaintenanceMode.onlyAvailableInMaintenanceMode()) {
+            methodAvailability.isAvailableWhenMaintenanceModeIsDisabled = false;
         }
         // Platform status
         if (availableOnStoppedNode != null) {
@@ -391,27 +393,26 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     /**
-     * @param tenantId
-     *        the ID of the tenant to check
      * @param session
      *        the session to user
      * @param isAlreadyInTransaction
      *        if the request is made in a transaction
-     * @return true if the tenant is available, false otherwise (if the tenant is paused)
+     * @return true if the maintenance mode is enabled, false otherwise
      */
-    protected boolean isTenantPaused(final long tenantId, final Session session, boolean isAlreadyInTransaction) {
+    protected boolean isMaintenanceModeEnabled(final Session session, boolean isAlreadyInTransaction) {
         try {
-            TenantAdministrationAPI tenantAdministrationAPI = accessResolver
-                    .getAPIImplementation(TenantAdministrationAPI.class);
+            MaintenanceAPI maintenanceAPI = accessResolver
+                    .getAPIImplementation(MaintenanceAPI.class);
             if (isAlreadyInTransaction) {
-                return tenantAdministrationAPI.isPaused();
+                return MaintenanceDetails.State.ENABLED
+                        .equals(maintenanceAPI.getMaintenanceDetails().getMaintenanceState());
             } else {
                 return selectUserTransactionService(session, getSessionType(session))
-                        .executeInTransaction(tenantAdministrationAPI::isPaused);
+                        .executeInTransaction(() -> MaintenanceDetails.State.ENABLED
+                                .equals(maintenanceAPI.getMaintenanceDetails().getMaintenanceState()));
             }
         } catch (final Throwable e) {
-            throw new BonitaRuntimeException("Cannot determine if the tenant with ID " + tenantId + " is accessible",
-                    e);
+            throw new BonitaRuntimeException("Cannot determine if the Maintenance mode is enabled", e);
         }
     }
 

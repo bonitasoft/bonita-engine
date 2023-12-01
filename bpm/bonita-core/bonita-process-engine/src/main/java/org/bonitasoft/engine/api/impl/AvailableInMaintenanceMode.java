@@ -19,17 +19,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to identify tenant-level API methods that can be called if a the tenant is in a pause mode. All other API method
+ * Used to identify API methods that can be called if the maintenance mode is enabled. All other API method
  * calls will be rejected.
  * Used by the Bonita Engine server interceptor.
  *
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @author Anthony Birembaut
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AvailableWhenTenantIsPaused {
+public @interface AvailableInMaintenanceMode {
 
-    boolean onlyAvailableWhenPaused() default false;
+    boolean onlyAvailableInMaintenanceMode() default false;
 
 }

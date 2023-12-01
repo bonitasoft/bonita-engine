@@ -31,7 +31,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
-@AvailableWhenTenantIsPaused
+@AvailableInMaintenanceMode
 public class PageAPIImpl implements PageAPI {
 
     protected ServiceAccessor getServiceAccessor() {
