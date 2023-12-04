@@ -63,6 +63,7 @@ class Deps {
     public static String woodstoxCoreVersion = "6.4.0"
     public static String woodstoxStax2ApiVersion = "3.1.4"
     public static String keycloakVersion = "21.1.2"
+    public static String xmlsecVersion = "2.2.6"
     public static String spnegoVersion = "1.1.1"
 
     // Test dependency versions:
