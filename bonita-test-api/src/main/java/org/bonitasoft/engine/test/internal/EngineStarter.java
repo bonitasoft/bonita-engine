@@ -94,8 +94,7 @@ public class EngineStarter {
                     + "s)  ===");
 
             LOGGER.debug("Publishing platform started event");
-            ServiceAccessorFactory.getInstance().createServiceAccessor()
-                    .publishEvent(new PlatformStartedEvent());
+            ServiceAccessorFactory.getInstance().createServiceAccessor().publishEvent(new PlatformStartedEvent());
         } catch (Exception e) {
             hasFailed = true;
             throw e;
@@ -159,24 +158,22 @@ public class EngineStarter {
                 }
             }
         }
-        //2 cache manager threads are allowed
-        // one for PlatformHibernatePersistenceService
-        // one for TenantHibernatePersistenceService
-        // there is no clean way to kill them, a shutdown hook is doing this
-        // killing them using hibernate implementation classes is causing weird behaviours
+        // Only 1 cache manager thread is allowed
+        // there is no clean way to kill it, a shutdown hook is doing this
+        // killing it using hibernate implementation classes is causing weird behaviours
         int nbOfThreads = keySet.size();
         int nbOfExpectedThreads = expectedThreads.size() + 2;
         boolean fail = nbOfThreads > nbOfExpectedThreads;
         LOGGER.info(nbOfThreads + " threads are alive. " + nbOfExpectedThreads + " are expected.");
         if (cacheManagerThreads.size() > 2) {
             LOGGER.info(
-                    "Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but "
+                    "Only 1 CacheManager thread is expected (HibernatePersistenceService) but "
                             + cacheManagerThreads.size() + " are found:");
             for (Thread thread : cacheManagerThreads) {
                 printThread(thread);
             }
         }
-        if (unexpectedThreads.size() > 0) {
+        if (!unexpectedThreads.isEmpty()) {
             LOGGER.info("The following list of threads is not expected:");
             for (Thread thread : unexpectedThreads) {
                 printThread(thread);
@@ -212,7 +209,7 @@ public class EngineStarter {
                 "Transaction Reaper Worker 0", "Transaction Reaper", "main", "Reference Handler", "Signal Dispatcher",
                 "Finalizer", "com.google.common.base.internal.Finalizer", "process reaper", "ReaderThread",
                 "Abandoned connection cleanup thread", "Monitor Ctrl-Break"/* Intellij */, "daemon-shutdown",
-                "surefire-forkedjvm", "Restlet");
+                "surefire-forkedjvm", "Restlet", "hz.bonita");
         for (final String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {
                 return true;

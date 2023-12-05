@@ -16,7 +16,10 @@ class Deps {
     public static String semver4jVersion = '3.1.0'
     public static String slf4jVersion = "1.7.36"
     public static String h2Version = "1.4.199"
+
+    // Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
     public static String hibernateVersion = "5.4.32.Final"
+
     public static String jacksonBomVersion = "2.15.3"
     public static String snakeyamlVersion = "1.32"
     public static String jakartaTransactionVersion = "1.3.3"
@@ -48,8 +51,7 @@ class Deps {
 
     // extensions versions
     public static String hazelcastVersion = "5.3.5"
-    //Last version compatible with hibernate 5
-    public static String hazelcastHibernateVersion = "2.1.1"
+    public static String jcacheVersion = "1.0.0"
     // javax.persistence-api used by hibernate
     public static String javaxPersistenceApiVersion = "2.2"
 

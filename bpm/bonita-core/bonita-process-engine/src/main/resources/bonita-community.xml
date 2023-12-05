@@ -1023,20 +1023,12 @@
         </property>
     </bean>
 
-    <bean id="persistenceService" class="org.bonitasoft.engine.persistence.HibernatePersistenceService" destroy-method="destroy">
-        <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
-        <constructor-arg name="extraHibernateProperties" ref="extraHibernateProperties" />
-        <constructor-arg name="sequenceManager" ref="sequenceManager" />
-        <constructor-arg name="queryBuilderFactory" ref="queryBuilderFactory" />
-    </bean>
-
     <bean id="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
         <property name="targetSetClass">
             <value>java.util.HashSet</value>
         </property>
         <property name="sourceSet">
             <list>
-
             </list>
         </property>
     </bean>
@@ -2167,6 +2159,8 @@
                 <entry key="javax.persistence.validation.mode"
                        value="${bonita.tenant.bdm.repository.javax.persistence.validation.mode}" />
                 <entry key="hibernate.current_session_context_class" value="thread" />
+                <entry key="hibernate.cache.use_second_level_cache" value="false" />
+                <entry key="hibernate.cache.use_query_cache" value="false" />
             </map>
         </constructor-arg>
         <constructor-arg name="tenantId" value="${tenantId}" />

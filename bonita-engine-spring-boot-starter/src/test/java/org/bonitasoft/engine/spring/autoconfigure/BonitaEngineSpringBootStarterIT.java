@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class BonitaEngineAutoConfigurationIT {
+public class BonitaEngineSpringBootStarterIT {
 
     @Test
     public void should_start_engine_when_application_starts() throws LoginException {

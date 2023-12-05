@@ -14,15 +14,12 @@
 package org.bonitasoft.engine.platform;
 
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-
-import java.io.File;
-
-import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -59,12 +56,6 @@ public class PlatformServiceImplTest {
 
     @Mock
     private Recorder recorder;
-
-    @Mock
-    private DataSource datasource;
-
-    @Mock
-    private File sqlFolder;
 
     @InjectMocks
     private PlatformServiceImpl platformServiceImpl;

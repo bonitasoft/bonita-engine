@@ -17,14 +17,16 @@ import static org.bonitasoft.engine.Profiles.CLUSTER;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
@@ -36,13 +38,15 @@ import org.springframework.core.env.StandardEnvironment;
  *
  * @author Charles Souillard
  */
+@Slf4j
 public class SpringBeanAccessor {
+
+    private static final String HAZELCAST_CONFIG_FILENAME = "hazelcast.xml";
 
     static final BonitaHomeServer BONITA_HOME_SERVER = BonitaHomeServer.getInstance();
     private BonitaSpringContext context;
 
     private boolean contextFinishedInitialized = false;
-    private File bonita_conf;
 
     public <T> T getService(final Class<T> serviceClass) {
         return getContext().getBean(serviceClass);
@@ -121,7 +125,6 @@ public class SpringBeanAccessor {
     protected Properties getProperties() throws IOException {
         Properties platformProperties = BONITA_HOME_SERVER.getPlatformProperties();
         platformProperties.putAll(BONITA_HOME_SERVER.getTenantProperties(BONITA_HOME_SERVER.getDefaultTenantId()));
-        platformProperties.setProperty("bonita.conf.folder", bonita_conf.getAbsolutePath());
         return platformProperties;
     }
 
@@ -129,23 +132,41 @@ public class SpringBeanAccessor {
         List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
 
         List<BonitaConfiguration> platformConfiguration = BONITA_HOME_SERVER.getPlatformConfiguration();
-        //handle special case for cache configuration files
-        Iterator<BonitaConfiguration> iterator = platformConfiguration.iterator();
-        bonita_conf = IOUtil.createTempDirectory(File.createTempFile("bonita_conf", "").toURI());
-        bonita_conf.delete();
-        bonita_conf.mkdir();
-        while (iterator.hasNext()) {
-            BonitaConfiguration bonitaConfiguration = iterator.next();
-            if (bonitaConfiguration.getResourceName().contains("cache")) {
-                iterator.remove();
-                IOUtil.write(new File(bonita_conf, bonitaConfiguration.getResourceName()),
-                        bonitaConfiguration.getResourceContent());
-            }
-        }
+
+        extractHazelcastConfigurationFile(platformConfiguration);
 
         bonitaConfigurations.addAll(platformConfiguration);
         bonitaConfigurations.addAll(BONITA_HOME_SERVER.getTenantConfiguration(BONITA_HOME_SERVER.getDefaultTenantId()));
         return bonitaConfigurations;
+    }
+
+    private static void extractHazelcastConfigurationFile(List<BonitaConfiguration> platformConfiguration)
+            throws IOException {
+        // handle special case for Hazelcast configuration file:
+        Iterator<BonitaConfiguration> iterator = platformConfiguration.iterator();
+        while (iterator.hasNext()) {
+            BonitaConfiguration bonitaConfiguration = iterator.next();
+            if (HAZELCAST_CONFIG_FILENAME.equals(bonitaConfiguration.getResourceName())) {
+                iterator.remove();
+                final File hzConfigFile = new File(IOUtil.TMP_DIRECTORY, HAZELCAST_CONFIG_FILENAME);
+                if (!hzConfigFile.exists()) {
+                    Files.write(hzConfigFile.toPath(), bonitaConfiguration.getResourceContent());
+                    hzConfigFile.deleteOnExit();
+                }
+                String hazelcastConfigFile = hzConfigFile.getAbsolutePath();
+
+                // Allow to preserve "hazelcast.config" if already passed as System property:
+                if (!System.getProperties().containsKey("hazelcast.config")) {
+                    log.info("Setting sysprop 'hazelcast.config' to {}", hazelcastConfigFile);
+                    System.setProperty("hazelcast.config", hazelcastConfigFile);
+                    System.setProperty("hibernate.javax.cache.uri", new File(hazelcastConfigFile).toURI().toString());
+                } else {
+                    log.info("Sysprop 'hazelcast.config' already set to '{}'. Preserving this value.",
+                            System.getProperty("hazelcast.config"));
+                }
+                return; // found, no need to go further
+            }
+        }
     }
 
     protected List<String> getSpringFileFromClassPath(boolean cluster) {
@@ -157,7 +178,7 @@ public class SpringBeanAccessor {
         if (property.startsWith("${") && property.endsWith("}")) {
             property = property.substring(2, property.length() - 1);
             String sysPropertyKey = property.substring(0, property.indexOf(':'));
-            String sysPropertyDefaultValue = property.substring(property.indexOf(':') + 1, property.length());
+            String sysPropertyDefaultValue = property.substring(property.indexOf(':') + 1);
             return System.getProperty(sysPropertyKey, sysPropertyDefaultValue);
         }
         return property;

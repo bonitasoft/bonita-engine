@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine;
 
+import java.util.Properties;
+
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import lombok.Data;
@@ -20,7 +22,12 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.impl.EventServiceImpl;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.persistence.HibernateConfigurationProvider;
 import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
+import org.bonitasoft.engine.persistence.HibernatePersistenceService;
+import org.bonitasoft.engine.persistence.QueryBuilderFactory;
+import org.bonitasoft.engine.sequence.SequenceManager;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +51,16 @@ public class EngineConfiguration {
     @ConditionalOnMissingBean(name = "platformEventService")
     EventService platformEventService() {
         return new EventServiceImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    HibernatePersistenceService persistenceService(final ReadSessionAccessor sessionAccessor,
+            final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
+            final SequenceManager sequenceManager, HibernateMetricsBinder hibernateMetricsBinder,
+            QueryBuilderFactory queryBuilderFactory) {
+        return new HibernatePersistenceService(sessionAccessor, hbmConfigurationProvider,
+                extraHibernateProperties, sequenceManager, queryBuilderFactory, hibernateMetricsBinder);
     }
 
     @Bean
