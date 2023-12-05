@@ -1,9 +1,9 @@
 class Deps {
 
     public static String bonitaArtifactsModelVersion = "1.0.0"
-    public static String springVersion = "5.3.27"
-    public static String springBootVersion = "2.7.12"
-    public static String springSessionVersion = "2.7.2"
+    public static String springVersion = "5.3.31"
+    public static String springBootVersion = "2.7.18"
+    public static String springSessionVersion = "2.7.4"
     public static String commonsIOVersion = "2.8.0"
     //fileupload 1.4 does not work on web-side.
     public static String commonscodec = "1.15"
@@ -68,6 +68,7 @@ class Deps {
     public static String woodstoxCoreVersion = "6.4.0"
     public static String woodstoxStax2ApiVersion = "3.1.4"
     public static String keycloakVersion = "21.1.2"
+    public static String xmlsecVersion = "2.2.6"
     public static String spnegoVersion = "1.1.1"
 
     // Test dependency versions:
