@@ -9,7 +9,6 @@ dependencies {
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
     testImplementation "org.springframework:spring-test:${Deps.springVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:${Deps.junit5Version}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"

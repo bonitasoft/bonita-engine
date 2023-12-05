@@ -23,6 +23,8 @@ import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.annotation.PreDestroy;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -67,6 +69,7 @@ public class HibernatePersistenceService implements PersistenceService {
 
     private final Map<String, String> classAliasMappings;
 
+    @Getter // for testing purposes
     private final Map<String, String> cacheQueries;
 
     private final List<Class<? extends PersistentObject>> classMapping;
@@ -463,6 +466,7 @@ public class HibernatePersistenceService implements PersistenceService {
         }
     }
 
+    @PreDestroy
     public void destroy() {
         getLogger().info(
                 "Closing Hibernate session factory of " + getClass().getName());

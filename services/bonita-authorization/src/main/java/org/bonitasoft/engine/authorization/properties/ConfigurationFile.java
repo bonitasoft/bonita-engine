@@ -147,7 +147,7 @@ public abstract class ConfigurationFile {
                 throw new IllegalArgumentException(format("File %s does not have a -internal version", propertyName));
             }
             final Properties tenantProperties = getTenantProperties();
-            // FIXME: is there a risk to remove a property that is not custom, here?
+            // FIXME: is there a risk to remove a property that is not internal, here?
             if (tenantProperties.remove(propertyName) != null) { // if the property was present
                 storePropertiesInCache(tenantProperties);
                 configurationFilesManager.removeProperty(getInternalPropertiesFilename(propertiesFilename),
