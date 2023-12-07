@@ -102,12 +102,18 @@ dependencyManagement {
         dependency "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
         dependency "com.googlecode.json-simple:json-simple:${Deps.jsonSimpleVersion}"
         dependency("org.keycloak:keycloak-servlet-filter-adapter:${Deps.keycloakVersion}") {
+            exclude "org.bouncycastle:bcprov-jdk15on"
+        }
+        dependency("org.keycloak:keycloak-saml-servlet-filter-adapter:${Deps.keycloakVersion}") {
+            exclude "org.bouncycastle:bcprov-jdk15on"
             exclude "org.apache.santuario:xmlsec"
         }
-        dependency "org.apache.santuario:xmlsec:${Deps.xmlsecVersion}"
-        dependency "org.keycloak:keycloak-saml-servlet-filter-adapter:${Deps.keycloakVersion}"
+        dependency("org.keycloak:keycloak-adapter-core:${Deps.keycloakVersion}") {
+            exclude "org.bouncycastle:bcprov-jdk15on"
+        }
         dependency "org.keycloak:keycloak-saml-adapter-api-public:${Deps.keycloakVersion}"
-        dependency "org.keycloak:keycloak-adapter-core:${Deps.keycloakVersion}"
+        dependency "org.apache.santuario:xmlsec:${Deps.xmlsecVersion}"
+        dependency "org.bouncycastle:bcprov-jdk18on:${Deps.bcprovVersion}"
         dependency "org.codelibs:spnego:${Deps.spnegoVersion}"
     }
 }
