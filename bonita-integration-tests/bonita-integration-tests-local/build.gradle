@@ -9,7 +9,7 @@ dependencies {
     api project(':bonita-integration-tests:bonita-integration-tests-client')
     api project(':bpm:bonita-server')
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
-    runtimeOnly "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    runtimeOnly "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
     runtimeOnly "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     runtimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"

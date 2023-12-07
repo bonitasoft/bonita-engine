@@ -32,7 +32,7 @@ class Deps {
     public static String quartzVersion = "2.3.2"
     public static String micrometerVersion = "1.6.1"
 
-    public static String mysqlVersion = "8.0.29"
+    public static String mysqlVersion = "8.2.0"
     public static String mssqlVersion = "8.4.1.jre8"
     public static String oracleVersion = "19.3.0.0"
     public static String postgresqlVersion = "42.4.3"
@@ -40,7 +40,7 @@ class Deps {
 
     public static String narayanaVersion = "5.10.6.Final"
     public static String jaxbVersion = "2.3.1"
-    public static String logbackVersion = "1.2.11"
+    public static String logbackVersion = "1.2.13"
     public static String javaxAnnotationsVersion = "1.3.2"
 
     // extensions versions
