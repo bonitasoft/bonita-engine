@@ -24,7 +24,7 @@ dependencies {
     testCompile project(':bpm:bonita-util:bonita-common-util-test')
     testRuntimeOnly "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
     testRuntimeOnly "com.h2database:h2:${Deps.h2Version}"
-    testRuntimeOnly "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    testRuntimeOnly "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
     testRuntimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testRuntimeOnly "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
 

@@ -9,7 +9,7 @@ dependencies {
     compile project(':bonita-integration-tests:bonita-integration-tests-client')
     compile project(':bpm:bonita-server')
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
-    runtime "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    runtime "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
     runtime "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     runtime "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
