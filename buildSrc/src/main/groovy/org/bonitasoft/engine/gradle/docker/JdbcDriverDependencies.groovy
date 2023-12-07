@@ -16,7 +16,7 @@ package org.bonitasoft.engine.gradle.docker
 
 class JdbcDriverDependencies {
 
-    final static String mysql = "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    final static String mysql = "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
     final static String oracle = "com.oracle.database.jdbc:ojdbc8:${Deps.oracleVersion}"
     final static String postgres = "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     final static String sqlserver = "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
