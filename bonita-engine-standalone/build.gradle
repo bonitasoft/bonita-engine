@@ -25,7 +25,7 @@ dependencies {
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    testImplementation "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    testImplementation "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
     testImplementation "com.h2database:h2:${Deps.h2Version}"
 
 }
