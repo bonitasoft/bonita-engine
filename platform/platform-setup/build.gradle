@@ -22,7 +22,7 @@ dependencies {
     compile "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
     compile "org.springframework.boot:spring-boot-starter-jdbc:${Deps.springBootVersion}"
     compile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
-    compile ("mysql:mysql-connector-java:${Deps.mysqlVersion}") {
+    compile ("com.mysql:mysql-connector-j:${Deps.mysqlVersion}") {
         exclude(module: 'protobuf-java')
     }
     compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
