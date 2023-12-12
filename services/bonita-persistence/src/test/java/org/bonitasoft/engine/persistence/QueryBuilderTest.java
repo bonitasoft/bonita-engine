@@ -84,7 +84,7 @@ public class QueryBuilderTest {
         doReturn(baseQuery).when(query).getQueryString();
         return new HQLQueryBuilder<>(session, query, new DefaultOrderByBuilder(),
                 classAliasMappings,
-                LIKE_ESCAPE_CHARACTER, false, orderByCheckingMode, selectListDescriptor);
+                LIKE_ESCAPE_CHARACTER, orderByCheckingMode, selectListDescriptor);
     }
 
     @Test
@@ -133,8 +133,7 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null,
-                false);
+        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.theValue = :f1)");
@@ -149,8 +148,7 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(
                 Arrays.asList(new FilterOption(TestObject.class, "age", 25),
                         new FilterOption(TestObject.class, "lastname", "John")),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
                 "SELECT testObj.* FROM test_object testObj WHERE (testObj.age = :f1 AND testObj.lastname = :f2)");
@@ -164,8 +162,7 @@ public class QueryBuilderTest {
         QueryBuilder queryBuilder = createQueryBuilder(
                 "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null,
-                false);
+        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
                 "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true AND (testObj.theValue = :f1)");
@@ -178,8 +175,7 @@ public class QueryBuilderTest {
         QueryBuilder queryBuilder = createQueryBuilder(
                 "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null,
-                false);
+        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null);
         queryBuilder.appendOrderByClause(
                 Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)),
                 TestObject.class);
@@ -197,13 +193,12 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(Collections.emptyList(),
                 new SearchFields(Collections.singletonList("toto"),
                         Collections.singletonMap(TestObject.class,
-                                aSet("field1", "field2"))),
-                false);
+                                aSet("field1", "field2"))));
         //then
         assertThat(queryBuilder.getQuery()).matches(
                 "SELECT testObj\\.\\* FROM test_object testObj WHERE \\(testObj.field1 LIKE :s1 ESCAPE '§' OR testObj.field2 LIKE :s2 ESCAPE '§'\\)");
-        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("%toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("%toto%");
     }
 
     @Test
@@ -214,18 +209,17 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(Collections.emptyList(),
                 new SearchFields(Arrays.asList("toto", "tata"),
                         Collections.singletonMap(TestObject.class,
-                                aSet("field1", "field2"))),
-                false);
+                                aSet("field1", "field2"))));
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
                 "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE :s1 ESCAPE '§' " +
                         "OR testObj.field1 LIKE :s2 ESCAPE '§' " +
                         "OR testObj.field2 LIKE :s3 ESCAPE '§' " +
                         "OR testObj.field2 LIKE :s4 ESCAPE '§')");
-        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("tata%");
-        assertThat(queryBuilder.getQueryParameters().get("s3")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("s4")).isEqualTo("tata%");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("%toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("%tata%");
+        assertThat(queryBuilder.getQueryParameters().get("s3")).isEqualTo("%toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s4")).isEqualTo("%tata%");
     }
 
     @Test
@@ -236,17 +230,13 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(Collections.emptyList(),
                 new SearchFields(Collections.singletonList("toto"),
                         Collections.singletonMap(TestObject.class,
-                                aSet("field1", "field2"))),
-                true);
+                                aSet("field1", "field2"))));
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
                 "SELECT testObj.* FROM test_object testObj WHERE " +
-                        "(testObj.field1 LIKE :s1 ESCAPE '§' OR testObj.field1 LIKE :s2 ESCAPE '§' " +
-                        "OR testObj.field2 LIKE :s3 ESCAPE '§' OR testObj.field2 LIKE :s4 ESCAPE '§')");
-        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("% toto%");
-        assertThat(queryBuilder.getQueryParameters().get("s3")).isEqualTo("toto%");
-        assertThat(queryBuilder.getQueryParameters().get("s4")).isEqualTo("% toto%");
+                        "(testObj.field1 LIKE :s1 ESCAPE '§' OR testObj.field2 LIKE :s2 ESCAPE '§')");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("%toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s2")).isEqualTo("%toto%");
     }
 
     private Set<String> aSet(String... fields) {
@@ -260,13 +250,12 @@ public class QueryBuilderTest {
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "field1", "tata")),
                 new SearchFields(Collections.singletonList("toto"),
-                        Collections.singletonMap(TestObject.class, aSet("field1", "field2"))),
-                false);
+                        Collections.singletonMap(TestObject.class, aSet("field1", "field2"))));
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
                 "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 = :f1) AND (testObj.field2 LIKE :s1 ESCAPE '§')");
         assertThat(queryBuilder.getQueryParameters().get("f1")).isEqualTo("tata");
-        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("toto%");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("%toto%");
     }
 
     @Test
@@ -276,13 +265,12 @@ public class QueryBuilderTest {
         //when
         queryBuilder.appendFilters(Collections.emptyList(),
                 new SearchFields(Collections.singletonList("the'value%with_special:_§§"),
-                        Collections.singletonMap(TestObject.class, aSet("field1"))),
-                false);
+                        Collections.singletonMap(TestObject.class, aSet("field1"))));
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo(
                         "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE :s1 ESCAPE '§')");
-        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("the'value§%with§_special:§_§§§§%");
+        assertThat(queryBuilder.getQueryParameters().get("s1")).isEqualTo("%the'value§%with§_special:§_§§§§%");
     }
 
     @Test
@@ -293,8 +281,7 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(
                 Collections.singletonList(
                         new FilterOption(TestObject.class, "age", 25, FilterOperationType.GREATER_OR_EQUALS)),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age >= :f1)");
@@ -308,8 +295,7 @@ public class QueryBuilderTest {
         //when
         queryBuilder.appendFilters(
                 Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.GREATER)),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age > :f1)");
@@ -323,8 +309,7 @@ public class QueryBuilderTest {
         //when
         queryBuilder.appendFilters(
                 Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.LESS)),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age < :f1)");
@@ -343,8 +328,7 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(
                 Collections.singletonList(
                         new FilterOption(TestObject.class, "age", 25, FilterOperationType.LESS_OR_EQUALS)),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age <= :f1)");
@@ -358,8 +342,7 @@ public class QueryBuilderTest {
         //when
         queryBuilder.appendFilters(
                 Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.DIFFERENT)),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age != :f1)");
@@ -371,8 +354,7 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, 27)), null,
-                false);
+        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, 27)), null);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
                 "SELECT testObj.* FROM test_object testObj WHERE ((:f1 <= testObj.age AND testObj.age <= :f2))");
@@ -391,8 +373,7 @@ public class QueryBuilderTest {
                 new FilterOption(TestObject.class, "lastname", "john"),
                 new FilterOption(FilterOperationType.OR),
                 new FilterOption(TestObject.class, "lastname", "jack"),
-                new FilterOption(FilterOperationType.R_PARENTHESIS)), null,
-                false);
+                new FilterOption(FilterOperationType.R_PARENTHESIS)), null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo(
@@ -410,8 +391,7 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(
                 Collections.singletonList(
                         new FilterOption(TestObject.class, "lastname", "jack", FilterOperationType.LIKE)),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname LIKE :f1 ESCAPE '§')");
@@ -426,8 +406,7 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(
                 Collections.singletonList(
                         new FilterOption(TestObject.class, "lastname", null, FilterOperationType.EQUALS)),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname IS NULL)");
@@ -441,8 +420,7 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(
                 Collections.singletonList(
                         new FilterOption(TestObject.class, "lastname", TEST_ENUM.TEST1, FilterOperationType.EQUALS)),
-                null,
-                false);
+                null);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname = :f1)");

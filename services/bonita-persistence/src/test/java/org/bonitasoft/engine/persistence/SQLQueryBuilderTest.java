@@ -43,7 +43,7 @@ public class SQLQueryBuilderTest {
         doReturn(baseQuery).when(query).getQueryString();
         return new SQLQueryBuilder(null, query, new DefaultOrderByBuilder(),
                 classAliasMappings,
-                LIKE_ESCAPE_CHARACTER, false, OrderByCheckingMode.NONE, null);
+                LIKE_ESCAPE_CHARACTER, OrderByCheckingMode.NONE, null);
     }
 
     @Test

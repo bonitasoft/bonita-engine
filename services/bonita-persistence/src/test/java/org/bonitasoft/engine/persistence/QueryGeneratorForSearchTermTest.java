@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,29 +29,11 @@ public class QueryGeneratorForSearchTermTest {
         QueryGeneratorForSearchTerm generator = new QueryGeneratorForSearchTerm('$');
 
         QueryGeneratorForSearchTerm.QueryGeneratedSearchTerms query = generator
-                .generate(Stream.of("field1").collect(toSet()), singletonList("termA"), true);
+                .generate(Stream.of("field1").collect(toSet()), singletonList("termA"));
 
-        assertThat(query.getSearch()).isEqualTo("field1 LIKE :s1 ESCAPE '$' OR field1 LIKE :s2 ESCAPE '$'");
+        assertThat(query.getSearch()).isEqualTo("field1 LIKE :s1 ESCAPE '$'");
         assertThat(query.getParameters()).containsOnly(
-                entry("s1", "termA%"),
-                entry("s2", "% termA%"));
-    }
-
-    @Test
-    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_not_enabled() {
-        QueryGeneratorForSearchTerm generator = new QueryGeneratorForSearchTerm('%');
-
-        QueryGeneratorForSearchTerm.QueryGeneratedSearchTerms query = generator.generate(
-                Stream.of("field1", "field2").collect(toSet()), asList("termA", "termB"),
-                false);
-
-        assertThat(query.getSearch()).isEqualTo(
-                "field1 LIKE :s1 ESCAPE '%' OR field1 LIKE :s2 ESCAPE '%' OR field2 LIKE :s3 ESCAPE '%' OR field2 LIKE :s4 ESCAPE '%'");
-        assertThat(query.getParameters()).containsOnly(
-                entry("s1", "termA%"),
-                entry("s2", "termB%"),
-                entry("s3", "termA%"),
-                entry("s4", "termB%"));
+                entry("s1", "%termA%"));
     }
 
     @Test
@@ -60,10 +41,10 @@ public class QueryGeneratorForSearchTermTest {
         QueryGeneratorForSearchTerm generator = new QueryGeneratorForSearchTerm('@');
 
         QueryGeneratorForSearchTerm.QueryGeneratedSearchTerms query = generator
-                .generate(Stream.of("field1").collect(toSet()), singletonList("100%"), false);
+                .generate(Stream.of("field1").collect(toSet()), singletonList("100%"));
 
         assertThat(query.getSearch()).isEqualTo("field1 LIKE :s1 ESCAPE '@'");
         assertThat(query.getParameters()).containsOnly(
-                entry("s1", "100@%%"));
+                entry("s1", "%100@%%"));
     }
 }

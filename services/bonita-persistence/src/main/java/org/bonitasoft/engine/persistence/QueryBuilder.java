@@ -28,7 +28,6 @@ import org.hibernate.query.Query;
 abstract class QueryBuilder<T> {
 
     private final Query baseQuery;
-    private final boolean wordSearchEnabled;
     private final OrderByCheckingMode orderByCheckingMode;
     private final AbstractSelectDescriptor<T> selectDescriptor;
     private final QueryGeneratorForFilters queryGeneratorForFilters;
@@ -42,13 +41,12 @@ abstract class QueryBuilder<T> {
 
     QueryBuilder(Session session, Query baseQuery, OrderByBuilder orderByBuilder,
             Map<String, String> classAliasMappings,
-            char likeEscapeCharacter, boolean wordSearchEnabled, OrderByCheckingMode orderByCheckingMode,
+            char likeEscapeCharacter, OrderByCheckingMode orderByCheckingMode,
             AbstractSelectDescriptor<T> selectDescriptor) {
         this.session = session;
         this.classAliasMappings = classAliasMappings;
         stringQueryBuilder = new StringBuilder(baseQuery.getQueryString());
         this.baseQuery = baseQuery;
-        this.wordSearchEnabled = wordSearchEnabled;
         this.orderByCheckingMode = orderByCheckingMode;
         this.selectDescriptor = selectDescriptor;
         this.queryGeneratorForFilters = new QueryGeneratorForFilters(classAliasMappings,
@@ -62,7 +60,7 @@ abstract class QueryBuilder<T> {
         return stringQueryBuilder.toString();
     }
 
-    void appendFilters(List<FilterOption> filters, SearchFields multipleFilter, boolean enableWordSearch) {
+    void appendFilters(List<FilterOption> filters, SearchFields multipleFilter) {
         Set<String> specificFilters = emptySet();
         if (!filters.isEmpty()) {
             if (!hasWHEREInRootQuery(stringQueryBuilder.toString())) {
@@ -77,7 +75,7 @@ abstract class QueryBuilder<T> {
             parameters.putAll(whereClause.getParameters());
         }
         if (multipleFilter != null && multipleFilter.getTerms() != null && !multipleFilter.getTerms().isEmpty()) {
-            handleMultipleFilters(stringQueryBuilder, multipleFilter, specificFilters, enableWordSearch);
+            handleMultipleFilters(stringQueryBuilder, multipleFilter, specificFilters);
         }
     }
 
@@ -108,8 +106,7 @@ abstract class QueryBuilder<T> {
     }
 
     private void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter,
-            final Set<String> specificFilters,
-            final boolean enableWordSearch) {
+            final Set<String> specificFilters) {
         final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
         final Set<String> fields = new HashSet<>();
         for (final Map.Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
@@ -122,12 +119,12 @@ abstract class QueryBuilder<T> {
 
         if (!fields.isEmpty()) {
             final List<String> terms = multipleFilter.getTerms();
-            applyFiltersOnQuery(builder, fields, terms, enableWordSearch);
+            applyFiltersOnQuery(builder, fields, terms);
         }
     }
 
     private void applyFiltersOnQuery(final StringBuilder queryBuilder, final Set<String> fields,
-            final List<String> terms, final boolean enableWordSearch) {
+            final List<String> terms) {
         if (!hasWHEREInRootQuery(queryBuilder.toString())) {
             queryBuilder.append(" WHERE ");
         } else {
@@ -136,7 +133,7 @@ abstract class QueryBuilder<T> {
         queryBuilder.append("(");
 
         QueryGeneratorForSearchTerm.QueryGeneratedSearchTerms result = queryGeneratorForSearchTerm.generate(fields,
-                terms, enableWordSearch);
+                terms);
         queryBuilder.append(result.getSearch());
 
         queryBuilder.append(")");
@@ -155,12 +152,11 @@ abstract class QueryBuilder<T> {
 
     abstract Query rebuildQuery(AbstractSelectDescriptor<T> selectDescriptor, Session session, Query query);
 
-    void manageFiltersAndParameters(AbstractSelectDescriptor<T> selectDescriptor, boolean enableWordSearch)
+    void manageFiltersAndParameters(AbstractSelectDescriptor<T> selectDescriptor)
             throws SBonitaReadException {
         if (selectDescriptor.hasAFilter()) {
             final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-            appendFilters(queryOptions.getFilters(), queryOptions.getMultipleFilter(),
-                    enableWordSearch);
+            appendFilters(queryOptions.getFilters(), queryOptions.getMultipleFilter());
         }
         if (selectDescriptor.hasOrderByParameters()) {
             appendOrderByClause(selectDescriptor.getQueryOptions().getOrderByOptions(),
@@ -185,7 +181,7 @@ abstract class QueryBuilder<T> {
     }
 
     public Query build() throws SBonitaReadException {
-        manageFiltersAndParameters(selectDescriptor, wordSearchEnabled);
+        manageFiltersAndParameters(selectDescriptor);
         Query query = baseQuery;
         if (hasChanged()) {
             query = rebuildQuery(selectDescriptor, session, baseQuery);

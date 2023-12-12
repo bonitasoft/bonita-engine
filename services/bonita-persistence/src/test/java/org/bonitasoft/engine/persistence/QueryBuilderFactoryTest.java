@@ -79,100 +79,83 @@ public class QueryBuilderFactoryTest {
 
     @Test
     public void should_word_search_returns_false_when_entity_class_is_null() throws Exception {
-        final boolean enableWordSearch = true;
         final Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
         final Class<? extends PersistentObject> entityClass = null;
         final boolean expectedResult = false;
 
-        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+        executeIsWordSearchEnabled(wordSearchExclusionMappings, entityClass, expectedResult);
 
     }
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_exclusion_is_empty() throws Exception {
-        final boolean enableWordSearch = true;
         final Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
         final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = true;
 
-        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
-    }
-
-    @Test
-    public void should_word_search_returns_false_when_feature_is_disabled_and_exclusion_is_empty() throws Exception {
-        final boolean enableWordSearch = false;
-        final Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
-        final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
-        final boolean expectedResult = false;
-
-        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+        executeIsWordSearchEnabled(wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
     @Test
     public void should_word_search_returns_false_when_feature_is_enabled_and_entity_class_is_excluded()
             throws Exception {
-        final boolean enableWordSearch = true;
         final Set<String> wordSearchExclusionMappings = Collections
                 .singleton(ParentDummyPersistentObject.class.getName());
         final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = false;
 
-        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+        executeIsWordSearchEnabled(wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_entity_class_is_not_excluded()
             throws Exception {
-        final boolean enableWordSearch = true;
         final Set<String> wordSearchExclusionMappings = Collections.singleton(DummyPersistentObject2.class.getName());
         final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = true;
 
-        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+        executeIsWordSearchEnabled(wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
     @Test
     public void should_word_search_returns_false_when_feature_is_enabled_and_parent_entity_class_is_excluded()
             throws Exception {
-        final boolean enableWordSearch = true;
         final Set<String> wordSearchExclusionMappings = Collections
                 .singleton(ParentDummyPersistentObject.class.getName());
         final Class<? extends PersistentObject> entityClass = Child1DummyPersistentObject.class;
         final boolean expectedResult = false;
 
-        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+        executeIsWordSearchEnabled(wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_child_entity_class_is_excluded()
             throws Exception {
-        final boolean enableWordSearch = true;
         final Set<String> wordSearchExclusionMappings = Collections
                 .singleton(Child1DummyPersistentObject.class.getName());
         final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = true;
 
-        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+        executeIsWordSearchEnabled(wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_brother_entity_class_is_excluded()
             throws Exception {
-        final boolean enableWordSearch = true;
         final Set<String> wordSearchExclusionMappings = Collections
                 .singleton(Child1DummyPersistentObject.class.getName());
         final Class<? extends PersistentObject> entityClass = Child2DummyPersistentObject.class;
         final boolean expectedResult = true;
 
-        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+        executeIsWordSearchEnabled(wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
-    private void executeIsWordSearchEnabled(final boolean enableWordSearch,
+    private void executeIsWordSearchEnabled(
             final Set<String> wordSearchExclusionMappings,
             final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
             throws Exception {
         QueryBuilderFactory queryBuilderFactory = new QueryBuilderFactory(OrderByCheckingMode.NONE, emptyMap(), '%',
-                enableWordSearch, wordSearchExclusionMappings);
+                wordSearchExclusionMappings);
 
         assertThat(queryBuilderFactory.isWordSearchEnabled(entityClass)).isEqualTo(expectedResult);
     }
