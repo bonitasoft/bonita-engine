@@ -1050,7 +1050,6 @@
             <bean factory-bean="hbmConfigurationProvider" factory-method="getClassAliasMappings" />
         </constructor-arg>
         <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.tenant.likeEscapeCharacter}" />
-        <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.tenant.enableWordSearch}" />
         <constructor-arg name="wordSearchExclusionMappings" ref="tenantWordSearchExclusionMappings" />
     </bean>
 

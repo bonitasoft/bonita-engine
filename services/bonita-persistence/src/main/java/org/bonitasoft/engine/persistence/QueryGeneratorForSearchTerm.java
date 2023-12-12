@@ -49,28 +49,19 @@ class QueryGeneratorForSearchTerm {
     }
 
     void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField,
-            final String currentTerm,
-            final boolean enableWordSearch) {
-        // Search if a sentence starts with the term
+            final String currentTerm) {
+        // We do not want to search for %currentTerm% to ensure we can use Lucene-like library.
         queryBuilder.append(currentField)
-                .append(buildLikeEscapeClause(escapeTerm(currentTerm, likeEscapeCharacter) + "%"));
-
-        if (enableWordSearch) {
-            // Search also if a word starts with the term
-            // We do not want to search for %currentTerm% to ensure we can use Lucene-like library.
-            queryBuilder.append(" OR ").append(currentField)
-                    .append(buildLikeEscapeClause("% " + escapeTerm(currentTerm, likeEscapeCharacter) + "%"));
-        }
+                .append(buildLikeEscapeClause("%" + escapeTerm(currentTerm, likeEscapeCharacter) + "%"));
     }
 
     private void buildLikeClauseForOneFieldMultipleTerms(final StringBuilder queryBuilder, final String currentField,
-            final List<String> terms,
-            final boolean enableWordSearch) {
+            final List<String> terms) {
         final Iterator<String> termIterator = terms.iterator();
         while (termIterator.hasNext()) {
             final String currentTerm = termIterator.next();
 
-            buildLikeClauseForOneFieldOneTerm(queryBuilder, currentField, currentTerm, enableWordSearch);
+            buildLikeClauseForOneFieldOneTerm(queryBuilder, currentField, currentTerm);
 
             if (termIterator.hasNext()) {
                 queryBuilder.append(" OR ");
@@ -78,11 +69,11 @@ class QueryGeneratorForSearchTerm {
         }
     }
 
-    QueryGeneratedSearchTerms generate(Set<String> fields, List<String> terms, boolean enableWordSearch) {
+    QueryGeneratedSearchTerms generate(Set<String> fields, List<String> terms) {
         StringBuilder stringBuilder = new StringBuilder();
         final Iterator<String> fieldIterator = fields.iterator();
         while (fieldIterator.hasNext()) {
-            buildLikeClauseForOneFieldMultipleTerms(stringBuilder, fieldIterator.next(), terms, enableWordSearch);
+            buildLikeClauseForOneFieldMultipleTerms(stringBuilder, fieldIterator.next(), terms);
             if (fieldIterator.hasNext()) {
                 stringBuilder.append(" OR ");
             }

@@ -34,10 +34,9 @@ public class HQLQueryBuilder<T> extends QueryBuilder<T> {
     HQLQueryBuilder(Session session, Query baseQuery, OrderByBuilder orderByBuilder,
             Map<String, String> classAliasMappings,
             char likeEscapeCharacter,
-            boolean wordSearchEnabled,
             OrderByCheckingMode orderByCheckingMode,
             SelectListDescriptor<T> selectDescriptor) {
-        super(session, baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter, wordSearchEnabled,
+        super(session, baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter,
                 orderByCheckingMode, selectDescriptor);
     }
 

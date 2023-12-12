@@ -33,27 +33,19 @@ public class QueryBuilderFactory {
     private Map<String, String> classAliasMappings;
     private char likeEscapeCharacter;
     private final Set<Class<? extends PersistentObject>> wordSearchExclusionMappings = new HashSet<>();
-    private final boolean enableWordSearch;
 
     public QueryBuilderFactory(OrderByCheckingMode orderByCheckingMode, Map<String, String> classAliasMappings,
-            char likeEscapeCharacter, boolean enableWordSearch, Set<String> wordSearchExclusionMappings)
+            char likeEscapeCharacter, Set<String> wordSearchExclusionMappings)
             throws Exception {
         this.orderByCheckingMode = orderByCheckingMode;
         this.classAliasMappings = classAliasMappings;
         this.likeEscapeCharacter = likeEscapeCharacter;
-        this.enableWordSearch = enableWordSearch;
-        initializeWordSearchExclusions(enableWordSearch, wordSearchExclusionMappings);
+        initializeWordSearchExclusions(wordSearchExclusionMappings);
     }
 
-    private void initializeWordSearchExclusions(boolean enableWordSearch, Set<String> wordSearchExclusionMappings)
+    private void initializeWordSearchExclusions(Set<String> wordSearchExclusionMappings)
             throws Exception {
-        if (enableWordSearch) {
-            log.warn("The word based search feature is experimental, using it in production may impact performances.");
-        }
         if (wordSearchExclusionMappings != null && !wordSearchExclusionMappings.isEmpty()) {
-            if (!enableWordSearch) {
-                log.info("You defined an exclusion mapping for the word based search feature, but it is not enabled.");
-            }
             for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
                 final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
                 if (!PersistentObject.class.isAssignableFrom(clazz)) {
@@ -70,14 +62,13 @@ public class QueryBuilderFactory {
     public <T> QueryBuilder createQueryBuilderFor(Session session,
             SelectListDescriptor<T> selectDescriptor) {
         Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-        boolean wordSearchEnabled = isWordSearchEnabled(selectDescriptor.getEntityType());
         if (query instanceof NativeQuery) {
             return new SQLQueryBuilder<>(session, query, orderByBuilder, classAliasMappings,
                     likeEscapeCharacter,
-                    wordSearchEnabled, orderByCheckingMode, selectDescriptor);
+                    orderByCheckingMode, selectDescriptor);
         } else {
             return new HQLQueryBuilder<>(session, query, orderByBuilder, classAliasMappings, likeEscapeCharacter,
-                    wordSearchEnabled, orderByCheckingMode, selectDescriptor);
+                    orderByCheckingMode, selectDescriptor);
         }
     }
 
@@ -86,7 +77,7 @@ public class QueryBuilderFactory {
     }
 
     protected boolean isWordSearchEnabled(final Class<? extends PersistentObject> entityClass) {
-        if (!enableWordSearch || entityClass == null) {
+        if (entityClass == null) {
             return false;
         }
         for (final Class<? extends PersistentObject> exclusion : wordSearchExclusionMappings) {
