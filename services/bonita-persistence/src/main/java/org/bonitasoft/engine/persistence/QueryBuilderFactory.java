@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -32,31 +30,13 @@ public class QueryBuilderFactory {
     private OrderByBuilder orderByBuilder = new DefaultOrderByBuilder();
     private Map<String, String> classAliasMappings;
     private char likeEscapeCharacter;
-    private final Set<Class<? extends PersistentObject>> wordSearchExclusionMappings = new HashSet<>();
 
     public QueryBuilderFactory(OrderByCheckingMode orderByCheckingMode, Map<String, String> classAliasMappings,
-            char likeEscapeCharacter, Set<String> wordSearchExclusionMappings)
+            char likeEscapeCharacter)
             throws Exception {
         this.orderByCheckingMode = orderByCheckingMode;
         this.classAliasMappings = classAliasMappings;
         this.likeEscapeCharacter = likeEscapeCharacter;
-        initializeWordSearchExclusions(wordSearchExclusionMappings);
-    }
-
-    private void initializeWordSearchExclusions(Set<String> wordSearchExclusionMappings)
-            throws Exception {
-        if (wordSearchExclusionMappings != null && !wordSearchExclusionMappings.isEmpty()) {
-            for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
-                final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
-                if (!PersistentObject.class.isAssignableFrom(clazz)) {
-                    throw new IllegalArgumentException(
-                            "Unable to add a word search exclusion mapping for class " + clazz
-                                    + " because it does not implements "
-                                    + PersistentObject.class);
-                }
-                this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
-            }
-        }
     }
 
     public <T> QueryBuilder createQueryBuilderFor(Session session,
@@ -75,17 +55,4 @@ public class QueryBuilderFactory {
     public void setOrderByBuilder(OrderByBuilder orderByBuilder) {
         this.orderByBuilder = orderByBuilder;
     }
-
-    protected boolean isWordSearchEnabled(final Class<? extends PersistentObject> entityClass) {
-        if (entityClass == null) {
-            return false;
-        }
-        for (final Class<? extends PersistentObject> exclusion : wordSearchExclusionMappings) {
-            if (exclusion.isAssignableFrom(entityClass)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 }
