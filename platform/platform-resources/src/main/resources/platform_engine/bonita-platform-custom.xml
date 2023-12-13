@@ -3,29 +3,4 @@
 
     <!-- ADD ANY BEAN DEFINITION YOU WANT TO BE AVAILABLE TO THE PLATFORM ACCESSOR -->
 
-    <!--
-    <bean id="platformWordSearchExclusionMappings" parent="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
-        <property name="targetSetClass">
-            <value>java.util.HashSet</value>
-        </property>
-        <property name="sourceSet">
-            <list merge="true">
-                <value>org.bonitasoft.engine.identity.model.SUser</value>
-            </list>
-        </property>
-    </bean>
-    -->
-
-    <!--
-    <bean id="tenantWordSearchExclusionMappings" parent="defaultTenantWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
-        <property name="targetSetClass">
-            <value>java.util.HashSet</value>
-        </property>
-        <property name="sourceSet">
-            <list merge="true">
-                <value>org.bonitasoft.engine.identity.model.SUser</value>
-            </list>
-        </property>
-    </bean>
-    -->
 </beans>

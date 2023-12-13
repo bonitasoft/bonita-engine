@@ -1023,56 +1023,12 @@
         </property>
     </bean>
 
-    <bean id="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
-        <property name="targetSetClass">
-            <value>java.util.HashSet</value>
-        </property>
-        <property name="sourceSet">
-            <list>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="platformWordSearchExclusionMappings" parent="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
-        <property name="targetSetClass">
-            <value>java.util.HashSet</value>
-        </property>
-        <property name="sourceSet">
-            <list merge="true">
-                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
-            </list>
-        </property>
-    </bean>
-
     <bean id="queryBuilderFactory" class="org.bonitasoft.engine.persistence.QueryBuilderFactory">
         <constructor-arg name="orderByCheckingMode" value="${sysprop.bonita.orderby.checking.mode:NONE}" />
         <constructor-arg name="classAliasMappings">
             <bean factory-bean="hbmConfigurationProvider" factory-method="getClassAliasMappings" />
         </constructor-arg>
         <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.tenant.likeEscapeCharacter}" />
-        <constructor-arg name="wordSearchExclusionMappings" ref="tenantWordSearchExclusionMappings" />
-    </bean>
-
-    <bean id="defaultTenantWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
-        <property name="targetSetClass">
-            <value>java.util.HashSet</value>
-        </property>
-        <property name="sourceSet">
-            <list>
-
-            </list>
-        </property>
-    </bean>
-
-    <bean id="tenantWordSearchExclusionMappings" parent="defaultTenantWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
-        <property name="targetSetClass">
-            <value>java.util.HashSet</value>
-        </property>
-        <property name="sourceSet">
-            <list merge="true">
-                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
-            </list>
-        </property>
     </bean>
 
     <bean id="hbmConfigurationProviderProperties" parent="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
