@@ -11,28 +11,23 @@ jobs:
     steps:
       - name: ↙️ Checkout project sources
         uses: actions/checkout@v4
-      #        with:
-      #          sparse-checkout: '.'
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+
       - name: 🔧 Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
           cache-read-only: false
+
       - name: ⚙️ Run Community build & ✔️ unit tests
         run: ./gradlew build
+
       - name: 🚀 Publish Test Report
-        uses: mikepenz/action-junit-report@v4
-        if: success() || failure() # always run even if the previous step fails
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
         with:
-          report_paths: '**/build/test-results/**/*.xml'
-          detailed_summary: true
+          files: '**/build/test-results/**/*.xml'
