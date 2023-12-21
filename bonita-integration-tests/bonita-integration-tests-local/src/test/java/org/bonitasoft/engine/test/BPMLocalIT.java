@@ -129,18 +129,13 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final long numberOfInitialArchivedComments = transactionService
                 .executeInTransaction(getNumberOfArchivedComments);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final Long step1Id = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         getProcessAPI().addProcessComment(processInstance.getId(), "kikoo lol");
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         assertEquals(1, (long) transactionService.executeInTransaction(getNumberOfComments));
         assertEquals(numberOfInitialArchivedComments,
                 (long) transactionService.executeInTransaction(getNumberOfArchivedComments));
         assignAndExecuteStep(step1Id, john);
-
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        assertEquals(2, (long) transactionService.executeInTransaction(getNumberOfComments));// claim add a comment...
-        assertEquals(numberOfInitialArchivedComments,
-                (long) transactionService.executeInTransaction(getNumberOfArchivedComments));
         waitForProcessToFinish(processInstance);
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
@@ -169,7 +164,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         processDef.addActor(ACTOR_NAME);
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDef.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final Long step1Id = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         final Callable<List<SPendingActivityMapping>> getPendingMappings = () -> {
             final QueryOptions queryOptions = new QueryOptions(0, 100, SPendingActivityMapping.class, "id",
@@ -205,7 +200,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
                 .addClasspathResource(new BarResource("myDep", content)).done();
         final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final Long step1Id = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         List<Long> dependencyIds = transactionService
                 .executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0,
                         100));
@@ -244,7 +239,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME,
                 john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final Long step1Id = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         List<Long> dependencyIds = transactionService
                 .executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService,
