@@ -646,7 +646,7 @@
             </set>
         </constructor-arg>
         <constructor-arg name="sequenceId" value="5" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10500:${bonita.platform.sequence.defaultRangeSize}}" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.5:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
 
     <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
