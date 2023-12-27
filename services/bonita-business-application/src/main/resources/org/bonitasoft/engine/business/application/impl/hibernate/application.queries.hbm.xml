@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+    <query name="getApplicationByToken">
+        SELECT application
+        FROM org.bonitasoft.engine.business.application.model.SApplication AS application
+        WHERE token = :token
+    </query>
+
+    <query name="getNumberOfSApplication">
+        SELECT count(application.id)
+        FROM org.bonitasoft.engine.business.application.model.SApplication AS application
+    </query>
+
+    <query name="getNumberOfSApplicationOfUser">
+        SELECT count(DISTINCT application.id)
+        FROM org.bonitasoft.engine.business.application.model.SApplication AS application, org.bonitasoft.engine.profile.model.SProfileMember as profileMember
+        WHERE application.profileId = profileMember.profileId
+        AND (
+            profileMember.userId = :userId
+            OR profileMember.id IN (
+                SELECT profileMember.id
+                FROM org.bonitasoft.engine.profile.model.SProfileMember AS profileMember, org.bonitasoft.engine.identity.model.SUserMembership AS userMember
+                WHERE userMember.userId = :userId
+                AND ((profileMember.groupId = userMember.groupId AND profileMember.roleId &lt;= 0)
+                    OR (profileMember.roleId = userMember.roleId AND profileMember.groupId &lt;= 0)
+                    OR (profileMember.groupId = userMember.groupId AND profileMember.roleId = userMember.roleId)
+                )
+            )
+        )
+    </query>
+
+    <query name="searchSApplication">
+        SELECT application
+        FROM org.bonitasoft.engine.business.application.model.SApplication AS application
+    </query>
+
+    <query name="searchSApplicationOfUser">
+        SELECT DISTINCT application
+        FROM org.bonitasoft.engine.business.application.model.SApplication AS application, org.bonitasoft.engine.profile.model.SProfileMember as profileMember
+        WHERE application.profileId = profileMember.profileId
+        AND (
+            profileMember.userId = :userId
+            OR profileMember.id IN (
+                SELECT profileMember.id
+                FROM org.bonitasoft.engine.profile.model.SProfileMember AS profileMember, org.bonitasoft.engine.identity.model.SUserMembership AS userMember
+                WHERE userMember.userId = :userId
+                AND ((profileMember.groupId = userMember.groupId AND profileMember.roleId &lt;= 0)
+                    OR (profileMember.roleId = userMember.roleId AND profileMember.groupId &lt;= 0)
+                    OR (profileMember.groupId = userMember.groupId AND profileMember.roleId = userMember.roleId)
+                )
+            )
+        )
+    </query>
+
+    <query name="getApplicationPageById">
+        SELECT applicationPage
+        FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage
+        WHERE id = :id
+    </query>
+
+    <query name="getApplicationPageByTokenAndApplicationToken">
+        SELECT applicationPage
+        FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage, org.bonitasoft.engine.business.application.model.SApplication as application
+        WHERE applicationPage.applicationId = application.id
+        AND applicationPage.token = :applicationPageToken
+        AND application.token = :applicationToken
+    </query>
+
+    <query name="getApplicationPageByTokenAndApplicationId">
+        SELECT applicationPage
+        FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage
+        WHERE applicationPage.applicationId = :applicationId
+        AND applicationPage.token = :applicationPageToken
+    </query>
+
+    <query name="getApplicationHomePage">
+        SELECT applicationPage
+        FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage, org.bonitasoft.engine.business.application.model.SApplication as application
+        WHERE applicationPage.id = application.homePageId
+        AND applicationPage.applicationId = application.id
+        AND application.id = :applicationId
+    </query>
+
+    <query name="getNumberOfSApplicationPage">
+        SELECT count(applicationPage.id)
+        FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage
+    </query>
+
+    <query name="searchSApplicationPage">
+        SELECT applicationPage
+        FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage
+    </query>
+
+    <query name="getApplicationMenuById">
+        SELECT applicationMenu
+        FROM org.bonitasoft.engine.business.application.model.SApplicationMenu as applicationMenu
+        WHERE id = :id
+    </query>
+
+    <query name="getNumberOfSApplicationMenu">
+        SELECT count(applicationMenu.id)
+        FROM org.bonitasoft.engine.business.application.model.SApplicationMenu as applicationMenu
+    </query>
+
+    <query name="searchSApplicationMenu">
+        SELECT applicationMenu
+        FROM org.bonitasoft.engine.business.application.model.SApplicationMenu as applicationMenu
+    </query>
+
+    <query name="getLastIndexForRootMenu">
+        SELECT max(applicationMenu.index)
+        FROM org.bonitasoft.engine.business.application.model.SApplicationMenu as applicationMenu
+        WHERE parentId is null
+    </query>
+
+    <query name="getLastIndexForChildOf">
+        SELECT max(applicationMenu.index)
+        FROM org.bonitasoft.engine.business.application.model.SApplicationMenu as applicationMenu
+        WHERE parentId = :parentId
+    </query>
+
+
+    <query name="getAllPagesForProfile">
+        SELECT DISTINCT page.name
+        FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage,
+        org.bonitasoft.engine.business.application.model.SApplication as application,
+        org.bonitasoft.engine.page.SPage as page
+        WHERE application.profileId = :profileId
+        AND (
+        application.layoutId = page.id
+        OR
+        application.themeId = page.id
+        OR (
+        applicationPage.applicationId = application.id
+        AND applicationPage.pageId = page.id
+        )
+        )
+
+        ORDER BY page.name
+    </query>
+    <query name="getAllPagesForProfileName">
+        SELECT DISTINCT page.name
+        FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage,
+        org.bonitasoft.engine.business.application.model.SApplication as application,
+        org.bonitasoft.engine.page.SPage as page,
+        org.bonitasoft.engine.profile.model.SProfile as profile
+        WHERE
+        profile.name = :profileName
+        AND application.profileId = profile.id
+        AND ( application.layoutId = page.id
+        OR application.themeId = page.id
+        OR ( applicationPage.applicationId = application.id AND applicationPage.pageId = page.id )
+        )
+
+        ORDER BY page.name
+    </query>
+
+</hibernate-mapping>

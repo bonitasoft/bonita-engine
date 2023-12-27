@@ -1,0 +1,29 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
+dependencies {
+    api "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
+    api(project(":bpm:bonita-client"))
+    api(project(":bpm:bonita-common"))
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+}
+
+group = 'org.bonitasoft.web'
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom { pom ->
+                name = 'Bonita Web Extensions'
+                description = 'Provide API to develop custom web extensions like pages and rest apis'
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

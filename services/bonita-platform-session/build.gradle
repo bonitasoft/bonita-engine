@@ -1,0 +1,6 @@
+
+
+dependencies {
+    api project(':services:bonita-commons')
+    api project(':services:bonita-builder')
+}

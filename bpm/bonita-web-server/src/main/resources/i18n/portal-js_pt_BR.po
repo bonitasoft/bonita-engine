@@ -1,0 +1,1228 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Project-Id-Version: bonita\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: bonita\n"
+"X-Crowdin-Project-ID: 13316\n"
+"X-Crowdin-Language: pt-BR\n"
+"X-Crowdin-File: /dev/bonita-web/portal/portal-js.pot\n"
+"X-Crowdin-File-ID: 60594\n"
+"Language-Team: Portuguese, Brazilian\n"
+"Language: pt_BR\n"
+"PO-Revision-Date: 2023-10-24 01:28\n"
+
+msgid "1 case has been deleted"
+msgstr "1 caso foi excluído"
+
+msgid "A page with this name already exists."
+msgstr "Já existe uma página com esse nome."
+
+msgid "A server error occurred. The operation did not complete successfully"
+msgstr "Ocorreu um erro de servidor. A operação não foi concluída com sucesso"
+
+msgid "Above normal"
+msgstr "Acima do nomal"
+
+msgid "Access denied. For more information, check the log file."
+msgstr "Acesso negado. Para mais informações, verifique o arquivo de log."
+
+msgid "Actions"
+msgstr "Ações"
+
+msgid "Activation state"
+msgstr "Estado de ativação"
+
+msgid "Actor name"
+msgstr "Nome do ator"
+
+msgid "Actors"
+msgstr "Atores"
+
+msgid "Actors must be resolved before enabling the Process."
+msgstr "Os atores devem ser resolvidos antes de ativar o processo."
+
+msgid "Add"
+msgstr "Adicionar"
+
+msgid "Add from custom pages"
+msgstr "Adicionar a partir de páginas personalizadas"
+
+msgid "Add membership"
+msgstr "Adicionar membros"
+
+msgid "Add menu"
+msgstr "Adicionar menu"
+
+msgid "Add menu item"
+msgstr "Adicionar item de menu"
+
+msgid "Add page"
+msgstr "Acionar página"
+
+msgid "Add pages in Navigation"
+msgstr "Acione as páginas de navegação"
+
+msgid "Add top-level menu"
+msgstr "Adicionar menu de nível superior"
+
+msgid "Adding on apply"
+msgstr "Adicionando em aplicar"
+
+msgid "Address"
+msgstr "Endereço"
+
+msgid "All"
+msgstr "Todos"
+
+msgid "All done. Good job!"
+msgstr "Tudo feito. Bom trabalho!"
+
+msgid "An Error occurred during process activation/deactivation."
+msgstr "Ocorreu um erro durante a ativação/desativação do processo"
+
+msgid "An Error occurred during process deletion."
+msgstr "Ocorreu um erro durante o processo de deleção."
+
+msgid "An application is a customized environment for a specific user profile, in which users interact with business data and business processes in the most efficient way."
+msgstr "Uma aplicação é um ambiente personalizado para um perfil específico, no qual usuários interagem com dados e processos de negócios de maneira mais eficaz."
+
+msgid "An error has occurred. For more information, check the log file."
+msgstr "Ocorreu um erro. Para mais informações, verifique o arquivo de log."
+
+msgid "An error occured during categories update"
+msgstr "Ocorreu um erro durante a atualização de categorias"
+
+msgid "An error occurred when deploying the BDM. Consult the logs for more information."
+msgstr "Ocorreu um erro ao implantar o BDM. Consulte as logs para mais informações."
+
+msgid "An error occurred while submitting the form."
+msgstr "Ocorreu um erro ao enviar o formulário."
+
+msgid "An error occurred while submitting the form.<br/>The task may not be available anymore."
+msgstr "Ocorreu um erro ao enviar o formulário. <br/> A tarefa pode não estar disponível mais."
+
+msgid "An error occurred with the requested operation."
+msgstr "Ocorreu um erro com a operação solicitada"
+
+msgid "Application XML file"
+msgstr "Arquivo XML do aplicativo"
+
+msgid "Application id not provided. Unable to retrieve the application details."
+msgstr "ID da aplicação não fornecida. Não foi possível recuperar os detalhes do aplicativo."
+
+msgid "Application list"
+msgstr "Lista de aplicativos"
+
+msgid "Apply"
+msgstr "Aplicar"
+
+msgid "Archived cases"
+msgstr "Instâncias arquivadas"
+
+msgid "Are you sure you want to delete it?"
+msgstr "Tem certeza que deseja excluir "
+
+msgid "Are you sure you want to delete this membership ?"
+msgstr "Tem certeza que deseja excluir este membro?"
+
+msgid "Assign to me. Only I will be able to do it"
+msgstr "Atribua a mim. Só eu serei capaz de fazê-lo"
+
+msgid "Assigned on"
+msgstr "Atribuído para"
+
+msgid "Available or My tasks"
+msgstr "Disponível ou minhas tarefas"
+
+msgid "BDM access control file can now be installed."
+msgstr "Arquivo de controle de acesso BDM agora pode ser instalado."
+
+msgid "BDM file"
+msgstr "Arquivo do BDM"
+
+msgid "BDM has not been uploaded. System was not able to upload the provided BDM file for technical reasons. You can try again later."
+msgstr "BDM não foi carregado. Sistema não foi capaz de fazer upload de arquivo BDM fornecido por razões técnicas. Você pode tentar novamente mais tarde."
+
+msgid "BDM successfully updated."
+msgstr "Arquivo BDM atualizado com sucesso."
+
+msgid "Back"
+msgstr "Voltar"
+
+msgid "Before updating the BDM, access control file should be deleted."
+msgstr "Antes de atualizar o BDM, arquivo de controle de acesso deve ser excluído."
+
+msgid "Before you import the application descriptor, the pages and the profile must already be loaded in the Portal."
+msgstr "Antes de importar o descritor de aplicativos, as páginas e o perfil devem já ser carregados no Portal."
+
+msgid "Business Data Model definition"
+msgstr "Definição de modelo de dados de negócios"
+
+msgid "Business card"
+msgstr "Cartão de visita"
+
+msgid "Business card has not been updated. Please retry later or contact an administrator"
+msgstr "Cartão de visita não foi atualizado. Por favor, tente novamente mais tarde ou entre em contato com o administrador"
+
+msgid "Business card successfully updated"
+msgstr "Cartão de crédito atualizado com sucesso"
+
+msgid "Can't import page or form to the process"
+msgstr "Não foi possível importar a página ou formulário no processo"
+
+msgid "Can't update expression content"
+msgstr "Não foi possível atualizar o conteúdo da expressão"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Cancelled, skipped instances"
+msgstr "Instâncias canceladas, ignoradas"
+
+msgid "Cannot upload the file"
+msgstr "Não foi possível carregar o arquivo"
+
+msgid "Case"
+msgstr "Instância de processo"
+
+msgid "Case ID"
+msgstr "ID do processo"
+
+msgid "Case comments"
+msgstr "Comentários da instância"
+
+msgid "Case id: {{caseId}} - Process: {{processName}} ({{processVersion}})"
+msgstr "Caso: {{caseId}} - Processo: {{processName}} ({{processVersion}})"
+
+msgid "Case overview"
+msgstr "Visão geral do caso"
+
+msgid "Case start"
+msgstr "Iniciar Instância"
+
+msgid "Cases with failures"
+msgstr "Casos com erros"
+
+msgid "Categories"
+msgstr "Categorias"
+
+msgid "Check that each entity is mapped to a profile, for either Bonita Portal or for applications you have created."
+msgstr "Verifique que cada entidade é mapeada para um perfil, para qualquer Portal Bonita ou para aplicativos que você tenha criado."
+
+msgid "City"
+msgstr "Cidade"
+
+msgid "Class name"
+msgstr "Nome da classe"
+
+msgid "Click here to choose the .xml file"
+msgstr "Clique aqui para escolher o arquivo .xml"
+
+msgid "Click here to choose your .zip file"
+msgstr "Clique aqui para escolher o arquivo .zip"
+
+msgid "Click on Cancel to remain on this page and try to execute the operation again once you logged back in (e.g. in another tab)."
+msgstr "Clique em Cancelar para permanecer nesta página e tente executar a operação novamente depois de fazer login novamente (por exemplo, em outra guia).\n"
+""
+
+msgid "Click on Cancel to remain on this page and wait for the maintenance to end."
+msgstr "Clique em Cancelar para permanecer nesta página e aguardar o término da manutenção."
+
+msgid "Click on OK to be redirected and log back in."
+msgstr "Clique em OK para ser redirecionado e faça login novamente."
+
+msgid "Click on OK to be redirected to the maintenance page."
+msgstr "Clique em OK para ser redirecionado para a página de manutenção."
+
+msgid "Close"
+msgstr "Fechar"
+
+msgid "Columns selection"
+msgstr "Seleção de colunas"
+
+msgid "Comment:"
+msgstr "Comentário:"
+
+msgid "Comments"
+msgstr "Comentários"
+
+msgid "Compilation failure. Verify that the Index.groovy class implements the PageController interface."
+msgstr "Erro de compilação. Verifique se a classe Index.groovy implementa a interface PageController."
+
+msgid "Completed instances"
+msgstr "Instâncias concluídas"
+
+msgid "Configuration state"
+msgstr "Estado da configuração"
+
+msgid "Confirm new Password"
+msgstr "Confirmar nova senha"
+
+msgid "Connectors"
+msgstr "Conectores"
+
+msgid "Connectors must be resolved before enabling the Process."
+msgstr "Conectores devem ser resolvidos antes de ativar o processo."
+
+msgid "Core to Bonita platform"
+msgstr "Núcleo da plataforma Bonita BPM"
+
+msgid "Core to Bonita platform; cannot be deleted"
+msgstr "O núcleo da plataforma Bonita, não pode ser excluído"
+
+msgid "Country"
+msgstr "País"
+
+msgid "Create a new membership"
+msgstr "Criar uma nova associação"
+
+msgid "Create an application"
+msgstr "Criar uma aplicação"
+
+msgid "Created by"
+msgstr "Criado por"
+
+msgid "Creation"
+msgstr "Criação"
+
+msgid "Creation date"
+msgstr "Data de criação"
+
+msgid "Creation on"
+msgstr "Criada em"
+
+msgid "Custom information"
+msgstr "Informação Personalizada"
+
+msgid "Custom information has not been updated. Please retry later or contact an administrator"
+msgstr "Informação personalizada não foi atualizada. Por favor, tente novamente mais tarde ou entre em contato com o administrador"
+
+msgid "Custom information successfully updated"
+msgstr "Informações personalizadas atualizadas com sucesso"
+
+msgid "Delete"
+msgstr "Excluir"
+
+msgid "Delete application"
+msgstr "Excluir aplicação"
+
+msgid "Delete membership"
+msgstr "Apagar membro"
+
+msgid "Delete process"
+msgstr "Excluir processo"
+
+msgid "Deleting a process definition will also delete all open and archived cases of this process."
+msgstr "Excluir uma definição de processo também irá apagar todos os casos abertos e arquivados deste processo."
+
+msgid "Description"
+msgstr "Descrição"
+
+msgid "Disable"
+msgstr "Desativar"
+
+msgid "Display name"
+msgstr "Nome de exibição"
+
+msgid "Done tasks"
+msgstr "Tarefas arquivadas"
+
+msgid "Drawing process..."
+msgstr "Desenhando o processo..."
+
+msgid "Due date"
+msgstr "Prazo final"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Edit menu"
+msgstr "Editar menu"
+
+msgid "Edit menu item"
+msgstr "Editar item de menu"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Enable"
+msgstr "Ativar"
+
+msgid "Enable all"
+msgstr "Ativar Tudo"
+
+msgid "Enter a new category name and click \"Add\" button to create a new category."
+msgstr "Insira um novo nome de categoria e clique no botão \"Adicionar\" para criar uma nova categoria."
+
+msgid "Enter the user to start the case for..."
+msgstr "Digite o usuário para o qual o caso será iniciado..."
+
+msgid "Error"
+msgstr "Erro"
+
+msgid "Error on drawing process!"
+msgstr "Erro ao desenhar o processo!"
+
+msgid "Error while trying to start the case. Some required information is missing (contract not fulfilled)."
+msgstr "Erro ao tentar iniciar o caso. Algumas informações necessárias estão faltando (contrato não cumprido)."
+
+msgid "Error!"
+msgstr "Erro!"
+
+msgid "Error: value must be a boolean"
+msgstr "Erro: o valor deve ser um booleano"
+
+msgid "Error: value must be a double"
+msgstr "Erro: o valor deve ser um double"
+
+msgid "Error: value must be an integer"
+msgstr "Erro: o valor deve ser um número inteiro"
+
+msgid "Executing, completing, initializing instances"
+msgstr "Executando, terminando, inicializando instâncias"
+
+msgid "Export"
+msgstr "Exportar"
+
+msgid "Export application descriptor"
+msgstr "Descritor de aplicativos de exportação"
+
+msgid "Expression content has been updated"
+msgstr "O conteúdo da expressão foi atualizado"
+
+msgid "Failed instances"
+msgstr "Instâncias em erro"
+
+msgid "File format may be invalid. For more information, check the log file."
+msgstr "O formato do arquivo pode ser inválido. Para mais informações, verifique o arquivo de log."
+
+msgid "Filename too long. The zip filename must be no longer than 50 characters"
+msgstr "O nome do arquivo muito grande. O nome do arquivo zip não deve exceder 50 caracteres"
+
+msgid "Filters"
+msgstr "Filtro"
+
+msgid "First name"
+msgstr "Primeiro nome"
+
+msgid "Form"
+msgstr "Formulário"
+
+msgid "Form submitted.<br/>The next task in the list is now selected."
+msgstr "Formulário enviado. <br/> A próxima tarefa na lista agora está selecionada."
+
+msgid "General"
+msgstr "Geral"
+
+msgid "General information"
+msgstr "Informações gerais"
+
+msgid "General information has not been updated. Please retry later or contact an administrator"
+msgstr "Informação gerais não foram atualizadas. Por favor, tente novamente mais tarde ou entre em contato com o administrador"
+
+msgid "General information successfully updated"
+msgstr "Informações gerais atualizadas com sucesso"
+
+msgid "Groups"
+msgstr "Grupos"
+
+msgid "Healthy cases"
+msgstr "Casos saudáveis"
+
+msgid "Hide Menu"
+msgstr "Esconder Menu"
+
+msgid "Hide menu"
+msgstr "Ocultar Menu"
+
+msgid "Hide panel"
+msgstr "Ocultar Painel"
+
+msgid "Highest"
+msgstr "Mais alto"
+
+msgid "However, due to the use of Hibernate for data persistence, some changes on the data may not be well handled. These changes may lead to a corrupted database and CANNOT BE REVERTED."
+msgstr "No entanto, devido ao uso da Hibernate para a persistência de dados, algumas alterações nos dados podem não ser bem tratadas. Essas alterações podem levar a uma base de dados corrompida e NÃO PODEM SER REVERTIDAS."
+
+msgid "I have read and understood the previous warning message. I have prepared a database backup so I can rollback this operation."
+msgstr "Eu li e entendi a mensagem de aviso anterior. Eu preparei um backup de banco de dados para poder reverter esta operação."
+
+msgid "IN ANY CASE, you MUST CREATE A BACKUP of the current BDM database before undergoing a BDM update."
+msgstr "EM QUALQUER CASE, você DEVE CRIAR UM BACKUP da base de dados BDM atual antes de passar por uma atualização BDM."
+
+msgid "If your changes do not fall into those change types, you can go ahead and proceed with the BDM update now."
+msgstr "Se suas mudanças não caírem nesses tipos de mudança, você pode prosseguir e prosseguir com a atualização BDM agora."
+
+msgid "Implementation version"
+msgstr "Versão de implementação"
+
+msgid "Import"
+msgstr "Importar"
+
+msgid "Import an application"
+msgstr "Importar uma aplicação"
+
+msgid "Import an application descriptor"
+msgstr "Importar um descritor de aplicação"
+
+msgid "In a production environment, this should be used with caution."
+msgstr "Num ambiente de produção, isto deve ser utilizado com prudência."
+
+msgid "In such cases, you must CANCEL THIS UPDATE and let the database administrator carefully script the changes and apply them to the database. Only then will you be able to update the BDM from this page."
+msgstr "Nesses casos, você deve CANCELAR ESTE UPDATE e permitir que o administrador da base de dados escreva cuidadosamente as alterações e as aplique ao banco de dados. Somente então você poderá atualizar o BDM a partir desta página."
+
+msgid "In task name column"
+msgstr "Na coluna nome da tarefa"
+
+msgid "In the menu <i>Organization > Manage</i>, go to the <i>Users</i> page of the wizard"
+msgstr "No menu <i>Organização > Gerenciar</i>, vá para a página <i>Usuários</i> do assistente"
+
+msgid "Install"
+msgstr "Instalar"
+
+msgid "Install Business Data Model"
+msgstr "Instalar o Modelo de Dados de Negócio"
+
+msgid "Install a BDM file"
+msgstr "Instalar um arquivo BDM"
+
+msgid "Installed"
+msgstr "Instalado"
+
+msgid "Installed by"
+msgstr "Instalado por"
+
+msgid "Installed on"
+msgstr "Instalado em"
+
+msgid "Installing"
+msgstr "Instalando"
+
+msgid "Installing Business Data Model"
+msgstr "Instalando o Modelo de Dados de Negócios"
+
+msgid "Installing or updating the BDM implies to be logged in as Technical User, and to activate the maintenance mode."
+msgstr "Instalar ou atualizar o BDM implica estar logado como Usuário Técnico e ativar o modo de manutenção."
+
+msgid "Items per page"
+msgstr "Itens por página"
+
+msgid "Job title"
+msgstr "Título do trabalho"
+
+msgid "Last login"
+msgstr "Último Acesso"
+
+msgid "Last name"
+msgstr "Sobrenome"
+
+msgid "Last update"
+msgstr "Última atualização"
+
+msgid "Layout"
+msgstr "Layout"
+
+msgid "Loading..."
+msgstr "Carregando..."
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "Look & Feel"
+msgstr "Aparência"
+
+msgid "Lowest"
+msgstr "Mais baixo"
+
+msgid "MM/dd/yyyy h:mm a"
+msgstr "MM/dd/yyyy hh:mm a"
+
+msgid "MMM DD LT"
+msgstr "MMM DD LT"
+
+msgid "Make sure all artifacts enabled on the platform are compatible with the new BDM."
+msgstr "Certifique-se de todos os artefatos habilitados na plataforma são compatíveis com o novo BDM."
+
+msgid "Make sure to deactivate the maintenance mode."
+msgstr "Certifique-se de desativar o modo de manutenção."
+
+msgid "Make this task available to other team members again"
+msgstr "Disponibilizar esta tarefa para outros membros da equipe novamente"
+
+msgid "Make this task personal: only I will be able to do it"
+msgstr "Tornar esta tarefa pessoal: somente você poderá fazer"
+
+msgid "Manage Categories"
+msgstr "Gerenciar categorias"
+
+msgid "Manager"
+msgstr "Gerente"
+
+msgid "Mapped categories"
+msgstr "Categoria mapeada"
+
+msgid "Maximum size 255 characters"
+msgstr "Tamanho máximo 255 caracteres"
+
+msgid "Membership has not been added. Please retry later or contact an administrator"
+msgstr "Membros não foram atualizados. Por favor, tente novamente mais tarde ou entre em contato com o administrador"
+
+msgid "Membership has not been removed. Please retry later or contact an administrator"
+msgstr "Membros não foram removidos. Por favor, tente novamente mais tarde ou entre em contato com o administrador"
+
+msgid "Membership successfully added"
+msgstr "Membros foram adicionados com sucesso"
+
+msgid "Membership successfully removed"
+msgstr "Membro removido com sucesso"
+
+msgid "Memberships"
+msgstr "Associação"
+
+msgid "Memberships mapped to {}"
+msgstr "Associações mapeadas para {}"
+
+msgid "Mobile"
+msgstr "Celular"
+
+msgid "Monitoring status"
+msgstr "Status do monitoramento"
+
+msgid "Multi-page menu"
+msgstr "Grupo de menus"
+
+msgid "My tasks"
+msgstr "Minhas tarefas"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "Navigation"
+msgstr "Navegação"
+
+msgid "New"
+msgstr "Novo"
+
+msgid "New Password"
+msgstr "Nova Senha"
+
+msgid "New comment"
+msgstr "Novos comentários"
+
+msgid "No application available."
+msgstr "Nenhuma aplicação disponível."
+
+msgid "No application found with id:"
+msgstr "Nenhum aplicativo encontrado com o ID:"
+
+msgid "No comment on this case yet. To add one, use the input field at the bottom of this panel"
+msgstr "Nenhum comentário sobre este caso ainda. Para adicionar um, use o campo de entrada na parte inferior deste painel"
+
+msgid "No custom information defined."
+msgstr "Sem informação customizada definida."
+
+msgid "No data"
+msgstr "Não há dados"
+
+msgid "No description."
+msgstr "Nenhuma descrição."
+
+msgid "No done task yet."
+msgstr "Ainda não acabou a tarefa."
+
+msgid "No form is needed. You can enter a comment and confirm."
+msgstr "Nenhum formulário é necessário. Você pode inserir um comentário e confirmar."
+
+msgid "No mapping"
+msgstr "Nenhum mapeamento"
+
+msgid "No process found with id:"
+msgstr "Nenhum processo encontrado com o ID:"
+
+msgid "No profile"
+msgstr "Sem perfis"
+
+msgid "No profile mapped to this application"
+msgstr "Sem perfil mapeado para esta aplicação"
+
+msgid "No updates have been made on categories. For more details, check logs."
+msgstr "Nenhuma atualização foi feita nas categorias. Para mais detalhes, verifique os logs."
+
+msgid "No user found with id:"
+msgstr "Nenhum usuário encontrado com o ID:"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "Not installed"
+msgstr "Não Instalado"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "One or more tasks are not available anymore. The list is now up to date."
+msgstr "Uma ou mais tarefas não estão mais disponíveis. A lista agora esta atualizada."
+
+msgid "One-page menu"
+msgstr "Menu de uma página"
+
+msgid "Only I can do this task"
+msgstr "Só eu posso fazer essa tarefa"
+
+msgid "Only available when the platform is under maintenance. Go to the \"Platform maintenance\" page to activate the maintenance mode."
+msgstr "Apenas disponível quando a plataforma estiver em manutenção. Vá para a página de \"Manutenção da plataforma\" para ativar o modo de manutenção."
+
+msgid "Only one Business Data Model (BDM) can be active at a time."
+msgstr "Somente um Modelo de Dados de Negócios (BDM) pode ser ativado no momento."
+
+msgid "Open cases"
+msgstr "Instâncias Abertas"
+
+msgid "Open in a popup"
+msgstr "Aberto em um pop-up"
+
+msgid "Open the task to perform it"
+msgstr "Abra a tarefa para executá-lo"
+
+msgid "Overview"
+msgstr "Visão geral"
+
+msgid "Page"
+msgstr "Página"
+
+msgid "Pages"
+msgstr "Páginas"
+
+msgid "Parameters"
+msgstr "Parâmetro"
+
+msgid "Parameters must be resolved before enabling the Process."
+msgstr "Os parâmetros devem ser resolvidos antes de ativar o processo."
+
+msgid "Password"
+msgstr "Senha"
+
+msgid "Password has not been updated. Please retry later or contact an administrator"
+msgstr "Senha não foi atualizada. Por favor tente mais tarde ou contate um administrador"
+
+msgid "Password successfully updated"
+msgstr "Senha atualizada com sucesso"
+
+msgid "Passwords don't match"
+msgstr "Senhas não coincidem"
+
+msgid "Personal information"
+msgstr "Informações pessoais"
+
+msgid "Personal information has not been updated. Please retry later or contact an administrator"
+msgstr "Informações pessoais não foram atualizadas. Por favor tente mais tarde ou contate um administrador"
+
+msgid "Personal information successfully updated"
+msgstr "Informações pessoais atualizadas com sucesso"
+
+msgid "Phone"
+msgstr "Telefone"
+
+msgid "Please refresh the page."
+msgstr "Por favor, atualize a página."
+
+msgid "Priority"
+msgstr "Prioridade"
+
+msgid "Process"
+msgstr "Processo"
+
+msgid "Process id"
+msgstr "Id do processo"
+
+msgid "Process id not provided. Unable to retrieve the process details."
+msgstr "ID do processo não fornecido. Não foi possível recuperar os detalhes do processo."
+
+msgid "Process name"
+msgstr "Nome do Processo"
+
+msgid "Process:"
+msgstr "Processo:"
+
+msgid "Profile"
+msgstr "Perfil"
+
+msgid "Profiles"
+msgstr "Perfis"
+
+msgid "Profiles / Memberships"
+msgstr "Perfis / Membros"
+
+msgid "Ready, waiting instances"
+msgstr "Instâncias prontas, ou em espera"
+
+msgid "Refresh data"
+msgstr "Atualizar dados"
+
+msgid "Release"
+msgstr "Liberar"
+
+msgid "Remove"
+msgstr "Remover"
+
+msgid "Remove all"
+msgstr "Remover tudo"
+
+msgid "Removing on apply"
+msgstr "Removendo em aplicar"
+
+msgid "Reset"
+msgstr "Restaurar"
+
+msgid "Reset to default"
+msgstr "Redefinir para padrão"
+
+msgid "Roles"
+msgstr "Funções"
+
+msgid "Save"
+msgstr "Salvar"
+
+msgid "Search..."
+msgstr "Pesquisar..."
+
+msgid "Select a group..."
+msgstr "Selecione um grupo..."
+
+msgid "Select a role..."
+msgstr "Selecione uma função..."
+
+msgid "Select all"
+msgstr "Selecionar todos"
+
+msgid "Select groups..."
+msgstr "Selecione grupos..."
+
+msgid "Select none"
+msgstr "Desmarcar tudo"
+
+msgid "Select roles..."
+msgstr "Selecione funções..."
+
+msgid "Select the <i>User information management</i> tab to add <i>Custom information</i> on the right"
+msgstr "Selecione a aba <i>Gerenciamento de Informações de Usuários</i> para adicionar <i>Informações customizadas</i> na direita"
+
+msgid "Select the entities (users, groups, roles, memberships) to map to the actors. These entities will do the human tasks in the process."
+msgstr "Selecione as entidades (usuários, grupos, funções, associações) a serem mapeadas aos atores. Estas entidades realizarão as tarefas humanas da aplicação."
+
+msgid "Select the page"
+msgstr "Selecionar a página"
+
+msgid "Select users..."
+msgstr "Selecione usuários..."
+
+msgid "Server is under maintenance."
+msgstr "O servidor está em manutenção."
+
+msgid "Set as Home page"
+msgstr "Definir como página principal"
+
+msgid "Show Menu"
+msgstr "Mostrar Menu"
+
+msgid "Show all the tasks I can do: both personal tasks and tasks available to other team members"
+msgstr "Mostrar todas as tarefas que pode fazer: tanto pessoais, tarefas e tarefas disponíveis para outros membros da equipe"
+
+msgid "Show menu"
+msgstr "Mostrar menu"
+
+msgid "Show my personal tasks: the ones I took and the ones assigned to me, automatically or by a process manager"
+msgstr "Mostrar minhas tarefas pessoais: as que eu peguei e as que foram designadas para mim, automaticamente ou por um gerente de processo"
+
+msgid "Show panel"
+msgstr "Mostrar painel"
+
+msgid "Show the tasks that I have done"
+msgstr "Mostrar as tarefas que eu fiz"
+
+msgid "Something went wrong during the deletion. You might want to cancel and try again."
+msgstr "Algo deu errado durante a exclusão. Você pode cancelar e tentar de novo."
+
+msgid "Something went wrong during the modification. You might want to cancel and try again."
+msgstr "Algo deu errado durante a modificação. Talvez você queira cancelar e tentar novamente."
+
+msgid "Something went wrong. You might want to cancel and try again."
+msgstr "Algo deu errado. Talvez você queira cancelar e tentar novamente."
+
+msgid "Sort by URL"
+msgstr "Ordenar pela URL"
+
+msgid "Sort by name"
+msgstr "Ordenar por nome"
+
+msgid "Sort by updated on"
+msgstr "Ordenar pela data de atualização"
+
+msgid "Sort by version"
+msgstr "Ordenar por versão"
+
+msgid "Specify the menu structure."
+msgstr "Defina a estrutura do menu."
+
+msgid "State"
+msgstr "Estado"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Status of importation"
+msgstr "Status da importação"
+
+msgid "Still, you can customize its look & feel on this page. You can also update some of its pages in the Resources menu."
+msgstr "Ainda assim, você pode personalizar sua aparência nesta página. Você também pode atualizar algumas de suas páginas no menu Recursos."
+
+msgid "Submit"
+msgstr "Enviar"
+
+msgid "Successfully updated categories"
+msgstr "As categorias foram atualizadas com sucesso"
+
+msgid "Table settings"
+msgstr "Parâmetros da tabela"
+
+msgid "Take"
+msgstr "Pegar"
+
+msgid "Task Id"
+msgstr "Id da tarefa"
+
+msgid "Task form"
+msgstr "Formulário da tarefa"
+
+msgid "Task list"
+msgstr "Lista de tarefas"
+
+msgid "Task name"
+msgstr "Nome da tarefa"
+
+msgid "Technical User"
+msgstr "Usuário Técnico"
+
+msgid "Technical error."
+msgstr "Erro técnico."
+
+msgid "The BDM schema and data have been rolled-back to what they were before this update attempt."
+msgstr "O esquema e os dados BDM foram revertidos para o que eram antes desta tentativa de atualização."
+
+msgid "The application"
+msgstr "A aplicação"
+
+msgid "The application does not exist. Go to application list page to see the new list of applications."
+msgstr "O aplicativo não existe. Vá para a página da lista de aplicativos para ver a nova lista de aplicativos."
+
+msgid "The application does not exist. Reload the page to see the new list of applications."
+msgstr "A aplicação não existe. Recarregue a página para ver a nova lista de aplicações."
+
+msgid "The application page does not exist. Reload the page to see the new list of application pages."
+msgstr "A página da aplicação não existe. Recarregue a página para ver a nova lista de páginas da aplicação."
+
+msgid "The attachment is too big.<br/>Select a smaller attachment and submit the form again."
+msgstr "O anexo é muito grande. <br/> Selecione um anexo menor e envie novamente."
+
+msgid "The business data: [ {} ] uses Business Objects which are not defined in the current Business Data model. Deploy a compatible Business Data model before enabling the process."
+msgstr "O dado de negócio: [ {} ] usa Objetos de Negócio que não estão definidos no modelo de Dados de Negócio atual. Instale um modelo de Dados de Negócio compatível antes de ativar o processo."
+
+msgid "The case is archived. You cannot add comments anymore"
+msgstr "O instância esta arquivada. Não é possível adicionar comentários mais"
+
+msgid "The case {{caseId}} has been started successfully."
+msgstr "A instância {{caseId}} foi iniciada com êxito."
+
+msgid "The category cannot be removed and added at the same time."
+msgstr "Categoria não pode ser removida e adicionada ao mesmo tempo."
+
+msgid "The current process has no connectors defined."
+msgstr "O processo atual tem os conectores não definidos."
+
+msgid "The current process has no parameters defined."
+msgstr "O processo atual não tem parâmetros definidos."
+
+msgid "The file you are trying to upload has the wrong mime type"
+msgstr "O arquivo que você está tentando carregar tem um tipo errado de mime"
+
+msgid "The form mappings must be resolved before enabling the Process."
+msgstr "Os mapeamentos de formulário devem ser resolvidos antes de ativar o processo."
+
+msgid "The image you are trying to upload is too big"
+msgstr "A imagem que você está tentando enviar é muito grande"
+
+msgid "The item does not exist anymore. Refresh the page to see the new status"
+msgstr "O item não existe mais. Atualize a página para ver o novo status"
+
+msgid "The menu does not exist. Reload the page to see the new list of menus."
+msgstr "O menu não existe. Recarregue a página para ver a nova lista de menus."
+
+msgid "The name for the URL must start with custompage_ followed only by alphanumeric characters."
+msgstr "O nome da URL deve começar com custompage_ seguido somente por caracteres alfanuméricos."
+
+msgid "The task has been submitted but an error occurred while adding the comment"
+msgstr "A tarefa foi apresentada, mas ocorreu um erro ao adicionar o comentário"
+
+msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">here</a>."
+msgstr "A lista inteira de tais alterações é listada <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">aqui</a>."
+
+msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
+msgstr "As palavras 'conteúdo', 'API' e 'tema' são reservados para uso interno. Eles não devem ser usados em um aplicativo ou a URL da página."
+
+msgid "Theme"
+msgstr "Tema"
+
+msgid "Then for each user, fill out the custom information value, in the Studio (<i>List of users</i> tab of the organization), or right on this Portal page."
+msgstr "Então para cada usuário, preencha o valor da informação personalizada, no Studio (<i>Lista de usuários</i> aba da organização), ou na direita da página do Portal."
+
+msgid "They will be removed from the database permanently."
+msgstr "Eles serão removidos permanentemente do banco de dados."
+
+msgid "This URL is already in use"
+msgstr "Essa URL já está em uso"
+
+msgid "This application is core to the Bonita platform. To keep it working as it should, it must remain available and its menu should stay as it is."
+msgstr "Essa aplicação é essencial para a plataforma Bonita. Para que continue a funcionar como deve ser, tem de permanecer disponível e o seu menu deve permanecer como está."
+
+msgid "This category has already been added to this process."
+msgstr "Esta categoria já foi adicionada a este processo."
+
+msgid "This field is mandatory"
+msgstr "Este campo é obrigatório"
+
+msgid "This is the task details panel. No information to display"
+msgstr "Este é o painel de detalhes de tarefa. Nenhuma informação para exibir"
+
+msgid "This name is already in use"
+msgstr "Este nome já está em uso"
+
+msgid "This process is no longer available."
+msgstr "Este processo não está mais disponível."
+
+msgid "This process is not fully configured, but it is still enabled. Users may still be able to start cases or do tasks, which may lead to errors."
+msgstr "Esse processo não está totalmente configurado, mas ainda está habilitado. Os usuários ainda podem iniciar casos ou realizar tarefas, o que pode levar a erros."
+
+msgid "This process is not fully configured."
+msgstr "Este processo não está totalmente configurado."
+
+msgid "This process is not fully configured. It cannot be enabled."
+msgstr "Esse processo não está totalmente configurado. Não pode ser habilitado."
+
+msgid "This task cannot be executed from here."
+msgstr "Esta tarefa não pode ser executada a partir daqui."
+
+msgid "This task is completed."
+msgstr "Esta tarefa esta concluída."
+
+msgid "This task is not available anymore. The list is now up to date."
+msgstr "Essa tarefa não está mais disponível. A lista agora esta atualizada."
+
+msgid "This task is overdue. It was supposed to be completed by {{dueDate}}"
+msgstr "Esta tarefa está em atraso. Era para ser concluída em {{dueDate}}"
+
+msgid "Title"
+msgstr "Título"
+
+msgid "To create an application, click New or Import."
+msgstr "Para criar uma aplicação clique em Novo ou Importar."
+
+msgid "To do"
+msgstr "Para fazer"
+
+msgid "To do so, go to"
+msgstr "Para fazer isso, vá para"
+
+msgid "To do so, log out and then log back in as the Technical User, whose credentials are set upon Bonita platform installation."
+msgstr "Para fazer isso, efetue logout e, em seguida, efetue login novamente como Usuário Técnico, cujas credenciais são definidas na instalação da plataforma Bonita."
+
+msgid "To fill out the form, you need to take this task. This means you will be the only one able to do it. To make it available to the team again, release it."
+msgstr "Para preencher o formulário, você precisa assumir esta tarefa. Isto significa que você será o único capaz de fazê-la. Para torná-la disponível para a equipe novamente, clique no botão liberar."
+
+msgid "To use this feature, create a new version of the process in Bonita Studio version 6.4 and above, then create and install the new .bar file in the Portal."
+msgstr "Para usar esse recurso, crie uma nova versão do processo no Bonita Studio com versão 6.4 ou superior , então crie e instale o novo arquivo .bar no Portal."
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Type here to search for a user..."
+msgstr "Digite aqui para pesquisar um usuário..."
+
+msgid "Type here to search..."
+msgstr "Digite aqui para pesquisar..."
+
+msgid "Type in a case id and <br> press enter to search for <br> human task of a specific case"
+msgstr "Digite um id de instância e <br>e clique enter para procurar <br>tarefa humana de uma instância específica"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Unable to add the comment. Refresh your task list and try again. If the problem persists, contact your administrator"
+msgstr "Não é possível adicionar o comentário. Atualizar sua lista de tarefas e tente novamente. Se o problema persistir, contate o administrador"
+
+msgid "Unable to map category:"
+msgstr "Não é possível mapear categoria:"
+
+msgid "Unassign. This will make it available to team again"
+msgstr "Cancelar a atribuição. Isto tornará disponível a equipe novamente"
+
+msgid "Under normal"
+msgstr "Em condições normais"
+
+msgid "Update"
+msgstr "Atualizar"
+
+msgid "Update Business Data Model"
+msgstr "Atualizar Modelo de Dados de Negócios"
+
+msgid "Update business card"
+msgstr "Atualizar cartão de visitas"
+
+msgid "Update custom information"
+msgstr "Atualizar informações personalizadas"
+
+msgid "Update general information"
+msgstr "Atualizar informações gerais"
+
+msgid "Update password"
+msgstr "Atualizar senha"
+
+msgid "Update personal information"
+msgstr "Atualizar informações pessoais"
+
+msgid "Updated by"
+msgstr "Atualizado por"
+
+msgid "Updated on"
+msgstr "Atualizado em"
+
+msgid "Updating the Business Data Model applies changes to both existing database tables and data."
+msgstr "A atualização do Modelo de Dados de Negócio aplica alterações nas tabelas e dados do banco de dados existentes."
+
+msgid "Upload new picture"
+msgstr "Carregar nova imagem"
+
+msgid "Use Arrow up and Arrow down keys to browse among existing categories."
+msgstr "Uso as teclas seta para cima e seta para baixo para navegar entre as categorias existentes."
+
+msgid "User id not provided. Unable to retrieve the user details."
+msgstr "ID do usuário não fornecido. Não foi possível recuperar os detalhes do usuário."
+
+msgid "Username"
+msgstr "Nome de usuário"
+
+msgid "Users"
+msgstr "Usuários"
+
+msgid "Users mapped to {}"
+msgstr "Usuários mapeados a {}"
+
+msgid "Value"
+msgstr "Valor"
+
+msgid "Version"
+msgstr "Versão"
+
+msgid "View application details"
+msgstr "Detalhes do aplicativo"
+
+msgid "View task"
+msgstr "Visualizar tarefas"
+
+msgid "View this task"
+msgstr "Visualizar esta tarefa"
+
+msgid "Warning:"
+msgstr "Aviso:"
+
+msgid "We couldn't find what you are looking for."
+msgstr "Não encontramos o que você está procurando."
+
+msgid "When you export an application descriptor, pages and profiles are not exported in the file."
+msgstr "Quando você exporta um descritor de aplicativo, páginas e perfis não são exportados no arquivo."
+
+msgid "You are about to export the descriptor of the application"
+msgstr "Você está prestes a exportar o descritor da aplicação"
+
+msgid "You are going to be redirected to the process list."
+msgstr "Você vai ser redirecionado para a lista de processos."
+
+msgid "You can create custom information in Bonita Studio:"
+msgstr "Você pode criar informações personalizadas no Bonita Studio:"
+
+msgid "You must add a page before you can reference it in a menu."
+msgstr "Você deve adicionar uma página antes de poder referenciá-la em um menu."
+
+msgid "Your personal task list is empty. You can take a task from the ​<a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\">To do</a> list."
+msgstr "Sua lista de tarefas pessoais está vazia. Você pode tomar uma tarefa da lista <a href=\"#\" ng-click=\"changeFilter(TASK_FILTERS.TODO)\"> para fazer</a>."
+
+msgid "Your session is no longer active."
+msgstr "Sua sessão não está mais ativa."
+
+msgid "Zip code"
+msgstr "Cep"
+
+msgid "Zip file structure error. Check that your .zip contains a well-formed page.properties and either the index.html or the Index.groovy file. For details, see the documentation or the example page readme (available in the custom page list)"
+msgstr "Erro de estrutura de arquivo de zip. Verifique que o seu .zip contém um page.properties bem formado e um index.html ou um Index.groovy. Para maiores detalhes, consulte a documentação ou a página de exemplo readme (disponível na lista de páginas personalizadas)"
+
+msgid "an Application"
+msgstr "uma Aplicação"
+
+msgid "an application"
+msgstr "uma aplicação"
+
+msgid "application descriptor has been partially imported. The following items are not loaded in the Portal."
+msgstr "descritor de aplicações foi importado parcialmente. Os seguintes itens não foram carregados no Portal."
+
+msgid "application descriptor has been successfully imported, with complete page mapping and menu mapping."
+msgstr "descritor de aplicativos foi importado com sucesso, com mapeamento completo de página e mapeamento de menu."
+
+msgid "here"
+msgstr "aqui"
+
+msgid "of"
+msgstr "de"
+
+msgid "will be permanently deleted."
+msgstr "será excluída permanentemente."
+
+msgid "{{firstname}} {{lastname}} already has the membership <b>{{role}} of {{group}}</b>"
+msgstr "{{firstname}}{{lastname}} já tem o membro <b>{{role}} do {{group}}</b>"
+
+msgid "{{membership.role_id.displayName}} of {{membership.group_id.displayName}}"
+msgstr "{{membership.role_id.displayName}} do {{membership.group_id.displayName}}"
+
+msgid "{{nbErrors}} errors on mapping updates"
+msgstr "Ocorreram {{nbErrors}} erros na atualização das associações"
+
+msgid "{{nbMapping}} Process manager mappings could not be updated"
+msgstr "{{nbMapping}} associações do perfil Gerenciador de processo de não puderam ser atualizadas"
+
+msgid "{{nbMapping}} Process manager mappings have been updated"
+msgstr "{{nbMapping}} associações do perfil Gerenciador de processo foram atualizadas"
+
+msgid "{{nbOfDeletedCases}} cases have been deleted"
+msgstr "{{nbOfDeletedCases}} casos foram excluídos"
+
+msgid "{{nbSucess}} actor mapping updates succeeded"
+msgstr "{{nbSucess}} mapeamento de atores atualizados com sucesso"
+
+msgid "{{role}} of {{group}}"
+msgstr "{{role}} de {{group}}"
+
+msgid "{{role}} of {{group}} has been created"
+msgstr "{{role}} de {{group}} foi criado"
+
+msgid "{} mapped"
+msgstr "{} mapeado"
+
+msgid "{} mappings to delete"
+msgstr "{} mapeamentos para excluir"
+
+msgid "{} more"
+msgstr "{} mais"
+
+msgid "{} of {}"
+msgstr "{} de {}"
+
