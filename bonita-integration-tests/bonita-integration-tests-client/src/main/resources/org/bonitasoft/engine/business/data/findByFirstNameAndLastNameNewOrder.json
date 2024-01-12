@@ -1,0 +1,30 @@
+[
+  {
+    "persistenceId": 1,
+    "persistenceVersion": 0,
+    "persistenceId_string": "1",
+    "persistenceVersion_string": "0",
+    "firstName": "Alphonse",
+    "lastName": "Dupond",
+    "hireDate": "123456789",
+    "birthDate": null,
+    "phoneNumbers": [
+      "123456789"
+    ],
+    "addresses": [
+      {}
+    ],
+    "booleanField": null,
+    "dog": null,
+    "links": [
+      {
+        "rel": "address",
+        "href": "/businessdata/com.company.model.Employee/1/address"
+      },
+      {
+        "rel": "Cat",
+        "href": "/businessdata/com.company.model.Employee/1/Cat"
+      }
+    ]
+  }
+]

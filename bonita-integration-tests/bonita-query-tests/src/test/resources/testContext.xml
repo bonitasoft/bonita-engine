@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/jdbc 
+            http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <jdbc:embedded-database id="dataSource" type="H2" />
+    <context:component-scan base-package="org.bonitasoft.engine.test.persistence" />
+
+    <bean class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="sessionFactory" class="org.bonitasoft.engine.test.persistence.TestLocalSessionFactoryBuilder">
+        <property name="dataSource" ref="dataSource" />
+        <property name="annotatedPackages">
+            <list>
+                <value>org.bonitasoft.engine.persistence</value>
+            </list>
+        </property>
+        <property name="annotatedClasses">
+            <list>
+                <value>org.bonitasoft.engine.identity.model.SContactInfo</value>
+                <value>org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition</value>
+                <value>org.bonitasoft.engine.identity.model.SCustomUserInfoValue</value>
+                <value>org.bonitasoft.engine.identity.model.SGroup</value>
+                <value>org.bonitasoft.engine.identity.model.SHavingIcon</value>
+                <value>org.bonitasoft.engine.identity.SIcon</value>
+                <value>org.bonitasoft.engine.identity.model.SRole</value>
+                <value>org.bonitasoft.engine.identity.model.SUser</value>
+                <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
+                <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
+                <value>org.bonitasoft.engine.parameter.SParameter</value>
+                <value>org.bonitasoft.engine.actor.mapping.model.SActor</value>
+                <value>org.bonitasoft.engine.actor.mapping.model.SActorMember</value>
+                <value>org.bonitasoft.engine.business.application.model.SApplication</value>
+                <value>org.bonitasoft.engine.business.application.model.SApplicationWithIcon</value>
+                <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
+                <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
+                <value>org.bonitasoft.engine.platform.model.SPlatform</value>
+                <value>org.bonitasoft.engine.platform.model.STenant</value>
+                <value>org.bonitasoft.engine.platform.command.model.SPlatformCommand</value>
+                <value>org.bonitasoft.engine.core.category.model.SCategory</value>
+                <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
+                <value>org.bonitasoft.engine.core.contract.data.SContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.STaskContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SComment</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SSystemComment</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.archive.SAComment</value>
+                <value>org.bonitasoft.engine.dependency.model.SDependency</value>
+                <value>org.bonitasoft.engine.dependency.model.SDependencyMapping</value>
+                <value>org.bonitasoft.engine.dependency.model.SPlatformDependency</value>
+                <value>org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping</value>
+                <value>org.bonitasoft.engine.profile.model.SProfile</value>
+                <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
+                <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADateDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADoubleDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAFloatDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SALongDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAXMLDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SXMLDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SLongDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDoubleDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SIntegerDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDateDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SLongTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SFloatDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SBooleanDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SBlobDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SShortTextDataInstance</value>
+                <value>org.bonitasoft.engine.resources.SBARResourceLight</value>
+                <value>org.bonitasoft.engine.resources.SBARResource</value>
+                <value>org.bonitasoft.engine.resources.STenantResourceLight</value>
+                <value>org.bonitasoft.engine.resources.STenantResource</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobDescriptor</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobParameter</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobLog</value>
+                <value>org.bonitasoft.engine.core.contract.data.SContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.STaskContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
+                <value>org.bonitasoft.engine.core.form.SFormMapping</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
+                <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo</value>
+                <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent</value>
+                <value>org.bonitasoft.engine.core.document.model.SLightDocument</value>
+                <value>org.bonitasoft.engine.temporary.content.STemporaryContent</value>
+                <value>org.bonitasoft.engine.core.document.model.SDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.SDocumentMapping</value>
+                <value>org.bonitasoft.engine.core.document.model.SMappedDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.archive.SAMappedDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.archive.SADocumentMapping</value>
+                <value>org.bonitasoft.engine.page.SPage</value>
+                <value>org.bonitasoft.engine.page.SPageWithContent</value>
+                <value>org.bonitasoft.engine.page.SPageMapping</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SProcessInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SGatewayInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SConnectorInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.event.SAEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.event.SACatchEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.event.SAIntermediateCatchEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.event.SABoundaryEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.event.SAThrowEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.event.SAIntermediateThrowEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessSimpleRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLog</value>
+                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter</value>
+            </list>
+        </property>
+        <property name="mappingResources">
+            <list>
+                <value>/org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.queries.hbm.xml</value>
+                <value>/org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/platform/model/impl/hibernate/platform.queries.hbm.xml</value>
+                <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.queries.hbm.xml</value>
+
+                <!-- GLUPSSSS Needed by process instance queries -->
+                <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
+                <value>/org/bonitasoft/engine/parameter/parameter.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
+                <value>/org/bonitasoft/engine/temporary/content/hibernate/temporary.content.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
+                <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
+
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/core/form/impl/form-mapping.queries.hbm.xml</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.use_sql_comments">false</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+</beans>

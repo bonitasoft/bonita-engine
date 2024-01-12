@@ -1,0 +1,12 @@
+
+
+dependencies {
+    api project(':services:bonita-commons')
+    api "org.javassist:javassist:${Deps.javassistVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    compileOnly project(':bpm:bonita-common')
+    testImplementation project(':bpm:bonita-common')
+}

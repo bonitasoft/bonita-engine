@@ -1,0 +1,11 @@
+{
+	"constraints":[
+		{"name":"aRule","expression":"an expression","explanation":"an explanation","inputNames":[]}
+	],
+	"inputs":[
+		{"description":"aDescription","name":"anInput","multiple":false,"type":"TEXT","inputs":[]},
+		{"description":"description","name":"complexInput","multiple":true,"type":null,"inputs":[
+			{"description":"aDescription","name":"anInput","multiple":false,"type":"TEXT","inputs":[]}
+		]}
+	]
+}	
