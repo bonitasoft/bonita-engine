@@ -1,0 +1,33 @@
+plugins {
+    id('bonita-tests')
+}
+
+repositories {
+    maven { url = uri('https://maven.restlet.talend.com') }
+}
+
+dependencies {
+    implementation project(':bpm:bonita-web-server')
+    implementation project(':bonita-test-api')
+    implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    implementation "commons-io:commons-io:${Deps.commonsIOVersion}"
+    implementation "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
+    implementation "org.springframework:spring-test:${Deps.springVersion}"
+    testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.restlet.jse:org.restlet:${Deps.restletVersion}"
+}
+
+configurations {
+    configureEach {
+        resolutionStrategy.force "org.codehaus.woodstox:stax2-api:${Deps.woodstoxStax2ApiVersion}"
+    }
+}
+
+java {
+    withSourcesJar()
+}
+
+group = 'org.bonitasoft.console'
+description = 'Bonita Integration Tests Web'

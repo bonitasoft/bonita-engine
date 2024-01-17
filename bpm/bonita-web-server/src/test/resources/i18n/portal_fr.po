@@ -1,0 +1,3 @@
+# only here to make test org.bonitasoft.console.common.server.page.PageContextHelperTest work
+msgid "test key"
+msgstr "test value"

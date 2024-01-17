@@ -1,0 +1,35 @@
+<configuration debug="false" scan="false">
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>[%level] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.bonitasoft" level="INFO" />
+    <logger name="org.bonitasoft.platform" level="INFO" />
+    <logger name="org.bonitasoft.platform.setup" level="INFO" />
+
+
+    <!-- SET level below to DEBUG for more information about errors: -->
+    <logger name="org.bonitasoft.platform.setup.PlatformSetupApplication" level="${bonita.platform.setup.log:-WARN}" />
+
+    <!--TRACE level displays all relevant jdbc transaction information-->
+    <!--<logger name="org.springframework" level="TRACE" />-->
+
+    <logger name="org.springframework" level="WARN" />
+    <logger name="org.springframework.jdbc" level="INFO" />
+    <logger name="org.springframework.jdbc.support" level="WARN" />
+
+    <!-- to avoid connection stacktrace (message is already logged in PlatformSetupApplication: -->
+    <logger name="org.apache.tomcat.jdbc.pool.ConnectionPool" level="OFF" />
+    <logger name="org.springframework.jdbc.datasource.init.ScriptUtils" level="OFF" />
+
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>

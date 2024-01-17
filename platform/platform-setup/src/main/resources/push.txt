@@ -1,0 +1,9 @@
+At execution, it:
+* ensures no configuration folder has been deleted locally before pushing. Otherwise it stops and fails.
+* writes all configuration files found in platform_conf/current in database.
+* writes license files found in platform_conf/licenses folder in database (Subscription editions only).
+* overwrites any previous configuration in the database.
+
+Important:
+- Only use this command once the current configuration has been pulled from the database with `setup.(bat|sh) pull` script and modified locally.
+- Those modifications will be applied only after you restart Bonita.

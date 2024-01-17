@@ -1,0 +1,132 @@
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
+import javax.persistence.Table;
+import javax.persistence.Version;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+
+/**
+ * 
+ */
+@javax.persistence.Entity(name = "Employee")
+@Table(name = "EMPLOYEE")
+@NamedQueries({
+    @NamedQuery(name = "Employee.findByPersistenceId", query = "SELECT e\nFROM Employee e\nWHERE e.persistenceId= :persistenceId\n"),
+    @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
+    @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId"),
+    @NamedQuery(name = "Employee.countForFindByFirstName", query = "SELECT COUNT(e)\nFROM Employee e\nWHERE e.firstName= :firstName\n"),
+    @NamedQuery(name = "Employee.countForFind", query = "SELECT COUNT(e)\nFROM Employee e\n")
+})
+public class Employee implements org.bonitasoft.engine.bdm.Entity
+{
+
+    @Id
+    @GeneratedValue(generator = "default_bonita_seq_generator")
+    @GenericGenerator(name = "default_bonita_seq_generator", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator", parameters = {
+        @Parameter(name = "sequence_name", value = "hibernate_sequence")
+    })
+    private Long persistenceId;
+    @Version
+    private Long persistenceVersion;
+    @Column(name = "FIRSTNAME", nullable = true)
+    private String firstName;
+    @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
+    @OrderColumn
+    private List<Address> addresses = new ArrayList<Address>(10);
+    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
+    @OrderColumn
+    @JsonIgnore
+    private List<Skill> skills = new ArrayList<Skill>(10);
+
+    public Employee() {
+    }
+
+    public void setPersistenceId(Long persistenceId) {
+        this.persistenceId = persistenceId;
+    }
+
+    public Long getPersistenceId() {
+        return persistenceId;
+    }
+
+    public void setPersistenceVersion(Long persistenceVersion) {
+        this.persistenceVersion = persistenceVersion;
+    }
+
+    public Long getPersistenceVersion() {
+        return persistenceVersion;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        if (this.addresses == null) {
+            this.addresses = addresses;
+        } else {
+            List<Address> copy = new ArrayList(addresses);
+            this.addresses.clear();
+            this.addresses.addAll(copy);
+        }
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void addToAddresses(Address addTo) {
+        List addresses = getAddresses();
+        addresses.add(addTo);
+    }
+
+    public void removeFromAddresses(Address removeFrom) {
+        List addresses = getAddresses();
+        addresses.remove(removeFrom);
+    }
+
+    public void setSkills(List<Skill> skills) {
+        if (this.skills == null) {
+            this.skills = skills;
+        } else {
+            List<Skill> copy = new ArrayList(skills);
+            this.skills.clear();
+            this.skills.addAll(copy);
+        }
+    }
+
+    @LazyLoaded
+    public List<Skill> getSkills() {
+        return skills;
+    }
+
+    public void addToSkills(Skill addTo) {
+        List skills = getSkills();
+        skills.add(addTo);
+    }
+
+    public void removeFromSkills(Skill removeFrom) {
+        List skills = getSkills();
+        skills.remove(removeFrom);
+    }
+
+}

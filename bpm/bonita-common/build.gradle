@@ -1,0 +1,74 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
+apply plugin: 'java-test-fixtures'
+
+dependencies {
+    api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
+    api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
+
+    api "org.bonitasoft.engine:bonita-business-archive"
+    api "org.bonitasoft.engine:bonita-business-object-model"
+    api "org.bonitasoft.engine:bonita-profile-model"
+    api "org.bonitasoft.engine:bonita-organization-model"
+    api "org.bonitasoft.engine:bonita-application-model"
+    api "com.fasterxml.jackson.core:jackson-databind"
+    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api "com.fasterxml.jackson.core:jackson-annotations"
+
+    runtimeOnly "com.sun.activation:jakarta.activation"
+
+    compileOnly project(':bpm:bonita-sap-jco-connector-api')
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+
+    testImplementation project(':bpm:bonita-sap-jco-connector-api')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation 'org.jmockit:jmockit:1.44'
+    testImplementation "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+
+    testFixturesApi("org.bonitasoft.engine:bonita-business-object-model") {
+        artifact { classifier = 'tests' }
+    }
+    testFixturesImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+}
+
+tasks.register("testsJar", Jar) {
+    archiveClassifier = 'tests'
+    from(sourceSets.test.output)
+}
+
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+tasks.register("javadocJar", Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+// Disable publishing of test fixtures variants because their dependencies are published as optional dependencies
+// It prevents consumers (e.g. bonita-distrib) to retrieve some transitive dependencies (e.g. bonita-business-object-model)
+components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }
+components.java.withVariantsFromConfiguration(configurations.testFixturesRuntimeElements) { skip() }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            artifact project.testsJar
+            pom { pom ->
+                name = "Bonita Common"
+                description = "Bonita Common is the useful layer common to bonita-client and bonita-server"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}
+
+test { jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}" }

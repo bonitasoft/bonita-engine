@@ -1,0 +1,21 @@
+<connectorDefinition>
+	<version>1.0</version>
+	<connectorId>org.bonitasoft.connector.BusinessDataUpdateConnector</connectorId>
+	<icon>xxx.png</icon>
+	<categories>
+		<category>
+			<name>other</name>
+			<icon>org/bonitasoft/engine/bdr/BusinessDataUpdateConnector.png</icon>
+		</category>
+	</categories>
+	<inputs>
+		<input type="String">bizData</input>
+		<required />
+		<parameters>
+			<string />
+		</parameters>
+	</inputs>
+	<outputs>
+		<output type="String">output1</output>
+	</outputs>
+</connectorDefinition>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization:Organization xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema">
+	<customUserInfoDefinitions>
+		<customUserInfoDefinition>
+			<name>Office location</name>
+		</customUserInfoDefinition>
+		<customUserInfoDefinition>
+			<name>Skills</name>
+			<description>The user skills</description>
+		</customUserInfoDefinition>
+	</customUserInfoDefinitions>
+  <users>
+    <user userName="anthony.birembault">
+      <password encrypted="false">bpm</password>
+      <jobTitle>Web Team Manager</jobTitle>
+      <personalData/>
+      <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Office location</name>
+	      <value>Engineering</value>
+	    </customUserInfoValue>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
+    </user>
+    <user userName="liuyanyan">
+      <password encrypted="false">bpm</password>
+      <personalData/>
+      <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
+    </user>
+  </users>
+  <roles>
+    <role name="Developer">
+      <displayName>Bonita developer</displayName>
+    </role>
+    <role name="Manager">
+      <displayName>Bonita Manager</displayName>
+    </role>
+  </roles>
+  <groups>
+    <group name="Engine">
+      <displayName>engine team</displayName>
+    </group>
+    <group name="Web">
+      <displayName>web team</displayName>
+    </group>
+  </groups>
+  <memberships>
+    <membership>
+      <userName>liuyanyan</userName>
+      <roleName>Developer</roleName>
+      <groupName>Engine</groupName>
+    </membership>
+    <membership>
+      <userName>anthony.birembault</userName>
+      <roleName>Manager</roleName>
+      <groupName>Web</groupName>
+    </membership>
+  </memberships>
+</organization:Organization>
