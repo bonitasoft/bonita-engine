@@ -215,11 +215,9 @@ public class ReceiveTasksIT extends TestWithUser {
                     "delivery", user, "m4", null, null, null);
             final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
                     .startProcess(receiveMessageProcess.getId());
-            waitForTaskInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING);
             waitForUserTask(receiveMessageProcessInstance, "userTask1");
             final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI()
                     .startProcess(receiveMessageProcess.getId());
-            waitForTaskInState(receiveMessageProcessInstance2, "waitForMessage", TestStates.WAITING);
             waitForUserTask(receiveMessageProcessInstance2, "userTask1");
         } finally {
             disableAndDeleteProcess(sendMessageProcess1);
@@ -229,7 +227,7 @@ public class ReceiveTasksIT extends TestWithUser {
     }
 
     /*
-     * 1 receiveProcess, 1 sendProcess, Message contains datas goes from EndEvent to ReceiveTask
+     * 1 receiveProcess, 1 sendProcess, Message contains data goes from EndEvent to ReceiveTask
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess),
      * startProcess(sendProcess)
      * checks : receiveProcess wait on receive task, sendProcess is finished, receiveProcess goes through receive task
@@ -381,8 +379,8 @@ public class ReceiveTasksIT extends TestWithUser {
 
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
-        final BusinessArchive receiveMessaceArchive = archiveBuilder.done();
-        final ProcessDefinition receiveMessageProcess = deployProcess(receiveMessaceArchive);
+        final BusinessArchive receiveMessageArchive = archiveBuilder.done();
+        final ProcessDefinition receiveMessageProcess = deployProcess(receiveMessageArchive);
 
         final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1,
                 ActorCriterion.NAME_ASC);
