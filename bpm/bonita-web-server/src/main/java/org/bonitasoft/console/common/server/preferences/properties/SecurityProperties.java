@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.console.common.server.preferences.properties;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,6 +37,26 @@ public class SecurityProperties {
      * property for the CSRF protection activation
      */
     public static final String CSRF_PROTECTION = "security.csrf.enabled";
+
+    /**
+     * Property for the (OWASP) Sanitizer protection activation.
+     * This sanitizer protects against multiple attacks such as XSS, but may restrict the use of some character
+     * sequences.
+     */
+    public static final String SANITIZER_PROTECTION = "security.sanitizer.enabled";
+
+    /**
+     * Property for the (OWASP) Sanitizer protection.
+     * The value of this property lists the json attributes that should be excluded when sanitizer protection is active.
+     */
+    public static final String SANITIZER_PROTECTION_EXCLUSIONS = "security.sanitizer.exclude";
+
+    /**
+     * default list of attributes excluded from sanitizer protection when the property is not set in
+     * security-config.properties
+     */
+    public static final List<String> DEFAULT_SANITIZER_PROTECTION_EXCLUSIONS = List.of("email", "password",
+            "password_confirm");
 
     /**
      * property for the CSRF token cookie to have the secure flag (HTTPS only)
@@ -83,6 +101,28 @@ public class SecurityProperties {
     public boolean isCSRFProtectionEnabled() {
         final String res = getPlatformProperty(CSRF_PROTECTION);
         return res != null && res.equals("true");
+    }
+
+    /**
+     * @return the value to allow or not Sanitizer activation for protection
+     */
+    public boolean isSanitizerProtectionEnabled() {
+        final String res = getPlatformProperty(SANITIZER_PROTECTION);
+        // keep true as default when not set correctly
+        return !Boolean.FALSE.toString().equalsIgnoreCase(res);
+    }
+
+    /**
+     * @return the attributes to exclude from Sanitizer protection, comma separated
+     */
+    public List<String> getAttributeExcludedFromSanitizerProtection() {
+        String excludedAttributes = getPlatformProperty(SANITIZER_PROTECTION_EXCLUSIONS);
+        if (excludedAttributes == null) {
+            return DEFAULT_SANITIZER_PROTECTION_EXCLUSIONS;
+        } else if (excludedAttributes.isBlank()) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(excludedAttributes.trim().split("\\s*,\\s*"));
     }
 
     /**
