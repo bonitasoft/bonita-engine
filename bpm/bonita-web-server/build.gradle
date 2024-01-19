@@ -31,6 +31,7 @@ dependencies {
     implementation "org.springframework:spring-web:${Deps.springVersion}"
     implementation "org.springframework:spring-core:${Deps.springVersion}"
     implementation "org.fedorahosted.tennera:jgettext:${Deps.jgettextVersion}"
+    implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:${Deps.owaspHTMLSanitizerVersion}"
     testImplementation(project(":bpm:bonita-server"))
     testImplementation "net.javacrumbs.json-unit:json-unit:${Deps.jsonUnitVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
