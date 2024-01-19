@@ -33,6 +33,7 @@ dependencies {
     implementation "org.springframework:spring-web:${Deps.springVersion}"
     implementation "org.springframework:spring-webmvc:${Deps.springVersion}"
     implementation "org.fedorahosted.tennera:jgettext:${Deps.jgettextVersion}"
+    implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:${Deps.owaspHTMLSanitizerVersion}"
 
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"

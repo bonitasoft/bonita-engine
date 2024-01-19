@@ -71,6 +71,7 @@ class Deps {
     public static String xmlsecVersion = "2.2.6"
     public static String bouncyCastleVersion = "1.77"
     public static String spnegoVersion = "1.1.1"
+    public static String owaspHTMLSanitizerVersion = "20220608.1"
 
     // Test dependency versions:
     public static String junit4Version = "4.13.2"

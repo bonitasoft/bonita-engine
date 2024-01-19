@@ -126,6 +126,11 @@
             <param-value>true</param-value>
         </init-param>
     </filter>
+    <!-- Sanitize filter to prevent code injection -->
+    <filter>
+        <filter-name>SanitizerFilter</filter-name>
+        <filter-class>org.bonitasoft.console.common.server.filter.SanitizerFilter</filter-class>
+    </filter>
     <!-- Cache Filter -->
     <filter>
         <filter-name>CacheFilter</filter-name>
@@ -269,6 +274,13 @@
         <url-pattern>/APIToolkit/system/session/*</url-pattern>
         <!-- see TokenValidatorFilter comment -->
         <url-pattern>/portal/custom-page/API/system/session/*</url-pattern>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>SanitizerFilter</filter-name>
+        <url-pattern>/API/*</url-pattern>
+        <url-pattern>/APIToolkit/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
     <!-- Cache Filter Mapping Start -->
