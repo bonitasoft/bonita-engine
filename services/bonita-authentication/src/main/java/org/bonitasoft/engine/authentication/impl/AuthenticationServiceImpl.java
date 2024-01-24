@@ -24,7 +24,7 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,9 +34,8 @@ import org.springframework.stereotype.Component;
  * @author Julien Reboul
  * @author Celine Souchet
  */
-
-@ConditionalOnProperty(value = "authentication.service.ref.name", havingValue = "authenticationService", matchIfMissing = true)
 @Component("authenticationService")
+@Lazy
 public class AuthenticationServiceImpl implements GenericAuthenticationService {
 
     private final IdentityService identityService;
