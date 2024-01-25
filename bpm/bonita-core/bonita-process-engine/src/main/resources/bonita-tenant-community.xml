@@ -852,6 +852,9 @@
         <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
     </bean>
 
+    <!--  Used to inject the bean referenced by property 'authentication.service.ref.name' in SecuredLoginServiceImpl: -->
+    <alias name="${authentication.service.ref.name:authenticationService}" alias="entryPointAuthenticationService"  />
+
     <bean id="externalIdentityMappingService"
           class="org.bonitasoft.engine.external.identity.mapping.impl.ExternalIdentityMappingServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />

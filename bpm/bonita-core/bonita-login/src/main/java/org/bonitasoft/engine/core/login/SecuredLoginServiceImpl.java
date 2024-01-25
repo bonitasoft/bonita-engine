@@ -41,6 +41,7 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -58,7 +59,8 @@ public class SecuredLoginServiceImpl implements LoginService {
     private final ProfileService profileService;
     private final PermissionsBuilder permissionsBuilder;
 
-    public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService,
+    public SecuredLoginServiceImpl(
+            @Qualifier("entryPointAuthenticationService") final GenericAuthenticationService authenticationService,
             final SessionService sessionService,
             final IdentityService identityService,
             TechnicalUser technicalUser, ProfileService profileService, PermissionsBuilder permissionsBuilder) {
