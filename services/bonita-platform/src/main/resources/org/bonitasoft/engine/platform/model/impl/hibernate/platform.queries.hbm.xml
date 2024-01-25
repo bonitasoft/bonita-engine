@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+  <query name="getPlatform">
+    SELECT platform
+    FROM org.bonitasoft.engine.platform.model.SPlatform AS platform
+  </query>
+
+  <query name="getDefaultTenant">
+    SELECT tenant
+    FROM org.bonitasoft.engine.platform.model.STenant AS tenant
+    WHERE tenant.defaultTenant = true
+  </query>
+
+  <query name="getDefaultTenantId">
+    SELECT tenant.id
+    FROM org.bonitasoft.engine.platform.model.STenant AS tenant
+    WHERE tenant.defaultTenant = true
+  </query>
+
+</hibernate-mapping>

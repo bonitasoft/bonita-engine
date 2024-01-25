@@ -1,0 +1,71 @@
+import org.apache.tools.ant.filters.PrefixLines
+import org.apache.tools.ant.filters.ReplaceTokens
+import org.bonitasoft.engine.gradle.PomUtils
+
+plugins { id 'distribution' }
+
+group = 'org.bonitasoft.platform'
+description = ''
+
+dependencies {
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    api "org.springframework:spring-tx:${Deps.springVersion}"
+    api "org.springframework:spring-jdbc:${Deps.springVersion}"
+    api "org.springframework:spring-context:${Deps.springVersion}"
+    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}
+
+
+processResources {
+    inputs.property("version", project.version)
+    from('src/main/resources') {
+        include 'PLATFORM_ENGINE_VERSION'
+        filter(ReplaceTokens, tokens: [version: project.version])
+    }
+    from("${projectDir}/../../bpm/bonita-core/bonita-process-engine/src/main/resources/bonita-platform-community.properties") {
+        filter(PrefixLines, prefix: "#")
+        rename 'bonita-platform-community.properties', 'platform_engine/bonita-platform-community-custom.properties'
+    }
+    from("${projectDir}/../../bpm/bonita-core/bonita-process-engine/src/main/resources/bonita-tenant-community.properties") {
+        filter(PrefixLines, prefix: "#")
+        rename 'bonita-tenant-community.properties', 'tenant_template_engine/bonita-tenant-community-custom.properties'
+    }
+}
+
+configurations { distributionZip }
+
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+distTar.enabled = false
+distributions {
+    main {
+        contents { from sourceSets.main.output }
+    }
+}
+
+artifacts { distributionZip distZip }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact distZip
+            artifact project.sourcesJar
+            pom { pom ->
+                name = "Bonita Platform Resources"
+                description = "Bonita Platform Resources serves to setup Bonita platform"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

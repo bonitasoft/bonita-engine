@@ -1,0 +1,2 @@
+msgid "about"
+msgstr "Copyright Bonitasoft 2016"

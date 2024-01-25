@@ -1,0 +1,55 @@
+WARNING: If some states change, it requires migration
+
+PROCESS
+0 Initializing
+1 Started
+2 Suspended
+3 Cancelled
+4 Aborted
+5 Completing
+6 Completed
+7 Failed / Error
+11 Aborting
+
+ACTIVITY (some constants are defined in the State interface)
+0 InitializingActivityState
+1 ExecutingFlowNodeState
+2 CompletedActivityState
+3 FailedActivityState
+4 ReadyActivityState
+9 CompletingActivityState
+10 WaitingFlowNodeState
+12 SkippedFlowNodeState
+13 AbortingSubTaskState
+14 CancelledFlowNodeState
+15 AbortingFlowNodeContainerState
+16 AbortedFlowNodeState
+17 CancellingFlowNodeContainerChildrenState
+18 CancellingFlowNodeState
+19 CancellingCallActivityState
+20 AbortingCallActivityState
+21 AbortingFlowNodeState
+22 CancellingBoundaryAndIntermediateCatchEventState
+23 InitializingLoopActivityState
+24 ExecutingLoopActivityState
+25 ExecutingActivityState
+26 ExecutingThrowEventState
+27 InitializingMultiInstanceActivityState
+28 ExecutingMultiInstanceActivityState
+30 CompletingCallActivityState
+31 ExecutingCallActivityState
+32 InitializingActivityWithBoundaryEventsState
+33 InitializingBoundaryEventState
+34 AbortingBoundaryEventsOnCompletingActivityState
+35 AbortingActivityWithBoundaryState
+36 CancellingActivityWithBoundaryState
+37 ExecutingAutomaticActivityState
+
+38 AbortingReceiveTaskState
+39 CancellingReceiveTaskState
+
+60 AbortingBoundaryAndIntermediateCatchEventState
+61 InitializingAndExecutingFlowNodeState
+65 ExecutingBoundaryEventState
+
+// up-to-date on 2020-09-15

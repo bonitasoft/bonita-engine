@@ -1,0 +1,15 @@
+
+
+dependencies {
+    api project(':services:bonita-session')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-builder')
+    api project(':services:bonita-events')
+    api project(':services:bonita-log')
+    api project(':services:bonita-persistence')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

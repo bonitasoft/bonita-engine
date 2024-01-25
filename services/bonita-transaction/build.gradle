@@ -1,0 +1,14 @@
+dependencies {
+    api project(':services:bonita-commons')
+    api "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+    testImplementation "org.jboss.logging:jboss-logging:${Deps.jbossLoggingVersion}"
+    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}
