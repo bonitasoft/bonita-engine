@@ -41,6 +41,7 @@ import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -58,7 +59,8 @@ public class SecuredLoginServiceImpl implements LoginService {
     private final ProfileService profileService;
     private final PermissionsBuilder permissionsBuilder;
 
-    public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService,
+    public SecuredLoginServiceImpl(
+            @Qualifier("entryPointAuthenticationService") final GenericAuthenticationService authenticationService,
             final SessionService sessionService,
             final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
             TechnicalUser technicalUser, ProfileService profileService, PermissionsBuilder permissionsBuilder) {
