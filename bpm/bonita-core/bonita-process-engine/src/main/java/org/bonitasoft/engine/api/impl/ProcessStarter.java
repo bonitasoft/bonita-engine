@@ -1,0 +1,217 @@
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.api.impl;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.bpm.process.ProcessActivationException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.comment.api.SCommentService;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.execution.*;
+import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.service.ModelConvertor;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.service.ServiceAccessorSingleton;
+
+/**
+ * @author Elias Ricken de Medeiros
+ * @author Vincent Elcrin
+ * @author Matthieu Chaffotte
+ */
+@Slf4j
+public class ProcessStarter {
+
+    private final long userId;
+
+    private final long processDefinitionId;
+
+    private final List<Operation> operations;
+
+    private final Map<String, Serializable> context;
+
+    private final Filter<SFlowNodeDefinition> filter;
+
+    private final Map<String, Serializable> processContractInputs;
+
+    private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
+            final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter,
+            final Map<String, Serializable> processContractInputs) {
+        this.userId = userId;
+        this.processDefinitionId = processDefinitionId;
+        this.operations = operations;
+        this.context = context;
+        this.filter = filter;
+        this.processContractInputs = processContractInputs;
+    }
+
+    public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
+            final Map<String, Serializable> context) {
+        this(userId, processDefinitionId, operations, context, new StartFlowNodeFilter(), null);
+    }
+
+    public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
+            final Map<String, Serializable> context,
+            final List<String> activityNames, Map<String, Serializable> processContractInputs) {
+        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames),
+                processContractInputs);
+    }
+
+    public ProcessStarter(final long userId, final long processDefinitionId,
+            final Map<String, Serializable> processContractInputs) {
+        this(userId, processDefinitionId, null, null, new StartFlowNodeFilter(), processContractInputs);
+    }
+
+    public ProcessInstance start()
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException,
+            ContractViolationException {
+        try {
+            return start(null);
+        } catch (final SContractViolationException e) {
+            throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(),
+                    e.getCause());
+        } catch (final SProcessDefinitionNotFoundException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (final SProcessDefinitionException e) {
+            throw new ProcessActivationException(e);
+        } catch (final SBonitaException e) {
+            throw new ProcessExecutionException(e);
+        }
+    }
+
+    // For commands
+    public ProcessInstance start(final List<ConnectorDefinitionWithInputValues> connectorsWithInput)
+            throws SProcessInstanceCreationException,
+            SBonitaReadException, SProcessDefinitionException, SContractViolationException {
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final ProcessExecutor processExecutor = serviceAccessor.getProcessExecutor();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+
+        final SProcessDefinition sProcessDefinition = processDefinitionService
+                .getProcessDefinitionIfIsEnabled(processDefinitionId);
+        final Map<String, Object> operationContext = getContext();
+        final long starterSubstituteUserId = SessionInfos.getUserIdFromSession();
+        final long starterUserId = getStarterUserId(starterSubstituteUserId);
+
+        final SProcessInstance startedSProcessInstance;
+        try {
+            final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
+            startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations,
+                    operationContext, connectorsWithInput,
+                    new FlowNodeSelector(sProcessDefinition, filter), processContractInputs);
+        } catch (final SProcessInstanceCreationException e) {
+            e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
+            e.setProcessDefinitionNameOnContext(sProcessDefinition.getName());
+            e.setProcessDefinitionVersionOnContext(sProcessDefinition.getVersion());
+            throw e;
+        }
+
+        logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId,
+                startedSProcessInstance);
+        return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
+    }
+
+    protected long getStarterUserId(final long starterSubstituteUserId) {
+        if (userId == 0) {
+            return starterSubstituteUserId;
+        }
+        return userId;
+    }
+
+    protected Map<String, Object> getContext() {
+        if (context != null) {
+            return new HashMap<>(context);
+        }
+        return Collections.emptyMap();
+    }
+
+    private void logProcessInstanceStartedAndAddComment(final SProcessDefinition sProcessDefinition,
+            final long starterId, final long starterSubstituteId,
+            final SProcessInstance sProcessInstance) {
+        final StringBuilder stb = new StringBuilder();
+        stb.append("The user <");
+        stb.append(SessionInfos.getUserNameFromSession());
+        if (starterId != starterSubstituteId) {
+            stb.append("> acting as delegate of user with id <");
+            stb.append(starterId);
+        }
+        stb.append("> has started the process instance <");
+        stb.append(sProcessInstance.getId());
+        stb.append("> of process <");
+        stb.append(sProcessDefinition.getName());
+        stb.append("> in version <");
+        stb.append(sProcessDefinition.getVersion());
+        stb.append("> and id <");
+        stb.append(sProcessDefinition.getId());
+        stb.append(">");
+
+        log.info(stb.toString());
+
+        addSystemCommentOnProcessInstanceWhenStartingProcessFor(sProcessInstance, starterId, starterSubstituteId);
+    }
+
+    protected void addSystemCommentOnProcessInstanceWhenStartingProcessFor(final SProcessInstance sProcessInstance,
+            final long starterId,
+            final long starterSubstituteId) {
+        final ServiceAccessor serviceAccessor = getServiceAccessor();
+        final SCommentService commentService = serviceAccessor.getCommentService();
+
+        if (starterId != starterSubstituteId) {
+            final IdentityService identityService = serviceAccessor.getIdentityService();
+            try {
+                final SUser starter = identityService.getUser(starterId);
+                commentService.addSystemComment(sProcessInstance.getId(),
+                        "The user " + SessionInfos.getUserNameFromSession()
+                                + " acting as delegate of the user " + starter.getUserName()
+                                + " has started the case.");
+            } catch (final SBonitaException e) {
+                log.error("Error when adding a comment on the process instance.", e);
+            }
+        }
+    }
+
+    protected ServiceAccessor getServiceAccessor() {
+        try {
+            return ServiceAccessorSingleton.getInstance();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+    }
+
+}

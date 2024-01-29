@@ -1,0 +1,40 @@
+plugins {
+    id("groovy")
+    id("java-gradle-plugin")
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+}
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    api "com.github.johnrengelman:shadow:8.1.1"
+    api "com.adarshr:gradle-test-logger-plugin:3.2.0"
+
+    // for database tests:
+    api "com.bmuschko:gradle-docker-plugin:6.7.0"
+}
+
+gradlePlugin {
+    plugins {
+        bonitaShade {
+            id = "bonita-shade"
+            implementationClass = "org.bonitasoft.engine.gradle.ShadePlugin"
+        }
+        bonitaTests {
+            // Add this plugin to every module that has *IT.java (and only those modules):
+            id = "bonita-tests"
+            implementationClass = "org.bonitasoft.engine.gradle.TestsPlugin"
+        }
+        bonitaHttpTests {
+            id = "bonita-http-test"
+            implementationClass = "org.bonitasoft.engine.gradle.HttpTestPlugin"
+        }
+        bonitaDatabaseTest {
+            id = "bonita-docker-database"
+            implementationClass = "org.bonitasoft.engine.gradle.docker.DockerDatabasePlugin"
+        }
+    }
+}

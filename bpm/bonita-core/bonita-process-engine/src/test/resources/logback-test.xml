@@ -1,0 +1,17 @@
+<configuration debug="false" scan="false">
+
+    <logger name="org.bonitasoft.engine.execution.work.FailedStateSetter" level="DEBUG" />
+    <logger name="org.bonitasoft.engine.bpm.contract.validation.ContractStructureValidator" level="DEBUG" />
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>|%d{HH:mm:ss.SSS}|%thread|%-5level|%logger{16}| %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.bonitasoft.engine.bpm.contract.validation.ContractConstraintsValidator" level="DEBUG" />
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>

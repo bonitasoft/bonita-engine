@@ -1,0 +1,21 @@
+language: java
+jdk: openjdk11
+os: linux
+dist: xenial
+
+script: ./gradlew -q test
+
+branches:
+  only:
+    - dev
+    - master
+
+# see https://docs.travis-ci.com/user/languages/java/#projects-using-gradle
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+

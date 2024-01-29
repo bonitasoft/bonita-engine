@@ -1,0 +1,686 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+  <query name="getNumberOfSAFlowNodeInstance">
+	SELECT COUNT(aa.id)
+	FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS aa
+  </query>
+
+  <query name="searchSAFlowNodeInstance">
+	SELECT aa
+	FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS aa
+  </query>
+
+  <query name="getNumberOfSAFlowNodeInstanceSupervisedBy">
+	SELECT COUNT(DISTINCT aa.id)
+	FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS aa,
+		 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
+	WHERE terminal = TRUE
+	AND aa.logicalGroup1 = supervisor.processDefId
+	AND (supervisor.userId = :supervisorId
+		OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+					 org.bonitasoft.engine.identity.model.SUserMembership as um
+				WHERE um.userId = :supervisorId
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+				)
+			)
+		)
+	)
+  </query>
+
+  <query name="searchSAFlowNodeInstanceSupervisedBy">
+	SELECT DISTINCT aa
+	FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS aa,
+		 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
+	WHERE terminal = TRUE
+	AND aa.logicalGroup1 = supervisor.processDefId
+	AND (supervisor.userId = :supervisorId
+		OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
+				WHERE um.userId = :supervisorId
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+				)
+			)
+		)
+	)
+  </query>
+
+	<query name="searchSAActivityInstanceSupervisedBy">
+		SELECT DISTINCT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance AS aa,
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
+		WHERE terminal = TRUE
+		AND aa.logicalGroup1 = supervisor.processDefId
+		AND (supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+					 	 org.bonitasoft.engine.identity.model.SUserMembership as um
+					WHERE um.userId = :supervisorId
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+  	</query>
+
+	<query name="getNumberOfSAActivityInstanceSupervisedBy">
+  		SELECT COUNT(DISTINCT aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance AS aa,
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
+		WHERE terminal = TRUE
+
+		AND aa.logicalGroup1 = supervisor.processDefId
+		AND (supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+					 	 org.bonitasoft.engine.identity.model.SUserMembership as um
+					WHERE um.userId = :supervisorId
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+	</query>
+
+	<query name="getArchivedFlowNodeInstanceById">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS aa
+		WHERE aa.id = :id
+	</query>
+
+	<query name="getMostRecentArchivedActivityInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance AS aa
+		WHERE aa.sourceObjectId = :activityInstanceId
+		ORDER BY aa.archiveDate DESC, aa.id DESC
+	</query>
+
+  <query name="getAActivityInstanceByActivityInstanceIdAndStateId">
+    SELECT aa
+    FROM org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance AS aa
+    WHERE aa.sourceObjectId = :activityInstanceId
+    	AND aa.stateId = :stateId
+  </query>
+
+  <query name="getAActivitiesFromProcessInstance">
+    SELECT aa
+    FROM org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance AS aa
+    WHERE aa.rootContainerId = :rootContainerId
+  </query>
+
+  <query name="getAActivitiesWithStates">
+    SELECT aa
+    FROM org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance AS aa
+    WHERE aa.rootContainerId = :rootContainerId
+    	AND aa.stateId IN (:stateIds)
+  </query>
+
+  <!-- External Service Queries -->
+	<query name="getNumberOfSAHumanTaskInstanceManagedBy">
+		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS aa
+		WHERE terminal = TRUE
+		AND assigneeId IN ( SELECT u.id
+							FROM org.bonitasoft.engine.identity.model.SUser u
+							WHERE u.managerUserId = :managerUserId )
+	</query>
+
+	<query name="searchSAHumanTaskInstanceManagedBy">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS aa
+		WHERE terminal = TRUE
+		AND assigneeId IN ( SELECT u.id
+							FROM org.bonitasoft.engine.identity.model.SUser u
+							WHERE u.managerUserId = :managerUserId )
+	</query>
+
+	<query name="getNumberOfSAHumanTaskInstanceSupervisedBy">
+		SELECT COUNT(DISTINCT aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance AS aa,
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
+		WHERE terminal = TRUE
+		AND aa.logicalGroup1 = supervisor.processDefId
+		AND(supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
+					WHERE um.userId = :supervisorId
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+  	</query>
+
+	<query name="searchSAHumanTaskInstanceSupervisedBy">
+		SELECT DISTINCT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance AS aa,
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
+		WHERE terminal = TRUE
+		AND aa.logicalGroup1 = supervisor.processDefId
+		AND(supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
+					WHERE um.userId = :supervisorId
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+	</query>
+
+  	<query name="searchSAHumanTaskInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAHumanTaskInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="getNumberOfSAProcessInstancewithSUserTaskInstance">
+		select COUNT(DISTINCT ap.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
+		WHERE ap.archiveDate = (
+			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance AS aa2
+			WHERE aa2.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId != 8
+		AND (ap.startedBy = :userId
+			OR (a.rootContainerId = ap.sourceObjectId
+				AND a.stable = TRUE
+				AND a.assigneeId = :userId)
+		)
+  	</query>
+
+  	<query name="searchSAProcessInstancewithSUserTaskInstance">
+		select DISTINCT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
+		WHERE ap.archiveDate = (
+			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance AS aa2
+			WHERE aa2.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId != 8
+		AND (ap.startedBy = :userId
+			OR (a.rootContainerId = ap.sourceObjectId
+				AND a.stable = TRUE
+				AND a.assigneeId = :userId)
+		)
+	</query>
+
+	<query name="searchSAHumanTaskInstancewithSAActivityInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAHumanTaskInstancewithSAActivityInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAManualTaskInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAManualTaskInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAManualTaskInstancewithSAActivityInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAManualTaskInstancewithSAActivityInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAUserTaskInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAUserTaskInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAUserTaskInstancewithSAActivityInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAUserTaskInstancewithSAActivityInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAAutomaticTaskInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAAutomaticTaskInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAReceiveTaskInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAReceiveTaskInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAAutomaticTaskInstancewithSAActivityInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAAutomaticTaskInstancewithSAActivityInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAReceiveTaskInstancewithSAActivityInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAReceiveTaskInstancewithSAActivityInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="searchSAActivityInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance AS aa
+		WHERE terminal = TRUE
+  	</query>
+
+	<query name="getNumberOfSAActivityInstance">
+  		SELECT COUNT(aa.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance AS aa
+		WHERE terminal = TRUE
+	</query>
+
+	<query name="getArchivedFlowNodesFromProcessInstance">
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS aa
+		WHERE aa.rootContainerId = :rootContainerId
+        ORDER BY aa.id
+	</query>
+
+	<query name="getNumberOfArchivedFlowNodesInAllStates">
+		SELECT new org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter(name AS name, stateName AS statename, count(aa) AS numberof)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS aa
+		WHERE logicalGroup4 = :parentProcessInstanceId
+		AND terminal = TRUE
+		GROUP BY name, stateName
+		ORDER BY name ASC, stateName ASC
+	</query>
+
+	<query name="searchSAConnectorInstance">
+		SELECT ac
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance AS ac
+	</query>
+	<query name="deleteArchivedConnectorInstances">
+		DELETE
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance AS ac
+		WHERE ac.containerType = :containerType AND ac.containerId IN (:containerIds)
+	</query>
+
+	<query name="getNumberOfSAConnectorInstance">
+		SELECT COUNT(ac.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance AS ac
+	</query>
+
+	<!-- Process Instance  -->
+	<query name="getSourceProcessInstanceIdsByProcessDefinitionId">
+		SELECT DISTINCT ap.sourceObjectId
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.processDefinitionId = :processDefinitionId
+	</query>
+
+	<query name="searchSAProcessInstance">
+		SELECT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+	</query>
+
+	<query name="getNumberOfSAProcessInstance">
+		SELECT COUNT(ap.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+	</query>
+
+	<query name="getArchivedProcessInstancesInAllStates">
+		SELECT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.sourceObjectId IN (:sourceObjectIds)
+	</query>
+
+	<query name="getArchivedProcessInstance">
+		SELECT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.id = :id
+	</query>
+
+  	<query name="getNumberOfSAProcessInstanceWithoutSubProcess">
+		SELECT COUNT(ap.sourceObjectId)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+	</query>
+
+  	<query name="searchSAProcessInstanceWithoutSubProcess">
+		SELECT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+  	</query>
+
+	<query name="getNumberOfSAProcessInstancewithSUserTaskInstanceWithoutSubProcess">
+		SELECT COUNT(ap.sourceObjectId)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+	</query>
+
+	<query name="searchSAProcessInstancewithSUserTaskInstanceWithoutSubProcess">
+		SELECT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+	</query>
+
+
+	<query name="getNumberOfSAProcessInstancewithSProcessSupervisorWithoutSubProcess">
+		SELECT COUNT(ap.sourceObjectId)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+		     org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND ap.processDefinitionId = processsupervisor.processDefId
+	</query>
+
+	<query name="searchSAProcessInstancewithSProcessSupervisorWithoutSubProcess">
+		SELECT DISTINCT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+		     org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND ap.processDefinitionId = processsupervisor.processDefId
+	</query>
+
+	<query name="getNumberOfSAProcessInstancewithSProcessSupervisorSUserTaskInstanceWithoutSubProcess">
+		SELECT COUNT(ap.sourceObjectId)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a,
+		     org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId = processsupervisor.processDefId
+	</query>
+
+	<query name="searchSAProcessInstancewithSProcessSupervisorSUserTaskInstanceWithoutSubProcess">
+		SELECT DISTINCT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a,
+		     org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId = processsupervisor.processDefId
+	</query>
+
+	<query name="getChildrenSourceProcessInstanceIdsFromRootProcessInstance">
+		SELECT DISTINCT ap.sourceObjectId
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.rootProcessInstanceId = :rootProcessInstanceId
+		AND ap.callerId != -1
+  	</query>
+	<query name="getArchivedChildrenProcessInstanceIds">
+		SELECT ap.sourceObjectId
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.rootProcessInstanceId IN (:sourceProcessInstanceIds)
+	</query>
+	<query name="deleteByIdsSAProcessInstance">
+		DELETE
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
+		WHERE ap.id IN (:ids)
+	</query>
+
+  	<sql-query name="getNumberOfSAProcessInstanceInvolvingUser">
+		<return-scalar column="count" type="long"/>
+		SELECT count(id) as count from (
+			SELECT ap.*
+				FROM arch_process_instance ap
+				JOIN (
+					select afi.logicalGroup2 from arch_flownode_instance afi
+						WHERE afi.kind in ('user', 'manual')
+						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
+						AND afi.stateId = 2
+				) humanTask ON (humanTask.logicalGroup2 = ap.sourceObjectId)
+			WHERE (ap.stateId in (6 , 7 , 3 , 4))
+			UNION
+			SELECT ap.*
+				FROM arch_process_instance ap
+				WHERE (ap.stateId in (6 , 7 , 3 , 4))
+					AND ap.startedBy = :userId
+		) ap
+	</sql-query>
+
+	<sql-query name="searchSAProcessInstanceInvolvingUser">
+		<return alias="ap" class="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" />
+		SELECT * from (
+			SELECT ap.*
+				FROM arch_process_instance ap
+				JOIN (
+					select afi.logicalGroup2 from arch_flownode_instance afi
+						WHERE afi.kind in ('user', 'manual')
+						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
+						AND afi.stateId = 2
+				) humanTask ON (humanTask.logicalGroup2 = ap.sourceObjectId)
+				WHERE (ap.stateId in (6 , 7 , 3 , 4))
+			UNION
+			SELECT ap.*
+				FROM arch_process_instance ap
+					WHERE (ap.stateId in (6 , 7 , 3 , 4))
+					AND ap.startedBy = :userId
+		) ap
+	</sql-query>
+
+  	<query name="getNumberOfSAProcessInstanceSupervisedBy">
+		SELECT COUNT(DISTINCT ap.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
+		WHERE ap.stateId IN (6,7,3,4)
+		AND ap.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
+			OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+				   	 org.bonitasoft.engine.identity.model.SUserMembership as um
+				WHERE um.userId = :userId
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+  	</query>
+
+  	<query name="searchSAProcessInstanceSupervisedBy">
+		SELECT DISTINCT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
+		WHERE ap.stateId IN (6,7,3,4)
+		AND ap.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
+			OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+				   	 org.bonitasoft.engine.identity.model.SUserMembership as um
+				WHERE um.userId = :userId
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+    </query>
+
+  	<query name="getNumberOfSAProcessInstancewithSUserTaskInstanceSupervisedBy">
+		SELECT COUNT(DISTINCT ap.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
+		WHERE ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
+			OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+				   	 org.bonitasoft.engine.identity.model.SUserMembership as um
+				WHERE um.userId = :userId
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+  	</query>
+
+  	<query name="searchSAProcessInstancewithSUserTaskInstanceSupervisedBy">
+		SELECT DISTINCT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap,
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+             org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
+		WHERE ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
+			OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+				   	 org.bonitasoft.engine.identity.model.SUserMembership as um
+				WHERE um.userId = :userId
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+    </query>
+
+    <query name="getSARefBusinessDataInstance">
+        SELECT ref
+        FROM org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance AS ref
+        WHERE ref.name = :name
+        AND ref.processInstanceId = :processInstanceId
+    </query>
+
+    <query name="getSAFlowNodeRefBusinessDataInstance">
+        SELECT ref
+        FROM org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance AS ref
+        WHERE ref.name = :name
+        AND ref.flowNodeInstanceId = :flowNodeInstanceId
+    </query>
+
+	<query name="deleteArchivedRefBizDataForProcessInstance">
+		DELETE FROM org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance
+		WHERE processInstanceId = :processInstanceId
+	</query>
+	<query name="deleteArchivedRefBizDataForProcessInstances">
+		DELETE FROM org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance
+		WHERE processInstanceId IN (:processInstanceIds)
+	</query>
+
+	<!-- Avoid deleting children without its parent using the rootProcessInstanceId in (:sourceProcessInstanceIds) -->
+	<query name="deleteArchiveProcessInstanceBySourceObjectId">
+		DELETE FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance
+		WHERE sourceObjectId IN (:sourceProcessInstanceIds)
+		AND rootProcessInstanceId IN (:sourceProcessInstanceIds)
+	</query>
+
+	<query name="getSourceObjectIdsOfArchivedFlowNodeInstances">
+		SELECT f.sourceObjectId
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS f
+		WHERE f.logicalGroup2 IN (:sourceProcessInstanceIds)
+	</query>
+
+	<query name="deleteArchivedFlowNodeInstances">
+		DELETE
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance AS f
+		WHERE f.sourceObjectId IN (:sourceObjectIds)
+	</query>
+
+</hibernate-mapping>

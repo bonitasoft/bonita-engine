@@ -1,0 +1,127 @@
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.api.impl.livingapplication;
+
+import java.util.List;
+
+import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
+import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
+import org.bonitasoft.engine.business.application.*;
+import org.bonitasoft.engine.business.application.importer.validator.ApplicationMenuCreatorValidator;
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.service.ServiceAccessor;
+
+/**
+ * @author Elias Ricken de Medeiros
+ */
+public class LivingApplicationMenuAPIDelegate {
+
+    private final ApplicationMenuModelConverter converter;
+    private final ApplicationService applicationService;
+    private final ApplicationMenuCreatorValidator creatorValidator;
+    private final long loggedUserId;
+
+    public LivingApplicationMenuAPIDelegate(final ServiceAccessor accessor,
+            final ApplicationMenuModelConverter converter,
+            final ApplicationMenuCreatorValidator creatorValidator, final long loggedUserId) {
+        this.creatorValidator = creatorValidator;
+        this.loggedUserId = loggedUserId;
+        applicationService = accessor.getApplicationService();
+        this.converter = converter;
+    }
+
+    /**
+     * @deprecated as of 9.0.0, Application menu should be created at startup.
+     */
+    @Deprecated(since = "9.0.0")
+    public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator)
+            throws CreationException {
+        try {
+            List<String> errors = creatorValidator.isValid(applicationMenuCreator);
+            if (!errors.isEmpty()) {
+                throw new CreationException(
+                        "The ApplicationMenuCreator is invalid. Problems: " + errors);
+            }
+            final int index = applicationService.getNextAvailableIndex(applicationMenuCreator.getParentId());
+            final SApplicationMenu sApplicationMenu = applicationService
+                    .createApplicationMenu(converter.buildSApplicationMenu(applicationMenuCreator, index));
+            applicationService.updateApplication(sApplicationMenu.getApplicationId(),
+                    new SApplicationUpdateBuilder(loggedUserId).done());
+            return converter.toApplicationMenu(sApplicationMenu);
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
+        }
+    }
+
+    /**
+     * @deprecated as of 9.0.0, Application menu should be updated at startup.
+     */
+    @Deprecated(since = "9.0.0")
+    public ApplicationMenu updateApplicationMenu(final long applicationMenuId, final ApplicationMenuUpdater updater)
+            throws ApplicationMenuNotFoundException,
+            UpdateException {
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationMenuUpdateDescriptor(updater);
+        try {
+            final SApplicationMenu sApplicationMenu = applicationService.updateApplicationMenu(applicationMenuId,
+                    updateDescriptor);
+            applicationService.updateApplication(sApplicationMenu.getApplicationId(),
+                    new SApplicationUpdateBuilder(loggedUserId).done());
+            return converter.toApplicationMenu(sApplicationMenu);
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationMenuNotFoundException(e.getMessage());
+        } catch (final SBonitaException e) {
+            throw new UpdateException(e);
+        }
+    }
+
+    public ApplicationMenu getApplicationMenu(final long applicationMenuId) throws ApplicationMenuNotFoundException {
+        try {
+            final SApplicationMenu sApplicationMenu = applicationService.getApplicationMenu(applicationMenuId);
+            return converter.toApplicationMenu(sApplicationMenu);
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationMenuNotFoundException(e.getMessage());
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    public void deleteApplicationMenu(final long applicationMenuId) throws DeletionException {
+        try {
+            final SApplicationMenu deletedApplicationMenu = applicationService.deleteApplicationMenu(applicationMenuId);
+            applicationService.updateApplication(deletedApplicationMenu.getApplicationId(),
+                    new SApplicationUpdateBuilder(loggedUserId).done());
+        } catch (final SObjectNotFoundException sonfe) {
+            throw new DeletionException(new ApplicationMenuNotFoundException(sonfe.getMessage()));
+        } catch (final SBonitaException e) {
+            throw new DeletionException(e);
+        }
+    }
+
+    public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchApplicationMenus searchApplicationMenus)
+            throws SearchException {
+        try {
+            searchApplicationMenus.execute();
+            return searchApplicationMenus.getResult();
+        } catch (final SBonitaException e) {
+            throw new SearchException(e);
+        }
+    }
+
+}

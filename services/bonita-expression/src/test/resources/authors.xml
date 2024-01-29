@@ -1,0 +1,14 @@
+<racine>
+	<encyclopedie nom="Wikipedia" site="http://fr.wikipedia.org">
+		<article nom="XPath">
+			<auteurs>
+				<auteur>
+					<nom>Dupont</nom>
+				</auteur>
+				<auteur>
+					<nom>Dubois</nom>
+				</auteur>
+			</auteurs>
+		</article>
+	</encyclopedie>
+</racine>
