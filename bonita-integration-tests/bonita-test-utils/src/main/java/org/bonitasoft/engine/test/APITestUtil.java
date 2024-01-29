@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1520,22 +1519,16 @@ public class APITestUtil extends PlatformTestUtil {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive,
                 BuildTestUtil.ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue(processInstance != null);
+        assertNotNull(processInstance);
         return processInstance;
     }
 
     public ArchivedDataInstance getArchivedDataInstance(final List<ArchivedDataInstance> archivedDataInstances,
             final String dataName) {
-        ArchivedDataInstance archivedDataInstance = null;
-        final Iterator<ArchivedDataInstance> iterator = archivedDataInstances.iterator();
-        while (archivedDataInstance == null || iterator.hasNext()) {
-            final ArchivedDataInstance next = iterator.next();
-            if (next.getName().equals(dataName)) {
-                archivedDataInstance = next;
-            }
-        }
-        assertNotNull(archivedDataInstance);
-        return archivedDataInstance;
+        return archivedDataInstances.stream()
+                .filter(archDataInstance -> archDataInstance.getName().equals(dataName))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No archived data instance found for name: " + dataName));
     }
 
     public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess,

@@ -51,7 +51,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     @Test
     public void getIntegerDataInstanceFromProcess() throws Exception {
         final String className = Integer.class.getName();
-        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+        final ProcessDefinition processDefinition = operateProcess(user,
                 new ExpressionBuilder().createConstantIntegerExpression(1), className);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinition.getId());
@@ -71,7 +71,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     public void getDataInstance_should_return_empty_list_when_start_index_is_greater_than_number_of_elements_in_Db()
             throws Exception {
         final String className = String.class.getName();
-        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+        final ProcessDefinition processDefinition = operateProcess(user,
                 new ExpressionBuilder().createConstantStringExpression("aaa"), className);
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
@@ -87,7 +87,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     @Test
     public void getShortTextDataInstanceFromProcess() throws Exception {
         final String className = String.class.getName();
-        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+        final ProcessDefinition processDefinition = operateProcess(user,
                 new ExpressionBuilder().createConstantStringExpression("aaa"), className);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinition.getId());
@@ -106,7 +106,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     @Test
     public void processWithShortAndLongTextData() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
-                .createNewInstance("processWithlongAndshortText", "1.0");
+                .createNewInstance("processWithLongAndShortText", "1.0");
         builder.addUserTask("step1", ACTOR_NAME);
         builder.addActor(ACTOR_NAME);
         final String shortTextValue = "shortTextValue";
@@ -114,9 +114,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
                 new ExpressionBuilder().createConstantStringExpression(shortTextValue));
         final String longTextValue = "longTextValue";
         final StringBuilder longBuilder = new StringBuilder(longTextValue);
-        for (int i = 0; i < 10; i++) {
-            longBuilder.append(longTextValue);
-        }
+        longBuilder.append(longTextValue.repeat(10));
         builder.addLongTextData("longTextData",
                 new ExpressionBuilder().createConstantStringExpression(longBuilder.toString()));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
@@ -133,7 +131,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     @Test
     public void getDoubleDataInstanceFromProcess() throws Exception {
         final String className = Double.class.getName();
-        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+        final ProcessDefinition processDefinition = operateProcess(user,
                 new ExpressionBuilder().createConstantDoubleExpression(1.5), className);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinition.getId());
@@ -152,7 +150,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     @Test
     public void getFloatDataInstanceFromProcess() throws Exception {
         final String className = Float.class.getName();
-        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+        final ProcessDefinition processDefinition = operateProcess(user,
                 new ExpressionBuilder().createConstantFloatExpression(1.5f), className);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinition.getId());
@@ -171,7 +169,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     @Test
     public void getBooleanDataInstanceFromProcess() throws Exception {
         final String className = Boolean.class.getName();
-        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+        final ProcessDefinition processDefinition = operateProcess(user,
                 new ExpressionBuilder().createConstantBooleanExpression(true), className);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinition.getId());
@@ -189,7 +187,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
 
     @Test
     public void getDateDataInstanceFromProcess() throws Exception {
-        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+        final ProcessDefinition processDefinition = operateProcess(user,
                 new ExpressionBuilder().createConstantDateExpression("2013-07-18T14:49:26.86+02:00"),
                 Date.class.getName());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
@@ -209,7 +207,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     @Test
     public void getLongDataInstanceFromProcess() throws Exception {
         final String className = Long.class.getName();
-        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+        final ProcessDefinition processDefinition = operateProcess(user,
                 new ExpressionBuilder().createConstantLongExpression(1), className);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
                 .getProcessDeploymentInfo(processDefinition.getId());
@@ -240,7 +238,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         // verify the retrieved data
         List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0,
                 10);
-        assertTrue(!processDataInstances.isEmpty());
+        assertFalse(processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals("var1", processDataInstances.get(0).getName());
         assertEquals(1, processDataInstances.get(0).getValue());
@@ -249,7 +247,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
 
         // retrieve data after the update
         processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10);
-        assertTrue(!processDataInstances.isEmpty());
+        assertFalse(processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals(2, processDataInstances.get(0).getValue());
 
@@ -287,7 +285,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         final List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(),
                 0, 10);
         assertEquals(1, processDataInstances.size());
-        assertEquals(null, processDataInstances.get(0).getValue());
+        assertNull(processDataInstances.get(0).getValue());
 
         // Evaluate the data
         final List<Expression> dependencies = Collections
@@ -295,7 +293,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         final Expression longExpression = new ExpressionBuilder().createGroovyScriptExpression("Script",
                 "data = new ArrayList<String>(); data.add(\"plop\"); return data;", List.class.getName(), dependencies);
         final Map<Expression, Map<String, Serializable>> expressions = Collections.singletonMap(longExpression,
-                Collections.<String, Serializable> emptyMap());
+                Collections.emptyMap());
         getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id, expressions);
 
         disableAndDeleteProcess(processDefinition);
@@ -319,7 +317,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         // verify the retrieved data
         List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0,
                 10);
-        assertTrue(!processDataInstances.isEmpty());
+        assertFalse(processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals("var1", processDataInstances.get(0).getName());
         assertEquals(1, processDataInstances.get(0).getValue());
@@ -328,7 +326,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
 
         // retrieve data after the update
         processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10);
-        assertTrue(!processDataInstances.isEmpty());
+        assertFalse(processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals(2, processDataInstances.get(0).getValue());
 
@@ -336,7 +334,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
 
         // retrieve data after the update
         processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10);
-        assertTrue(!processDataInstances.isEmpty());
+        assertFalse(processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals(3, processDataInstances.get(0).getValue());
 
@@ -362,7 +360,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         // verify the retrieved data
         List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0,
                 10);
-        assertTrue(!processDataInstances.isEmpty());
+        assertFalse(processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals("var1", processDataInstances.get(0).getName());
         assertEquals(1, processDataInstances.get(0).getValue());
@@ -373,30 +371,30 @@ public class ProcessDataInstanceIT extends TestWithUser {
 
         // retrieve data after process has finished
         try {
-            processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10);
+            getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10);
         } finally {
             disableAndDeleteProcess(processDefinition);
         }
     }
 
-    private ProcessDefinition operateProcess(final User user, final String dataName, final Expression expression,
-            final String className) throws Exception {
+    private ProcessDefinition operateProcess(final User user, final Expression expression, final String className)
+            throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process", "1.0");
         if (className.equals(Integer.class.getName())) {
-            processDefinitionBuilder.addIntegerData(dataName, expression);
+            processDefinitionBuilder.addIntegerData("var1", expression);
         } else if (className.equals(Long.class.getName())) {
-            processDefinitionBuilder.addLongData(dataName, expression);
+            processDefinitionBuilder.addLongData("var1", expression);
         } else if (className.equals(Double.class.getName())) {
-            processDefinitionBuilder.addDoubleData(dataName, expression);
+            processDefinitionBuilder.addDoubleData("var1", expression);
         } else if (className.equals(Float.class.getName())) {
-            processDefinitionBuilder.addFloatData(dataName, expression);
+            processDefinitionBuilder.addFloatData("var1", expression);
         } else if (className.equals(Boolean.class.getName())) {
-            processDefinitionBuilder.addBooleanData(dataName, expression);
+            processDefinitionBuilder.addBooleanData("var1", expression);
         } else if (className.equals(Date.class.getName())) {
-            processDefinitionBuilder.addDateData(dataName, expression);
+            processDefinitionBuilder.addDateData("var1", expression);
         } else if (className.equals(String.class.getName())) {
-            processDefinitionBuilder.addShortTextData(dataName, expression);
+            processDefinitionBuilder.addShortTextData("var1", expression);
         }
         final DesignProcessDefinition processDef = processDefinitionBuilder.addActor(ACTOR_NAME)
                 .addDescription("Delivery all day and night long")
@@ -422,6 +420,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor",
                 user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        Thread.sleep(10);
         getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
 
         final ArchivedDataInstance archivedData = getProcessAPI().getArchivedProcessDataInstance(dataName,
@@ -449,7 +448,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
     }
 
     @Test
-    public void dontArchivedTransientProcessDataInstance() throws Exception {
+    public void doNotArchiveTransientProcessDataInstance() throws Exception {
         final String dataName = "test";
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive",
                 "1.0");
@@ -484,7 +483,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         try {
             getProcessAPI().getArchivedProcessDataInstance("o", processInstance.getId());
             fail("The data named 'o' does not exists");
-        } catch (final ArchivedDataNotFoundException dnfe) {
+        } catch (final ArchivedDataNotFoundException ignored) {
             // Do nothing
         } finally {
             disableAndDeleteProcess(processDefinition);
@@ -505,6 +504,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor",
                 user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        Thread.sleep(10);
         getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
 
         List<ArchivedDataInstance> archivedDataInstances = getProcessAPI()
