@@ -34,7 +34,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExceptionContext;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -472,14 +471,14 @@ public class ActivityDataInstanceIT extends TestWithUser {
         try {
             getProcessAPI().getArchivedProcessDataInstance("o", userTaskId);
             fail("The data named 'o' does not exists");
-        } catch (final ArchivedDataNotFoundException dnfe) {
+        } catch (final ArchivedDataNotFoundException ignored) {
             // Do nothing
         } finally {
             disableAndDeleteProcess(processDefinition);
         }
     }
 
-    private ProcessDefinition deployAndEnableProcWithPersistedAndTransientVariable() throws BonitaException {
+    private ProcessDefinition deployAndEnableProcWithPersistedAndTransientVariable() throws Exception {
         final String startName = "start";
         final String endName = "end";
         final Expression defaultValue = new ExpressionBuilder().createConstantStringExpression("default");
