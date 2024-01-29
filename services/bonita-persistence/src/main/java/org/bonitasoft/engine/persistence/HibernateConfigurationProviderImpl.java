@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.services.Vendor.POSTGRES;
-import static org.bonitasoft.engine.services.Vendor.SQLSERVER;
+import static org.bonitasoft.engine.services.Vendor.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,6 +133,9 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         }
         if (vendor == SQLSERVER) {
             sessionFactoryBuilder.applyInterceptor(new SQLServerInterceptor());
+        }
+        if (vendor == ORACLE) {
+            sessionFactoryBuilder.applyInterceptor(new OracleInterceptor());
         }
         this.sessionFactory = sessionFactoryBuilder.build();
         for (PersistentClass entityBinding : metadata.getEntityBindings()) {

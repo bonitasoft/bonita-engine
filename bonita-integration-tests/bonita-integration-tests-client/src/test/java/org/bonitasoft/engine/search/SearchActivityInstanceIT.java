@@ -1282,20 +1282,20 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription("Famous French actor");
-        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("usertask1", ACTOR_NAME)
-                .addUserTask("usertask2", ACTOR_NAME)
-                .addUserTask("usertask3", ACTOR_NAME).addUserTask("task4", ACTOR_NAME)
-                .addUserTask("usertask5", ACTOR_NAME)
-                .addUserTask("usertask6", ACTOR_NAME).getProcess();
+        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME)
+                .addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME).addUserTask("task4", ACTOR_NAME)
+                .addUserTask("userTask5", ACTOR_NAME)
+                .addUserTask("userTask6", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
                 john);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(pi0, "usertask1");
-        waitForUserTask(pi0, "usertask2");
-        waitForUserTask(pi0, "usertask3");
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTask(pi0, "userTask2");
+        waitForUserTask(pi0, "userTask3");
         waitForUserTask(pi0, "task4");
-        waitForUserTask(pi0, "usertask5");
-        waitForUserTask(pi0, "usertask6");
+        waitForUserTask(pi0, "userTask5");
+        waitForUserTask(pi0, "userTask6");
 
         // filter all *userTask*, managedBy jack:
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -1306,15 +1306,15 @@ public class SearchActivityInstanceIT extends TestWithUser {
         assertEquals(5, aHumanTasksRes.getCount());
         List<HumanTaskInstance> tasks = aHumanTasksRes.getResult();
         HumanTaskInstance humanTaskInstance = tasks.get(0);
-        assertEquals("usertask1", humanTaskInstance.getName());
+        assertEquals("userTask1", humanTaskInstance.getName());
         humanTaskInstance = tasks.get(1);
-        assertEquals("usertask2", humanTaskInstance.getName());
+        assertEquals("userTask2", humanTaskInstance.getName());
         humanTaskInstance = tasks.get(2);
-        assertEquals("usertask3", humanTaskInstance.getName());
+        assertEquals("userTask3", humanTaskInstance.getName());
         humanTaskInstance = tasks.get(3);
-        assertEquals("usertask5", humanTaskInstance.getName());
+        assertEquals("userTask5", humanTaskInstance.getName());
         humanTaskInstance = tasks.get(4);
-        assertEquals("usertask6", humanTaskInstance.getName());
+        assertEquals("userTask6", humanTaskInstance.getName());
 
         // filter all *userTask*, managedBy jules:
         builder = new SearchOptionsBuilder(0, 10);
