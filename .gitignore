@@ -40,7 +40,7 @@ engine-sp-it.exec
 FILEPATH.*.db
 Temporary*.java
 generated
-bonita_journal.db.*
+h2databasedir
 
 ### gradle
 build
