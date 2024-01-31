@@ -20,12 +20,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.web.toolkit.client.common.i18n.AbstractI18n;
+import org.junit.After;
 import org.junit.Test;
 
 /**
  * @author Emmanuel Duchastenier
  */
 public class I18nTest {
+
+    @After
+    public void cleanup() {
+        System.clearProperty(I18n.I18N_CUSTOM_DIR_PROPERTY);
+        final I18n i18n = I18n.getInstance();
+        i18n.refresh();
+    }
 
     @Test
     public void getStreams_should_read_from_classpath() {
@@ -67,8 +75,6 @@ public class I18nTest {
         final Map<String, String> translations = i18n.getLocale(AbstractI18n.LOCALE.es);
 
         assertThat(translations.get("test key")).isEqualTo("valor de prueba en Espanol");
-
-        System.clearProperty(I18n.I18N_CUSTOM_DIR_PROPERTY);
     }
 
     @Test
@@ -81,8 +87,6 @@ public class I18nTest {
         final Map<String, String> translations = i18n.getLocale(AbstractI18n.LOCALE.fr);
 
         assertThat(translations.get("test key")).isEqualTo("Valeur modifiée");
-
-        System.clearProperty(I18n.I18N_CUSTOM_DIR_PROPERTY);
     }
 
     @Test
@@ -97,7 +101,5 @@ public class I18nTest {
         assertThat(translations.get("test key")).isEqualTo("Valeur modifiée");
         assertThat(translations.get("about")).isEqualTo("Copyright Bonitasoft 2016");
         assertThat(translations.get("web site title")).isEqualTo("Bienvenue dans Bonita Portal 7+");
-
-        System.clearProperty(I18n.I18N_CUSTOM_DIR_PROPERTY);
     }
 }
