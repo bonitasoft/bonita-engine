@@ -76,6 +76,12 @@ subprojects {
         description "List runtime dependencies for a specified configuration"
         configurations = [project.configurations.runtimeClasspath]
     }
+    tasks.withType(Test).configureEach {
+        if (!project.hasProperty("createTestReports")) {
+            reports.html.required = false
+            reports.junitXml.required = false
+        }
+    }
     testlogger {
         showFullStackTraces false
         showCauses true
