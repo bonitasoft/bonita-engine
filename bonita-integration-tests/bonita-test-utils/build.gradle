@@ -1,0 +1,15 @@
+dependencies {
+    api project(':bpm:bonita-client')
+    api project(':bpm:bonita-common')
+    api project(':bonita-test-api')
+    api "junit:junit:${Deps.junit4Version}"
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    api "org.assertj:assertj-core:${Deps.assertjVersion}"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
+}

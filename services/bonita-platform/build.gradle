@@ -1,0 +1,35 @@
+
+
+dependencies {
+    api project(':services:bonita-cache')
+    api project(':services:bonita-builder')
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-commons')
+    testImplementation project(':services:bonita-events')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}
+
+group = 'org.bonitasoft.engine.platform'
+def generatePlatformProperties = task("generatePlatformProperties") {
+    doFirst{
+        project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl").mkdirs()
+        project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl/platform.properties").text =
+                "version $project.version"
+    }
+    inputs.property "version", project.version
+    outputs.file project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl/platform.properties")
+}
+tasks.processResources.dependsOn generatePlatformProperties
+sourceSets {
+    main {
+        resources {
+            srcDir project.file("build/generated/main/resources")
+        }
+    }
+}

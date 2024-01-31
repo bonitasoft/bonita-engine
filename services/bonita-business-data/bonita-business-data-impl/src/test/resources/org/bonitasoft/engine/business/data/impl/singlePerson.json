@@ -1,0 +1,39 @@
+{
+  "persistenceId": 1,
+  "persistenceVersion": 2,
+  "persistenceId_string": "1",
+  "persistenceVersion_string": "2",
+  "name": "John",
+  "age": 50,
+  "phones": [
+    {
+      "persistenceId": null,
+      "persistenceVersion": null,
+      "persistenceId_string": null,
+      "persistenceVersion_string": null,
+      "number": "1234560"
+    },
+    {
+      "persistenceId": null,
+      "persistenceVersion": null,
+      "persistenceId_string": null,
+      "persistenceVersion_string": null,
+      "number": "1234561"
+    },
+    {
+      "persistenceId": null,
+      "persistenceVersion": null,
+      "persistenceId_string": null,
+      "persistenceVersion_string": null,
+      "number": "1234562"
+    }
+  ],
+  "birthday": 123456789,
+  "hasMobile": true,
+  "bools": [
+    true,
+    false,
+    true,
+    false
+  ]
+}

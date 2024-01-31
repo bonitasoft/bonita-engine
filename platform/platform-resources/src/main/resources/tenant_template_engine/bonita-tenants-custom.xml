@@ -1,0 +1,57 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+
+    <!-- ADD ANY BEAN DEFINITION YOU WANT TO BE AVAILABLE TO THE TENANT ACCESSOR -->
+
+    <!--
+    <bean id="flushEventListeners" parent="defaultFlushEventListeners" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+    -->
+
+    <!--
+    <bean id="activatedRecords" parent="defaultActivatedRecords" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+    -->
+
+
+    <!-- custom authorization rule mapping must implement org.bonitasoft.engine.core.form.AuthorizationRuleMapping -->
+    <!--
+    <bean id="customAuthorizationRuleMapping"
+          class="org.bonitasoft.engine.core.form.impl.custom.CustomAuthorizationRuleMappingImpl"/>
+    -->
+
+    <!-- custom authorization rules must implements org.bonitasoft.engine.page.AuthorizationRule -->
+    <!--
+    <bean id="customIsProcessInitiatorRule" class="org.bonitasoft.engine.core.form.impl.custom.CustomIsProcessInitiatorRule">
+        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
+        <constructor-arg name="sessionService" ref="sessionService"/>
+    </bean>
+    -->
+
+
+    <!-- Authorization rule that also grants access to case overview page for a manager of a user involved in the case -->
+    <!--
+    <bean id="managerInvolvedAuthorizationRuleMappingImpl"
+          class="org.bonitasoft.engine.core.form.impl.ManagerInvolvedAuthorizationRuleMappingImpl"/>
+
+    <bean id="isManagerOfUserInvolvedInProcessInstanceRule" class="org.bonitasoft.engine.page.IsManagerOfUserInvolvedInProcessInstanceRule">
+        <constructor-arg name="sessionService" ref="sessionService"/>
+        <constructor-arg name="processInvolvementDelegate" ref="processInvolvementDelegate"/>
+    </bean>
+    -->
+
+
+    <!-- Schema Manager that avoids to update the database schema when updating BDM -->
+    <!--
+    <bean id="schemaManager" class="org.bonitasoft.engine.business.data.impl.SchemaManagerReadOnly">
+    </bean>
+        -->
+</beans>
