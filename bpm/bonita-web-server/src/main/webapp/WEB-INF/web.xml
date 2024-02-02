@@ -38,11 +38,11 @@
             <param-value>frame-ancestors 'self';</param-value>
         </init-param>
         <!--
-            The excludePattern default value is the one commented out bellow, but you can uncomment it and add new patterns if you need to
+            There is no default excludePattern for this filter, but you can uncomment it and add one if you need to
         -->
         <!-- init-param>
             <param-name>excludePattern</param-name>
-            <param-value>^/(bonita/)?(portal/resource/.+/content/$)|(portal/custom-page/.+/$)</param-value>
+            <param-value></param-value>
         </init-param -->
     </filter>
     <filter>
