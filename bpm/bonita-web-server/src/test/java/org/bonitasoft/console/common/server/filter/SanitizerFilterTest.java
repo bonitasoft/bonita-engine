@@ -218,6 +218,8 @@ public class SanitizerFilterTest {
 
         final String body = String.format("{%n" +
                 "  \"key1\": \"value1\",%n" +
+                "  \"keyOfEmpty\": \"\",%n" +
+                "  \"keyOfNull\": null,%n" +
                 "  \"%s\": \"%s\",%n" +
                 "  \"%s\": \"%s\",%n" +
                 "  \"%s\": \"%s\",%n" +
@@ -270,6 +272,8 @@ public class SanitizerFilterTest {
             var json = mapper.readTree(stringBody);
             // check normal values
             assertThat(json.get("key1").asText()).isEqualTo("value1");
+            assertThat(json.get("keyOfEmpty").asText()).isEqualTo("");
+            assertThat(json.get("keyOfNull").isNull()).isTrue();
             assertThat(json.get("email").asText()).isEqualTo("walter.bates@bonitasoft.com");
             // check sanitized values
             assertThat(json.get(attName1).asText()).isEqualTo(saneValue1);
