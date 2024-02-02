@@ -40,6 +40,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.console.common.server.preferences.properties.PropertiesFactory;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
 /**
@@ -197,7 +198,7 @@ public class SanitizerFilter extends ExcludingPatternFilter {
             }
             return changed.get() ? Optional.of(array) : Optional.empty();
         } else if (node.isValueNode()) {
-            if (node.isBoolean() || node.isNumber() || node.isPojo()) {
+            if (node.isBoolean() || node.isNumber() || node.isPojo() || StringUtils.isEmpty(node.textValue())) {
                 // that's safe
                 return Optional.empty();
             }
