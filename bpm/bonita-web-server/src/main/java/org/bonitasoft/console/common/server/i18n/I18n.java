@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.bonitasoft.web.toolkit.client.common.i18n.AbstractI18n;
 import org.bonitasoft.web.toolkit.client.common.texttemplate.Arg;
+import org.bonitasoft.web.toolkit.client.common.texttemplate.TextTemplate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -156,12 +157,10 @@ public class I18n extends AbstractI18n {
     @Override
     protected String getText(String string) {
         return string;
-        //        throw new RuntimeException("On server side, we absolutely need to pass locale");
     }
 
     @Override
     protected String getText(String string, Arg... args) {
-        return string;
-        //        throw new RuntimeException("On server side, we absolutely need to pass locale");
+        return new TextTemplate(string).toString(args);
     }
 }

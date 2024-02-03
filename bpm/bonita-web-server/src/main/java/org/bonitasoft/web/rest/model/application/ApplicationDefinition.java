@@ -16,6 +16,7 @@ package org.bonitasoft.web.rest.model.application;
 import org.bonitasoft.web.toolkit.client.data.item.Definitions;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.ItemAttribute;
+import org.bonitasoft.web.toolkit.client.data.item.attribute.validator.FileIsImageOrServletPathValidator;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -45,7 +46,8 @@ public class ApplicationDefinition extends ItemDefinition<ApplicationItem> {
         createAttribute(ApplicationItem.ATTRIBUTE_THEME_ID, ItemAttribute.TYPE.ITEM_ID);
         createAttribute(ApplicationItem.ATTRIBUTE_VERSION, ItemAttribute.TYPE.STRING);
         createAttribute(ApplicationItem.ATTRIBUTE_DESCRIPTION, ItemAttribute.TYPE.TEXT);
-        createAttribute(ApplicationItem.ATTRIBUTE_ICON, ItemAttribute.TYPE.IMAGE);
+        createAttribute(ApplicationItem.ATTRIBUTE_ICON, ItemAttribute.TYPE.STRING)
+                .addValidator(new FileIsImageOrServletPathValidator(ApplicationItem.ICON_PATH_API_PREFIX));
         createAttribute(ApplicationItem.ATTRIBUTE_CREATION_DATE, ItemAttribute.TYPE.STRING);
         createAttribute(ApplicationItem.ATTRIBUTE_CREATED_BY, ItemAttribute.TYPE.ITEM_ID);
         createAttribute(ApplicationItem.ATTRIBUTE_LAST_UPDATE_DATE, ItemAttribute.TYPE.STRING);
