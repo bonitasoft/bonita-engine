@@ -44,15 +44,13 @@ public class FrameSecurityFilter extends ExcludingPatternFilter {
 
     protected static final String CONTENT_SECURITY_POLICY_HEADER_DEFAULT = "frame-ancestors 'self';";
 
-    protected static final String FRAME_FILTER_EXCLUDED_PAGES_PATTERN = "^/(bonita/)?(portal/resource/.+/content/$)|(portal/custom-page/.+/$)";
-
     protected String xFrameHeaderValue;
 
     protected String contentSecurityHeaderValue;
 
     @Override
     public String getDefaultExcludedPages() {
-        return FRAME_FILTER_EXCLUDED_PAGES_PATTERN;
+        return "";
     }
 
     @Override
