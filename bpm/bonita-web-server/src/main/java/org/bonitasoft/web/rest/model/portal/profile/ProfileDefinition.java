@@ -16,9 +16,11 @@ package org.bonitasoft.web.rest.model.portal.profile;
 import static org.bonitasoft.web.toolkit.client.data.item.template.ItemHasIcon.ATTRIBUTE_ICON;
 import static org.bonitasoft.web.toolkit.client.data.item.template.ItemHasUniqueId.ATTRIBUTE_ID;
 
+import org.bonitasoft.web.rest.server.datastore.organization.Avatars;
 import org.bonitasoft.web.toolkit.client.data.item.Definitions;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.ItemAttribute;
+import org.bonitasoft.web.toolkit.client.data.item.attribute.validator.FileIsImageOrServletPathValidator;
 
 /**
  * @author Julien Mege
@@ -64,7 +66,8 @@ public class ProfileDefinition extends ItemDefinition<ProfileItem> {
 
         createAttribute(ProfileItem.ATTRIBUTE_DESCRIPTION, ItemAttribute.TYPE.TEXT);
 
-        createAttribute(ATTRIBUTE_ICON, ItemAttribute.TYPE.IMAGE);
+        createAttribute(ATTRIBUTE_ICON, ItemAttribute.TYPE.STRING)
+                .addValidator(new FileIsImageOrServletPathValidator(Avatars.PATH));
 
         createAttribute(ProfileItem.ATTRIBUTE_UPDATED_BY_USER_ID, ItemAttribute.TYPE.ITEM_ID);
 

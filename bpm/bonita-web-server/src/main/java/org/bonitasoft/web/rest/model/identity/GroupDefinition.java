@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.web.rest.model.identity;
 
+import org.bonitasoft.web.rest.server.datastore.organization.Avatars;
 import org.bonitasoft.web.toolkit.client.data.item.Definitions;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.ItemAttribute;
+import org.bonitasoft.web.toolkit.client.data.item.attribute.validator.FileIsImageOrServletPathValidator;
 
 /**
  * @author Yongtao Guo
@@ -60,7 +62,8 @@ public class GroupDefinition extends ItemDefinition<GroupItem> {
         createAttribute(GroupItem.ATTRIBUTE_CREATION_DATE, ItemAttribute.TYPE.DATETIME);
         createAttribute(GroupItem.ATTRIBUTE_CREATED_BY_USER_ID, ItemAttribute.TYPE.STRING);
         createAttribute(GroupItem.ATTRIBUTE_LAST_UPDATE_DATE, ItemAttribute.TYPE.DATETIME);
-        createAttribute(GroupItem.ATTRIBUTE_ICON, ItemAttribute.TYPE.IMAGE);
+        createAttribute(GroupItem.ATTRIBUTE_ICON, ItemAttribute.TYPE.STRING)
+                .addValidator(new FileIsImageOrServletPathValidator(Avatars.PATH));
         createAttribute(GroupItem.ATTRIBUTE_PARENT_PATH, ItemAttribute.TYPE.STRING);
         createAttribute(GroupItem.ATTRIBUTE_PARENT_GROUP_ID, ItemAttribute.TYPE.STRING);
     }

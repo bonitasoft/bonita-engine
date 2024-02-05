@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.web.rest.model.identity;
 
+import org.bonitasoft.web.rest.server.datastore.organization.Avatars;
 import org.bonitasoft.web.toolkit.client.data.item.Definitions;
 import org.bonitasoft.web.toolkit.client.data.item.ItemDefinition;
 import org.bonitasoft.web.toolkit.client.data.item.attribute.ItemAttribute;
+import org.bonitasoft.web.toolkit.client.data.item.attribute.validator.FileIsImageOrServletPathValidator;
 
 /**
  * User definition
@@ -60,7 +62,8 @@ public class UserDefinition extends ItemDefinition<UserItem> {
                 .isMandatory();
         createAttribute(UserItem.ATTRIBUTE_LASTNAME, ItemAttribute.TYPE.STRING)
                 .isMandatory();
-        createAttribute(UserItem.ATTRIBUTE_ICON, ItemAttribute.TYPE.IMAGE);
+        createAttribute(UserItem.ATTRIBUTE_ICON, ItemAttribute.TYPE.STRING)
+                .addValidator(new FileIsImageOrServletPathValidator(Avatars.PATH));
         createAttribute(UserItem.ATTRIBUTE_USERNAME, ItemAttribute.TYPE.STRING)
                 .isMandatory();
         createAttribute(UserItem.ATTRIBUTE_PASSWORD, ItemAttribute.TYPE.PASSWORD);
