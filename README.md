@@ -1,6 +1,6 @@
 # Bonita Engine
 
-[![Build](https://github.com/bonitasoft/bonita-engine/workflows/Build/badge.svg)](https://github.com/bonitasoft/bonita-engine/actions)
+[![Build](https://github.com/bonitasoft/bonita-engine/actions/workflows/build.yml/badge.svg)](https://github.com/bonitasoft/bonita-engine/actions/workflows/build.yml)
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.bonitasoft.engine/bonita-server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.bonitasoft.engine/bonita-server)
 
