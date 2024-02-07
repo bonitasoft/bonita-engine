@@ -19,12 +19,6 @@ dependencies {
     testImplementation "org.restlet.jse:org.restlet:${Deps.restletVersion}"
 }
 
-configurations {
-    configureEach {
-        resolutionStrategy.force "org.codehaus.woodstox:stax2-api:${Deps.woodstoxStax2ApiVersion}"
-    }
-}
-
 java {
     withSourcesJar()
 }
