@@ -1,0 +1,32 @@
+{
+  "persistenceId": 9223372036854775807,
+  "persistenceId_string": "9223372036854775807",
+  "persistenceVersion": 1,
+  "persistenceVersion_string": "1",
+  "aString": "string",
+  "aBoolean": true,
+  "aDate": 123,
+  "anOffsetDateTime": "1949-04-09T11:14:05Z",
+  "aLocalDate": "2017-03-06",
+  "aLocalDateTime": "1945-05-08T12:31:17",
+  "aDouble": 1.7976931348623157E308,
+  "aDouble_string": "1.7976931348623157E308",
+  "aFloat": 3.4028235E38,
+  "aFloat_string": "3.4028235E38",
+  "aInteger": 2147483647,
+  "aLong": 9223372036854775807,
+  "aLong_string": "9223372036854775807",
+  "aText": "text",
+  "manyLong": [
+    1,
+    2
+  ],
+  "manyLong_string": [
+    "1",
+    "2"
+  ],
+  "manyString": [
+    "abc",
+    "def"
+  ]
+}

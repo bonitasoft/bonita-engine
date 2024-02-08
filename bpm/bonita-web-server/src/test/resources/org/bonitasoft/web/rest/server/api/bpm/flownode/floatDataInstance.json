@@ -1,0 +1,15 @@
+{
+  "tenantId": 2,
+  "tenantId_string": "2",
+  "name": "dataInstanceName",
+  "description": "description",
+  "transientData": false,
+  "className": "com.company.Model",
+  "containerType": null,
+  "id": 5,
+  "id_string": "5",
+  "containerId": 7,
+  "containerId_string": "7",
+  "value": 123.456,
+  "value_string": "123.456"
+}

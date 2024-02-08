@@ -1,0 +1,50 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
+plugins {
+    id 'java-library'
+    id 'bonita-tests'
+}
+
+dependencies {
+    api(project(":bpm:bonita-common"))
+    api(project(":bpm:bonita-client"))
+
+    api("org.springframework.boot:spring-boot-starter:${Deps.springBootVersion}") {
+        exclude(module: 'snakeyaml')
+    }
+    api("org.yaml:snakeyaml:${Deps.snakeyamlVersion}")
+
+    implementation(project(":bonita-engine-standalone"))
+    implementation(project(":bpm:bonita-server"))
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${Deps.springBootVersion}")
+
+    testImplementation("org.springframework.boot:spring-boot-test:${Deps.springBootVersion}")
+    testImplementation("junit:junit:${Deps.junit4Version}")
+    testImplementation("org.assertj:assertj-core:${Deps.assertjVersion}")
+}
+
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+tasks.register("javadocJar", Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            pom { pom ->
+                name = "bonita-engine-spring-boot-starter"
+                description = "bonita-engine-spring-boot-starter"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

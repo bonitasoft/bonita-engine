@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns="http://www.bonitasoft.org/ns/actormapping/6.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/actormapping/6.0">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Actor Mapping Schema 1.0
+			for Bonita Open Solution.
+			Copyright (C) 2011 BonitaSoft S.A.
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="actorMappings">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="actorMapping" maxOccurs="unbounded" type="ActorMapping" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="ActorMapping">
+		<xsd:all>
+			<xsd:element name="users" type="Users" minOccurs="0" />
+			<xsd:element name="groups" type="Groups" minOccurs="0" />
+			<xsd:element name="roles" type="Roles" minOccurs="0" />
+			<xsd:element name="memberships" type="Membership" minOccurs="0" />
+		</xsd:all>
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+	</xsd:complexType>
+
+
+	<xsd:complexType name="Users">
+		<xsd:sequence>
+			<xsd:element name="user" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Groups">
+		<xsd:sequence>
+			<xsd:element name="group" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Roles">
+		<xsd:sequence>
+			<xsd:element name="role" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Membership">
+		<xsd:sequence>
+			<xsd:element name="membership" minOccurs="0" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:all>
+						<xsd:element name="group" type="xsd:string" />
+						<xsd:element name="role" type="xsd:string" />
+					</xsd:all>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>

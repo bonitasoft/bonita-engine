@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:profiles xmlns:profiles="http://documentation.bonitasoft.com/profile-xml-schema/1.0">
+	<profile name="Administrator" isDefault="true">
+		<description>Administrator profile</description>
+		<profileMapping>
+			<users>
+				<user>userName1</user>
+			</users>
+			<memberships>
+				<membership>
+					<group>/group1</group>
+					<role>role2</role>
+				</membership>
+				<membership>
+					<group>/group2</group>
+					<role>role2</role>
+				</membership>
+			</memberships>
+			<roles>
+				<role>role1</role>
+				<role>role2</role>
+			</roles>
+		</profileMapping>
+	</profile>
+	<profile name="Team Manager" isDefault="true">
+		<description>Team Manager profile</description>
+		<profileMapping>
+			<users>
+				<user>userName4</user>
+			</users>
+		</profileMapping>
+	</profile>
+	<profile name="Process owner" isDefault="false">
+		<description>Process owner profile</description>
+		<profileMapping>
+			<memberships>
+				<membership>
+					<group>/group3</group>
+					<role>role3</role>
+				</membership>
+			</memberships>
+		</profileMapping>
+	</profile>
+	<profile name="User" isDefault="false">
+		<description>User profile</description>
+		<profileMapping>
+			<groups>
+				<group>/group1</group>
+			</groups>
+		</profileMapping>
+	</profile>
+</profiles:profiles>

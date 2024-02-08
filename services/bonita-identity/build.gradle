@@ -1,0 +1,18 @@
+
+
+dependencies {
+    api project(':bpm:bonita-common')
+    api project(':services:bonita-log')
+    api project(':services:bonita-builder')
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-events')
+    api "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
+    api "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

@@ -1,0 +1,174 @@
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.execution.work;
+
+import java.util.Map;
+
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.connector.ConnectorResult;
+import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
+import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SEndEventDefinitionBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
+import org.bonitasoft.engine.execution.event.EventsHandler;
+import org.bonitasoft.engine.service.ServiceAccessor;
+import org.bonitasoft.engine.transaction.STransactionException;
+import org.bonitasoft.engine.work.WorkDescriptor;
+import org.bonitasoft.engine.work.WorkService;
+
+/**
+ * @author Baptiste Mesta
+ * @author Celine Souchet
+ * @author Matthieu Chaffotte
+ */
+public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
+
+    private final long flowNodeInstanceId;
+
+    private final long flowNodeDefinitionId;
+
+    ExecuteConnectorOfActivity(final long processDefinitionId, final long processInstanceId,
+            final long flowNodeDefinitionId, final long flowNodeInstanceId,
+            final long connectorInstanceId,
+            final String connectorDefinitionName) {
+        super(processDefinitionId, connectorInstanceId, connectorDefinitionName,
+                new SExpressionContext(flowNodeInstanceId,
+                        DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinitionId),
+                processInstanceId);
+        this.flowNodeDefinitionId = flowNodeDefinitionId;
+        this.flowNodeInstanceId = flowNodeInstanceId;
+    }
+
+    @Override
+    protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result,
+            final SConnectorDefinition sConnectorDefinition)
+            throws STransactionException, SBonitaException {
+        evaluateOutput(context, result, sConnectorDefinition, flowNodeInstanceId,
+                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+    }
+
+    @Override
+    protected void continueFlow(final Map<String, Object> context) throws SBonitaException {
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final FlowNodeInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final WorkService workService = serviceAccessor.getWorkService();
+        final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+        final WorkDescriptor executeFlowNodeWork = serviceAccessor.getBPMWorkFactory()
+                .createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance);
+        workService.registerWork(executeFlowNodeWork);
+    }
+
+    @Override
+    protected void setContainerInFail(final Map<String, Object> context) throws SBonitaException {
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(
+                serviceAccessor.getEventInstanceService(),
+                serviceAccessor.getSchedulerService());
+        FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter,
+                serviceAccessor.getActivityInstanceService(),
+                serviceAccessor.getFlowNodeStateManager());
+        failedStateSetter.setAsFailed(flowNodeInstanceId);
+    }
+
+    @Override
+    protected SThrowEventInstance createThrowErrorEventInstance(final Map<String, Object> context,
+            final SEndEventDefinition eventDefinition)
+            throws SBonitaException {
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final EventInstanceService eventInstanceService = serviceAccessor.getEventInstanceService();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+
+        final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+        final SEndEventInstanceBuilder builder = BuilderFactory.get(SEndEventInstanceBuilderFactory.class)
+                .createNewEndEventInstance(eventDefinition.getName(),
+                        eventDefinition.getId(), sFlowNodeInstance.getRootContainerId(),
+                        sFlowNodeInstance.getParentContainerId(), processDefinitionId,
+                        sFlowNodeInstance.getRootContainerId(), sFlowNodeInstance.getParentProcessInstanceId());
+        builder.setParentActivityInstanceId(flowNodeInstanceId);
+        final SThrowEventInstance done = (SThrowEventInstance) builder.done();
+        eventInstanceService.createEventInstance(done);
+        return done;
+    }
+
+    @Override
+    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition,
+            final Throwable exception)
+            throws SBonitaException {
+        setConnectorAndContainerToFailed(context, exception);
+        final ServiceAccessor serviceAccessor = getServiceAccessor(context);
+        final EventsHandler eventsHandler = serviceAccessor.getEventsHandler();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+
+        final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+
+        // create a fake definition
+        final String errorCode = sConnectorDefinition.getErrorCode();
+        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory
+                .get(SThrowErrorEventTriggerDefinitionBuilderFactory.class)
+                .createNewInstance(errorCode).done();
+        // event definition as the error code as name, this way we don't need to find the connector that throw this error
+        final SEndEventDefinition eventDefinition = BuilderFactory.get(SEndEventDefinitionBuilderFactory.class)
+                .createNewInstance(errorCode)
+                .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
+        // create an instance using this definition
+        final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(context, eventDefinition);
+        final SProcessDefinition sProcessDefinition = processDefinitionService
+                .getProcessDefinition(processDefinitionId);
+        eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
+                throwEventInstance,
+                errorEventTriggerDefinition, sFlowNodeInstance);
+        serviceAccessor.getBPMArchiverService().archiveAndDeleteFlowNodeInstance(throwEventInstance,
+                sProcessDefinition.getId());
+    }
+
+    @Override
+    public String getDescription() {
+        return getClass().getSimpleName() + ": flowNodeInstanceId = " + flowNodeInstanceId
+                + ", connectorDefinitionName = " + connectorDefinitionName;
+    }
+
+    @Override
+    protected SConnectorDefinition getSConnectorDefinition(final ProcessDefinitionService processDefinitionService)
+            throws SBonitaException {
+        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        final SFlowNodeDefinition flowNodeDefinition = processDefinition.getProcessContainer()
+                .getFlowNode(flowNodeDefinitionId);
+
+        final SConnectorDefinition sConnectorDefinition = flowNodeDefinition
+                .getConnectorDefinition(connectorDefinitionName);
+        if (sConnectorDefinition == null) {
+            throw new SConnectorDefinitionNotFoundException(
+                    "Couldn't find the connector definition [" + connectorDefinitionName + "]");
+        }
+        return sConnectorDefinition;
+    }
+}
