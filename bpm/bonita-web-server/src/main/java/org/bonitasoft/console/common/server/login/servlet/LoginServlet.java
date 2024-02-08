@@ -67,6 +67,11 @@ public class LoginServlet extends HttpServlet {
      */
     protected static final String LOGIN_URL_PARAM_NAME = "loginUrl";
 
+    /*
+     * System property to allow login with GET from the development suite
+     */
+    public static final String ENABLE_DEV_SUITE_LOGIN = "org.bonitasoft.web.login.get.enabled";
+
     /**
      * Necessary studio integration (username and password are passed in the URL in development mode)
      *
@@ -74,9 +79,13 @@ public class LoginServlet extends HttpServlet {
      *             use {@link #doPost(HttpServletRequest, HttpServletResponse)} instead
      */
     @Override
-    @Deprecated(since = "8.0", forRemoval = true)
+    @Deprecated(since = "8.0", forRemoval = false)
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
+        if (!Boolean.parseBoolean(System.getProperty(ENABLE_DEV_SUITE_LOGIN))) {
+            resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("query string : " + dropPassword(req.getQueryString()));
         }

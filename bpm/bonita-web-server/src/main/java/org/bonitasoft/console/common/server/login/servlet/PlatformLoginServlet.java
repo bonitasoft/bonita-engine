@@ -79,12 +79,6 @@ public class PlatformLoginServlet extends HttpServlet {
     protected final PortalCookies portalCookies = new PortalCookies();
 
     @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
-        doPost(request, response);
-    }
-
-    @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
         PlatformSession platformSession;

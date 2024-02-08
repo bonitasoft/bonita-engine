@@ -41,6 +41,7 @@ import org.bonitasoft.console.common.server.login.LoginManager;
 import org.bonitasoft.console.common.server.utils.SessionUtil;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.session.APISession;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,6 +75,11 @@ public class LoginServletTest {
     @Before
     public void setup() {
         doReturn("application/x-www-form-urlencoded").when(req).getContentType();
+    }
+
+    @After
+    public void tearDown() {
+        System.clearProperty(LoginServlet.ENABLE_DEV_SUITE_LOGIN);
     }
 
     @Test
@@ -135,6 +141,7 @@ public class LoginServletTest {
     @Test
     public void testDoGetShouldDropPassowrdWhenLoggingQueryString() throws Exception {
         //given
+        System.setProperty(LoginServlet.ENABLE_DEV_SUITE_LOGIN, "true");
         final LoginServlet servlet = spy(new LoginServlet());
         doReturn("password=123&username=john").when(req).getQueryString();
         doNothing().when(servlet).doPost(req, resp);
@@ -148,6 +155,19 @@ public class LoginServletTest {
                 .containsPattern(".*TRACE.*.username=john")
                 .doesNotContain("password")
                 .doesNotContain("123");
+    }
+
+    @Test
+    public void testDoGetShouldfailWhenSysPropNotSet() throws Exception {
+        //given
+        final LoginServlet servlet = spy(new LoginServlet());
+
+        //when
+        servlet.doGet(req, resp);
+
+        //then
+        verify(servlet, never()).doPost(req, resp);
+        verify(resp).setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     @Test
