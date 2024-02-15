@@ -1,0 +1,14 @@
+<connectorImplementation>
+	
+	<definitionId>org.bonitasoft.test.toolkit.connector.TestConnector</definitionId>
+	<definitionVersion>1.0</definitionVersion>
+	<implementationClassname>org.bonitasoft.test.toolkit.connector.TestConnector</implementationClassname>
+	<implementationId>org.bonitasoft.test.toolkit.connector.testConnector</implementationId>
+	<implementationVersion>1.0</implementationVersion>
+	
+	<jarDependencies>
+		<jarDependency>aDependency.jar</jarDependency>
+		<jarDependency>anOtherDependency.jar</jarDependency>
+	</jarDependencies>
+	
+</connectorImplementation>

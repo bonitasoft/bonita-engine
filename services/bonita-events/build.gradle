@@ -1,0 +1,24 @@
+
+
+dependencies {
+    api project(':services:bonita-commons')
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}
+
+tasks.register("testsJar", Jar) {
+    archiveClassifier = 'tests'
+    from(sourceSets.test.output)
+}
+
+group = 'org.bonitasoft.engine.events'
+description = 'Bonita Event'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact testsJar
+        }
+    }
+}

@@ -1,0 +1,8 @@
+
+
+dependencies {
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "org.apache.commons:commons-exec:${Deps.commonsExecVersion}"
+}
+
+group = 'org.bonitasoft.platform'

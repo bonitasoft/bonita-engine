@@ -1,0 +1,176 @@
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.api;
+
+import java.util.Map;
+
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.platform.*;
+
+/**
+ * <b>Manage the platform.</b>
+ * <p>
+ * The platform is the base on which runs the engine.<br>
+ * It mainly handles the creation of tables in database and also allow to start/stop a Node which is the current Virtual
+ * machine on which runs the engine. There
+ * is only one platform for a running Bonita Engine.
+ * </p>
+ *
+ * @author Elias Ricken de Medeiros
+ * @author Lu Kai
+ * @author Zhang Bole
+ * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
+ */
+public interface PlatformAPI {
+
+    /**
+     * <b>Initialize the platform.</b>
+     * The running environment of Bonita Engine is initialized and marked as activated.<br>
+     * Business elements linked to the execution are initialized, after this step the technical user will be able to
+     * connect to the engine and to import the
+     *
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         occurs if the API session is invalid, e.g session has expired.
+     * @throws CreationException
+     *         occurs when an exception is thrown during platform creation
+     * @deprecated Not useful anymore, initialization is done by the setup tool
+     */
+    @Deprecated(forRemoval = true, since = "8.0.0")
+    void initializePlatform() throws CreationException;
+
+    /**
+     * <b>Starts the node.</b>
+     * <p>
+     * The node is the currently Java Virtual Machine on which Bonita Engine is running
+     * <p>
+     * Starting the node make the Scheduler service to start and restart elements that were not finished by the Work
+     * service on the previous shutdown.
+     *
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         occurs if API Session is invalid, e.g session has expired.
+     * @throws StartNodeException
+     *         occurs when an exception is thrown during the activation of the node
+     */
+    void startNode() throws StartNodeException;
+
+    /**
+     * <b>Stops the node.</b>
+     * <p>
+     * The node is the currently Java Virtual Machine on which Bonita Engine is running
+     * <p>
+     * Stopping the node make the Scheduler service to stop.
+     *
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         occurs if API Session is invalid, e.g session has expired.
+     * @throws StopNodeException
+     *         occurs when an exception is thrown during the stop of the node
+     */
+    void stopNode() throws StopNodeException;
+
+    /**
+     * Get the platform.
+     *
+     * @return the Platform object
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws PlatformNotFoundException
+     *         occurs when the identifier does not refer to an existing platform
+     */
+    Platform getPlatform() throws PlatformNotFoundException;
+
+    /**
+     * Check if the platform created or not.
+     *
+     * @return true if the platform exists
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws PlatformNotFoundException
+     *         occurs when the identifier does not refer to an existing platform
+     */
+    boolean isPlatformCreated() throws PlatformNotFoundException;
+
+    /**
+     * Get the state of the platform of the current node
+     *
+     * @return {@link PlatformState#STARTED} or {@link PlatformState#STOPPED} depending on the scheduler state
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws PlatformNotFoundException
+     *         occurs when the identifier does not refer to an existing platform
+     */
+    PlatformState getPlatformState() throws PlatformNotFoundException;
+
+    /**
+     * Is the current node started?
+     *
+     * @return true if the node is started, false if not started or if its state cannot be determined.
+     * @since 6.1
+     */
+    boolean isNodeStarted();
+
+    /**
+     * Reschedules triggers which are in error state.
+     *
+     * @throws UpdateException
+     *         If an exception occurs during the scheduling
+     * @since 6.2
+     */
+    void rescheduleErroneousTriggers() throws UpdateException;
+
+    /**
+     * INTERNAL USE ONLY
+     * get client configuration files of the platform
+     *
+     * @return the client platform configuration files as a map containing file name and file content
+     * @since 7.3
+     */
+    @Internal
+    Map<String, byte[]> getClientPlatformConfigurations();
+
+    /**
+     * INTERNAL USE ONLY
+     * Get client configuration files at tenant level.
+     * Since 8.0, as there is only 1 tenant, the tenantId is not relevant anymore.
+     *
+     * @return the client tenants configuration files as a map with file name and file content
+     * @since 7.3
+     */
+    @Internal
+    Map<String, byte[]> getClientTenantConfigurations();
+
+    /**
+     * INTERNAL USE ONLY
+     * get client auto login configuration file for tenant
+     *
+     * @return file content
+     * @since 7.3
+     */
+    @Internal
+    byte[] getClientTenantConfiguration(long tenantId, String file);
+
+    /**
+     * INTERNAL USE ONLY
+     * update a single client configuration file of the tenant
+     *
+     * @param tenantId tenant to update
+     * @param file file name to update
+     * @param content the new content of the file
+     * @throws UpdateException
+     * @since 7.3
+     */
+    @Internal
+    void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException;
+}

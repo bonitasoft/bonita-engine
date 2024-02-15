@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:profiles xmlns:profiles="http://documentation.bonitasoft.com/profile-xml-schema/1.0">
+	<profile name="Administrator" isDefault="true">
+		<description>Administrator profile</description>
+		<profileMapping>
+			<users>
+				<user>userName1</user>
+				<user>userName2</user>
+			</users>
+		</profileMapping>
+	</profile>
+	<profile name="User" isDefault="false">
+		<description>User profile</description>
+	</profile>
+</profiles:profiles>

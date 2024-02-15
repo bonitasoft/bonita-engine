@@ -1,0 +1,58 @@
+plugins {
+    id("bonita-http-test")
+    id("bonita-docker-database")
+    id("bonita-tests")
+}
+dependencies {
+    api project(':bonita-test-api')
+    api "junit:junit:${Deps.junit4Version}"
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api project(':bpm:bonita-common')
+    api project(':bpm:bonita-client')
+    api project(':bonita-integration-tests:bonita-test-utils')
+    api "org.assertj:assertj-core:${Deps.assertjVersion}"
+    api "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    api "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    api "net.jodah:concurrentunit:${Deps.concurrentUnitVersion}"
+    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation project(':bpm:bonita-server')
+    testImplementation testFixtures(project(':bpm:bonita-common'))
+    testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+}
+
+test.doFirst {
+    def emptyFile = new File("$project.buildDir/bonita_home_client_HTTP/engine-client/conf/bonita-client-custom.properties")
+    emptyFile.getParentFile().mkdirs()
+    emptyFile.text = ""
+    copy {
+        from file("$projectDir/bonita-client-http.properties")
+        into file("$project.buildDir/bonita_home_client_HTTP/engine-client/work")
+        rename 'bonita-client-http.properties', 'bonita-client-community.properties'
+    }
+    def invalidFile = new File("$project.buildDir/bonita_home_client_invalidAPIType/engine-client/conf/bonita-client-custom.properties")
+    invalidFile.getParentFile().mkdirs()
+    invalidFile.text = ""
+    copy {
+        from file("$projectDir/bonita-client-invalid.properties")
+        into file("$project.buildDir/bonita_home_client_invalidAPIType/engine-client/work")
+        rename 'bonita-client-invalid.properties', 'bonita-client-community.properties'
+    }
+}
+group = 'org.bonitasoft.engine.test'
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
+}
+
+httpTests {
+    integrationTestsSuite = "**/*IT.class"
+}
+
+tests {
+    slowTestsSuite = "**/*IT.class"
+}
+
+databaseIntegrationTest { include "**/*IT.class" }
