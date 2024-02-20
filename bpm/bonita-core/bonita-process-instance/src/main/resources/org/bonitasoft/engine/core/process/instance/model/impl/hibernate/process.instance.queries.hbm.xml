@@ -1700,45 +1700,35 @@
 
 	<sql-query name="getNumberOfSProcessInstanceInvolvingUser">
 		<return-scalar column="count" type="long"/>
-		SELECT count(id) as count from (
-			SELECT p.*
-				FROM process_instance p
-				JOIN (
-					select afi.logicalGroup2 from arch_flownode_instance afi
-						WHERE afi.tenantId = :tenantId
-						AND afi.kind in ('user', 'manual')
-						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
-						AND afi.stateId = 2
-				) humanTask ON (humanTask.logicalGroup2 = p.id)
-			WHERE p.tenantId = :tenantId
-			UNION
-			SELECT p.*
-				FROM process_instance p
-				WHERE p.tenantId = :tenantId
-					AND p.startedBy = :userId
-		) p
+         SELECT COUNT(1) as count
+            FROM process_instance p
+            WHERE (
+                ID IN (
+                    SELECT DISTINCT afi.logicalGroup2
+                    FROM arch_flownode_instance afi
+                    WHERE afi.tenantId = :tenantId
+                    AND afi.kind IN ('user', 'manual')
+                    AND (afi.executedBy = :userId OR afi.executedBySubstitute = :userId)
+                    AND afi.stateId = 2)
+                OR (tenantId = :tenantId AND startedBy = :userId)
+            )
 	</sql-query>
 
 
 	<sql-query name="searchSProcessInstanceInvolvingUser">
 		<return alias="p" class="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" />
-		SELECT * from (
-			SELECT p.*
-				FROM process_instance p
-				JOIN (
-					select afi.logicalGroup2 from arch_flownode_instance afi
-						WHERE afi.tenantId = :tenantId
-						AND afi.kind in ('user', 'manual')
-						AND ( afi.executedBy = :userId OR afi.executedBySubstitute = :userId )
-						AND afi.stateId = 2
-				) humanTask ON (humanTask.logicalGroup2 = p.id)
-			WHERE p.tenantId = :tenantId
-			UNION
-			SELECT p.*
-				FROM process_instance p
-				WHERE p.tenantId = :tenantId
-					AND p.startedBy = :userId
-		) p
+         SELECT *
+            FROM process_instance p
+            WHERE (
+                ID IN (
+                    SELECT DISTINCT afi.logicalGroup2
+                    FROM arch_flownode_instance afi
+                    WHERE afi.tenantId = :tenantId
+                    AND afi.kind IN ('user', 'manual')
+                    AND (afi.executedBy = :userId OR afi.executedBySubstitute = :userId)
+                    AND afi.stateId = 2)
+                OR (tenantId = :tenantId AND startedBy = :userId)
+            )
 	</sql-query>
 
 	<query name="getNumberOfSProcessInstanceInvolvingUsersManagedBy">
