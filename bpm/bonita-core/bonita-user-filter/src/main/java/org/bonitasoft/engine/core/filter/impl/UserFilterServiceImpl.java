@@ -1,0 +1,255 @@
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.core.filter.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
+
+import javax.xml.bind.JAXBException;
+
+import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.connector.ConnectorExecutor;
+import org.bonitasoft.engine.connector.exception.SConnectorException;
+import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
+import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.filter.FilterResult;
+import org.bonitasoft.engine.core.filter.UserFilterService;
+import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
+import org.bonitasoft.engine.core.filter.exception.SUserFilterLoadingException;
+import org.bonitasoft.engine.core.filter.model.UserFilterImplementationDescriptor;
+import org.bonitasoft.engine.core.filter.model.UserFilterImplementationParser;
+import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
+import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.filter.UserFilter;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
+ * @author Celine Souchet
+ */
+
+public class UserFilterServiceImpl implements UserFilterService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserFilterServiceImpl.class);
+    public static final String FILTER_CACHE_NAME = "USER_FILTER";
+
+    private final ConnectorExecutor connectorExecutor;
+    private final CacheService cacheService;
+    private final ExpressionResolverService expressionResolverService;
+    private final ProcessResourcesService processResourcesService;
+    private final UserFilterImplementationParser userFilterImplementationParser = new UserFilterImplementationParser();
+
+    public UserFilterServiceImpl(final ConnectorExecutor connectorExecutor, final CacheService cacheService,
+            final ExpressionResolverService expressionResolverService,
+            ProcessResourcesService processResourcesService) {
+        super();
+        this.connectorExecutor = connectorExecutor;
+        this.cacheService = cacheService;
+        this.expressionResolverService = expressionResolverService;
+        this.processResourcesService = processResourcesService;
+    }
+
+    @Override
+    public FilterResult executeFilter(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition,
+            final Map<String, SExpression> inputs,
+            final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName)
+            throws SUserFilterExecutionException {
+        final FilterResult filterResult;
+        String implementationClassName = "";
+        UserFilterImplementationDescriptor descriptor = null;
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                    Thread.currentThread().toString() + "-[" + Thread.currentThread().getId() + ","
+                            + Thread.currentThread().getState() + "]");
+        }
+        try {
+            descriptor = getDescriptor(processDefinitionId, sUserFilterDefinition);
+            if (descriptor == null) {
+                loadUserFilters(processDefinitionId);
+                descriptor = getDescriptor(processDefinitionId, sUserFilterDefinition);
+                if (descriptor == null) {
+                    throw new SUserFilterExecutionException(
+                            "unable to load descriptor for filter " + sUserFilterDefinition.getUserFilterId());
+                }
+            }
+            implementationClassName = descriptor.getImplementationClassName();
+            filterResult = executeFilterInClassloader(implementationClassName, inputs, classLoader, expressionContext,
+                    actorName);
+        } catch (final SConnectorException e) {
+            String dbgInfo = "";
+            if (logger.isDebugEnabled()) {
+                dbgInfo = buildDebugMessage(processDefinitionId, sUserFilterDefinition, inputs, classLoader,
+                        expressionContext, actorName,
+                        implementationClassName, descriptor);
+            }
+            if (e.getCause() != null) {
+                throw new SUserFilterExecutionException(dbgInfo, e.getCause());
+            } else {
+                throw new SUserFilterExecutionException("SConnectorException: " + e.getMessage() + dbgInfo, e);
+            }
+        } catch (final SUserFilterExecutionException e) {
+            throw e;
+        } catch (final Throwable e) {// catch throwable because we might have NoClassDefFound... see ENGINE-1333
+            throw new SUserFilterExecutionException(e);
+        }
+
+        if (logger.isDebugEnabled()) {
+            String stb = "Executed userFilter [name: <" +
+                    sUserFilterDefinition.getName() +
+                    ">, user filter id: <" +
+                    sUserFilterDefinition.getUserFilterId() +
+                    ">, version: <" +
+                    sUserFilterDefinition.getVersion() +
+                    ">] on flow node instance with id: <" +
+                    expressionContext.getContainerId() +
+                    ">";
+
+            logger.debug(stb);
+        }
+        return filterResult;
+    }
+
+    protected String buildDebugMessage(long processDefinitionId, SUserFilterDefinition sUserFilterDefinition,
+            Map<String, SExpression> inputs,
+            ClassLoader classLoader, SExpressionContext expressionContext, String actorName,
+            String implementationClassName,
+            UserFilterImplementationDescriptor descriptor) {
+        return " Flow node instance id: <" +
+                expressionContext.getContainerId() +
+                ">" +
+                "\n Current Thread ID : <" +
+                Thread.currentThread().getId() +
+                ">, Current Thread State : <" +
+                Thread.currentThread().getState() +
+                ">,\n ProcessDefinitionID : <" +
+                processDefinitionId +
+                ">, SUserFilterDefinition : <" +
+                sUserFilterDefinition +
+                ">, Inputs : <" +
+                inputs.toString() +
+                ">, ClassLoader : <" +
+                classLoader.toString() +
+                ">, ExpressionContext : <" +
+                expressionContext +
+                ">, ActorName : <" +
+                actorName +
+                ">, UserFilterImplementationDescriptor : <" +
+                descriptor +
+                ">, ImplementationClassName : <" +
+                implementationClassName +
+                ">";
+    }
+
+    private UserFilterImplementationDescriptor getDescriptor(final long processDefinitionId,
+            final SUserFilterDefinition sUserFilterDefinition)
+            throws SCacheException {
+        return (UserFilterImplementationDescriptor) cacheService.get(FILTER_CACHE_NAME,
+                getUserFilterImplementationIdInCache(processDefinitionId, sUserFilterDefinition.getUserFilterId(),
+                        sUserFilterDefinition.getVersion()));
+    }
+
+    private String getUserFilterImplementationIdInCache(final long processDefinitionId, final String userFilterId,
+            final String version) {
+        return processDefinitionId + ":" + userFilterId + "-" + version;
+    }
+
+    protected FilterResult executeFilterInClassloader(final String implementationClassName,
+            final Map<String, SExpression> parameters,
+            final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName)
+            throws InstantiationException,
+            IllegalAccessException, ClassNotFoundException, SUserFilterExecutionException,
+            SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException, SInvalidExpressionException, SConnectorException,
+            InterruptedException, ExecutionException {
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(classLoader);
+            final UserFilter filter = (UserFilter) Class.forName(implementationClassName, true, classLoader)
+                    .newInstance();
+            final SConnectorUserFilterAdapter adapter = new SConnectorUserFilterAdapter(filter, actorName);
+            final HashMap<String, Object> inputParameters = new HashMap<>(parameters.size());
+            for (final Entry<String, SExpression> input : parameters.entrySet()) {
+                if (expressionContext != null) {
+                    inputParameters.put(input.getKey(),
+                            expressionResolverService.evaluate(input.getValue(), expressionContext));
+                } else {
+                    inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
+                }
+            }
+            connectorExecutor.execute(adapter, inputParameters, classLoader).get();
+            return new FilterResultImpl(adapter.getUserIds(),
+                    adapter.shouldAutoAssignTaskIfSingleResult());
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    @Override
+    public void removeUserFilters(final long processDefinitionId) throws SBonitaReadException, SRecorderException {
+        processResourcesService.removeAll(processDefinitionId, BARResourceType.USER_FILTER);
+    }
+
+    @Override
+    public boolean loadUserFilters(final long processDefinitionId) throws SUserFilterLoadingException {
+        String name = null;
+        try {
+            final List<SBARResource> listFiles = processResourcesService.get(processDefinitionId,
+                    BARResourceType.USER_FILTER, 0, 1000);//FIXME
+            final Pattern pattern = Pattern.compile("^.*\\" + IMPLEMENTATION_EXT + "$");
+            for (final SBARResource file : listFiles) {
+                name = file.getName();
+                if (pattern.matcher(name).matches()) {
+                    UserFilterImplementationDescriptor userFilterImplementationDescriptor;
+                    userFilterImplementationDescriptor = userFilterImplementationParser
+                            .convert(new String(file.getContent()));
+                    if (userFilterImplementationDescriptor == null) {
+                        throw new SUserFilterLoadingException(
+                                "Can not parse ConnectorImplementation XML. The file name is " + name);
+                    }
+                    cacheService.store(
+                            FILTER_CACHE_NAME,
+                            getUserFilterImplementationIdInCache(processDefinitionId,
+                                    userFilterImplementationDescriptor.getDefinitionId(),
+                                    userFilterImplementationDescriptor.getDefinitionVersion()),
+                            userFilterImplementationDescriptor);
+                }
+            }
+            return true;
+        } catch (final JAXBException e) {
+            throw new SUserFilterLoadingException(
+                    "Cannot load userFilterImplementationDescriptor XML. The file name is " + name, e);
+        } catch (final SCacheException e) {
+            throw new SUserFilterLoadingException("Unable to cache the user filter implementation" + name, e);
+        } catch (SBonitaReadException e) {
+            throw new SUserFilterLoadingException("Unable to list the user filter implementations", e);
+        }
+    }
+
+}

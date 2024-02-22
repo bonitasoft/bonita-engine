@@ -1,0 +1,93 @@
+import org.bonitasoft.engine.gradle.ShadeDependency
+
+plugins { id 'bonita-shade' }
+
+dependencies {
+    // import jackson bom to align jackson dependencies even when resolving shade dependencies
+    // When create the shade version of bonita-server, the bonita-common project is excluded causing the jackson bom not to be imported
+    // This cause issues to the code deposit because an different version of jackson, that was not downloaded to local cache, can be required during offline build.
+    // Remove the shade to solve that issue
+    implementation(platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}"))
+    api project(':bpm:bonita-core:bonita-process-engine')
+    api project(':services:bonita-builder')
+    api project(':bpm:bonita-core:bonita-actor-mapping')
+    api project(':bpm:bonita-api:bonita-server-api-http')
+    api project(':services:bonita-archive')
+    api project(':services:bonita-authentication')
+    api project(':services:bonita-business-application')
+    api project(':services:bonita-business-data:bonita-business-data-impl')
+    api project(':services:bonita-business-data:bonita-business-data-client-resources')
+    api project(':services:bonita-business-data:bonita-business-data-generator')
+    api project(':services:bonita-cache')
+    api project(':bpm:bonita-core:bonita-category')
+    api project(':services:bonita-classloader')
+    api project(':services:bonita-command')
+    api project(':bpm:bonita-core:bonita-contract-data')
+    api project(':services:bonita-connector-executor')
+    api project(':services:bonita-data-definition')
+    api project(':services:bonita-data-instance')
+    api project(':services:bonita-events')
+    api project(':services:bonita-expression')
+    api project(':services:bonita-external-identity-mapping')
+    api project(':bpm:bonita-core:bonita-form-mapping')
+    api project(':services:bonita-incident')
+    api project(':services:bonita-identity')
+    api project(':services:bonita-lock')
+    api project(':bpm:bonita-core:bonita-login')
+    api project(':services:bonita-log')
+    api project(':services:bonita-page')
+    api project(':bpm:bonita-core:bonita-parameter')
+    api project(':services:bonita-persistence')
+    api project(':services:bonita-platform')
+    api project(':services:bonita-platform-authentication')
+    api project(':services:bonita-platform-command')
+    api project(':bpm:bonita-core:bonita-platform-login')
+    api project(':services:bonita-platform-session')
+    api project(':bpm:bonita-core:bonita-process-comment')
+    api project(':bpm:bonita-core:bonita-process-definition')
+    api project(':bpm:bonita-core:bonita-process-instance')
+    api project(':services:bonita-scheduler')
+    api project(':services:bonita-session')
+    api project(':bpm:bonita-core:bonita-supervisor-mapping')
+    api project(':bpm:bonita-synchro-repository:bonita-synchro-service')
+    api project(':bpm:bonita-synchro-repository:bonita-synchro-service-impl')
+    api project(':bpm:bonita-synchro-repository:bonita-synchro-register')
+    api project(':services:bonita-time-tracker')
+    api project(':services:bonita-transaction')
+    api project(':bpm:bonita-core:bonita-core-data')
+    api project(':bpm:bonita-core:bonita-user-filter')
+    api project(':services:bonita-work')
+    api project(':bpm:bonita-external')
+    api project(':services:bonita-profile')
+    api project(':bpm:bonita-common')
+}
+
+shade {
+    exclude project(':bpm:bonita-common')
+    exclude project(':platform:platform-resources')
+
+    excludeLibs('hibernate-core',
+            new ShadeDependency(group: 'org.jboss.spec.javax.transaction', name: 'jboss-transaction-api_1.2_spec'),
+            new ShadeDependency(group: 'javax.activation', name: 'javax.activation-api')
+    )
+    excludeLibs('jaxb-api',
+            new ShadeDependency(group: 'javax.activation', name: 'javax.activation-api'))
+    excludeLibs('jaxb-runtime',
+            new ShadeDependency(group: 'javax.activation', name: 'javax.activation-api'))
+    excludeLibs('quartz',
+            new ShadeDependency(group: 'com.mchange', name: '*'),
+            new ShadeDependency(group: 'com.zaxxer', name: 'HikariCP-java7'))
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            shadow(MavenPublication) { publication ->
+                publication.getPom().with {
+                    name = "Bonita Server"
+                    description = "Bonita Server is the Server-side BPM Execution Engine"
+                }
+            }
+        }
+    }
+}

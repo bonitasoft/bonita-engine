@@ -1,0 +1,16 @@
+plugins {
+    id('bonita-tests')
+}
+
+dependencies {
+    runtimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    api project(':services:bonita-commons')
+    api project(':services:bonita-time-tracker')
+    api project(':services:bonita-session')
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

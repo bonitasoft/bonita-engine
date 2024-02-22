@@ -1,0 +1,52 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
+plugins {
+    id "java-library"
+    id "bonita-tests"
+}
+
+dependencies {
+    api project(':bpm:bonita-common')
+    api "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
+    api "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    api "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation 'org.eclipse.jetty:jetty-server:8.1.14.v20131031'
+    testImplementation 'org.eclipse.jetty:jetty-jndi:8.1.14.v20131031'
+    testImplementation 'org.eclipse.jetty:jetty-webapp:8.1.14.v20131031'
+    testImplementation 'org.eclipse.jetty:jetty-plus:8.1.14.v20131031'
+}
+
+tasks.register("testsJar", Jar) {
+    archiveClassifier = 'tests'
+    from(sourceSets.test.output)
+}
+
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+tasks.register("javadocJar", Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            artifact project.testsJar
+            pom { pom ->
+                name = "Bonita Client"
+                description = "Bonita Client is the Jar used to interact with a running Bonita Engine"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

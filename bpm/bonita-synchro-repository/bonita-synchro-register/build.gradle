@@ -1,0 +1,9 @@
+
+
+dependencies {
+    api project(':bpm:bonita-core:bonita-process-engine')
+    api project(':bpm:bonita-synchro-repository:bonita-synchro-service-impl')
+    api project(':services:bonita-commons')
+    compileOnly 'jakarta.jms:jakarta.jms-api:3.0.0'
+    compileOnly 'org.apache.activemq:activemq-client:5.16.6'
+}
