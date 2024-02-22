@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+
+    <!--  To not persist the session after reboot tomcat -->
+    <Manager pathname="" />
+
+    <!-- #################################################################################################################### -->
+    <!-- ##############   BETWEEN THESE 2 SECTIONS IS A TEMPLATE MODIFIED BY BONITA SETUP TOOL.              ################ -->
+    <!-- #######   BELOW VALUES SURROUNDED BY '@@' MUST NOT BE TOUCHED, AS THEY ARE USED INTERNALLY BY SETUP TOOL.   ######## -->
+    <!-- #########      FOR OTHER VALUES, DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOU ARE DOING.      ############ -->
+    <!-- ##############          YOU CAN ADD CUSTOM CONFIGURATION ABOVE AND BELOW THIS TEMPLATE.            ################# -->
+    <!-- #################################################################################################################### -->
+
+    <!-- ##################################################### -->
+    <!-- Configure Datasource for Bonita standard database -->
+    <!-- ##################################################### -->
+    <Resource name="RawBonitaDS"
+              auth="Container"
+              type="@@ds1.xa.driver_class_name@@"
+              class="@@ds1.xa.driver_class_name@@"
+              factory="@@ds1.xa_datasource_factory@@"
+              description="Raw Bonita Datasource"
+              maxTotal="50"
+              closeMethod="close"
+              loginTimeout="0"
+              serverName="@@ds1_database_server_name@@"
+              portNumber="@@ds1_database_port_number@@"
+              port="@@ds1_database_port_number@@"
+              databaseName="@@ds1_database_database_name@@"
+              user="@@ds1.database_connection_user@@"
+              password="@@ds1.database_connection_password@@"
+              explicitUrl="true"
+              url="@@ds1.database_connection_url@@" />
+
+    <Resource name="bonitaDS"
+              uniqueName="jdbc/bonitaDSXA"
+              auth="Container"
+              jmxEnabled="true" jmxName="org.bonitasoft:name=bonitaDS"
+              factory="org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory"
+              transactionManager="TransactionManager"
+              type="javax.sql.XADataSource"
+              initialSize="@@ds1_connection_pool_initialSize@@"
+              maxTotal="@@ds1_connection_pool_maxTotal@@"
+              minIdle="@@ds1_connection_pool_minIdle@@"
+              maxIdle="@@ds1_connection_pool_maxIdle@@"
+              xaDataSource="RawBonitaDS" />
+
+    <Resource name="bonitaSequenceManagerDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxTotal="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWaitMillis="10000"
+              initialSize="3"
+              validationInterval="30000"
+              removeAbandonedOnBorrow="true"
+              removeAbandonedOnMaintenance="true"
+              logAbandoned="false"
+              testOnBorrow="true"
+              testWithIdle="false"
+              timeBetweenEvictionRunsMillis="60000"
+              minEvictableIdleTimeMillis="600000"
+              validationQuery="@@ds1.database_test_query@@"
+              username="@@ds1.database_connection_user@@"
+              password="@@ds1.database_connection_password@@"
+              driverClassName="@@ds1.driver_class_name@@"
+              url="@@ds1.database_connection_url@@" />
+
+    <!-- ##################################################### -->
+    <!-- Configure Business Data Datasource -->
+    <!-- ##################################################### -->
+    <Resource name="RawBusinessDataDS"
+              auth="Container"
+              type="@@ds2.xa.driver_class_name@@"
+              class="@@ds2.xa.driver_class_name@@"
+              factory="@@ds2.xa_datasource_factory@@"
+              description="Raw Bonita Business Data Datasource"
+              maxTotal="5"
+              closeMethod="close"
+              loginTimeout="0"
+              serverName="@@ds2_database_server_name@@"
+              portNumber="@@ds2_database_port_number@@"
+              port="@@ds2_database_port_number@@"
+              databaseName="@@ds2_database_database_name@@"
+              user="@@ds2.database_connection_user@@"
+              password="@@ds2.database_connection_password@@"
+              explicitUrl="true"
+              url="@@ds2.database_connection_url@@" />
+
+    <Resource
+            name="BusinessDataDS"
+            uniqueName="jdbc/bonitaDSXA"
+            auth="Container"
+            jmxEnabled="true" 
+            jmxName="org.bonitasoft:name=BusinessDataDS"
+            factory="org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory"
+            transactionManager="TransactionManager"
+            type="javax.sql.XADataSource"
+            initialSize="@@ds2_connection_pool_initialSize@@"
+            maxTotal="@@ds2_connection_pool_maxTotal@@"
+            minIdle="@@ds2_connection_pool_minIdle@@"
+            maxIdle="@@ds2_connection_pool_maxIdle@@"
+            xaDataSource="RawBusinessDataDS" />
+
+    <Resource name="NotManagedBizDataDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxTotal="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWaitMillis="10000"
+              initialSize="3"
+              validationInterval="30000"
+              removeAbandonedOnBorrow="true"
+              removeAbandonedOnMaintenance="true"
+              logAbandoned="false"
+              testOnBorrow="true"
+              testWithIdle="false"
+              timeBetweenEvictionRunsMillis="60000"
+              minEvictableIdleTimeMillis="600000"
+              validationQuery="@@ds2.database_test_query@@"
+              username="@@ds2.database_connection_user@@"
+              password="@@ds2.database_connection_password@@"
+              driverClassName="@@ds2.driver_class_name@@"
+              url="@@ds2.database_connection_url@@" />
+
+    <!-- #################################################################################################################### -->
+    <!-- ########################         END OF TEMPLATE MODIFIED BY BONITA SETUP TOOL             ######################### -->
+    <!-- ###################            YOU CAN ADD CUSTOM CONFIGURATION *BELOW* THIS TEMPLATE              ################# -->
+    <!-- #################################################################################################################### -->
+
+</Context>

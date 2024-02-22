@@ -1,0 +1,7 @@
+<ConnectorImplementation id="org.bonitasoft.connector.testConnector" version="1.0"
+	definitionId="org.bonitasoft.connector.testConnector" definitionVersion="1.0"
+	implementationClassname="org.bonitasoft.engine.connectors.TestConnector">
+	<jarDependencies>
+		<jarDependency>TestConnector.jar</jarDependency>
+	</jarDependencies>
+</ConnectorImplementation>

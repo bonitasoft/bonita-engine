@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:profiles xmlns:profiles="http://documentation.bonitasoft.com/profile-xml-schema/1.0">
+	<profile name="User" isDefault="true">
+		<description>The user can view and perform tasks and can start a new case of a process.</description>
+	</profile>
+	<profile name="Administrator" isDefault="true">
+		<description>The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task).</description>
+	</profile>
+</profiles:profiles>

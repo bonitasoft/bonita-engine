@@ -1,0 +1,346 @@
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.transaction;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.transaction.*;
+
+import lombok.extern.slf4j.Slf4j;
+import org.bonitasoft.engine.commons.ExceptionUtils;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+
+@Slf4j
+public class JTATransactionServiceImpl implements TransactionService {
+
+    private final TransactionManager txManager;
+
+    private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
+
+    private final ThreadLocal<TransactionServiceContext> txContextThreadLocal;
+    private XAResourceRetriever xaResourceRetriever;
+
+    public JTATransactionServiceImpl(final TransactionManager txManager) {
+        this.txManager = txManager;
+        txContextThreadLocal = new TransactionServiceContextThreadLocal();
+        xaResourceRetriever = new XAResourceRetriever();
+    }
+
+    protected JTATransactionServiceImpl(final TransactionManager txManager,
+            XAResourceRetriever xaResourceRetriever) {
+        this.xaResourceRetriever = xaResourceRetriever;
+        this.txManager = txManager;
+        txContextThreadLocal = new TransactionServiceContextThreadLocal();
+    }
+
+    @Override
+    public void begin() throws STransactionCreationException {
+        final TransactionServiceContext txContext = getTransactionServiceContext();
+        try {
+            int status = txManager.getStatus();
+            checkForNestedBonitaTransaction(txContext, status);
+            clearPreviousTransaction(status);
+            initTxContext(txContext, status);
+            if (txContext.externallyManaged) {
+                //do not open transaction because it was open externally
+                return;
+            }
+            if (log.isTraceEnabled()) {
+                log.trace(
+                        "Beginning transaction in thread " + Thread.currentThread().getId() + " "
+                                + txManager.getTransaction());
+                txContext.stackTraceThatMadeLastBegin = generateCurrentStack();
+            }
+            txManager.begin();
+            handleNumberOfActiveTransactions();
+        } catch (final STransactionCreationException e) {
+            resetTxContext(txContext);
+            throw e;
+        } catch (final Throwable e) {
+            resetTxContext(txContext);
+            throw new STransactionCreationException(e);
+        }
+    }
+
+    private void clearPreviousTransaction(int status) throws STransactionCreationException {
+        if (status != Status.STATUS_ACTIVE && status != Status.STATUS_NO_TRANSACTION) {
+            //the transaction is in an inconsistent state, we try to rollback
+            log.warn(
+                    "Starting a new transaction on the thread but there is already a transaction is state " + status +
+                            ". Will try to call rollback on the transaction manager to cleanup the thread from this transaction.");
+            try {
+                txManager.rollback();
+            } catch (SystemException e) {
+                throw new STransactionCreationException(
+                        "A transaction was already associated with the thread. We tried to " +
+                                " rollback it but without success. If the transaction manager does not disassociate the thread with the transaction,"
+                                +
+                                " restart the server. Status of the transaction was " + status,
+                        e);
+            }
+        }
+    }
+
+    private void handleNumberOfActiveTransactions() throws RollbackException, SystemException {
+        numberOfActiveTransactions.getAndIncrement();
+        txManager.getTransaction()
+                .registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
+    }
+
+    private void initTxContext(TransactionServiceContext txContext, int status) {
+        txContext.externallyManaged = (status == Status.STATUS_ACTIVE);
+        txContext.isInScopeOfBonitaTransaction = true;
+        txContext.beforeCommitCallables.clear();
+    }
+
+    private void checkForNestedBonitaTransaction(TransactionServiceContext txContext, int status)
+            throws STransactionCreationException {
+        if (txContext.isInScopeOfBonitaTransaction) {
+            String message = "We do not support nested calls to the transaction service. Current state is: " + status
+                    + ". ";
+            if (log.isTraceEnabled()) {
+                message += "Last begin made by: " + txContext.stackTraceThatMadeLastBegin;
+            }
+            throw new STransactionCreationException(message);
+        }
+    }
+
+    private String generateCurrentStack() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getClass().getName()).append("\nNew transaction started by: ");
+        final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for (int i = 3; i < stackTraceElements.length; i++) {
+            sb.append("\n        at ");
+            sb.append(stackTraceElements[i]);
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public void complete() throws STransactionCommitException, STransactionRollbackException {
+        // Depending of the txManager status we either commit or rollback.
+        final TransactionServiceContext txContext = getTransactionServiceContext();
+        try {
+            if (log.isTraceEnabled()) {
+                log.trace(
+                        "Completing transaction in thread " + Thread.currentThread().getId() + " "
+                                + txManager.getTransaction().toString());
+            }
+            final int status = txManager.getStatus();
+            if (status == Status.STATUS_NO_TRANSACTION) {
+                throw new STransactionCommitException("No transaction started.");
+            }
+            if (txContext.externallyManaged) {
+                return; // We do not manage the transaction boundaries
+            }
+            if (status == Status.STATUS_MARKED_ROLLBACK) {
+                if (log.isTraceEnabled()) {
+                    log.trace(
+                            "Rolling back transaction in thread " + Thread.currentThread().getId() + " "
+                                    + txManager.getTransaction().toString());
+                }
+                txManager.rollback();
+            } else {
+                try {
+                    executeBeforeCommitCallables(txContext);
+                } finally {
+                    //even if there is an issue in before commit callables execution, we always call the commit to ensure end of the tx
+                    txManager.commit();
+                }
+            }
+        } catch (final SystemException | HeuristicMixedException | HeuristicRollbackException | RollbackException e) {
+            throw new STransactionCommitException(e);
+        } finally {
+            resetTxContext(txContext);
+        }
+    }
+
+    TransactionServiceContext getTransactionServiceContext() {
+        return txContextThreadLocal.get();
+    }
+
+    private void executeBeforeCommitCallables(TransactionServiceContext txContext) throws STransactionCommitException {
+        final List<Callable<Void>> callables = txContext.beforeCommitCallables;
+        for (final Callable<Void> callable : callables) {
+            try {
+                callable.call();
+            } catch (Exception e) {
+                throw new STransactionCommitException("Exception while executing callable in beforeCommit phase", e);
+            }
+        }
+    }
+
+    void resetTxContext(TransactionServiceContext txContext) {
+        txContext.isInScopeOfBonitaTransaction = false;
+        txContext.externallyManaged = false;
+        txContext.beforeCommitCallables.clear();
+        txContext.stackTraceThatMadeLastBegin = null;
+    }
+
+    @Override
+    public boolean isTransactionActive() {
+        try {
+            return txManager.getStatus() == Status.STATUS_ACTIVE;
+        } catch (final Throwable e) {
+            log.warn(
+                    "Unable to check if there is an active transaction {}", e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public void setRollbackOnly() throws STransactionException {
+        try {
+            txManager.setRollbackOnly();
+        } catch (final IllegalStateException | SystemException e) {
+            throw new STransactionException(e);
+        }
+    }
+
+    @Override
+    public boolean isRollbackOnly() throws STransactionException {
+        try {
+            return txManager.getStatus() == Status.STATUS_MARKED_ROLLBACK;
+        } catch (final SystemException e) {
+            throw new STransactionException("Error while trying to get the transaction's status.", e);
+        }
+    }
+
+    @Override
+    public void registerBonitaSynchronization(final Synchronization txSync)
+            throws STransactionNotFoundException {
+        try {
+            final Transaction transaction = txManager.getTransaction();
+            if (transaction == null) {
+                throw new STransactionNotFoundException("No active transaction.");
+            }
+            transaction.registerSynchronization(txSync);
+        } catch (final IllegalStateException | SystemException | RollbackException e) {
+            throw new STransactionNotFoundException(e);
+        }
+    }
+
+    @Override
+    public void registerBeforeCommitCallable(final Callable<Void> callable) throws STransactionNotFoundException {
+        try {
+            final Transaction transaction = txManager.getTransaction();
+            if (transaction == null) {
+                throw new STransactionNotFoundException("No active transaction");
+            }
+            getTransactionServiceContext().beforeCommitCallables.add(callable);
+        } catch (final IllegalStateException | SystemException e) {
+            throw new STransactionNotFoundException(e.getMessage());
+        }
+    }
+
+    @Override
+    public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
+        begin();
+        try {
+            return callable.call();
+        } catch (final Exception e) {
+            log(callable, e);
+            setRollbackOnly();
+            throw e;
+        } catch (final Throwable t) {
+            log(callable, t);
+            setRollbackOnly();
+            throw new SBonitaRuntimeException(t);
+        } finally {
+            complete();
+        }
+    }
+
+    private <T> void log(Callable<T> callable, Throwable e) {
+        if (log.isDebugEnabled()) {
+            log.debug(
+                    "Setting rollbackOnly on current transaction because callable '{}' has thrown an exception: {} " +
+                            "cause {}",
+                    callable, e.getMessage(), ExceptionUtils.printLightWeightStacktrace(e));
+        }
+    }
+
+    @Override
+    public long getNumberOfActiveTransactions() {
+        return numberOfActiveTransactions.get();
+    }
+
+    private static class DecrementNumberOfActiveTransactionsSynchronization implements Synchronization {
+
+        private final JTATransactionServiceImpl txService;
+
+        public DecrementNumberOfActiveTransactionsSynchronization(final JTATransactionServiceImpl txService) {
+            this.txService = txService;
+        }
+
+        @Override
+        public void beforeCompletion() {
+            // Nothing to do
+        }
+
+        @Override
+        public void afterCompletion(final int status) {
+            // Whatever the status, decrement the number of active transactions
+            txService.numberOfActiveTransactions.getAndDecrement();
+        }
+    }
+
+    static class TransactionServiceContext {
+
+        /*
+         * this flag means that we already called begin on the bonita transaction service whether or not the transaction
+         * is managed externally
+         */
+        boolean isInScopeOfBonitaTransaction = false;
+        /*
+         * true when the transaction was open outside of bonita
+         */
+        boolean externallyManaged = false;
+
+        /**
+         * We maintain a list of Callables that must be executed just before the real commit (and before the
+         * beforeCompletion method is called), so that we
+         * ensure
+         * that Hibernate has not already flushed its session.
+         */
+        List<Callable<Void>> beforeCommitCallables = new ArrayList<>();
+
+        /**
+         * for tracing only
+         */
+        String stackTraceThatMadeLastBegin;
+    }
+
+    private static class TransactionServiceContextThreadLocal extends ThreadLocal<TransactionServiceContext> {
+
+        @Override
+        protected TransactionServiceContext initialValue() {
+            return new TransactionServiceContext();
+        }
+    }
+
+    @Override
+    public Optional<Boolean> hasMultipleResources() {
+        try {
+            return xaResourceRetriever.retrieveResources(txManager.getTransaction()).map(List::size)
+                    .map(size -> size > 1);
+        } catch (SystemException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}

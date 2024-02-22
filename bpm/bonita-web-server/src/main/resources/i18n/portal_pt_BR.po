@@ -1,0 +1,298 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: bonita\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-07 05:21+0200\n"
+"PO-Revision-Date: 2023-10-23 08:28\n"
+"Last-Translator: \n"
+"Language-Team: Portuguese, Brazilian\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: bonita\n"
+"X-Crowdin-Project-ID: 13316\n"
+"X-Crowdin-Language: pt-BR\n"
+"X-Crowdin-File: /dev/bonita-web/portal/portal.po\n"
+"X-Crowdin-File-ID: 60581\n"
+
+msgid "%attribute% file format is not allowed. Only %file_formats% files are allowed."
+msgstr "formato de arquivo %attribute% não é permitido. Apenas arquivos %file_formats% são permitidos."
+
+msgid "%attribute% is mandatory"
+msgstr "%attribute% é obrigatório"
+
+msgid "%attribute% is not a valid Color value"
+msgstr "%attribute% não é um valor válido de cor"
+
+msgid "%attribute% is not a valid URL"
+msgstr "%attribute% não é um URL válido"
+
+msgid "%attribute% is not a valid email"
+msgstr "%attribute% não é um e-mail válido"
+
+msgid "%attribute% is not well written"
+msgstr "%attribute% não está bem escrito"
+
+msgid "%attribute% must be a boolean value"
+msgstr "%attribute% deve ser um valor booleano"
+
+msgid "%attribute% must be a numeric value"
+msgstr "%attribute% deve ser um valor numérico"
+
+msgid "%attribute% must be an integer value"
+msgstr "%attribute% deve ser um valor inteiro"
+
+msgid "%attribute% must be less or equal than %value%"
+msgstr "%attribute% deve ser menor ou igual do que %value%"
+
+msgid "%attribute% must be less than %value%"
+msgstr "%attribute% deve ser menor que %value%"
+
+msgid "%attribute% must be on a single line"
+msgstr "%attribute% deve ser uma única linha"
+
+msgid "%attribute% must be one of {%list%}"
+msgstr "%attribute% deve ser um dos {%list%}"
+
+msgid "%className% is not Serializable"
+msgstr "%className% não é serializável"
+
+msgid "%className% not found. Only jdk types are supported"
+msgstr "%className% não encontrado. Somente tipos de jdk são suportados"
+
+msgid "%value% is not a valid value for %className%"
+msgstr "%value% não é um valor válido para %className%"
+
+msgid "A group with the name %groupName% already exists"
+msgstr "Um grupo com o nome %groupName% já existe"
+
+msgid "An error occurred while creating a definition"
+msgstr "Ocorreu um erro ao criar uma definição"
+
+msgid "An error occurred while deleting an item with the id %id%"
+msgstr "Ocorreu um erro ao excluir um item com o id %id%"
+
+msgid "Bonita Applications"
+msgstr "Aplicações Bonita BPM"
+
+msgid "Can't create group. Group '%groupName%' already exists"
+msgstr "Não é possível criar o grupo. Grupo '%groupName%' já existe"
+
+msgid "Can't create role. Role '%roleName%' already exists"
+msgstr "Não é possível criar a função. Função '%roleName%' já existe"
+
+msgid "Can't create user. User '%userName%' already exists"
+msgstr "Não é possível criar o usuário. Usuário '%userName%' já existe"
+
+msgid "Can't import Applications."
+msgstr "Não foi possível importar aplicações."
+
+msgid "Can't import applications. An application '%token%' already exists"
+msgstr "Não é possível importar as aplicações. Uma aplicação 'token %' já existe"
+
+msgid "Can't import organization"
+msgstr "Não é possível importar organização"
+
+msgid "Can't import organization. Please check that your file is well-formed."
+msgstr "Não é possível importar a organização. Por favor, verifique se o arquivo está bem formatado."
+
+msgid "Can't parse json, non-well formed content"
+msgstr "Impossível analisar json, o conteúdo não é bem formado"
+
+msgid "Can't start process %processId%, user %userId% not found"
+msgstr "Impossível iniciar o processo %processId%, usuário %userId% não encontrado"
+
+msgid "Can't start process, process %processId% is not enabled"
+msgstr "Não pode iniciar o processo, o processo %processId% não está ativado"
+
+msgid "Can't start process, process %processId% not found"
+msgstr "Não pode iniciar processo, o processo %processId% não foi encontrado"
+
+msgid "Can't update user. User not found"
+msgstr "Impossível atualizar usuário. Usuário não foi encontrado"
+
+msgid "Category with name %categoryName% already exists"
+msgstr "Já existe a categoria com o nome %categoryName%"
+
+msgid "Data definition %dataName% doesn't exists for process %processId%"
+msgstr "Definição do dado %dataName% não existe para o processo %processId%"
+
+msgid "Error during Application import file reading."
+msgstr "Erro na leitura do arquivo de importação de aplicações."
+
+msgid "Error occured when starting process %processId%"
+msgstr "Ocorreu um erro ao iniciar o processo %processId%"
+
+msgid "Error uploading the file. Maybe your session expired. You can try to refresh the page."
+msgstr "Erro ao carregar o arquivo. Talvez sua sessão tenha expirado. Você pode tentar atualizar a página."
+
+msgid "Error when adding group to actor member"
+msgstr "Erro ao adicionar grupo como membro do ator"
+
+msgid "Error when creating group"
+msgstr "Erro ao criar grupo"
+
+msgid "Error when creating user"
+msgstr "Erro ao criar o usuário"
+
+msgid "Error when deleting groups"
+msgstr "Error when deleting groups"
+
+msgid "Error when deleting users"
+msgstr "Erro ao remover usuários"
+
+msgid "Error when pausing BPM services"
+msgstr "Erro ao suspender os serviços BPM"
+
+msgid "Error when resuming BPM services"
+msgstr "Erro ao relançar os serviços BPM"
+
+msgid "Error when searching users"
+msgstr "Erro ao pesquisar usuários"
+
+msgid "Error when updating %activityId% activity variables"
+msgstr "Erro ao atualizar as variáveis de atividade %activityId%"
+
+msgid "Error when updating group"
+msgstr "Erro ao atualizar o grupo"
+
+msgid "Error when updating process deployment informations"
+msgstr "Erro ao atualizar informações de implantação do processo"
+
+msgid "Error when updating user"
+msgstr "Erro ao atualizar usuário"
+
+msgid "Filters are not supported by this API"
+msgstr "Filtros não são suportados nesta API"
+
+msgid "Json can't be mapped to "
+msgstr "Json não pode ser mapeado para "
+
+msgid "Login failed. No profile has been set up for this user. Contact your administrator."
+msgstr "O seu login falhou. Nenhum perfil foi criado para este usuário. Contate o administrador."
+
+msgid "Login form"
+msgstr "Formulário de login"
+
+msgid "MM/dd/yyyy"
+msgstr "dd/MM/yyyy"
+
+msgid "MM/dd/yyyy h:mm a"
+msgstr "MM/dd/yyyy hh:mm a"
+
+msgid "MMMM dd, yyyy"
+msgstr "MMMM dd, yyyy"
+
+msgid "Only the value attribute can be updated"
+msgstr "Apenas o valor do atributo pode ser atualizado"
+
+msgid "Password"
+msgstr "Senha "
+
+msgid "Password must be at least %number% characters long"
+msgstr "Senha deve ter pelo menos %number% caracteres"
+
+msgid "Password must contain at least %number% digits"
+msgstr "Senha deve conter pelo menos dígitos %number%"
+
+msgid "Password must contain at least %number% lower case characters"
+msgstr "Senha deve conter pelo menos %number% minúsculas caracteres"
+
+msgid "Password must contain at least %number% special characters"
+msgstr "A senha deve conter pelo menos %number% caracteres especiais"
+
+msgid "Password must contain at least %number% upper case characters"
+msgstr "A senha deve conter pelo menos %number% letras maiúsculas"
+
+msgid "Please, contact your administrator."
+msgstr "Por favor, contate o administrador."
+
+msgid "Process %appName% in version %version% already exists"
+msgstr "Processo %appName% na versão %version% já existe"
+
+msgid "Process %appName% in version %version% contains 6.x Legacy artifacts (forms or case overview page). Those are based on Google Web Toolkit (GWT), a technology that is no longer supported by Bonita. To know more, check the documentation."
+msgstr "Processo %appName% na versão %version% contém artefatos de legado 6. x (formulários ou página visão geral do caso). Aqueles são baseados no Google Web Toolkit (GWT), uma tecnologia que não é mais suportada por Bonita. Para saber mais, consulte a documentação."
+
+msgid "Process definition not found for id %processId%"
+msgstr "Definição de processo não encontrada para o id %processId%"
+
+msgid "Profile member already exists"
+msgstr "Membro do perfil já existe"
+
+msgid "Request parameter \"id\" must be set."
+msgstr "O parâmetro id\" da interrogação deve ser definido."
+
+msgid "Search terms are not supported by this API"
+msgstr "Termos de pesquisa não são suportados nesta API"
+
+msgid "Session expired. Please log in again."
+msgstr "Sessão expirada. Por favor, conecte-se novamente."
+
+msgid "Sorting is not supported by this API"
+msgstr "Ordenação não é suportada nesta API"
+
+msgid "The only mandatory filter is %name%"
+msgstr "O único filtro obrigatório é %name%"
+
+msgid "The server is not available"
+msgstr "O servidor não está disponível"
+
+msgid "This category has already been added to this process"
+msgstr "Esta categoria já foi adicionada a este processo"
+
+msgid "This group has already been mapped to actor"
+msgstr "Este grupo já foi designado como ator"
+
+msgid "This membership has already been mapped to actor"
+msgstr "Esta associação já foi designada como ator"
+
+msgid "This membership is already added to user"
+msgstr "Esta associação já foi adicionada ao usuário"
+
+msgid "This role has already been mapped to actor"
+msgstr "Esta função já foi designada como ator"
+
+msgid "This user has already been mapped to actor"
+msgstr "Este usuário já foi designado como ator"
+
+msgid "Unable to deploy business archive"
+msgstr "Não foi possível instalar o arquivo"
+
+msgid "Unable to disable process"
+msgstr "Impossível desativar processo"
+
+msgid "Unable to enable process"
+msgstr "Impossível ativar processo"
+
+msgid "Unable to find data instance %dataName% for activity %activityId%"
+msgstr "Impossível encontrar dados de instância %dataName% da atividade %activityId%"
+
+msgid "Unable to find role %roleId%"
+msgstr "Não é possível localizar a função %roleId%"
+
+msgid "Unable to get group path, group not found"
+msgstr "Não é possível obter o caminho do grupo, grupo não encontrado"
+
+msgid "Unable to get process data definitions, process %processId% not found"
+msgstr "Impossível obter definições de dados do processo, processo %processId% não foi encontrado"
+
+msgid "Unable to log in. Please check your username and password."
+msgstr "Não foi possível logar. Por favor, verifique seu nome de usuário e senha."
+
+msgid "User"
+msgstr "Usuário"
+
+msgid "User not found"
+msgstr "Usuário não foi encontrado"
+
+msgid "Welcome to"
+msgstr "Bem-vindo ao"
+
+msgid "message"
+msgstr "mensagem"
+
+msgid "or"
+msgstr "ou"
+

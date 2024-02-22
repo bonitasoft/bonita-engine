@@ -1,0 +1,14 @@
+plugins {
+    id "org.sonarqube" version "3.0"
+    id 'org.barfuin.gradle.taskinfo' version '2.1.0' // Adds a 'tiTree' task to display Gradle task-graph
+}
+  
+sonarqube {
+    properties {
+          property "sonar.projectKey", "bonitasoft_bonita-engine"
+          property "sonar.organization", "bonitasoft"
+          property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
+apply from: "common.gradle"

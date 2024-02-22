@@ -1,0 +1,20 @@
+<connectorDefinition>
+	<version>1.0</version>
+	<connectorId>org.bonitasoft.connector.testConnector</connectorId>
+	<icon>xxx.png</icon>
+	<categories>
+		<category>
+			<name>other</name>
+			<icon>org/bonitasoft/engine/connectors/TestConnector.png</icon>
+		</category>
+	</categories>
+	<inputs>
+		<input type="String">input1</input>
+		<required />
+		<parameters>
+			<string />
+		</parameters>
+	</inputs>
+	<outputs>
+	</outputs>
+</connectorDefinition>
