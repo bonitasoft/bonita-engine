@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -21,7 +20,6 @@ import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,38 +43,6 @@ public class PermissionAPIImplTest {
         doReturn(serviceAccessor).when(permissionAPI).getServiceAccessor();
         doReturn(permissionService).when(serviceAccessor).getPermissionService();
         apiCallContext = new APICallContext("GET", "identity", "user", "1", "query", "{\"body\":\"value\"}");
-    }
-
-    @Test
-    public void should_executeSecurityScript_call_the_service() throws Exception {
-        //given all ok
-        doReturn(true).when(permissionService).checkAPICallWithScript("myScript", apiCallContext, false);
-
-        //when
-        final boolean isAllowed = permissionAPI.checkAPICallWithScript("myScript", apiCallContext, false);
-
-        //then
-        assertThat(isAllowed).isTrue();
-    }
-
-    @Test
-    public void should_executeSecurityScript_throw_not_found_exception_when_file_does_not_exists() throws Exception {
-        doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext,
-                false);
-
-        final String message = assertThrows(NotFoundException.class,
-                () -> permissionAPI.checkAPICallWithScript("myScript", apiCallContext, false)).getMessage();
-        assertThat(message).contains("the class myScript is not found");
-    }
-
-    @Test
-    public void should_executeSecurityScript_throw_execution_exception() throws Exception {
-        //given
-        doThrow(SExecutionException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext,
-                false);
-
-        assertThrows(ExecutionException.class,
-                () -> permissionAPI.checkAPICallWithScript("myScript", apiCallContext, false));
     }
 
     @Test

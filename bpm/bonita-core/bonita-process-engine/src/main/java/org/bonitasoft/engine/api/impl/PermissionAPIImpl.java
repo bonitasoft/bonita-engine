@@ -18,10 +18,8 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.permission.APICallContext;
-import org.bonitasoft.engine.authorization.PermissionService;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 
@@ -31,23 +29,6 @@ import org.bonitasoft.engine.service.ServiceAccessorSingleton;
 @Slf4j
 @AvailableInMaintenanceMode
 public class PermissionAPIImpl implements PermissionAPI {
-
-    @Override
-    @Deprecated(forRemoval = true, since = "7.14.0")
-    public boolean checkAPICallWithScript(String className, APICallContext context, boolean reload)
-            throws ExecutionException, NotFoundException {
-        ServiceAccessor serviceAccessor = getServiceAccessor();
-        PermissionService permissionService = serviceAccessor.getPermissionService();
-        try {
-            return permissionService.checkAPICallWithScript(className, context, reload);
-        } catch (SExecutionException e) {
-            throw new ExecutionException(
-                    "Unable to execute the security rule " + className + " for the api call " + context, e);
-        } catch (ClassNotFoundException e) {
-            throw new NotFoundException("Unable to execute the security rule " + className + " for the api call "
-                    + context + " because the class " + className + " is not found", e);
-        }
-    }
 
     @Override
     public boolean isAuthorized(APICallContext apiCallContext) throws ExecutionException {

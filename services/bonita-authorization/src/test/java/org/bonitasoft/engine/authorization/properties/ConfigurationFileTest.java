@@ -63,15 +63,15 @@ public class ConfigurationFileTest {
     public void setupMocksAndSpies() {
         resourcesPermissionsMapping = spy(
                 new ResourcesPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
-        doReturn(resourcesProperties).when(resourcesPermissionsMapping).getTenantProperties();
+        doReturn(resourcesProperties).when(resourcesPermissionsMapping).getProperties();
 
         customPermissionsMapping = spy(
                 new CustomPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
-        doReturn(customProperties).when(customPermissionsMapping).getTenantProperties();
+        doReturn(customProperties).when(customPermissionsMapping).getProperties();
 
         compoundPermissionsMapping = spy(
                 new CompoundPermissionsMapping(TENANT_ID, cacheService, configurationFilesManager));
-        doReturn(compoundProperties).when(compoundPermissionsMapping).getTenantProperties();
+        doReturn(compoundProperties).when(compoundPermissionsMapping).getProperties();
     }
 
     @Test
@@ -135,7 +135,7 @@ public class ConfigurationFileTest {
                 TENANT_ID, false);
 
         // when:
-        configFile.getTenantProperties();
+        configFile.getProperties();
 
         // then:
         verify(cacheService).get(CONFIGURATION_FILES_CACHE, "resources-permissions-mapping.properties");

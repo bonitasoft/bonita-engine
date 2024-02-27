@@ -33,11 +33,11 @@ public abstract class ConfigurationFile {
 
     protected static final String CONFIGURATION_FILES_CACHE = "CONFIGURATION_FILES_CACHE";
 
-    private final long tenantId;
+    protected final long tenantId;
 
     private final String propertiesFilename;
 
-    private final String cacheKey;
+    protected final String cacheKey;
 
     protected boolean setKeysToLowerCase;
 
@@ -60,11 +60,27 @@ public abstract class ConfigurationFile {
         this.setKeysToLowerCase = setKeysToLowerCase;
     }
 
-    private Properties readPropertiesFromDatabaseAndStoreThemInCache() {
+    protected Properties readPropertiesAndStoreThemInCache() {
+        return readPropertiesFromDatabaseAndStoreThemInCache();
+    }
+
+    protected Properties readPropertiesFromDatabaseAndStoreThemInCache() {
         Properties tenantProperties = configurationFilesManager.getTenantProperties(propertiesFilename, tenantId,
                 setKeysToLowerCase);
         storePropertiesInCache(tenantProperties);
         return tenantProperties;
+    }
+
+    protected Properties readPropertiesFromClasspathAndStoreThemInCache() {
+        //Read properties from classpath
+        Properties classpathProperties = new Properties();
+        try {
+            classpathProperties.load(ConfigurationFile.class.getResourceAsStream(getPropertiesFileName()));
+            storePropertiesInCache(classpathProperties);
+        } catch (IOException e) {
+            log.error("Cannot retrieve dynamic authorizations", e);
+        }
+        return classpathProperties;
     }
 
     protected abstract String getPropertiesFileName();
@@ -84,7 +100,7 @@ public abstract class ConfigurationFile {
         }
     }
 
-    Properties getTenantProperties() {
+    Properties getProperties() {
         Properties properties;
         try {
             properties = (Properties) cacheService.get(CONFIGURATION_FILES_CACHE, cacheKey);
@@ -94,13 +110,13 @@ public abstract class ConfigurationFile {
             return new Properties(); // Should we return null?
         }
         if (properties == null) {
-            properties = readPropertiesFromDatabaseAndStoreThemInCache();
+            properties = readPropertiesAndStoreThemInCache();
         }
         return properties;
     }
 
     public String getProperty(final String propertyName) {
-        final String propertyValue = getTenantProperties().getProperty(propertyName);
+        final String propertyValue = getProperties().getProperty(propertyName);
         return propertyValue != null ? propertyValue.trim() : null;
     }
 
@@ -114,7 +130,7 @@ public abstract class ConfigurationFile {
                 throw new IllegalArgumentException(
                         format("File %s cannot be modified directly, as a writable version exists", propertyName));
             }
-            final Properties tenantProperties = getTenantProperties();
+            final Properties tenantProperties = getProperties();
             if (tenantProperties.remove(propertyName) != null) { // if the property was present
                 storePropertiesInCache(tenantProperties);
                 configurationFilesManager.removeProperty(propertiesFilename, tenantId, propertyName);
@@ -129,7 +145,7 @@ public abstract class ConfigurationFile {
             if (!hasCustomVersion()) {
                 throw new IllegalArgumentException(format("File %s does not have a -custom version", propertyName));
             }
-            final Properties tenantProperties = getTenantProperties();
+            final Properties tenantProperties = getProperties();
             // FIXME: is there a risk to remove a property that is not custom, here?
             if (tenantProperties.remove(propertyName) != null) { // if the property was present
                 storePropertiesInCache(tenantProperties);
@@ -146,7 +162,7 @@ public abstract class ConfigurationFile {
             if (!hasInternalVersion()) {
                 throw new IllegalArgumentException(format("File %s does not have a -internal version", propertyName));
             }
-            final Properties tenantProperties = getTenantProperties();
+            final Properties tenantProperties = getProperties();
             // FIXME: is there a risk to remove a property that is not internal, here?
             if (tenantProperties.remove(propertyName) != null) { // if the property was present
                 storePropertiesInCache(tenantProperties);
@@ -164,7 +180,7 @@ public abstract class ConfigurationFile {
                 throw new IllegalArgumentException(
                         format("File %s cannot be modified directly, as a writable version exists", propertyName));
             }
-            final Properties tenantProperties = getTenantProperties();
+            final Properties tenantProperties = getProperties();
             tenantProperties.setProperty(propertyName, propertyValue);
             storePropertiesInCache(tenantProperties);
             configurationFilesManager.setProperty(propertiesFilename, tenantId, propertyName,
@@ -179,7 +195,7 @@ public abstract class ConfigurationFile {
             if (!hasCustomVersion()) {
                 throw new IllegalArgumentException(format("File %s does not have a -custom version", propertyName));
             }
-            final Properties tenantProperties = getTenantProperties();
+            final Properties tenantProperties = getProperties();
             tenantProperties.setProperty(propertyName, propertyValue);
             storePropertiesInCache(tenantProperties);
             configurationFilesManager.setProperty(getCustomPropertiesFilename(propertiesFilename),
@@ -194,7 +210,7 @@ public abstract class ConfigurationFile {
             if (!hasInternalVersion()) {
                 throw new IllegalArgumentException(format("File %s does not have a -internal version", propertyName));
             }
-            final Properties tenantProperties = getTenantProperties();
+            final Properties tenantProperties = getProperties();
             tenantProperties.setProperty(propertyName, propertyValue);
             storePropertiesInCache(tenantProperties);
             configurationFilesManager.setProperty(getInternalPropertiesFilename(propertiesFilename),

@@ -179,41 +179,6 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void init_method_should_store_sample_security_script_from_classpath() throws Exception {
-        //when
-        platformSetup.init();
-        //then
-        List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList(
-                        "SELECT * FROM CONFIGURATION WHERE content_type= '"
-                                + ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(1);
-        assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("SamplePermissionRule.groovy.sample");
-    }
-
-    @Test
-    public void init_method_should_store_security_scripts_from_folder_if_exists() throws Exception {
-        //when
-        final Path confFolder = temporaryFolder.newFolder().toPath();
-        configurationFolderUtil.buildPlatformEngineFolder(confFolder);
-        configurationFolderUtil.buildSqlFolder(confFolder, dbVendor);
-
-        System.setProperty(BONITA_SETUP_FOLDER, confFolder.toString());
-
-        FileUtils.write(confFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
-                .resolve("tenant_template_security_scripts")
-                .resolve("SomeCustomScript.groovy").toFile(), "custom content", Charset.defaultCharset());
-        platformSetup.init();
-        //then
-        List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList(
-                        "SELECT * FROM CONFIGURATION WHERE content_type= '"
-                                + ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(1);
-        assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("SomeCustomScript.groovy");
-    }
-
-    @Test
     public void should_extract_configuration() throws Exception {
         final File destinationFolder = temporaryFolder.newFolder("setup");
         //given
@@ -250,8 +215,7 @@ public class PlatformSetupIT {
                 "custom-permissions-mapping.properties",
                 "resources-permissions-mapping.properties",
                 "resources-permissions-mapping-custom.properties",
-                "resources-permissions-mapping-internal.properties",
-                "SamplePermissionRule.groovy.sample");
+                "resources-permissions-mapping-internal.properties");
     }
 
     @Test

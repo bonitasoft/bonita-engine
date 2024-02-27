@@ -94,7 +94,7 @@ public class ResourcesPermissionsMappingTest {
     public ResourcesPermissionsMapping getResourcesPermissionsMapping(final String fileContent) {
         final ResourcesPermissionsMapping resourcesPermissionsMapping = spy(
                 new ResourcesPermissionsMapping(423L, cacheService, configurationFilesManager));
-        doReturn(getProperties(fileContent.getBytes())).when(resourcesPermissionsMapping).getTenantProperties();
+        doReturn(getProperties(fileContent.getBytes())).when(resourcesPermissionsMapping).getProperties();
         return resourcesPermissionsMapping;
     }
 }

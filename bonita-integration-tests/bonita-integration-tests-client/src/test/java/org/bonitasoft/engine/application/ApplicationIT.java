@@ -258,6 +258,23 @@ public class ApplicationIT extends TestWithTechnicalUser {
 
         loginOnDefaultTenantWith("baptiste", "bpm");
 
+        long userId = user.getId();
+        assertThat(
+                getPermissionAPI().isAuthorized(new APICallContext("GET", "identity", "user", String.valueOf(userId))))
+                        .isTrue();
+        assertThat(getPermissionAPI()
+                .isAuthorized(new APICallContext("GET", "identity", "user", String.valueOf(userId + 1)))).isFalse();
+        assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "identity", "user", null))).isFalse();
+
+        getProfileAPI().createProfileMember(
+                getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).searchTerm("Admin").done()).getResult()
+                        .get(0).getId(),
+                user.getId(),
+                -1L,
+                -1L);
+
+        loginOnDefaultTenantWith("baptiste", "bpm");
+
         assertThat(getPermissionAPI().isAuthorized(new APICallContext("GET", "identity", "user", null))).isTrue();
     }
 
