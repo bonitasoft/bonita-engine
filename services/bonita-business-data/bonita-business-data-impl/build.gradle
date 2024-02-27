@@ -25,7 +25,7 @@ dependencies {
     testImplementation "org.springframework:spring-test:${Deps.springVersion}"
     testImplementation "org.springframework:spring-jdbc:${Deps.springVersion}"
     testImplementation testFixtures(project(':bpm:bonita-common'))
-    testRuntimeOnly "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
+    testRuntimeOnly "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
     testRuntimeOnly "com.h2database:h2:${Deps.h2Version}"
     testRuntimeOnly "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
     testRuntimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"

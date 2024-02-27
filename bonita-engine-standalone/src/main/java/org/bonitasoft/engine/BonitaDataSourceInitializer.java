@@ -25,8 +25,8 @@ import javax.naming.spi.ObjectFactory;
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
 
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.dbcp2.managed.BasicManagedDataSource;
+import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
+import org.apache.tomcat.dbcp.dbcp2.managed.BasicManagedDataSource;
 
 class BonitaDataSourceInitializer {
 

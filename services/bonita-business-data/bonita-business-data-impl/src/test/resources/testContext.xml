@@ -14,7 +14,7 @@
     <!-- create Arjuna transaction manager -->
     <bean id="arjunaTransactionManager" factory-method="transactionManager" class="com.arjuna.ats.jta.TransactionManager" />
 
-    <bean id="businessDataDataSource" class="org.apache.commons.dbcp2.managed.BasicManagedDataSource">
+    <bean id="businessDataDataSource" class="org.apache.tomcat.dbcp.dbcp2.managed.BasicManagedDataSource">
         <property name="initialSize" value="1" />
         <property name="maxTotal" value="10" />
         <property name="url" value="${db.url}" />
@@ -24,7 +24,7 @@
     </bean>
 
     <bean id="notManagedBizDataSource"
-          class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+          class="org.apache.tomcat.dbcp.dbcp2.BasicDataSource" destroy-method="close">
         <property name="initialSize" value="1" />
         <property name="maxTotal" value="10" />
         <property name="url" value="${db.url}" />

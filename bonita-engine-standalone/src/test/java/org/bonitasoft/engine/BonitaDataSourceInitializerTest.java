@@ -15,7 +15,7 @@ package org.bonitasoft.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

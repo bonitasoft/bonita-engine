@@ -11,7 +11,7 @@ class Deps {
     public static String commonsBeanutilsVersion = "1.9.4"
     public static String commonsCollections4Version = "4.4"
     public static String commonsLangVersion = "3.11"
-    public static String commonsDbcp2Version = "2.5.0"
+    public static String tomcatDbcpVersion = "9.0.83"
     public static String commonsCLIVersion = "1.4"
     public static String semver4jVersion = '3.1.0'
     public static String slf4jVersion = "1.7.36"
