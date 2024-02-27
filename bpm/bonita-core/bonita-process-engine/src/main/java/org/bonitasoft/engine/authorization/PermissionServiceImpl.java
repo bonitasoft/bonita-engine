@@ -13,29 +13,25 @@
  **/
 package org.bonitasoft.engine.authorization;
 
+import static java.lang.String.format;
 import static org.bonitasoft.engine.classloader.ClassLoaderIdentifier.identifier;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import groovy.lang.GroovyClassLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.permission.PermissionRule;
-import org.bonitasoft.engine.authorization.properties.CompoundPermissionsMapping;
-import org.bonitasoft.engine.authorization.properties.CustomPermissionsMapping;
-import org.bonitasoft.engine.authorization.properties.PropertiesWithSet;
-import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
+import org.bonitasoft.engine.authorization.properties.*;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.properties.BooleanProperty;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.impl.ServerLoggerWrapper;
 import org.bonitasoft.engine.session.APISession;
@@ -58,6 +54,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnSingleCandidate(PermissionService.class)
 public class PermissionServiceImpl implements PermissionService {
 
+    public static final String PROPERTY_TO_ENABLE_DYNAMIC_PERMISSIONS = "bonita.runtime.authorization.dynamic-check.enabled";
     public static final String RESOURCES_PROPERTY = "resources";
     public static final String PROPERTY_CONTENT_TYPE = "contentType";
     public static final String PROPERTY_API_EXTENSIONS = "apiExtensions";
@@ -71,10 +68,12 @@ public class PermissionServiceImpl implements PermissionService {
     private final ClassLoaderService classLoaderService;
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
-    private GroovyClassLoader groovyClassLoader;
+    protected GroovyClassLoader groovyClassLoader;
     private final CompoundPermissionsMapping compoundPermissionsMapping;
     private final ResourcesPermissionsMapping resourcesPermissionsMapping;
     private final CustomPermissionsMapping customPermissionsMapping;
+    protected final DynamicPermissionsChecks dynamicPermissionsChecks;
+    protected final BooleanProperty dynamicPermissionCheck;
 
     protected final long tenantId;
 
@@ -83,7 +82,9 @@ public class PermissionServiceImpl implements PermissionService {
             @Value("${tenantId}") final long tenantId,
             CompoundPermissionsMapping compoundPermissionsMapping,
             ResourcesPermissionsMapping resourcesPermissionsMapping,
-            CustomPermissionsMapping customPermissionsMapping) {
+            CustomPermissionsMapping customPermissionsMapping,
+            DynamicPermissionsChecks dynamicPermissionsChecks,
+            @Value("${bonita.runtime.authorization.dynamic-check.enabled:true}") boolean dynamicPermissionCheck) {
         this.classLoaderService = classLoaderService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
@@ -91,20 +92,20 @@ public class PermissionServiceImpl implements PermissionService {
         this.compoundPermissionsMapping = compoundPermissionsMapping;
         this.resourcesPermissionsMapping = resourcesPermissionsMapping;
         this.customPermissionsMapping = customPermissionsMapping;
+        this.dynamicPermissionsChecks = dynamicPermissionsChecks;
+        this.dynamicPermissionCheck = initDynamicPermissionsEnabledProperty(dynamicPermissionCheck);
     }
 
-    @Override
-    public boolean checkAPICallWithScript(final String className, final APICallContext context, final boolean reload)
+    BooleanProperty initDynamicPermissionsEnabledProperty(boolean dynamicPermissionsEnabled) {
+        return new BooleanProperty("Dynamic permissions", PROPERTY_TO_ENABLE_DYNAMIC_PERMISSIONS,
+                dynamicPermissionsEnabled);
+    }
+
+    protected boolean checkAPICallWithScript(final String className, final APICallContext context)
             throws SExecutionException, ClassNotFoundException {
         checkStarted();
         //groovy class loader load class from files and cache then when loaded, no need to do some lazy loading or load all class on start
-        Class<?> aClass;
-        if (reload) {
-            reload();
-            aClass = groovyClassLoader.loadClass(className, true, true, true);
-        } else {
-            aClass = Class.forName(className, true, groovyClassLoader);
-        }
+        Class<?> aClass = getRuleClass(className);
         if (!PermissionRule.class.isAssignableFrom(aClass)) {
             throw new SExecutionException("The class " + aClass.getName()
                     + " does not implements org.bonitasoft.engine.api.permission.PermissionRule");
@@ -120,6 +121,10 @@ public class PermissionServiceImpl implements PermissionService {
         }
     }
 
+    protected Class<?> getRuleClass(String className) throws SExecutionException, ClassNotFoundException {
+        return Class.forName(className, true, groovyClassLoader);
+    }
+
     public SSession getSession() throws SExecutionException {
         try {
             return sessionService.getSession(sessionAccessor.getSessionId());
@@ -128,7 +133,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
     }
 
-    private void reload() throws SExecutionException {
+    public void reload() throws SExecutionException {
         stop();
         try {
             start();
@@ -152,16 +157,6 @@ public class PermissionServiceImpl implements PermissionService {
         groovyClassLoader = new GroovyClassLoader(
                 classLoaderService.getClassLoader(identifier(ScopeType.TENANT, tenantId)));
         groovyClassLoader.setShouldRecompile(true);
-        try {
-            final File folder = getBonitaHomeServer().getSecurityScriptsFolder(tenantId);
-            groovyClassLoader.addClasspath(folder.getAbsolutePath());
-        } catch (BonitaHomeNotSetException | IOException e) {
-            throw new SExecutionException(e);
-        }
-    }
-
-    BonitaHomeServer getBonitaHomeServer() {
-        return BonitaHomeServer.getInstance();
     }
 
     @Override
@@ -174,6 +169,27 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean isAuthorized(APICallContext apiCallContext) throws SExecutionException {
+        if (dynamicPermissionCheck.isEnabled()) {
+            // Check if there is an active dynamic permission for this resource:
+            final Set<String> resourceDynamicPermissions = getDeclaredPermissions(apiCallContext.getApiName(),
+                    apiCallContext.getResourceName(), apiCallContext.getMethod(), apiCallContext.getResourceId(),
+                    dynamicPermissionsChecks);
+            if (!resourceDynamicPermissions.isEmpty()) {
+                // if there is a dynamic rule, use it to check the permissions
+                if (log.isTraceEnabled()) {
+                    log.trace("Dynamic REST API permissions check");
+                }
+                return isAuthorizedByDynamicPermissions(apiCallContext,
+                        getSession().getUserPermissions(),
+                        resourceDynamicPermissions);
+            }
+        }
+        // if there is no dynamic rule, use the static permissions
+        return isAuthorizedByStaticPermissions(apiCallContext);
+    }
+
+    protected boolean isAuthorizedByStaticPermissions(APICallContext apiCallContext)
+            throws SExecutionException {
         if (log.isTraceEnabled()) {
             log.trace("Static REST API permissions check");
         }
@@ -194,6 +210,85 @@ public class PermissionServiceImpl implements PermissionService {
                         + ", required permissions: " + resourcePermissions);
 
         return false;
+    }
+
+    protected boolean isAuthorizedByDynamicPermissions(APICallContext apiCallContext, Set<String> userPermissions,
+            Set<String> resourceDynamicPermissions) throws SExecutionException {
+        checkResourceAuthorizationsSyntax(resourceDynamicPermissions);
+        if (checkDynamicPermissionsWithProfilesOrUsername(resourceDynamicPermissions, userPermissions)) {
+            return true;
+        }
+        final String resourceClassName = getResourceClassName(resourceDynamicPermissions);
+        if (resourceClassName != null) {
+            try {
+                return checkDynamicPermissionsWithScript(apiCallContext, resourceClassName);
+            } catch (ClassNotFoundException e) {
+                throw new SExecutionException(
+                        "Unable to execute the security rule " + resourceClassName + " for the api call "
+                                + apiCallContext + " because the class " + resourceClassName + " is not found",
+                        e);
+            }
+        }
+        return false;
+    }
+
+    protected void checkResourceAuthorizationsSyntax(final Set<String> resourceAuthorizations) {
+        for (final String resourceAuthorization : resourceAuthorizations) {
+            if (!resourceAuthorization.matches("(" + USER_TYPE_AUTHORIZATION_PREFIX + "|"
+                    + PROFILE_TYPE_AUTHORIZATION_PREFIX + "|" + SCRIPT_TYPE_AUTHORIZATION_PREFIX + ")\\|.+")) {
+                if (log.isWarnEnabled()) {
+                    log.warn("Error while getting dynamic authorizations. Unknown syntax: " + resourceAuthorization
+                            + " defined in dynamic-permissions-checks.properties");
+                }
+                throw new IllegalArgumentException(
+                        format("Dynamic permission rule %s is not valid", resourceAuthorization));
+            }
+        }
+    }
+
+    protected Set<String> getResourceAuthorizationsForProfileOrUser(final Set<String> resourcePermissions) {
+        return resourcePermissions.stream()
+                .filter(item -> item.startsWith(PROFILE_TYPE_AUTHORIZATION_PREFIX + "|")
+                        || item.startsWith(USER_TYPE_AUTHORIZATION_PREFIX + "|"))
+                .collect(Collectors.toSet());
+    }
+
+    protected boolean checkDynamicPermissionsWithProfilesOrUsername(final Set<String> resourceAuthorizations,
+            final Set<String> userPermissions) {
+        return getResourceAuthorizationsForProfileOrUser(resourceAuthorizations).stream()
+                .anyMatch(userPermissions::contains);
+    }
+
+    protected boolean checkDynamicPermissionsWithScript(final APICallContext apiCallContext,
+            final String resourceClassName) throws SExecutionException, ClassNotFoundException {
+        final boolean authorized = checkAPICallWithScript(resourceClassName, apiCallContext);
+        if (!authorized) {
+            if (log.isDebugEnabled()) {
+                StringBuilder msg = new StringBuilder().append("Unauthorized access to ")
+                        .append(apiCallContext.getMethod()).append(" ").append(apiCallContext.getApiName())
+                        .append("/").append(apiCallContext.getResourceName())
+                        .append(apiCallContext.getResourceId() != null ? "/" + apiCallContext.getResourceId()
+                                : "")
+                        .append(", Permission script: ").append(resourceClassName);
+                msg.append(", attempted by ").append(getSession().getUserName());
+                log.debug(msg.toString());
+            }
+        }
+        return authorized;
+    }
+
+    protected String getResourceClassName(final Set<String> resourcePermissions) {
+        String className = null;
+        for (final String resourcePermission : resourcePermissions) {
+            if (resourcePermission.startsWith(SCRIPT_TYPE_AUTHORIZATION_PREFIX + "|")) {
+                className = resourcePermission.substring((SCRIPT_TYPE_AUTHORIZATION_PREFIX + "|").length());
+            }
+        }
+        return className;
+    }
+
+    public Set<String> getResourceDynamicPermissions(final String resourceKey) {
+        return dynamicPermissionsChecks.getPropertyAsSet(resourceKey);
     }
 
     protected Set<String> getDeclaredPermissions(final String apiName, final String resourceName, final String method,

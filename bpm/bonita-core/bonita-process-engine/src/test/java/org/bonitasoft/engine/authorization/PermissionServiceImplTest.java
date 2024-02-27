@@ -14,41 +14,36 @@
 package org.bonitasoft.engine.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.anyString;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.*;
 
-import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.authorization.properties.CompoundPermissionsMapping;
 import org.bonitasoft.engine.authorization.properties.CustomPermissionsMapping;
+import org.bonitasoft.engine.authorization.properties.DynamicPermissionsChecks;
 import org.bonitasoft.engine.authorization.properties.ResourcesPermissionsMapping;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -60,24 +55,17 @@ public class PermissionServiceImplTest {
 
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+
     @Mock
     private ClassLoaderService classLoaderService;
+
     @Mock
     private SessionAccessor sessionAccessor;
+
     @Mock
     private SessionService sessionService;
 
-    @Mock
-    private APIAccessorImpl apiIAccessorImpl;
-
     private PermissionServiceImpl permissionService;
-
-    @Mock
-    private BonitaHomeServer bonitaHomeServer;
 
     @Mock
     private SSession session;
@@ -91,23 +79,20 @@ public class PermissionServiceImplTest {
     @Mock
     private CustomPermissionsMapping customPermissionsMapping;
 
-    private File securityFolder;
+    @Mock
+    private DynamicPermissionsChecks dynamicPermissionsChecks;
 
     @Before
     public void before()
             throws IOException, SClassLoaderException, SSessionNotFoundException, BonitaHomeNotSetException {
-        securityFolder = temporaryFolder.newFolder("security");
 
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
                 .getClassLoader(any());
         permissionService = spy(
                 new PermissionServiceImpl(classLoaderService, sessionAccessor, sessionService, TENANT_ID,
-                        compoundPermissionsMapping, resourcesPermissionsMapping, customPermissionsMapping));
-        doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();
-        doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
+                        compoundPermissionsMapping, resourcesPermissionsMapping, customPermissionsMapping,
+                        dynamicPermissionsChecks, true));
         doReturn(session).when(sessionService).getSession(anyLong());
-
-        doReturn(securityFolder).when(bonitaHomeServer).getSecurityScriptsFolder(anyLong());
     }
 
     @Test
@@ -117,9 +102,9 @@ public class PermissionServiceImplTest {
         permissionService.stop();
 
         //when
-        expectedException.expect(SExecutionException.class);
-        expectedException.expectMessage(containsString("not started"));
-        permissionService.checkAPICallWithScript("plop", new APICallContext(), false);
+        Throwable throwable = assertThrows(SExecutionException.class,
+                () -> permissionService.checkAPICallWithScript("plop", new APICallContext()));
+        assertThat(throwable.getMessage()).contains("not started");
     }
 
     @Test
@@ -133,142 +118,33 @@ public class PermissionServiceImplTest {
     public void should_checkAPICallWithScript_throw_exception_if_not_started()
             throws SExecutionException, ClassNotFoundException {
         //given service not started
-        expectedException.expect(SExecutionException.class);
-        expectedException.expectMessage(containsString("not started"));
 
         //when
-        permissionService.checkAPICallWithScript("plop", new APICallContext(), false);
+        Throwable throwable = assertThrows(SExecutionException.class,
+                () -> permissionService.checkAPICallWithScript("plop", new APICallContext()));
+        assertThat(throwable.getMessage()).contains("not started");
     }
 
     @Test
     public void should_checkAPICallWithScript_with_wrong_class() throws SBonitaException, ClassNotFoundException {
         //given
         permissionService.start();
-        expectedException.expect(SExecutionException.class);
-        expectedException.expectMessage(
-                containsString("does not implements org.bonitasoft.engine.api.permission.PermissionRule"));
 
         //when
-        permissionService.checkAPICallWithScript(String.class.getName(), new APICallContext(), false);
-    }
-
-    @Test
-    public void should_checkAPICallWithScript_run_the_class_in_script_folder()
-            throws SBonitaException, ClassNotFoundException, IOException {
-        //given
-        final String methodBody = "        return true\n";
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent(methodBody),
-                Charset.defaultCharset());
-
-        systemOutRule.clearLog();
-        permissionService.start();
-
-        //when
-        final boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(),
-                false);
-
-        assertThat(myCustomRule).isTrue();
-        assertThat(systemOutRule.getLog()).containsPattern("WARN.*.Executing my custom rule");
-    }
-
-    @Test
-    public void should_checkAPICallWithScript_run_the_class_with_package_in_script_root_folder()
-            throws SBonitaException, ClassNotFoundException, IOException {
-        //given
-        File test = new File(securityFolder, "test");
-        test.mkdir();
-        FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"),
-                getRuleContent("test", "        return true\n"), Charset.defaultCharset());
-
-        systemOutRule.clearLog();
-        permissionService.start();
-
-        //when
-        final boolean myCustomRule = permissionService.checkAPICallWithScript("test.MyCustomRule", new APICallContext(),
-                false);
-
-        assertThat(myCustomRule).isTrue();
-        assertThat(systemOutRule.getLog()).containsPattern("WARN.*.Executing my custom rule");
-    }
-
-    /*
-     * @Test
-     * public void perf() throws SBonitaException, ClassNotFoundException, IOException {
-     * //given
-     * FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +
-     * "import org.bonitasoft.engine.api.APIAccessor\n" +
-     * "import org.bonitasoft.engine.api.Logger\n" +
-     * "import org.bonitasoft.engine.api.permission.APICallContext\n" +
-     * "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
-     * "import org.bonitasoft.engine.session.APISession\n" +
-     * "\n" +
-     * "class MyCustomRule implements PermissionRule {\n" +
-     * "    @Override\n" +
-     * "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n"
-     * +
-     * "        logger.warning(\"Executing my custom rule\")\n" +
-     * "        return true\n" +
-     * "    }\n" +
-     * "}" +
-     * "");
-     * permissionService.start();
-     * long before = System.nanoTime();
-     * //when
-     * for (int i = 0; i < 25000; i++) {
-     * boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
-     * assertThat(myCustomRule).isTrue();
-     * }
-     * fail("time= "+(System.nanoTime()-before)/250000);
-     * }
-     */
-
-    @Test
-    public void should_checkAPICallWithScript_reload_classes() throws Exception {
-        //given
-        permissionService.start();
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"),
-                getRuleContent("        return true\n"), Charset.defaultCharset());
-
-        //when
-        boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
-
-        assertThat(myCustomRule).isTrue();
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"),
-                getRuleContent("        return false\n"), Charset.defaultCharset());
-
-        myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
-
-        assertThat(myCustomRule).isFalse();
-        verify(bonitaHomeServer, times(3)).getSecurityScriptsFolder(TENANT_ID);
-
-    }
-
-    @Test
-    public void should_checkAPICallWithScript_that_throw_exception() throws Exception {
-        //given
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"),
-                getRuleContent("        throw new RuntimeException()\n"),
-                Charset.defaultCharset());
-
-        permissionService.start();
-
-        expectedException.expect(SExecutionException.class);
-        expectedException.expectCause(CoreMatchers.<Throwable> instanceOf(RuntimeException.class));
-        //when
-        permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
-
-        //then
-        verify(bonitaHomeServer).getSecurityScriptsFolder(TENANT_ID);
+        Throwable throwable = assertThrows(SExecutionException.class,
+                () -> permissionService.checkAPICallWithScript(String.class.getName(), new APICallContext()));
+        assertThat(throwable.getMessage())
+                .contains("does not implements org.bonitasoft.engine.api.permission.PermissionRule");
     }
 
     @Test
     public void should_checkAPICallWithScript_with_unknown_class() throws SBonitaException, ClassNotFoundException {
         //given
         permissionService.start();
-        expectedException.expect(ClassNotFoundException.class);
 
         //when
-        permissionService.checkAPICallWithScript("plop", new APICallContext(), false);
+        assertThrows(ClassNotFoundException.class,
+                () -> permissionService.checkAPICallWithScript("plop", new APICallContext()));
     }
 
     @Test
@@ -362,43 +238,177 @@ public class PermissionServiceImplTest {
         assertThat(isAuthorized).isTrue();
     }
 
-    private void returnPermissionsFor(final String method, final String apiName, final String resourceName,
-            final List<String> resourceQualifiers,
-            final List<String> toBeReturned) {
-        if (resourceQualifiers != null) {
-            doReturn(new HashSet<>(toBeReturned)).when(resourcesPermissionsMapping).getResourcePermissions(method,
-                    apiName, resourceName,
-                    resourceQualifiers);
-        } else {
-            doReturn(new HashSet<>(toBeReturned)).when(resourcesPermissionsMapping).getResourcePermissions(method,
-                    apiName, resourceName);
-        }
+    @Test
+    public void isAuthorized_should_call_script_when_declared() throws Exception {
+        returnDynamicPermissionsFor("GET", "bpm", "case", null, List.of("check|className"));
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+        doReturn(true).when(permissionService).checkAPICallWithScript("className", apiCallContext);
+
+        final boolean isAuthorized = permissionService.isAuthorized(apiCallContext);
+
+        assertThat(isAuthorized).isTrue();
+        verify(permissionService).checkAPICallWithScript("className", apiCallContext);
     }
 
-    private String getRuleContent(String methodBody) {
-        return getRuleContent(null, methodBody);
+    @Test
+    public void isAuthorized_should_return_false_when_script_returns_false() throws Exception {
+        returnDynamicPermissionsFor("GET", "bpm", "case", null, List.of("check|className"));
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+        doReturn(false).when(permissionService).checkAPICallWithScript("className", apiCallContext);
+
+        final boolean isAuthorized = permissionService.isAuthorized(apiCallContext);
+
+        assertThat(isAuthorized).isFalse();
+        verify(permissionService).checkAPICallWithScript("className", apiCallContext);
     }
 
-    private String getRuleContent(String packageName, String methodBody) {
-        StringBuilder content = new StringBuilder();
-        if (packageName != null) {
-            content.append("package ").append(packageName).append(";\n");
+    @Test
+    public void isAuthorized_should_return_false_when_script_execution_fails() throws Exception {
+        returnDynamicPermissionsFor("GET", "bpm", "case", null, List.of("check|className"));
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+        doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("className",
+                apiCallContext);
 
-        }
-        content.append("import org.bonitasoft.engine.api.APIAccessor\n")
-                .append("import org.bonitasoft.engine.api.Logger\n")
-                .append("import org.bonitasoft.engine.api.permission.APICallContext\n")
-                .append("import org.bonitasoft.engine.api.permission.PermissionRule\n")
-                .append("import org.bonitasoft.engine.session.APISession\n")
-                .append("\n")
-                .append("class MyCustomRule implements PermissionRule {\n")
-                .append("    @Override\n")
-                .append("    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n")
-                .append("        logger.warning(\"Executing my custom rule\")\n")
-                .append(methodBody)
-                .append("    }\n")
-                .append("}");
-        return content.toString();
+        assertThrows(SExecutionException.class,
+                () -> permissionService.isAuthorized(apiCallContext));
+    }
+
+    @Test
+    public void isAuthorized_should_check_static_permissions_if_no_script_declared() throws Exception {
+        //given
+        doReturn(false).when(permissionService).isAuthorizedByStaticPermissions(any(APICallContext.class));
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+
+        // when:
+        final boolean authorized = permissionService.isAuthorized(apiCallContext);
+
+        // then:
+        assertThat(authorized).isFalse();
+        verify(permissionService).isAuthorizedByStaticPermissions(eq(apiCallContext));
+    }
+
+    @Test
+    public void isAuthorized_should_return_true_with_profile_check() throws Exception {
+        final String sessionUserPermissions = "profile|admin";
+        returnPermissionsFor("GET", "bpm", "case", null, List.of(sessionUserPermissions, "check|className"));
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+        returnUserPermissionsFromSession(sessionUserPermissions);
+
+        final boolean isAuthorized = permissionService.isAuthorized(apiCallContext);
+
+        assertThat(isAuthorized).isTrue();
+        verify(permissionService, never()).checkDynamicPermissionsWithScript(any(), any());
+    }
+
+    @Test
+    public void isAuthorized_should_return_true_with_user_check() throws Exception {
+        // given
+        final String userPermissions = "user|Juan-Carlos";
+        returnPermissionsFor("GET", "bpm", "case", null, List.of(userPermissions, "check|className"));
+        returnUserPermissionsFromSession(userPermissions);
+
+        // when
+        final boolean isAuthorized = permissionService.isAuthorized(
+                new APICallContext("GET", "bpm", "case", null, "", ""));
+
+        // then
+        assertThat(isAuthorized).isTrue();
+        verify(permissionService, never()).checkDynamicPermissionsWithScript(any(), anyString());
+    }
+
+    @Test
+    public void isAuthorized_should_work_with_default_rule() throws Exception {
+        // given
+        long userId = 10L;
+        doReturn(userId).when(session).getUserId();
+        final List<String> dynamicAuthorizations = List.of("check|org.bonitasoft.permissions.UserPermissionRule");
+        returnDynamicPermissionsFor("GET", "identity", "user", null, dynamicAuthorizations);
+
+        // when
+        permissionService.start();
+        final boolean isAuthorizedOnAllUsers = permissionService.isAuthorized(
+                new APICallContext("GET", "identity", "user", null, "", ""));
+
+        // then
+        assertThat(isAuthorizedOnAllUsers).isFalse();
+
+        // when
+        final boolean isAuthorizedOnCurrentUser = permissionService.isAuthorized(
+                new APICallContext("GET", "identity", "user", String.valueOf(userId), "", ""));
+
+        // then
+        assertThat(isAuthorizedOnCurrentUser).isTrue();
+    }
+
+    @Test
+    public void isAuthorized_should_throw_exception_if_the_script_is_not_found() throws Exception {
+        returnDynamicPermissionsFor("GET", "bpm", "case", null, List.of("check|className"));
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+        doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("className",
+                apiCallContext);
+
+        assertThrows(SExecutionException.class,
+                () -> permissionService.isAuthorized(apiCallContext));
+    }
+
+    @Test
+    public void isAuthorized_should_throw_exception_if_syntax_is_invalid() {
+        returnDynamicPermissionsFor("GET", "bpm", "case", null, List.of("anyText"));
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> permissionService.isAuthorized(apiCallContext));
+    }
+
+    @Test
+    public void checkResourceAuthorizationsSyntax_should_throw_exception_if_syntax_is_invalid() {
+        final Set<String> resourceAuthorizations = new HashSet<>();
+        resourceAuthorizations.add("any string");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> permissionService.checkResourceAuthorizationsSyntax(resourceAuthorizations));
+    }
+
+    @Test
+    public void checkResourceAuthorizationsSyntax_should_not_throw_exception_if_syntax_is_valid() {
+        final Set<String> resourceAuthorizations = Set.of("user|any.username", "profile|any.profile",
+                "check|className");
+
+        permissionService.checkResourceAuthorizationsSyntax(resourceAuthorizations);
+
+        // no exception
+    }
+
+    @Test
+    public void should_checkPermissions_return_true_if_dynamic_authorized() throws Exception {
+        //given
+        final List<String> dynamicAuthorizations = List.of("check|className");
+        returnDynamicPermissionsFor("GET", "bpm", "case", null, dynamicAuthorizations);
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+        doReturn(true).when(permissionService).isAuthorizedByDynamicPermissions(eq(apiCallContext),
+                anySet(), anySet());
+
+        //when
+        final boolean isAuthorized = permissionService.isAuthorized(apiCallContext);
+
+        //then
+        assertThat(isAuthorized).isTrue();
+    }
+
+    @Test
+    public void should_checkPermissions_return_false_if_dynamic_not_authorized() throws Exception {
+        //given
+        final List<String> dynamicAuthorizations = List.of("check|className");
+        returnDynamicPermissionsFor("GET", "bpm", "case", null, dynamicAuthorizations);
+        final APICallContext apiCallContext = new APICallContext("GET", "bpm", "case", null, "", "");
+        doReturn(false).when(permissionService).isAuthorizedByDynamicPermissions(eq(apiCallContext),
+                anySet(), anySet());
+
+        //when
+        final boolean isAuthorized = permissionService.isAuthorized(apiCallContext);
+
+        //then
+        assertThat(isAuthorized).isFalse();
     }
 
     @Test
@@ -562,5 +572,71 @@ public class PermissionServiceImplTest {
         //then
         assertThat(permissionService.getResourcePermissions("GET|bpm/case")).containsExactlyInAnyOrder("CasePermission",
                 "MyPermission");
+    }
+
+    @Rule
+    public RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
+
+    @Rule
+    public EnvironmentVariables envVar = new EnvironmentVariables();
+
+    @Test
+    public void initDynamicPermissionsEnabledProperty_should_take_System_property_if_set() {
+        // given:
+        System.setProperty("bonita.runtime.authorization.dynamic-check.enabled", "false");
+        envVar.set("bonita.runtime.authorization.dynamic-check.enabled", "true");
+
+        // when:
+        final boolean property = permissionService.initDynamicPermissionsEnabledProperty(true).isEnabled();
+
+        // then:
+        assertThat(property).isFalse();
+    }
+
+    @Test
+    public void initDynamicPermissionsEnabledProperty_should_take_envVar_if_no_System_property_if_set() {
+        // given:
+        envVar.set("BONITA_RUNTIME_AUTHORIZATION_DYNAMICCHECK_ENABLED", "false");
+
+        // when:
+        final boolean property = permissionService.initDynamicPermissionsEnabledProperty(true).isEnabled();
+
+        // then:
+        assertThat(property).isFalse();
+    }
+
+    @Test
+    public void initDynamicPermissionsEnabledProperty_should_take_file_property_if_no_System__nor_env_property_if_set() {
+        // when:
+        final boolean property = permissionService.initDynamicPermissionsEnabledProperty(false).isEnabled();
+
+        // then:
+        assertThat(property).isFalse();
+    }
+
+    private void returnPermissionsFor(final String method, final String apiName, final String resourceName,
+            final List<String> resourceQualifiers,
+            final List<String> toBeReturned) {
+        returnPermissionsFor(method, apiName, resourceName, resourceQualifiers, toBeReturned,
+                resourcesPermissionsMapping);
+    }
+
+    private void returnDynamicPermissionsFor(final String method, final String apiName, final String resourceName,
+            final List<String> resourceQualifiers,
+            final List<String> toBeReturned) {
+        returnPermissionsFor(method, apiName, resourceName, resourceQualifiers, toBeReturned, dynamicPermissionsChecks);
+    }
+
+    private void returnPermissionsFor(final String method, final String apiName, final String resourceName,
+            final List<String> resourceQualifiers,
+            final List<String> toBeReturned, final ResourcesPermissionsMapping resourcesPermissionsMapping) {
+        if (resourceQualifiers != null) {
+            doReturn(new HashSet<>(toBeReturned)).when(resourcesPermissionsMapping).getResourcePermissions(method,
+                    apiName, resourceName,
+                    resourceQualifiers);
+        } else {
+            doReturn(new HashSet<>(toBeReturned)).when(resourcesPermissionsMapping).getResourcePermissions(method,
+                    apiName, resourceName);
+        }
     }
 }

@@ -51,7 +51,9 @@ class UserPermissionRule implements PermissionRule {
             }
             return false
         } else {
-            if (apiCallContext.getQueryString().contains("d=professional_data") || apiCallContext.getQueryString().contains("d=personnal_data")) {
+            if (apiCallContext.getQueryString() != null
+                    && (apiCallContext.getQueryString().contains("d=professional_data")
+                    || apiCallContext.getQueryString().contains("d=personnal_data"))) {
                 return false
             }
             def filters = apiCallContext.getFilters()

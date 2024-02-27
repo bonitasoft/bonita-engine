@@ -26,7 +26,7 @@ public interface PermissionRule {
 
     /**
      * Called by the engine when using
-     * {@link org.bonitasoft.engine.api.PermissionAPI#checkAPICallWithScript(String, APICallContext, boolean)}
+     * {@link org.bonitasoft.engine.api.PermissionAPI#isAuthorized(APICallContext)}
      *
      * @param apiSession
      *        the api session from the user doing the api call
