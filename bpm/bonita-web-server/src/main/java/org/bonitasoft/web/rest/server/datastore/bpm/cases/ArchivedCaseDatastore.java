@@ -21,7 +21,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
@@ -86,18 +85,7 @@ public class ArchivedCaseDatastore extends CommonDatastore<ArchivedCaseItem, Arc
             final String orders,
             final Map<String, String> filters) {
 
-        // Build search
-        final SearchOptionsBuilder builder = SearchOptionsBuilderUtil.buildSearchOptions(page, resultsByPage, orders,
-                search);
-
-        addStringFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_PROCESS_NAME,
-                ProcessInstanceSearchDescriptor.NAME);
-        addLongFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_PROCESS_ID,
-                ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID);
-        addLongFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_STARTED_BY_USER_ID,
-                ProcessInstanceSearchDescriptor.STARTED_BY);
-        addLongFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_SOURCE_OBJECT_ID,
-                ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID);
+        final SearchOptionsBuilder builder = buildSearchOptions(page, resultsByPage, search, orders, filters);
 
         // Run search depending on filters passed
         final SearchResult<ArchivedProcessInstance> searchResult = runSearch(filters, builder);
@@ -108,6 +96,39 @@ public class ArchivedCaseDatastore extends CommonDatastore<ArchivedCaseItem, Arc
                 resultsByPage,
                 searchResult.getCount(),
                 convertEngineToConsoleItemsList(searchResult.getResult()));
+    }
+
+    protected SearchOptionsBuilder buildSearchOptions(final int page, final int resultsByPage, final String search,
+            final String orders, final Map<String, String> filters) {
+        // Build search
+        final SearchOptionsBuilder builder = SearchOptionsBuilderUtil.buildSearchOptions(page, resultsByPage, orders,
+                search);
+
+        addStringFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_PROCESS_NAME,
+                ArchivedProcessInstancesSearchDescriptor.NAME);
+        addLongFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_PROCESS_ID,
+                ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID);
+        addLongFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_STARTED_BY_USER_ID,
+                ArchivedProcessInstancesSearchDescriptor.STARTED_BY);
+        addLongFilterToSearchBuilder(filters, builder, ArchivedCaseItem.ATTRIBUTE_SOURCE_OBJECT_ID,
+                ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID);
+
+        addCallerFilterToSearchBuilderIfNecessary(filters, builder);
+        return builder;
+    }
+
+    void addCallerFilterToSearchBuilderIfNecessary(final Map<String, String> filters,
+            final SearchOptionsBuilder builder) {
+        /*
+         * By default we add a caller filter of -1 to avoid having sub processes.
+         * If caller is forced to any then we don't need to add the filter.
+         */
+        if (!filters.containsKey(CaseItem.FILTER_CALLER)) {
+            builder.filter(ArchivedProcessInstancesSearchDescriptor.CALLER_ID, -1);
+        } else if (!"any".equalsIgnoreCase(filters.get(CaseItem.FILTER_CALLER))) {
+            builder.filter(ArchivedProcessInstancesSearchDescriptor.CALLER_ID,
+                    MapUtil.getValueAsLong(filters, CaseItem.FILTER_CALLER));
+        }
     }
 
     // Overridden for testing
@@ -136,8 +157,7 @@ public class ArchivedCaseDatastore extends CommonDatastore<ArchivedCaseItem, Arc
                                 MapUtil.getValueAsLong(filters, ArchivedCaseItem.FILTER_SUPERVISOR_ID), builder.done());
             }
 
-            if (filters.containsKey(CaseItem.FILTER_CALLER)
-                    && "any".equalsIgnoreCase(filters.get(CaseItem.FILTER_CALLER))) {
+            if (filters.containsKey(CaseItem.FILTER_CALLER)) {
                 builder.filter(ArchivedProcessInstancesSearchDescriptor.STATE_ID,
                         ProcessInstanceState.COMPLETED.getId());
                 return processAPI.searchArchivedProcessInstancesInAllStates(builder.done());
