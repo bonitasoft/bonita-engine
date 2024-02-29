@@ -1,0 +1,2 @@
+msgid "test key"
+msgstr "valor de prueba en Espanol"

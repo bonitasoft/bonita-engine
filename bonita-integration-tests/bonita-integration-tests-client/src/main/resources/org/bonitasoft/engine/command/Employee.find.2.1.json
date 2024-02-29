@@ -1,0 +1,17 @@
+[
+  {
+    "persistenceId": "${json-unit.ignore}",
+    "persistenceId_string": "${json-unit.ignore}",
+    "persistenceVersion": 0,
+    "persistenceVersion_string": "0",
+    "firstName": "Matthieu",
+    "lastName": "Chaffotte",
+    "birthdate": null,
+    "links": [
+      {
+        "rel": "addresses",
+        "href": "${json-unit.ignore}"
+      }
+    ]
+  }
+]

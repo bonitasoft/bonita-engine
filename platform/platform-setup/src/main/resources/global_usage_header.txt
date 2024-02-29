@@ -1,0 +1,6 @@
+Important:
+For basic bundle installations and starts, launch the `bonita-start`(.bat|.sh) script, at top level of Bonita bundles.
+It will create the database tables, configure the server using information from `database.properties`, and then start the server for you.
+So you normally don't need to run this `setup` script manually.
+
+However, for specific needs, here are the details of use:

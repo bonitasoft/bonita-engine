@@ -1,0 +1,105 @@
+{
+  "persistenceId": 666,
+  "persistenceId_string": "666",
+  "persistenceVersion": 2,
+  "persistenceVersion_string": "2",
+  "name": "John",
+  "age": 50,
+  "phones": [
+    {
+      "persistenceId": 22365,
+      "persistenceId_string": "22365",
+      "persistenceVersion": 365,
+      "persistenceVersion_string": "365",
+      "number": "1234560"
+    },
+    {
+      "persistenceId": 22366,
+      "persistenceId_string": "22366",
+      "persistenceVersion": 366,
+      "persistenceVersion_string": "366",
+      "number": "1234561"
+    },
+    {
+      "persistenceId": 22367,
+      "persistenceId_string": "22367",
+      "persistenceVersion": 367,
+      "persistenceVersion_string": "367",
+      "number": "1234562"
+    }
+  ],
+  "birthday": 123456789,
+  "hasMobile": true,
+  "bools": [
+    true,
+    false,
+    true,
+    false
+  ],
+  "address1": {
+    "persistenceId": 2598,
+    "persistenceId_string": "2598",
+    "persistenceVersion": 99992598,
+    "persistenceVersion_string": "99992598",
+    "street": "Rue Gustave Eiffel",
+    "number": 32.0,
+    "number_string": "32.0",
+    "floors": [
+      1.0,
+      4.0
+    ],
+    "floors_string": [
+      "1.0",
+      "4.0"
+    ],
+    "links": [
+      {
+        "rel": "doorCode",
+        "href": "/businessdata/com.company.model.Address/2598/doorCode"
+      }
+    ]
+  },
+  "address2": {
+    "persistenceId": 358,
+    "persistenceId_string": "358",
+    "persistenceVersion": 118,
+    "persistenceVersion_string": "118",
+    "street": null,
+    "number": null,
+    "number_string": null,
+    "floors": null,
+    "floors_string": null,
+    "links": [
+      {
+        "rel": "doorCode",
+        "href": "/businessdata/com.company.model.Address/358/doorCode"
+      }
+    ]
+  },
+  "toIncludes": [
+    1235,
+    6666,
+    7777
+  ],
+  "toIncludes_string": [
+    "1235",
+    "6666",
+    "7777"
+  ],
+  "methodHandlerObject": {},
+  "proxys": [
+    {},
+    {},
+    {}
+  ],
+  "links": [
+    {
+      "rel": "secretPhone",
+      "href": "/businessdata/com.company.model.PersonWithDetails/666/secretPhone"
+    },
+    {
+      "rel": "toIgnores",
+      "href": "/businessdata/com.company.model.PersonWithDetails/666/toIgnores"
+    }
+  ]
+}

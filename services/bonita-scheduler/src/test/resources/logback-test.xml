@@ -1,0 +1,47 @@
+<configuration>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+		<encoder>
+			<pattern>|%d{HH:mm:ss.SSS}|%thread|%-5level|%logger{16}| %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="org.bonitasoft" level="INFO" />
+	<logger name="org.quartz.simpl.RAMJobStore" level="INFO" />
+
+	<root level="WARN">
+		<appender-ref ref="STDOUT" />
+	</root>
+	<!-- Show events of synchro repository -->
+	<!-- <logger name="org.bonitasoft.engine.test.synchro.SynchroRepository" level="DEBUG" /> -->
+	<!-- Show stack traces when there is error on jobs -->
+	<!-- <logger name="org.bonitasoft.engine.scheduler.impl.JobWrapper" level="DEBUG" /> -->
+	<!-- Show lock acquire/release -->
+<!-- 	<logger name="org.bonitasoft.engine.lock.impl.MemoryLockService" level="TRACE" /> -->
+<!-- 	<logger naorg.bonitasoft.engine.execution.work.InSessionBonitaWorkWork" level="DEBUG" /> -->
+
+
+	<!-- Quartz log for job lifecycle -->
+	<!-- <property name="baseLogFileName" value="target/log/quartzJobs" />
+
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${baseLogFileName}.log</file>
+
+		Support multiple-JVM writing to the same log file
+		<prudent>true</prudent>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${baseLogFileName}-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<cleanHistoryOnStart>true</cleanHistoryOnStart>
+		</rollingPolicy>
+		<encoder>
+			<pattern>|%d{HH:mm:ss.SSS}| %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="org.bonitasoft.engine.scheduler.impl.FileJobListener" level="INFO">
+		<appender-ref ref="FILE" />
+	</logger> -->
+	
+</configuration>

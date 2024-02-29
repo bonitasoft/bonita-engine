@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+   <query name="getPageById">
+	   SELECT page
+	   FROM org.bonitasoft.engine.page.SPage AS page
+	   WHERE page.id = :id
+   </query>
+
+   <query name="getPageByName">
+	   SELECT page
+	   FROM org.bonitasoft.engine.page.SPage AS page
+	   WHERE page.name = :pageName
+       AND  page.processDefinitionId = 0
+   </query>
+
+    <query name="getPageByNameAndProcessDefinitionId">
+        SELECT  page
+        FROM    org.bonitasoft.engine.page.SPage AS page
+        WHERE   page.name = :pageName
+        AND     page.processDefinitionId = :processDefinitionId
+    </query>
+
+    <query name="getPageByProcessDefinitionId">
+        SELECT  page
+        FROM    org.bonitasoft.engine.page.SPage AS page
+        WHERE   page.processDefinitionId = :processDefinitionId
+    </query>
+
+    <query name="getNumberOfSPage">
+		SELECT COUNT(page.id)
+		FROM org.bonitasoft.engine.page.SPage AS page
+	</query>
+
+	<query name="searchSPage">
+		SELECT page
+		FROM org.bonitasoft.engine.page.SPage AS page
+	</query>
+
+	<query name="getPageContent">
+		SELECT pagecontent
+		FROM org.bonitasoft.engine.page.SPageWithContent AS pagecontent
+		WHERE pagecontent.id = :id
+	</query>
+
+	<query name="getPageMappingByKey">
+		SELECT pagemapping
+		FROM org.bonitasoft.engine.page.SPageMapping AS pagemapping
+		WHERE pagemapping.key = :key
+	</query>
+
+	<query name="getPageMappingByPageId">
+		SELECT pagemapping
+		FROM org.bonitasoft.engine.page.SPageMapping AS pagemapping
+		WHERE pagemapping.pageId = :pageId
+	</query>
+
+</hibernate-mapping>

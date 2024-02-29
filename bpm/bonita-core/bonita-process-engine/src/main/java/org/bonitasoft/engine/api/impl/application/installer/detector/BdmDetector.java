@@ -1,0 +1,39 @@
+/**
+ * Copyright (C) 2018 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.api.impl.application.installer.detector;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.bonitasoft.engine.io.FileOperations;
+import org.springframework.stereotype.Component;
+
+@Component
+public class BdmDetector implements ArtifactDetector {
+
+    @Override
+    public boolean isCompliant(File file) {
+        byte[] bdm;
+        try {
+            bdm = FileOperations.getFileFromZip(file, "bom.xml");
+        } catch (IOException e) {
+            return false;
+        }
+        // The bdm doesn't contain its namespace, so we can't perform the usual xml validation.
+        // So we look for the tag 'businessObjectModel', better than nothing:
+        return new String(bdm, UTF_8).contains("<businessObjectModel");
+    }
+}
