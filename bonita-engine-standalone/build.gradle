@@ -1,0 +1,56 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
+plugins {
+    id "java-library"
+}
+
+dependencies {
+
+    api(project(":bpm:bonita-client"))
+
+    implementation(project(":bpm:bonita-server"))
+    implementation(project(':platform:platform-resources'))
+
+    implementation "org.springframework:spring-context:${Deps.springVersion}"
+    implementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+    implementation "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
+    implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    runtimeOnly "com.h2database:h2:${Deps.h2Version}"
+
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testImplementation "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    testImplementation "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
+    testImplementation "com.h2database:h2:${Deps.h2Version}"
+
+}
+
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+tasks.register("javadocJar", Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            pom { pom ->
+                name = "Bonita Engine Standalone"
+                description = "Bonita Engine Standalone is the library to easily embed Bonita Engine is your applications"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

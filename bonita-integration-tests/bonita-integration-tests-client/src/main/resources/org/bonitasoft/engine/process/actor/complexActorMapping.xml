@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actorMappings:actorMappings xmlns:actorMappings="http://www.bonitasoft.org/ns/actormapping/6.0">
+    <actorMapping name="Employee actor">
+        <users>
+            <user>john</user>
+        </users>
+        <groups>
+            <group>/RD</group>
+        </groups>
+        <roles>
+            <role>dev</role>
+        </roles>
+        <memberships>
+            <membership>
+                <role>dev</role>
+                <group>/RD</group>
+            </membership>
+        </memberships>
+    </actorMapping>
+</actorMappings:actorMappings>

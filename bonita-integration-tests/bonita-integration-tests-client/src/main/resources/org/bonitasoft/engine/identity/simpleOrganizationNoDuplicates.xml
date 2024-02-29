@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization:Organization xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema">
+  <users>
+    <user userName="johnnyfootball">
+      <password encrypted="false">bpm</password>
+      <jobTitle>QA Analyst</jobTitle>
+      <personalData/>
+      <professionalData/>
+    </user>
+  </users>
+  <roles>
+    <role name="Tester">
+      <displayName>Bonita tester</displayName>
+    </role>
+  </roles>
+  <groups>
+    <group name="QA">
+      <displayName>QA team</displayName>
+    </group>
+  </groups>
+  <memberships>
+    <membership>
+      <userName>johnnyfootball</userName>
+      <roleName>Tester</roleName>
+      <groupName>QA</groupName>
+    </membership>
+  </memberships>
+</organization:Organization>

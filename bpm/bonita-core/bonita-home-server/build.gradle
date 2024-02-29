@@ -1,0 +1,12 @@
+
+dependencies {
+    api project(':services:bonita-commons')
+    api project(':bpm:bonita-common')
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api project(':platform:platform-resources')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}

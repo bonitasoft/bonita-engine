@@ -1,0 +1,10 @@
+<connectorImplementation>
+	<definitionId>org.bonitasoft.engine.filter.user.testFilter</definitionId>
+	<definitionVersion>1.0</definitionVersion>
+	<implementationClassname>org.bonitasoft.engine.filter.user.TestFilter</implementationClassname>
+	<implementationId>org.bonitasoft.engine.filter.user.testFilter</implementationId>
+	<implementationVersion>1.0</implementationVersion>
+	<jarDependencies>
+		<jarDependency>TestFilter.jar</jarDependency>
+	</jarDependencies>
+</connectorImplementation>

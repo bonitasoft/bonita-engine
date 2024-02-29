@@ -1,0 +1,21 @@
+<configuration>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder
+			by default -->
+		<encoder>
+			<pattern>|%d{HH:mm:ss.SSS}|%thread|%-5level|%logger{16}| %msg%n</pattern>
+		</encoder>
+	</appender>
+
+
+	<logger name="org.bonitasoft.web.rest.server.api.bpm.flownode" level="INFO" />
+	<logger name="org.bonitasoft.console.common.server.utils" level="DEBUG" />
+	<logger name="org.bonitasoft.web.rest.server.api.bpm.process" level="INFO" />
+	<logger name="org.bonitasoft.web.rest.server.api.resource" level="INFO" />
+	<logger name="org.bonitasoft.console.common.server.login.servlet" level="TRACE" />
+
+	<root level="WARN">
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>

@@ -1,0 +1,24 @@
+dependencies {
+    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api project(':bonita-engine-standalone')
+    api "junit:junit:${Deps.junit4Version}"
+    api(project(':platform:platform-resources'))
+
+    // for http tests:
+    compileOnly("org.eclipse.jetty:jetty-server:${Deps.jettyVersion}")
+    compileOnly("org.eclipse.jetty:jetty-servlet:${Deps.jettyVersion}")
+    compileOnly(project(':bpm:bonita-api:bonita-server-api-http'))
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+
+    testImplementation project(':bpm:bonita-server')
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
+}

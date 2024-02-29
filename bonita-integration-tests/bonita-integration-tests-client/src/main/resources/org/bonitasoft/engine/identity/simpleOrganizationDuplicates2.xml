@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization:Organization xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema">
+	<customUserInfoDefinitions>
+		<customUserInfoDefinition>
+			<name>Office location</name>
+			<description>The office location</description>
+		</customUserInfoDefinition>
+		<customUserInfoDefinition>
+			<name>Skills</name>
+			<description>The user skills were updated</description>
+		</customUserInfoDefinition>
+	</customUserInfoDefinitions>
+  <users>
+    <user userName="johnnyfootball">
+      <password encrypted="false">bpm</password>
+      <jobTitle>QA Analyst</jobTitle>
+      <enabled>false</enabled>
+      <personalData/>
+      <professionalData/>
+    </user>
+    <user userName="liuyanyan">
+      <password encrypted="false">bpm2</password>
+      <enabled>true</enabled>
+      <personalData/>
+      <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Office location</name>
+	      <value>Engineering</value>
+	    </customUserInfoValue>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java, Groovy</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
+    </user>
+  </users>
+  <roles>
+    <role name="Developer">
+      <displayName>Bonitasoft developer</displayName>
+    </role>
+    <role name="Tester">
+      <displayName>Bonita tester</displayName>
+    </role>
+  </roles>
+  <groups>
+    <group name="Engine">
+      <displayName>RD engine team</displayName>
+    </group>
+    <group name="QA">
+      <displayName>QA team</displayName>
+    </group>
+  </groups>
+  <memberships>
+    <membership>
+      <userName>liuyanyan</userName>
+      <roleName>Developer</roleName>
+      <groupName>Engine</groupName>
+    </membership>
+    <membership>
+      <userName>johnnyfootball</userName>
+      <roleName>Tester</roleName>
+      <groupName>QA</groupName>
+    </membership>
+  </memberships>
+</organization:Organization>

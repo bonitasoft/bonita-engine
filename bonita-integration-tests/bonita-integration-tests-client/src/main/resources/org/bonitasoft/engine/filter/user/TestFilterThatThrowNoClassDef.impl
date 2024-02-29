@@ -1,0 +1,6 @@
+<connectorImplementation id="org.bonitasoft.engine.filter.user.testFilterThatThrowNoClassDef" version="1.0"
+	definitionId="org.bonitasoft.engine.filter.user.testFilterThatThrowNoClassDef" definitionVersion="1.0"
+	implementationClassname="org.bonitasoft.engine.filter.user.TestFilterThatThrowNoClassDef">
+	<jarDependencies>
+	</jarDependencies>
+</connectorImplementation>
