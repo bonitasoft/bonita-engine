@@ -27,7 +27,7 @@ rem Optional JAAS configuration. Usually used when delegating authentication to 
 rem set SECURITY_OPTS="-Djava.security.auth.login.config=%CATALINA_HOME%\conf\jaas-standard.cfg"
 
 rem Optional JMX remote access Configuration. Used to enable remote JMX agent in tomcat to monitor Heap Memory, Threads, CPU Usage, Classes, and configure various MBeans.
-if "%JMX_REMOTE_ACCESS%" == "true" (set JMX_REMOTE_ACCESS_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9000 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.password.file=%CATALINA_HOME%\conf\jmxremote.password -Dcom.sun.management.jmxremote.access.file=%CATALINA_HOME%\conf\jmxremote.access")
+if "%JMX_REMOTE_ACCESS%" == "true" (set JMX_REMOTE_ACCESS_OPTS="-Dcom.sun.management.jmxremote.port=9000 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.password.file=%CATALINA_HOME%\conf\jmxremote.password -Dcom.sun.management.jmxremote.access.file=%CATALINA_HOME%\conf\jmxremote.access")
 
 rem Pass the JVM system properties to Tomcat JVM using CATALINA_OPTS variable
 set CATALINA_OPTS=%CATALINA_OPTS% %LOG_CONF_FILE_PATH% %PLATFORM_SETUP% %XA_TIMEOUT_OPTS% %H2_DATABASE_DIR% %DB_OPTS% %BDM_DB_OPTS% %ARJUNA_OPTS% %INCIDENT_LOG_DIR% %JMX_REMOTE_ACCESS_OPTS% -Dfile.encoding=UTF-8 -Xshare:auto -Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -Dlog4j2.formatMsgNoLookups=true
