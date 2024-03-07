@@ -1,0 +1,29 @@
+plugins {
+    id('bonita-tests')
+}
+
+dependencies {
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api project(':services:bonita-events')
+    api(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) {
+        exclude(module: "jboss-transaction-api_1.2_spec")
+        exclude(group: "javax.activation") //replaced by jakarta
+    }
+    api "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+    api project(':services:bonita-session')
+    api project(':services:bonita-commons')
+    api project(':services:bonita-lock')
+    api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    implementation("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compileOnly "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testImplementation "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

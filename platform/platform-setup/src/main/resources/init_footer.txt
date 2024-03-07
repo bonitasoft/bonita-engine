@@ -1,0 +1,5 @@
+Run this init command once to create database structure before launching Bonita.
+
+At execution, it:
+ * creates database structure (tables) on target database.
+ * writes all configuration files found in `platform_conf/initial` and licenses found in `platform_conf/licenses` in the database.

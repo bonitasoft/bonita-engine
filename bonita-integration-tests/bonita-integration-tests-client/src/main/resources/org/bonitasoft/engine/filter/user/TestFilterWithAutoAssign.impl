@@ -1,0 +1,10 @@
+<connectorImplementation>
+	<definitionId>org.bonitasoft.engine.filter.user.testFilterWithAutoAssign</definitionId>
+	<definitionVersion>1.0</definitionVersion>
+	<implementationClassname>org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign</implementationClassname>
+	<implementationId>org.bonitasoft.engine.filter.user.testFilterWithAutoAssign</implementationId>
+	<implementationVersion>1.0</implementationVersion>
+	<jarDependencies>
+		<jarDependency>TestFilterWithAutoAssign.jar</jarDependency>
+	</jarDependencies>
+</connectorImplementation>

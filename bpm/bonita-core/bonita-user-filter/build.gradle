@@ -1,0 +1,17 @@
+
+
+dependencies {
+    api project(':services:bonita-session')
+    api project(':services:bonita-expression')
+    api project(':bpm:bonita-common')
+    api project(':bpm:bonita-core:bonita-process-definition')
+    api project(':services:bonita-cache')
+    api project(':services:bonita-resources')
+    api project(':services:bonita-connector-executor')
+    api project(':bpm:bonita-core:bonita-process-instance')
+    api project(':bpm:bonita-core:bonita-home-server')
+    api project(':services:bonita-commons')
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+}

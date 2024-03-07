@@ -1,0 +1,8 @@
+At execution, it:
+ * writes the configuration currently in database in the folder platform_conf/current.
+ * writes license files found in the database to the folder platform_conf/licenses (Subscription editions only).
+ * overwrites any previous configuration and license files previously in platform_conf/current folder.
+
+Important:
+This step is mandatory before updating the configuration to ensure database consistency.
+For example, when a tenant is created by Bonita, its related configuration files need to be extracted before you can edit the configuration.

@@ -1,0 +1,52 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+
+
+	   http://www.springframework.org/schema/util 
+	   http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+    <import resource="classpath:/datasource/datasource-dependency-${sysprop.bonita.db.vendor:h2}.xml" />
+
+
+    <!-- create Arjuna transaction manager -->
+    <bean id="arjunaTransactionManager" factory-method="transactionManager" class="com.arjuna.ats.jta.TransactionManager" />
+
+    <bean id="businessDataDataSource" class="org.apache.tomcat.dbcp.dbcp2.managed.BasicManagedDataSource">
+        <property name="initialSize" value="1" />
+        <property name="maxTotal" value="10" />
+        <property name="url" value="${db.url}" />
+        <property name="username" value="${db.user}" />
+        <property name="password" value="${db.password}" />
+        <property name="transactionManager" ref="arjunaTransactionManager" />
+    </bean>
+
+    <bean id="notManagedBizDataSource"
+          class="org.apache.tomcat.dbcp.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="initialSize" value="1" />
+        <property name="maxTotal" value="10" />
+        <property name="url" value="${db.url}" />
+        <property name="username" value="${db.user}" />
+        <property name="password" value="${db.password}" />
+    </bean>
+
+    <bean id="jpa-test-configuration" class="org.bonitasoft.engine.business.data.JpaTestConfiguration">
+        <constructor-arg name="jpaConfiguration">
+            <util:map id="jpa-configuration">
+                <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
+                <entry key="hibernate.connection.datasource" value-ref="businessDataDataSource" />
+            </util:map>
+        </constructor-arg>
+        <constructor-arg name="jpaModelConfiguration">
+            <util:map id="jpa-model-configuration">
+                <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
+                <entry key="hibernate.show_sql" value="false" />
+                <entry key="hibernate.format_sql" value="true" />
+                <entry key="hibernate.connection.datasource" value-ref="notManagedBizDataSource" />
+            </util:map>
+        </constructor-arg>
+    </bean>
+
+</beans>
