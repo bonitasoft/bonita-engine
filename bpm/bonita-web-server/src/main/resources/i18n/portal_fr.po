@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-04 06:21+0100\n"
-"PO-Revision-Date: 2024-02-05 03:01\n"
+"PO-Revision-Date: 2024-03-07 03:01\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -21,7 +21,7 @@ msgid "%attribute% file format is not allowed. Only %file_formats% files are all
 msgstr "le format de fichier %attribute%  n'est pas autorisé. Utiliser les fichiers de format %file_formats%."
 
 msgid "%attribute% file format not allowed or not starting with correct servlet path"
-msgstr ""
+msgstr "Le format de fichier %attribute% n'est pas autorisé ou ne commence pas par un chemin de servlet correct"
 
 msgid "%attribute% is mandatory"
 msgstr "%attribute% est obligatoire"
