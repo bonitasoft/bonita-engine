@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.service.ModelConvertor.toUserMembership;
 import static org.bonitasoft.engine.tenant.TenantResourceState.INSTALLED;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.OffsetDateTime;
@@ -38,6 +38,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.business.data.BusinessDataReference;
 import org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
@@ -53,6 +54,7 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinition
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
@@ -80,13 +82,13 @@ import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.STenantResourceState;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.tenant.TenantResource;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ModelConvertorTest {
+@ExtendWith(MockitoExtension.class)
+class ModelConvertorTest {
 
     @Mock
     private FlowNodeStateManager manager;
@@ -95,7 +97,7 @@ public class ModelConvertorTest {
     private FormRequiredAnalyzer formRequiredAnalyzer;
 
     @Test
-    public void convertDataInstanceIsTransient() {
+    void convertDataInstanceIsTransient() {
         final SDataInstance sDataInstance = mock(SDataInstance.class);
         when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
         when(sDataInstance.isTransientData()).thenReturn(true);
@@ -105,7 +107,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void convertDataInstanceIsNotTransient() {
+    void convertDataInstanceIsNotTransient() {
         final SDataInstance sDataInstance = mock(SDataInstance.class);
         when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
         when(sDataInstance.isTransientData()).thenReturn(false);
@@ -114,18 +116,18 @@ public class ModelConvertorTest {
         assertFalse(dataInstance.isTransientData());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getProcessInstanceState_conversionOnUnknownStateShouldThrowException() {
-        ModelConvertor.getProcessInstanceState("un_known_state");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void getProcessInstanceState_conversionOnNullStateShouldThrowException() {
-        ModelConvertor.getProcessInstanceState(null);
+    @Test
+    void getProcessInstanceState_conversionOnUnknownStateShouldThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> ModelConvertor.getProcessInstanceState("un_known_state"));;
     }
 
     @Test
-    public void convertSUserToUserDoesntShowPassword() {
+    void getProcessInstanceState_conversionOnNullStateShouldThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> ModelConvertor.getProcessInstanceState(null));
+    }
+
+    @Test
+    void convertSUserToUserDoesntShowPassword() {
         final SUser sUser = mock(SUser.class);
         ModelConvertor.toUser(sUser);
         verify(sUser, never()).getPassword();
@@ -133,7 +135,8 @@ public class ModelConvertorTest {
 
     private DocumentService createdMockedDocumentService() {
         final DocumentService documentService = mock(DocumentService.class);
-        doReturn("url?fileName=document&contentStorageId=123").when(documentService).generateDocumentURL("document",
+        lenient().doReturn("url?fileName=document&contentStorageId=123").when(documentService).generateDocumentURL(
+                "document",
                 "123");
         return documentService;
     }
@@ -142,12 +145,12 @@ public class ModelConvertorTest {
         final SMappedDocument documentMapping = mock(SMappedDocument.class);
         doReturn("document").when(documentMapping).getFileName();
         doReturn(123l).when(documentMapping).getDocumentId();
-        doReturn("whateverUrl").when(documentMapping).getUrl();
+        lenient().doReturn("whateverUrl").when(documentMapping).getUrl();
         return documentMapping;
     }
 
     @Test
-    public void toArchivedUserTaskInstance_sould_return_the_right_identifiers() {
+    void toArchivedUserTaskInstance_should_return_the_right_identifiers() {
         final SAUserTaskInstance sInstance = new SAUserTaskInstance();
         sInstance.setRootContainerId(1L);
         sInstance.setParentContainerId(2L);
@@ -173,7 +176,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void getDocument_from_process_instance_and_name_should_return_a_document_with_generated_url_when_it_has_content() {
+    void getDocument_from_process_instance_and_name_should_return_a_document_with_generated_url_when_it_has_content() {
 
         final SMappedDocument documentMapping = createMockedDocument();
         final DocumentService documentService = createdMockedDocumentService();
@@ -185,7 +188,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void getDocument_from_process_instance_and_name_should_return_a_document_url_when_is_external_url() {
+    void getDocument_from_process_instance_and_name_should_return_a_document_url_when_is_external_url() {
 
         final SMappedDocument documentMapping = createMockedDocument();
         final DocumentService documentService = createdMockedDocumentService();
@@ -197,7 +200,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void should_convert_server_definition_into_client_definition() {
+    void should_convert_server_definition_into_client_definition() {
         final CustomUserInfoDefinitionImpl definition = ModelConvertor.convert(
                 SCustomUserInfoDefinition.builder().name("name").id(1).description("description").build());
 
@@ -207,7 +210,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void should_convert_server_value_into_client_value() {
+    void should_convert_server_value_into_client_value() {
         final CustomUserInfoValue value = ModelConvertor.convert(
                 SCustomUserInfoValue.builder().definitionId(2).userId(1).value("value").build());
 
@@ -217,14 +220,14 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void should_return_null_when_trying_to_convert_a_null_value() {
+    void should_return_null_when_trying_to_convert_a_null_value() {
         final CustomUserInfoValue value = ModelConvertor.convert((SCustomUserInfoValue) null);
 
         assertThat(value).isNull();
     }
 
     @Test
-    public void toEventTriggerInstance_can_convert_TIMER_Type() {
+    void toEventTriggerInstance_can_convert_TIMER_Type() {
         // Given
         final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2,
                 "eventInstanceName", 69, "jobTriggerName");
@@ -242,7 +245,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toTimerEventTriggerInstance_can_convert() {
+    void toTimerEventTriggerInstance_can_convert() {
         // Given
         final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2,
                 "eventInstanceName", 69, "jobTriggerName");
@@ -261,7 +264,118 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedProcessInstance_can_convert() {
+    void toProcessInstance() {
+        // Given
+        final SProcessInstance sProcessInstance = new SProcessInstance();
+        sProcessInstance.setCallerId(-1L);
+        sProcessInstance.setDescription("description");
+        sProcessInstance.setEndDate(1345646L);
+        sProcessInstance.setId(98L);
+        sProcessInstance.setLastUpdate(8L);
+        sProcessInstance.setName("name2");
+        sProcessInstance.setProcessDefinitionId(9L);
+        sProcessInstance.setRootProcessInstanceId(9745L);
+        sProcessInstance.setStartDate(8864564156L);
+        sProcessInstance.setStartedBy(46L);
+        sProcessInstance.setStartedBySubstitute(962L);
+        sProcessInstance.setStateId(4);
+        sProcessInstance.setStringIndex1("stringIndex1");
+        sProcessInstance.setStringIndex2("stringIndex2");
+        sProcessInstance.setStringIndex3("stringIndex3");
+        sProcessInstance.setStringIndex4("stringIndex4");
+        sProcessInstance.setStringIndex5("stringIndex5");
+        sProcessInstance.setTenantId(514L);
+
+        final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("name", "version");
+        sProcessDefinition.setStringIndex(1, "label1", null);
+        sProcessDefinition.setStringIndex(2, "label2", null);
+        sProcessDefinition.setStringIndex(3, "label3", null);
+        sProcessDefinition.setStringIndex(4, "label4", null);
+        sProcessDefinition.setStringIndex(5, "label5", null);
+
+        // Then
+        final ProcessInstance processInstance = ModelConvertor
+                .toProcessInstance(sProcessDefinition, sProcessInstance);
+
+        // When
+        assertNotNull(processInstance);
+        assertEquals(sProcessInstance.getCallerId(), processInstance.getCallerId());
+        assertEquals(sProcessInstance.getId(), processInstance.getId());
+        assertEquals(sProcessInstance.getDescription(), processInstance.getDescription());
+        assertEquals(sProcessInstance.getEndDate(), processInstance.getEndDate().getTime());
+        assertEquals(sProcessInstance.getLastUpdate(), processInstance.getLastUpdate().getTime());
+        assertEquals(sProcessInstance.getName(), processInstance.getName());
+        assertEquals(sProcessInstance.getProcessDefinitionId(), processInstance.getProcessDefinitionId());
+        assertEquals(sProcessInstance.getRootProcessInstanceId(), processInstance.getRootProcessInstanceId());
+        assertEquals(sProcessInstance.getStartDate(), processInstance.getStartDate().getTime());
+        assertEquals(sProcessInstance.getStartedBy(), processInstance.getStartedBy());
+        assertEquals(sProcessInstance.getStartedBySubstitute(), processInstance.getStartedBySubstitute());
+        assertEquals(sProcessDefinition.getStringIndexLabel(1), processInstance.getStringIndexLabel(1));
+        assertEquals(sProcessInstance.getStringIndex1(), processInstance.getStringIndex1());
+        assertEquals(sProcessDefinition.getStringIndexLabel(2), processInstance.getStringIndexLabel(2));
+        assertEquals(sProcessInstance.getStringIndex2(), processInstance.getStringIndex2());
+        assertEquals(sProcessDefinition.getStringIndexLabel(3), processInstance.getStringIndexLabel(3));
+        assertEquals(sProcessInstance.getStringIndex3(), processInstance.getStringIndex3());
+        assertEquals(sProcessDefinition.getStringIndexLabel(4), processInstance.getStringIndexLabel(4));
+        assertEquals(sProcessInstance.getStringIndex4(), processInstance.getStringIndex4());
+        assertEquals(sProcessDefinition.getStringIndexLabel(5), processInstance.getStringIndexLabel(5));
+        assertEquals(sProcessInstance.getStringIndex5(), processInstance.getStringIndex5());
+    }
+
+    @Test
+    void toProcessInstance_wit_missing_process_definition() {
+        // Given
+        final SProcessInstance sProcessInstance = new SProcessInstance();
+        sProcessInstance.setCallerId(-1L);
+        sProcessInstance.setDescription("description");
+        sProcessInstance.setEndDate(1345646L);
+        sProcessInstance.setId(98L);
+        sProcessInstance.setLastUpdate(8L);
+        sProcessInstance.setName("name2");
+        sProcessInstance.setProcessDefinitionId(9L);
+        sProcessInstance.setRootProcessInstanceId(9745L);
+        sProcessInstance.setStartDate(8864564156L);
+        sProcessInstance.setStartedBy(46L);
+        sProcessInstance.setStartedBySubstitute(962L);
+        sProcessInstance.setStateId(4);
+        sProcessInstance.setStringIndex1("stringIndex1");
+        sProcessInstance.setStringIndex2("stringIndex2");
+        sProcessInstance.setStringIndex3("stringIndex3");
+        sProcessInstance.setStringIndex4("stringIndex4");
+        sProcessInstance.setStringIndex5("stringIndex5");
+        sProcessInstance.setTenantId(514L);
+
+        // Then
+        final ProcessInstance processInstance = ModelConvertor
+                .toProcessInstance(null, sProcessInstance);
+
+        // When
+        assertNotNull(processInstance);
+        assertEquals(sProcessInstance.getCallerId(), processInstance.getCallerId());
+        assertEquals(sProcessInstance.getId(), processInstance.getId());
+        assertEquals(sProcessInstance.getDescription(), processInstance.getDescription());
+        assertEquals(sProcessInstance.getEndDate(), processInstance.getEndDate().getTime());
+        assertEquals(sProcessInstance.getLastUpdate(), processInstance.getLastUpdate().getTime());
+        assertEquals(sProcessInstance.getName(), processInstance.getName());
+        assertEquals(sProcessInstance.getProcessDefinitionId(), processInstance.getProcessDefinitionId());
+        assertEquals(sProcessInstance.getRootProcessInstanceId(), processInstance.getRootProcessInstanceId());
+        assertEquals(sProcessInstance.getStartDate(), processInstance.getStartDate().getTime());
+        assertEquals(sProcessInstance.getStartedBy(), processInstance.getStartedBy());
+        assertEquals(sProcessInstance.getStartedBySubstitute(), processInstance.getStartedBySubstitute());
+        assertNull(processInstance.getStringIndexLabel(1));
+        assertEquals(sProcessInstance.getStringIndex1(), processInstance.getStringIndex1());
+        assertNull(processInstance.getStringIndexLabel(2));
+        assertEquals(sProcessInstance.getStringIndex2(), processInstance.getStringIndex2());
+        assertNull(processInstance.getStringIndexLabel(3));
+        assertEquals(sProcessInstance.getStringIndex3(), processInstance.getStringIndex3());
+        assertNull(processInstance.getStringIndexLabel(4));
+        assertEquals(sProcessInstance.getStringIndex4(), processInstance.getStringIndex4());
+        assertNull(processInstance.getStringIndexLabel(5));
+        assertEquals(sProcessInstance.getStringIndex5(), processInstance.getStringIndex5());
+    }
+
+    @Test
+    void toArchivedProcessInstance_can_convert() {
         // Given
         final SAProcessInstance saProcessInstance = new SAProcessInstance();
         saProcessInstance.setCallerId(-1L);
@@ -323,7 +437,62 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toFormMapping_can_convert() {
+    void toArchivedProcessInstance_can_convert_when_process_definition_is_missing() {
+        // Given
+        final SAProcessInstance saProcessInstance = new SAProcessInstance();
+        saProcessInstance.setCallerId(-1L);
+        saProcessInstance.setDescription("description");
+        saProcessInstance.setEndDate(1345646L);
+        saProcessInstance.setId(98L);
+        saProcessInstance.setLastUpdate(8L);
+        saProcessInstance.setName("name2");
+        saProcessInstance.setProcessDefinitionId(9L);
+        saProcessInstance.setRootProcessInstanceId(9745L);
+        saProcessInstance.setSourceObjectId(741L);
+        saProcessInstance.setStartDate(8864564156L);
+        saProcessInstance.setStartedBy(46L);
+        saProcessInstance.setStartedBySubstitute(962L);
+        saProcessInstance.setStateId(4);
+        saProcessInstance.setStringIndex1("stringIndex1");
+        saProcessInstance.setStringIndex2("stringIndex2");
+        saProcessInstance.setStringIndex3("stringIndex3");
+        saProcessInstance.setStringIndex4("stringIndex4");
+        saProcessInstance.setStringIndex5("stringIndex5");
+        saProcessInstance.setTenantId(514L);
+
+        // Then
+        final ArchivedProcessInstance archivedProcessInstance = ModelConvertor
+                .toArchivedProcessInstance(saProcessInstance, null);
+
+        // When
+        assertNotNull(archivedProcessInstance);
+        assertEquals(saProcessInstance.getCallerId(), archivedProcessInstance.getCallerId());
+        assertEquals(saProcessInstance.getId(), archivedProcessInstance.getId());
+        assertEquals(saProcessInstance.getDescription(), archivedProcessInstance.getDescription());
+        assertEquals(saProcessInstance.getEndDate(), archivedProcessInstance.getEndDate().getTime());
+        assertEquals(saProcessInstance.getLastUpdate(), archivedProcessInstance.getLastUpdate().getTime());
+        assertEquals(saProcessInstance.getName(), archivedProcessInstance.getName());
+        assertEquals(saProcessInstance.getProcessDefinitionId(), archivedProcessInstance.getProcessDefinitionId());
+        assertEquals(saProcessInstance.getRootProcessInstanceId(), archivedProcessInstance.getRootProcessInstanceId());
+        assertEquals(saProcessInstance.getSourceObjectId(), archivedProcessInstance.getSourceObjectId());
+        assertEquals(saProcessInstance.getStartDate(), archivedProcessInstance.getStartDate().getTime());
+        assertEquals(saProcessInstance.getStartedBy(), archivedProcessInstance.getStartedBy());
+        assertEquals(saProcessInstance.getStartedBySubstitute(), archivedProcessInstance.getStartedBySubstitute());
+        assertEquals(saProcessInstance.getStateId(), archivedProcessInstance.getStateId());
+        assertNull(archivedProcessInstance.getStringIndexLabel(1));
+        assertEquals(saProcessInstance.getStringIndex1(), archivedProcessInstance.getStringIndexValue(1));
+        assertNull(archivedProcessInstance.getStringIndexLabel(2));
+        assertEquals(saProcessInstance.getStringIndex2(), archivedProcessInstance.getStringIndexValue(2));
+        assertNull(archivedProcessInstance.getStringIndexLabel(3));
+        assertEquals(saProcessInstance.getStringIndex3(), archivedProcessInstance.getStringIndexValue(3));
+        assertNull(archivedProcessInstance.getStringIndexLabel(4));
+        assertEquals(saProcessInstance.getStringIndex4(), archivedProcessInstance.getStringIndexValue(4));
+        assertNull(archivedProcessInstance.getStringIndexLabel(5));
+        assertEquals(saProcessInstance.getStringIndex5(), archivedProcessInstance.getStringIndexValue(5));
+    }
+
+    @Test
+    void toFormMapping_can_convert() {
         // Given
         SFormMapping sFormMapping = new SFormMapping();
         sFormMapping.setId(555l);
@@ -348,7 +517,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toFormMappings_can_convert() {
+    void toFormMappings_can_convert() {
         // Given
         SFormMapping sFormMapping = new SFormMapping();
         sFormMapping.setId(555l);
@@ -374,7 +543,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toFormMapping_can_convert_null() {
+    void toFormMapping_can_convert_null() {
         // Given
 
         // Then
@@ -386,7 +555,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void convertSContractDefinition() {
+    void convertSContractDefinition() {
         //given
         final InputDefinition expectedSimpleInput = new InputDefinitionImpl("name", Type.TEXT, "description");
         final InputDefinition expectedComplexInput = new InputDefinitionImpl("complex input", "complex description",
@@ -414,7 +583,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void convertNullSContractDefinition() {
+    void convertNullSContractDefinition() {
         //when
         final ContractDefinition contract = ModelConvertor.toContract(null);
 
@@ -423,7 +592,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void convertMultipleSContractDefinition() {
+    void convertMultipleSContractDefinition() {
         //given
         final InputDefinition expectedSimpleInput = new InputDefinitionImpl("name", Type.TEXT, "description", true);
         final InputDefinition expectedComplexInput = new InputDefinitionImpl("complex input", "complex description",
@@ -476,7 +645,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void convert_multiple_business_data() {
+    void convert_multiple_business_data() {
         BusinessDataReference businessDataReference = ModelConvertor
                 .toBusinessDataReference(createProcessSimpleDataReference("myBData", 157l, "theType", 5555l));
 
@@ -484,7 +653,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void convert_simple_business_data() {
+    void convert_simple_business_data() {
         BusinessDataReference businessDataReference = ModelConvertor
                 .toBusinessDataReference(createProcessMultipleDataReference("myBData", 157l, "theType",
                         Arrays.asList(5555l, 5556l, 5557l)));
@@ -494,14 +663,14 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void convert_null_business_data() {
+    void convert_null_business_data() {
         BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(null);
 
         assertThat(businessDataReference).isNull();
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_gateways() {
+    void toArchivedFlownodeInstance_should_convert_reachStateDate_for_gateways() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -513,7 +682,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_receivetask() {
+    void toArchivedFlownodeInstance_should_convert_reachStateDate_for_receivetask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -523,7 +692,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_sendtask() {
+    void toArchivedFlownodeInstance_should_convert_reachStateDate_for_sendtask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -534,7 +703,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_usertask() {
+    void toArchivedFlownodeInstance_should_convert_reachStateDate_for_usertask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -545,7 +714,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toFlownodeInstance_should_convert_reachStateDate_for_usertask() {
+    void toFlownodeInstance_should_convert_reachStateDate_for_usertask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -556,7 +725,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_lastUpdateDate_for_usertask() {
+    void toArchivedFlownodeInstance_should_convert_lastUpdateDate_for_usertask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -569,7 +738,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toFlownodeInstance_should_convert_lastUpdateDate_for_usertask() {
+    void toFlownodeInstance_should_convert_lastUpdateDate_for_usertask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -581,7 +750,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void should_convert_expected_end_date() {
+    void should_convert_expected_end_date() {
         //given
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
@@ -604,7 +773,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void should_convert_archived_expected_end_date() {
+    void should_convert_archived_expected_end_date() {
         //given
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
@@ -628,7 +797,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void should_set_the_parentPath_when_creating_a_UserMembership() {
+    void should_set_the_parentPath_when_creating_a_UserMembership() {
         //given
         SUserMembership sUserMembership = new SUserMembership(257L, 157L, 357L, 457L, 557L, 190119993L,
                 "dummy rolename", "dummy groupname", "dummy username", "Bonita/dummy");
@@ -642,7 +811,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toTenantResource_should_convert_all_fields() {
+    void toTenantResource_should_convert_all_fields() {
         // given:
         final OffsetDateTime offsetDateTime = OffsetDateTime.parse("1970-01-01T00:00:15Z");
         String resourceName = "any";
