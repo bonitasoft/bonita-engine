@@ -14,16 +14,10 @@
 package org.bonitasoft.engine.service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.impl.SessionInfos;
@@ -37,14 +31,8 @@ import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.comment.impl.ArchivedCommentImpl;
 import org.bonitasoft.engine.bpm.comment.impl.CommentImpl;
-import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
-import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
-import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
-import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
-import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
-import org.bonitasoft.engine.bpm.connector.ConnectorState;
+import org.bonitasoft.engine.bpm.connector.*;
 import org.bonitasoft.engine.bpm.connector.impl.ArchivedConnectorInstanceImpl;
-import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfoImpl;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
@@ -56,89 +44,14 @@ import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.data.impl.ArchivedDataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.BlobDataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.BooleanDataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
-import org.bonitasoft.engine.bpm.data.impl.DataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.DateDataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.DoubleDataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.FloatDataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.LongDataInstanceImpl;
-import org.bonitasoft.engine.bpm.data.impl.ShortTextDataInstanceImpl;
+import org.bonitasoft.engine.bpm.data.impl.*;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.impl.ArchivedDocumentImpl;
 import org.bonitasoft.engine.bpm.document.impl.DocumentImpl;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityStates;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedAutomaticTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedCallActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedGatewayInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedLoopActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedManualTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedReceiveTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedSendTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedSubProcessActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.BPMEventType;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.StateCategory;
-import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
-import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedAutomaticTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedCallActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedFlowNodeInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedGatewayInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedHumanTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedLoopActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedManualTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedMultiInstanceActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedReceiveTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedSendTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedSubProcessActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedUserTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.AutomaticTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.BoundaryEventInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.CallActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.EndEventInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.EventInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowNodeInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.GatewayInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.HumanTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateCatchEventInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateThrowEventInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.LoopActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ManualTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ReceiveTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.SendTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.StartEventInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.SubProcessActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.TimerEventTriggerInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingErrorEventImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingEventImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingMessageEventImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingSignalEventImpl;
-import org.bonitasoft.engine.bpm.process.ActivationState;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.flownode.*;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.*;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.ArchivedProcessInstanceImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
@@ -168,44 +81,9 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SType;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
+import org.bonitasoft.engine.core.process.definition.model.*;
+import org.bonitasoft.engine.core.process.instance.model.*;
+import org.bonitasoft.engine.core.process.instance.model.archive.*;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
@@ -230,41 +108,14 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
-import org.bonitasoft.engine.identity.ContactData;
+import org.bonitasoft.engine.identity.*;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
-import org.bonitasoft.engine.identity.Icon;
-import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.RoleCreator.RoleField;
-import org.bonitasoft.engine.identity.SIcon;
-import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCreator.UserField;
-import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.impl.ContactDataImpl;
-import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
-import org.bonitasoft.engine.identity.impl.CustomUserInfoValueImpl;
-import org.bonitasoft.engine.identity.impl.GroupImpl;
-import org.bonitasoft.engine.identity.impl.IconImpl;
-import org.bonitasoft.engine.identity.impl.RoleImpl;
-import org.bonitasoft.engine.identity.impl.UserImpl;
-import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
-import org.bonitasoft.engine.identity.model.SContactInfo;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
-import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUserLogin;
-import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.xml.ExportedGroup;
-import org.bonitasoft.engine.identity.xml.ExportedRole;
-import org.bonitasoft.engine.identity.xml.ExportedUser;
-import org.bonitasoft.engine.identity.xml.ExportedUserMembership;
+import org.bonitasoft.engine.identity.impl.*;
+import org.bonitasoft.engine.identity.model.*;
+import org.bonitasoft.engine.identity.xml.*;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.job.impl.FailedJobImpl;
 import org.bonitasoft.engine.operation.Operation;
@@ -302,7 +153,12 @@ import org.bonitasoft.engine.tenant.TenantResourceState;
  * @author Yanyan Liu
  * @author Celine Souchet
  */
+@Slf4j
 public class ModelConvertor {
+
+    protected ModelConvertor() {
+        // private constructor
+    }
 
     public static APISession toAPISession(final SSession session, final String tenant) {
         final long tenantId = session.getTenantId();
@@ -394,13 +250,9 @@ public class ModelConvertor {
             final FlowNodeStateManager flowNodeStateManager) {
         switch (sFlowNode.getType()) {
             case START_EVENT:
-                return toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
             case INTERMEDIATE_CATCH_EVENT:
-                return toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
             case BOUNDARY_EVENT:
-                return toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
             case INTERMEDIATE_THROW_EVENT:
-                return toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
             case END_EVENT:
                 return toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
             case GATEWAY:
@@ -590,29 +442,34 @@ public class ModelConvertor {
         final List<ProcessInstance> clientProcessInstances = new ArrayList<>();
         if (sProcessInstances != null) {
             final Map<Long, SProcessDefinition> processDefinitions = new HashMap<>();
-
             for (final SProcessInstance sProcessInstance : sProcessInstances) {
-                final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService,
-                        processDefinitions,
-                        sProcessInstance.getProcessDefinitionId());
+                SProcessDefinition sProcessDefinition = processDefinitions.computeIfAbsent(
+                        sProcessInstance.getProcessDefinitionId(),
+                        processDefinitionId -> getProcessDefinition(processDefinitionService, processDefinitionId));
                 clientProcessInstances.add(toProcessInstance(sProcessDefinition, sProcessInstance));
             }
         }
         return Collections.unmodifiableList(clientProcessInstances);
     }
 
+    /**
+     * @param processDefinitionService the {@link ProcessDefinitionService}
+     * @param processDefinitionId the process definition id
+     * @return the {@link SProcessDefinition} for the processDefinitionId or null if no {@link SProcessDefinition} is
+     *         found.
+     */
     private static SProcessDefinition getProcessDefinition(final ProcessDefinitionService processDefinitionService,
-            final Map<Long, SProcessDefinition> processDefinitions, final long processDefinitionId) {
-        SProcessDefinition sProcessDefinition = processDefinitions.get(processDefinitionId);
-        if (sProcessDefinition == null) {
-            try {
-                sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-                processDefinitions.put(sProcessDefinition.getId(), sProcessDefinition);
-            } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
-                throw new SBonitaRuntimeException(e);
-            }
+            final long processDefinitionId) {
+        try {
+            return processDefinitionService.getProcessDefinition(processDefinitionId);
+        } catch (SProcessDefinitionNotFoundException pdnfe) {
+            // Due to RUNTIME-1828 sProcessDefinition can be null. Do not rethrow exception
+            log.warn("No process definition found for process definition id {}.",
+                    processDefinitionId);
+            return null;
+        } catch (SBonitaReadException e) {
+            throw new SBonitaRuntimeException(e);
         }
-        return sProcessDefinition;
     }
 
     public static ProcessInstance toProcessInstance(final SProcessDefinition definition,
@@ -928,11 +785,10 @@ public class ModelConvertor {
         if (saProcessInstances != null) {
             final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<>(saProcessInstances.size());
             final Map<Long, SProcessDefinition> processDefinitions = new HashMap<>(saProcessInstances.size());
-
             for (final SAProcessInstance saProcessInstance : saProcessInstances) {
-                final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService,
-                        processDefinitions,
-                        saProcessInstance.getProcessDefinitionId());
+                SProcessDefinition sProcessDefinition = processDefinitions.computeIfAbsent(
+                        saProcessInstance.getProcessDefinitionId(),
+                        processDefinitionId -> getProcessDefinition(processDefinitionService, processDefinitionId));
                 clientProcessInstances.add(toArchivedProcessInstance(saProcessInstance, sProcessDefinition));
             }
             return Collections.unmodifiableList(clientProcessInstances);
@@ -1930,12 +1786,12 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedComment> toArchivedComments(final List<SAComment> serverObjects) {
-        final List<ArchivedComment> commments = new ArrayList<>();
+        final List<ArchivedComment> comments = new ArrayList<>();
         for (final SAComment saComment : serverObjects) {
             final ArchivedComment comment = toArchivedComment(saComment);
-            commments.add(comment);
+            comments.add(comment);
         }
-        return commments;
+        return comments;
     }
 
     public static ArchivedComment toArchivedComment(final SAComment saComment) {
@@ -1973,20 +1829,6 @@ public class ModelConvertor {
             operatorType = OperatorType.XPATH_UPDATE_QUERY;
         }
         return operatorType;
-    }
-
-    public static ConnectorDefinition toConnectorDefinition(final SConnectorDefinition connector) {
-        final ConnectorDefinitionImpl connectorDefinitionImpl = new ConnectorDefinitionImpl(connector.getName(),
-                connector.getConnectorId(),
-                connector.getVersion(), connector.getActivationEvent());
-        // connectorDefinitionImpl.setId(connector.getId());
-        for (final Entry<String, SExpression> input : connector.getInputs().entrySet()) {
-            connectorDefinitionImpl.addInput(input.getKey(), toExpression(input.getValue()));
-        }
-        for (final SOperation operation : connector.getOutputs()) {
-            connectorDefinitionImpl.addOutput(toOperation(operation));
-        }
-        return connectorDefinitionImpl;
     }
 
     public static List<ActorInstance> toActors(final List<SActor> sActors) {
