@@ -497,7 +497,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions)
                     .getCount() > 0;
             checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasOpenProcessInstances);
-            final boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
+            final boolean hasArchivedProcessInstances = searchArchivedProcessInstancesInAllStates(searchOptions)
+                    .getCount() > 0;
             checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasArchivedProcessInstances);
 
             removeAllCategoriesFromProcessDefinition(processDefinitionId);
