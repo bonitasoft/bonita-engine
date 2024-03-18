@@ -79,6 +79,7 @@ import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
@@ -716,18 +717,33 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
-        getProcessAPI().disableProcess(processDefinitionId);
+        var processApi = getProcessAPI();
+        processApi.disableProcess(processDefinitionId);
 
         // Delete all process instances
         long nbDeletedProcessInstances;
         do {
-            nbDeletedProcessInstances = getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 100);
+            nbDeletedProcessInstances = processApi.deleteProcessInstances(processDefinitionId, 0, 100);
         } while (nbDeletedProcessInstances > 0);
+
+        // Search all root archived process instances ids for the given processDefinition
+        var rootArchivedProcessInstancesIds = processApi
+                .searchArchivedProcessInstancesInAllStates(new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+                        .filter(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId)
+                        .differentFrom(ArchivedProcessInstancesSearchDescriptor.CALLER_ID, "-1")
+                        .done())
+                .getResult()
+                .stream()
+                .map(ArchivedProcessInstance::getRootProcessInstanceId)
+                .collect(Collectors.toList());
+        if (!rootArchivedProcessInstancesIds.isEmpty()) {
+            processApi.deleteArchivedProcessInstancesInAllStates(rootArchivedProcessInstancesIds);
+        }
 
         // Delete all archived process instances
         long nbDeletedArchivedProcessInstances;
         do {
-            nbDeletedArchivedProcessInstances = getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0,
+            nbDeletedArchivedProcessInstances = processApi.deleteArchivedProcessInstances(processDefinitionId, 0,
                     100);
         } while (nbDeletedArchivedProcessInstances > 0);
 
