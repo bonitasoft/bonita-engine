@@ -73,11 +73,11 @@ public class MandatoryLivingApplicationImporter extends LivingApplicationImporte
         try {
             List<ImportStatus> importStatuses = importProvidedNonRemovableNonEditablePagesFromClasspath();
 
-            boolean firstRun = importStatuses.stream().map(ImportStatus::getStatus)
-                    .allMatch(importStatus -> importStatus == ImportStatus.Status.ADDED);
-            defaultLivingApplicationImporter.setAddRemovablePagesIfMissing(firstRun);
+            // If all mandatory pages have been added OR replaced, then it is considered a first startup
+            this.firstRun = importStatuses.stream().map(ImportStatus::getStatus)
+                    .noneMatch(importStatus -> importStatus == ImportStatus.Status.SKIPPED);
 
-            this.firstRun = firstRun;
+            defaultLivingApplicationImporter.setAddRemovablePagesIfMissing(firstRun);
 
             importStatuses.addAll(importProvidedNonRemovableEditablePagesFromClasspath());
 
@@ -119,9 +119,9 @@ public class MandatoryLivingApplicationImporter extends LivingApplicationImporte
                             + PROVIDED_FINAL_APPLICATIONS_PATH + "/*.zip",
                     false, true);
 
-            boolean firstRun = importStatuses.stream().map(ImportStatus::getStatus)
-                    .allMatch(status -> status != ImportStatus.Status.SKIPPED);
-            defaultLivingApplicationImporter.setAddEditableApplicationsIfMissing(firstRun);
+            defaultLivingApplicationImporter.setAddEditableApplicationsIfMissing(importStatuses.stream()
+                    .map(ImportStatus::getStatus)
+                    .noneMatch(status -> status == ImportStatus.Status.SKIPPED));
 
             List<String> createdOrReplaced = getNonSkippedImportedResources(importStatuses);
             if (createdOrReplaced.isEmpty()) {
