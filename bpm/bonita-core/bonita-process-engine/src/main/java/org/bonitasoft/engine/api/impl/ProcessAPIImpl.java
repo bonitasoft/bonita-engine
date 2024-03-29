@@ -23,18 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -54,25 +44,8 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstances;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetNumberOfActivityInstance;
-import org.bonitasoft.engine.api.impl.transaction.actor.ExportActorMapping;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsByActorIds;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfActorMembers;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfActors;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfGroupsOfActor;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfMembershipsOfActor;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfRolesOfActor;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfUsersOfActor;
-import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
-import org.bonitasoft.engine.api.impl.transaction.actor.RemoveActorMember;
-import org.bonitasoft.engine.api.impl.transaction.category.CreateCategory;
-import org.bonitasoft.engine.api.impl.transaction.category.DeleteSCategory;
-import org.bonitasoft.engine.api.impl.transaction.category.GetCategories;
-import org.bonitasoft.engine.api.impl.transaction.category.GetCategory;
-import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategories;
-import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategoriesOfProcess;
-import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromProcessDefinition;
-import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
+import org.bonitasoft.engine.api.impl.transaction.actor.*;
+import org.bonitasoft.engine.api.impl.transaction.category.*;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
 import org.bonitasoft.engine.api.impl.transaction.event.GetEventInstances;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
@@ -80,38 +53,11 @@ import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressions
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.flownode.SetExpectedEndDate;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
-import org.bonitasoft.engine.api.impl.transaction.process.AddProcessDefinitionToCategory;
-import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
-import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
-import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
-import org.bonitasoft.engine.api.impl.transaction.process.GetLatestProcessDefinitionId;
-import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessDeploymentInfos;
-import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessDeploymentInfosUnrelatedToCategory;
-import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessInstance;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfos;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForGroup;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForGroups;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForRole;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForRoles;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForUser;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForUsers;
-import org.bonitasoft.engine.api.impl.transaction.process.SetProcessInstanceState;
-import org.bonitasoft.engine.api.impl.transaction.process.UpdateProcessDeploymentInfo;
-import org.bonitasoft.engine.api.impl.transaction.task.AssignOrUnassignUserTask;
-import org.bonitasoft.engine.api.impl.transaction.task.AssignUserTaskIfNotAssigned;
-import org.bonitasoft.engine.api.impl.transaction.task.GetAssignedTasks;
-import org.bonitasoft.engine.api.impl.transaction.task.GetHumanTaskInstance;
-import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOpenTasksForUsers;
-import org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority;
+import org.bonitasoft.engine.api.impl.transaction.process.*;
+import org.bonitasoft.engine.api.impl.transaction.task.*;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
-import org.bonitasoft.engine.bpm.actor.ActorCriterion;
-import org.bonitasoft.engine.bpm.actor.ActorInstance;
-import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
-import org.bonitasoft.engine.bpm.actor.ActorMappingImportException;
-import org.bonitasoft.engine.bpm.actor.ActorMember;
-import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
-import org.bonitasoft.engine.bpm.actor.ActorUpdater;
+import org.bonitasoft.engine.bpm.actor.*;
 import org.bonitasoft.engine.bpm.actor.ActorUpdater.ActorField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -124,79 +70,17 @@ import org.bonitasoft.engine.bpm.category.CategoryUpdater;
 import org.bonitasoft.engine.bpm.category.CategoryUpdater.CategoryField;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
-import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
-import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
-import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
-import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
-import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
-import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
-import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.connector.*;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidatorFactory;
-import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
-import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
-import org.bonitasoft.engine.bpm.data.DataDefinition;
-import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.data.DataNotFoundException;
-import org.bonitasoft.engine.bpm.document.ArchivedDocument;
-import org.bonitasoft.engine.bpm.document.ArchivedDocumentNotFoundException;
-import org.bonitasoft.engine.bpm.document.Document;
-import org.bonitasoft.engine.bpm.document.DocumentAttachmentException;
-import org.bonitasoft.engine.bpm.document.DocumentCriterion;
-import org.bonitasoft.engine.bpm.document.DocumentException;
-import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
-import org.bonitasoft.engine.bpm.document.DocumentValue;
-import org.bonitasoft.engine.bpm.flownode.ActivityDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ActivityStates;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.EventCriterion;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.SendEventException;
-import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
-import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
+import org.bonitasoft.engine.bpm.data.*;
+import org.bonitasoft.engine.bpm.document.*;
+import org.bonitasoft.engine.bpm.flownode.*;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.Index;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessActivationException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
-import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
-import org.bonitasoft.engine.bpm.process.ProcessExportException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.V6FormDeployException;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
@@ -204,11 +88,7 @@ import org.bonitasoft.engine.bpm.supervisor.SupervisorNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.commons.exceptions.SV6FormsDeployException;
+import org.bonitasoft.engine.commons.exceptions.*;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.category.CategoryService;
@@ -242,19 +122,7 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.*;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowSignalEventTriggerDefinitionBuilderFactory;
@@ -267,29 +135,10 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowS
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.*;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
-import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.*;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
@@ -307,20 +156,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.ContractDataNotFoundException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.exception.FormMappingNotFoundException;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
@@ -328,12 +164,7 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.expression.ContainerState;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.expression.ExpressionType;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.expression.*;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -367,12 +198,7 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.search.AbstractHumanTaskInstanceSearchEntity;
-import org.bonitasoft.engine.search.Order;
-import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.search.Sort;
+import org.bonitasoft.engine.search.*;
 import org.bonitasoft.engine.search.activity.SearchActivityInstances;
 import org.bonitasoft.engine.search.activity.SearchArchivedActivityInstances;
 import org.bonitasoft.engine.search.comment.SearchArchivedComments;
@@ -380,12 +206,7 @@ import org.bonitasoft.engine.search.comment.SearchComments;
 import org.bonitasoft.engine.search.comment.SearchCommentsInvolvingUser;
 import org.bonitasoft.engine.search.comment.SearchCommentsManagedBy;
 import org.bonitasoft.engine.search.connector.SearchArchivedConnectorInstance;
-import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
-import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
-import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
-import org.bonitasoft.engine.search.descriptor.SearchProcessSupervisorDescriptor;
-import org.bonitasoft.engine.search.descriptor.SearchUserDescriptor;
+import org.bonitasoft.engine.search.descriptor.*;
 import org.bonitasoft.engine.search.events.trigger.SearchTimerEventTriggerInstances;
 import org.bonitasoft.engine.search.flownode.SearchArchivedFlowNodeInstances;
 import org.bonitasoft.engine.search.flownode.SearchFlowNodeInstances;
@@ -393,26 +214,7 @@ import org.bonitasoft.engine.search.identity.SearchUsersWhoCanExecutePendingHuma
 import org.bonitasoft.engine.search.identity.SearchUsersWhoCanStartProcessDeploymentInfo;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
-import org.bonitasoft.engine.search.process.SearchArchivedProcessInstances;
-import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesInvolvingUser;
-import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesSupervisedBy;
-import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesWithoutSubProcess;
-import org.bonitasoft.engine.search.process.SearchFailedProcessInstances;
-import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
-import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUser;
-import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUsersManagedBy;
-import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesSupervisedBy;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfos;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosCanBeStartedBy;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosStartedBy;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy;
-import org.bonitasoft.engine.search.process.SearchProcessInstances;
-import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfos;
-import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosCanBeStartedBy;
-import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosSupervisedBy;
+import org.bonitasoft.engine.search.process.*;
 import org.bonitasoft.engine.search.supervisor.SearchArchivedHumanTasksSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchProcessDeploymentInfosSupervised;
 import org.bonitasoft.engine.search.supervisor.SearchSupervisors;
@@ -5215,21 +5017,32 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void cancelProcessInstance(final long processInstanceId)
             throws ProcessInstanceNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final LockService lockService = tenantAccessor.getLockService();
         final ProcessInstanceInterruptor processInstanceInterruptor = tenantAccessor.getProcessInstanceInterruptor();
-        // lock process execution
-        final String objectType = SFlowElementsContainerType.PROCESS.name();
         BonitaLock lock = null;
         try {
-            lock = lockService.lock(processInstanceId, objectType, tenantAccessor.getTenantId());
-            processInstanceInterruptor.interruptProcessInstance(processInstanceId, SStateCategory.CANCELLING);
-        } catch (final SProcessInstanceNotFoundException spinfe) {
-            throw new ProcessInstanceNotFoundException(processInstanceId);
-        } catch (final SBonitaException e) {
-            throw new UpdateException(e);
+            // lock process execution
+            lock = lockService.lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(),
+                    tenantAccessor.getTenantId());
+            inTx(() -> {
+                try {
+                    return processInstanceInterruptor.interruptProcessInstance(processInstanceId,
+                            SStateCategory.CANCELLING);
+                } catch (final SProcessInstanceNotFoundException spinfe) {
+                    throw new ProcessInstanceNotFoundException(processInstanceId);
+                } catch (final SBonitaException e) {
+                    throw new UpdateException(e);
+                }
+            });
+        } catch (ProcessInstanceNotFoundException | UpdateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BonitaRuntimeException(String.format("Failed to cancel process instance %s", processInstanceId),
+                    e);
         } finally {
             // unlock process execution
             try {
@@ -6486,12 +6299,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     /**
      * Execute a flow node. All methods that executes flow nodes and human tasks uses this one.
      *
-     * @param userId
-     *        the id of the user executing the task
+     * @param userId the id of the user executing the task
      * @param flowNodeInstanceId
      * @param inputs
-     * @param shouldBeReadyTask
-     *        if true the method will only accept to execute human task in ready state
+     * @param shouldBeReadyTask if true the method will only accept to execute human task in ready state
      * @throws ContractViolationException
      * @throws SBonitaException
      */

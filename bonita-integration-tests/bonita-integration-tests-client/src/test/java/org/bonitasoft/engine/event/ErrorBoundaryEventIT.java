@@ -142,12 +142,14 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
         final FlowNodeInstance callActivityL2 = waitForFlowNodeInExecutingState(processInstance, "callStepL2", false);
         final FlowNodeInstance callActivityL1 = waitForFlowNodeInExecutingState(processInstance, "callStepL1", true);
         final long calledStep2Id = waitForUserTask(processInstance, "calledStep2");
-        final ActivityInstance calledStep1 = waitForUserTaskAndExecuteAndGetIt(processInstance, "calledStep1", user);
+        final ActivityInstance calledStep1 = waitForUserTaskAndGetIt(processInstance, "calledStep1");
 
         final ProcessInstance calledProcessInstanceL0 = getProcessAPI()
                 .getProcessInstance(calledStep1.getParentProcessInstanceId());
         final ProcessInstance calledProcessInstanceL1 = getProcessAPI()
                 .getProcessInstance(callActivityL1.getParentProcessInstanceId());
+
+        assignAndExecuteStep(calledStep1, user);
 
         waitForArchivedActivity(calledStep2Id, TestStates.ABORTED);
         final FlowNodeInstance executionStep = waitForFlowNodeInReadyState(processInstance, EXCEPTION_STEP, false);
