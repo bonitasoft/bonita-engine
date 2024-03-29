@@ -692,7 +692,9 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
         var processApi = getProcessAPI();
-        processApi.disableProcess(processDefinitionId);
+        if (processApi.getProcessDeploymentInfo(processDefinitionId).getActivationState() == ActivationState.ENABLED) {
+            processApi.disableProcess(processDefinitionId);
+        }
 
         // Delete all process instances
         long nbDeletedProcessInstances;
