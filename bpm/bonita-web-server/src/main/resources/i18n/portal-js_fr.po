@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 72698\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2024-03-21 03:08\n"
+"PO-Revision-Date: 2024-04-01 14:46\n"
 
 msgid "1 case has been deleted"
 msgstr "1 cas a été supprimé"
