@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 61810\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2024-04-01 14:46\n"
+"PO-Revision-Date: 2024-04-02 08:23\n"
 
 msgid "1 case has been deleted"
 msgstr "1 caso foi excluído"
@@ -224,7 +224,7 @@ msgid "Click here to choose your .zip file"
 msgstr "Clique aqui para escolher o arquivo .zip"
 
 msgid "Click on Cancel to remain on this page and try to execute the operation again once you logged back in (e.g. in another tab)."
-msgstr "Clique em Cancelar para permanecer nesta página e tente executar a operação novamente depois de fazer login novamente (por exemplo, em outra guia).\n"
+msgstr "Clique em Cancelar para permanecer nesta página e tente executar a operação novamente depois de fazer login novamente (por exemplo, em outra guia)."
 
 msgid "Click on Cancel to remain on this page and wait for the maintenance to end."
 msgstr "Clique em Cancelar para permanecer nesta página e aguardar o término da manutenção."
