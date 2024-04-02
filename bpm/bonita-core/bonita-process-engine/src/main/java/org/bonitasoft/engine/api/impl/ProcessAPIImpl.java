@@ -185,7 +185,14 @@ import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.persistence.*;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderAndField;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.SBARResource;
@@ -4831,21 +4838,32 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void cancelProcessInstance(final long processInstanceId)
             throws ProcessInstanceNotFoundException, UpdateException {
         final ServiceAccessor serviceAccessor = getServiceAccessor();
         final LockService lockService = serviceAccessor.getLockService();
         final ProcessInstanceInterruptor processInstanceInterruptor = serviceAccessor.getProcessInstanceInterruptor();
-        // lock process execution
-        final String objectType = SFlowElementsContainerType.PROCESS.name();
         BonitaLock lock = null;
         try {
-            lock = lockService.lock(processInstanceId, objectType, serviceAccessor.getTenantId());
-            processInstanceInterruptor.interruptProcessInstance(processInstanceId, SStateCategory.CANCELLING);
-        } catch (final SProcessInstanceNotFoundException spinfe) {
-            throw new ProcessInstanceNotFoundException(processInstanceId);
-        } catch (final SBonitaException e) {
-            throw new UpdateException(e);
+            // lock process execution
+            lock = lockService.lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(),
+                    serviceAccessor.getTenantId());
+            inTx(() -> {
+                try {
+                    return processInstanceInterruptor.interruptProcessInstance(processInstanceId,
+                            SStateCategory.CANCELLING);
+                } catch (final SProcessInstanceNotFoundException spinfe) {
+                    throw new ProcessInstanceNotFoundException(processInstanceId);
+                } catch (final SBonitaException e) {
+                    throw new UpdateException(e);
+                }
+            });
+        } catch (ProcessInstanceNotFoundException | UpdateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BonitaRuntimeException(String.format("Failed to cancel process instance %s", processInstanceId),
+                    e);
         } finally {
             // unlock process execution
             try {
