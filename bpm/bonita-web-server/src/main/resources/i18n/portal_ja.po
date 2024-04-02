@@ -2,7 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bonita\n"
 "Report-Msgid-Bugs-To: \n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2024-04-01 14:35+0000\n"
+=======
+"POT-Creation-Date: 2024-04-01 14:32+0000\n"
+>>>>>>> origin/master
 "PO-Revision-Date: 2024-04-01 14:46\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
