@@ -132,6 +132,9 @@ public class ProfileIT extends AbstractProfileIT {
         // given
         final Profile profileBefore = getProfileAPI().getProfile(adminProfileId);
 
+        // Make sure lastUpdateDate is changed
+        Thread.sleep(5);
+
         // when
         logoutOnTenant();
         loginOnDefaultTenantWith("userName3", "User3Pwd");
@@ -141,6 +144,9 @@ public class ProfileIT extends AbstractProfileIT {
         // then
         final Profile profileAfter = getProfileAPI().getProfile(adminProfileId);
         checkMetaData(profileBefore, profileAfter, user3);
+
+        // Make sure lastUpdateDate is changed
+        Thread.sleep(5);
 
         // when
         logoutOnTenant();
