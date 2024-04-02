@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 72698\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2024-03-21 03:08\n"
+"PO-Revision-Date: 2024-04-01 14:46\n"
 
 msgid "1 case has been deleted"
 msgstr "1 caso foi excluído"
@@ -353,7 +353,7 @@ msgid "Enable all"
 msgstr "Ativar Tudo"
 
 msgid "Enter a new category name and click \"Add\" button to create a new category."
-msgstr "Insira um novo nome de categoria e clique no botão \"Adicionar\" para criar uma nova categoria."
+msgstr "Insira um novo nome de categoria e clique no botão \"Adicionar\" para criar uma categoria nova."
 
 msgid "Enter the user to start the case for..."
 msgstr "Digite o usuário para o qual o caso será iniciado..."
@@ -770,7 +770,7 @@ msgid "Remove all"
 msgstr "Remover tudo"
 
 msgid "Removing on apply"
-msgstr "Removendo em aplicar"
+msgstr "Removendo ao aplicar"
 
 msgid "Reset"
 msgstr "Restaurar"
@@ -935,7 +935,7 @@ msgid "The case {{caseId}} has been started successfully."
 msgstr "A instância {{caseId}} foi iniciada com êxito."
 
 msgid "The category cannot be removed and added at the same time."
-msgstr "Categoria não pode ser removida e adicionada ao mesmo tempo."
+msgstr "Categoria não pode ser removida e adicionada em simultâneo."
 
 msgid "The current process has no connectors defined."
 msgstr "O processo atual tem os conectores não definidos."
@@ -986,7 +986,7 @@ msgid "This application is core to the Bonita platform. To keep it working as it
 msgstr "Essa aplicação é essencial para a plataforma Bonita. Para que continue a funcionar como deve ser, tem de permanecer disponível e o seu menu deve permanecer como está."
 
 msgid "This category has already been added to this process."
-msgstr "Esta categoria já foi adicionada a este processo."
+msgstr "Esta categoria já foi adicionada para este processo."
 
 msgid "This field is mandatory"
 msgstr "Este campo é obrigatório"
