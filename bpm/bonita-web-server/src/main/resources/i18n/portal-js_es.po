@@ -11,7 +11,7 @@ msgstr ""
 "X-Crowdin-File-ID: 61810\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-04-02 08:23\n"
+"PO-Revision-Date: 2024-01-01 00:00\n"
 
 msgid "1 case has been deleted"
 msgstr "Se ha eliminado 1 caso"
@@ -68,7 +68,7 @@ msgid "Add top-level menu"
 msgstr "Agregar menú superior"
 
 msgid "Adding on apply"
-msgstr ""
+msgstr "Aplicar para agregar"
 
 msgid "Address"
 msgstr "Dirección"
@@ -353,7 +353,7 @@ msgid "Enable all"
 msgstr "Activar todo"
 
 msgid "Enter a new category name and click \"Add\" button to create a new category."
-msgstr ""
+msgstr "Introduzca un nuevo nombre de categoría y haga clic en el botón \"Añadir\" para crear una nueva categoría."
 
 msgid "Enter the user to start the case for..."
 msgstr "Introduzca el usuario para el cual iniciar el caso..."
@@ -503,7 +503,7 @@ msgid "Installing Business Data Model"
 msgstr "Instalando el modelo de datos de negocio"
 
 msgid "Installing or updating the BDM implies to be logged in as Technical User, and to activate the maintenance mode."
-msgstr ""
+msgstr "Instalar o actualizar la BDM requiere una conexión como Usuario Técnico y haber activado el modo de mantenimiento."
 
 msgid "Items per page"
 msgstr "Elementos por página"
@@ -545,7 +545,7 @@ msgid "Make sure all artifacts enabled on the platform are compatible with the n
 msgstr "Asegúrese de que todos los artefactos instalados en la plataforma son compatibles con el nuevo BDM."
 
 msgid "Make sure to deactivate the maintenance mode."
-msgstr ""
+msgstr "Asegúrese de desactivar el modo de mantenimiento."
 
 msgid "Make this task available to other team members again"
 msgstr "Liberar - hacer esta tarea disponible de nuevo para los otros miembros del equipo"
@@ -560,7 +560,7 @@ msgid "Manager"
 msgstr "Responsable"
 
 msgid "Mapped categories"
-msgstr ""
+msgstr "Categorías asociadas"
 
 msgid "Maximum size 255 characters"
 msgstr "Máximo 250 caracteres"
@@ -647,7 +647,7 @@ msgid "No profile mapped to this application"
 msgstr "Sin perfil asignado a esta aplicación"
 
 msgid "No updates have been made on categories. For more details, check logs."
-msgstr ""
+msgstr "Ninguna actualización ha sido efectuada sobre las categorías. Para más información, consulte los registros (logs)."
 
 msgid "No user found with id:"
 msgstr "Ningún usuario encontrado con id:"
@@ -671,7 +671,7 @@ msgid "Only I can do this task"
 msgstr "Sólo yo puedo hacer esta tarea"
 
 msgid "Only available when the platform is under maintenance. Go to the \"Platform maintenance\" page to activate the maintenance mode."
-msgstr ""
+msgstr "Únicamente disponible cuando la plataforma está en mantenimiento. Vaya a la página \"Mantenimiento de la plataforma\" para activar el modo de mantenimiento."
 
 msgid "Only one Business Data Model (BDM) can be active at a time."
 msgstr "Sólo un Modelo de Datos de Negocio (BDM) puede estar activo al mismo tiempo."
@@ -770,7 +770,7 @@ msgid "Remove all"
 msgstr "Eliminar todo"
 
 msgid "Removing on apply"
-msgstr ""
+msgstr "Aplicar para eliminar"
 
 msgid "Reset"
 msgstr "Reiniciar"
@@ -935,7 +935,7 @@ msgid "The case {{caseId}} has been started successfully."
 msgstr "El caso {{caseId}} se ha iniciado con éxito."
 
 msgid "The category cannot be removed and added at the same time."
-msgstr ""
+msgstr "La categoría no puede ser eliminada y añadida al mismo tiempo."
 
 msgid "The current process has no connectors defined."
 msgstr "El proceso actual no tiene ningún conector definido"
@@ -965,7 +965,7 @@ msgid "The task has been submitted but an error occurred while adding the commen
 msgstr "La tarea ha sido enviada pero ocurrió un error al agregar el comentario"
 
 msgid "The whole list of such changes is listed <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">here</a>."
-msgstr ""
+msgstr "La lista completa de estos cambios está disponible <a ng-href=\"{{documentationUrl}}\" target=\"_blank\" translate=\"\">aquí</a>."
 
 msgid "The words 'content', 'API' and 'theme' are reserved for internal use. They must not be used in an application or page URL."
 msgstr "Las palabras 'content', 'API' y 'theme' están reservadas para uso interno. No debe utilizarse en la URL de una página o en una aplicación."
@@ -986,7 +986,7 @@ msgid "This application is core to the Bonita platform. To keep it working as it
 msgstr "Esta aplicación es core para la plataforma Bonita. Para que siga funcionando como debería, debe permanecer disponible y su menú debe permanecer como está."
 
 msgid "This category has already been added to this process."
-msgstr ""
+msgstr "Esta categoría ya ha sido añadida a este proceso."
 
 msgid "This field is mandatory"
 msgstr "Este campo es obligatorio"
@@ -1061,7 +1061,7 @@ msgid "Unable to add the comment. Refresh your task list and try again. If the p
 msgstr "No se puede agregar el comentario. Actualiza la lista de tareas e inténtalo de nuevo. Si el problema persiste, ponte en contacto con tu administrador"
 
 msgid "Unable to map category:"
-msgstr ""
+msgstr "No se puede mapear la categoría:"
 
 msgid "Unassign. This will make it available to team again"
 msgstr "Desasignar. Esto la hará disponible para el equipo de nuevo"
