@@ -1,0 +1,48 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Project-Id-Version: bonita\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Crowdin-Project: bonita\n"
+"X-Crowdin-Project-ID: 13316\n"
+"X-Crowdin-Language: fr\n"
+"X-Crowdin-File: /release-10.0.0/bonita-web/distrib/resources.pot\n"
+"X-Crowdin-File-ID: 72848\n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
+"PO-Revision-Date: 2024-01-01 00:00\n"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Attention"
+msgstr "Attention"
+
+msgid "Example:"
+msgstr "Exemple :"
+
+msgid "Execute"
+msgstr "Exécuter"
+
+msgid "Expecting a {} value."
+msgstr "Attend une valeur {}."
+
+msgid "no description defined in contract for this input"
+msgstr "Cet input n'a pas de description dans le contrat"
+
+msgid "Not a valid number!"
+msgstr "Nombre invalide !"
+
+msgid "remove"
+msgstr "Enlever"
+
+msgid "Select a file"
+msgstr "Sélectionnez un fichier"
+
+msgid "Start"
+msgstr "Démarrer"
+
+msgid "this is a temporary form generated automatically for testing. Before you put your process into production, create and map the necessary forms."
+msgstr "il s'agit d'un formulaire temporaire généré automatiquement à des fins de test. Avant de passer votre processus en production, vous devrez créer les formulaires définitifs et les associer au processus et aux tâches humaines."
+

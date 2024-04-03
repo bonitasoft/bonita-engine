@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+    <application token="superAdminAppBonita" version="1.0" profile="_BONITA_INTERNAL_PROFILE_SUPER_ADMIN" state="ACTIVATED">
+        <displayName>Bonita Super Administrator Application</displayName>
+        <iconPath>bonita-super-admin-application.png</iconPath>
+        <applicationPages />
+        <applicationMenus />
+    </application>
+</applications>

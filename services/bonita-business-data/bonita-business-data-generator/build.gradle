@@ -1,0 +1,58 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id 'maven-publish'
+}
+
+dependencies {
+    api project(':services:bonita-commons')
+    api "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
+    api "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
+    api "org.springframework:spring-core:${Deps.springVersion}"
+    api "org.javassist:javassist:${Deps.javassistVersion}"
+    api project(':bpm:bonita-common')
+    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api "org.glassfish.jaxb:codemodel:${Deps.jaxbVersion}"
+    testImplementation "junit:junit:${Deps.junit4Version}"
+    testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testImplementation testFixtures(project(':bpm:bonita-common'))
+    testImplementation project(':services:bonita-business-data:bonita-business-data-api')
+}
+
+group = 'org.bonitasoft.engine.data'
+
+
+sourceSets {
+    main {
+        resources { srcDirs "src/main/resources", "../bonita-business-data-client-resources/src/main/java" }
+    }
+}
+
+tasks.register("sourcesJar", Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+tasks.register("javadocJar", Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { 
+            from project.components.java 
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            pom { pom ->
+                name = "Bonita Business Data Generator"
+                description = "Bonita Business Data Generator is the library used to generate and compile a Business Data Model"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

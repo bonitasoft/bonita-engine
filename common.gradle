@@ -1,0 +1,101 @@
+apply plugin: 'org.barfuin.gradle.taskinfo'
+
+allprojects {
+    apply plugin: 'maven-publish'
+
+    group = 'org.bonitasoft.engine'
+    
+    tasks.withType(Copy).configureEach {
+        setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+    }
+
+    publishing {
+        repositories {
+            if (project.hasProperty("altDeploymentRepository")) {
+                def repoProperties = project.getProperties()."altDeploymentRepository".split("::")
+                maven {
+                    name = repoProperties.first()
+                    url = repoProperties.last()
+                    //those credentials can be given using -P<repo_name>Username and -P<repo_name>Password see README.md
+                    credentials(PasswordCredentials)
+                }
+            }
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.adarshr.test-logger'
+
+    repositories {
+        mavenCentral()
+        if (project.hasProperty("extraRepositories")) {
+
+            def extraRepositories = project.getProperties().get("extraRepositories")
+            extraRepositories.split(",").each { repo ->
+                def repoProperties = repo.split("::")
+                maven {
+                    name = repoProperties.first()
+                    url = repoProperties.last()
+                    //those credentials can be given using -P<repo_name>Username and -P<repo_name>Password see README.md
+                    credentials(PasswordCredentials)
+                }
+            }
+        }
+
+        // related to ehcache-core 2.x - must be challenged when upgrading to ehcache 3.x
+        // needed to get org.terracotta.internal:statistics:1.0.5 (required by ehcache-core jar)
+        maven {
+            url 'https://repo.terracotta.org/maven2/'
+        }
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+            mavenContent {
+                snapshotsOnly()
+            }
+        }
+        mavenLocal()
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+    configurations.configureEach {
+    }
+    afterEvaluate {
+        tasks.withType(AbstractCompile).configureEach { options.encoding = 'UTF-8' }
+    }
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.fork = true
+    }
+    tasks.named('test') {
+        jvmArgs += ['--add-opens','java.base/java.util=ALL-UNNAMED','--add-opens','java.base/java.lang=ALL-UNNAMED','-Dfile.encoding=UTF-8']
+    }
+    tasks.withType(Javadoc).configureEach {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.encoding = 'UTF-8'
+    }
+    tasks.withType(DependencyReportTask).configureEach {
+        group "Documentation"
+        description "List runtime dependencies for a specified configuration"
+        configurations = [project.configurations.runtimeClasspath]
+    }
+    tasks.withType(Test).configureEach {
+        if (!project.hasProperty("createTestReports")) {
+            reports.html.required = false
+            reports.junitXml.required = false
+        }
+    }
+    testlogger {
+        showFullStackTraces false
+        showCauses true
+        showPassed false
+        showSkipped true
+        showSummary false
+    }
+}

@@ -1,0 +1,138 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
+//this module is published to be imported as dependency management
+plugins {
+    id "io.spring.dependency-management" version "1.1.0"
+}
+dependencyManagement {
+    dependencies {
+        imports {
+            mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}"
+            mavenBom "org.codehaus.groovy:groovy-bom:${Deps.groovyVersion}"
+            mavenBom "org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}"
+        }
+        dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
+            entry 'slf4j-api'
+            entry 'slf4j-jdk14'
+        }
+        dependency "com.h2database:h2:${Deps.h2Version}"
+        dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
+
+        dependencySet(group: 'org.springframework', version: Deps.springVersion) {
+            entry 'spring-context'
+            entry 'spring-core'
+            entry 'spring-web'
+        }
+        dependencySet(group: "org.springframework.boot", version: Deps.springBootVersion) {
+            entry "spring-boot-starter-jdbc"
+            entry "spring-boot-autoconfigure"
+        }
+        dependency("org.hibernate:hibernate-core:${Deps.hibernateVersion}") {
+            exclude 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec'
+        }
+        dependency "org.hibernate:hibernate-jcache:${Deps.hibernateVersion}"
+        dependency("javax.cache:cache-api:${Deps.jcacheVersion}")
+        dependency "javax.persistence:javax.persistence-api:${Deps.javaxPersistenceApiVersion}"
+        dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
+        dependency "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
+        dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") {
+            exclude 'commons-collections:commons-collections'
+        }
+        dependency("commons-cli:commons-cli:${Deps.commonsCLIVersion}")
+        dependency "commons-codec:commons-codec:${Deps.commonscodec}"
+        dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+        dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
+        dependency "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
+        dependency "org.javassist:javassist:${Deps.javassistVersion}"
+        dependencySet(group: 'org.apache.httpcomponents', version: Deps.httpComponentsVersion) {
+            entry 'httpclient'
+            entry 'httpmime'
+        }
+        dependency "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+        dependency "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
+        dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
+        dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
+        dependency "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
+        dependency "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
+        dependency("org.quartz-scheduler:quartz:${Deps.quartzVersion}")
+        dependency "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
+        dependency("javax.annotation:javax.annotation-api:$Deps.javaxAnnotationsVersion")
+        dependencySet(group: "io.micrometer", version: Deps.micrometerVersion) {
+            entry "micrometer-core"
+            entry "micrometer-registry-jmx"
+            entry "micrometer-registry-prometheus"
+        }
+        dependencySet(group: 'com.hazelcast', version: Deps.hazelcastVersion) {
+            entry 'hazelcast'
+            entry 'hazelcast-spring'
+        }
+        // declared here because it is used by web-extension and by distrib
+        dependency "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
+        // To be removed only when client projects (rest api extension) have all moved their deps to jakarta
+        // Just keep a version managed to prevent client build breaks
+        dependency "javax.servlet:javax.servlet-api:${Deps.javaxServletVersion}"
+
+        // Bonita engine dependencies:
+        dependency "org.bonitasoft.engine:bonita-common:${project.version}"
+        dependency "org.bonitasoft.engine:bonita-server:${project.version}"
+        dependency "org.bonitasoft.engine:bonita-client:${project.version}"
+        dependency "org.bonitasoft.engine:bonita-test-api:${project.version}"
+        dependency "com.bonitasoft.engine:bonita-common-sp:${project.version}"
+        dependency "com.bonitasoft.engine:bonita-server-sp:${project.version}"
+        dependency "com.bonitasoft.engine:bonita-client-sp:${project.version}"
+
+        // Web extensions dependencies:
+        dependency "org.bonitasoft.console:bonita-web-server:${project.version}"
+        dependency "org.bonitasoft.console:bonita-web-server-sp:${project.version}"
+        dependency "org.bonitasoft.web:bonita-web-extensions:${project.version}"
+        dependency "com.bonitasoft.web:bonita-web-extensions-sp:${project.version}"
+
+        // Web layer specific dependencies:
+        dependency "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
+        dependency "org.glassfish.web:jakarta.servlet.jsp.jstl:${Deps.jakartaJstlVersion}"
+        dependency "jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:${Deps.jakartaJstlApiVersion}"
+        dependency "org.fedorahosted.tennera:jgettext:${Deps.jgettextVersion}"
+        dependency "org.tuckey:urlrewritefilter:${Deps.urlrewriteVersion}"
+        dependency "org.restlet.jse:org.restlet:${Deps.restletVersion}"
+        dependency("org.restlet.jee:org.restlet.ext.servlet:${Deps.restletVersion}") {
+            exclude "org.restlet.jee:org.restlet"
+        }
+        dependency("org.restlet.jse:org.restlet.ext.jackson:${Deps.restletVersion}") {
+            exclude "org.codehaus.woodstox:woodstox-core-asl"
+            exclude "org.codehaus.woodstox:stax2-api"
+        }
+        // Specify woodstox version to override the version pulled by jackson-dataformat-xml (transitive dep of restlet)
+        dependency "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
+        dependency "com.googlecode.json-simple:json-simple:${Deps.jsonSimpleVersion}"
+        dependency "org.keycloak:keycloak-saml-adapter-api-public:${Deps.keycloakVersion}"
+        dependency("org.keycloak:keycloak-saml-servlet-filter-adapter:${Deps.keycloakVersion}") {
+            exclude "org.bouncycastle:bcprov-jdk15on"
+            exclude "org.bouncycastle:bcpkix-jdk15on"
+            exclude "org.bouncycastle:bcutil-jdk15on"
+            exclude "org.apache.santuario:xmlsec"
+        }
+        dependency("org.keycloak:keycloak-adapter-core:${Deps.keycloakVersion}") {
+            exclude "org.bouncycastle:bcprov-jdk15on"
+        }
+        dependency("org.keycloak:keycloak-servlet-filter-adapter:${Deps.keycloakVersion}") {
+            exclude "org.bouncycastle:bcprov-jdk15on"
+        }
+        dependency "org.apache.santuario:xmlsec:${Deps.xmlsecVersion}"
+        dependency "org.bouncycastle:bcprov-jdk18on:${Deps.bouncyCastleVersion}"
+        dependency "org.bouncycastle:bcpkix-jdk18on:${Deps.bouncyCastleVersion}"
+        dependency "org.bouncycastle:bcutil-jdk18on:${Deps.bouncyCastleVersion}"
+        dependency "org.codelibs:spnego:${Deps.spnegoVersion}"
+    }
+}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'bonita-engine'
+            pom { pom ->
+                name = "Bonita Engine"
+                description = "Bonita Engine is a workflow engine which can be embedded inside your own applications"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

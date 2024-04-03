@@ -1,0 +1,48 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Project-Id-Version: bonita\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: bonita\n"
+"X-Crowdin-Project-ID: 13316\n"
+"X-Crowdin-Language: ja\n"
+"X-Crowdin-File: /release-10.0.0/bonita-web/distrib/resources.pot\n"
+"X-Crowdin-File-ID: 72848\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"PO-Revision-Date: 2024-01-01 00:00\n"
+
+msgid "Add"
+msgstr "追加"
+
+msgid "Attention"
+msgstr "注意"
+
+msgid "Example:"
+msgstr "例："
+
+msgid "Execute"
+msgstr "実行"
+
+msgid "Expecting a {} value."
+msgstr "{} の値を期待しています。"
+
+msgid "no description defined in contract for this input"
+msgstr "この入力項目のコントラクトには、説明が定義されていません"
+
+msgid "Not a valid number!"
+msgstr "有効な数値ではないです"
+
+msgid "remove"
+msgstr "削除"
+
+msgid "Select a file"
+msgstr "ファイルを選択します。"
+
+msgid "Start"
+msgstr "開始"
+
+msgid "this is a temporary form generated automatically for testing. Before you put your process into production, create and map the necessary forms."
+msgstr "これはテスト用に自動生成された一時的なフォームです。本番環境にプロセスを移行する前に必要なフォームを作成し、マップしてください。"
+

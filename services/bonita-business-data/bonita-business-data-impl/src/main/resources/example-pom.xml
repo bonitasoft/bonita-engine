@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.mycompagny</groupId>
+    <artifactId>my-application</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <bonita.version>PUT_BONITA_VERSION_HERE</bonita.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.mycompagny</groupId>
+            <artifactId>bdm-dao</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/bdm-dao.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.mycompagny</groupId>
+            <artifactId>bdm-model</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/bdm-model.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-client</artifactId>
+            <version>${bonita.version}</version>
+        </dependency>
+        <!-- required when using lazy relations-->
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.18.1-GA</version>
+        </dependency>
+    </dependencies>
+
+</project>
