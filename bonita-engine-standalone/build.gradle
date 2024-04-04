@@ -15,18 +15,18 @@ dependencies {
     implementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
     implementation "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
     implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    runtimeOnly "com.h2database:h2:${Deps.h2Version}"
+    runtimeOnly libs.h2
 
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testImplementation "com.mysql:mysql-connector-j:${Deps.mysqlVersion}"
-    testImplementation "com.h2database:h2:${Deps.h2Version}"
+    testImplementation libs.h2
 
 }
 

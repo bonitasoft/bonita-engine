@@ -10,6 +10,6 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 }

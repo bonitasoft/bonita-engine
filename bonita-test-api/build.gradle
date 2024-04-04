@@ -9,8 +9,8 @@ dependencies {
     compileOnly("org.eclipse.jetty:jetty-servlet:${Deps.jettyVersion}")
     compileOnly(project(':bpm:bonita-api:bonita-server-api-http'))
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 
     testImplementation project(':bpm:bonita-server')
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"

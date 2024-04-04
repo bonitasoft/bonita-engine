@@ -8,7 +8,7 @@ dependencies {
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 
 }

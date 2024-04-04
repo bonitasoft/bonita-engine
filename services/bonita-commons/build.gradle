@@ -6,7 +6,7 @@ dependencies {
     }
     api "commons-io:commons-io:${Deps.commonsIOVersion}"
     api "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
-    api "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    api libs.commonsLang
     api(group: 'com.thoughtworks.xstream', name: 'xstream', version: Deps.xstreamVersion)
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     api "org.springframework:spring-context:${Deps.springVersion}"
@@ -24,8 +24,8 @@ dependencies {
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: Deps.junit5Version
     testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: Deps.junit5Version
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 }
 
 description = 'Bonita Engine Util Classes'

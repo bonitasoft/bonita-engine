@@ -1,0 +1,33 @@
+[versions]
+# The groovy version must be in synch with the runtime-bom artifact:
+groovyVersion = "3.0.19"
+springVersion = "5.3.32"
+springBootVersion = "2.7.18"
+commonsLangVersion = "3.11"
+
+[libraries]
+groovyCore = { module = "org.codehaus.groovy:groovy", version.ref = "groovyVersion" }
+groovyServlet = { module = "org.codehaus.groovy:groovy-servlet", version.ref = "groovyVersion" }
+groovyXml = { module = "org.codehaus.groovy:groovy-xml", version.ref = "groovyVersion" }
+groovyJson = { module = "org.codehaus.groovy:groovy-json", version.ref = "groovyVersion" }
+groovyJmx = { module = "org.codehaus.groovy:groovy-jmx", version.ref = "groovyVersion" }
+groovyNio = { module = "org.codehaus.groovy:groovy-nio", version.ref = "groovyVersion" }
+groovyGroovysh = { module = "org.codehaus.groovy:groovy-groovysh", version.ref = "groovyVersion" }
+groovyDatetime = { module = "org.codehaus.groovy:groovy-datetime", version.ref = "groovyVersion" }
+groovyDateutil = { module = "org.codehaus.groovy:groovy-dateutil", version.ref = "groovyVersion" }
+groovyDocgenerator = { module = "org.codehaus.groovy:groovy-docgenerator", version.ref = "groovyVersion" }
+groovyJsr223 = { module = "org.codehaus.groovy:groovy-jsr223", version.ref = "groovyVersion" }
+groovySql = { module = "org.codehaus.groovy:groovy-sql", version.ref = "groovyVersion" }
+groovyTemplates = { module = "org.codehaus.groovy:groovy-templates", version.ref = "groovyVersion" }
+groovyYaml = { module = "org.codehaus.groovy:groovy-yaml", version.ref = "groovyVersion" }
+
+h2 = "com.h2database:h2:1.4.199"
+
+commonsLang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLangVersion" }
+
+[bundles]
+groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx", "groovyNio", "groovyGroovysh", "groovyDatetime",
+    "groovyDateutil", "groovyDocgenerator", "groovyJsr223", "groovySql", "groovyTemplates", "groovyYaml"]
+
+[plugins]
+dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.51.0" }

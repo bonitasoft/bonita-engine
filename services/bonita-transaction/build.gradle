@@ -2,8 +2,8 @@ dependencies {
     api project(':services:bonita-commons')
     api "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"

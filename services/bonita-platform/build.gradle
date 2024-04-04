@@ -11,8 +11,8 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 }
 
 group = 'org.bonitasoft.engine.platform'

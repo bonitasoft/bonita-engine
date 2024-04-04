@@ -1,3 +1,14 @@
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            library("lombok", "org.projectlombok:lombok:1.18.30")
+            library("snakeyaml", "org.yaml:snakeyaml:1.32")
+        }
+        testlibs {
+            from(files("gradle/testlibs.versions.toml"))
+        }
+    }
+}
 include(':bonita-engine')
 include(':platform:platform-resources')
 include(':platform:platform-setup')

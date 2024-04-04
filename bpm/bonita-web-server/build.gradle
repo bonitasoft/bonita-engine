@@ -16,7 +16,7 @@ dependencies {
     implementation "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
     implementation "commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}"
     implementation "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
-    implementation "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    implementation libs.commonsLang
     implementation "com.googlecode.json-simple:json-simple:${Deps.jsonSimpleVersion}"
     implementation "org.tuckey:urlrewritefilter:${Deps.urlrewriteVersion}"
     implementation "org.glassfish.web:jakarta.servlet.jsp.jstl:${Deps.jakartaJstlVersion}"
@@ -30,7 +30,7 @@ dependencies {
         exclude(group: "org.codehaus.woodstox", module: "stax2-api")
     }
     implementation "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
-    implementation "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
+    implementation libs.groovyCore
     implementation "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
     implementation "org.springframework:spring-core:${Deps.springVersion}"
     implementation "org.springframework:spring-context:${Deps.springVersion}"
@@ -39,8 +39,8 @@ dependencies {
     implementation "org.fedorahosted.tennera:jgettext:${Deps.jgettextVersion}"
     implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:${Deps.owaspHTMLSanitizerVersion}"
 
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 
     testImplementation(project(":bpm:bonita-server"))
     testImplementation "net.javacrumbs.json-unit:json-unit:${Deps.jsonUnitVersion}"

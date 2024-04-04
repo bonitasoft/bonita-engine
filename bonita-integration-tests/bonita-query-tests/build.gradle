@@ -3,7 +3,7 @@
 dependencies {
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
-    testImplementation "com.h2database:h2:${Deps.h2Version}"
+    testImplementation libs.h2
     testImplementation "org.springframework:spring-beans:${Deps.springVersion}"
     testImplementation "org.springframework:spring-tx:${Deps.springVersion}"
     testImplementation "org.springframework:spring-test:${Deps.springVersion}"

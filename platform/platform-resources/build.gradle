@@ -8,8 +8,8 @@ group = 'org.bonitasoft.platform'
 description = ''
 
 dependencies {
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
     api "org.springframework:spring-tx:${Deps.springVersion}"
     api "org.springframework:spring-jdbc:${Deps.springVersion}"
     api "org.springframework:spring-context:${Deps.springVersion}"

@@ -15,7 +15,7 @@ dependencyManagement {
             entry 'slf4j-api'
             entry 'slf4j-jdk14'
         }
-        dependency "com.h2database:h2:${Deps.h2Version}"
+        dependency libs.h2.get() as String
         dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
 
         dependencySet(group: 'org.springframework', version: Deps.springVersion) {
@@ -40,7 +40,7 @@ dependencyManagement {
         }
         dependency("commons-cli:commons-cli:${Deps.commonsCLIVersion}")
         dependency "commons-codec:commons-codec:${Deps.commonscodec}"
-        dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+        dependency libs.commonsLang.get() as String
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
         dependency "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"
         dependency "org.javassist:javassist:${Deps.javassistVersion}"
@@ -52,7 +52,7 @@ dependencyManagement {
         dependency "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
         dependency "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
         dependency "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
-        dependency "org.yaml:snakeyaml:${Deps.snakeyamlVersion}"
+        dependency libs.snakeyaml.get() as String
         dependency "org.mindrot:jbcrypt:${Deps.jbcryptVersion}"
         dependency("org.quartz-scheduler:quartz:${Deps.quartzVersion}")
         dependency "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"

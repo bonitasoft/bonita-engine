@@ -11,6 +11,6 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 }

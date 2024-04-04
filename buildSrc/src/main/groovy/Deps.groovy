@@ -10,18 +10,15 @@ class Deps {
     public static String commonsFileupload = "1.5"
     public static String commonsBeanutilsVersion = "1.9.4"
     public static String commonsCollections4Version = "4.4"
-    public static String commonsLangVersion = "3.11"
     public static String tomcatDbcpVersion = "9.0.83"
     public static String commonsCLIVersion = "1.4"
     public static String semver4jVersion = '3.1.0'
     public static String slf4jVersion = "1.7.36"
-    public static String h2Version = "1.4.199"
 
     // Attention, see PassingPropertiesJCacheRegionFactory javadoc if this version changes:
     public static String hibernateVersion = "5.4.32.Final"
 
     public static String jacksonBomVersion = "2.15.3"
-    public static String snakeyamlVersion = "1.32"
     public static String jakartaTransactionVersion = "1.3.3"
     public static String jakartaServletVersion = "4.0.4"
     // Keep this until all client projects have migrated to jakarta or it will break their builds !
@@ -42,7 +39,6 @@ class Deps {
     public static String mssqlVersion = "8.4.1.jre8"
     public static String oracleVersion = "19.3.0.0"
     public static String postgresqlVersion = "42.4.4"
-    public static String lombokVersion = "1.18.30"
 
     public static String narayanaVersion = "5.10.6.Final"
     public static String jaxbVersion = "2.3.1"

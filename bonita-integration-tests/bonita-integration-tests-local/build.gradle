@@ -14,8 +14,8 @@ dependencies {
     runtimeOnly "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     runtimeOnly "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    testImplementation "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testAnnotationProcessor libs.lombok
+    testImplementation libs.lombok
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"
 }
 

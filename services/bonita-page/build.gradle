@@ -13,6 +13,6 @@ dependencies {
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testImplementation testFixtures(project(':bpm:bonita-common'))
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 }

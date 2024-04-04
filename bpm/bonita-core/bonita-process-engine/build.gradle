@@ -63,33 +63,21 @@ dependencies {
     api "org.springframework:spring-context:${Deps.springVersion}"
     api "org.springframework.session:spring-session-core:${Deps.springSessionVersion}"
     api "org.springframework:spring-web:${Deps.springVersion}"
-    api "org.codehaus.groovy:groovy:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-servlet:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-xml:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-json:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-jmx:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-nio:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-groovysh:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-datetime:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-dateutil:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-docgenerator:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-jsr223:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-sql:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-templates:${Deps.groovyVersion}"
-    api "org.codehaus.groovy:groovy-yaml:${Deps.groovyVersion}"
+    api libs.bundles.groovy
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
 
     // Dependency on javax.annotations as it is not provided anymore in Java 11:
     api("javax.annotation:javax.annotation-api:${Deps.javaxAnnotationsVersion}")
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
     testImplementation "org.junit.jupiter:junit-jupiter-params:${Deps.junit5Version}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
-    testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testAnnotationProcessor libs.lombok
+
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"

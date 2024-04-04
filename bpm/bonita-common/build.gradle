@@ -18,8 +18,8 @@ dependencies {
     runtimeOnly "com.sun.activation:jakarta.activation"
 
     compileOnly project(':bpm:bonita-sap-jco-connector-api')
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 
     testImplementation project(':bpm:bonita-sap-jco-connector-api')
     testImplementation "junit:junit:${Deps.junit4Version}"

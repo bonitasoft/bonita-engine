@@ -9,6 +9,6 @@ dependencies {
     api project(':services:bonita-archive')
     api project(':services:bonita-persistence')
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    annotationProcessor libs.lombok
+    compileOnly libs.lombok
 }
