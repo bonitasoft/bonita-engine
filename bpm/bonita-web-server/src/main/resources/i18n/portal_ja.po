@@ -21,7 +21,7 @@ msgid "%attribute% file format is not allowed. Only %file_formats% files are all
 msgstr "%attribute% ファイルの形式は許可されていません。%file_formats%のファイルのみが許可されます。"
 
 msgid "%attribute% file format not allowed or not starting with correct servlet path"
-msgstr ""
+msgstr "%attribute% ファイル形式が許可されていないか、正しいサーブレット パスで始まっていません"
 
 msgid "%attribute% is mandatory"
 msgstr "%attribute%は必須です。"
