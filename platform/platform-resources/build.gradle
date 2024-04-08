@@ -10,11 +10,11 @@ description = ''
 dependencies {
     annotationProcessor libs.lombok
     compileOnly libs.lombok
-    api "org.springframework:spring-tx:${Deps.springVersion}"
-    api "org.springframework:spring-jdbc:${Deps.springVersion}"
-    api "org.springframework:spring-context:${Deps.springVersion}"
+    api libs.springTx
+    api libs.springJdbc
+    api libs.springContext
     api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api libs.commonsIO
 
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

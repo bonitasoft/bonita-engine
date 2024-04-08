@@ -9,7 +9,7 @@ dependencies {
     api project(':services:bonita-commons')
     api "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
     api "org.eclipse.jdt:ecj:${Deps.eclipseCompilerVersion}"
-    api "org.springframework:spring-core:${Deps.springVersion}"
+    api libs.springCore
     api "org.javassist:javassist:${Deps.javassistVersion}"
     api project(':bpm:bonita-common')
     api libs.commonsLang

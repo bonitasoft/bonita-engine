@@ -14,13 +14,13 @@ configurations {
 dependencies {
     api "org.apache.commons:commons-text:1.10.0"
     api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    api(group: 'org.springframework.boot', name: 'spring-boot-starter', version: Deps.springBootVersion) {
+    api(libs.springBootStarter) {
         exclude(module: 'jul-to-slf4j')
         exclude(module: 'log4j-to-slf4j')
         exclude(module: 'snakeyaml')
     }
     api libs.snakeyaml
-    api "org.springframework.boot:spring-boot-starter-jdbc:${Deps.springBootVersion}"
+    api libs.springBootStarterJdbc
     api "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     api ("com.mysql:mysql-connector-j:${Deps.mysqlVersion}") {
         exclude(module: 'protobuf-java')
@@ -44,7 +44,7 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testImplementation(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) {
+    testImplementation(libs.springBootStarterTest) {
         exclude(module: 'json-path')
     }
     testImplementation "xmlunit:xmlunit:${Deps.xmlunitVersion}"

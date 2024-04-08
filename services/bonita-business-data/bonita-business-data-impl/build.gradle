@@ -22,8 +22,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testImplementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
-    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
-    testImplementation "org.springframework:spring-jdbc:${Deps.springVersion}"
+    testImplementation libs.springTest
+    testImplementation libs.springJdbc
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testRuntimeOnly "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
     testRuntimeOnly libs.h2

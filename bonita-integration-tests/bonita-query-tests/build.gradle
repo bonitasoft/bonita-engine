@@ -4,13 +4,13 @@ dependencies {
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation libs.h2
-    testImplementation "org.springframework:spring-beans:${Deps.springVersion}"
-    testImplementation "org.springframework:spring-tx:${Deps.springVersion}"
-    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
-    testImplementation 'org.springframework:spring-orm:4.3.16.RELEASE'
-    testImplementation "org.springframework:spring-jdbc:${Deps.springVersion}"
-    testImplementation 'jakarta.inject:jakarta.inject-api:1.0.5'
-    testImplementation project(':bpm:bonita-server')
-    testImplementation project(':bpm:bonita-common')
+    testImplementation libs.springBeans
+    testImplementation libs.springTx
+    testImplementation libs.springTest
+    testImplementation libs.springJdbc
+    testImplementation "org.springframework:spring-orm:4.3.16.RELEASE"
+    testImplementation "jakarta.inject:jakarta.inject-api:1.0.5"
+    testImplementation project(":bpm:bonita-server")
+    testImplementation project(":bpm:bonita-common")
 
 }

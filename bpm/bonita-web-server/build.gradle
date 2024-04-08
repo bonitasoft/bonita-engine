@@ -10,11 +10,11 @@ repositories {
 dependencies {
     implementation(project(":bpm:bonita-common"))
     implementation(project(":bpm:bonita-web-extensions"))
-    implementation "commons-io:commons-io:${Deps.commonsIOVersion}"
+    implementation libs.commonsIO
     implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     implementation "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
-    implementation "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
-    implementation "commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}"
+    implementation libs.commonsFileUpload
+    implementation libs.commonsBeanUtils
     implementation "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
     implementation libs.commonsLang
     implementation "com.googlecode.json-simple:json-simple:${Deps.jsonSimpleVersion}"
@@ -32,10 +32,10 @@ dependencies {
     implementation "com.fasterxml.woodstox:woodstox-core:${Deps.woodstoxCoreVersion}"
     implementation libs.groovyCore
     implementation "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
-    implementation "org.springframework:spring-core:${Deps.springVersion}"
-    implementation "org.springframework:spring-context:${Deps.springVersion}"
-    implementation "org.springframework:spring-web:${Deps.springVersion}"
-    implementation "org.springframework:spring-webmvc:${Deps.springVersion}"
+    implementation libs.springCore
+    implementation libs.springContext
+    implementation libs.springWeb
+    implementation libs.springWebMvc
     implementation "org.fedorahosted.tennera:jgettext:${Deps.jgettextVersion}"
     implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:${Deps.owaspHTMLSanitizerVersion}"
 
@@ -46,7 +46,7 @@ dependencies {
     testImplementation "net.javacrumbs.json-unit:json-unit:${Deps.jsonUnitVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
+    testImplementation libs.springTest
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"

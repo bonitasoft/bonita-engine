@@ -4,7 +4,7 @@ dependencies {
     api "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
     api project(':services:bonita-commons')
     api project(':services:bonita-session')
-    api "org.springframework:spring-context:${Deps.springVersion}"
+    api libs.springContext
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "ch.qos.logback:logback-classic:${Deps.logbackVersion}"

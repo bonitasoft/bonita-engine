@@ -2,10 +2,33 @@
 # The groovy version must be in synch with the runtime-bom artifact:
 groovyVersion = "3.0.19"
 springVersion = "5.3.32"
+springSessionVersion = "2.7.4"
 springBootVersion = "2.7.18"
 commonsLangVersion = "3.11"
+junit5Version = "5.6.3"
+bonitaArtifactsModelVersion = "1.0.0"
+commonsIOVersion = "2.8.0"
+commonsFileUploadVersion = "1.5"
+commonsBeanutilsVersion = "1.9.4"
 
 [libraries]
+springCore = { module = "org.springframework:spring-core", version.ref = "springVersion" }
+springBeans = { module = "org.springframework:spring-beans", version.ref = "springVersion" }
+springContext = { module = "org.springframework:spring-context", version.ref = "springVersion" }
+springTx = { module = "org.springframework:spring-tx", version.ref = "springVersion" }
+springJdbc = { module = "org.springframework:spring-jdbc", version.ref = "springVersion" }
+springWebMvc = { module = "org.springframework:spring-webmvc", version.ref = "springVersion" }
+springWeb = { module = "org.springframework:spring-web", version.ref = "springVersion" }
+springSessionCore = { module = "org.springframework.session:spring-session-core", version.ref = "springSessionVersion" }
+springSessionHazelcast = { module = "org.springframework.session:spring-session-hazelcast", version.ref = "springSessionVersion" }
+
+springBootAutoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "springBootVersion" }
+springBootConfigurationProcessor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "springBootVersion" }
+springBootTest = { module = "org.springframework.boot:spring-boot-test", version.ref = "springBootVersion" }
+springBootStarter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "springBootVersion" }
+springBootStarterJdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "springBootVersion" }
+springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBootVersion" }
+
 groovyCore = { module = "org.codehaus.groovy:groovy", version.ref = "groovyVersion" }
 groovyServlet = { module = "org.codehaus.groovy:groovy-servlet", version.ref = "groovyVersion" }
 groovyXml = { module = "org.codehaus.groovy:groovy-xml", version.ref = "groovyVersion" }
@@ -21,13 +44,42 @@ groovySql = { module = "org.codehaus.groovy:groovy-sql", version.ref = "groovyVe
 groovyTemplates = { module = "org.codehaus.groovy:groovy-templates", version.ref = "groovyVersion" }
 groovyYaml = { module = "org.codehaus.groovy:groovy-yaml", version.ref = "groovyVersion" }
 
-h2 = "com.h2database:h2:1.4.199"
+
+bonitaArtifactsModelBom = { module = "org.bonitasoft.engine:bonita-artifacts-model-dependencies", version.ref = "bonitaArtifactsModelVersion" }
+
+bonitaCommonArtifactsModel =  { module = "org.bonitasoft.engine:bonita-common-artifacts-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaBusinessArchiveModel =  { module = "org.bonitasoft.engine:bonita-business-archive", version.ref = "bonitaArtifactsModelVersion" }
+bonitaProcessDefinitionModel =  { module = "org.bonitasoft.engine:bonita-process-definition-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaFormMappingModel =  { module = "org.bonitasoft.engine:bonita-form-mapping-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaBusinessObjectModel =  { module = "org.bonitasoft.engine:bonita-business-object-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaBdmAccessControlModel =  { module = "org.bonitasoft.engine:bonita-bdm-access-control-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaProfileModel =  { module = "org.bonitasoft.engine:bonita-profile-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaOrganizationModel =  { module = "org.bonitasoft.engine:bonita-organization-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaApplicationModel =  { module = "org.bonitasoft.engine:bonita-application-model", version.ref = "bonitaArtifactsModelVersion" }
+bonitaConnectorModel =  { module = "org.bonitasoft.engine:bonita-connector-model", version.ref = "bonitaArtifactsModelVersion" }
 
 commonsLang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLangVersion" }
+snakeyaml = "org.yaml:snakeyaml:1.32"
+commonsIO = { group = "commons-io", name = "commons-io", version.ref = "commonsIOVersion" }
+commonsFileUpload = { group = "commons-fileupload", name = "commons-fileupload", version.ref = "commonsFileUploadVersion" }
+commonsBeanUtils = { group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutilsVersion" }
+
+h2 = "com.h2database:h2:1.4.199"
+
+lombok = "org.projectlombok:lombok:1.18.30"
+
+junit5api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5Version" }
+junitJupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5Version" }
+junitVintageEngine = { group = "org.junit.vintage", name = "junit-vintage-engine", version.ref = "junit5Version" }
+junit4 = "junit:junit:4.13.2"
+springTest = { module = "org.springframework:spring-test", version.ref = "springVersion" }
+
 
 [bundles]
 groovy = ["groovyCore", "groovyServlet", "groovyXml", "groovyJson", "groovyJmx", "groovyNio", "groovyGroovysh", "groovyDatetime",
     "groovyDateutil", "groovyDocgenerator", "groovyJsr223", "groovySql", "groovyTemplates", "groovyYaml"]
 
 [plugins]
-dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.51.0" }
+bonitaFormatting = { id = "com.bonitasoft.gradle.bonita-formatting", version = "0.1.63" }
+dependencyUpdates = { id = "com.github.ben-manes.versions", version = "0.51.0" } # used by "List out-of-date dependencies" script
+taskInfo = { id = "org.barfuin.gradle.taskinfo", version = "2.2.0" } # Adds a 'tiTree' task to display Gradle task-graph

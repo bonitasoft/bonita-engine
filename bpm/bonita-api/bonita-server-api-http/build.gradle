@@ -5,18 +5,18 @@ dependencies {
     api project(':services:bonita-session')
     api project(':bpm:bonita-common')
     api "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
-    api "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
-    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
+    api libs.commonsFileUpload
+    api libs.commonsIO
+    testImplementation libs.springTest
+    testImplementation libs.junit5api
+    testRuntimeOnly libs.junitJupiterEngine
+    testImplementation libs.junit4
+    testRuntimeOnly libs.junitVintageEngine
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
-    testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testRuntimeOnly "org.springframework:spring-webmvc:${Deps.springVersion}"
+    testRuntimeOnly libs.springWebMvc
     compileOnly "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
     testImplementation "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
 }

@@ -4,7 +4,7 @@ apply plugin: 'java-test-fixtures'
 
 dependencies {
     api platform("com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}")
-    api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
+    api platform(libs.bonitaArtifactsModelBom)
 
     api "org.bonitasoft.engine:bonita-business-archive"
     api "org.bonitasoft.engine:bonita-business-object-model"

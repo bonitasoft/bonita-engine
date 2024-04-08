@@ -6,7 +6,7 @@ plugins {
 dependencies {
     api project(':bonita-test-api')
     api "junit:junit:${Deps.junit4Version}"
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api libs.commonsIO
     api project(':bpm:bonita-common')
     api project(':bpm:bonita-client')
     api project(':bonita-integration-tests:bonita-test-utils')

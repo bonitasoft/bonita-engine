@@ -1,16 +1,16 @@
 import org.bonitasoft.engine.gradle.PomUtils
 
 dependencies {
-    api(group: 'commons-beanutils', name: 'commons-beanutils', version: Deps.commonsBeanutilsVersion) {
+    api(libs.commonsBeanUtils) {
         exclude(module: 'commons-collections')
     }
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api libs.commonsIO
     api "com.sun.activation:jakarta.activation:${Deps.activationVersion}"
     api libs.commonsLang
     api(group: 'com.thoughtworks.xstream', name: 'xstream', version: Deps.xstreamVersion)
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
-    api "org.springframework:spring-context:${Deps.springVersion}"
-    api "org.springframework.boot:spring-boot-autoconfigure:${Deps.springBootVersion}"
+    api libs.springContext
+    api libs.springBootAutoconfigure
     api "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"

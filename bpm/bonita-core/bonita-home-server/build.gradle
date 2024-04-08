@@ -2,7 +2,7 @@
 dependencies {
     api project(':services:bonita-commons')
     api project(':bpm:bonita-common')
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api libs.commonsIO
     api project(':platform:platform-resources')
     testImplementation "junit:junit:${Deps.junit4Version}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

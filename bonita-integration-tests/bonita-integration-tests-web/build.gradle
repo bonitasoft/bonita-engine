@@ -10,9 +10,9 @@ dependencies {
     implementation project(':bpm:bonita-web-server')
     implementation project(':bonita-test-api')
     implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    implementation "commons-io:commons-io:${Deps.commonsIOVersion}"
+    implementation libs.commonsIO
     implementation "jakarta.servlet:jakarta.servlet-api:${Deps.jakartaServletVersion}"
-    implementation "org.springframework:spring-test:${Deps.springVersion}"
+    implementation libs.springTest
     testImplementation "org.hamcrest:hamcrest:${Deps.hamcrestVersion}"
     testImplementation "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testImplementation "org.assertj:assertj-core:${Deps.assertjVersion}"

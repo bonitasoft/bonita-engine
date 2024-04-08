@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
+    api platform(libs.bonitaArtifactsModelBom)
 
     api "com.vdurmont:semver4j:${Deps.semver4jVersion}"
     api "org.bonitasoft.engine:bonita-organization-model"
@@ -59,10 +59,10 @@ dependencies {
     api project(':services:bonita-temporary-content')
     api "com.fasterxml.jackson.core:jackson-databind"
     api project(':platform:platform-resources')
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
-    api "org.springframework:spring-context:${Deps.springVersion}"
-    api "org.springframework.session:spring-session-core:${Deps.springSessionVersion}"
-    api "org.springframework:spring-web:${Deps.springVersion}"
+    api libs.commonsIO
+    api libs.springContext
+    api libs.springSessionCore
+    api libs.springWeb
     api libs.bundles.groovy
     api "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
 
@@ -83,7 +83,7 @@ dependencies {
     testImplementation "org.mockito:mockito-junit-jupiter:${Deps.mockitoVersion}"
     testImplementation "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"      // works with Junit4
     testImplementation "com.github.stefanbirkner:system-lambda:${Deps.systemLambdaVersion}"    // works with Junit5
-    testImplementation "org.springframework:spring-test:${Deps.springVersion}"
+    testImplementation libs.springTest
     compileOnly project(':bpm:bonita-common')
     testImplementation testFixtures(project(':bpm:bonita-common'))
     testImplementation "org.awaitility:awaitility:${Deps.awaitilityVersion}"

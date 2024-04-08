@@ -11,7 +11,7 @@ dependencies {
     implementation(project(":bpm:bonita-server"))
     implementation(project(':platform:platform-resources'))
 
-    implementation "org.springframework:spring-context:${Deps.springVersion}"
+    implementation libs.springContext
     implementation "org.jboss.narayana.jta:narayana-jta:${Deps.narayanaVersion}"
     implementation "org.apache.tomcat:tomcat-dbcp:${Deps.tomcatDbcpVersion}"
     implementation "org.slf4j:slf4j-api:${Deps.slf4jVersion}"

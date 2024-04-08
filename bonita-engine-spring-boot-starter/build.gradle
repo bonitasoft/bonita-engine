@@ -9,7 +9,7 @@ dependencies {
     api(project(":bpm:bonita-common"))
     api(project(":bpm:bonita-client"))
 
-    api("org.springframework.boot:spring-boot-starter:${Deps.springBootVersion}") {
+    api(libs.springBootStarter) {
         exclude(module: 'snakeyaml')
     }
     api(libs.snakeyaml)
@@ -17,9 +17,9 @@ dependencies {
     implementation(project(":bonita-engine-standalone"))
     implementation(project(":bpm:bonita-server"))
 
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${Deps.springBootVersion}")
+    annotationProcessor(libs.springBootConfigurationProcessor)
 
-    testImplementation("org.springframework.boot:spring-boot-test:${Deps.springBootVersion}")
+    testImplementation(libs.springBootTest)
     testImplementation("junit:junit:${Deps.junit4Version}")
     testImplementation("org.assertj:assertj-core:${Deps.assertjVersion}")
 }

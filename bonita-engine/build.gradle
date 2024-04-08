@@ -9,7 +9,7 @@ dependencyManagement {
         imports {
             mavenBom "com.fasterxml.jackson:jackson-bom:${Deps.jacksonBomVersion}"
             mavenBom "org.codehaus.groovy:groovy-bom:${Deps.groovyVersion}"
-            mavenBom "org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}"
+            mavenBom libs.bonitaArtifactsModelBom.get() as String
         }
         dependencySet(group: 'org.slf4j', version: Deps.slf4jVersion) {
             entry 'slf4j-api'
@@ -18,12 +18,12 @@ dependencyManagement {
         dependency libs.h2.get() as String
         dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
 
-        dependencySet(group: 'org.springframework', version: Deps.springVersion) {
+        dependencySet(group: 'org.springframework', version: libs.versions.springVersion.get()) {
             entry 'spring-context'
             entry 'spring-core'
             entry 'spring-web'
         }
-        dependencySet(group: "org.springframework.boot", version: Deps.springBootVersion) {
+        dependencySet(group: "org.springframework.boot", version: libs.versions.springBootVersion.get()) {
             entry "spring-boot-starter-jdbc"
             entry "spring-boot-autoconfigure"
         }
@@ -33,13 +33,12 @@ dependencyManagement {
         dependency "org.hibernate:hibernate-jcache:${Deps.hibernateVersion}"
         dependency("javax.cache:cache-api:${Deps.jcacheVersion}")
         dependency "javax.persistence:javax.persistence-api:${Deps.javaxPersistenceApiVersion}"
-        dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
-        dependency "commons-fileupload:commons-fileupload:${Deps.commonsFileupload}"
-        dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") {
+        dependency libs.commonsIO.get() as String
+        dependency libs.commonsFileUpload.get() as String
+        dependency(libs.commonsBeanUtils.get() as String) {
             exclude 'commons-collections:commons-collections'
         }
         dependency("commons-cli:commons-cli:${Deps.commonsCLIVersion}")
-        dependency "commons-codec:commons-codec:${Deps.commonscodec}"
         dependency libs.commonsLang.get() as String
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
         dependency "jakarta.transaction:jakarta.transaction-api:${Deps.jakartaTransactionVersion}"

@@ -1,5 +1,5 @@
 dependencies {
-    api platform("org.bonitasoft.engine:bonita-artifacts-model-dependencies:${Deps.bonitaArtifactsModelVersion}")
+    api platform(libs.bonitaArtifactsModelBom)
 
     api project(':bpm:bonita-common')
     api project(':bpm:bonita-core:bonita-process-definition')

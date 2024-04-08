@@ -1,5 +1,5 @@
 dependencies {
-    api "commons-io:commons-io:${Deps.commonsIOVersion}"
+    api libs.commonsIO
     api project(':bonita-engine-standalone')
     api "junit:junit:${Deps.junit4Version}"
     api(project(':platform:platform-resources'))
