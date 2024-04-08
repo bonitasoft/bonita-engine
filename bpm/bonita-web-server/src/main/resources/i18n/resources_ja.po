@@ -28,20 +28,20 @@ msgstr "実行"
 msgid "Expecting a {} value."
 msgstr "{} の値を期待しています。"
 
-msgid "no description defined in contract for this input"
-msgstr "この入力項目のコントラクトには、説明が定義されていません"
-
 msgid "Not a valid number!"
 msgstr "有効な数値ではないです"
-
-msgid "remove"
-msgstr "削除"
 
 msgid "Select a file"
 msgstr "ファイルを選択します。"
 
 msgid "Start"
 msgstr "開始"
+
+msgid "no description defined in contract for this input"
+msgstr "この入力項目のコントラクトには、説明が定義されていません"
+
+msgid "remove"
+msgstr "削除"
 
 msgid "this is a temporary form generated automatically for testing. Before you put your process into production, create and map the necessary forms."
 msgstr "これはテスト用に自動生成された一時的なフォームです。本番環境にプロセスを移行する前に必要なフォームを作成し、マップしてください。"

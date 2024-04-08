@@ -28,20 +28,20 @@ msgstr "Executar"
 msgid "Expecting a {} value."
 msgstr "Um valor {} é esperado."
 
-msgid "no description defined in contract for this input"
-msgstr "nenhuma descrição definida no contrato para esta entrada"
-
 msgid "Not a valid number!"
 msgstr "Não é um número válido!"
-
-msgid "remove"
-msgstr "remover"
 
 msgid "Select a file"
 msgstr "Selecione um arquivo"
 
 msgid "Start"
 msgstr "Iniciar"
+
+msgid "no description defined in contract for this input"
+msgstr "nenhuma descrição definida no contrato para esta entrada"
+
+msgid "remove"
+msgstr "remover"
 
 msgid "this is a temporary form generated automatically for testing. Before you put your process into production, create and map the necessary forms."
 msgstr "este é um formulário temporário gerado automaticamente para teste. Antes de colocar o processo em produção, crie e mapeie os formulários necessários."
