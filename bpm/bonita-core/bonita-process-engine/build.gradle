@@ -78,6 +78,7 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
+    testCompile "org.junit.jupiter:junit-jupiter-params:${Deps.junit5Version}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${Deps.junit5Version}"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${Deps.junit5Version}"
     testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
