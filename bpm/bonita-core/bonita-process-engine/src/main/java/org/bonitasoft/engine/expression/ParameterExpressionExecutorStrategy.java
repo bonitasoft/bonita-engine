@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.lang.model.SourceVersion;
+
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -93,14 +95,11 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         super.validate(expression);
-        // $ can be part of variable name
-        if (!expression.getContent().matches("(^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]*")) {
+        if (!SourceVersion.isIdentifier(expression.getContent()) || SourceVersion.isKeyword(expression.getContent())) {
             throw new SInvalidExpressionException(
-                    "The expression content does not matches with (^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]* in expression: "
-                            + expression,
+                    expression.getContent() + " is not a valid parameter name in expression : " + expression,
                     expression.getName());
         }
-
     }
 
     @Override
